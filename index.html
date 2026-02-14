@@ -1,15 +1,238 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Aedin Lai</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aedin Lai</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Outfit',sans-serif;
+background:white;
+color:black;
+overflow-x:hidden;
+}
+
+/* ---------- FLOAT NAV BAR ---------- */
+
+.top-bar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:70px;
+display:flex;
+justify-content:center;
+align-items:center;
+border-bottom:2px solid black;
+background:white;
+transform:translateY(-100%);
+opacity:0;
+transition:all 0.5s ease;
+z-index:100;
+}
+
+.top-bar.show{
+transform:translateY(0);
+opacity:1;
+}
+
+.top-bar h3{
+font-family:'Playfair Display',serif;
+font-size:1.8rem;
+letter-spacing:1px;
+}
+
+/* ---------- HERO ---------- */
+
+header{
+height:80vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+transition:transform 0.4s ease;
+transform-origin:center;
+}
+
+h1{
+font-family:'Playfair Display',serif;
+font-size:clamp(4rem,9vw,7rem);
+font-weight:800;
+letter-spacing:2px;
+margin-bottom:10px;
+}
+
+h2{
+font-size:clamp(1.2rem,2.5vw,1.8rem);
+font-weight:300;
+display:flex;
+gap:2px;
+}
+
+/* ---------- LETTER WAVE ---------- */
+
+.wave-letter{
+display:inline-block;
+animation:driftWave 4s ease-in-out infinite both;
+animation-play-state: paused;
+}
+
+#waveText .wave-letter{
+animation-play-state: running;
+}
+
+.btn:hover .wave-letter{
+animation-play-state: running;
+}
+
+@keyframes driftWave{
+0%{transform:translateY(0px);}
+50%{transform:translateY(-3px);}
+100%{transform:translateY(0px);}
+}
+
+/* ---------- BUTTON SECTION ---------- */
+
+.button-section{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:60px 5vw;
+}
+
+.grid{
+width:100%;
+max-width:1400px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:40px;
+}
+
+.btn{
+border:2px solid black;
+border-radius:20px;
+padding:45px 30px;
+font-size:2rem;
+font-weight:600;
+text-decoration:none;
+color:black;
+display:flex;
+justify-content:center;
+align-items:center;
+transition:all 0.4s ease;
+}
+
+.btn span{
+display:inline-block;
+}
+
+.btn:hover{
+transform:scale(1.06);
+box-shadow:0 0 25px rgba(0,0,0,0.4);
+}
+
+/* ---------- RESPONSIVE ---------- */
+
+@media(max-width:900px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+
+</style>
 </head>
 
 <body>
 
-<h1>Aedin Lai</h1>
-<p>Welcome to my website all</p>
+<!-- TOP FLOAT BAR -->
+<div class="top-bar" id="topBar">
+<h3>Aedin Lai</h3>
+</div>
 
-<script src="script.js"></script>
+<header id="hero">
+<h1>Aedin Lai</h1>
+<h2 id="waveText">Welcome to my website</h2>
+</header>
+
+<section class="button-section">
+<div class="grid">
+<a class="btn" href="#"><span class="btnText">Resume</span></a>
+<a class="btn" href="#"><span class="btnText">Project Portfolio</span></a>
+<a class="btn" href="#"><span class="btnText">About Me</span></a>
+<a class="btn" href="#"><span class="btnText">Contact Me</span></a>
+<a class="btn" href="#"><span class="btnText">More</span></a>
+</div>
+</section>
+
+<script>
+
+/* ---------- HEADER SHRINK ---------- */
+
+const hero = document.getElementById('hero');
+const topBar = document.getElementById('topBar');
+
+window.addEventListener('scroll', () => {
+
+let scale = Math.max(0.65, 1 - window.scrollY / 900);
+hero.style.transform = `scale(${scale})`;
+
+/* Show top bar after hero leaves */
+if(window.scrollY > hero.offsetHeight * 0.6){
+topBar.classList.add("show");
+}else{
+topBar.classList.remove("show");
+}
+
+});
+
+/* ---------- LETTER SPLIT ---------- */
+
+function applyWave(element){
+
+const words = element.innerText.split(" ");
+element.innerHTML = "";
+
+words.forEach(word=>{
+
+const wordSpan = document.createElement("span");
+wordSpan.style.marginRight="8px";
+
+[...word].forEach((letter,index)=>{
+
+const span = document.createElement("span");
+span.textContent = letter;
+span.classList.add("wave-letter");
+span.style.animationDelay = `${index * 0.3}s`;
+
+wordSpan.appendChild(span);
+});
+
+element.appendChild(wordSpan);
+});
+
+}
+
+applyWave(document.getElementById("waveText"));
+
+document.querySelectorAll(".btnText").forEach(el=>{
+applyWave(el);
+});
+
+</script>
+
 </body>
 </html>
+
+
