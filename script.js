@@ -25,7 +25,7 @@ const strength = 15;         // warp strength
 
 function drawGrid(){
     ctx.clearRect(0,0,width,height);
-    ctx.strokeStyle = "rgba(0,0,0,0.08)";
+    ctx.strokeStyle = "rgba(0,0,0,0.8)";
     ctx.lineWidth = 1;
 
     for(let x = 0; x <= width; x += spacing){
