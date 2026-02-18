@@ -72,7 +72,7 @@ window.addEventListener("mousemove", e => {
 });
 
 const spacing = 40;
-const influenceRadius = 150;
+const influenceRadius = 90;
 
 function drawGrid(){
 
