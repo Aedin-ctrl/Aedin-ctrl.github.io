@@ -5,25 +5,34 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Aedin Lai</title>
 
-<link rel="stylesheet" href="style.css">
-
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<canvas id="bgGrid"></canvas>
+<div class="scroll-progress"></div>
+
+<canvas id="gridCanvas"></canvas>
 
 <div class="top-bar" id="topBar">
 <h3>Aedin Lai</h3>
 </div>
 
-<header id="hero">
+<header id="hero" class="fade-in">
 <h1>Aedin Lai</h1>
 <h2 id="waveText">Welcome To My Website</h2>
 </header>
 
-<section class="button-section">
+<section class="marquee">
+<div class="marquee-track">
+HTML • CSS • JavaScript • UI/UX • Creative Coding • Design • Portfolio •
+</div>
+</section>
+
+<section class="button-section fade-in">
+<div class="background-word">PORTFOLIO</div>
+
 <div class="grid">
 <a class="btn" href="#"><span class="btnText">Resume</span></a>
 <a class="btn" href="#"><span class="btnText">Project Portfolio</span></a>
