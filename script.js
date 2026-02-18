@@ -94,7 +94,7 @@ function drawGrid(){
 
             if(dist < influenceRadius){
                 let force = 1 - (dist / influenceRadius);
-                offsetX = dx * force * 0.15;
+                offsetX = -dx * force * 0.15;
             }
 
             ctx.lineTo(x + offsetX, y);
@@ -117,7 +117,7 @@ function drawGrid(){
 
             if(dist < influenceRadius){
                 let force = 1 - (dist / influenceRadius);
-                offsetY = dy * force * 0.15;
+                offsetY = -dy * force * 0.15;
             }
 
             ctx.lineTo(x, y + offsetY);
