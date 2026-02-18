@@ -1,132 +1,123 @@
 console.log("Website Loaded");
 
-/* ---------- HEADER SHRINK ---------- */
+/* HEADER SHRINK + TOP BAR */
 
 const hero = document.getElementById('hero');
 const topBar = document.getElementById('topBar');
+const progressBar = document.querySelector('.scroll-progress');
 
 window.addEventListener('scroll', () => {
 
-    let scale = Math.max(0.65, 1 - window.scrollY / 900);
-    hero.style.transform = `scale(${scale})`;
+let scale = Math.max(0.7, 1 - window.scrollY / 900);
+hero.style.transform = `scale(${scale})`;
 
-    if(window.scrollY > hero.offsetHeight * 0.6){
-        topBar.classList.add("show");
-    } else {
-        topBar.classList.remove("show");
-    }
-
-});
-
-/* ---------- LETTER SPLIT ---------- */
-
-function applyWave(element){
-
-    const words = element.innerText.split(" ");
-    element.innerHTML = "";
-
-    words.forEach(word => {
-
-        const wordSpan = document.createElement("span");
-        wordSpan.style.marginRight = "8px";
-
-        [...word].forEach((letter,index) => {
-
-            const span = document.createElement("span");
-            span.textContent = letter;
-            span.classList.add("wave-letter");
-            span.style.animationDelay = `${index * 0.3}s`;
-
-            wordSpan.appendChild(span);
-        });
-
-        element.appendChild(wordSpan);
-    });
+if(window.scrollY > hero.offsetHeight * 0.6){
+topBar.classList.add("show");
+}else{
+topBar.classList.remove("show");
 }
 
-applyWave(document.getElementById("waveText"));
-
-document.querySelectorAll(".btnText").forEach(el=>{
-    applyWave(el);
+let scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+progressBar.style.width = scrollPercent + "%";
 });
 
+/* FADE IN */
 
-/* ---------- WARP GRID BACKGROUND ---------- */
+const faders = document.querySelectorAll(".fade-in");
 
-const canvas = document.getElementById("bgGrid");
+const observer = new IntersectionObserver(entries=>{
+entries.forEach(entry=>{
+if(entry.isIntersecting){
+entry.target.classList.add("visible");
+}
+});
+},{threshold:0.2});
+
+faders.forEach(el=>observer.observe(el));
+
+/* MAGNETIC BUTTONS */
+
+document.querySelectorAll(".btn").forEach(btn=>{
+btn.addEventListener("mousemove",(e)=>{
+const rect = btn.getBoundingClientRect();
+const x = e.clientX - rect.left - rect.width/2;
+const y = e.clientY - rect.top - rect.height/2;
+btn.style.transform = `translate(${x*0.2}px, ${y*0.2}px)`;
+});
+btn.addEventListener("mouseleave",()=>{
+btn.style.transform = "translate(0,0)";
+});
+});
+
+/* WARP GRID */
+
+const canvas = document.getElementById("gridCanvas");
 const ctx = canvas.getContext("2d");
 
-let width, height;
-let mouse = { x: -9999, y: -9999 }; // start off-screen so it doesn't glitch
+let mouse = {x:null,y:null};
+const spacing = 40;
+const influenceRadius = 80;
 
-function resize(){
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
+function resizeCanvas(){
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 }
-resize();
-window.addEventListener("resize", resize);
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
-window.addEventListener("mousemove", e => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
+window.addEventListener("mousemove",(e)=>{
+mouse.x = e.clientX;
+mouse.y = e.clientY;
 });
 
-const spacing = 40;
-const influenceRadius = 90;
-
 function drawGrid(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.strokeStyle = "rgba(0,0,0,0.15)";
+ctx.lineWidth = 1;
 
-    ctx.clearRect(0,0,width,height);
-    ctx.strokeStyle = "rgba(0,0,0,0.25)"; // visible for testing
-    ctx.lineWidth = 1;
+for(let x=0;x<canvas.width;x+=spacing){
+ctx.beginPath();
+for(let y=0;y<canvas.height;y+=spacing){
+let dx = x - mouse.x;
+let dy = y - mouse.y;
+let dist = Math.sqrt(dx*dx+dy*dy);
 
-    // vertical lines
-    for(let x = 0; x <= width; x += spacing){
-        ctx.beginPath();
+let offsetX=0;
+let offsetY=0;
 
-        for(let y = 0; y <= height; y += 10){
+if(dist<influenceRadius){
+let force = (influenceRadius-dist)/influenceRadius;
+offsetX = -dx * force * 0.08;
+offsetY = -dy * force * 0.08;
+}
 
-            let dx = x - mouse.x;
-            let dy = y - mouse.y;
-            let dist = Math.sqrt(dx*dx + dy*dy);
+ctx.lineTo(x+offsetX,y+offsetY);
+}
+ctx.stroke();
+}
 
-            let offsetX = 0;
+for(let y=0;y<canvas.height;y+=spacing){
+ctx.beginPath();
+for(let x=0;x<canvas.width;x+=spacing){
+let dx = x - mouse.x;
+let dy = y - mouse.y;
+let dist = Math.sqrt(dx*dx+dy*dy);
 
-            if(dist < influenceRadius){
-                let force = 1 - (dist / influenceRadius);
-                offsetX = -dx * force * 0.15;
-            }
+let offsetX=0;
+let offsetY=0;
 
-            ctx.lineTo(x + offsetX, y);
-        }
+if(dist<influenceRadius){
+let force = (influenceRadius-dist)/influenceRadius;
+offsetX = -dx * force * 0.08;
+offsetY = -dy * force * 0.08;
+}
 
-        ctx.stroke();
-    }
+ctx.lineTo(x+offsetX,y+offsetY);
+}
+ctx.stroke();
+}
 
-    // horizontal lines
-    for(let y = 0; y <= height; y += spacing){
-        ctx.beginPath();
-
-        for(let x = 0; x <= width; x += 10){
-
-            let dx = x - mouse.x;
-            let dy = y - mouse.y;
-            let dist = Math.sqrt(dx*dx + dy*dy);
-
-            let offsetY = 0;
-
-            if(dist < influenceRadius){
-                let force = 1 - (dist / influenceRadius);
-                offsetY = -dy * force * 0.15;
-            }
-
-            ctx.lineTo(x, y + offsetY);
-        }
-
-        ctx.stroke();
-    }
-
-    requestAnimationFrame(drawGrid);
+requestAnimationFrame(drawGrid);
 }
 
 drawGrid();
