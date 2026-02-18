@@ -1,123 +1,194 @@
-console.log("Website Loaded");
-
-/* HEADER SHRINK + TOP BAR */
-
-const hero = document.getElementById('hero');
-const topBar = document.getElementById('topBar');
-const progressBar = document.querySelector('.scroll-progress');
-
-window.addEventListener('scroll', () => {
-
-let scale = Math.max(0.7, 1 - window.scrollY / 900);
-hero.style.transform = `scale(${scale})`;
-
-if(window.scrollY > hero.offsetHeight * 0.6){
-topBar.classList.add("show");
-}else{
-topBar.classList.remove("show");
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
 }
 
-let scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-progressBar.style.width = scrollPercent + "%";
-});
+body{
+font-family:'Outfit',sans-serif;
+background: linear-gradient(120deg, #ffffff, #f4f4f4, #ffffff);
+background-size: 200% 200%;
+animation: gradientMove 18s ease infinite;
+color:black;
+overflow-x:hidden;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* SCROLL PROGRESS */
+
+.scroll-progress{
+position:fixed;
+top:0;
+left:0;
+height:4px;
+background:black;
+width:0%;
+z-index:999;
+}
+
+/* GRID CANVAS */
+
+#gridCanvas{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-2;
+}
+
+/* FLOAT BLOBS */
+
+body::before{
+content:"";
+position:fixed;
+width:600px;
+height:600px;
+background:radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
+top:-200px;
+right:-200px;
+z-index:-1;
+}
+
+/* TOP BAR */
+
+.top-bar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:70px;
+display:flex;
+justify-content:center;
+align-items:center;
+border-bottom:1px solid rgba(0,0,0,0.1);
+background:white;
+transform:translateY(-100%);
+opacity:0;
+transition:all 0.5s ease;
+z-index:100;
+}
+
+.top-bar.show{
+transform:translateY(0);
+opacity:1;
+}
+
+.top-bar h3{
+font-family:'Playfair Display',serif;
+font-size:1.8rem;
+}
+
+/* HERO */
+
+header{
+height:80vh;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+text-align:center;
+transition:transform 0.4s ease;
+}
+
+h1{
+font-family:'Playfair Display',serif;
+font-size:clamp(4rem,9vw,7rem);
+font-weight:800;
+}
+
+h2{
+font-size:clamp(1.2rem,2.5vw,1.8rem);
+font-weight:300;
+}
+
+/* MARQUEE */
+
+.marquee{
+overflow:hidden;
+white-space:nowrap;
+padding:20px 0;
+border-top:1px solid rgba(0,0,0,0.1);
+border-bottom:1px solid rgba(0,0,0,0.1);
+}
+
+.marquee-track{
+display:inline-block;
+animation:marqueeMove 15s linear infinite;
+font-weight:500;
+}
+
+@keyframes marqueeMove{
+0%{transform:translateX(0);}
+100%{transform:translateX(-50%);}
+}
+
+/* BUTTON SECTION */
+
+.button-section{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+position:relative;
+padding:60px 5vw;
+}
+
+.background-word{
+position:absolute;
+font-size:15vw;
+opacity:0.03;
+font-weight:800;
+z-index:-1;
+}
+
+.grid{
+width:100%;
+max-width:1200px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:40px;
+}
+
+.btn{
+border:2px solid black;
+border-radius:20px;
+padding:45px 30px;
+font-size:2rem;
+font-weight:600;
+text-decoration:none;
+color:black;
+display:flex;
+justify-content:center;
+align-items:center;
+transition:all 0.3s ease;
+position:relative;
+}
+
+.btn:hover{
+box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
 
 /* FADE IN */
 
-const faders = document.querySelectorAll(".fade-in");
-
-const observer = new IntersectionObserver(entries=>{
-entries.forEach(entry=>{
-if(entry.isIntersecting){
-entry.target.classList.add("visible");
-}
-});
-},{threshold:0.2});
-
-faders.forEach(el=>observer.observe(el));
-
-/* MAGNETIC BUTTONS */
-
-document.querySelectorAll(".btn").forEach(btn=>{
-btn.addEventListener("mousemove",(e)=>{
-const rect = btn.getBoundingClientRect();
-const x = e.clientX - rect.left - rect.width/2;
-const y = e.clientY - rect.top - rect.height/2;
-btn.style.transform = `translate(${x*0.2}px, ${y*0.2}px)`;
-});
-btn.addEventListener("mouseleave",()=>{
-btn.style.transform = "translate(0,0)";
-});
-});
-
-/* WARP GRID */
-
-const canvas = document.getElementById("gridCanvas");
-const ctx = canvas.getContext("2d");
-
-let mouse = {x:null,y:null};
-const spacing = 40;
-const influenceRadius = 80;
-
-function resizeCanvas(){
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-}
-resizeCanvas();
-window.addEventListener("resize", resizeCanvas);
-
-window.addEventListener("mousemove",(e)=>{
-mouse.x = e.clientX;
-mouse.y = e.clientY;
-});
-
-function drawGrid(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.strokeStyle = "rgba(0,0,0,0.15)";
-ctx.lineWidth = 1;
-
-for(let x=0;x<canvas.width;x+=spacing){
-ctx.beginPath();
-for(let y=0;y<canvas.height;y+=spacing){
-let dx = x - mouse.x;
-let dy = y - mouse.y;
-let dist = Math.sqrt(dx*dx+dy*dy);
-
-let offsetX=0;
-let offsetY=0;
-
-if(dist<influenceRadius){
-let force = (influenceRadius-dist)/influenceRadius;
-offsetX = -dx * force * 0.08;
-offsetY = -dy * force * 0.08;
+.fade-in{
+opacity:0;
+transform:translateY(40px);
+transition:all 1s ease;
 }
 
-ctx.lineTo(x+offsetX,y+offsetY);
-}
-ctx.stroke();
-}
-
-for(let y=0;y<canvas.height;y+=spacing){
-ctx.beginPath();
-for(let x=0;x<canvas.width;x+=spacing){
-let dx = x - mouse.x;
-let dy = y - mouse.y;
-let dist = Math.sqrt(dx*dx+dy*dy);
-
-let offsetX=0;
-let offsetY=0;
-
-if(dist<influenceRadius){
-let force = (influenceRadius-dist)/influenceRadius;
-offsetX = -dx * force * 0.08;
-offsetY = -dy * force * 0.08;
+.fade-in.visible{
+opacity:1;
+transform:translateY(0);
 }
 
-ctx.lineTo(x+offsetX,y+offsetY);
+@media(max-width:900px){
+.grid{
+grid-template-columns:1fr;
 }
-ctx.stroke();
 }
-
-requestAnimationFrame(drawGrid);
-}
-
-drawGrid();
