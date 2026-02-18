@@ -4,8 +4,6 @@ padding:0;
 box-sizing:border-box;
 }
 
-/* ---------- BODY ---------- */
-
 body{
 font-family:'Outfit',sans-serif;
 background:white;
@@ -13,7 +11,7 @@ color:black;
 overflow-x:hidden;
 }
 
-/* ---------- BACKGROUND GRID CANVAS ---------- */
+/* ---------- BACKGROUND GRID ---------- */
 
 #bgGrid{
 position:fixed;
@@ -150,8 +148,6 @@ display:inline-block;
 transform:scale(1.06);
 box-shadow:0 0 25px rgba(0,0,0,0.4);
 }
-
-/* ---------- RESPONSIVE ---------- */
 
 @media(max-width:900px){
 .grid{
