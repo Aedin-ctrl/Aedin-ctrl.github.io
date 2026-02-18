@@ -1,143 +1,147 @@
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
 body{
-font-family:'Outfit',sans-serif;
-background:white;
-color:black;
-overflow-x:hidden;
-position:relative;
+  font-family:'Outfit',sans-serif;
+  background:white;
+  color:black;
+  overflow-x:hidden;
+  position:relative;
 }
 
 /* ===== SCROLL PROGRESS BAR ===== */
-
 .scroll-progress{
-position:fixed;
-top:0;
-left:0;
-height:4px;
-width:0%;
-background:black;
-z-index:999;
-transition:width 0.1s ease;
+  position:fixed;
+  top:0;
+  left:0;
+  height:4px;
+  width:0%;
+  background:black;
+  z-index:999;
+  transition:width 0.1s ease;
 }
 
 /* ===== FLOATING BACKGROUND GLOW ===== */
-
 body::before{
-content:"";
-position:fixed;
-width:500px;
-height:500px;
-background:radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
-top:-150px;
-right:-150px;
-z-index:-1;
-pointer-events:none;
+  content:"";
+  position:fixed;
+  width:500px;
+  height:500px;
+  background:radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
+  top:-150px;
+  right:-150px;
+  z-index:-1;
+  pointer-events:none;
 }
 
 /* ===== FLOAT NAV BAR ===== */
-
 .top-bar{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:70px;
-display:flex;
-justify-content:center;
-align-items:center;
-border-bottom:1px solid rgba(0,0,0,0.1);
-background:white;
-transform:translateY(-100%);
-opacity:0;
-transition:all 0.5s ease;
-z-index:100;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:70px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-bottom:1px solid rgba(0,0,0,0.1);
+  background:white;
+  transform:translateY(-100%);
+  opacity:0;
+  transition:all 0.5s ease;
+  z-index:100;
 }
 
 .top-bar.show{
-transform:translateY(0);
-opacity:1;
+  transform:translateY(0);
+  opacity:1;
 }
 
 .top-bar h3{
-font-family:'Playfair Display',serif;
-font-size:1.8rem;
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;
 }
 
 /* ===== HERO ===== */
-
 header{
-height:80vh;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-text-align:center;
-transition:transform 0.4s ease;
+  height:80vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+  transition:transform 0.4s ease;
 }
 
 h1{
-font-family:'Playfair Display',serif;
-font-size:clamp(4rem,9vw,7rem);
-font-weight:800;
-letter-spacing:2px;
-margin-bottom:10px;
+  font-family:'Playfair Display',serif;
+  font-size:clamp(4rem,9vw,7rem);
+  font-weight:800;
+  letter-spacing:2px;
+  margin-bottom:10px;
 }
 
 h2{
-font-size:clamp(1.2rem,2.5vw,1.8rem);
-font-weight:300;
+  font-size:clamp(1.2rem,2.5vw,1.8rem);
+  font-weight:300;
 }
 
 /* ===== BUTTON SECTION ===== */
-
 .button-section{
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:60px 5vw;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:60px 5vw;
 }
 
 .grid{
-width:100%;
-max-width:1400px;
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:40px;
+  width:100%;
+  max-width:1400px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:40px;
 }
 
+/* ===== BUTTONS WITH SHADOWS & CLICK EFFECT ===== */
 .btn{
-border:2px solid black;
-border-radius:20px;
-padding:45px 30px;
-font-size:2rem;
-font-weight:600;
-text-decoration:none;
-color:black;
-display:flex;
-justify-content:center;
-align-items:center;
-transition:all 0.3s ease;
+  border:2px solid black;
+  border-radius:20px;
+  padding:45px 30px;
+  font-size:2rem;
+  font-weight:600;
+  text-decoration:none;
+  color:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition: all 0.2s ease;
+  background:white;
+  cursor:pointer;
+
+  /* Base shadow for depth */
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1), 0 12px 30px rgba(0,0,0,0.05);
+  position: relative;
 }
 
-/* ===== DEPTH UPGRADE (Feature #7) ===== */
-
+/* Hover lifts button slightly */
 .btn:hover{
-transform:translateY(-5px);
-box-shadow:
-0 8px 20px rgba(0,0,0,0.15),
-0 20px 40px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15), 0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* Active simulates click press */
+.btn:active{
+  transform: translateY(2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1), 0 8px 20px rgba(0,0,0,0.05);
 }
 
 /* ===== RESPONSIVE ===== */
-
 @media(max-width:900px){
-.grid{
-grid-template-columns:1fr;
-}
+  .grid{
+    grid-template-columns:1fr;
+  }
 }
