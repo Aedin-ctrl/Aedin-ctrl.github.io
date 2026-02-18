@@ -9,21 +9,37 @@ font-family:'Outfit',sans-serif;
 background:white;
 color:black;
 overflow-x:hidden;
+position:relative;
 }
 
-/* ---------- BACKGROUND GRID ---------- */
+/* ===== SCROLL PROGRESS BAR ===== */
 
-#bgGrid{
+.scroll-progress{
 position:fixed;
 top:0;
 left:0;
-width:100%;
-height:100%;
-z-index:0;
+height:4px;
+width:0%;
+background:black;
+z-index:999;
+transition:width 0.1s ease;
+}
+
+/* ===== FLOATING BACKGROUND GLOW ===== */
+
+body::before{
+content:"";
+position:fixed;
+width:500px;
+height:500px;
+background:radial-gradient(circle, rgba(0,0,0,0.05), transparent 70%);
+top:-150px;
+right:-150px;
+z-index:-1;
 pointer-events:none;
 }
 
-/* ---------- FLOAT NAV BAR ---------- */
+/* ===== FLOAT NAV BAR ===== */
 
 .top-bar{
 position:fixed;
@@ -34,7 +50,7 @@ height:70px;
 display:flex;
 justify-content:center;
 align-items:center;
-border-bottom:2px solid black;
+border-bottom:1px solid rgba(0,0,0,0.1);
 background:white;
 transform:translateY(-100%);
 opacity:0;
@@ -50,10 +66,9 @@ opacity:1;
 .top-bar h3{
 font-family:'Playfair Display',serif;
 font-size:1.8rem;
-letter-spacing:1px;
 }
 
-/* ---------- HERO ---------- */
+/* ===== HERO ===== */
 
 header{
 height:80vh;
@@ -63,9 +78,6 @@ align-items:center;
 flex-direction:column;
 text-align:center;
 transition:transform 0.4s ease;
-transform-origin:center;
-position:relative;
-z-index:1;
 }
 
 h1{
@@ -79,33 +91,9 @@ margin-bottom:10px;
 h2{
 font-size:clamp(1.2rem,2.5vw,1.8rem);
 font-weight:300;
-display:flex;
-gap:2px;
 }
 
-/* ---------- LETTER WAVE ---------- */
-
-.wave-letter{
-display:inline-block;
-animation:driftWave 4s ease-in-out infinite both;
-animation-play-state: paused;
-}
-
-#waveText .wave-letter{
-animation-play-state: running;
-}
-
-.btn:hover .wave-letter{
-animation-play-state: running;
-}
-
-@keyframes driftWave{
-0%{transform:translateY(0px);}
-50%{transform:translateY(-3px);}
-100%{transform:translateY(0px);}
-}
-
-/* ---------- BUTTON SECTION ---------- */
+/* ===== BUTTON SECTION ===== */
 
 .button-section{
 min-height:100vh;
@@ -113,8 +101,6 @@ display:flex;
 justify-content:center;
 align-items:center;
 padding:60px 5vw;
-position:relative;
-z-index:1;
 }
 
 .grid{
@@ -136,18 +122,19 @@ color:black;
 display:flex;
 justify-content:center;
 align-items:center;
-transition:all 0.4s ease;
-background:white;
+transition:all 0.3s ease;
 }
 
-.btn span{
-display:inline-block;
-}
+/* ===== DEPTH UPGRADE (Feature #7) ===== */
 
 .btn:hover{
-transform:scale(1.06);
-box-shadow:0 0 25px rgba(0,0,0,0.4);
+transform:translateY(-5px);
+box-shadow:
+0 8px 20px rgba(0,0,0,0.15),
+0 20px 40px rgba(0,0,0,0.08);
 }
+
+/* ===== RESPONSIVE ===== */
 
 @media(max-width:900px){
 .grid{
