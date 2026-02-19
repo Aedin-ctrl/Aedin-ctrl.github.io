@@ -106,7 +106,7 @@ h2{
   gap:40px;
 }
 
-/* ===== BUTTONS WITH STRONGER SHADOWS & CLICK EFFECT ===== */
+/* ===== CLEAN SOLID BUTTON STYLE ===== */
 .btn{
   border:2px solid black;
   border-radius:20px;
@@ -118,25 +118,24 @@ h2{
   display:flex;
   justify-content:center;
   align-items:center;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   background:white;
   cursor:pointer;
 
-  /* Base shadow for depth (darker black) */
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25), 0 16px 40px rgba(0,0,0,0.15);
-  position: relative;
+  /* SOLID black shadow */
+  box-shadow: 8px 8px 0px black;
 }
 
-/* Hover lifts button up and right */
+/* Hover: lift up and right */
 .btn:hover{
-  transform: translate(6px, -8px); /* right 6px, up 8px */
-  box-shadow: 0 14px 30px rgba(0,0,0,0.5), 0 28px 60px rgba(0,0,0,0.35);
+  transform: translate(6px, -6px);
+  box-shadow: 12px 12px 0px black;
 }
 
-/* Active simulates click press */
+/* Click press */
 .btn:active{
-  transform: translate(2px, 2px); /* slight downward press */
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.2);
+  transform: translate(2px, 2px);
+  box-shadow: 4px 4px 0px black;
 }
 
 /* ===== RESPONSIVE ===== */
