@@ -99,10 +99,10 @@ body { font-family: var(--sans); background: var(--white); color: var(--black); 
 
 /* ── HERO QUICK NAV ── */
 .hero-sidenav {
-  position: fixed;
+  position: absolute;
   right: 2rem;
   top: 50%;
-  margin-top: -140px; /* half of total height: 4 buttons * 64px + 3 gaps * 12px = 292px / 2 */
+  margin-top: -152px; /* (4 buttons x 64px + 3 gaps x 12px) / 2 = 152px */
   display: flex;
   flex-direction: column;
   gap: 12px;
