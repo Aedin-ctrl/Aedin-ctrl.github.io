@@ -9,23 +9,16 @@ const hamburger    = document.getElementById('hamburger');
 const navDrawer    = document.getElementById('navDrawer');
 const heroSidenav  = document.getElementById('heroSidenav');
 
-// ── SIDENAV FADE ──────────────────────────────────────────
-let sidenavTimeout;
-
-function hideSidenav() {
-  heroSidenav.classList.add('hidden');
-}
-
-function showSidenavIfInHero() {
+// ── SIDENAV FADE (based purely on scroll position) ──────
+function updateSidenav() {
   const heroH = document.getElementById('hero').offsetHeight;
-  if (window.scrollY < heroH * 0.8) {
+  if (window.scrollY < heroH * 0.75) {
     heroSidenav.classList.remove('hidden');
-    clearTimeout(sidenavTimeout);
-    sidenavTimeout = setTimeout(hideSidenav, 2500);
+  } else {
+    heroSidenav.classList.add('hidden');
   }
 }
 
-// Fade sidenav immediately on any scroll
 window.addEventListener('scroll', () => {
   // Scroll progress bar
   const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
@@ -35,16 +28,12 @@ window.addEventListener('scroll', () => {
   const heroH = document.getElementById('hero').offsetHeight;
   mainNav.classList.toggle('scrolled', window.scrollY > heroH * 0.6);
 
-  // Hide sidenav on scroll
-  hideSidenav();
+  // Sidenav visibility
+  updateSidenav();
 });
 
-// Show sidenav on mouse move (only while in hero)
-document.addEventListener('mousemove', showSidenavIfInHero);
-
-// Fade in sidenav on page load, then auto-hide
-setTimeout(() => { heroSidenav.classList.remove('hidden'); }, 600);
-sidenavTimeout = setTimeout(hideSidenav, 3200);
+// Show on load
+setTimeout(() => { heroSidenav.classList.remove('hidden'); }, 400);
 
 // ── HAMBURGER MENU ────────────────────────────────────────
 hamburger.addEventListener('click', () => {
