@@ -9,31 +9,16 @@ const hamburger    = document.getElementById('hamburger');
 const navDrawer    = document.getElementById('navDrawer');
 const heroSidenav  = document.getElementById('heroSidenav');
 
-// ── SIDENAV FADE (based purely on scroll position) ──────
-function updateSidenav() {
-  const heroH = document.getElementById('hero').offsetHeight;
-  if (window.scrollY < heroH * 0.75) {
-    heroSidenav.classList.remove('hidden');
-  } else {
-    heroSidenav.classList.add('hidden');
-  }
-}
-
-window.addEventListener('scroll', () => {
-  // Scroll progress bar
-  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-  progressBar.style.width = pct + '%';
-
-  // Nav bar appearance
-  const heroH = document.getElementById('hero').offsetHeight;
-  mainNav.classList.toggle('scrolled', window.scrollY > heroH * 0.6);
-
-  // Sidenav visibility
-  updateSidenav();
-});
-
 // Show on load
 setTimeout(() => { heroSidenav.classList.remove('hidden'); }, 400);
+
+// ── SCROLL (progress bar + nav only) ─────────────────────
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  progressBar.style.width = pct + '%';
+  const heroH = document.getElementById('hero').offsetHeight;
+  mainNav.classList.toggle('scrolled', window.scrollY > heroH * 0.6);
+});
 
 // ── HAMBURGER MENU ────────────────────────────────────────
 hamburger.addEventListener('click', () => {
