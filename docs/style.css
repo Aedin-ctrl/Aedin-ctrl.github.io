@@ -97,43 +97,43 @@ body { font-family: var(--sans); background: var(--white); color: var(--black); 
 
 .nav-drawer a:hover { color: var(--black); }
 
-/* ── HERO SIDE NAV ── */
+/* ── HERO QUICK NAV (top-right pill buttons) ── */
 .hero-sidenav {
-  position: fixed; right: 2.5vw; top: 50%;
-  transform: translateY(-50%);
-  display: flex; flex-direction: column; gap: 0.9rem;
+  position: fixed;
+  top: 80px;
+  right: 2vw;
+  display: flex; flex-direction: column; gap: 0.5rem;
   z-index: 150;
   opacity: 1;
   transition: opacity 0.6s ease;
   pointer-events: all;
+  align-items: flex-end;
 }
 
 .hero-sidenav.hidden { opacity: 0; pointer-events: none; }
 
 .sidenav-item {
-  display: flex; align-items: center; gap: 0.7rem;
-  justify-content: flex-end;
-  text-decoration: none; cursor: pointer;
-}
-
-.sidenav-label {
-  font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--muted);
-  opacity: 0; transform: translateX(6px);
-  transition: opacity 0.2s, transform 0.2s;
+  display: inline-flex; align-items: center;
+  text-decoration: none;
+  font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--black);
+  background: rgba(248,246,241,0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.45rem 1.1rem;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s, color 0.2s;
   white-space: nowrap;
 }
 
-.sidenav-item:hover .sidenav-label { opacity: 1; transform: translateX(0); }
-
-.sidenav-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--muted);
-  transition: background 0.2s, transform 0.2s;
-  flex-shrink: 0;
+.sidenav-item:hover {
+  background: var(--black);
+  color: var(--white);
+  transform: translateX(-3px);
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
 }
-
-.sidenav-item:hover .sidenav-dot { background: var(--black); transform: scale(1.5); }
 
 /* ── HERO ── */
 #hero {
