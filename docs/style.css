@@ -97,43 +97,62 @@ body { font-family: var(--sans); background: var(--white); color: var(--black); 
 
 .nav-drawer a:hover { color: var(--black); }
 
-/* ── HERO QUICK NAV (top-right pill buttons) ── */
+/* ── HERO QUICK NAV ── */
 .hero-sidenav {
   position: fixed;
-  top: 80px;
-  right: 2vw;
-  display: flex; flex-direction: column; gap: 0.5rem;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   z-index: 150;
-  opacity: 1;
-  transition: opacity 0.6s ease;
-  pointer-events: all;
   align-items: flex-end;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+  pointer-events: all;
 }
 
-.hero-sidenav.hidden { opacity: 0; pointer-events: none; }
+.hero-sidenav.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
 
 .sidenav-item {
-  display: inline-flex; align-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  font-size: 0.75rem; font-weight: 600;
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--black);
-  background: rgba(248,246,241,0.85);
-  backdrop-filter: blur(8px);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 0.45rem 1.1rem;
-  box-shadow: 2px 2px 0 rgba(0,0,0,0.08);
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s, color 0.2s;
+  background: rgba(248,246,241,0.92);
+  backdrop-filter: blur(10px);
+  border: 1.5px solid rgba(10,10,10,0.15);
+  border-radius: 10px;
+  padding: 0.75rem 1.6rem;
+  min-width: 130px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08), 4px 4px 0 rgba(0,0,0,0.07);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease;
   white-space: nowrap;
 }
 
 .sidenav-item:hover {
+  transform: translateY(-4px) scale(1.04);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.13), 6px 6px 0 rgba(0,0,0,0.1);
   background: var(--black);
   color: var(--white);
-  transform: translateX(-3px);
-  box-shadow: 4px 4px 0 rgba(0,0,0,0.15);
 }
+
+.sidenav-item:active {
+  transform: translateY(-1px) scale(1.01);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1), 3px 3px 0 rgba(0,0,0,0.08);
+}
+
+@media (max-width: 900px) { .hero-sidenav { display: none; } }
 
 /* ── HERO ── */
 #hero {
