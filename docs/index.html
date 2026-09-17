@@ -175,7 +175,6 @@
   .proj-tags{color:var(--faint); font-size:12.5px; margin-top:8px;}
   .proj-link{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:2px; white-space:nowrap; align-self:start;}
   .proj-link:hover{border-color:var(--ink);}
-  .proj-todo{color:var(--faint); font-style:italic;}
 
   .timeline{max-width:600px; position:relative; padding-left:24px;}
   .timeline::before{
@@ -266,43 +265,50 @@
           <h1 class="hero-name">Aedin Lai</h1>
           <p class="hero-tagline">Building at the intersection of hardware and software &mdash; turning ideas into working systems.</p>
           <p class="bio">
-            I'm a first-year Electrical &amp; Computer Engineering student with a genuine interest
-            in how things work at the hardware and software level. I'm at the start of my journey,
-            but already diving into projects and building real things.
+            I'm an Electrical &amp; Computer Engineering student at Northeastern University, and a
+            competitive epee fencer. I like working at the intersection of hardware and software
+            &mdash; recent work spans data center infrastructure, neuroscience research hardware,
+            and a from-scratch arcade machine.
           </p>
           <p class="bio">
-            I'm driven by curiosity &mdash; whether it's writing code, designing circuits, or just
-            figuring out a hard problem. Always learning, always building.
+            Most recently I was a Data Center Infrastructure Intern at SingleStore, and before that
+            a research intern at the Yale University School of Medicine, building measurement
+            hardware for a study on cognition and movement in neurological patients.
           </p>
           <div class="cta-row">
             <button class="btn-primary" onclick="showTab('projects')">See the work</button>
             <button class="btn-secondary" onclick="showTab('contact')">Get in touch</button>
           </div>
           <div class="chip-group">
-            <div class="chip-group-label">Languages</div>
+            <div class="chip-group-label">Programming</div>
             <div class="chip-row">
-              <span class="chip">C / C++</span>
               <span class="chip">Python</span>
-              <span class="chip">JavaScript</span>
+              <span class="chip">Java</span>
+              <span class="chip">C#</span>
+              <span class="chip">SQL</span>
               <span class="chip">MATLAB</span>
-              <span class="chip">VHDL</span>
-            </div>
-          </div>
-          <div class="chip-group">
-            <div class="chip-group-label">Web &amp; Dev Tools</div>
-            <div class="chip-row">
               <span class="chip">HTML / CSS</span>
-              <span class="chip">Git</span>
-              <span class="chip">Linux</span>
+              <span class="chip">JavaScript</span>
             </div>
           </div>
           <div class="chip-group">
-            <div class="chip-group-label">Hardware &amp; Engineering</div>
+            <div class="chip-group-label">Hardware &amp; CAD</div>
             <div class="chip-row">
+              <span class="chip">Raspberry Pi</span>
               <span class="chip">Embedded Systems</span>
-              <span class="chip">Circuit Design</span>
-              <span class="chip">PCB Design</span>
-              <span class="chip">Signal Processing</span>
+              <span class="chip">Sensor Integration</span>
+              <span class="chip">SolidWorks</span>
+              <span class="chip">AutoCAD</span>
+            </div>
+          </div>
+          <div class="chip-group">
+            <div class="chip-group-label">Tools</div>
+            <div class="chip-row">
+              <span class="chip">Git</span>
+              <span class="chip">GitHub</span>
+              <span class="chip">Pandas</span>
+              <span class="chip">Linux</span>
+              <span class="chip">VS Code</span>
             </div>
           </div>
         </section>
@@ -315,25 +321,33 @@
             </div>
           </div>
 
-          <!-- TODO: replace these two placeholder rows with real projects -->
           <div class="project-row">
             <span class="proj-index">01</span>
             <div>
-              <span class="proj-title proj-todo">[Add your first project]</span>
-              <p class="proj-desc">Replace this with a brief description &mdash; what it does, what you built it with, and what you learned.</p>
-              <p class="proj-tags">tech / tools used</p>
+              <span class="proj-title">One-Inch Punch Arcade Machine</span>
+              <p class="proj-desc">Lead constructor and designer on a full-scale arcade machine built from scratch for Northeastern's GE1501 &mdash; mechanical build, electronics, and scoring software, concept to expo launch. Dual laser sensors measure swing velocity for a live score; the wooden frame, pendulum-and-magnet reset system, and laser-cut acrylic paneling were all built by hand and stress-tested through 80+ personal test swings.</p>
+              <p class="proj-tags">Mechanical design &middot; electronics &middot; scoring software &mdash; Fall 2025</p>
             </div>
-            <a class="proj-link" href="#">View project</a>
           </div>
 
           <div class="project-row">
             <span class="proj-index">02</span>
             <div>
-              <span class="proj-title proj-todo">[Add your second project]</span>
-              <p class="proj-desc">Replace this with your second project's description. What problem did it solve? What tech did you use?</p>
-              <p class="proj-tags">tech / tools used</p>
+              <span class="proj-title">Cal Tracker</span>
+              <p class="proj-desc">A self-hosted, real-time calorie tracking web app running on a Raspberry Pi, with a lightweight front-end/back-end and persistent local storage.</p>
+              <p class="proj-tags">Python &middot; HTML/CSS &middot; Raspberry Pi</p>
             </div>
-            <a class="proj-link" href="#">View project</a>
+            <a class="proj-link" href="https://calorietracker.aedinlai.com" target="_blank">View project</a>
+          </div>
+
+          <div class="project-row">
+            <span class="proj-index">03</span>
+            <div>
+              <span class="proj-title">Hallway Marathon Event Site</span>
+              <p class="proj-desc">Designed and built an event website from scratch (HTML, CSS, JavaScript, no frameworks) with live betting odds and competitor stats for a multi-university competition &mdash; independently managed all content, deployment, and live updates throughout the event.</p>
+              <p class="proj-tags">HTML &middot; CSS &middot; JavaScript</p>
+            </div>
+            <a class="proj-link" href="https://hallway-marathon.github.io" target="_blank">View project</a>
           </div>
         </section>
 
@@ -341,21 +355,34 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-heading">Resume</h2>
-              <p class="panel-sub">Where I've studied, and what I've been building.</p>
+              <p class="panel-sub">Education, experience, and leadership.</p>
             </div>
           </div>
           <div class="timeline">
             <div class="role">
-              <h3 class="role-title">B.S. Electrical &amp; Computer Engineering</h3>
-              <!-- TODO: replace with your real school name -->
-              <p class="role-meta proj-todo">[Your University] &mdash; 2024 to present</p>
-              <p class="role-desc">First year coursework covering fundamentals of circuits, programming, and engineering problem-solving.</p>
+              <h3 class="role-title">Data Center Infrastructure Intern</h3>
+              <p class="role-meta">SingleStore, Boston MA &mdash; June to September 2026</p>
+              <p class="role-desc">Led hardware deployment for a phased data center expansion, scaling a private cloud platform from 160 to 300+ VMs. Redesigned a single-push rollout into an incremental two-racks-at-a-time strategy, diagnosed a Linux kernel storage defect and a multi-week NFS instability, and supported a full Oakland-to-Boston data center relocation.</p>
             </div>
             <div class="role">
-              <h3 class="role-title">High School Diploma</h3>
-              <!-- TODO: replace with your real high school name -->
-              <p class="role-meta proj-todo">[Your High School] &mdash; 2024</p>
-              <p class="role-desc">Add anything relevant &mdash; AP courses, clubs, awards, or early projects that sparked your interest in ECE.</p>
+              <h3 class="role-title">Research Intern</h3>
+              <p class="role-meta">PEACE Foundation, Yale University School of Medicine &mdash; 2023 to 2024</p>
+              <p class="role-desc">Designed and built a full-body balance measurement device to study cognition and movement in neurological patients, automating data collection across ASD, Alzheimer's, Parkinson's, and schizophrenia patient populations. Presented findings at ISEC 2024; co-authored results accepted for publication in JAMA (2025).</p>
+            </div>
+            <div class="role">
+              <h3 class="role-title">B.S. Electrical &amp; Computer Engineering</h3>
+              <p class="role-meta">Northeastern University, Boston MA &mdash; Expected May 2029</p>
+              <p class="role-desc">Coursework: Calculus 2, Physics 2, Chemistry, Cornerstone of Engineering 2, First-Year Writing.</p>
+            </div>
+            <div class="role">
+              <h3 class="role-title">Captain, Club Fencing</h3>
+              <p class="role-meta">Northeastern University &mdash; 2025 to present</p>
+              <p class="role-desc">Anchor the epee team toward the 2026 Collegiate Fencing Club National Championship; lead scheduling, logistics, recruitment, and practice design for the full roster.</p>
+            </div>
+            <div class="role">
+              <h3 class="role-title">Competitive Epee Fencer</h3>
+              <p class="role-meta">Marx Fencing Academy &mdash; 2018 to 2025</p>
+              <p class="role-desc">USA Fencing rating A25 &middot; #103 national / #122 global rank &middot; Top-16 World Cup &middot; All-American (2021&ndash;2025).</p>
             </div>
           </div>
         </section>
@@ -364,11 +391,10 @@
           <div class="contact-wrap">
             <h2 class="panel-heading" style="margin-bottom:0;">Say hello</h2>
             <p class="contact-line">The fastest way to reach me is email &mdash; I check it more than anything else.</p>
-            <!-- TODO: replace with your real email -->
-            <a class="mailto proj-todo" href="#">[add your email]</a>
+            <a class="mailto" href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>
             <div class="social-row">
               <a href="https://github.com/Aedin-ctrl" target="_blank">GitHub</a>
-              <!-- TODO: add LinkedIn/Instagram links here if you want them public -->
+              <a href="https://linkedin.com/in/aedin-lai" target="_blank">LinkedIn</a>
             </div>
           </div>
         </section>
