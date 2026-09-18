@@ -554,10 +554,13 @@
     '/projects/casino': { type:'iframe', src: CASINO_BASE }
   };
   const GROUP_PREFIX = { games:'', advantage:'adv_', calculators:'calc_' };
+  const FOLDER_TO_PATH = { '': '/projects/casino' };
   for(const group in CASINO_GAMES){
     const prefix = GROUP_PREFIX[group];
     for(const slug in CASINO_GAMES[group]){
-      ROUTES[`/projects/casino/${prefix}${slug}`] = { type:'iframe', src: CASINO_BASE + CASINO_GAMES[group][slug] + '/' };
+      const folder = CASINO_GAMES[group][slug];
+      ROUTES[`/projects/casino/${prefix}${slug}`] = { type:'iframe', src: CASINO_BASE + folder + '/' };
+      FOLDER_TO_PATH[folder] = `/projects/casino/${prefix}${slug}`;
     }
   }
 
@@ -634,6 +637,18 @@
   document.getElementById('dotClose').addEventListener('click', () => navigateTo('/'));
   document.getElementById('dotMinimize').addEventListener('click', () => browserEl.classList.toggle('minimized'));
   document.getElementById('dotMaximize').addEventListener('click', () => monitorEl.classList.toggle('maximized'));
+
+  window.addEventListener('message', (event) => {
+    if(event.origin !== 'https://casino.aedinlai.com') return;
+    const data = event.data;
+    if(!data || data.source !== 'casino') return;
+    const path = FOLDER_TO_PATH[data.folder || ''];
+    if(!path || path === currentPath) return;
+    currentPath = path;
+    addressInput.value = displayValue(path);
+    const topSeg = path === '/' ? 'general' : path.split('/')[1];
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === topSeg));
+  });
 </script>
 
 </body>
