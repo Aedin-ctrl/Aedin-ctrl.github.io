@@ -66,12 +66,23 @@
   .dot{
     width:9px; height:9px; border-radius:50%; border:1.2px solid var(--faint);
     background:var(--paper);
+    cursor:pointer;
     transition:background-color .15s ease, border-color .15s ease;
   }
-  .dots:hover .dot:nth-child(1){background:#ff5f57; border-color:#e0443e;}
-  .dots:hover .dot:nth-child(2){background:#febc2e; border-color:#dea123;}
-  .dots:hover .dot:nth-child(3){background:#28c840; border-color:#1aab29;}
-  .dot--close{cursor:pointer;}
+  .dot:nth-child(1):hover{background:#ff5f57; border-color:#e0443e;}
+  .dot:nth-child(2):hover{background:#febc2e; border-color:#dea123;}
+  .dot:nth-child(3):hover{background:#28c840; border-color:#1aab29;}
+
+  .browser.minimized{height:auto;}
+  .browser.minimized .tab-strip,
+  .browser.minimized .viewport{display:none;}
+
+  .monitor.maximized{
+    position:fixed; inset:0; z-index:999;
+    max-width:none; border-radius:0; box-shadow:none; padding:0;
+  }
+  .monitor.maximized .camera-dot{display:none;}
+  .monitor.maximized .browser{height:100vh; border-radius:0; border:none;}
   .address{
     flex:1;
     border:1px solid var(--line);
@@ -264,7 +275,7 @@
     <div class="browser">
       <div class="chrome-bar">
         <div class="dots">
-          <span class="dot dot--close" id="dotClose" title="Back to home"></span><span class="dot"></span><span class="dot"></span>
+          <span class="dot" id="dotClose" title="Back to home"></span><span class="dot" id="dotMinimize" title="Minimize"></span><span class="dot" id="dotMaximize" title="Maximize"></span>
         </div>
         <div class="address" id="address">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -462,6 +473,8 @@
   const panels = document.querySelectorAll('.panel');
   const viewport = document.querySelector('.viewport');
   const addressText = document.getElementById('address-text');
+  const browserEl = document.querySelector('.browser');
+  const monitorEl = document.querySelector('.monitor');
   const paths = { general: 'aedinlai.com', projects: 'aedinlai.com/projects', resume: 'aedinlai.com/resume', contact: 'aedinlai.com/contact' };
 
   function showTab(name){
@@ -469,9 +482,12 @@
     panels.forEach(p => p.classList.toggle('active', p.id === name));
     addressText.textContent = paths[name];
     viewport.scrollTop = 0;
+    browserEl.classList.remove('minimized');
   }
   buttons.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
   document.getElementById('dotClose').addEventListener('click', () => showTab('general'));
+  document.getElementById('dotMinimize').addEventListener('click', () => browserEl.classList.toggle('minimized'));
+  document.getElementById('dotMaximize').addEventListener('click', () => monitorEl.classList.toggle('maximized'));
 </script>
 
 </body>
