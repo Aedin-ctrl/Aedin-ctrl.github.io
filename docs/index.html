@@ -63,15 +63,20 @@
     flex-shrink:0;
   }
   .dots{display:flex; gap:7px; flex-shrink:0;}
+  .dot-hit{
+    width:20px; height:20px; margin:-5.5px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
   .dot{
     width:9px; height:9px; border-radius:50%; border:1.2px solid var(--faint);
     background:var(--paper);
-    cursor:pointer;
+    pointer-events:none;
     transition:background-color .15s ease, border-color .15s ease;
   }
-  .dot:nth-child(1):hover{background:#ff5f57; border-color:#e0443e;}
-  .dot:nth-child(2):hover{background:#febc2e; border-color:#dea123;}
-  .dot:nth-child(3):hover{background:#28c840; border-color:#1aab29;}
+  .dot-hit:nth-child(1):hover .dot{background:#ff5f57; border-color:#e0443e;}
+  .dot-hit:nth-child(2):hover .dot{background:#febc2e; border-color:#dea123;}
+  .dot-hit:nth-child(3):hover .dot{background:#28c840; border-color:#1aab29;}
 
   .browser.minimized{height:auto;}
   .browser.minimized .tab-strip,
@@ -303,7 +308,7 @@
     <div class="browser">
       <div class="chrome-bar">
         <div class="dots">
-          <span class="dot" id="dotClose" title="Back to home"></span><span class="dot" id="dotMinimize" title="Minimize"></span><span class="dot" id="dotMaximize" title="Maximize"></span>
+          <span class="dot-hit" id="dotClose" title="Back to home"><span class="dot"></span></span><span class="dot-hit" id="dotMinimize" title="Minimize"><span class="dot"></span></span><span class="dot-hit" id="dotMaximize" title="Maximize"><span class="dot"></span></span>
         </div>
         <div class="address" id="address">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
