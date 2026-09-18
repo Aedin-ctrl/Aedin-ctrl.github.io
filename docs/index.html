@@ -445,26 +445,26 @@
               <div class="proj-subnav">
                 <div class="proj-subgroup">
                   <span class="proj-subgroup-label">games</span>
-                  <button class="proj-sublink" data-path="/projects/casino/games/blackjack">blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/games/poker">poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/games/baccarat">baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/games/craps">craps</button>
-                  <button class="proj-sublink" data-path="/projects/casino/games/roulette">roulette</button>
-                  <button class="proj-sublink" data-path="/projects/casino/games/mahjong">mahjong</button>
+                  <button class="proj-sublink" data-path="/projects/casino/blackjack">blackjack</button>
+                  <button class="proj-sublink" data-path="/projects/casino/poker">poker</button>
+                  <button class="proj-sublink" data-path="/projects/casino/baccarat">baccarat</button>
+                  <button class="proj-sublink" data-path="/projects/casino/craps">craps</button>
+                  <button class="proj-sublink" data-path="/projects/casino/roulette">roulette</button>
+                  <button class="proj-sublink" data-path="/projects/casino/mahjong">mahjong</button>
                 </div>
                 <div class="proj-subgroup">
                   <span class="proj-subgroup-label">advantage</span>
-                  <button class="proj-sublink" data-path="/projects/casino/advantage/blackjack">blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/advantage/poker">poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/advantage/baccarat">baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/advantage/mahjong">mahjong</button>
+                  <button class="proj-sublink" data-path="/projects/casino/adv_blackjack">adv_blackjack</button>
+                  <button class="proj-sublink" data-path="/projects/casino/adv_poker">adv_poker</button>
+                  <button class="proj-sublink" data-path="/projects/casino/adv_baccarat">adv_baccarat</button>
+                  <button class="proj-sublink" data-path="/projects/casino/adv_mahjong">adv_mahjong</button>
                 </div>
                 <div class="proj-subgroup">
                   <span class="proj-subgroup-label">calculators</span>
-                  <button class="proj-sublink" data-path="/projects/casino/calculators/blackjack">blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calculators/poker">poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calculators/baccarat">baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calculators/mahjong">mahjong</button>
+                  <button class="proj-sublink" data-path="/projects/casino/calc_blackjack">calc_blackjack</button>
+                  <button class="proj-sublink" data-path="/projects/casino/calc_poker">calc_poker</button>
+                  <button class="proj-sublink" data-path="/projects/casino/calc_baccarat">calc_baccarat</button>
+                  <button class="proj-sublink" data-path="/projects/casino/calc_mahjong">calc_mahjong</button>
                 </div>
               </div>
             </div>
@@ -553,9 +553,11 @@
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io' },
     '/projects/casino': { type:'iframe', src: CASINO_BASE }
   };
+  const GROUP_PREFIX = { games:'', advantage:'adv_', calculators:'calc_' };
   for(const group in CASINO_GAMES){
+    const prefix = GROUP_PREFIX[group];
     for(const slug in CASINO_GAMES[group]){
-      ROUTES[`/projects/casino/${group}/${slug}`] = { type:'iframe', src: CASINO_BASE + CASINO_GAMES[group][slug] + '/' };
+      ROUTES[`/projects/casino/${prefix}${slug}`] = { type:'iframe', src: CASINO_BASE + CASINO_GAMES[group][slug] + '/' };
     }
   }
 
