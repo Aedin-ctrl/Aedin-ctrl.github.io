@@ -276,6 +276,19 @@
   .social-row a{font-size:13px; color:var(--muted); border-bottom:1px solid transparent;}
   .social-row a:hover{color:var(--ink); border-color:var(--faint);}
 
+  .penguin-wrap{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    min-height:calc(100vh - 220px);
+    gap:18px;
+  }
+  .penguin-svg{ width:180px; height:auto; }
+  .penguin-svg path, .penguin-svg circle{
+    fill:none; stroke:var(--ink); stroke-width:2.5;
+    stroke-linecap:round; stroke-linejoin:round;
+  }
+  .penguin-svg .penguin-eye{ fill:var(--ink); stroke:none; }
+  .penguin-caption{ color:var(--faint); font-size:13px; letter-spacing:.02em; }
+
   .note{
     margin-top:26px;
     color:#9a9ea5;
@@ -521,6 +534,25 @@
           </div>
         </section>
 
+        <section class="panel" id="secret-penguin">
+          <div class="penguin-wrap">
+            <svg class="penguin-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="100" cy="52" r="30" />
+              <path d="M62,88 C42,118 37,168 47,203 C57,223 143,223 153,203 C163,168 158,118 138,88" />
+              <path d="M79,92 C66,127 66,177 81,212" />
+              <path d="M121,92 C134,127 134,177 119,212" />
+              <path d="M57,108 C42,138 42,168 57,193" />
+              <path d="M143,108 C158,138 158,168 143,193" />
+              <path d="M92,68 L84,80 L100,84 Z" />
+              <path d="M68,220 L58,233 L80,228" />
+              <path d="M132,220 L142,233 L120,228" />
+              <circle class="penguin-eye" cx="88" cy="47" r="3.2" />
+              <circle class="penguin-eye" cx="112" cy="47" r="3.2" />
+            </svg>
+            <p class="penguin-caption">You found it.</p>
+          </div>
+        </section>
+
       </div>
       <iframe class="content-frame" id="contentFrame" title="Embedded project"></iframe>
     </div>
@@ -551,7 +583,8 @@
     '/contact': { type:'panel', panel:'contact' },
     '/projects/cal-tracker': { type:'iframe', src:'https://calorietracker.aedinlai.com' },
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io' },
-    '/projects/casino': { type:'iframe', src: CASINO_BASE }
+    '/projects/casino': { type:'iframe', src: CASINO_BASE },
+    '/secret_penguin': { type:'panel', panel:'secret-penguin' }
   };
   const GROUP_PREFIX = { games:'', advantage:'adv_', calculators:'calc_' };
   const FOLDER_TO_PATH = { '': '/projects/casino' };
