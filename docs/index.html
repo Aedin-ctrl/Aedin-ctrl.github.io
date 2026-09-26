@@ -553,6 +553,13 @@
           </div>
         </section>
 
+        <section class="panel" id="secret-projects">
+          <div class="penguin-wrap">
+            <h2 class="panel-heading">Secret Projects</h2>
+            <p class="penguin-caption">Coming soon.</p>
+          </div>
+        </section>
+
       </div>
       <iframe class="content-frame" id="contentFrame" title="Embedded project"></iframe>
     </div>
@@ -584,7 +591,8 @@
     '/projects/cal-tracker': { type:'iframe', src:'https://calorietracker.aedinlai.com' },
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io' },
     '/projects/casino': { type:'iframe', src: CASINO_BASE },
-    '/secret_penguin': { type:'panel', panel:'secret-penguin' }
+    '/secret_penguin': { type:'panel', panel:'secret-penguin' },
+    '/secret_projects': { type:'panel', panel:'secret-projects' }
   };
   const GROUP_PREFIX = { games:'', advantage:'adv_', calculators:'calc_' };
   const FOLDER_TO_PATH = { '': '/projects/casino' };
@@ -662,14 +670,41 @@
 
   addressInput.addEventListener('focus', () => addressInput.select());
   addressInput.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){ e.preventDefault(); navigateTo(addressInput.value); }
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      if(addressInput.value.trim().toLowerCase() === 'password'){
+        secretArmed = true;
+        secretSequence = [];
+        addressInput.blur();
+        return;
+      }
+      navigateTo(addressInput.value);
+    }
     else if(e.key === 'Escape'){ addressInput.value = displayValue(currentPath); addressInput.blur(); }
   });
   addressInput.addEventListener('blur', () => { addressInput.value = displayValue(currentPath); });
 
-  document.getElementById('dotClose').addEventListener('click', () => navigateTo('/'));
-  document.getElementById('dotMinimize').addEventListener('click', () => browserEl.classList.toggle('minimized'));
-  document.getElementById('dotMaximize').addEventListener('click', () => monitorEl.classList.toggle('maximized'));
+  // Secret combo lock: once armed via the "password" address-bar entry, the
+  // three window dots stop closing/minimizing/maximizing and instead record
+  // clicks. Red, green, yellow, yellow unlocks /secret_projects.
+  let secretArmed = false;
+  let secretSequence = [];
+  const SECRET_CODE = ['dotClose', 'dotMaximize', 'dotMinimize', 'dotMinimize']; // red, green, yellow, yellow
+
+  function handleDot(id, defaultAction){
+    if(!secretArmed){ defaultAction(); return; }
+    secretSequence.push(id);
+    if(secretSequence.length > SECRET_CODE.length) secretSequence.shift();
+    if(secretSequence.length === SECRET_CODE.length && secretSequence.every((v, i) => v === SECRET_CODE[i])){
+      secretArmed = false;
+      secretSequence = [];
+      navigateTo('/secret_projects');
+    }
+  }
+
+  document.getElementById('dotClose').addEventListener('click', () => handleDot('dotClose', () => navigateTo('/')));
+  document.getElementById('dotMinimize').addEventListener('click', () => handleDot('dotMinimize', () => browserEl.classList.toggle('minimized')));
+  document.getElementById('dotMaximize').addEventListener('click', () => handleDot('dotMaximize', () => monitorEl.classList.toggle('maximized')));
 
   window.addEventListener('message', (event) => {
     if(event.origin !== 'https://casino.aedinlai.com') return;
