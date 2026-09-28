@@ -6,7 +6,7 @@
 #   1. LectureNotes.app          ->  /Applications
 #   2. BlackHole 2ch audio driver (lets the app hear your computer's sound)
 #   3. Ollama                     (runs the language models locally)
-#   4. The speech + language models themselves (~5.5 GB)
+#   4. The speech + language models themselves (~3.5 GB)
 #
 # Safe to re-run: anything already installed is detected and skipped.
 #
@@ -28,7 +28,8 @@ BLACKHOLE_SHA="57b540f27a3e29c37e310e01bee0fdfab76733087e47f997ef9dccf851400dcf"
 BLACKHOLE_DRIVER="/Library/Audio/Plug-Ins/HAL/BlackHole2ch.driver"
 
 OLLAMA_INSTALLER="https://ollama.com/install.sh"
-OLLAMA_MODELS=("llama3.2:3b" "qwen2.5vl:3b")
+# One multimodal model covers both Q&A and the camera feature.
+OLLAMA_MODELS=("qwen3.5:4b")
 
 WHISPER_URL="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
 WHISPER_DIR="$HOME/Library/Application Support/LectureNotes/models"
@@ -68,7 +69,7 @@ fi
 
 echo
 echo "${bold}LectureNotes installer${reset}"
-echo "${dim}Installs the app, the BlackHole audio driver, Ollama, and ~5.5 GB"
+echo "${dim}Installs the app, the BlackHole audio driver, Ollama, and ~3.5 GB"
 echo "of speech and language models. Everything runs locally on your Mac.${reset}"
 echo
 
@@ -180,7 +181,7 @@ fi
 
 # --- 4. models -------------------------------------------------------------
 
-step "Language models (~5 GB — this is the slow part)"
+step "Language model (~3.4 GB — this is the slow part)"
 for model in "${OLLAMA_MODELS[@]}"; do
   if "$ollama_bin" list 2>/dev/null | awk '{print $1}' | grep -qx "$model"; then
     ok "$model already downloaded"
