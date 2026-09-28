@@ -4,14 +4,17 @@
 <meta charset="UTF-8">
 <title>Aedin Lai</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Self-hosted (SIL Open Font License, see fonts/*-OFL.txt) instead of
+     Google Fonts, so visiting the site doesn't send anyone's IP address to
+     Google. Both are variable fonts: one file covers every weight used. */
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('fonts/SpaceGrotesk-latin.woff2') format('woff2');}
   :root{
     --paper:#ffffff;
     --ink:#101114;
     --muted:#6b7280;
-    --faint:#a3a8b0;
+    --faint:#6f747c;  /* 4.7:1 on white (WCAG AA); was #a3a8b0 at 2.4:1 */
     --line:#e6e7eb;
     --line-strong:#16171b;
   }
@@ -31,6 +34,17 @@
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
 
   .rig{width:100%; max-width:1800px;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+  .site-footer{display:flex; justify-content:center; gap:18px; margin-top:10px; font-size:12px;}
+  .site-footer button{color:#4b5059; font-size:12px; padding:2px 4px;}  /* 7:1 on the #f5f5f6 page background */
+  .site-footer button:hover{color:var(--ink);}
+  .inline-link{color:inherit; text-decoration:underline; font-size:inherit; padding:0;}
+  .legal{max-width:760px; color:var(--muted); font-size:14px; line-height:1.65;}
+  .legal h3{font-family:'Space Grotesk',sans-serif; font-size:16px; color:var(--ink); margin:26px 0 6px;}
+  .legal p, .legal li{margin:6px 0;}
+  .legal ul{padding-left:20px;}
+  .legal a{color:var(--ink); text-decoration:underline;}
+  .legal .updated{color:var(--faint); font-size:12.5px;}
   .monitor{
     width:100%;
     background:var(--paper);
@@ -292,7 +306,7 @@
 
   .note{
     margin-top:26px;
-    color:#9a9ea5;
+    color:var(--faint);
     font-size:12.5px;
     text-align:center;
     max-width:560px;
@@ -369,11 +383,11 @@
     <div class="browser">
       <div class="chrome-bar">
         <div class="dots">
-          <span class="dot-hit" id="dotClose" title="Back to home"><span class="dot"></span></span><span class="dot-hit" id="dotMinimize" title="Minimize"><span class="dot"></span></span><span class="dot-hit" id="dotMaximize" title="Maximize"><span class="dot"></span></span>
+          <span class="dot-hit" id="dotClose" title="Back to home" role="button" tabindex="0" aria-label="Back to home"><span class="dot"></span></span><span class="dot-hit" id="dotMinimize" title="Minimize" role="button" tabindex="0" aria-label="Minimize window"><span class="dot"></span></span><span class="dot-hit" id="dotMaximize" title="Maximize" role="button" tabindex="0" aria-label="Maximize window"><span class="dot"></span></span>
         </div>
         <div class="address" id="address">
-          <svg id="lockIcon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path id="lockShackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <input type="text" id="address-input" class="address-input" value="aedinlai.com" spellcheck="false" autocomplete="off" autocapitalize="off">
+          <svg id="lockIcon" aria-hidden="true" focusable="false" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path id="lockShackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input type="text" id="address-input" class="address-input" aria-label="Page address" value="aedinlai.com" spellcheck="false" autocomplete="off" autocapitalize="off">
         </div>
       </div>
       <div class="tab-strip">
@@ -576,15 +590,15 @@
             <p class="contact-line">The fastest way to reach me is email &mdash; I check it more than anything else.</p>
             <a class="mailto" href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>
             <div class="social-row">
-              <a href="https://github.com/Aedin-ctrl" target="_blank">GitHub</a>
-              <a href="https://linkedin.com/in/aedin-lai" target="_blank">LinkedIn</a>
+              <a href="https://github.com/Aedin-ctrl" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href="https://linkedin.com/in/aedin-lai" target="_blank" rel="noopener noreferrer">LinkedIn</a>
             </div>
           </div>
         </section>
 
         <section class="panel" id="secret-penguin">
           <div class="penguin-wrap">
-            <svg class="penguin-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+            <svg class="penguin-svg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Line drawing of a penguin">
               <circle cx="100" cy="52" r="30" />
               <path d="M62,88 C42,118 37,168 47,203 C57,223 143,223 153,203 C163,168 158,118 138,88" />
               <path d="M79,92 C66,127 66,177 81,212" />
@@ -613,17 +627,19 @@
             <span class="proj-index">01</span>
             <div>
               <span class="proj-title">LectureNotes</span>
-              <p class="proj-desc">A native macOS app that listens to a lecture and writes it down for you. It captures your mic and your computer's own audio at the same time, so a Zoom call comes out as a single speaker-tagged transcript, live, as it happens. When someone asks a question out loud it notices, answers it in a side tab on its own, and there's a camera tool for pointing at a slide and asking about it. Everything runs locally &mdash; the transcription and the answers both happen on your machine, and nothing gets uploaded.</p>
+              <p class="proj-desc">A native macOS app that listens to a lecture and writes it down for you. It captures your mic and your computer's own audio at the same time, so a Zoom call comes out as a single speaker-tagged transcript, live, as it happens. When someone asks a question out loud it notices, answers it in a side tab on its own, and there's a camera tool for pointing at a slide and asking about it. Transcription always happens on your Mac. Answers come from an on-device AI model, unless you connect your own Claude account; then questions, screenshots and notes are sent to Anthropic to answer them (<button class="inline-link" data-path="/privacy">details</button>).</p>
               <p class="proj-tags">C++ &middot; Objective-C++ &middot; whisper.cpp &middot; Dear ImGui &middot; Ollama &mdash; 2025</p>
 
               <p class="dl-lead">Paste this into Terminal. It installs the app, the audio driver it needs, and the models it runs on &mdash; all of it, in one go.</p>
 
               <div class="dl-cmd">
                 <code id="installCmd">curl -fsSL https://www.aedinlai.com/install-lecturenotes.sh | bash</code>
-                <button class="dl-copy" id="copyInstall" type="button">Copy</button>
+                <button class="dl-copy" id="copyInstall" type="button" aria-label="Copy install command">Copy</button>
               </div>
 
               <p class="dl-fine">Apple Silicon Macs (M1 or newer), macOS Sonoma or later. Downloads about 4&nbsp;GB of models, so give it time. It asks for your password once, to install the audio driver. Safe to re-run &mdash; it skips whatever you already have. You can <a href="install-lecturenotes.sh">read the script first</a>, and you should.</p>
+
+              <p class="dl-fine"><strong>Before you record:</strong> get permission. Some places, including Massachusetts, require everyone's consent to record a conversation, and most schools have their own rules about recording classes and outside help. You're responsible for following them. By installing you agree to the <button class="inline-link" data-path="/terms">terms</button>.</p>
 
               <p class="dl-fine">Have a Claude Pro or Max plan? Click <strong>Set up Claude</strong> in the app's first-launch checklist and it'll answer with Claude instead of the on-device model. One sign-in in your browser, using your own account. Without it, everything still works for free.</p>
 
@@ -648,10 +664,68 @@
           </div>
         </section>
 
+
+        <section class="panel" id="privacy">
+          <div class="panel-head"><div><h2 class="panel-heading">Privacy</h2>
+            <p class="panel-sub">What this site and LectureNotes do with your information. Short version: almost nothing.</p></div></div>
+          <div class="legal">
+            <p class="updated">Last updated September 28, 2026</p>
+
+            <h3>This website</h3>
+            <ul>
+              <li><strong>No cookies, no analytics, no tracking.</strong> Nothing on this site stores anything in your browser or counts your visits, so there's nothing to consent to.</li>
+              <li><strong>No accounts or forms.</strong> The address bar at the top only navigates this page; nothing you type is sent anywhere.</li>
+              <li><strong>Hosting.</strong> The site is hosted on GitHub Pages. Like any web host, GitHub may log visitors' IP addresses for security and operations; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub's privacy statement</a>.</li>
+              <li><strong>Fonts are served from this site</strong>, not from Google.</li>
+              <li><strong>Embedded projects.</strong> Some projects open inside the page from my other sites (casino.aedinlai.com, calorietracker.aedinlai.com, hallway-marathon.github.io). Those pages load fonts from Google Fonts, so Google receives your IP address when you open them.</li>
+              <li><strong>Email.</strong> If you email me, I get your address and whatever you write, and use it only to reply.</li>
+            </ul>
+
+            <h3>LectureNotes (the Mac app)</h3>
+            <ul>
+              <li><strong>I don't collect anything.</strong> The app sends no analytics or usage data to me, and I never see your recordings, transcripts or notes.</li>
+              <li><strong>Stays on your Mac:</strong> audio is transcribed on your Mac and never uploaded. Transcripts, answers and notes are saved to <code>~/Documents/LectureNotes</code>. Answers from the free on-device AI model are also produced on your Mac. A small log of when Claude calls succeeded or failed is kept in <code>~/Library/Logs/LectureNotes</code>.</li>
+              <li><strong>If you connect Claude</strong> (optional), the questions it detects (with the few sentences said just before them), screenshots you take with the camera tool, and the transcript used to write notes are sent to Anthropic through your own Claude account, to produce the answers. Anthropic's <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and your plan's terms apply to that.</li>
+              <li><strong>Installing it</strong> downloads files from this site, existential.audio (BlackHole audio driver), ollama.com (Ollama and the AI model) and huggingface.co (the speech model). Those servers see your IP address, like any download.</li>
+            </ul>
+
+            <h3>Other</h3>
+            <p>This site isn't directed at children under 13. If anything here changes, this page will be updated. Questions: <a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>.</p>
+          </div>
+        </section>
+
+        <section class="panel" id="terms">
+          <div class="panel-head"><div><h2 class="panel-heading">Terms</h2>
+            <p class="panel-sub">The ground rules for this site and for LectureNotes.</p></div></div>
+          <div class="legal">
+            <p class="updated">Last updated September 28, 2026</p>
+
+            <h3>This site</h3>
+            <p>This is a personal portfolio. Everything on it is provided for general information, as is. The writing, design and drawings are &copy; Aedin Lai unless noted otherwise.</p>
+
+            <h3>LectureNotes</h3>
+            <ul>
+              <li><strong>It's free.</strong> There's nothing to buy, so there are no payments or refunds.</li>
+              <li><strong>No warranty.</strong> LectureNotes is a student project provided &ldquo;as is&rdquo;, without warranties of any kind. To the fullest extent the law allows, I'm not liable for any loss or damage from using it.</li>
+              <li><strong>Answers can be wrong.</strong> They come from AI models. Check anything important, especially for coursework.</li>
+              <li><strong>Get permission before you record.</strong> Some places, including Massachusetts, require everyone's consent to record a conversation, and schools often have rules about recording classes. You're responsible for getting any permission you need and following those rules.</li>
+              <li><strong>Follow your school's academic integrity rules.</strong> Don't use LectureNotes where outside help isn't allowed, such as during exams.</li>
+              <li><strong>Claude is optional</strong> and runs through your own Claude account, under Anthropic's terms and your plan's limits.</li>
+              <li><strong>Open-source parts.</strong> LectureNotes includes open-source software under the MIT License (whisper.cpp, Dear ImGui and nlohmann/json); their notices are in <a href="licenses.txt">licenses.txt</a> and inside the app. The audio driver, Ollama and the AI models are downloaded from their publishers during setup and are covered by their own licenses.</li>
+            </ul>
+
+            <h3>General</h3>
+            <p>These terms are governed by the laws of the Commonwealth of Massachusetts. They may change, and this page will show the latest version. Questions: <a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>.</p>
+          </div>
+        </section>
       </div>
       <iframe class="content-frame" id="contentFrame" title="Embedded project"></iframe>
     </div>
   </div>
+  <nav class="site-footer" aria-label="Legal">
+    <button type="button" data-path="/privacy">Privacy</button>
+    <button type="button" data-path="/terms">Terms</button>
+  </nav>
 </div>
 
 <script>
@@ -676,9 +750,11 @@
     '/projects': { type:'panel', panel:'projects' },
     '/resume': { type:'panel', panel:'resume' },
     '/contact': { type:'panel', panel:'contact' },
-    '/projects/cal-tracker': { type:'iframe', src:'https://calorietracker.aedinlai.com' },
-    '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io' },
-    '/projects/casino': { type:'iframe', src: CASINO_BASE },
+    '/projects/cal-tracker': { type:'iframe', src:'https://calorietracker.aedinlai.com', title:'Cal Tracker project' },
+    '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io', title:'Hallway Marathon event site' },
+    '/projects/casino': { type:'iframe', src: CASINO_BASE, title:'Casino practice tools' },
+    '/privacy': { type:'panel', panel:'privacy' },
+    '/terms': { type:'panel', panel:'terms' },
     '/secret_penguin': { type:'panel', panel:'secret-penguin' },
     '/secret_projects': { type:'panel', panel:'secret-projects', secret:true }
   };
@@ -734,6 +810,7 @@
       panels.forEach(p => p.classList.remove('active'));
       panelsViewport.style.display = 'none';
       contentFrame.style.display = 'block';
+      contentFrame.title = route.title || 'Embedded project';
       contentFrame.src = route.src;
     }
     return true;
@@ -832,6 +909,10 @@
   document.getElementById('dotClose').addEventListener('click', () => handleDot('dotClose', () => navigateTo('/')));
   document.getElementById('dotMinimize').addEventListener('click', () => handleDot('dotMinimize', () => browserEl.classList.toggle('minimized')));
   document.getElementById('dotMaximize').addEventListener('click', () => handleDot('dotMaximize', () => monitorEl.classList.toggle('maximized')));
+  // Enter / Space activate the dots like real buttons.
+  document.querySelectorAll('.dot-hit').forEach(el => el.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); }
+  }));
 
   window.addEventListener('message', (event) => {
     if(event.origin !== 'https://casino.aedinlai.com') return;
