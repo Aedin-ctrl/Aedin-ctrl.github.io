@@ -679,7 +679,7 @@
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io' },
     '/projects/casino': { type:'iframe', src: CASINO_BASE },
     '/secret_penguin': { type:'panel', panel:'secret-penguin' },
-    '/secret_projects': { type:'panel', panel:'secret-projects' }
+    '/secret_projects': { type:'panel', panel:'secret-projects', secret:true }
   };
   const GROUP_PREFIX = { games:'', advantage:'adv_', calculators:'calc_' };
   const FOLDER_TO_PATH = { '': '/projects/casino' };
@@ -710,9 +710,11 @@
     return 'aedinlai.com' + (path === '/' ? '' : path);
   }
 
-  function applyRoute(path){
+  // Secret routes can't be typed into the address bar; only the combo lock
+  // below opens them, by passing allowSecret.
+  function applyRoute(path, allowSecret){
     const route = ROUTES[path];
-    if(!route) return false;
+    if(!route || (route.secret && !allowSecret)) return false;
     currentPath = path;
     addressInput.value = displayValue(path);
     browserEl.classList.remove('minimized');
@@ -735,9 +737,9 @@
     return true;
   }
 
-  function navigateTo(rawPath){
+  function navigateTo(rawPath, allowSecret){
     const path = normalizePath(rawPath);
-    const ok = applyRoute(path);
+    const ok = applyRoute(path, allowSecret);
     if(!ok){
       addressInput.value = displayValue(currentPath);
       addressEl.classList.remove('invalid');
@@ -809,7 +811,7 @@
     if(secretSequence.length === SECRET_CODE.length && secretSequence.every((v, i) => v === SECRET_CODE[i])){
       secretArmed = false;
       secretSequence = [];
-      navigateTo('/secret_projects');
+      navigateTo('/secret_projects', true);
     }
   }
 
