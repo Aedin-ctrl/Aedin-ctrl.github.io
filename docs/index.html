@@ -102,6 +102,7 @@
   }
   .address:focus-within{border-color:var(--line-strong);}
   .address svg{flex-shrink:0; opacity:0.55;}
+  .address.unlocked svg{cursor:pointer; opacity:0.85;}
   .address-input{
     flex:1; min-width:0;
     font:inherit; color:inherit;
@@ -371,7 +372,7 @@
           <span class="dot-hit" id="dotClose" title="Back to home"><span class="dot"></span></span><span class="dot-hit" id="dotMinimize" title="Minimize"><span class="dot"></span></span><span class="dot-hit" id="dotMaximize" title="Maximize"><span class="dot"></span></span>
         </div>
         <div class="address" id="address">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <svg id="lockIcon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path id="lockShackle" d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           <input type="text" id="address-input" class="address-input" value="aedinlai.com" spellcheck="false" autocomplete="off" autocapitalize="off">
         </div>
       </div>
@@ -693,6 +694,8 @@
   }
 
   let currentPath = '/';
+  // Set by the combo lock; not persisted, so every reload starts locked.
+  let secretUnlocked = false;
 
   function normalizePath(raw){
     let p = (raw || '').trim();
@@ -710,11 +713,10 @@
     return 'aedinlai.com' + (path === '/' ? '' : path);
   }
 
-  // Secret routes can't be typed into the address bar; only the combo lock
-  // below opens them, by passing allowSecret.
-  function applyRoute(path, allowSecret){
+  // Secret routes only resolve while the combo lock below is open.
+  function applyRoute(path){
     const route = ROUTES[path];
-    if(!route || (route.secret && !allowSecret)) return false;
+    if(!route || (route.secret && !secretUnlocked)) return false;
     currentPath = path;
     addressInput.value = displayValue(path);
     browserEl.classList.remove('minimized');
@@ -737,9 +739,9 @@
     return true;
   }
 
-  function navigateTo(rawPath, allowSecret){
+  function navigateTo(rawPath){
     const path = normalizePath(rawPath);
-    const ok = applyRoute(path, allowSecret);
+    const ok = applyRoute(path);
     if(!ok){
       addressInput.value = displayValue(currentPath);
       addressEl.classList.remove('invalid');
@@ -799,7 +801,8 @@
 
   // Secret combo lock: once armed via the "password" address-bar entry, the
   // three window dots stop closing/minimizing/maximizing and instead record
-  // clicks. Red, green, yellow, yellow unlocks /secret_projects.
+  // clicks. Red, green, yellow, yellow unlocks /secret_projects and opens the
+  // padlock; clicking the open padlock locks it again without leaving the page.
   let secretArmed = false;
   let secretSequence = [];
   const SECRET_CODE = ['dotClose', 'dotMaximize', 'dotMinimize', 'dotMinimize']; // red, green, yellow, yellow
@@ -811,9 +814,20 @@
     if(secretSequence.length === SECRET_CODE.length && secretSequence.every((v, i) => v === SECRET_CODE[i])){
       secretArmed = false;
       secretSequence = [];
-      navigateTo('/secret_projects', true);
+      setSecretUnlocked(true);
+      navigateTo('/secret_projects');
     }
   }
+
+  const lockShackle = document.getElementById('lockShackle');
+  function setSecretUnlocked(open){
+    secretUnlocked = open;
+    addressEl.classList.toggle('unlocked', open);
+    lockShackle.setAttribute('d', open ? 'M7 11V7a5 5 0 0 1 9.9-1' : 'M7 11V7a5 5 0 0 1 10 0v4');
+  }
+  document.getElementById('lockIcon').addEventListener('click', () => {
+    if(secretUnlocked) setSecretUnlocked(false);
+  });
 
   document.getElementById('dotClose').addEventListener('click', () => handleDot('dotClose', () => navigateTo('/')));
   document.getElementById('dotMinimize').addEventListener('click', () => handleDot('dotMinimize', () => browserEl.classList.toggle('minimized')));
