@@ -21,6 +21,12 @@ set -euo pipefail
 BASE_URL="${LECTURENOTES_BASE_URL:-https://www.aedinlai.com}"
 
 APP_URL="$BASE_URL/downloads/LectureNotes.zip"
+# Filled in by LectureNotes' scripts/release.sh each time a new build is
+# published, so it always matches the zip next to this script.
+APP_SHA256="__APP_SHA256__"
+# The developer team that signs LectureNotes. Anyone who tampers with the
+# download can change the zip, but can't produce this signature.
+APP_TEAM_ID="N2XQ4P7AN5"
 APP_DEST="/Applications/LectureNotes.app"
 
 BLACKHOLE_URL="https://existential.audio/downloads/BlackHole2ch-0.7.1.pkg"
@@ -90,11 +96,22 @@ fi
 step "Installing LectureNotes"
 curl -fL --progress-bar "$APP_URL" -o "$TEMP_DIR/LectureNotes.zip" \
   || die "Could not download LectureNotes from $APP_URL"
+actual_app_sha="$(shasum -a 256 "$TEMP_DIR/LectureNotes.zip" | cut -d' ' -f1)"
+[ "$actual_app_sha" = "$APP_SHA256" ] || die "The LectureNotes download didn't match its expected checksum.
+       Not installing it. Please report this at aedinlai.com."
 unzip -q "$TEMP_DIR/LectureNotes.zip" -d "$TEMP_DIR/app" \
   || die "The downloaded file was not a valid zip archive."
 
 extracted="$(find "$TEMP_DIR/app" -maxdepth 1 -iname '*.app' -print -quit)"
 [ -n "$extracted" ] || die "No .app found inside the downloaded archive."
+
+# Check the signature before trusting it with mic and screen permissions:
+# intact, and made by the LectureNotes developer team.
+codesign --verify --deep --strict "$extracted" 2>/dev/null \
+  || die "The downloaded app's signature is broken. Not installing it."
+signed_team="$(codesign -dv "$extracted" 2>&1 | sed -n 's/^TeamIdentifier=//p')"
+[ "$signed_team" = "$APP_TEAM_ID" ] || die "The downloaded app isn't signed by the LectureNotes developer.
+       Not installing it."
 
 # curl doesn't set com.apple.quarantine the way a browser does, so this is
 # belt-and-braces in case the archive arrived some other way.
