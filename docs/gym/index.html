@@ -109,7 +109,12 @@
 <script>
 (() => {
   const LIVE_URL = 'https://goboardapi.azurewebsites.net/api/FacilityCount/GetCountsByAccount?AccountAPIKey=2a2be0d8-df10-4a48-bedd-b3bc0cd628e7';
-  const HISTORY_URL = 'https://raw.githubusercontent.com/Aedin-ctrl/marino-tracker/main/data/history.json';
+  // Two independent recorders; the page merges them, so a gap in one is
+  // covered by the other (each headcount is counted once either way).
+  const HISTORY_URLS = [
+    'https://marino-tracker.pizza-calc-api.workers.dev/history',                    // Cloudflare, every 10 min
+    'https://raw.githubusercontent.com/Aedin-ctrl/marino-tracker/main/data/history.json',  // GitHub Actions
+  ];
   const TZ = 'America/New_York';
   const FIRST_HOUR = 5, LAST_HOUR = 23;
   const STALE_MS = 2 * 3600000;   // older than this: closed or not being counted
@@ -361,14 +366,17 @@
     return asUtc + (utcWall - eastWall);
   }
   async function loadHistory(){
-    try{
-      const r = await fetch(HISTORY_URL + '?t=' + Math.floor(Date.now() / 300000), { cache:'no-store' });
+    const results = await Promise.allSettled(HISTORY_URLS.map(async url => {
+      const r = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Math.floor(Date.now() / 300000), { cache:'no-store' });
       if(!r.ok) throw new Error(r.status);
-      const h = await r.json();
-      rooms = Object.assign({}, h.rooms, rooms);
-      samples = h.samples || [];
-    }catch(err){ /* live view still works */ }
+      return r.json();
+    }));
+    const loaded = results.filter(x => x.status === 'fulfilled').map(x => x.value);
+    if(!loaded.length) return;   // live view still works
+    for(const h of loaded) rooms = Object.assign({}, h.rooms, rooms);
+    samples = loaded.flatMap(h => h.samples || []).sort((a, b) => a.t - b.t);
   }
+
 
   (async () => {
     await Promise.all([loadHistory(), loadLive()]);

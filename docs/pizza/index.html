@@ -149,7 +149,7 @@
 
 <script>
 (() => {
-  const API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787' : 'https://pizza-calc-api.WORKERS_SUBDOMAIN.workers.dev';
+  const API = location.hostname === '127.0.0.1' ? 'http://127.0.0.1:8787' : 'https://pizza-calc-api.pizza-calc-api.workers.dev';
   const PRESETS = { round: [['small', 10], ['medium', 12], ['large', 14], ['xl', 16]], square: [['small', 10], ['medium', 12], ['large', 14], ['xl', 16]] };
   const PRESET_NAMES = { small:'Small', medium:'Medium', large:'Large', xl:'XL', custom:'Custom' };
   const TOPPING_WORTH = 0.07, MAX_TOPPINGS_COUNTED = 6;
