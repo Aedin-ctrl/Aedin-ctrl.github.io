@@ -240,6 +240,23 @@
   .proj-link{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:2px; white-space:nowrap; align-self:start;}
   .proj-link:hover{border-color:var(--ink);}
 
+  /* Secret projects: one compact row each; click to open the details in place. */
+  .sp-item{border-top:1px solid var(--line);}
+  .sp-item:last-child{border-bottom:1px solid var(--line);}
+  .sp-sum{
+    display:grid; grid-template-columns:32px 1fr auto; gap:20px; align-items:baseline;
+    padding:18px 0; cursor:pointer; list-style:none;
+  }
+  .sp-sum::-webkit-details-marker{display:none;}
+  .sp-brief{display:block; margin-top:4px;}
+  .sp-toggle{color:var(--faint); font-size:18px; line-height:1; width:18px; text-align:center; align-self:center;}
+  .sp-toggle::before{content:'+';}
+  .sp-item[open] .sp-toggle::before{content:'\2212';}
+  .sp-sum:hover .proj-title, .sp-sum:hover .sp-toggle{color:var(--ink);}
+  .sp-sum:focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:4px;}
+  .sp-body{padding:0 0 26px 52px;}
+  .sp-body > .proj-desc:first-child{margin-top:0;}
+
   .proj-subnav{display:flex; gap:30px; margin-top:16px; flex-wrap:wrap;}
   .proj-subgroup{display:flex; flex-direction:column; gap:5px;}
   .proj-subgroup-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin-bottom:2px;}
@@ -359,6 +376,8 @@
   }
   @media (max-width:640px){
     .project-row{grid-template-columns:24px 1fr; gap:6px 14px;}
+    .sp-sum{grid-template-columns:24px 1fr auto; gap:6px 14px;}
+    .sp-body{padding-left:0;}
     .proj-link{grid-column:1 / -1; justify-self:start; margin-top:4px;}
     .address{max-width:none;}
     .browser{height:calc(100vh - 50px); height:calc(100dvh - 50px);}
@@ -617,10 +636,17 @@
             </div>
           </div>
 
-          <div class="project-row">
-            <span class="proj-index">01</span>
-            <div>
-              <span class="proj-title">LectureNotes</span>
+          <details class="sp-item">
+            <summary class="sp-sum">
+              <span class="proj-index">01</span>
+              <span>
+                <span class="proj-title">LectureNotes</span>
+                <span class="proj-desc sp-brief">Listens to a lecture, writes it down live, and answers questions asked out loud. macOS.</span>
+              </span>
+              <span class="sp-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="sp-body">
+
               <p class="proj-desc">A native macOS app that listens to a lecture and writes it down for you. It captures your mic and your computer's own audio at the same time, so a Zoom call comes out as a single speaker-tagged transcript, live, as it happens. When someone asks a question out loud it notices, answers it in a side tab on its own, and there's a camera tool for pointing at a slide and asking about it. Transcription always happens on your Mac. Answers come from an on-device AI model, unless you connect your own Claude account; then questions, screenshots and notes are sent to Anthropic to answer them (<button class="inline-link" data-path="/privacy">details</button>).</p>
               <p class="proj-tags">C++ &middot; Objective-C++ &middot; whisper.cpp &middot; Dear ImGui &middot; Ollama &mdash; 2025</p>
 
@@ -655,47 +681,54 @@
                 </div>
               </details>
             </div>
-          </div>
+          </details>
 
-          <div class="project-row">
-            <span class="proj-index">02</span>
-            <div>
-              <span class="proj-title">SceneTyper</span>
+          <details class="sp-item">
+            <summary class="sp-sum">
+              <span class="proj-index">02</span>
+              <span>
+                <span class="proj-title">typr</span>
+                <span class="proj-desc sp-brief">Fakes someone writing and revising an essay on screen, for filming. Types into any document. macOS.</span>
+              </span>
+              <span class="sp-toggle" aria-hidden="true"></span>
+            </summary>
+            <div class="sp-body">
+
               <p class="proj-desc">A macOS app I made for a short film, to fake someone writing an essay on screen. Give it the final text (paste it, or drop in a PDF, Word doc or photo of the page) and a running time, and it types into whatever document is open &mdash; Google Docs, Word, Pages &mdash; at a human pace, with pauses, typos and second thoughts. Then it goes back through its own rough draft, jumping word by word with the keyboard, highlighting and rewording, until the page matches the script exactly. A floating bar shows the timer for each part. If anyone touches the keyboard it pauses instantly and remembers its place, or it can let an actor's keypresses drive the typing so their hands match the screen.</p>
               <p class="proj-tags">Swift &middot; SwiftUI &middot; AppKit &middot; Claude &mdash; 2026</p>
 
               <p class="dl-lead">Paste this into Terminal. It installs the app, and nothing else.</p>
 
               <div class="dl-cmd">
-                <code id="installCmdST">curl -fsSL https://www.aedinlai.com/install-scenetyper.sh | bash</code>
-                <button class="dl-copy" data-target="installCmdST" type="button" aria-label="Copy install command">Copy</button>
+                <code id="installCmdTypr">curl -fsSL https://www.aedinlai.com/install-typr.sh | bash</code>
+                <button class="dl-copy" data-target="installCmdTypr" type="button" aria-label="Copy install command">Copy</button>
               </div>
 
-              <p class="dl-fine">macOS Ventura or later, Apple Silicon or Intel. About 1&nbsp;MB. On first launch it asks for Accessibility permission, which is what lets it type into your document. Safe to re-run &mdash; it replaces an older copy. You can <a href="install-scenetyper.sh">read the script first</a>, and you should.</p>
+              <p class="dl-fine">macOS Ventura or later, Apple Silicon or Intel. About 1&nbsp;MB. On first launch it asks for Accessibility permission, which is what lets it type into your document. Safe to re-run &mdash; it replaces an older copy. You can <a href="install-typr.sh">read the script first</a>, and you should.</p>
 
-              <p class="dl-fine">Have Claude Code signed in on your Mac? SceneTyper uses it to write the rough-draft wording it later revises; your script is sent to Anthropic through your own account to do that (<button class="inline-link" data-path="/privacy">details</button>). Without it, it uses a built-in word list &mdash; or open a <code>.scenetyper</code> scene file someone made with Claude and you get exactly their takes.</p>
+              <p class="dl-fine">Have Claude Code signed in on your Mac? typr uses it to write the rough-draft wording it later revises; your script is sent to Anthropic through your own account to do that (<button class="inline-link" data-path="/privacy">details</button>). Without it, it uses a built-in word list &mdash; or open a <code>.typr</code> scene file someone made with Claude and you get exactly their takes.</p>
 
               <details class="dl-alt">
                 <summary>Or download just the app</summary>
                 <div class="dl-altbody">
                   <div class="dl-row">
-                    <a class="dl-btn" href="downloads/SceneTyper.zip" download>Download .zip</a>
+                    <a class="dl-btn" href="downloads/typr.zip" download>Download .zip</a>
                     <span class="dl-meta">1 MB &middot; same app as the command installs</span>
                   </div>
                   <div class="dl-note">
                     <span class="dl-note-mark">01</span>
-                    <span><strong>macOS will refuse to open it at first.</strong> Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the Security section, and click <strong>Open Anyway</strong> next to the message about SceneTyper. That button only shows up for about an hour after you try to open the app. The command above skips all of this.</span>
+                    <span><strong>macOS will refuse to open it at first.</strong> Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the Security section, and click <strong>Open Anyway</strong> next to the message about typr. That button only shows up for about an hour after you try to open the app. The command above skips all of this.</span>
                   </div>
                 </div>
               </details>
             </div>
-          </div>
+          </details>
         </section>
 
 
         <section class="panel" id="privacy">
           <div class="panel-head"><div><h2 class="panel-heading">Privacy</h2>
-            <p class="panel-sub">What this site, LectureNotes and SceneTyper do with your information. Short version: almost nothing.</p></div></div>
+            <p class="panel-sub">What this site, LectureNotes and typr do with your information. Short version: almost nothing.</p></div></div>
           <div class="legal">
             <p class="updated">Last updated September 28, 2026</p>
 
@@ -717,10 +750,10 @@
               <li><strong>Installing it</strong> downloads files from this site, existential.audio (BlackHole audio driver), ollama.com (Ollama and the AI model) and huggingface.co (the speech model). Those servers see your IP address, like any download.</li>
             </ul>
 
-            <h3>SceneTyper (the Mac app)</h3>
+            <h3>typr (the Mac app)</h3>
             <ul>
               <li><strong>I don't collect anything.</strong> No analytics or usage data, and I never see your scripts.</li>
-              <li><strong>Stays on your Mac:</strong> your script, settings and the draft wording it generates (saved in <code>~/Library/Application Support/SceneTyper</code>).</li>
+              <li><strong>Stays on your Mac:</strong> your script, settings and the draft wording it generates (saved in <code>~/Library/Application Support/typr</code>).</li>
               <li><strong>Keyboard access</strong> (the Accessibility permission) is used only to type into the document in front of you and, during a take, to notice when a key is pressed or the mouse is clicked so it can pause. Keys and clicks aren't recorded or saved.</li>
               <li><strong>If Claude Code is signed in</strong> on your Mac, the script is sent to Anthropic through your own Claude account to write the rough-draft wording. Anthropic's <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and your plan's terms apply to that.</li>
               <li><strong>Installing it</strong> downloads the app from this site.</li>
@@ -733,7 +766,7 @@
 
         <section class="panel" id="terms">
           <div class="panel-head"><div><h2 class="panel-heading">Terms</h2>
-            <p class="panel-sub">The ground rules for this site, LectureNotes and SceneTyper.</p></div></div>
+            <p class="panel-sub">The ground rules for this site, LectureNotes and typr.</p></div></div>
           <div class="legal">
             <p class="updated">Last updated September 28, 2026</p>
 
@@ -751,7 +784,7 @@
               <li><strong>Open-source parts.</strong> LectureNotes includes open-source software under the MIT License (whisper.cpp, Dear ImGui and nlohmann/json); their notices are in <a href="licenses.txt">licenses.txt</a> and inside the app. The audio driver, Ollama and the AI models are downloaded from their publishers during setup and are covered by their own licenses.</li>
             </ul>
 
-            <h3>SceneTyper</h3>
+            <h3>typr</h3>
             <ul>
               <li><strong>It's free</strong> and provided &ldquo;as is&rdquo;, without warranties of any kind. To the fullest extent the law allows, I'm not liable for any loss or damage from using it.</li>
               <li><strong>It types into whatever window is in front.</strong> Start takes in a document you don't mind it editing (it can clear it between takes), and keep other work closed or saved. It refuses to type into terminal apps.</li>
