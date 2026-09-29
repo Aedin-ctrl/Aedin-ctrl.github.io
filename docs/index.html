@@ -229,14 +229,15 @@
     grid-template-columns:32px 1fr auto;
     gap:20px;
     align-items:baseline;
-    padding:20px 0;
+    padding:15px 0;
     border-top:1px solid var(--line);
   }
   .project-row:last-child{border-bottom:1px solid var(--line);}
   .proj-index{color:var(--faint); font-size:13px; font-family:'Space Grotesk', sans-serif;}
   .proj-title{font-size:16.5px; display:inline; color:var(--ink);}
-  .proj-desc{color:var(--muted); font-size:13.5px; line-height:1.6; margin-top:6px; max-width:780px;}
-  .proj-tags{color:var(--faint); font-size:12.5px; margin-top:8px;}
+  .proj-desc{color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:4px; max-width:720px;}
+  #projects .proj-desc{min-height:3.1em;}  /* two lines, so every row is the same height */
+  .proj-tags{color:var(--faint); font-size:12.5px; margin-top:6px;}
   .proj-link{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:2px; white-space:nowrap; align-self:start;}
   .proj-link:hover{border-color:var(--ink);}
 
@@ -499,7 +500,7 @@
             <span class="proj-index">01</span>
             <div>
               <span class="proj-title">One-Inch Punch Arcade Machine</span>
-              <p class="proj-desc">Lead constructor and designer on a full-scale arcade machine built from scratch for Northeastern's GE1501 &mdash; mechanical build, electronics, and scoring software, concept to expo launch. Dual laser sensors measure swing velocity for a live score; the wooden frame, pendulum-and-magnet reset system, and laser-cut acrylic paneling were all built by hand and stress-tested through 80+ personal test swings.</p>
+              <p class="proj-desc">Led the design and build of a full-scale arcade punching machine for Northeastern's GE1501: laser sensors score each swing, with a hand-built frame and auto-reset pendulum.</p>
               <p class="proj-tags">Mechanical design &middot; electronics &middot; scoring software &mdash; Fall 2025</p>
             </div>
           </div>
@@ -508,7 +509,7 @@
             <span class="proj-index">02</span>
             <div>
               <span class="proj-title">Cal Tracker</span>
-              <p class="proj-desc">A self-hosted, real-time calorie tracking web app running on a Raspberry Pi, with a lightweight front-end/back-end and persistent local storage.</p>
+              <p class="proj-desc">A self-hosted, real-time calorie tracker running on a Raspberry Pi, with its own lightweight front end, back end and local storage.</p>
               <p class="proj-tags">Python &middot; HTML/CSS &middot; Raspberry Pi</p>
             </div>
             <button class="proj-link" data-path="/projects/cal-tracker">View project</button>
@@ -518,7 +519,7 @@
             <span class="proj-index">03</span>
             <div>
               <span class="proj-title">Hallway Marathon Event Site</span>
-              <p class="proj-desc">Designed and built an event website from scratch (HTML, CSS, JavaScript, no frameworks) with live betting odds and competitor stats for a multi-university competition &mdash; independently managed all content, deployment, and live updates throughout the event.</p>
+              <p class="proj-desc">An event site built from scratch for a multi-university race, with live betting odds and competitor stats, run and updated live throughout the event.</p>
               <p class="proj-tags">HTML &middot; CSS &middot; JavaScript</p>
             </div>
             <button class="proj-link" data-path="/projects/hallway-marathon">View project</button>
@@ -528,33 +529,8 @@
             <span class="proj-index">04</span>
             <div>
               <span class="proj-title">Casino</span>
-              <p class="proj-desc">Consolidated ten separate casino/card-game practice tools (blackjack, poker, baccarat, craps, roulette, mahjong) &mdash; each previously its own standalone site &mdash; into a single hub site.</p>
+              <p class="proj-desc">Ten casino and card-game practice tools (blackjack, poker, baccarat, craps, roulette, mahjong), merged from separate sites into one hub.</p>
               <p class="proj-tags">HTML &middot; CSS &middot; JavaScript</p>
-              <div class="proj-subnav">
-                <div class="proj-subgroup">
-                  <span class="proj-subgroup-label">games</span>
-                  <button class="proj-sublink" data-path="/projects/casino/blackjack">blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/poker">poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/baccarat">baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/craps">craps</button>
-                  <button class="proj-sublink" data-path="/projects/casino/roulette">roulette</button>
-                  <button class="proj-sublink" data-path="/projects/casino/mahjong">mahjong</button>
-                </div>
-                <div class="proj-subgroup">
-                  <span class="proj-subgroup-label">advantage</span>
-                  <button class="proj-sublink" data-path="/projects/casino/adv_blackjack">adv_blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/adv_poker">adv_poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/adv_baccarat">adv_baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/adv_mahjong">adv_mahjong</button>
-                </div>
-                <div class="proj-subgroup">
-                  <span class="proj-subgroup-label">calculators</span>
-                  <button class="proj-sublink" data-path="/projects/casino/calc_blackjack">calc_blackjack</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calc_poker">calc_poker</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calc_baccarat">calc_baccarat</button>
-                  <button class="proj-sublink" data-path="/projects/casino/calc_mahjong">calc_mahjong</button>
-                </div>
-              </div>
             </div>
             <button class="proj-link" data-path="/projects/casino">View project</button>
           </div>
@@ -563,7 +539,7 @@
             <span class="proj-index">05</span>
             <div>
               <span class="proj-title">Marino Tracker</span>
-              <p class="proj-desc">Shows how packed Northeastern's Marino Center is right now, room by room, and keeps its own history: a GitHub Actions job records the rec center's live head counts every 15 minutes, and the page turns the last 7 days into an hour-by-hour heatmap and the quietest times to go today.</p>
+              <p class="proj-desc">Shows how packed Northeastern's Marino Center is, room by room, and logs the counts every 10 minutes to find the quietest time to go.</p>
               <p class="proj-tags">JavaScript &middot; GitHub Actions &middot; web scraping &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/marino-tracker">View project</button>
@@ -573,7 +549,7 @@
             <span class="proj-index">06</span>
             <div>
               <span class="proj-title">Pizza Calc</span>
-              <p class="proj-desc">Works out what a pizza really costs per square inch &mdash; round, square or rectangle, preset or custom size, toppings, deals, in person or online &mdash; and rates it against every pizza on a shared list everyone can add to, backed by a small Cloudflare Worker and database.</p>
+              <p class="proj-desc">Works out a pizza's real price per square inch for any shape, size, toppings or deal, and rates it against a shared list anyone can add to.</p>
               <p class="proj-tags">JavaScript &middot; Cloudflare Workers &middot; SQL &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/pizza-calc">View project</button>
