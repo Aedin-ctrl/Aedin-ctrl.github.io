@@ -8,7 +8,7 @@
 #      The free build tools (~240 MB) are downloaded once and kept for next
 #      time. If the build fails for any reason, the ready-made app is used.
 #   2. Ollama                (runs the language model locally)
-#   3. The speech + language models themselves (~4 GB)
+#   3. The speech + language models themselves (~4.5 GB)
 # No administrator rights needed. Windows records your computer's sound
 # natively, so unlike the Mac version there's no audio driver to install.
 #
@@ -75,9 +75,12 @@ $OllamaExe   = Join-Path $OllamaDir 'ollama.exe'
 $OllamaApp   = Join-Path $OllamaDir 'ollama app.exe'
 $OllamaSetup = 'https://ollama.com/download/OllamaSetup.exe'
 $OllamaModels = @('qwen3.5:4b')   # one multimodal model covers both Q&A and the camera feature
-$WhisperUrl  = 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin'
+# q8_0 (not the Mac's q5_0): about 3x faster on ARM CPUs thanks to ggml's
+# int8 kernels, at least as fast on x64, and more accurate.
+$WhisperUrl  = 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q8_0.bin'
 $WhisperDir  = Join-Path $WorkRoot 'models'
-$WhisperDest = Join-Path $WhisperDir 'ggml-large-v3-turbo-q5_0.bin'
+$WhisperDest = Join-Path $WhisperDir 'ggml-large-v3-turbo-q8_0.bin'
+$WhisperOld  = Join-Path $WhisperDir 'ggml-large-v3-turbo-q5_0.bin'   # earlier betas
 # Much faster English model the app switches to on PCs too slow for the main
 # one to keep up in real time (about 5x faster on a 4-core laptop CPU).
 $FastUrl     = 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en-q5_1.bin'
@@ -181,7 +184,7 @@ function BuildFromSource($arch, $temp, $outDir) {
         "-DCMAKE_C_COMPILER=$(Fwd (Join-Path $llvm 'bin\clang.exe'))" `
         "-DCMAKE_CXX_COMPILER=$(Fwd (Join-Path $llvm 'bin\clang++.exe'))" `
         "-DCMAKE_RC_COMPILER=$(Fwd (Join-Path $llvm 'bin\windres.exe'))" `
-        -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=ON *> $log
+        -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=ON -DLN_NATIVE_CPU=ON *> $log
     if ($LASTEXITCODE -ne 0) { throw "Configuring the build failed (details in $log)" }
     & $cmake --build $build --parallel $env:NUMBER_OF_PROCESSORS *>> $log
     if ($LASTEXITCODE -ne 0) { throw "Compiling failed (details in $log)" }
@@ -227,7 +230,7 @@ try {
 
     Write-Host ''
     Write-Host 'LectureNotes installer' -ForegroundColor White
-    Write-Host 'Builds the app on your PC, then installs Ollama and ~4 GB of speech and language models.' -ForegroundColor DarkGray
+    Write-Host 'Builds the app on your PC, then installs Ollama and ~4.5 GB of speech and language models.' -ForegroundColor DarkGray
     Write-Host 'Everything runs locally on your PC. No administrator password needed.' -ForegroundColor DarkGray
     Write-Host ''
 
@@ -348,7 +351,7 @@ try {
         }
     }
 
-    Step 'Speech models (~730 MB)'
+    Step 'Speech models (~1.1 GB)'
     New-Item -ItemType Directory -Path $WhisperDir -Force | Out-Null
     foreach ($m in @(@($WhisperUrl, $WhisperDest), @($FastUrl, $FastDest))) {
         if (Test-Path $m[1]) {
@@ -361,6 +364,7 @@ try {
             Ok $m[1]
         }
     }
+    if ((Test-Path $WhisperDest) -and (Test-Path $WhisperOld)) { Remove-Item $WhisperOld -Force -ErrorAction SilentlyContinue }
 
     Remove-Item -Recurse -Force $temp -ErrorAction SilentlyContinue
 
