@@ -1,9 +1,9 @@
 # Daily News routine
 
 Instructions for the cloud agent that writes each day's stories for the News
-tab on aedinlai.com (docs/news/). It runs every morning at 6 AM Boston time.
-Edit this file to change what it does; the routine just says "follow
-scripts/news-routine.md".
+tab on aedinlai.com (docs/news/). It runs every morning at 6 AM Boston time
+from Aedin's Mac (scripts/news-daily.sh, a launchd job), which asks Claude to
+follow this file. Edit this file to change what it does.
 
 ## 1. Is today already done?
 
@@ -53,7 +53,8 @@ categories.
 
 ## 4. Write the day file
 
-Write a JSON array to `/tmp/news-today.json`, one object per story:
+Write a JSON array to `news-today.json` in the repo root (it's gitignored),
+one object per story:
 
 ```json
 {
@@ -79,11 +80,14 @@ Write a JSON array to `/tmp/news-today.json`, one object per story:
 
 ## 5. Add it and publish
 
-    node scripts/news.mjs add /tmp/news-today.json --date $TODAY
+    node scripts/news.mjs add news-today.json --date $TODAY
 
 If it reports a problem, fix the JSON and run it again. The script needs at
 least 10 stories, requires every field, and refuses a lead source that an
-earlier day already used. Then:
+earlier day already used.
+
+When the Mac runner started you, stop here: it checks the result, commits and
+pushes by itself. Otherwise publish:
 
     git add docs/news
     git commit -m "News: $TODAY ($(node -e "console.log(require('./docs/news/days/$TODAY.json').articles.length)") stories)"
