@@ -219,6 +219,16 @@ function InstallUninstaller {
 $ErrorActionPreference = 'Continue'
 $app = '__APP__'
 Write-Host 'Uninstalling LectureNotes...'
+# Ask a running copy to close first (it saves a lecture in progress).
+$running = Get-Process -Name 'LectureNotes' -ErrorAction SilentlyContinue
+if ($running) {
+    try {
+        Add-Type -Namespace LectureNotesUninstall -Name Win -MemberDefinition '[DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr FindWindowW(string cls, string title); [DllImport("user32.dll")] public static extern bool PostMessageW(IntPtr hwnd, uint msg, IntPtr w, IntPtr l);'
+        $hwnd = [LectureNotesUninstall.Win]::FindWindowW('LectureNotesWindow', [NullString]::Value)
+        if ($hwnd -ne [IntPtr]::Zero) { [LectureNotesUninstall.Win]::PostMessageW($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null }
+    } catch {}
+    $running | ForEach-Object { $_.WaitForExit(15000) | Out-Null }
+}
 Get-Process -Name 'LectureNotes' -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Seconds 1
 $programs = [Environment]::GetFolderPath('Programs')
