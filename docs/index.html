@@ -628,6 +628,9 @@
           </div>
         </section>
 
+        <!-- Filled in with one secret project when a temp key is typed (see lookUpTempKey). -->
+        <section class="panel" id="shared-project"></section>
+
         <section class="panel" id="secret-projects">
           <div class="panel-head">
             <div>
@@ -887,11 +890,7 @@
     buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === topSeg));
 
     if(route.type === 'panel'){
-      contentFrame.style.display = 'none';
-      contentFrame.src = 'about:blank';
-      panelsViewport.style.display = '';
-      panels.forEach(p => p.classList.toggle('active', p.id === route.panel));
-      panelsViewport.scrollTop = 0;
+      showPanel(route.panel);
     } else {
       panels.forEach(p => p.classList.remove('active'));
       panelsViewport.style.display = 'none';
@@ -900,6 +899,14 @@
       contentFrame.src = route.src;
     }
     return true;
+  }
+
+  function showPanel(id){
+    contentFrame.style.display = 'none';
+    contentFrame.src = 'about:blank';
+    panelsViewport.style.display = '';
+    panels.forEach(p => p.classList.toggle('active', p.id === id));
+    panelsViewport.scrollTop = 0;
   }
 
   function navigateTo(rawPath){
@@ -917,50 +924,124 @@
 
   applyRoute('/');
 
-  document.querySelectorAll('[data-path]').forEach(el => {
-    el.addEventListener('click', () => navigateTo(el.dataset.path));
-  });
+  function wirePathLinks(root){
+    root.querySelectorAll('[data-path]').forEach(el => {
+      el.addEventListener('click', () => navigateTo(el.dataset.path));
+    });
+  }
+  wirePathLinks(document);
   buttons.forEach(b => b.addEventListener('click', () => navigateTo('/' + (b.dataset.tab === 'general' ? '' : b.dataset.tab))));
 
   addressInput.addEventListener('focus', () => addressInput.select());
   addressInput.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
       e.preventDefault();
-      if(addressInput.value.trim().toLowerCase() === 'password'){
+      const typed = addressInput.value;
+      if(typed.trim().toLowerCase() === 'password'){
         secretArmed = true;
         secretSequence = [];
         addressInput.blur();
         return;
       }
-      navigateTo(addressInput.value);
+      if(ROUTES[normalizePath(typed)]){ navigateTo(typed); return; }
+      addressInput.blur();
+      lookUpTempKey(typed).then(project => {
+        if(!(project && showSharedProject(project))) navigateTo(typed);
+      });
     }
     else if(e.key === 'Escape'){ addressInput.value = displayValue(currentPath); addressInput.blur(); }
   });
   addressInput.addEventListener('blur', () => { addressInput.value = displayValue(currentPath); });
 
   // "Copy" buttons next to install commands (data-target = the <code> id).
-  document.querySelectorAll('.dl-copy[data-target]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const code = document.getElementById(btn.dataset.target);
-      try { await navigator.clipboard.writeText(code.textContent.trim()); }
-      catch(err){
-        // The clipboard API needs a secure context; if it's unavailable,
-        // select the text so it can still be copied by hand.
-        const range = document.createRange();
-        range.selectNodeContents(code);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-        return;
-      }
-      btn.textContent = 'Copied';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Copy';
-        btn.classList.remove('copied');
-      }, 1600);
+  function wireCopyButtons(root){
+    root.querySelectorAll('.dl-copy[data-target]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const code = document.getElementById(btn.dataset.target);
+        try { await navigator.clipboard.writeText(code.textContent.trim()); }
+        catch(err){
+          // The clipboard API needs a secure context; if it's unavailable,
+          // select the text so it can still be copied by hand.
+          const range = document.createRange();
+          range.selectNodeContents(code);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+          return;
+        }
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = 'Copy';
+          btn.classList.remove('copied');
+        }, 1600);
+      });
     });
-  });
+  }
+  wireCopyButtons(document);
+
+  // Temp keys: "Key:Project" lines under "temp" in fonts/glyphs.txt. Typing a
+  // key in the address bar shows just that one secret project (it never
+  // unlocks the others) for 24 hours after the commit that added the line:
+  // the site asks GitHub for the file as it was a day ago, and a key that was
+  // already in it then has expired. If GitHub can't be reached, nothing opens.
+  const TEMP_KEYS_FILE = 'fonts/glyphs.txt';
+  const TEMP_KEYS_REPO = 'Aedin-ctrl/Aedin-ctrl.github.io';
+  const TEMP_KEYS_REPO_PATH = 'docs/' + TEMP_KEYS_FILE;
+
+  function parseTempKeys(text){
+    const keys = new Map();
+    let inTemp = false;
+    for(const raw of text.split(/\r?\n/)){
+      const line = raw.trim();
+      if(!inTemp){ if(line.toLowerCase() === 'temp') inTemp = true; continue; }
+      const m = line.match(/^([^:\s]+)\s*:\s*(.+)$/);
+      if(m) keys.set(m[1].toLowerCase(), m[2].trim());
+    }
+    return keys;
+  }
+
+  async function lookUpTempKey(typed){
+    const key = typed.trim().toLowerCase();
+    if(!key || /[\s\/.]/.test(key)) return null;
+    try{
+      const current = await fetch(TEMP_KEYS_FILE + '?t=' + Date.now(), {cache:'no-store'});
+      if(!current.ok) return null;
+      const project = parseTempKeys(await current.text()).get(key);
+      if(!project) return null;
+      const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const commits = await fetch(`https://api.github.com/repos/${TEMP_KEYS_REPO}/commits?path=${encodeURIComponent(TEMP_KEYS_REPO_PATH)}&until=${dayAgo}&per_page=1`);
+      if(!commits.ok) return null;
+      const list = await commits.json();
+      if(list.length){
+        const old = await fetch(`https://raw.githubusercontent.com/${TEMP_KEYS_REPO}/${list[0].sha}/${TEMP_KEYS_REPO_PATH}`, {cache:'no-store'});
+        if(!old.ok) return null;
+        if(parseTempKeys(await old.text()).has(key)) return null;  // already there a day ago
+      }
+      return project;
+    }catch(err){
+      return null;
+    }
+  }
+
+  function showSharedProject(name){
+    const item = [...document.querySelectorAll('#secret-projects .sp-item')]
+      .find(d => d.querySelector('.proj-title').textContent.trim().toLowerCase() === name.toLowerCase());
+    if(!item) return false;
+    const panel = document.getElementById('shared-project');
+    const card = item.cloneNode(true);
+    card.open = true;
+    panel.replaceChildren(card);
+    wirePathLinks(panel);
+    wireCopyButtons(panel);
+    // Not a route: typing this address later doesn't reopen it.
+    currentPath = '/shared/' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    addressInput.value = displayValue(currentPath);
+    browserEl.classList.remove('minimized');
+    buttons.forEach(b => b.classList.remove('active'));
+    showPanel('shared-project');
+    return true;
+  }
 
   // Secret combo lock: once armed via the "password" address-bar entry, the
   // three window dots stop closing/minimizing/maximizing and instead record
