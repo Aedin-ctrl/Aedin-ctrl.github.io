@@ -57,7 +57,15 @@ $Pdfium = @{
 
 # Named "LectureNotes App" so it never merges with an existing "lecturenotes"
 # folder (e.g. a Mac Desktop shared into a virtual machine).
-$InstallDir  = if ($env:LECTURENOTES_INSTALL_DIR) { $env:LECTURENOTES_INSTALL_DIR } else { Join-Path ([Environment]::GetFolderPath('Desktop')) 'LectureNotes App' }
+$Desktop     = [Environment]::GetFolderPath('Desktop')
+# In a Parallels VM the Desktop is usually the Mac's Desktop shared into
+# Windows (C:\Mac\Home\Desktop), and writing the app there through the share
+# can stall the VM (worse if the Mac syncs its Desktop with iCloud). Keep the
+# app on the PC's own disk in that case; the Start menu entry still finds it.
+$OnMacShare  = $Desktop -like 'C:\Mac\*' -or $Desktop -like '\\Mac\*'
+$InstallDir  = if ($env:LECTURENOTES_INSTALL_DIR) { $env:LECTURENOTES_INSTALL_DIR }
+               elseif ($OnMacShare) { Join-Path $env:LOCALAPPDATA 'LectureNotes App' }
+               else { Join-Path $Desktop 'LectureNotes App' }
 $AppExe      = Join-Path $InstallDir 'LectureNotes.exe'
 $OldInstall  = Join-Path $env:LOCALAPPDATA 'Programs\LectureNotes'   # where the first beta installed
 $WorkRoot    = Join-Path $env:LOCALAPPDATA 'LectureNotes'
@@ -357,7 +365,12 @@ try {
     Write-Host 'Opening it now. On first launch the setup checklist checks your microphone;'
     Write-Host 'if Windows asks whether LectureNotes can use it, click Allow.'
     Write-Host "Your computer's own sound (Zoom, videos) is captured automatically."
-    Write-Host 'Later, open it from the "LectureNotes App" folder on your Desktop or the Start menu.'
+    if ($OnMacShare) {
+        Write-Host 'Later, open it from the Start menu: LectureNotes. (It lives in your AppData folder,'
+        Write-Host 'not on the Desktop, because this Desktop is a folder shared from a Mac.)'
+    } else {
+        Write-Host 'Later, open it from the "LectureNotes App" folder on your Desktop or the Start menu.'
+    }
     Write-Host ''
     Start-Process -FilePath $AppExe -WorkingDirectory $InstallDir
 } catch {
