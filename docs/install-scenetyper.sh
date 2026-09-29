@@ -20,7 +20,7 @@ BASE_URL="${SCENETYPER_BASE_URL:-https://www.aedinlai.com}"
 APP_URL="$BASE_URL/downloads/SceneTyper.zip"
 # Filled in by SceneTyper's scripts/release.sh each time a new build is
 # published, so it always matches the zip next to this script.
-APP_SHA256="0000000000000000000000000000000000000000000000000000000000000000"
+APP_SHA256="10c58e6201fc6d2985c3ccf87dcabdcf706fe6d2fc40949e1e05ee2c08f28ae3"
 # The developer team that signs SceneTyper. Anyone who tampers with the
 # download can change the zip, but can't produce this signature.
 APP_TEAM_ID="N2XQ4P7AN5"
