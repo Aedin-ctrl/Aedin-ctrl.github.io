@@ -23,7 +23,7 @@ BASE_URL="${LECTURENOTES_BASE_URL:-https://www.aedinlai.com}"
 APP_URL="$BASE_URL/downloads/LectureNotes.zip"
 # Filled in by LectureNotes' scripts/release.sh each time a new build is
 # published, so it always matches the zip next to this script.
-APP_SHA256="1ddb972ff618a78c95011c79957e919df54f11ce86f9a50d0e4afccfb1a50572"
+APP_SHA256="0bfaa2f62a66a333ff9dbac084e26e6a4b5fb5da44b8ad0697d2c1bbd88592f7"
 # The developer team that signs LectureNotes. Anyone who tampers with the
 # download can change the zip, but can't produce this signature.
 APP_TEAM_ID="N2XQ4P7AN5"
