@@ -78,6 +78,10 @@ $OllamaModels = @('qwen3.5:4b')   # one multimodal model covers both Q&A and the
 $WhisperUrl  = 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin'
 $WhisperDir  = Join-Path $WorkRoot 'models'
 $WhisperDest = Join-Path $WhisperDir 'ggml-large-v3-turbo-q5_0.bin'
+# Much faster English model the app switches to on PCs too slow for the main
+# one to keep up in real time (about 5x faster on a 4-core laptop CPU).
+$FastUrl     = 'https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en-q5_1.bin'
+$FastDest    = Join-Path $WhisperDir 'ggml-small.en-q5_1.bin'
 
 function Step($t)  { Write-Host "==> $t" -ForegroundColor Cyan }
 function Info($t)  { Write-Host "    $t" -ForegroundColor DarkGray }
@@ -344,16 +348,18 @@ try {
         }
     }
 
-    Step 'Speech model (~550 MB)'
-    if (Test-Path $WhisperDest) {
-        Ok 'already downloaded'
-    } else {
-        New-Item -ItemType Directory -Path $WhisperDir -Force | Out-Null
-        # Download beside the real name, then move into place, so an
-        # interrupted download can't leave a truncated file that looks valid.
-        Download $WhisperUrl "$WhisperDest.partial"
-        Move-Item -Path "$WhisperDest.partial" -Destination $WhisperDest -Force
-        Ok $WhisperDest
+    Step 'Speech models (~730 MB)'
+    New-Item -ItemType Directory -Path $WhisperDir -Force | Out-Null
+    foreach ($m in @(@($WhisperUrl, $WhisperDest), @($FastUrl, $FastDest))) {
+        if (Test-Path $m[1]) {
+            Ok "$(Split-Path -Leaf $m[1]) already downloaded"
+        } else {
+            # Download beside the real name, then move into place, so an
+            # interrupted download can't leave a truncated file that looks valid.
+            Download $m[0] "$($m[1]).partial"
+            Move-Item -Path "$($m[1]).partial" -Destination $m[1] -Force
+            Ok $m[1]
+        }
     }
 
     Remove-Item -Recurse -Force $temp -ErrorAction SilentlyContinue
