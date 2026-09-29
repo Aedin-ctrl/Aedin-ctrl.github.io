@@ -202,6 +202,61 @@ function BuildFromSource($arch, $temp, $outDir) {
     Copy-Item (Join-Path $src 'resources\windows\THIRD_PARTY_NOTICES.txt') $outDir -Force
 }
 
+# An uninstaller in the app folder, also listed in Settings > Apps (per user,
+# no admin). It removes what this script put on the PC, keeps the user's
+# notes (Documents\LectureNotes), and leaves Ollama, which has its own entry.
+function InstallUninstaller {
+    $appLiteral = $InstallDir -replace "'", "''"
+    $script = @'
+# Removes LectureNotes from this PC. Notes in Documents\LectureNotes are kept.
+$ErrorActionPreference = 'Continue'
+$app = '__APP__'
+Write-Host 'Uninstalling LectureNotes...'
+Get-Process -Name 'LectureNotes' -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Sleep -Seconds 1
+$programs = [Environment]::GetFolderPath('Programs')
+if ($programs) { Remove-Item (Join-Path $programs 'LectureNotes.lnk') -Force -ErrorAction SilentlyContinue }
+# Build tools, speech models, logs and settings (only this app's own folder).
+if ($env:LOCALAPPDATA) {
+    $data = Join-Path $env:LOCALAPPDATA 'LectureNotes'
+    if (Test-Path $data) { Remove-Item -Recurse -Force $data -ErrorAction SilentlyContinue }
+}
+Remove-Item 'HKCU:\Software\LectureNotes' -Recurse -Force -ErrorAction SilentlyContinue
+cmdkey.exe /delete:LectureNotes/AnthropicAPIKey 2>&1 | Out-Null
+$ollama = if ($env:LOCALAPPDATA) { Join-Path $env:LOCALAPPDATA 'Programs\Ollama\ollama.exe' } else { '' }
+if ($ollama -and (Test-Path $ollama)) {
+    $answer = Read-Host 'Also delete the AI model LectureNotes downloaded into Ollama (qwen3.5, about 3.4 GB)? [y/N]'
+    if ($answer -match '^(y|yes)$') {
+        & $ollama rm qwen3.5:4b 2>&1 | Out-Null
+        & $ollama rm qwen3.5:9b 2>&1 | Out-Null
+    }
+}
+Remove-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LectureNotes' -Recurse -Force -ErrorAction SilentlyContinue
+# The app folder last (this script lives in it); only if it's really the app.
+Set-Location $env:TEMP
+if ($app -and (Test-Path (Join-Path $app 'LectureNotes.exe'))) { Remove-Item -Recurse -Force $app -ErrorAction SilentlyContinue }
+Write-Host ''
+Write-Host 'LectureNotes is uninstalled. Your notes in Documents\LectureNotes were kept.' -ForegroundColor Green
+Write-Host 'Ollama is still installed; remove it from Settings > Apps if you no longer need it.'
+Read-Host 'Press Enter to close'
+'@
+    $script = $script.Replace('__APP__', $appLiteral)
+    $ps1 = Join-Path $InstallDir 'uninstall.ps1'
+    [IO.File]::WriteAllText($ps1, $script, (New-Object Text.UTF8Encoding $true))
+    $command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$ps1`""
+    Set-Content -Path (Join-Path $InstallDir 'Uninstall LectureNotes.cmd') -Value "@$command" -Encoding ASCII
+    $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LectureNotes'
+    New-Item -Path $key -Force | Out-Null
+    $values = @{
+        DisplayName = 'LectureNotes'; DisplayIcon = $AppExe; Publisher = 'aedinlai.com'
+        DisplayVersion = (Get-Date -Format 'yyyy.M.d'); InstallLocation = $InstallDir
+        UninstallString = $command; URLInfoAbout = 'https://www.aedinlai.com'
+    }
+    foreach ($name in $values.Keys) { Set-ItemProperty -Path $key -Name $name -Value $values[$name] }
+    Set-ItemProperty -Path $key -Name NoModify -Value 1 -Type DWord
+    Set-ItemProperty -Path $key -Name NoRepair -Value 1 -Type DWord
+}
+
 # The ready-made app, if building isn't possible on this PC.
 function InstallPrebuilt($arch, $temp, $outDir) {
     $zip = Join-Path $temp 'LectureNotes.zip'
@@ -291,6 +346,7 @@ try {
     $link.WorkingDirectory = $InstallDir
     $link.Description = 'LectureNotes: live lecture transcription and answers'
     $link.Save()
+    InstallUninstaller
     Ok "$InstallDir ($how)"
 
     # --- 2. Ollama ----------------------------------------------------------
