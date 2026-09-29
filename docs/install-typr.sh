@@ -118,11 +118,7 @@ fi
 echo
 echo "${green}${bold}typr is installed.${reset}"
 echo
-echo "Opening it now. On first launch:"
-echo "  ${dim}1.${reset} Click ${bold}Allow in System Settings…${reset} and switch typr on under"
-echo "     ${dim}Accessibility. That's what lets it type into your document.${reset}"
-echo "  ${dim}2.${reset} Paste the script (or drop in a PDF / Word doc), or double-click"
-echo "     ${dim}the .typr file you were sent.${reset}"
-echo "  ${dim}3.${reset} Click into an empty document and press ${bold}⌃⌥⌘P${reset} to start a take."
+echo "Opening it now. It starts on a short setup page: allow keyboard access,"
+echo "test that it types, then click ${bold}Start using typr${reset}."
 echo
 open "$APP_DEST"
