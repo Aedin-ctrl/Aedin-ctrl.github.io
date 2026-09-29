@@ -1,20 +1,22 @@
 #!/bin/bash
-# Writes and publishes today's News stories. Run by the launchd job
-# ~/Library/LaunchAgents/com.aedinlai.news-daily.plist (6 AM, a few retries
-# during the day, and at login); it exits right away once today is done.
+# Writes and publishes today's News stories. Runs on a schedule, at 6 AM with
+# a few retries during the day, and exits right away once today is done:
+#   Mac:  launchd job ~/Library/LaunchAgents/com.aedinlai.news-daily.plist
+#   Pi:   cron, 0 6,9,13,19 * * * ~/news-daily/news-daily.sh >> ~/news-daily/log 2>&1
 #
-# Works in its own clone (~/Library/Application Support/news-daily/site) so it
-# never touches the working copy on the Desktop. Claude does the research and
+# Works in its own clone (news-daily/site in the folder below) so it never
+# touches a working copy. Claude does the research and
 # runs scripts/news.mjs add (see scripts/news-routine.md); this script checks
 # the result, commits docs/news/ and pushes to main with the Mac's git login.
 #
 #   scripts/news-daily.sh          run now (skips if today is already published)
-#   tail -f ~/Library/Logs/news-daily.log
+#   tail -f ~/Library/Logs/news-daily.log   (Pi: ~/news-daily/log)
 set -uo pipefail
 
-export PATH="$HOME/.local/bin:$HOME/.nvm/versions/node/v22.21.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
+NVM_NODE=$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | tail -1)
+export PATH="$HOME/.local/bin:${NVM_NODE:+$NVM_NODE:}/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 REMOTE="https://github.com/Aedin-ctrl/Aedin-ctrl.github.io.git"
-BASE="$HOME/Library/Application Support/news-daily"
+if [ "$(uname)" = Darwin ]; then BASE="$HOME/Library/Application Support/news-daily"; else BASE="$HOME/news-daily"; fi
 SITE="$BASE/site"
 LOCK="$BASE/lock"
 MODEL="claude-sonnet-5-5"
