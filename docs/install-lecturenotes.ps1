@@ -384,7 +384,15 @@ try {
         Write-Host 'Later, open it from the "LectureNotes App" folder on your Desktop or the Start menu.'
     }
     Write-Host ''
-    Start-Process -FilePath $AppExe -WorkingDirectory $InstallDir
+    try {
+        Start-Process -FilePath $AppExe -WorkingDirectory $InstallDir
+    } catch {
+        # Installed fine; Windows refused to start it (Smart App Control or
+        # another app-control policy blocking unsigned apps).
+        Write-Host "Windows would not open LectureNotes: $($_.Exception.Message)" -ForegroundColor Yellow
+        Write-Host 'This is usually Smart App Control, which blocks apps that are not code-signed yet.' -ForegroundColor Yellow
+        Write-Host 'See Windows Security > App & browser control > Smart App Control settings.' -ForegroundColor Yellow
+    }
 } catch {
     if ($_.Exception.Message -ne 'LectureNotes install stopped.') {
         Write-Host "error: $($_.Exception.Message)" -ForegroundColor Red
