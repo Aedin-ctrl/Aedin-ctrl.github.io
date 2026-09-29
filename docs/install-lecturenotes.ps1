@@ -29,10 +29,10 @@ $BaseUrl = if ($env:LECTURENOTES_BASE_URL) { $env:LECTURENOTES_BASE_URL } else {
 
 # Filled in by LectureNotes' scripts/release-windows.sh each time a new
 # build is published, so they always match the files next to this script.
-$SourceSha256 = '394e8a87224cfe04b21656d893bd4130faa2f20f01e05237cfeccb6a236c2c1b'
+$SourceSha256 = '68e72a8a455480ce7da802f46754c66e9af88c83a25bac700908f55ac1c75633'
 $AppSha256 = @{
-    'x64'   = 'cc84f2e6414fb3397090fc236aa9d13c7c09cd834854e37190a210637d58f15b'
-    'arm64' = '0f57769d90d8d487c0f48eb3030257233aa44120dfa8f7984cab47ac586f5fba'
+    'x64'   = '372e6f737a7a8456b4ab069e2beefc0ef029818eb8165c4211796a6f829c2999'
+    'arm64' = '9e6f6fdf2f3a66a1fe97368abd8fe9624795f730cf0e1da58a14b1208b5a7e43'
 }
 
 # The free, open-source build tools, pinned by checksum. LLVM/Clang via
