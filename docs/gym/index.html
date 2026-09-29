@@ -31,11 +31,14 @@
   .chip[aria-pressed="true"]{background:var(--ink); color:var(--paper); border-color:var(--ink);}
 
   .rooms{display:grid; gap:10px; margin-top:6px;}
-  .room{display:grid; grid-template-columns:minmax(150px,1.3fr) 3fr 76px; gap:12px; align-items:center; font-size:14px;}
+  .room{display:grid; grid-template-columns:minmax(150px,1.3fr) 3fr 104px; gap:12px; align-items:center; font-size:14px;}
   .room .bar{height:10px; background:#f1f2f4; border-radius:999px; overflow:hidden;}
   .room .bar span{display:block; height:100%; border-radius:999px;}
   .room .num{text-align:right; color:var(--muted); font-variant-numeric:tabular-nums;}
   .room.closed{color:var(--faint);}
+  .room .age{display:block; font-size:11.5px; color:var(--faint);}
+  .room.old .bar span{opacity:0.45;}
+  .room.old .age{color:#b45309;}
 
   .best{display:flex; gap:10px; flex-wrap:wrap;}
   .best-slot{border:1px solid var(--line); border-radius:10px; padding:10px 14px; min-width:120px;}
@@ -108,11 +111,13 @@
   const LIVE_URL = 'https://goboardapi.azurewebsites.net/api/FacilityCount/GetCountsByAccount?AccountAPIKey=2a2be0d8-df10-4a48-bedd-b3bc0cd628e7';
   const HISTORY_URL = 'https://raw.githubusercontent.com/Aedin-ctrl/marino-tracker/main/data/history.json';
   const TZ = 'America/New_York';
-  const FIRST_HOUR = 5, LAST_HOUR = 23;   // heatmap / profile columns (Marino opens early, closes by midnight)
+  const FIRST_HOUR = 5, LAST_HOUR = 23;
+  const STALE_MS = 2 * 3600000;   // older than this: closed or not being counted
+  const OLD_MS = 60 * 60000;      // older than this: shown, but flagged as old   // heatmap / profile columns (Marino opens early, closes by midnight)
 
   let rooms = {};       // id -> {name, facility, capacity}
   let samples = [];     // [{t, c:{id:count|null}}]
-  let live = null;      // {counts:{id:count|null}, updated: Date}
+  let live = null;      // {counts:{id:count|null}, counted:{id:ms}}
   let area = 'marino';  // 'marino' | room id
 
   const $ = id => document.getElementById(id);
@@ -164,44 +169,89 @@
     }));
   }
 
+  const ago = ms => { const m = Math.max(0, Math.round(ms / 60000)); return m < 1 ? 'just now' : m < 60 ? `${m} min ago` : `${Math.floor(m / 60)}h ${m % 60}m ago`; };
+
   function renderNow(){
-    const counts = live ? live.counts : (samples.length ? samples[samples.length - 1].c : null);
-    if(!counts){ $('nowLabel').textContent = 'Couldn’t load the counts'; return; }
+    const last = samples.length ? samples[samples.length - 1] : null;
+    const counts = live ? live.counts : last ? last.c : null;
+    const counted = live ? live.counted : last ? Object.fromEntries(Object.keys(last.c).map(id => [id, ((last.u && last.u[id]) || last.t) * 1000])) : {};
+    if(!counts){ $('nowLabel').textContent = 'Couldn\u2019t load the counts'; return; }
     const a = areaPct(counts);
     const lv = level(a ? a.pct : null);
-    $('nowPct').textContent = a ? a.pct + '%' : '–';
+    $('nowPct').textContent = a ? a.pct + '%' : '\u2013';
     $('nowPct').style.color = lv.color;
-    $('nowLabel').textContent = lv.word + (area === 'marino' ? '' : ' · ' + shortName(rooms[area].name));
-    const when = live ? live.updated : new Date(samples[samples.length - 1].t * 1000);
-    const mins = Math.max(0, Math.round((Date.now() - when) / 60000));
-    $('nowDetail').textContent = (a ? `${a.people} of ${a.cap} spots · ` : '') + `counted ${mins < 1 ? 'just now' : mins + ' min ago'}` + (live ? '' : ' (saved sample; live feed unavailable)');
+    $('nowLabel').textContent = lv.word + (area === 'marino' ? '' : ' \u00b7 ' + shortName(rooms[area].name));
+    // How old the counts behind the headline are (staff count each room separately).
+    const ages = Object.keys(counts).filter(id => counts[id] !== null && counted[id] && (area === 'marino' ? isMarino(id) : id === area)).map(id => Date.now() - counted[id]);
+    const ageText = !ages.length ? '' : ages.length === 1 || Math.max(...ages) - Math.min(...ages) < 120000
+      ? `counted ${ago(Math.max(...ages))}` : `from counts taken ${ago(Math.min(...ages)).replace(' ago', '')}\u2013${ago(Math.max(...ages))}`;
+    $('nowDetail').textContent = (a ? `${a.people} of ${a.cap} spots \u00b7 ` : '') + ageText + (live ? '' : ' (saved sample; live feed unavailable)');
 
     const list = Object.keys(rooms).sort((x, y) => isMarino(y) - isMarino(x) || rooms[x].name.localeCompare(rooms[y].name));
     $('rooms').replaceChildren(...list.map(id => {
       const c = counts[id], cap = rooms[id].capacity || 0;
       const pct = c === null || c === undefined || !cap ? null : Math.round(c / cap * 100);
+      const age = counted[id] ? Date.now() - counted[id] : null;
       const row = document.createElement('div');
-      row.className = 'room' + (pct === null ? ' closed' : '');
+      row.className = 'room' + (pct === null ? ' closed' : age > OLD_MS ? ' old' : '');
       row.innerHTML = `<span></span><div class="bar"><span></span></div><span class="num"></span>`;
       row.children[0].textContent = shortName(rooms[id].name);
       row.children[1].firstChild.style.width = (pct === null ? 0 : Math.min(100, pct)) + '%';
       row.children[1].firstChild.style.background = level(pct).color;
       row.children[2].textContent = pct === null ? 'closed' : `${c}/${cap}`;
+      if(pct !== null && age !== null){
+        const small = document.createElement('span'); small.className = 'age';
+        small.textContent = (age > OLD_MS ? 'old \u00b7 ' : '') + ago(age);
+        row.children[2].appendChild(small);
+      }
       return row;
     }));
   }
 
-  // Average percent by (day, hour) and by (weekday, hour) for the chosen area.
+  // Every distinct headcount once: the feed repeats a room's last count until
+  // staff count it again, so samples carry each count's time (u) and the
+  // count is placed in the hour it was taken.
+  function headcounts(){
+    const seen = new Set(), out = [];
+    for(const s of samples){
+      for(const id in s.c){
+        const c = s.c[id];
+        if(c === null || c === undefined) continue;
+        const t = (s.u && s.u[id]) || s.t;
+        const key = id + '@' + t;
+        if(seen.has(key)) continue;
+        seen.add(key);
+        out.push({ id, t, count: c });
+      }
+    }
+    return out;
+  }
+
+  // Percent full for the chosen area in each (day, hour): each room's average
+  // count that hour over its capacity, summed across rooms counted that hour.
+  // Weekday / all-day profiles average those hourly values across days.
   function aggregate(){
+    const cells = new Map();   // "day|hour" -> {weekday, rooms: Map(id -> [sum, n])}
+    for(const h of headcounts()){
+      if(area === 'marino' ? !isMarino(h.id) : h.id !== area) continue;
+      const e = eastern(new Date(h.t * 1000));
+      const key = e.day + '|' + e.hour;
+      const cell = cells.get(key) || { weekday: e.weekday, hour: e.hour, rooms: new Map() };
+      const r = cell.rooms.get(h.id) || [0, 0];
+      r[0] += h.count; r[1]++;
+      cell.rooms.set(h.id, r);
+      cells.set(key, cell);
+    }
     const byDayHour = new Map(), byWeekdayHour = new Map(), byHour = new Map();
     const add = (map, key, v) => { const e = map.get(key) || [0, 0]; e[0] += v; e[1]++; map.set(key, e); };
-    for(const s of samples){
-      const a = areaPct(s.c);
-      if(!a) continue;
-      const e = eastern(new Date(s.t * 1000));
-      add(byDayHour, e.day + '|' + e.hour, a.pct);
-      add(byWeekdayHour, e.weekday + '|' + e.hour, a.pct);
-      add(byHour, e.hour, a.pct);
+    for(const [key, cell] of cells){
+      let people = 0, cap = 0;
+      for(const [id, [sum, n]] of cell.rooms){ people += sum / n; cap += rooms[id]?.capacity || 0; }
+      if(!cap) continue;
+      const pct = people / cap * 100;
+      byDayHour.set(key, [pct, 1]);
+      add(byWeekdayHour, cell.weekday + '|' + cell.hour, pct);
+      add(byHour, cell.hour, pct);
     }
     const avg = (map, key) => { const e = map.get(key); return e ? e[0] / e[1] : null; };
     const days = new Set([...byDayHour.keys()].map(k => k.split('|')[0])).size;
@@ -288,19 +338,17 @@
       const r = await fetch(LIVE_URL, { cache:'no-store' });
       if(!r.ok) throw new Error(r.status);
       const data = await r.json();
-      const counts = {};
-      let newest = 0;
+      const counts = {}, counted = {};
       for(const x of data){
         const id = String(x.LocationId);
         rooms[id] = rooms[id] || { name: x.LocationName.replace(/\s*-\s*/g, ' - ').replace(/\s+/g, ' ').trim(), facility: x.FacilityName, capacity: x.TotalCapacity };
         rooms[id].capacity = x.TotalCapacity;
-        // Feed times are Eastern local; approximate "minutes ago" via the same wall clock.
         const updated = easternToDate(x.LastUpdatedDateAndTime);
-        const stale = Date.now() - updated > 2 * 3600000;
+        const stale = Date.now() - updated > STALE_MS;
         counts[id] = x.IsClosed || stale ? null : x.LastCount;
-        if(!stale && updated > newest) newest = updated;
+        counted[id] = updated;
       }
-      live = { counts, updated: new Date(newest || Date.now()) };
+      live = { counts, counted };
     }catch(err){
       live = null;
     }
