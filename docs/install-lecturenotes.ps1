@@ -240,8 +240,10 @@ try {
     $sac = $null
     try { $sac = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control\CI\Policy' -ErrorAction Stop).VerifiedAndReputablePolicyState } catch {}
     if ($sac -eq 1) {
-        Write-Host 'Heads up: Smart App Control is on for this PC. It may block LectureNotes from opening,' -ForegroundColor Yellow
-        Write-Host 'because this early version is not code-signed yet. (Windows Security > App & browser control.)' -ForegroundColor Yellow
+        Write-Host 'Heads up: Smart App Control is on for this PC. It blocks apps that are not code-signed,' -ForegroundColor Yellow
+        Write-Host 'and this early version of LectureNotes is not signed yet, so Windows may refuse to open it.' -ForegroundColor Yellow
+        Write-Host 'The only fix is Windows Security > App & browser control > Smart App Control settings > Off.' -ForegroundColor Yellow
+        Write-Host '(Windows does not let you turn it back on later without resetting the PC, so it is your call.)' -ForegroundColor Yellow
         Write-Host ''
     }
 
