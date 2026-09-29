@@ -162,10 +162,13 @@ function BuildFromSource($arch, $temp, $outDir) {
     # warnings) into errors; with 'Stop' the first warning would abort the
     # build. Exit codes are checked explicitly instead.
     $ErrorActionPreference = 'Continue'
-    & $cmake -S $src -B $build -G Ninja "-DCMAKE_MAKE_PROGRAM=$ninja" `
-        "-DCMAKE_C_COMPILER=$(Join-Path $llvm 'bin\clang.exe')" `
-        "-DCMAKE_CXX_COMPILER=$(Join-Path $llvm 'bin\clang++.exe')" `
-        "-DCMAKE_RC_COMPILER=$(Join-Path $llvm 'bin\windres.exe')" `
+    # CMake reads backslashes in -D values as escapes ("\U" in C:\Users), so
+    # every path it gets uses forward slashes.
+    function Fwd($p) { $p -replace '\\', '/' }
+    & $cmake -S (Fwd $src) -B (Fwd $build) -G Ninja "-DCMAKE_MAKE_PROGRAM=$(Fwd $ninja)" `
+        "-DCMAKE_C_COMPILER=$(Fwd (Join-Path $llvm 'bin\clang.exe'))" `
+        "-DCMAKE_CXX_COMPILER=$(Fwd (Join-Path $llvm 'bin\clang++.exe'))" `
+        "-DCMAKE_RC_COMPILER=$(Fwd (Join-Path $llvm 'bin\windres.exe'))" `
         -DCMAKE_BUILD_TYPE=Release -DFETCHCONTENT_FULLY_DISCONNECTED=ON *> $log
     if ($LASTEXITCODE -ne 0) { throw "Configuring the build failed (details in $log)" }
     & $cmake --build $build --parallel $env:NUMBER_OF_PROCESSORS *>> $log
