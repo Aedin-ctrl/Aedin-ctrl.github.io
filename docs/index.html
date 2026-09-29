@@ -632,109 +632,9 @@
         <section class="panel" id="shared-project"></section>
 
         <section class="panel" id="secret-projects">
-          <div class="panel-head">
-            <div>
-              <h2 class="panel-heading">Secret Projects</h2>
-              <p class="panel-sub">Things I build for myself. Rough edges left in on purpose.</p>
-            </div>
-          </div>
-
-          <details class="sp-item">
-            <summary class="sp-sum">
-              <span class="proj-index">01</span>
-              <span>
-                <span class="proj-title">LectureNotes</span>
-                <span class="proj-desc sp-brief">Listens to a lecture, writes it down live, and answers questions asked out loud. macOS and Windows (beta).</span>
-              </span>
-              <span class="sp-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="sp-body">
-
-              <p class="proj-desc">A native macOS app that listens to a lecture and writes it down for you. It captures your mic and your computer's own audio at the same time, so a Zoom call comes out as a single speaker-tagged transcript, live, as it happens. When someone asks a question out loud it notices, answers it in a side tab on its own, and there's a camera tool for pointing at a slide and asking about it. Transcription always happens on your computer. Answers come from an on-device AI model, unless you connect your own Claude account; then questions, screenshots and notes are sent to Anthropic to answer them (<button class="inline-link" data-path="/privacy">details</button>).</p>
-              <p class="proj-tags">C++ &middot; Objective-C++ &middot; whisper.cpp &middot; Dear ImGui &middot; Ollama &mdash; 2025</p>
-
-              <p class="dl-lead">Paste this into Terminal. It installs the app, the audio driver it needs, and the models it runs on &mdash; all of it, in one go.</p>
-
-              <div class="dl-cmd">
-                <code id="installCmd">curl -fsSL https://www.aedinlai.com/install-lecturenotes.sh | bash</code>
-                <button class="dl-copy" id="copyInstall" data-target="installCmd" type="button" aria-label="Copy install command">Copy</button>
-              </div>
-
-              <p class="dl-fine">Apple Silicon Macs (M1 or newer), macOS Sonoma or later. Downloads about 4&nbsp;GB of models, so give it time. It asks for your password once, to install the audio driver. Safe to re-run &mdash; it skips whatever you already have. You can <a href="install-lecturenotes.sh">read the script first</a>, and you should.</p>
-
-              <p class="dl-lead">On Windows (beta), paste this into PowerShell instead:</p>
-
-              <div class="dl-cmd">
-                <code id="installCmdWin">irm https://www.aedinlai.com/install-lecturenotes.ps1 | iex</code>
-                <button class="dl-copy" data-target="installCmdWin" type="button" aria-label="Copy Windows install command">Copy</button>
-              </div>
-
-              <p class="dl-fine">Windows 10 (22H2) or 11, on Intel/AMD or ARM PCs. It builds the app on your PC from its source code into a <strong>LectureNotes App</strong> folder on your Desktop (the free build tools are about 240&nbsp;MB, downloaded once), then sets up the same local AI and speech models as the Mac. No administrator password, and no audio driver: Windows records your computer's sound on its own. It's a beta and not code-signed yet, so on PCs with Smart App Control turned on, Windows may refuse to open it. To remove it later, use Settings &gt; Apps &gt; LectureNotes (your notes are kept). You can <a href="install-lecturenotes.ps1">read the script first</a>.</p>
-
-              <p class="dl-fine"><strong>Before you record:</strong> get permission. Some places, including Massachusetts, require everyone's consent to record a conversation, and most schools have their own rules about recording classes and outside help. You're responsible for following them. By installing you agree to the <button class="inline-link" data-path="/terms">terms</button>.</p>
-
-              <p class="dl-fine">Have a Claude Pro or Max plan? Click <strong>Set up Claude</strong> in the app's first-launch checklist and it'll answer with Claude instead of the on-device model. One sign-in in your browser, using your own account. Without it, everything still works for free.</p>
-
-              <details class="dl-alt">
-                <summary>Or download just the app</summary>
-                <div class="dl-altbody">
-                  <div class="dl-row">
-                    <a class="dl-btn" href="downloads/LectureNotes.zip" download>Download .zip</a>
-                    <span class="dl-meta">1.3 MB &middot; app only, no setup</span>
-                  </div>
-                  <div class="dl-note">
-                    <span class="dl-note-mark">01</span>
-                    <span><strong>macOS will refuse to open it, and right-clicking won't help.</strong> You'll get "Apple could not verify LectureNotes is free of malware" with no way past it &mdash; macOS Sequoia removed the old right-click&nbsp;&rarr;&nbsp;Open trick. Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the Security section, and click <strong>Open Anyway</strong> next to the message about LectureNotes. That button only shows up for about an hour after you try to open the app. It isn't notarized because I haven't paid Apple $99/year for a personal project.</span>
-                  </div>
-                  <div class="dl-note">
-                    <span class="dl-note-mark">02</span>
-                    <span><strong>You'll still have to set the rest up by hand.</strong> Installing BlackHole, installing Ollama, and downloading the models are all on you. The app's checklist tells you what's missing, but the command above just does all of it.</span>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </details>
-
-          <details class="sp-item">
-            <summary class="sp-sum">
-              <span class="proj-index">02</span>
-              <span>
-                <span class="proj-title">typr</span>
-                <span class="proj-desc sp-brief">Fakes someone writing and revising an essay on screen, for filming. Types into any document. macOS.</span>
-              </span>
-              <span class="sp-toggle" aria-hidden="true"></span>
-            </summary>
-            <div class="sp-body">
-
-              <p class="proj-desc">A macOS app I made for a short film, to fake someone writing an essay on screen. Give it the final text (paste it, or drop in a PDF, Word doc or photo of the page) and a running time, and it types into whatever document is open &mdash; Google Docs, Word, Pages &mdash; at a human pace, with pauses, typos and second thoughts. Then it goes back through its own rough draft, jumping word by word with the keyboard, highlighting and rewording, until the page matches the script exactly. A floating bar shows the timer for each part. If anyone touches the keyboard it pauses instantly and remembers its place, or it can let an actor's keypresses drive the typing so their hands match the screen.</p>
-              <p class="proj-tags">Swift &middot; SwiftUI &middot; AppKit &middot; Claude &mdash; 2026</p>
-
-              <p class="dl-lead">Paste this into Terminal. It installs the app, and nothing else.</p>
-
-              <div class="dl-cmd">
-                <code id="installCmdTypr">curl -fsSL https://www.aedinlai.com/install-typr.sh | bash</code>
-                <button class="dl-copy" data-target="installCmdTypr" type="button" aria-label="Copy install command">Copy</button>
-              </div>
-
-              <p class="dl-fine">macOS Ventura or later, Apple Silicon or Intel. About 1&nbsp;MB. On first launch it asks for Accessibility permission, which is what lets it type into your document. Safe to re-run &mdash; it replaces an older copy. You can <a href="install-typr.sh">read the script first</a>, and you should.</p>
-
-              <p class="dl-fine">Have Claude Code signed in on your Mac? typr uses it to write the rough-draft wording it later revises; your script is sent to Anthropic through your own account to do that (<button class="inline-link" data-path="/privacy">details</button>). Without it, it uses a built-in word list &mdash; or open a <code>.typr</code> scene file someone made with Claude and you get exactly their takes.</p>
-
-              <details class="dl-alt">
-                <summary>Or download just the app</summary>
-                <div class="dl-altbody">
-                  <div class="dl-row">
-                    <a class="dl-btn" href="downloads/typr.zip" download>Download .zip</a>
-                    <span class="dl-meta">1 MB &middot; same app as the command installs</span>
-                  </div>
-                  <div class="dl-note">
-                    <span class="dl-note-mark">01</span>
-                    <span><strong>macOS will refuse to open it at first.</strong> Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the Security section, and click <strong>Open Anyway</strong> next to the message about typr. That button only shows up for about an hour after you try to open the app. The command above skips all of this.</span>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </details>
+          <!-- secret:begin (sealed by scripts/secret.mjs; edit secret/panel.html instead) -->
+          <script type="application/json" id="secretCipher">{"v":1,"n":4,"iter":600000,"salt":"qtGTqkK_dCqzjtIMvClo3Q","tempSalt":"pVS5ZNhj7wYsxJRHMu0WPw","iv":"oxqfHj1emGdA1v5H","ct":"3MfGYI94n-isurpUUsPZM4WOVR1dQPWAf5Pjz0mpYmM0VYPPOMCsAWYpLds4kD0ZUYbyP5Skhht8tboODiZuB-M_Fe59SC1HckmIR9ksVM712NlTMrw-k22LSKmZ5cxsJMlJ4QTk2MAINdPT_VKjzHzfR7kK6CwYOQpPlOWJyDLfxZDDnFSRxZ1mAWAkPq73_xuj5f4Ia3JnRS_HcOia5R6Ca-neSO8wg0tslzusnm52cMOjb0IncPgrE1QcaHyi0CtF_dXEJvCXQ7deyhgC_Lup_yHzgJ44QulW7Voot-WEg0d6AO_TSqJ_TNP9zG330x7otblZcub8_ZRD__RE7hWGw8AXtbPjuF2fWHa4y0Nh-Me4vRCsuwWd3GWylB_Sfe1Fml2rZ2SWQQy0LuAuRtn92ICvPx0k89QmEm8rlgI6slD2Lui95Ij0bnIjiaf_TzivE9SzTxZpYk-yqOLsV3f0V-xjREjVqz9T9_Hpk2CXp5SJths9RO9pEyYSPAOyiIIyADM0SNwYJ99ingHOlVbRmpWlOX_EQt3SXBf0Xj6dbVJxfBKkIVAAU9BfBkPmt7pCCG8wUrSnjJrIkXsXDmg28U8I5PDwKGPhHaWhqWcCnd-DhimuGfdrO_U8acLtMKdHzFdOiy76mEjip2jLEbIv-38tKmaVCICv3mncDvluZQu3PD-TTw1O8ZvEPGxn401sJAbG2zJtdD9Jg6xtiJJS1enewfaJcxB-zdTEQuLIz1uy7bI3q4qZHgl8Ak_0VMY0Sl11pOkcmdOjBLEdHeeH_ZJc6FUIhUPF_CRMq1OClNgrUCjzG8N2oGBdu_ydvqmKi7UNmciYWXz01Ql80eYoJRXjbGD9DB1oYbtJq6nTgr98ZkO9wkSIEOGwAEZ-DkWCDcHhU7nzhJJ3s43Qs1Md5tS7VvqfHPu69wb9l71jvjQkxzHu5YdsqoQ4KJ_wU-NJijTSYy0NNVnZAEy0VQPDbYrpXv04DkHPPs3vf0L2ihCiYdmkHpi3_QhEg3TK_A3G2Cl5BKEV7JWk25K0sX97coL81MZTmrKA55UER3zU4cmAfvzrF6bAYMa-FiCTZmggEpvW1KGlHWEXKV9Mnjv7gq3_mjts6gTt0x-gce91ugxqVL-ZHc3yV0jGXA1yyzlD1Tr-9BYLlO8RIGIP82kFKfFp_c4g4azjJk7CIX2zgCufpSsusECW1rxgDYfnvIqOUHdwmC0XCCCT3ybRmPtGAEJvtjCytjUrXtIGgC6ErXewOdAR6lCqPcQsG65e_Np0-j5Cl_1DSdFzgG9p4Ihi0WoBUG_6pyXhJ5YdpnwKaNfBS3Fk6zoPAHwHEJtJD5gFKlrNFh8vBcIMxFAWx9q7RPveycrXTdtA7EGXkPnpgkeWlDvNWt5Mk0f5mt7kF1MYl7MvtJ_YBb4ibk8TvC4MR8aoD6-HWQtHBJxdp6YSeKYQoDObW9GjEHPdsOs43nFoTQf1qhV3yTyY2iPJLirSMYkuQKTHyuy3A4KwIb8JSeUDtIcy6g3Jbk93nvuTPHhbfhBl7WZXbSYV_Vzr8bQFMmyMQVz8KDn8P5H8BYjhXGQEE7ogrwnD-Ff57TWxgieeE-8vndxrZHwUASSRZaVILYT0N5ZlLoswbBF3qkjVFAV2bGQueEE0BY30lRpAIDdJSThTQiZ35NPgm5wH-e03RFfnSd6AP-QpgWfv3VVBwIYEHzsWxYLedrDvUA5d7AgFBSCCVzhmwpUQbEocSxMqfj7eEa8V7Dy8pjQ8x6MQurctos9AUDe8mJiO8LyT6qHXnyMbhEwuh5TCgg5e36SkeMV9wXVT8CnT6Bv_Q7TMLQ0unncIitWudLrSdCVDAEIeKUyU6tPVH3M076oJSED3XgiZKCTJJOKI78sHxZzCDkVZjTBtzcYDH29kIRBVEf9mlJM8jUhB5xsclCgPa1KT9gU4Gt7H64ISBz4uisnJvDMwHHT4Eh7UdL2vg_E7pDfvKTgmOzRpNDyDOeAGM68bx_F2NHDohLuC6BdzAypariZXOCe60Xqf1LnoZuYWqVlodBIqgbPwkTLGVvZloQ7csyGchoy_JsJM-0wEIDtR7YZn-EVXna-FPC4MzyJTzC2aZRXJaT3-DKniKIvi8MSNkcHWG6xtKTICq5DGoKcxgoHE73-hypxYOUHca_HP89dWI38qM2JSH8E3bip0N6FJP_fTXMtHdfNJkZagXhblTfiVEQzniLctczwBRmndSC3i_y59i2k-YMsLJ5ioW2iG8u9xpimPYrE5OpB4irTQkbsGGFY9O6oHLsFcdiBZdx3GxAoPrET4tfiwPFL3LtOZwm9apAsnmLeAB3HbQoRMRV8DEJn1llT-Mo_ZILRbZg0sZpnyX84KOXyuCyoC19bXf2tDQ1r-53EE3N3VBbWq1ADwhRFuXswI2SdRjQg3dkp4OPGzEqZF-A-c8ACuXE-r-plNR3GlHIJGA86fbFBdOpzycNpDfy3U7GIcmtFxqJTa3eDSvYw79dg3EXFRKS7Vg1mbPQMWCBr94M99dRcGVs9_4tbkfoOoPBQaPk1ly-hzjFj7qwO7j7RBmpSz8wCnLf4TFZokCqt5K-R2-Ov2Adikc9DcXOeqn3xE_488dwwu3yPgIFtLE5uZT80w-lk02nKw-QrKSltjA0kdiFkJyYoYFDuF1ahPYLprfF-ZAcC-ei_cKkz8usMG8vQANClD8ykuqu-0xcOn7fzLUnhx0BHnAJOLssj614hzgwO9Y6nULG3cX8oW72Zkg1mi_WRuUxyP8icpihW9jGb6juE_2C7kOMFTWZbSvo6cPd_NWsRuY1ZA_bZEABZToXxaaLulwgn2pfQYTPn0osKF1noMzBm8wJQPojI3rEIrMylUFfS3hBgAPJsvhbeXuG_xXL7nX0fu7DhCCT3WHPRdS5HhNAoKvHk6I6tOUF7CrVG7wotlQ17UX6YUpHndmpj2lsE3QTzIGd25hIczhXCoieyIyDbgO_H4wmae699-ANMcMOd7qwsTexdnGuqt9qmQ2aGAKxcFse61s0Tr0hEVocrlSkJwnFJahk2YXOiYQdO8NiX24ZU0pbWIlhWyWd8Vk86e0ZcFvTFx4jEdm_pmJYEGBY5_KAFRb0AEAQgPEvf-h4UK-0qbRtmQIMRCJtE6anXNpjvxEc6nYJOr_5diOiJRLynHKCoVw-x_BEaN0Wh71ttUK6w72XuoixSxZjWMBoTNl9hWpzJkNR0eauyyVW0nNWkWpbeqTxyel5yM0SkYHq70zY0BVozqKLtzNb4HQlLDL8Xh1QPlYlPTLMedix6TzSyg-CzeKSxUP0oov7S0IjSWJWmmKeLzUqJEH-5uYcx9AiBGFLH5NQH3W7J6B0EYyuTIZm2DchFx3FpoKAJdm1YDSeasdwB2Pbv-sUl8iVp-8eREVgTjjqxRhxe9fUCUahl7aGwMiBXN01E7vv13avufcdUqgpR3i8S4WoNQW6F5EQxYpE9dcsxfo9qu3OMSlvsNzKphV8zokEVEwp6sX8nRkSbZc4CmFTDqb78TjkF3q1DDw9RFuo-3eT2Ly9m4cODf8lNvYHfCi8JoV-4oysHeDDxjZ8cNY778OhVbmumt0HcB9Mm6DZH9ews0QCUP_qIDXlIcS1AgbWhYQ0o9_n11e3ACesstSjnhXMK6egZc8HIqJrr1j7erbLGH4JeGwW2yeRxRS_8opLvBFCyw34OvsUQZVX4HI1fphP3nuIaBbAARVeU_f0GfAsAWu72EQh0v4ObW6FNuPBkxAXD_RkKAxrPUfdb-3A6feZZO15eiRLMOJyO1uUbZ2cF2Erv9jsKHyTQkTsXCewwgOuyHq9Nu_71_OGW7dTqAbbM0VIxHN4pqqMMxqlXuWmDoj8npn-0gV6JsneMgX2_FZN4xCPYACiNlLsClP7NTJoOq0Wb0fo0vEhK5_lnbYGohbctBnkG_XIm7G0hZPBzIRmiGrrZsGWr-zwwAhTvk1V3BIkNmjfWE4DlwudpOx0D8W9Lix4lUZJ0DUOegKEqtsuhnqoEyeSegy5mAtPkFcvFGx-MV--WnZJB7qqBswoV5ZuFIYxr5DODiPvy325vvC7ECh6Sr4bLOwIFbWKK6aEQkCk3yaOGSDe5wCPe1LNcomagv5UJaK7LxnhDU3L6Mw2X_kcF6PrpmIiaqpNZt5lqM2Yx34DdEM7Bm3RyrgSS92wSUuvgKGvl4qYWuwjyllkxDbu7TwHifKa0UJbwHb0arha3NTR1ESVKveCH4JEkwpr6iFDDgkZDWbNvlgnnU_hAc23yybmKOQSKHJbdfb_1niIqM2ZC1_ooAgTd8Rn4n0-d-rg1tx3De5mcwEC9RZ6sd3GojukKkQsGIpEZvxXvfA3DlroU4mB3SUqYJk-ryMsAsbxNTLUXbY3XQ1QGtEqLeZxhjH830JKCTtjJqfuGUDhQfLCUCHHLbObh_Q0Ae-rmgUjUDMsiVZ0mI0xqGFJnsGnApYazTurPpXorMLKoHlZe3_H8uXUCOF9sxiSB_DdRePNgnjbbEd9ekXzVzhV1RBXqahw-zijPXW_aqatxpjVhssr3nCxUYv_xcG4YXY4HcmXQTvBB7tXOa2k0sDGwo_viNy5hAclX7owNUN9_5yN6zhgJ-qYeLkRRjHRo42xBvXP1wgjsRi-0P2HKOfp_dPhHEfyh7nwsoavG6YtFlSUQiuuYNiiM6YsjbjHydrbSUOdFMgccPUJLRc-gsHNRi2zj0qgMN3Eg4UFZrB6FVMr9WRsnxM7J-a3cyLjU3QtBGuKRmMlbCsyPTtjdSt3Dpf0Ph000cEgRR34QTPP29UIy-Px9mCB9xqfPpEtvTSJ8m59CIANaO9lLecMVCFxtU4yaQwTGMPTjms0Tyi_8nNGdqtMl9nzInxotinqBmh0HUyuB-utHz1pCdrC2x_7Fhuc8mldvQdp52aN7Fxvni1nYvDuP4jn1qWlZoTVHIFNEO5Z3chFEwWapcUD_fmQxKYZ2zOgUxhfcDJiU0Kr2FmxNYOniM4fV6h8QH26VyDzK4tJWqjeKbQZ6WfEoi_Jc5m5iWOfJ5JI79UqfMhbfbIQ2Zy8NS51ZJy4uj2mc50SgfT4rnRjbi2f-QKm2Gw866cNLY-02s-v-oUD6xKJ7w7mgw5NgDyKJaIDrAIIDt8eper82hUHmz19phkvPmToe0ZtuWzihzb0Ax7djyocNYi5GwA-oRbzKbdV4LHXFucWEq3_P05JMZ8cgaq37PfBcFn6-YQ0gvwk09k_jsGzxRKZ0Ej8z32jjXSk68ypbWzGQTvikn-tRbeCePUgPr1HHrGohQzktbIp6bKZUG-K5_042GKa70pzwvQ34cNxTYkCsfO18LDOvP31H5Ws-oOiphLMKC9sZYQC2L0RPb2kezrG-rlzIsu37Fdn3uZl0y5Ftt396KnGrzAx8QIW4jd-JPiCFUxfPVpIez6aI9FMQ1DZ7N-rFw4pfGSb70KZgOZhVQqAmxsTbqY5IevMhrVEeSRQ_S_e6ZzT2KJP_bqx89426OzUPL2cGmclw_tytg6QeX9s5ZQzolg5y1KCuzxPLCvOMcfBPBj98kT7YWeNAhWJjEn5A7F4skIAQR2NqlK4KCnjpC0xJhej10mfhWVgcuhvBPDNAZx60fL46u96t6IwN2n5pX3MYhwaHpVnBWydYS73hKyCcUKA4GagWpFVyTpAgUAl5aSaUZt2tKAknFWTY0uUsr2h9zggM7n_VtAlT6HV0Cdsyp8vwYWAQtiMOcJh3ks7Zrpdm2IJuE-DiIY8Mp-Tmd9DZ98hyDeVNllGIjdX2NSH1qotohSta-7PzJn3bey_DN8LYz2YNdVwNWcJFwlo3WDMQsAgJNA9Dy7pDCvwyD9-g8Y_cVD7_Mh6vFOvzZMukzG6ENurmfydWJOxSMo_mOcGGRJGq41Stq5WUXOoCocki9i430isWIr5CMrx1hkcP8t70zeG-gbLccGyL7FS6cb3NHGC5h2szuszP9dH6rQN7h3nyrmjGtQHFzb1atO2wQnPTRknEC1u9wAzgb6Xcmyx9zcVs_V0L-igKtO9k3gX4BYbkvXtdD_nTer7yMX-BNXRObyMBc572UwakLJBnpgUwl0BhgllnXe-h5yJOGppXWIqJEXI5SyfcBI31Tt_KHqNymR5gA_Ssvrjxhu-tV6_ks1BJmMt2Ghji86Gv7fl2ILOPZqICUEC100r2KWY1g5yF8HmVpW3YMkUQHD5RS2uP9qd4qyzc58jJhcjsauslqdWIeyIDL8tp1UeAU7kaudGIE2iNTJ9SU666p9xALZNzVCz7pTXXv5XNrsFa16zP_0nb6_WipvMVkl4PCp2A5hrboCHPUiPCXFqvepr_JI1YYg4loHgt0d_trBWhBLxe5Qybz2LFX78OUR11yOJyAHyBsTJ6NGpASLNUAI4LgDl3Gu2sfEOfio2laFxF2XM36CTlg-kt0-V9ffSGgJa50CTizOHUh4oVKfAz1O4pOkStlmAqESZlufYV8emzgP98FUwRam97nR_2TYGdFh5LeLLDxvYOTaExau7KTK4Nzn8tNt-2SXkhbDz13QP6r9624GyESF33YveHhJEx8hcP0tapEm6nrkAH_qS7U7I9JzAldqyLN2KI4WekTTXUw6c-wC2P9aWbwDywCXpNSuUXURgQiY1QOvBJVmyk5_-oPy2PoeDsBhR5rOdh2wxfJ_NmkagX4C5qanWR3Q5Y-wSuSeHsDgsOntPw0b44YHB3uMNJlowroOhmd9eHwdeU2M-Tt4Ts0c9qaSykUz58gBK-GT72bx7gfp9LoYV9_B8PGquUU66OhT1PeWhSjkpUnoQO0dhX84VgAfeZxXgaWl2vBc35Nli82DVn8XUL7crjX_9UtIqQZvsCdo7M-54FE0dFtIMRZysQmcoAaoeLxCQlQtjvIjyHQx6dhufxwAZqNdtleDJOq307Wlor3DnZmerkp6JSwt1P1a6kshhDCvwE1a_6war51h3HOGvqAYwkTZ2k_WMvpErZxvKdzOkLIqGbzZ2zxfPNgMxPeCAiLmjvtX6_mEAK2irpO0gP8RHQG5loFPOOu76ZCDVWP5TysLKk8ropRegzJxG8uKk4TLpYv3NwIrACWQgj8Sl2weJu15O6e8VT0zqUv-cZOdGgf85rvcfeYjTEieQvRrtyB3k_GJbdsXi3qHuE9VtoN5fquT0UbV4QbRUsxxV_e45Kk2QmzuWjUEyKU9-yrS4qDan9TlTF9QdmVcEWIKEFU1v4jIjqS7S8M3ENxRnr2__QY9T1LiFgGM0qlQSMHjeyNdLEhOS_JKG-fdmVZfb72ZSgKrwRo8BI63fM8uzTzbcmeODnhccGxk68uZim3CHYDwpFBa5yVqx2QGMdHBo7JAJPzUlmM9JXN-3y5QumQ_PlGarvUUkgtnUAhL2hHX4e5uR4ejvrTUmU-iNdjSVT3UOxcu0XK2wHheCyIGVgtjvZdEZNCJHxtwdj2rU1p86gNTJFHCxaVbYFMiWoGHNYpOBmXN_rFPTn0B1U3jId-lUWDICdDjpOK5cLrTclus480B4aRvDU0cJXZc-jseI7Ty4hsF0_a2Waz8kLrL2U3k37EhXir6mFHffRfEGGsdXN7_IQ9s29G4SCk1qc3nDKaSaS6zynScNu6OmUlmktvDwk50ZLv6wg2G-N6NuNFCH2q0aazSKz222P51DH0IihTC8lZSxHqIqpINB2VPbxGZx1jaT4f5QVQ5vu5XwirDqAgc3nZLKB0JFffrQCJiPfQMDKjwPZpcQRuShge4bwwVye46m0t6vuOoPLxxOpg0ShPf-q2l8Qd9O3-V6ygLU9-9W7ynSLAenKds7FBY0L3OnXfHARA2PIFT1msL37sIJqhzGdOMUdaEWPorn5FQM7fn7f_LPicVQDj-bPn2fvxb_GDgFKLSqEsTcLk6412zhrLPTs1yvYwojNwpkw3r8NsajcQrTSmQzu01XSzXYyXPORAQGTN-TzHo5SDblyI_AsHCWes_ot02izMxSM8GqV8qw5xPJW-hR7gCex-sHjX0jkVpdgbV-48TiZduXFEfrfkoQgiU00W4hrfw5_7D2dCqjlbVgnBQ8LytTD2Q8dBPVUin5OPPyKhTQMj4uhgokz27iQIjlQpbhhWNxSOKcsCGYo-U3zhiLandVB76bAYH0FNx2shvuvruScet5BqUM0UkM0flEe5wVX_tD0oHen-UtibGJkzcDRXN9Su9xnWDyFntBH0GUExOn4nqMXPmMzWOKpHaaNx2xwq1ite4R6pCSkSrvf9EtSxdJ2Vjs2yvNw67bLXFBJZgOTqy1bcfM_H1WiiTupZEWGioEr8af22AAIYwTWvsxRGRS9ilbNaBAl5xa9fA1sFVKQQaaFxE3MiEKYmg8IdF9HUm2knu-uSeEyib06yFEJBS2CcwoJ5c1sc8es0A-c_iRFJ_FhDCCrrVc-qCl-rB6qDg4SNXRcWXmB3zIJhpGma3yZbCfYprH37eeCJsLhPNqaGg0UEWgeB0QtRRTnWCsKq7mIMqKmGRCEUcnqrE8YKRfD5H3ZQudzIIlhMKxOE_ZwKXxDkd9sxhNaTlHFIEnQ6HbzmPIWg5zMD7Jg-D2_UWyeZc1xa1Q190tAxdX5a55jcRcSCLNJ5cEsk0-2Mupq7o148ObB6ra1oiEDA8Gjwh3e03tzyaymxcF4-yhz3gMFxcaLRiW3q33lvdtSE-hHcs7YTL8VeDnJbGrAoRisFBHx5JADFjeCmCuHyo01mBzR0flzj2QkVTl8B9DQiOZode8ohwBIm5Nd0-LNMWiKURaA7ucEf7pIgJ4G22MHDuSp5_FBiqmfpZ5seML9J_wHxubzszAN5XrmFtcCa84d-tgTrw4UsrCRkU9SNpx33xsmTKtIOquPkuWxHW98-zY1or9ybVG_PEPnUmpkEjqpQcGHSaRSrSjEcFW1kR0lBQsBQgwQhiczYOzVd5-oVEyGNzMiTYrzAscaRubdQqQYFpzuffyD4aGqMfWB0GznCeJW8QEZE7R3iIKVWxdQaKvrPbOjQUdaePE4iHspEfFdfFFE-s3OQ7j_l2t0GSpqfQkmFroFsdsbRzUJMJaGZc6hG13S6BnKh6oTYGMKYoRSRwCE5bFLTAQsjcGEBgllAzMmEjUNkBSncgz6qekTERDTV1CBrTxpgHqSY3lTxGrTa7Yt8NTsu7zUFuGw5vAb3U43CBox_gRNZ-Lfbtuupjp5gi4WDIBpC_N1smft-5jhshkoDQF_qMzdCikXItCfGkH-n4BXwmkSO_JybV4wqIh0tv2M0QoN4YHL7qK58M9X7n4QtHW4iibHaoiqDndXdnpu33Jq2Xmaw8q8lOBV_M6v_XOkDUwvJ9EIxpsaQwdj5Z9djPMxdhanG-Lk8P3XBYfaJ2SLBxPu5z_Eqgh-N0WKziHXh4Lv1ijOGdDdWcBPkZI0QpvdmQBtBsCj_98KuSkQWwunFR1zy8teh5ViArG9v9CChUcv11QamLmQYHl6XWYZ_LLrai4eVHMy8KGf1oAlBKFSkUt5FkoBl9ocoeXVnKSKgo1KRw9qmyGJzX7j5SEt37wzZTspQNp7lZsnQbl2IGZf_dRgThW3LIjJOPiqRPyduRc1LbMOdZJLdwGj7wTebFqurp-VgsEGNdaHdFtpFl2Z9bPW5j09RnNAVp1xeTLfEt2QVhErRPnc67qP9bcWI35spTXaimAuuw1w0D0zu6WRRBRbcIPglWWf9m2aypJ2wCQY_v5DBnEcoGy-cV1PZKgNXD2W_Bt6BAFw0_C85OE6fdUYtIFTPHKwEvAZpAlnbMo-fToodQ87pjnOWvpvLCg_pL0Ms0a2sWko0cBPPz7l715PxE68wjtuH5LZmR49wJbOxvA8cQiVJ0_rPzUzR-NP0H42vCauk40Eo2lbG_N7C4K9l3QrlKjVLza_xy4eX8kzKJ06lOOfTn_AD35GvUoxgPP7jjp0SMcYJw9z7vGhNgM-NMM_x0BD4ciWq1G8BD2lRuTKYd2JB2rihuCT1LUh8I8oUkmzvCUK8CETeVZLclakSf7vHniWVl7rS93fU7tpwKQz0JFdXQmQjcwoCuXhoIbxOLnqR_m9b9V7w5GStYrES-qm0bxpK8Gkx0pBfe89m0IAzOa2PY_VKPX2feDJMDF27_wxgjM9lqDdl5qR_8rxd6U0ZFtZ_Y4CdpJWvlgpmwCaq4QmTRTBQYP-XteGs4UdecIyI2_uQImh096uQftkhXVDJ1KcTZHM9DjpGWxi9jvPFquw9aQ9wKsd8lEVt24cZD-R_txCcCW0W8CVcd4Eme05SM4POJVvSeHnDUx4zVkvjkGCjLSSXWdHX0qkID_Gm72Z_noSimt6Ls1iGxJN5_9DZEdfuuhXu9HXed0k_-gP3cKupXIHJLtDdjWqgQuut7UWii7MfpK2GJPhffMElAVxXfnoHCkSCnpkvP_s4zkoYVHhTClta2LqhjL0HNbTuAf0jzSFIllJ-T_-7_2ZCuVPy4wLGXBrRX575a7sTstHr3ohz1OPvkB5rS_Rr_1sPlxemvqe1kLdroAR-x7cx0WKCpz_yjVoPCxYJGhvLxUvsqWcO31fZ9f6AsdZRL_3fIIdowCQ7CgOBCH_x2rRLRVeDzFJXtq69HysT1IFFDDIdu3jX7xSGPxkUNkBQenqCtBNdjjK0ukBOqKHPjRJduLH7VmbEwGQMZlHi5qSoV4P_uow-ytF44M08KVPk0ieDnKFbt3yWEVszJOVQBVXbV7G5lyfmM45cjgpwgk5VKaT73jGcMWCwQMB_uSO-LXw9euLfI6NNjJGwoLYhklfz9VYfGgHM9ZcdxuAyC4p0vyxUhN77N811lQp-XM5oL5jfLB_TSI4bhrqv5456iNDJwGGOimZLI76v97mS1cE2DbLm2hJN30Xmtke-ODRKGA_5B599asAkqsoH484bN3UNvxQTP-R_4nCHvNQMXJrpDPGSyfmGLgqwDd46fl_5JD17LaOFSZxl9m3rXAlL_ZkQrIMOq7yN7UArAfYX5U7nNrjiAx9sscFUghvfihF0Eby7Zb9GXaswZeFKY-cWUI9VRiqwgx9-_2Mde0aevryahd7WKPavrTlLAZ77hrFNodMmlUe8kXuu1vsckRF-HdK0ptVz_WczaGh1iIZjTZ220Y3StjL59AebnzKY9OnHMy90cFFc-9e7UWuDOlN51a5vUjBgluL451RqQwq5xgDojDfR3uYBssfd-eGMhRJXNNXg86RELxOT2Oz6-j6yC7koaAxhYhKfnB_ptMYulJSuVj2O5iyV3EgcCyw0TYWuvYa9PZ1vKaRpX3OfU-13dVOEwqd8URBLzutkG76JQ0D6Q5e2KdNYJsojSQfqWZVRIcQG4y7r6gAl6xvptuysjIWu0dy6BiXzGhlK3nKnDMzE2VeGPXmPXpOAbuBD8R2cHuwlQ0eck31dzyfpIWSkcS68KubxF7wDd5F0-wceYRgYsTE3C7WzyBKH9CbWPs-gBenEUsFpnnTUzOFA0c5WDG7lbJL7nOjESI-kXWkNql3oaKIxM0xQaVU-bkWzchwAvH1KvrpoVG6C8BROuXs2-XuxOWC8juMq8sHJolkJqjblgizCBSBivPgklQ6VO4S86JT4GIFiQTP8BtTsDMxCBjkLdAQbcnNa7IQgHUdo0E4uYuVpENHohQN_HTMGx8mmRLF5mkDbZxhISfDpB87zm4kUAfrPon9kuqFJuiUuWvwvpYQlXjPjieQPJPgDUf4Hw8yGYv2fSlvm6uwMNyojs4021UuJlZW148ado5uULIyHwIm1kT0dhZttIodhIIJRFaarVaRDREzH_eN8NdXG3NoLxAY7-WTnVPBx1CxVBMzk5cv7wTSGyDoeQZdGkqx5-FQX7jo2BwYFKMcbpRMcBHGFmwS7-M-ybH8wVwIyxLH71cw50vdphGM4zHYvF_KK01Fc882JYiU5h2HL73dx1MjaYIzLq91IjvrWbmYM7KXPlRHSyiYTb2BWk7Bn0EH8mc_DHQDnjWMrzkkXa65QmgXSDtG3ATIpl61ftunWSX415opIuXL4oW4asjKNsDE51BYkLtbvRENUPE_xGQBKL3dLrKo90NhcBfdOJAt8nmupKTJY9HtfOHJ1Nv7YxKXnY33MjT3LYlKcXXWYVs-oNTX65y9sKycCh92vApy8b3dH1ZjADszots6ABn0Gwg8CZk_mWyi2Od9mJm00ISiEYtqaLFrBRJhp6yOMWm-YdCuGKW6W4dt8qZul-IfFw1wiXycAI2HGM2elqM3A0kt-d0xBFKCI51tJrbI7KHQE2x1qQzGoVJylRFEYpNrEpRGVpzm1gAcA5WihtE9JtBKRjasLiASC64iq-9pGXKFbs_Avum_iF9EhWA7HgbGWmwa7qix-Ddc"}</script>
+          <!-- secret:end -->
         </section>
 
 
@@ -930,20 +830,17 @@
     });
   }
   wirePathLinks(document);
-  buttons.forEach(b => b.addEventListener('click', () => navigateTo('/' + (b.dataset.tab === 'general' ? '' : b.dataset.tab))));
+  buttons.forEach(b => b.addEventListener('click', () => { disarmSecret(); navigateTo('/' + (b.dataset.tab === 'general' ? '' : b.dataset.tab)); }));
 
   addressInput.addEventListener('focus', () => addressInput.select());
   addressInput.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
       e.preventDefault();
       const typed = addressInput.value;
-      if(typed.trim().toLowerCase() === 'password'){
-        secretArmed = true;
-        secretSequence = [];
-        addressInput.blur();
-        return;
-      }
-      if(ROUTES[normalizePath(typed)]){ navigateTo(typed); return; }
+      if(ROUTES[normalizePath(typed)]){ disarmSecret(); navigateTo(typed); return; }
+      // Any other entry might be the lock's word, so it arms the dots (the
+      // page never says which word is right; only the sealed panel knows).
+      armSecret(typed);
       addressInput.blur();
       lookUpTempKey(typed).then(project => {
         if(!(project && showSharedProject(project))) navigateTo(typed);
@@ -980,11 +877,37 @@
   }
   wireCopyButtons(document);
 
-  // Temp keys: "Key:Project" lines under "temp" in fonts/glyphs.txt. Typing a
-  // key in the address bar shows just that one secret project (it never
-  // unlocks the others) for 24 hours after the commit that added the line:
-  // the site asks GitHub for the file as it was a day ago, and a key that was
-  // already in it then has expired. If GitHub can't be reached, nothing opens.
+  // The Secret Projects panel is sealed (AES-GCM, key from PBKDF2) by
+  // scripts/secret.mjs, so the page source only holds ciphertext. The key
+  // comes from the word typed in the address bar plus the dot colours.
+  const SECRET_BOX = JSON.parse(document.getElementById('secretCipher').textContent);
+  const DOT_COLORS = { dotClose:'red', dotMinimize:'yellow', dotMaximize:'green' };
+  const fromB64 = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
+
+  // Must match secretFor() / deriveTemp() in scripts/secret.mjs.
+  function normalizeSecretWord(typed){ return typed.trim().toLowerCase(); }
+
+  async function pbkdf2(secret, salt, iterations, bits){
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveBits']);
+    return new Uint8Array(await crypto.subtle.deriveBits({ name:'PBKDF2', hash:'SHA-256', salt, iterations }, base, bits));
+  }
+  // Resolves to the plaintext, or null when the key is wrong.
+  async function openSealed(keyBytes, iv, ct){
+    try{
+      const key = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
+      return new TextDecoder().decode(await crypto.subtle.decrypt({ name:'AES-GCM', iv: fromB64(iv) }, key, fromB64(ct)));
+    }catch(err){
+      return null;
+    }
+  }
+
+  // Temp keys: "id:iv:ciphertext" lines under "temp" in fonts/glyphs.txt,
+  // added with `node scripts/secret.mjs temp add KEY PROJECT`. The file holds
+  // neither the key nor the project in the clear: the typed key derives both
+  // the line's id and the AES key for that one project (it never unlocks the
+  // others). A key works for 24 hours after the commit that added its line:
+  // the site asks GitHub for the file as it was a day ago, and a line that
+  // was already in it then has expired. If GitHub can't be reached, nothing opens.
   const TEMP_KEYS_FILE = 'fonts/glyphs.txt';
   const TEMP_KEYS_REPO = 'Aedin-ctrl/Aedin-ctrl.github.io';
   const TEMP_KEYS_REPO_PATH = 'docs/' + TEMP_KEYS_FILE;
@@ -995,20 +918,30 @@
     for(const raw of text.split(/\r?\n/)){
       const line = raw.trim();
       if(!inTemp){ if(line.toLowerCase() === 'temp') inTemp = true; continue; }
-      const m = line.match(/^([^:\s]+)\s*:\s*(.+)$/);
-      if(m) keys.set(m[1].toLowerCase(), m[2].trim());
+      const m = line.match(/^([0-9a-f]{32}):([\w-]+):([\w-]+)$/);
+      if(m) keys.set(m[1], { iv: m[2], ct: m[3] });
     }
     return keys;
   }
 
+  async function deriveTempKey(key){
+    const bits = await pbkdf2(key, fromB64(SECRET_BOX.tempSalt), SECRET_BOX.iter, 384);
+    const id = [...bits.slice(32, 48)].map(b => b.toString(16).padStart(2, '0')).join('');
+    return { aes: bits.slice(0, 32), id };
+  }
+
+  // Resolves to the one project's HTML, or null.
   async function lookUpTempKey(typed){
-    const key = typed.trim().toLowerCase();
+    const key = normalizeSecretWord(typed);
     if(!key || /[\s\/.]/.test(key)) return null;
     try{
       const current = await fetch(TEMP_KEYS_FILE + '?t=' + Date.now(), {cache:'no-store'});
       if(!current.ok) return null;
-      const project = parseTempKeys(await current.text()).get(key);
-      if(!project) return null;
+      const entries = parseTempKeys(await current.text());
+      if(!entries.size) return null;
+      const { aes, id } = await deriveTempKey(key);
+      const entry = entries.get(id);
+      if(!entry) return null;
       const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const commits = await fetch(`https://api.github.com/repos/${TEMP_KEYS_REPO}/commits?path=${encodeURIComponent(TEMP_KEYS_REPO_PATH)}&until=${dayAgo}&per_page=1`);
       if(!commits.ok) return null;
@@ -1016,20 +949,21 @@
       if(list.length){
         const old = await fetch(`https://raw.githubusercontent.com/${TEMP_KEYS_REPO}/${list[0].sha}/${TEMP_KEYS_REPO_PATH}`, {cache:'no-store'});
         if(!old.ok) return null;
-        if(parseTempKeys(await old.text()).has(key)) return null;  // already there a day ago
+        if(parseTempKeys(await old.text()).has(id)) return null;  // already there a day ago
       }
-      return project;
+      return await openSealed(aes, entry.iv, entry.ct);
     }catch(err){
       return null;
     }
   }
 
-  function showSharedProject(name){
-    const item = [...document.querySelectorAll('#secret-projects .sp-item')]
-      .find(d => d.querySelector('.proj-title').textContent.trim().toLowerCase() === name.toLowerCase());
-    if(!item) return false;
+  function showSharedProject(html){
+    const holder = document.createElement('div');
+    holder.innerHTML = html;
+    const card = holder.querySelector('.sp-item');
+    if(!card) return false;
+    const name = card.querySelector('.proj-title').textContent.trim();
     const panel = document.getElementById('shared-project');
-    const card = item.cloneNode(true);
     card.open = true;
     panel.replaceChildren(card);
     wirePathLinks(panel);
@@ -1043,24 +977,60 @@
     return true;
   }
 
-  // Secret combo lock: once armed via the "password" address-bar entry, the
-  // three window dots stop closing/minimizing/maximizing and instead record
-  // clicks. Red, green, yellow, yellow unlocks /secret_projects and opens the
-  // padlock; clicking the open padlock locks it again without leaving the page.
+  // Secret combo lock: an address-bar entry that isn't a page arms the three
+  // window dots, which then stop closing/minimizing/maximizing and record
+  // clicks instead. Each time the last few clicks could be the combo, the page
+  // tries them with that word against the sealed panel; the right pair opens
+  // /secret_projects and the padlock. Clicking the open padlock locks it again
+  // without leaving the page. The word and combo live in secret/config.json.
   let secretArmed = false;
+  let secretWord = '';
   let secretSequence = [];
-  const SECRET_CODE = ['dotClose', 'dotMaximize', 'dotMinimize', 'dotMinimize']; // red, green, yellow, yellow
+  let secretClicks = 0;
+  let secretTry = Promise.resolve();
+  let secretLoaded = false;
+  const SECRET_MAX_CLICKS = 12;  // then the dots go back to normal
+
+  function armSecret(typed){
+    secretArmed = true;
+    secretWord = normalizeSecretWord(typed);
+    secretSequence = [];
+    secretClicks = 0;
+  }
+  function disarmSecret(){
+    secretArmed = false;
+    secretSequence = [];
+  }
+
+  async function tryUnlock(word, sequence){
+    const secret = word + '\n' + sequence.map(id => DOT_COLORS[id]).join(' ');
+    const key = await pbkdf2(secret, fromB64(SECRET_BOX.salt), SECRET_BOX.iter, 256);
+    return openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
+  }
 
   function handleDot(id, defaultAction){
     if(!secretArmed){ defaultAction(); return; }
     secretSequence.push(id);
-    if(secretSequence.length > SECRET_CODE.length) secretSequence.shift();
-    if(secretSequence.length === SECRET_CODE.length && secretSequence.every((v, i) => v === SECRET_CODE[i])){
-      secretArmed = false;
-      secretSequence = [];
+    if(secretSequence.length > SECRET_BOX.n) secretSequence.shift();
+    if(++secretClicks >= SECRET_MAX_CLICKS) disarmSecret();
+    if(secretSequence.length !== SECRET_BOX.n) return;
+    const word = secretWord, sequence = secretSequence.slice();
+    // One attempt at a time, in click order.
+    secretTry = secretTry.then(async () => {
+      if(secretUnlocked) return;
+      const html = await tryUnlock(word, sequence);
+      if(html === null) return;
+      disarmSecret();
+      if(!secretLoaded){
+        const panel = document.getElementById('secret-projects');
+        panel.innerHTML = html;
+        wirePathLinks(panel);
+        wireCopyButtons(panel);
+        secretLoaded = true;
+      }
       setSecretUnlocked(true);
       navigateTo('/secret_projects');
-    }
+    });
   }
 
   const lockShackle = document.getElementById('lockShackle');
