@@ -628,7 +628,7 @@
 
               <div class="dl-cmd">
                 <code id="installCmd">curl -fsSL https://www.aedinlai.com/install-lecturenotes.sh | bash</code>
-                <button class="dl-copy" id="copyInstall" type="button" aria-label="Copy install command">Copy</button>
+                <button class="dl-copy" id="copyInstall" data-target="installCmd" type="button" aria-label="Copy install command">Copy</button>
               </div>
 
               <p class="dl-fine">Apple Silicon Macs (M1 or newer), macOS Sonoma or later. Downloads about 4&nbsp;GB of models, so give it time. It asks for your password once, to install the audio driver. Safe to re-run &mdash; it skips whatever you already have. You can <a href="install-lecturenotes.sh">read the script first</a>, and you should.</p>
@@ -656,12 +656,46 @@
               </details>
             </div>
           </div>
+
+          <div class="project-row">
+            <span class="proj-index">02</span>
+            <div>
+              <span class="proj-title">SceneTyper</span>
+              <p class="proj-desc">A macOS app I made for a short film, to fake someone writing an essay on screen. Give it the final text (paste it, or drop in a PDF, Word doc or photo of the page) and a running time, and it types into whatever document is open &mdash; Google Docs, Word, Pages &mdash; at a human pace, with pauses, typos and second thoughts. Then it goes back through its own rough draft, jumping word by word with the keyboard, highlighting and rewording, until the page matches the script exactly. A floating bar shows the timer for each part. If anyone touches the keyboard it pauses instantly and remembers its place, or it can let an actor's keypresses drive the typing so their hands match the screen.</p>
+              <p class="proj-tags">Swift &middot; SwiftUI &middot; AppKit &middot; Claude &mdash; 2026</p>
+
+              <p class="dl-lead">Paste this into Terminal. It installs the app, and nothing else.</p>
+
+              <div class="dl-cmd">
+                <code id="installCmdST">curl -fsSL https://www.aedinlai.com/install-scenetyper.sh | bash</code>
+                <button class="dl-copy" data-target="installCmdST" type="button" aria-label="Copy install command">Copy</button>
+              </div>
+
+              <p class="dl-fine">macOS Ventura or later, Apple Silicon or Intel. About 1&nbsp;MB. On first launch it asks for Accessibility permission, which is what lets it type into your document. Safe to re-run &mdash; it replaces an older copy. You can <a href="install-scenetyper.sh">read the script first</a>, and you should.</p>
+
+              <p class="dl-fine">Have Claude Code signed in on your Mac? SceneTyper uses it to write the rough-draft wording it later revises; your script is sent to Anthropic through your own account to do that (<button class="inline-link" data-path="/privacy">details</button>). Without it, it uses a built-in word list &mdash; or open a <code>.scenetyper</code> scene file someone made with Claude and you get exactly their takes.</p>
+
+              <details class="dl-alt">
+                <summary>Or download just the app</summary>
+                <div class="dl-altbody">
+                  <div class="dl-row">
+                    <a class="dl-btn" href="downloads/SceneTyper.zip" download>Download .zip</a>
+                    <span class="dl-meta">1 MB &middot; same app as the command installs</span>
+                  </div>
+                  <div class="dl-note">
+                    <span class="dl-note-mark">01</span>
+                    <span><strong>macOS will refuse to open it at first.</strong> Go to <strong>System Settings &rarr; Privacy &amp; Security</strong>, scroll to the Security section, and click <strong>Open Anyway</strong> next to the message about SceneTyper. That button only shows up for about an hour after you try to open the app. The command above skips all of this.</span>
+                  </div>
+                </div>
+              </details>
+            </div>
+          </div>
         </section>
 
 
         <section class="panel" id="privacy">
           <div class="panel-head"><div><h2 class="panel-heading">Privacy</h2>
-            <p class="panel-sub">What this site and LectureNotes do with your information. Short version: almost nothing.</p></div></div>
+            <p class="panel-sub">What this site, LectureNotes and SceneTyper do with your information. Short version: almost nothing.</p></div></div>
           <div class="legal">
             <p class="updated">Last updated September 28, 2026</p>
 
@@ -683,6 +717,15 @@
               <li><strong>Installing it</strong> downloads files from this site, existential.audio (BlackHole audio driver), ollama.com (Ollama and the AI model) and huggingface.co (the speech model). Those servers see your IP address, like any download.</li>
             </ul>
 
+            <h3>SceneTyper (the Mac app)</h3>
+            <ul>
+              <li><strong>I don't collect anything.</strong> No analytics or usage data, and I never see your scripts.</li>
+              <li><strong>Stays on your Mac:</strong> your script, settings and the draft wording it generates (saved in <code>~/Library/Application Support/SceneTyper</code>).</li>
+              <li><strong>Keyboard access</strong> (the Accessibility permission) is used only to type into the document in front of you and, during a take, to notice when a key is pressed or the mouse is clicked so it can pause. Keys and clicks aren't recorded or saved.</li>
+              <li><strong>If Claude Code is signed in</strong> on your Mac, the script is sent to Anthropic through your own Claude account to write the rough-draft wording. Anthropic's <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and your plan's terms apply to that.</li>
+              <li><strong>Installing it</strong> downloads the app from this site.</li>
+            </ul>
+
             <h3>Other</h3>
             <p>This site isn't directed at children under 13. If anything here changes, this page will be updated. Questions: <a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>.</p>
           </div>
@@ -690,7 +733,7 @@
 
         <section class="panel" id="terms">
           <div class="panel-head"><div><h2 class="panel-heading">Terms</h2>
-            <p class="panel-sub">The ground rules for this site and for LectureNotes.</p></div></div>
+            <p class="panel-sub">The ground rules for this site, LectureNotes and SceneTyper.</p></div></div>
           <div class="legal">
             <p class="updated">Last updated September 28, 2026</p>
 
@@ -706,6 +749,13 @@
               <li><strong>Follow your school's academic integrity rules.</strong> Don't use LectureNotes where outside help isn't allowed, such as during exams.</li>
               <li><strong>Claude is optional</strong> and runs through your own Claude account, under Anthropic's terms and your plan's limits.</li>
               <li><strong>Open-source parts.</strong> LectureNotes includes open-source software under the MIT License (whisper.cpp, Dear ImGui and nlohmann/json); their notices are in <a href="licenses.txt">licenses.txt</a> and inside the app. The audio driver, Ollama and the AI models are downloaded from their publishers during setup and are covered by their own licenses.</li>
+            </ul>
+
+            <h3>SceneTyper</h3>
+            <ul>
+              <li><strong>It's free</strong> and provided &ldquo;as is&rdquo;, without warranties of any kind. To the fullest extent the law allows, I'm not liable for any loss or damage from using it.</li>
+              <li><strong>It types into whatever window is in front.</strong> Start takes in a document you don't mind it editing (it can clear it between takes), and keep other work closed or saved. It refuses to type into terminal apps.</li>
+              <li><strong>Claude is optional</strong> and runs through your own Claude account, under Anthropic's terms and your plan's limits.</li>
             </ul>
 
             <h3>General</h3>
@@ -846,29 +896,29 @@
   });
   addressInput.addEventListener('blur', () => { addressInput.value = displayValue(currentPath); });
 
-  const copyInstallBtn = document.getElementById('copyInstall');
-  if(copyInstallBtn){
-    copyInstallBtn.addEventListener('click', async () => {
-      const cmd = document.getElementById('installCmd').textContent.trim();
-      try { await navigator.clipboard.writeText(cmd); }
+  // "Copy" buttons next to install commands (data-target = the <code> id).
+  document.querySelectorAll('.dl-copy[data-target]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const code = document.getElementById(btn.dataset.target);
+      try { await navigator.clipboard.writeText(code.textContent.trim()); }
       catch(err){
         // The clipboard API needs a secure context; if it's unavailable,
         // select the text so it can still be copied by hand.
         const range = document.createRange();
-        range.selectNodeContents(document.getElementById('installCmd'));
+        range.selectNodeContents(code);
         const sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
         return;
       }
-      copyInstallBtn.textContent = 'Copied';
-      copyInstallBtn.classList.add('copied');
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
       setTimeout(() => {
-        copyInstallBtn.textContent = 'Copy';
-        copyInstallBtn.classList.remove('copied');
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
       }, 1600);
     });
-  }
+  });
 
   // Secret combo lock: once armed via the "password" address-bar entry, the
   // three window dots stop closing/minimizing/maximizing and instead record
