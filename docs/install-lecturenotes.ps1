@@ -27,8 +27,8 @@ $BaseUrl = if ($env:LECTURENOTES_BASE_URL) { $env:LECTURENOTES_BASE_URL } else {
 # Filled in by LectureNotes' scripts/release-windows.sh each time a new
 # build is published, so they always match the zips next to this script.
 $AppSha256 = @{
-    'x64'   = '__SHA256_X64__'
-    'arm64' = '__SHA256_ARM64__'
+    'x64'   = '6408d98f08858989e267f21ca796d2424b4237227f6e6bf899bf40be600a7abe'
+    'arm64' = 'f80e137730aaa4d89e2fc1cd61cf1d0771b70e4f091077af7b4318ed617f4388'
 }
 
 $InstallDir  = Join-Path $env:LOCALAPPDATA 'Programs\LectureNotes'
