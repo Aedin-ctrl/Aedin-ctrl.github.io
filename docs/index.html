@@ -35,9 +35,9 @@
 
   .rig{width:100%; max-width:1800px;}
   :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
-  /* Its own 40px strip under the monitor (the monitor is shortened by the
-     same amount), with the links centered vertically in it. */
-  .site-footer{display:flex; justify-content:center; align-items:center; gap:18px; height:40px; font-size:12px;}
+  /* Its own 20px strip under the monitor (the monitor is shortened by the
+     same amount), with the links centered in it both ways. */
+  .site-footer{display:flex; justify-content:center; align-items:center; gap:18px; height:20px; font-size:12px;}
   .site-footer button{color:#4b5059; font-size:12px; padding:2px 4px;}  /* 7:1 on the #f5f5f6 page background */
   .site-footer button:hover{color:var(--ink);}
   .inline-link{color:inherit; text-decoration:underline; font-size:inherit; padding:0;}
@@ -56,13 +56,6 @@
     position:relative;
     box-shadow:0 40px 80px -32px rgba(16,17,20,0.18);
   }
-  .camera-dot{
-    position:absolute;
-    top:2px; left:50%; transform:translateX(-50%);
-    width:6px; height:6px; border-radius:50%;
-    border:1.2px solid var(--faint);
-    background:var(--paper);
-  }
 
   .browser{
     border:1px solid var(--line);
@@ -70,8 +63,8 @@
     overflow:hidden;
     display:flex;
     flex-direction:column;
-    height:calc(100vh - 70px);   /* 14px top padding + 16px monitor bezel + 40px footer */
-    height:calc(100dvh - 70px);
+    height:calc(100vh - 50px);   /* 14px top padding + 16px monitor bezel + 20px footer */
+    height:calc(100dvh - 50px);
   }
   .chrome-bar{
     display:flex; align-items:center; gap:16px;
@@ -104,7 +97,6 @@
     position:fixed; inset:0; z-index:999;
     max-width:none; border-radius:0; box-shadow:none; padding:0;
   }
-  .monitor.maximized .camera-dot{display:none;}
   .monitor.maximized .browser{height:100vh; border-radius:0; border:none;}
   .address{
     flex:1;
@@ -369,7 +361,7 @@
     .project-row{grid-template-columns:24px 1fr; gap:6px 14px;}
     .proj-link{grid-column:1 / -1; justify-self:start; margin-top:4px;}
     .address{max-width:none;}
-    .browser{height:calc(100vh - 70px); height:calc(100dvh - 70px);}
+    .browser{height:calc(100vh - 50px); height:calc(100dvh - 50px);}
     .panel-head{align-items:flex-start;}
   }
   @media (prefers-reduced-motion:reduce){
@@ -382,7 +374,6 @@
 
 <div class="rig">
   <div class="monitor">
-    <div class="camera-dot"></div>
     <div class="browser">
       <div class="chrome-bar">
         <div class="dots">
