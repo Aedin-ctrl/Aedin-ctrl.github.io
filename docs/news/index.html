@@ -99,12 +99,20 @@
   .status strong{color:var(--ink); font-weight:500;}
   .status button{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:1px;}
 
-  /* Cards: same structure and height in every row. */
-  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); grid-auto-rows:1fr; gap:16px;}
+  /* Sections: the day's top 6, then everything else. */
+  .sec + .sec{margin-top:40px;}
+  .sec-head{display:flex; align-items:baseline; gap:12px; margin-bottom:14px;}
+  .sec-head h2{font-size:17px;}
+  .sec-head p{font-size:13px; color:var(--faint);}
+
+  /* Cards: headline + full summary only, same height in every row. The
+     min() keeps a column from ever being wider than a phone screen. */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%, 250px), 1fr)); grid-auto-rows:1fr; gap:14px;}
+  .grid.top{grid-template-columns:repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap:16px;}
   .card{
-    cursor:pointer;
+    cursor:pointer; min-width:0;
     display:flex; flex-direction:column;
-    border:1px solid var(--line); border-radius:12px; padding:20px 22px 18px;
+    border:1px solid var(--line); border-radius:12px; padding:18px 20px;
     text-align:left; background:var(--paper); width:100%;
     transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease;
   }
@@ -117,19 +125,15 @@
   .unease i{display:block; width:3px; border-radius:1px; background:var(--line);}
   .unease i:nth-child(1){height:5px}.unease i:nth-child(2){height:7px}.unease i:nth-child(3){height:9px}.unease i:nth-child(4){height:11px}.unease i:nth-child(5){height:13px}
   .unease i.on{background:var(--ink);}
-  .card h2{font-size:18px; line-height:1.3; margin-top:12px;
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
-  .card .sum{color:var(--muted); font-size:13.5px; line-height:1.6; margin-top:8px;
-    display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+  .card h2{font-size:16px; line-height:1.3; overflow-wrap:anywhere;}
+  .card .sum{color:var(--muted); font-size:13.5px; line-height:1.6; margin-top:8px; overflow-wrap:anywhere;}
+  .top .card{padding:22px 24px; border-color:#d6d8dd;}
+  .top .card h2{font-size:19px;}
+  .top .card .sum{font-size:14px;}
   .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin-top:16px;}
   .impacts{list-style:none; margin-top:6px; display:flex; flex-direction:column; gap:6px;}
   .impacts li{position:relative; padding-left:14px; font-size:13px; line-height:1.5; color:var(--ink);}
   .impacts li::before{content:''; position:absolute; left:0; top:.62em; width:5px; height:1.5px; background:var(--ink);}
-  .card .impacts li{display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
-  .card-foot{margin-top:auto; padding-top:16px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
-  .card-tags{font-size:12px; color:var(--faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;}
-  .more{font-size:12.5px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:1px; white-space:nowrap; flex-shrink:0;}
-  .card:hover .more{border-color:var(--ink);}
 
   .day-head{font-size:13px; color:var(--muted); margin:32px 0 12px; padding-top:16px; border-top:1px solid var(--line);}
   .day-head:first-child{margin-top:0; padding-top:0; border-top:none;}
@@ -189,7 +193,7 @@
     .top-inner{padding:12px 16px;}
     .tools{width:100%;}
     .search{flex:1; width:auto;}
-    .grid{grid-template-columns:1fr; grid-auto-rows:auto;}
+    .grid, .grid.top{grid-template-columns:1fr; grid-auto-rows:auto;}
     main{padding:20px 16px 44px;}
     .sheet-bar{padding:10px 16px;}
     .sheet-body{padding:22px 16px 40px;}
@@ -314,26 +318,31 @@
     items.forEach(t => ul.append(el('li', '', t)));
     return ul;
   }
-  // The whole card is clickable; its "Read in depth" button is the keyboard target.
-  function card(a, i){
+  // A card is just the headline and the whole summary; the rest is in the sheet.
+  function card(a){
     const b = el('article', 'card');
     b.dataset.id = a.id;
-    b.append(metaRow(a, i, a._day), el('h2', '', a.headline), el('p', 'sum', a.summary),
-             el('div', 'label', 'What it could mean'), impactsList(a.impacts.slice(0, 3)));
-    const foot = el('div', 'card-foot');
-    const more = el('button', 'more', 'Read in depth');
-    more.type = 'button';
-    foot.append(el('span', 'card-tags', a.tags.map(t => '#' + t).join(' \u00b7 ')), more);
-    b.append(foot);
+    b.tabIndex = 0;
+    b.setAttribute('role', 'button');
+    b.append(el('h2', '', a.headline), el('p', 'sum', a.summary));
     b.addEventListener('click', () => openSheet(a.id));
+    b.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openSheet(a.id); } });
     return b;
   }
 
-  function cardGrid(list){
-    const g = el('div', 'grid');
+  function cardGrid(list, cls){
+    const g = el('div', 'grid' + (cls ? ' ' + cls : ''));
     g.append(...list.map(card));
     return g;
   }
+  function section(title, sub, list, cls){
+    const s = el('section', 'sec');
+    const h = el('div', 'sec-head');
+    h.append(el('h2', '', title), el('p', '', sub));
+    s.append(h, cardGrid(list, cls));
+    return s;
+  }
+  const TOP = 6;
 
   // ---------- views ----------
   async function showDay(day){
@@ -354,7 +363,8 @@
     if(day === dayList[0] && day !== today && today > day){
       statusEl.append(el('span', '', 'Today’s stories are still being written. Showing the latest day.'));
     }
-    grid.append(cardGrid(shown));
+    grid.append(section('Must see', 'The biggest stories today', shown.slice(0, TOP), 'top'));
+    if(shown.length > TOP) grid.append(section('Also interesting', 'The rest of the cool stuff', shown.slice(TOP)));
   }
 
   function matches(entry, terms){
@@ -474,7 +484,7 @@
     $('sheet').classList.remove('open');
     $('sheetBack').classList.remove('open');
     if(!q.value.trim() && currentDay) history.replaceState(null, '', '#' + currentDay);
-    const c = grid.querySelector(`[data-id="${CSS.escape(id)}"] .more`);
+    const c = grid.querySelector(`[data-id="${CSS.escape(id)}"]`);
     if(c) c.focus({ preventScroll:true });
   }
   function stepSheet(d){

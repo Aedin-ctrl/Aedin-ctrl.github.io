@@ -15,6 +15,7 @@
 //   date       YYYY-MM-DD the story was reported
 //   unease     1-5
 //   sources    1-5 {name, url}
+// Order matters: the page shows the first 6 as "Must see" and the rest below.
 // `id` is made from the day + headline when it's missing. The page
 // (docs/news/index.html) searches index.json and loads a day file when opened.
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';

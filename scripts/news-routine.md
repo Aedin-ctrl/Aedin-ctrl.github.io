@@ -58,7 +58,7 @@ Write a JSON array to `/tmp/news-today.json`, one object per story:
 ```json
 {
   "headline": "Accurate, punchy headline, sentence case, <= 90 chars",
-  "summary": "2 sentences: what happened, plainly.",
+  "summary": "1-2 sentences, <= 45 words: what happened, plainly. This is all the card shows.",
   "impacts": ["3-4 bullets, each <= 140 chars: how this could affect people, society or the reader"],
   "details": ["4-6 paragraphs, ~350-500 words total: background, what exactly happened, who's involved, key numbers, what experts say, what's uncertain or overhyped, what to watch next"],
   "category": "Neurotech | AI | Surveillance | Biotech | Climate | Space | Cyber | Geopolitics | Economy | Health | Tech",
@@ -70,7 +70,10 @@ Write a JSON array to `/tmp/news-today.json`, one object per story:
 ```
 
 - `unease` is 1-5: how unsettling the story is.
-- Order the stories most compelling first.
+- **Order matters.** The first 6 stories are shown as **Must see**: the
+  biggest, most significant or most unsettling stories of the day. Everything
+  after that is listed under **Also interesting**, the lighter "huh, that's
+  cool" stuff. So put the 6 strongest first, then the rest.
 - Reuse existing tags where they fit, so search works across days. Look at the
   tags in index.json first.
 
