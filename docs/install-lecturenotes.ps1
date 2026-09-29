@@ -57,7 +57,7 @@ $Pdfium = @{
 
 # Named "LectureNotes App" so it never merges with an existing "lecturenotes"
 # folder (e.g. a Mac Desktop shared into a virtual machine).
-$InstallDir  = Join-Path ([Environment]::GetFolderPath('Desktop')) 'LectureNotes App'
+$InstallDir  = if ($env:LECTURENOTES_INSTALL_DIR) { $env:LECTURENOTES_INSTALL_DIR } else { Join-Path ([Environment]::GetFolderPath('Desktop')) 'LectureNotes App' }
 $AppExe      = Join-Path $InstallDir 'LectureNotes.exe'
 $OldInstall  = Join-Path $env:LOCALAPPDATA 'Programs\LectureNotes'   # where the first beta installed
 $WorkRoot    = Join-Path $env:LOCALAPPDATA 'LectureNotes'
@@ -80,6 +80,10 @@ function Fail($t)  { Write-Host "error: $t" -ForegroundColor Red; throw 'Lecture
 # Invoke-WebRequest is the fallback. Neither adds the "downloaded from the
 # internet" mark that makes SmartScreen interrupt.
 function Download($url, $dest) {
+    # Native tools write progress to stderr; if output is ever redirected,
+    # Windows PowerShell would turn that into terminating errors under
+    # 'Stop'. Exit codes are checked explicitly instead.
+    $ErrorActionPreference = 'Continue'
     $curl = Join-Path $env:SystemRoot 'System32\curl.exe'
     if (Test-Path $curl) {
         & $curl -fL --progress-bar -o $dest $url
@@ -97,6 +101,7 @@ function CheckSha($file, $expected, $what) {
 # tar.exe (built into Windows 10 1803+) unpacks zips far faster than
 # Expand-Archive, which matters for the 180 MB compiler.
 function Unpack($archive, $dest) {
+    $ErrorActionPreference = 'Continue'   # see Download
     New-Item -ItemType Directory -Path $dest -Force | Out-Null
     $tar = Join-Path $env:SystemRoot 'System32\tar.exe'
     if (Test-Path $tar) {
@@ -245,7 +250,8 @@ try {
         try {
             BuildFromSource $arch $temp $staging
         } catch {
-            Write-Host "    Couldn't build it here: $($_.Exception.Message)" -ForegroundColor Yellow
+            $why = if ($_.Exception.Message) { $_.Exception.Message } else { $_ | Out-String }
+            Write-Host "    Couldn't build it here: $why" -ForegroundColor Yellow
             Info 'Using the ready-made app instead.'
             if (Test-Path $staging) { Remove-Item -Recurse -Force $staging }
             InstallPrebuilt $arch $temp $staging
@@ -319,8 +325,11 @@ try {
             Ok "$model already downloaded"
         } else {
             Info "Pulling $model"
+            $ErrorActionPreference = 'Continue'   # progress goes to stderr; see Download
             & $OllamaExe pull $model
-            if ($LASTEXITCODE -ne 0) { Fail "Could not download $model." }
+            $pulled = $LASTEXITCODE
+            $ErrorActionPreference = 'Stop'
+            if ($pulled -ne 0) { Fail "Could not download $model." }
         }
     }
 
