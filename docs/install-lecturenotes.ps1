@@ -101,10 +101,17 @@ function Download($url, $dest) {
     $ErrorActionPreference = 'Continue'
     $curl = Join-Path $env:SystemRoot 'System32\curl.exe'
     if (Test-Path $curl) {
-        & $curl -fL --progress-bar -o $dest $url
-        if ($LASTEXITCODE -ne 0) { throw "Could not download $url" }
-    } else {
+        # --ssl-revoke-best-effort: school and office networks often block
+        # certificate revocation lookups, which otherwise fails every download.
+        & $curl -fL --ssl-revoke-best-effort --progress-bar -o $dest $url
+        if ($LASTEXITCODE -eq 0) { return }
+        Remove-Item $dest -Force -ErrorAction SilentlyContinue
+        Write-Host '    (retrying the download another way)' -ForegroundColor DarkGray
+    }
+    try {
         Invoke-WebRequest -Uri $url -OutFile $dest -UseBasicParsing
+    } catch {
+        throw "Could not download $url ($($_.Exception.Message))"
     }
 }
 
@@ -232,9 +239,15 @@ if ($ollama -and (Test-Path $ollama)) {
     }
 }
 Remove-Item 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LectureNotes' -Recurse -Force -ErrorAction SilentlyContinue
-# The app folder last (this script lives in it); only if it's really the app.
+# The app's own files last (this script is one of them), then the folder if
+# nothing else is in it.
 Set-Location $env:TEMP
-if ($app -and (Test-Path (Join-Path $app 'LectureNotes.exe'))) { Remove-Item -Recurse -Force $app -ErrorAction SilentlyContinue }
+if ($app -and (Test-Path -LiteralPath (Join-Path $app 'LectureNotes.exe'))) {
+    foreach ($f in 'LectureNotes.exe', 'pdfium.dll', 'THIRD_PARTY_NOTICES.txt', 'Uninstall LectureNotes.cmd', 'uninstall.ps1') {
+        Remove-Item -LiteralPath (Join-Path $app $f) -Force -ErrorAction SilentlyContinue
+    }
+    if (-not (Get-ChildItem -LiteralPath $app -Force -ErrorAction SilentlyContinue)) { Remove-Item -LiteralPath $app -Force -ErrorAction SilentlyContinue }
+}
 Write-Host ''
 Write-Host 'LectureNotes is uninstalled. Your notes in Documents\LectureNotes were kept.' -ForegroundColor Green
 Write-Host 'Ollama is still installed; remove it from Settings > Apps if you no longer need it.'
@@ -244,7 +257,9 @@ Read-Host 'Press Enter to close'
     $ps1 = Join-Path $InstallDir 'uninstall.ps1'
     [IO.File]::WriteAllText($ps1, $script, (New-Object Text.UTF8Encoding $true))
     $command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$ps1`""
-    Set-Content -Path (Join-Path $InstallDir 'Uninstall LectureNotes.cmd') -Value "@$command" -Encoding ASCII
+    # Relative to itself, so it works whatever characters the path contains.
+    Set-Content -Path (Join-Path $InstallDir 'Uninstall LectureNotes.cmd') -Encoding ASCII `
+        -Value '@powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0uninstall.ps1"'
     $key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\LectureNotes'
     New-Item -Path $key -Force | Out-Null
     $values = @{
@@ -311,8 +326,16 @@ try {
     $running = Get-Process -Name 'LectureNotes' -ErrorAction SilentlyContinue
     if ($running) {
         Info 'Closing the running copy of LectureNotes'
-        $running | ForEach-Object { $_.CloseMainWindow() | Out-Null }
-        Start-Sleep -Seconds 3
+        # Ask it to close (it saves a lecture in progress), then wait for it.
+        try {
+            Add-Type -Namespace LectureNotesSetup -Name Win -MemberDefinition @'
+[DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern IntPtr FindWindowW(string cls, string title);
+[DllImport("user32.dll")] public static extern bool PostMessageW(IntPtr hwnd, uint msg, IntPtr w, IntPtr l);
+'@
+            $hwnd = [LectureNotesSetup.Win]::FindWindowW('LectureNotesWindow', [NullString]::Value)
+            if ($hwnd -ne [IntPtr]::Zero) { [LectureNotesSetup.Win]::PostMessageW($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero) | Out-Null }
+        } catch {}
+        $running | ForEach-Object { $_.WaitForExit(15000) | Out-Null }
         Get-Process -Name 'LectureNotes' -ErrorAction SilentlyContinue | Stop-Process -Force
         Start-Sleep -Seconds 1
     }
