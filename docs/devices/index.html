@@ -142,7 +142,7 @@
     who.append(el('div', 'dev-name', (dev.tailscale && dev.tailscale.name) || dev.hostname || d.id),
                el('div', 'dev-what', [dev.model, dev.os].filter(Boolean).join(' · ')));
     const state = el('span', 'dev-state', online ? 'Connected' : 'Offline');
-    state.append(el('small', '', online ? `${things.filter(t => t.status === 'running').length} running` + (bad ? ` · ${bad} need a look` : '') : 'last seen ' + ago(age)));
+    state.append(el('small', '', online ? `${things.filter(t => t.status === 'running').length} running` + (bad ? ` · ${bad} ${bad === 1 ? "needs" : "need"} a look` : '') : 'last seen ' + ago(age)));
     sum.append(who, state, el('span', 'toggle'));
     sum.addEventListener('click', () => { open.has(d.id) ? open.delete(d.id) : open.add(d.id); render(); });
     box.append(sum);
