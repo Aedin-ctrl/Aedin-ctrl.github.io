@@ -36,8 +36,10 @@ the economy when the story has a strange or ominous angle. Mix it up: no
 more than 3 stories from any one category, and at least 5 different
 categories.
 
-**Recency:** prefer stories reported in the last 7 days. Stories up to about
-30 days old are fine if they're still unfolding or weren't covered yet.
+**Recency:** the day has three tiers (see step 4). At least 3 stories must
+be reported in the last 3 days. The rest can be up to about 3 months old
+(92 days at most) if they're big and haven't been covered yet, but prefer
+the last few weeks.
 
 **Accuracy is the whole point:**
 
@@ -71,10 +73,15 @@ one object per story:
 ```
 
 - `unease` is 1-5: how unsettling the story is.
-- **Order matters.** The first 6 stories are shown as **Must see**: the
-  biggest, most significant or most unsettling stories of the day. Everything
-  after that is listed under **Also interesting**, the lighter "huh, that's
-  cool" stuff. So put the 6 strongest first, then the rest.
+- **Order matters.** The page splits the list into three sections, and every
+  card shows its category and date:
+  1. **Just in** (stories 1-3): things that happened very recently, reported
+     within 3 days of today. The script rejects the day if any of these is
+     older.
+  2. **Must see** (stories 4-9): the 6 coolest, biggest or most unsettling
+     stories from roughly the last few months (at most 92 days old). These
+     are the "wait, that's real?" ones.
+  3. **Top stories** (10 and up): everything else worth knowing.
 - Reuse existing tags where they fit, so search works across days. Look at the
   tags in index.json first.
 
@@ -83,8 +90,8 @@ one object per story:
     node scripts/news.mjs add news-today.json --date $TODAY
 
 If it reports a problem, fix the JSON and run it again. The script needs at
-least 10 stories, requires every field, and refuses a lead source that an
-earlier day already used.
+least 10 stories, requires every field, checks the story ages above, and
+refuses a lead source that an earlier day already used.
 
 When the Mac runner started you, stop here: it checks the result, commits and
 pushes by itself. Otherwise publish:

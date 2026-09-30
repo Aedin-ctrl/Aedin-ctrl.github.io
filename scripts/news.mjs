@@ -15,7 +15,9 @@
 //   date       YYYY-MM-DD the story was reported
 //   unease     1-5
 //   sources    1-5 {name, url}
-// Order matters: the page shows the first 6 as "Must see" and the rest below.
+// Order matters: the page shows the first 3 as "Just in" (reported within
+// NOW_DAYS of the day), the next 6 as "Must see" (the biggest stories, up to
+// MAX_AGE_DAYS old), and the rest as "Top stories". `add` checks the ages.
 // `id` is made from the day + headline when it's missing. The page
 // (docs/news/index.html) searches index.json and loads a day file when opened.
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
@@ -27,6 +29,7 @@ const NEWS = join(ROOT, 'docs/news');
 const DAYS = join(NEWS, 'days');
 const INDEX = join(NEWS, 'index.json');
 const MIN_PER_DAY = 10;
+const NOW = 3, NOW_DAYS = 3, MAX_AGE_DAYS = 92;
 const CATEGORIES = ['Neurotech', 'AI', 'Surveillance', 'Biotech', 'Climate', 'Space', 'Cyber', 'Geopolitics', 'Economy', 'Health', 'Tech'];
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -108,6 +111,15 @@ function add(file, day){
   if(!Array.isArray(list)) die('file must be an array of articles or {"articles": [...]}');
   checkDay(day, list);
   const articles = list.map(a => tidy(a, day));
+
+  const age = a => Math.round((Date.parse(day) - Date.parse(a.date)) / 864e5);
+  const late = articles.filter(a => age(a) < 0);
+  if(late.length) die('dated after ' + day + ':\n' + late.map(a => `  "${a.headline}" (${a.date})`).join('\n'));
+  const stale = articles.slice(0, NOW).filter(a => age(a) > NOW_DAYS);
+  if(stale.length) die(`the first ${NOW} stories ("Just in") must be reported within ${NOW_DAYS} days of ${day}:\n` +
+    stale.map(a => `  "${a.headline}" (${a.date})`).join('\n') + '\nmove fresher stories to the top');
+  const old = articles.filter(a => age(a) > MAX_AGE_DAYS);
+  if(old.length) die(`stories must be at most ${MAX_AGE_DAYS} days old:\n` + old.map(a => `  "${a.headline}" (${a.date})`).join('\n'));
 
   // Same story twice in one day, or a lead source already used on an earlier day.
   const ids = new Set();
