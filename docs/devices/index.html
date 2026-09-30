@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Devices</title>
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b; --wash:#f6f6f7;
+    --ok:#1f9d55; --warn:#c98a06; --bad:#c92a2a; --off:#b8bcc4;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  main{max-width:980px; margin:0 auto; padding:32px clamp(16px,4vw,48px) 56px;}
+  .crumbs{font-size:13px; color:var(--faint); display:flex; gap:8px; align-items:center;}
+  .crumbs button{font-size:13px; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:1px;}
+  .crumbs button:hover{color:var(--ink); border-color:var(--faint);}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:10px 0 24px;}
+  .head h1{font-size:22px;}
+  .head p{color:var(--muted); font-size:14px; margin-top:4px;}
+  .fresh{font-size:12.5px; color:var(--faint); display:flex; align-items:center; gap:10px;}
+  .fresh button{font-size:12.5px; color:var(--ink); border-bottom:1px solid var(--faint);}
+
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--off); flex-shrink:0; display:inline-block;}
+  .dot.ok{background:var(--ok); box-shadow:0 0 0 3px rgba(31,157,85,.14);}
+  .dot.warn{background:var(--warn);}
+  .dot.bad{background:var(--bad);}
+
+  /* One row per device; click to open everything running on it. */
+  .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
+  .dev:hover, .dev.open{border-color:var(--line-strong);}
+  .dev-sum{width:100%; display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center; padding:18px 20px; text-align:left;}
+  .dev-name{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
+  .dev-what{font-size:13px; color:var(--muted); margin-top:1px; overflow-wrap:anywhere;}
+  .dev-state{font-size:13px; color:var(--ink); white-space:nowrap; text-align:right;}
+  .dev-state small{display:block; color:var(--faint); font-size:12px;}
+  .toggle{color:var(--faint); font-size:18px; width:18px; text-align:center;}
+  .toggle::before{content:'+';}
+  .dev.open .toggle::before{content:'\2212';}
+  .dev-body{display:none; border-top:1px solid var(--line); padding:18px 20px 20px;}
+  .dev.open .dev-body{display:block;}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,130px),1fr)); gap:10px;}
+  .stat{background:var(--wash); border-radius:9px; padding:10px 12px;}
+  .stat b{display:block; font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; font-variant-numeric:tabular-nums;}
+  .stat span{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint);}
+  .bar{height:4px; background:var(--line); border-radius:3px; margin-top:6px; overflow:hidden;}
+  .bar i{display:block; height:100%; background:var(--ink); border-radius:3px;}
+
+  .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin:22px 0 8px;}
+  .things{border-top:1px solid var(--line);}
+  .thing{display:grid; grid-template-columns:auto 1fr auto; gap:4px 12px; align-items:baseline; padding:12px 0; border-bottom:1px solid var(--line);}
+  .thing .dot{align-self:center;}
+  .t-name{font-size:14.5px; font-weight:500; display:flex; gap:8px; align-items:baseline; flex-wrap:wrap;}
+  .kind{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--faint); font-weight:400;}
+  .t-status{font-size:12.5px; white-space:nowrap; text-align:right;}
+  .t-status.ok{color:var(--ok);} .t-status.warn{color:var(--warn);} .t-status.bad{color:var(--bad);} .t-status.off{color:var(--faint);}
+  .t-detail{grid-column:2 / -1; font-size:12px; color:var(--faint); font-family:ui-monospace, SFMono-Regular, Menlo, monospace; overflow-wrap:anywhere;}
+  .t-check{grid-column:2 / -1; font-size:12.5px; color:var(--muted);}
+  .t-check.bad{color:var(--bad);}
+  .t-meta{grid-column:2 / -1; font-size:12px; color:var(--muted);}
+  .hint{font-size:12.5px; color:var(--faint); margin-top:14px; line-height:1.6;}
+  .hint code{font-family:ui-monospace, Menlo, monospace; font-size:12px; color:var(--muted);}
+  .empty{color:var(--muted); font-size:14px; padding:48px 0; text-align:center;}
+  .empty small{display:block; color:var(--faint); font-size:12.5px; margin-top:6px;}
+
+  @media (max-width:560px){
+    .dev-sum{grid-template-columns:auto 1fr auto; padding:16px;}
+    .dev-state{grid-column:2 / 3; text-align:left;}
+    .toggle{grid-row:1; grid-column:3;}
+    .dev-body{padding:16px;}
+    .thing{grid-template-columns:auto 1fr;}
+    .t-status{grid-column:2; text-align:left;}
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="crumbs"><button type="button" id="back">Secret projects</button><span>/</span><span>Devices</span></div>
+  <div class="head">
+    <div>
+      <h1>Devices</h1>
+      <p>What's connected, and what's running on it.</p>
+    </div>
+    <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
+  </div>
+  <div id="list" aria-live="polite"></div>
+</main>
+
+<script>
+  // Data comes from the pi-status Worker, which each machine's agent reports
+  // to every minute. The read key is only in the sealed secret panel, which
+  // opens this page as devices/#k=KEY.
+  const API = 'https://pi-status.pizza-calc-api.workers.dev';
+  const KEY = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+  const ONLINE_SECONDS = 150;      // reports come every 60 s
+  const $ = id => document.getElementById(id);
+  const open = new Set();
+  let data = null, fetchedAt = 0;
+
+  function el(tag, cls, text){
+    const n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;
+    return n;
+  }
+  const ago = s => s < 60 ? `${Math.max(0, Math.round(s))}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`;
+  const dur = s => { const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60); return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; };
+  const gb = b => b >= 1e9 ? (b / 1e9).toFixed(1) + ' GB' : Math.round(b / 1e6) + ' MB';
+
+  const STATUS = {
+    running:   ['ok', 'Running'],
+    starting:  ['warn', 'Starting'],
+    done:      ['ok', 'Finished OK'],
+    scheduled: ['ok', 'Scheduled'],
+    trouble:   ['warn', 'Needs a look'],
+    failed:    ['bad', 'Failed'],
+    stopped:   ['off', 'Stopped'],
+  };
+  const ORDER = { failed:0, trouble:1, starting:2, running:3, scheduled:4, done:5, stopped:6 };
+  const KIND = { service:'service', program:'program', cron:'scheduled job', container:'container' };
+
+  function deviceRow(d, age){
+    const r = d.report, dev = r.device || {};
+    const online = age < ONLINE_SECONDS;
+    const box = el('section', 'dev' + (open.has(d.id) ? ' open' : ''));
+    const sum = el('button', 'dev-sum');
+    sum.type = 'button';
+    sum.setAttribute('aria-expanded', open.has(d.id));
+    const things = r.things || [];
+    const bad = things.filter(t => t.status === 'failed' || t.status === 'trouble').length;
+    sum.append(el('span', 'dot ' + (!online ? '' : bad ? 'warn' : 'ok')));
+    const who = el('span');
+    who.append(el('div', 'dev-name', (dev.tailscale && dev.tailscale.name) || dev.hostname || d.id),
+               el('div', 'dev-what', [dev.model, dev.os].filter(Boolean).join(' · ')));
+    const state = el('span', 'dev-state', online ? 'Connected' : 'Offline');
+    state.append(el('small', '', online ? `${things.filter(t => t.status === 'running').length} running` + (bad ? ` · ${bad} need a look` : '') : 'last seen ' + ago(age)));
+    sum.append(who, state, el('span', 'toggle'));
+    sum.addEventListener('click', () => { open.has(d.id) ? open.delete(d.id) : open.add(d.id); render(); });
+    box.append(sum);
+
+    const body = el('div', 'dev-body');
+    const stats = el('div', 'stats');
+    const stat = (label, value, frac) => {
+      const s = el('div', 'stat');
+      s.append(el('b', '', value), el('span', '', label));
+      if(frac != null){ const b = el('div', 'bar'), i = el('i'); i.style.width = Math.min(100, Math.round(frac * 100)) + '%'; b.append(i); s.append(b); }
+      stats.append(s);
+    };
+    if(dev.temp_c != null) stat('Temperature', dev.temp_c + ' °C', dev.temp_c / 85);
+    if(dev.load) stat('CPU load', dev.load[0].toFixed(2), dev.cpus ? dev.load[0] / dev.cpus : null);
+    if(dev.mem_total) stat('Memory', `${gb(dev.mem_used)} / ${gb(dev.mem_total)}`, dev.mem_used / dev.mem_total);
+    if(dev.disk_total) stat('Disk', `${gb(dev.disk_used)} / ${gb(dev.disk_total)}`, dev.disk_used / dev.disk_total);
+    if(dev.uptime) stat('Up for', dur(dev.uptime + (online ? age : 0)));
+    stat('Last report', ago(age));
+    body.append(stats);
+
+    body.append(el('div', 'label', 'Running on it'));
+    const list = el('div', 'things');
+    const sorted = things.slice().sort((a, b) => (ORDER[a.status] ?? 9) - (ORDER[b.status] ?? 9) || a.name.localeCompare(b.name));
+    if(!sorted.length) list.append(el('div', 'empty', 'Nothing of yours is running on it right now.'));
+    const now = Date.now() / 1000;
+    for(const t of sorted){
+      const [cls, label] = STATUS[t.status] || ['off', t.status];
+      const row = el('div', 'thing');
+      const name = el('div', 't-name', t.name);
+      name.append(el('span', 'kind', KIND[t.kind] || t.kind));
+      row.append(el('span', 'dot ' + cls), name, el('span', 't-status ' + cls, label));
+      if(t.check) row.append(el('div', 't-check' + (t.check.ok ? '' : ' bad'), t.check.label));
+      const meta = [];
+      if(t.since && t.status !== 'stopped') meta.push('since ' + ago(now - t.since).replace(' ago', '') + ' ago');
+      if(t.last_seen) meta.push('last seen ' + ago(now - t.last_seen));
+      if(t.cpu != null) meta.push(`CPU ${t.cpu}%`);
+      if(t.mem) meta.push(gb(t.mem));
+      if(t.procs > 1) meta.push(`${t.procs} processes`);
+      if(meta.length) row.append(el('div', 't-meta', meta.join(' · ')));
+      if(t.detail) row.append(el('div', 't-detail', t.detail));
+      list.append(row);
+    }
+    body.append(list);
+    const hint = el('p', 'hint');
+    hint.append('New programs, services and cron jobs show up here on their own within a minute. Rename or hide one in ');
+    hint.append(el('code', '', '~/pi-status/names.json'), ' on the device.');
+    body.append(hint);
+    box.append(body);
+    return box;
+  }
+
+  function render(){
+    const list = $('list');
+    if(!data){ return; }
+    const since = (Date.now() - fetchedAt) / 1000;
+    const nodes = data.devices.map(d => deviceRow(d, d.age + since));
+    if(!nodes.length){
+      const e = el('div', 'empty', 'No devices have reported yet.');
+      e.append(el('small', '', 'Install the agent on the Pi and it appears within a minute.'));
+      nodes.push(e);
+    }
+    list.replaceChildren(...nodes);
+    $('fresh').textContent = 'Updated ' + ago(since);
+  }
+
+  async function load(){
+    if(!KEY){
+      $('list').replaceChildren(el('div', 'empty', 'Open this from the secret panel.'));
+      return;
+    }
+    try {
+      const r = await fetch(API + '/devices', { headers:{ Authorization:'Bearer ' + KEY }, cache:'no-store' });
+      if(r.status === 401) throw new Error('key');
+      if(!r.ok) throw new Error(r.status);
+      data = await r.json();
+      fetchedAt = Date.now();
+      render();
+    } catch(e){
+      if(!data) $('list').replaceChildren(el('div', 'empty', e.message === 'key' ? 'That key doesn’t work any more.' : 'Couldn’t reach the status server.'));
+      $('fresh').textContent = 'Couldn’t refresh';
+    }
+  }
+
+  // Back to the Secret Projects panel in the page this is embedded in.
+  $('back').addEventListener('click', () => {
+    if(window.parent !== window) window.parent.postMessage({ source:'devices', path:'/secret_projects' }, location.origin);
+    else location.href = '../';
+  });
+  $('refresh').addEventListener('click', load);
+  load();
+  setInterval(load, 20000);
+  setInterval(render, 5000);
+</script>
+</body>
+</html>
