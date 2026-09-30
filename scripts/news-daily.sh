@@ -2,7 +2,7 @@
 # Writes and publishes today's News stories. Runs on a schedule, at 6 AM with
 # a few retries during the day, and exits right away once today is done:
 #   Mac:  launchd job ~/Library/LaunchAgents/com.aedinlai.news-daily.plist
-#   Pi:   cron, 0 6,9,13,19 * * * ~/news-daily/news-daily.sh >> ~/news-daily/log 2>&1
+#   Pi:   cron (TZ America/New_York), 0 6,9,13,19 * * * with NEWS_REMOTE + GIT_SSH_COMMAND set
 #
 # Works in its own clone (news-daily/site in the folder below) so it never
 # touches a working copy. Claude does the research and
@@ -15,7 +15,9 @@ set -uo pipefail
 
 NVM_NODE=$(ls -d "$HOME"/.nvm/versions/node/*/bin 2>/dev/null | tail -1)
 export PATH="$HOME/.local/bin:${NVM_NODE:+$NVM_NODE:}/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
-REMOTE="https://github.com/Aedin-ctrl/Aedin-ctrl.github.io.git"
+# The Pi pushes with a deploy key for this one repo: set NEWS_REMOTE to the SSH
+# address and GIT_SSH_COMMAND to use that key (see the crontab line).
+REMOTE="${NEWS_REMOTE:-https://github.com/Aedin-ctrl/Aedin-ctrl.github.io.git}"
 if [ "$(uname)" = Darwin ]; then BASE="$HOME/Library/Application Support/news-daily"; else BASE="$HOME/news-daily"; fi
 SITE="$BASE/site"
 LOCK="$BASE/lock"
