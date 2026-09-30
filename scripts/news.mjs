@@ -17,7 +17,8 @@
 //   sources    1-5 {name, url}
 // Order matters: the page shows the first 3 as "Just in" (reported within
 // NOW_DAYS of the day), the next 6 as "Must see" (the biggest stories, up to
-// MAX_AGE_DAYS old), and the rest as "Top stories". `add` checks the ages.
+// MAX_AGE_DAYS old), and the rest as "Top stories". `add` checks the ages and
+// wants MIN_NEW stories (12 Top stories); `check` accepts older, shorter days.
 // `id` is made from the day + headline when it's missing. The page
 // (docs/news/index.html) searches index.json and loads a day file when opened.
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
@@ -28,7 +29,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const NEWS = join(ROOT, 'docs/news');
 const DAYS = join(NEWS, 'days');
 const INDEX = join(NEWS, 'index.json');
-const MIN_PER_DAY = 10;
+const MIN_PER_DAY = 10, MIN_NEW = 21;
 const NOW = 3, NOW_DAYS = 3, MAX_AGE_DAYS = 92;
 const CATEGORIES = ['Neurotech', 'AI', 'Surveillance', 'Biotech', 'Climate', 'Space', 'Cyber', 'Geopolitics', 'Economy', 'Health', 'Tech'];
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -110,6 +111,7 @@ function add(file, day){
   const list = Array.isArray(raw) ? raw : raw.articles;
   if(!Array.isArray(list)) die('file must be an array of articles or {"articles": [...]}');
   checkDay(day, list);
+  if(list.length < MIN_NEW) die(`${day}: ${list.length} articles, need at least ${MIN_NEW} (3 Just in, 6 Must see, 12 Top stories)`);
   const articles = list.map(a => tidy(a, day));
 
   const age = a => Math.round((Date.parse(day) - Date.parse(a.date)) / 864e5);

@@ -19,7 +19,7 @@ Read `docs/news/index.json`: its `articles` list has every headline so far
 30 days, unless there has been a big new development. In that case, write
 it as a follow-up and lead with the new reporting.
 
-## 3. Research 10-12 stories
+## 3. Research 21-24 stories
 
 The reader is an engineering student who wants **interesting but kind of
 scary** things going on in the world: the "wait, that's real?" stories. For
@@ -33,7 +33,7 @@ Good areas include neurotech and brain data, biocomputing, AI behaving in
 unsettling ways, surveillance and privacy, cyberattacks on infrastructure,
 biotech, pandemics, climate tipping points, space risks, and geopolitics or
 the economy when the story has a strange or ominous angle. Mix it up: no
-more than 3 stories from any one category, and at least 5 different
+more than 4 stories from any one category, and at least 7 different
 categories.
 
 **Recency:** the day has three tiers (see step 4). At least 3 stories must
@@ -81,7 +81,8 @@ one object per story:
   2. **Must see** (stories 4-9): the 6 coolest, biggest or most unsettling
      stories from roughly the last few months (at most 92 days old). These
      are the "wait, that's real?" ones.
-  3. **Top stories** (10 and up): everything else worth knowing.
+  3. **Top stories** (10 and up, at least 12 of them): everything else
+     worth knowing.
 - Reuse existing tags where they fit, so search works across days. Look at the
   tags in index.json first.
 
@@ -90,7 +91,7 @@ one object per story:
     node scripts/news.mjs add news-today.json --date $TODAY
 
 If it reports a problem, fix the JSON and run it again. The script needs at
-least 10 stories, requires every field, checks the story ages above, and
+least 21 stories, requires every field, checks the story ages above, and
 refuses a lead source that an earlier day already used.
 
 When the Mac runner started you, stop here: it checks the result, commits and

@@ -22,7 +22,7 @@ if [ "$(uname)" = Darwin ]; then BASE="$HOME/Library/Application Support/news-da
 SITE="$BASE/site"
 LOCK="$BASE/lock"
 MODEL="claude-sonnet-5-5"
-MAX_SECONDS=5400
+MAX_SECONDS=9000
 
 log(){ echo "$(date '+%F %T') $*"; }
 mkdir -p "$BASE"
