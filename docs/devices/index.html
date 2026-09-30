@@ -20,10 +20,7 @@
   :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
 
   main{max-width:980px; margin:0 auto; padding:32px clamp(16px,4vw,48px) 56px;}
-  .crumbs{font-size:13px; color:var(--faint); display:flex; gap:8px; align-items:center;}
-  .crumbs button{font-size:13px; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:1px;}
-  .crumbs button:hover{color:var(--ink); border-color:var(--faint);}
-  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:10px 0 24px;}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:0 0 24px;}
   .head h1{font-size:22px;}
   .head p{color:var(--muted); font-size:14px; margin-top:4px;}
   .fresh{font-size:12.5px; color:var(--faint); display:flex; align-items:center; gap:10px;}
@@ -84,7 +81,6 @@
 </head>
 <body>
 <main>
-  <div class="crumbs"><button type="button" id="back">Secret projects</button><span>/</span><span>Devices</span></div>
   <div class="head">
     <div>
       <h1>Devices</h1>
@@ -226,11 +222,6 @@
     }
   }
 
-  // Back to the Secret Projects panel in the page this is embedded in.
-  $('back').addEventListener('click', () => {
-    if(window.parent !== window) window.parent.postMessage({ source:'devices', path:'/secret_projects' }, location.origin);
-    else location.href = '../';
-  });
   $('refresh').addEventListener('click', load);
   load();
   setInterval(load, 20000);
