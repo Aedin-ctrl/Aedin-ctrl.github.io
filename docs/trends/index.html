@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Trends</title>
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b; --wash:#f6f6f7;
+    --ok:#1f9d55; --warn:#c98a06; --bad:#c92a2a; --off:#b8bcc4;
+    --ai:#4f6bd8; --tech:#1f9d55; --finance:#b8860b;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  main{max-width:980px; margin:0 auto; padding:32px clamp(16px,4vw,48px) 56px;}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:0 0 24px;}
+  .head h1{font-size:22px;}
+  .head p{color:var(--muted); font-size:14px; margin-top:4px;}
+  .fresh{font-size:12.5px; color:var(--faint); display:flex; align-items:center; gap:10px;}
+  .fresh button{font-size:12.5px; color:var(--ink); border-bottom:1px solid var(--faint);}
+
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--off); flex-shrink:0; display:inline-block;}
+  .dot.ok{background:var(--ok); box-shadow:0 0 0 3px rgba(31,157,85,.14);}
+  .dot.warn{background:var(--warn);}
+  .dot.bad{background:var(--bad);}
+
+  /* what it is doing right now */
+  .now{border:1px solid var(--line-strong); border-radius:12px; padding:20px; margin-bottom:14px;}
+  .now-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .now-state{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;}
+  .now-when{margin-left:auto; font-size:12.5px; color:var(--faint);}
+  .now-what{font-size:14px; color:var(--muted); margin-top:8px; overflow-wrap:anywhere;}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,120px),1fr)); gap:10px; margin-top:16px;}
+  .stat{background:var(--wash); border-radius:9px; padding:10px 12px;}
+  .stat b{display:block; font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; font-variant-numeric:tabular-nums;}
+  .stat span{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint);}
+
+  .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin:26px 0 8px;}
+
+  /* where the feed comes from */
+  .srcs{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,220px),1fr)); gap:10px;}
+  .src{border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; gap:10px; align-items:center;}
+  .src div{min-width:0;}
+  .src b{font-size:14px; font-weight:600; display:block;}
+  .src small{font-size:12px; color:var(--faint);}
+
+  /* topic split */
+  .split{display:flex; height:10px; border-radius:6px; overflow:hidden; background:var(--line); margin-bottom:8px;}
+  .split i{display:block; height:100%;}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12.5px; color:var(--muted);}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:9px; height:9px; border-radius:2px; display:inline-block;}
+
+  /* what it has been showing */
+  .items{border-top:1px solid var(--line);}
+  .item{display:grid; grid-template-columns:auto 1fr auto; gap:3px 12px; align-items:baseline; padding:12px 0; border-bottom:1px solid var(--line);}
+  .pill{font-size:10px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; padding:2px 7px; border-radius:999px; color:#fff; align-self:center;}
+  .pill.ai{background:var(--ai);} .pill.tech{background:var(--tech);} .pill.finance{background:var(--finance);}
+  .it-cap{font-size:14.5px; font-weight:500; overflow-wrap:anywhere;}
+  .it-cap a{text-decoration:none; border-bottom:1px solid var(--line);}
+  .it-cap a:hover{border-color:var(--ink);}
+  .it-who{grid-column:2; font-size:12.5px; color:var(--faint);}
+  .it-num{font-size:12.5px; color:var(--faint); white-space:nowrap; text-align:right;}
+
+  .digest{border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:12px;}
+  .digest h3{font-size:15px; margin-bottom:6px;}
+  .digest p{font-size:14px; color:var(--muted); white-space:pre-wrap;}
+  .empty{color:var(--faint); font-size:13.5px; padding:16px 0;}
+</style>
+</head>
+<body>
+<main>
+  <div class="head">
+    <div>
+      <h1>Trends</h1>
+      <p>The tech, AI and finance feed running on the Pi.</p>
+    </div>
+    <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
+  </div>
+  <div id="body" aria-live="polite"><p class="empty">Loading…</p></div>
+</main>
+
+<script>
+  // Same Worker as the Devices view. The Pi posts its state every minute or so; the read key only
+  // exists inside the sealed secret panel, which opens this page as trends/#k=KEY.
+  const API = 'https://pi-status.pizza-calc-api.workers.dev';
+  const KEY = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+  const LIVE_SECONDS = 180;
+  const TOPICS = ['ai', 'tech', 'finance'];
+  const $ = id => document.getElementById(id);
+  let data = null;
+
+  function el(tag, cls, text){
+    const n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;
+    return n;
+  }
+  const ago = s => s < 60 ? `${Math.max(0, Math.round(s))}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`;
+  const num = n => n == null ? '' : n >= 1e6 ? (n / 1e6).toFixed(1).replace('.0','') + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n);
+
+  // plain words for what the Pi is doing
+  const STATE = {
+    playing:  ['ok',   'Playing'],
+    starting: ['warn', 'Starting up'],
+    digesting:['ok',   'Writing the digest'],
+    resting:  ['off',  'Resting'],
+    stopped:  ['off',  'Stopped'],
+    setup:    ['warn', 'Being set up'],
+  };
+  const SOURCE_NAME = { youtube: 'YouTube', reddit: 'Reddit', hackernews: 'Hacker News' };
+
+  function render(){
+    const b = $('body');
+    b.replaceChildren();
+    if(!data){ b.append(el('p','empty','Could not reach the Pi status service.')); return; }
+    const s = data.status;
+    if(!s){ b.append(el('p','empty','The Pi has not reported anything yet.')); return; }
+
+    const live = s.age < LIVE_SECONDS;
+    const [tone, word] = STATE[s.state] || ['warn', s.state || 'Unknown'];
+
+    // now
+    const now = el('section','now');
+    const top = el('div','now-top');
+    top.append(el('span','dot ' + (live ? tone : '')), el('span','now-state', live ? word : 'Not reporting'));
+    if(live && s.platform) top.append(el('span','it-num', s.platform === 'youtube' ? 'a video' : s.platform));
+    top.append(el('span','now-when','updated ' + ago(s.age)));
+    now.append(top);
+    if(s.note) now.append(el('div','now-what', s.note));
+    if(!live) now.append(el('div','now-what','Nothing has arrived for ' + ago(s.age) + '. The Pi may be off or offline.'));
+
+    const t = s.today || {}, pi = s.pi || {};
+    const stats = el('div','stats');
+    const stat = (label, value) => { const n = el('div','stat'); n.append(el('b','',value), el('span','',label)); stats.append(n); };
+    stat('shown today', String(t.seen || 0));
+    stat('queued up', String(s.queue || 0));
+    if(pi.freeMB != null) stat('pi memory free', (pi.freeMB/1024).toFixed(1) + ' GB');
+    if(pi.tempC != null) stat('pi temperature', pi.tempC + ' °C');
+    now.append(stats);
+    b.append(now);
+
+    // topic split today
+    const by = t.byTopic || {};
+    const total = TOPICS.reduce((a,k) => a + (by[k]||0), 0);
+    if(total){
+      b.append(el('div','label','What it showed today'));
+      const bar = el('div','split');
+      const legend = el('div','legend');
+      for(const k of TOPICS){
+        const n = by[k] || 0;
+        if(n){ const i = el('i'); i.style.width = (100*n/total) + '%'; i.style.background = `var(--${k})`; bar.append(i); }
+        const sp = el('span');
+        const sw = el('i','swatch'); sw.style.background = `var(--${k})`;
+        sp.append(sw, document.createTextNode(`${k} — ${n}`));
+        legend.append(sp);
+      }
+      b.append(bar, legend);
+    }
+
+    // sources
+    b.append(el('div','label','Where it gets the feed'));
+    const srcs = el('div','srcs');
+    for(const [name, v] of Object.entries(s.sources || {})){
+      const ok = v.health === 'ok';
+      const card = el('div','src');
+      card.append(el('span','dot ' + (ok ? 'ok' : v.health === 'unknown' ? '' : 'warn')));
+      const txt = el('div');
+      txt.append(el('b','', SOURCE_NAME[name] || name),
+                 el('small','', ok ? `${v.items} items last check` : (v.detail || v.health)));
+      card.append(txt);
+      srcs.append(card);
+    }
+    if(!srcs.children.length) srcs.append(el('p','empty','No source reports yet.'));
+    b.append(srcs);
+
+    // digests
+    const days = data.days || [];
+    if(days.length){
+      b.append(el('div','label','Daily digest'));
+      for(const d of days.slice(0,5)){
+        const box = el('section','digest');
+        box.append(el('h3','', d.date));
+        box.append(el('p','', d.summary || 'No summary written for this day.'));
+        b.append(box);
+      }
+    }
+
+    // the actual content
+    b.append(el('div','label','Recently on screen'));
+    const list = el('div','items');
+    for(const it of (s.recent || [])){
+      const row = el('div','item');
+      row.append(el('span','pill ' + (it.topic||''), it.topic || '—'));
+      const cap = el('div','it-cap');
+      if(it.url){ const a = el('a','', it.caption || '(no title)'); a.href = it.url; a.target = '_blank'; a.rel = 'noopener'; cap.append(a); }
+      else cap.append(document.createTextNode(it.caption || '(no title)'));
+      row.append(cap);
+      row.append(el('span','it-num', [num(it.views) && num(it.views)+' views', ago((Date.now()-it.at)/1000)].filter(Boolean).join(' · ')));
+      row.append(el('div','it-who', it.author || ''));
+      list.append(row);
+    }
+    if(!list.children.length) list.append(el('p','empty','Nothing shown yet.'));
+    b.append(list);
+
+    $('fresh').textContent = 'checked ' + new Date().toLocaleTimeString();
+  }
+
+  async function load(){
+    if(!KEY){ data = null; render(); return; }
+    try{
+      const r = await fetch(API + '/trends?days=5', { headers: { Authorization: 'Bearer ' + KEY }, cache: 'no-store' });
+      data = r.ok ? await r.json() : null;
+    }catch{ data = null; }
+    render();
+  }
+  $('refresh').addEventListener('click', load);
+  load();
+  setInterval(load, 60000);
+</script>
+</body>
+</html>
