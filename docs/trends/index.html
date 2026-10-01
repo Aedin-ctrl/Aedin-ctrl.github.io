@@ -60,6 +60,17 @@
   .chip.on{border-color:var(--line-strong); background:var(--ink); color:#fff;}
   .found{font-size:12.5px; color:var(--faint); margin:0 0 4px;}
 
+  /* the day's digest, worked out from what came through */
+  .sum{background:var(--wash); border-radius:11px; padding:14px 16px; margin:10px 0 4px; font-size:14px; color:var(--ink);}
+  .sum .lines{color:var(--muted);}
+  .sum .rows{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,240px),1fr)); gap:14px; margin-top:12px;}
+  .sum h4{font-family:'Space Grotesk',sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); font-weight:600; margin-bottom:5px;}
+  .sum ol{margin:0; padding-left:18px; font-size:13.5px;}
+  .sum ol li{margin-bottom:3px;}
+  .sum .tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .sum .tag{font-size:12.5px; padding:3px 9px; border-radius:999px; background:var(--paper); border:1px solid var(--line);}
+  .sum a{text-decoration:none; border-bottom:1px solid var(--line);}
+
   .day{margin-top:22px;}
   .day-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; padding-bottom:7px; border-bottom:1px solid var(--line-strong);}
   .day-head h2{font-size:16px;}
@@ -245,6 +256,50 @@
       if(d.watchedMinutes) parts.push(`${d.watchedMinutes} min watched`);
       head.append(el('small','', parts.join(' · ')));
       sec.append(head);
+
+      // the digest: only worth showing when nothing is being filtered, since it covers the whole day
+      if(d.summary && !query && !likedOnly && !topic){
+        const sum = el('div','sum');
+        sum.append(el('div','lines', d.summary));
+        const rows = el('div','rows');
+        if((d.top||[]).length){
+          const col = el('div'); col.append(el('h4','','Biggest that day'));
+          const ol = el('ol');
+          for(const t of d.top.slice(0,4)){
+            const li = el('li');
+            if(t.url){ const a = el('a','', t.caption); a.href = t.url; a.target='_blank'; a.rel='noopener'; li.append(a); }
+            else li.append(document.createTextNode(t.caption));
+            li.append(el('span','it-num', ' — ' + (t.views ? num(t.views) + ' views' : t.author)));
+            ol.append(li);
+          }
+          col.append(ol); rows.append(col);
+        }
+        if((d.creators||[]).length){
+          const col = el('div'); col.append(el('h4','','Watched most'));
+          const ol = el('ol');
+          for(const c of d.creators.slice(0,4)) ol.append(el('li','', `${c.name} — ${c.count}`));
+          col.append(ol); rows.append(col);
+        }
+        if((d.rising||[]).length){
+          const col = el('div'); col.append(el('h4','','Words that jumped'));
+          const tags = el('div','tags');
+          for(const r of d.rising.slice(0,8)){
+            const t = el('span','tag', r.word);
+            t.title = `${r.count} today, ${r.before} the day before`;
+            tags.append(t);
+          }
+          col.append(tags); rows.append(col);
+        }
+        if((d.tickers||[]).length){
+          const col = el('div'); col.append(el('h4','','Tickers mentioned'));
+          const tags = el('div','tags');
+          for(const t of d.tickers) tags.append(el('span','tag', `${t.symbol} ×${t.count}`));
+          col.append(tags); rows.append(col);
+        }
+        if(rows.children.length) sum.append(rows);
+        sec.append(sum);
+      }
+
       const limit = shown[d.date] || PAGE;
       for(const it of items.slice(0, limit)) sec.append(itemRow(it));
       if(items.length > limit){
