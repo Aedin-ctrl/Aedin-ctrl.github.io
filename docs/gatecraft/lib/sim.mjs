@@ -38,9 +38,88 @@ export const PARTS = {
 
 export const isSource = (type) => PARTS[type]?.ins === 0;
 
+// ---- chips: a circuit packaged up and reused ----
+//
+// This is what turns a gate toy into something you design with. You build an adder once, name it,
+// and from then on it is a part like any other. A design carries its chip definitions with it, so a
+// shared link still works for someone who has never seen your chip.
+//
+// A chip's pins come from the switches and lamps inside it: every switch becomes an input, every
+// lamp an output, ordered top to bottom so the pins sit where you would expect.
+export const CHIP = 'chip:';
+export const isChip = (type) => typeof type === 'string' && type.startsWith(CHIP);
+export const chipName = (type) => type.slice(CHIP.length);
+
+const byY = (a, b) => a.y - b.y || a.x - b.x;
+export function chipPins(def) {
+  return {
+    ins: (def.parts || []).filter((p) => p.type === 'in').sort(byY),
+    outs: (def.parts || []).filter((p) => p.type === 'out').sort(byY),
+  };
+}
+
+// What a chip instance looks like on the board, so the canvas and hit-testing agree.
+export function chipShape(def) {
+  const { ins, outs } = chipPins(def);
+  const rows = Math.max(ins.length, outs.length, 1);
+  return { name: 'Chip', ins: ins.length, outs: outs.length, w: 78, h: Math.max(42, 20 + rows * 22),
+           pinNames: { ins: ins.map((p) => p.label || ''), outs: outs.map((p) => p.label || '') } };
+}
+
+// Replace every chip instance with its innards, so the engine only ever sees real gates. Chips may
+// contain chips; `depth` stops a chip that somehow contains itself from expanding for ever.
+export function flatten(circuit, depth = 0) {
+  const chips = circuit.chips || {};
+  const parts = [], wires = [...(circuit.wires || [])];
+  let expanded = false;
+
+  for (const p of circuit.parts || []) {
+    if (!isChip(p.type)) { parts.push(p); continue; }
+    const def = chips[chipName(p.type)];
+    if (!def || depth > 6) { continue; }          // unknown or too deep: drop it rather than loop
+    expanded = true;
+    const inner = flatten({ ...def, chips }, depth + 1);
+    const pre = p.id + '/';
+    for (const ip of inner.parts) parts.push({ ...ip, id: pre + ip.id, x: p.x, y: p.y });
+    for (const iw of inner.wires) wires.push({ from: [pre + iw.from[0], iw.from[1]], to: [pre + iw.to[0], iw.to[1]] });
+
+    const { ins, outs } = chipPins(def);
+    // an input pin on the instance feeds whatever the matching inner switch fed
+    ins.forEach((sw, i) => {
+      const feed = wires.find((w) => w.to[0] === p.id && w.to[1] === i);
+      const inside = inner.wires.filter((w) => w.from[0] === sw.id);
+      for (const target of inside) {
+        if (feed) wires.push({ from: feed.from, to: [pre + target.to[0], target.to[1]] });
+      }
+    });
+    // an output pin carries whatever the matching inner lamp was reading
+    outs.forEach((lamp, i) => {
+      const innerFeed = inner.wires.find((w) => w.to[0] === lamp.id);
+      if (!innerFeed) return;
+      for (const w of wires) {
+        if (w.from[0] === p.id && w.from[1] === i) { w.from = [pre + innerFeed.from[0], innerFeed.from[1]]; }
+      }
+    });
+  }
+
+  // drop the wires that referred to the instance itself; they have been rerouted above
+  const live = new Set(parts.map((x) => x.id));
+  const clean = wires.filter((w) => live.has(w.from[0]) && live.has(w.to[0]));
+  const out = { parts, wires: clean, chips };
+  return expanded ? flatten(out, depth + 1) : out;
+}
+
 // Where a pin sits on the part's body, so the canvas and the hit-testing agree on one answer.
-export function pinPos(part, side, index) {
-  const def = PARTS[part.type];
+export function defOf(part, chips) {
+  if (isChip(part.type)) {
+    const def = (chips || {})[chipName(part.type)];
+    return def ? chipShape(def) : null;
+  }
+  return PARTS[part.type];
+}
+
+export function pinPos(part, side, index, chips) {
+  const def = defOf(part, chips);
   if (!def) return { x: part.x, y: part.y };
   const n = side === 'in' ? def.ins : def.outs;
   const spacing = def.h / (n + 1);
@@ -58,7 +137,8 @@ export const NETS = Symbol('nets');
 //   circuit : { parts: [...], wires: [...] }
 //   memory  : Map of partId -> that part's scrap memory (switch positions, flip-flop contents)
 // Returns { values, settled, passes } where values maps every output pin to LOW/HIGH.
-export function simulate(circuit, memory, { maxPasses = 60 } = {}) {
+export function simulate(rawCircuit, memory, { maxPasses = 60 } = {}) {
+  const circuit = (rawCircuit.parts || []).some((p) => isChip(p.type)) ? flatten(rawCircuit) : rawCircuit;
   const parts = circuit.parts || [];
   const wires = circuit.wires || [];
 
@@ -103,7 +183,8 @@ export function simulate(circuit, memory, { maxPasses = 60 } = {}) {
 // What a given input pin is reading — used to light up the wires.
 export function valueAt(circuit, values, partId, side, index) {
   if (side === 'out') return values.get(key(partId, 'out', index)) ?? LOW;
-  const w = (circuit.wires || []).find((x) => x.to[0] === partId && x.to[1] === index);
+  const c = (circuit.parts || []).some((p) => isChip(p.type)) ? flatten(circuit) : circuit;
+  const w = (c.wires || []).find((x) => x.to[0] === partId && x.to[1] === index);
   return w ? values.get(key(w.from[0], 'out', w.from[1])) ?? LOW : LOW;
 }
 
@@ -114,7 +195,7 @@ export function problems(circuit) {
   const parts = circuit.parts || [], wires = circuit.wires || [];
   const fed = new Set(wires.map((w) => key(w.to[0], 'in', w.to[1])));
   for (const p of parts) {
-    const def = PARTS[p.type];
+    const def = defOf(p, circuit.chips);
     if (!def) continue;
     for (let i = 0; i < def.ins; i++) {
       if (!fed.has(key(p.id, 'in', i))) out.push({ partId: p.id, pin: i, what: `${def.name} input not connected` });

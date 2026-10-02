@@ -95,6 +95,7 @@
   <button class="btn" id="run">Running</button>
   <button class="btn ghost" id="step">Tick</button>
   <button class="btn ghost" id="clear">Clear</button>
+  <button class="btn ghost" id="makeChip" title="Turn what is on the board into a reusable part">Make chip</button>
   <div class="spacer"></div>
   <span class="note" id="note"></span>
   <button class="btn ghost" id="panelBtn">Panel</button>
@@ -103,7 +104,7 @@
 </header>
 
 <main>
-  <aside id="palette"><h2>Parts</h2></aside>
+  <aside id="palette"><h2>Parts</h2><h2 style="margin-top:14px; display:none">Your chips</h2><div id="yourChips"></div></aside>
 
   <div class="stage">
     <svg class="board" id="board"></svg>
@@ -134,7 +135,8 @@
 </form></dialog>
 
 <script type="module">
-import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS } from './lib/sim.mjs';
+import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS,
+         CHIP, isChip, chipName, chipShape, defOf, chipPins } from './lib/sim.mjs';
 import { encode, decode, codeFromText } from './lib/share.mjs';
 import { EXAMPLES, buildExample } from './lib/examples.mjs';
 
@@ -143,7 +145,9 @@ const SVG = 'http://www.w3.org/2000/svg';
 const el = (n, attrs = {}) => { const e = document.createElementNS(SVG, n); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 const GRID = 22, snap = (v) => Math.round(v / GRID) * GRID;
 
-let circuit = { parts: [], wires: [], name: '' };
+let circuit = { parts: [], wires: [], name: '', chips: {} };
+// what a part is, including chips the user has made
+const defFor = (p) => defOf(p, circuit.chips);
 let memory = new Map();
 let picked = null;            // part type chosen in the palette
 let selected = null;          // { kind:'part'|'wire', id }
@@ -154,13 +158,13 @@ let running = true, nextId = 1;
 // Undo. Circuits are small plain data, so the simplest correct thing is to keep whole snapshots
 // rather than trying to invert each action.
 const past = [], future = [];
-const snapshot = () => JSON.stringify({ parts: circuit.parts, wires: circuit.wires, name: circuit.name });
+const snapshot = () => JSON.stringify({ parts: circuit.parts, wires: circuit.wires, name: circuit.name, chips: circuit.chips });
 function remember() { past.push(snapshot()); if (past.length > 60) past.shift(); future.length = 0; }
 function restore(json) {
   const c = JSON.parse(json);
-  circuit = { parts: c.parts, wires: c.wires, name: c.name };
+  circuit = { parts: c.parts, wires: c.wires, name: c.name, chips: c.chips || {} };
   selected = null; wiring = null; dragging = null;
-  draw();
+  paintPalette(); draw();
 }
 function undo() { if (!past.length) return; future.push(snapshot()); restore(past.pop()); flash('Undone'); }
 function redo() { if (!future.length) return; past.push(snapshot()); restore(future.pop()); flash('Redone'); }
@@ -181,12 +185,45 @@ ORDER.forEach((type, i) => {
   b.addEventListener('click', () => { picked = picked === type ? null : type; paintPalette(); });
   $('palette').append(b);
 });
-function paintPalette(){ for (const b of $('palette').querySelectorAll('.tool')) b.classList.toggle('on', b.dataset.type === picked); }
+function paintPalette(){
+  // your own chips, listed under the built-in parts
+  let host = $('yourChips');
+  const names = Object.keys(circuit.chips || {});
+  host.previousElementSibling.style.display = names.length ? '' : 'none';
+  host.replaceChildren(...names.map((name) => {
+    const type = CHIP + name;
+    const b = document.createElement('button');
+    b.className = 'tool'; b.dataset.type = type; b.title = name;
+    const mini = el('svg', { width: 40, height: 26, viewBox: '0 0 60 40' });
+    mini.append(...glyph(type, true));
+    b.append(mini, Object.assign(document.createElement('small'), { textContent: name.slice(0, 8) }));
+    b.addEventListener('click', () => { picked = picked === type ? null : type; paintPalette(); });
+    b.addEventListener('dblclick', () => {
+      if (!confirm(`Forget the chip "${name}"? Anything already placed will stop working.`)) return;
+      remember();
+      const { [name]: gone, ...rest } = circuit.chips; circuit.chips = rest;
+      paintPalette(); draw();
+    });
+    return b;
+  }));
+  for (const b of $('palette').querySelectorAll('.tool')) b.classList.toggle('on', b.dataset.type === picked);
+}
 
 // ---------- how each part is drawn ----------
 // Standard engineering symbols, drawn from scratch: a D-shape for AND, a curved shield for OR,
 // a circle on the nose for an inverted output.
 function glyph(type, mini = false) {
+  if (isChip(type)) {
+    const def = circuit.chips?.[chipName(type)];
+    const sh = def ? chipShape(def) : { w: 78, h: 42 };
+    const w = mini ? 42 : sh.w, h = mini ? 28 : sh.h, ox = mini ? 9 : 0, oy = mini ? 6 : 0;
+    const box = el('rect', { x: ox + 4, y: oy + 2, width: w - 8, height: h - 4, rx: 5,
+      fill: 'var(--paper)', stroke: 'currentColor', 'stroke-width': 2 });
+    const label = el('text', { x: ox + w / 2, y: oy + h / 2 + 4, 'text-anchor': 'middle',
+      'font-size': mini ? 9 : 11, 'font-weight': 600, fill: 'currentColor' });
+    label.textContent = chipName(type).slice(0, mini ? 5 : 9);
+    return [box, label];
+  }
   const d = PARTS[type], w = mini ? 46 : d.w, h = mini ? 30 : d.h, ox = mini ? 7 : 0, oy = mini ? 5 : 0;
   const S = { fill: 'var(--paper)', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linejoin': 'round' };
   const L = { fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round' };
@@ -229,8 +266,8 @@ function draw() {
   $('hint').style.display = circuit.parts.length ? 'none' : '';
 
   for (const [i, w] of circuit.wires.entries()) {
-    const a = pinPos(part(w.from[0]) || {}, 'out', w.from[1]);
-    const b = pinPos(part(w.to[0]) || {}, 'in', w.to[1]);
+    const a = pinPos(part(w.from[0]) || {}, 'out', w.from[1], circuit.chips);
+    const b = pinPos(part(w.to[0]) || {}, 'in', w.to[1], circuit.chips);
     const live = valueAt(circuit, values, w.from[0], 'out', w.from[1]);
     const dx = Math.max(26, Math.abs(b.x - a.x) * 0.5);
     const path = el('path', {
@@ -244,7 +281,7 @@ function draw() {
   }
 
   for (const p of circuit.parts) {
-    const def = PARTS[p.type]; if (!def) continue;
+    const def = defFor(p); if (!def) continue;
     const g = el('g', { transform: `translate(${p.x} ${p.y})` });
     g.style.cursor = 'grab';
     const on = def.outs ? valueAt(circuit, values, p.id, 'out', 0) : valueAt(circuit, values, p.id, 'in', 0);
@@ -261,7 +298,7 @@ function draw() {
     for (const side of ['in', 'out']) {
       const n = side === 'in' ? def.ins : def.outs;
       for (let i = 0; i < n; i++) {
-        const pos = pinPos({ ...p, x: 0, y: 0 }, side, i);
+        const pos = pinPos({ ...p, x: 0, y: 0 }, side, i, circuit.chips);
         const lit = valueAt(circuit, values, p.id, side, i);
         const dot = el('circle', { cx: pos.x, cy: pos.y, r: 5.5, fill: lit ? 'var(--live)' : 'var(--paper)', stroke: 'var(--strong)', 'stroke-width': 1.8 });
         dot.style.cursor = 'crosshair';
@@ -309,7 +346,7 @@ board.addEventListener('pointerdown', (e) => {
   selected = null;
   if (picked) {
     remember();
-    const p = at(e), def = PARTS[picked];
+    const p = at(e), def = defFor({ type: picked }) || PARTS[picked] || { w: 60, h: 40 };
     circuit.parts.push({ id: 'p' + (nextId++), type: picked, x: snap(p.x - def.w / 2), y: snap(p.y - def.h / 2) });
     if (!e.shiftKey) { picked = null; paintPalette(); }
   }
@@ -335,7 +372,7 @@ function startDrag(e, p) {
   dragging = { part: p, dx: pos.x - p.x, dy: pos.y - p.y };
   draw();
 }
-function startWire(p, side, i) { const pos = pinPos(p, side, i); wiring = { part: p, side, index: i, from: pos, at: pos }; }
+function startWire(p, side, i) { const pos = pinPos(p, side, i, circuit.chips); wiring = { part: p, side, index: i, from: pos, at: pos }; }
 function endWire(p, side, i) {
   if (!wiring) return;
   let a = wiring, b = { part: p, side, index: i };
@@ -387,7 +424,22 @@ setInterval(() => {
 
 $('run').addEventListener('click', () => { running = !running; $('run').textContent = running ? 'Running' : 'Paused'; $('run').classList.toggle('on', !running); draw(); });
 $('step').addEventListener('click', () => { tick++; for (const p of circuit.parts) if (p.type === 'clock') { const m = memory.get(p.id) || {}; m.on = tick % 2 === 0; memory.set(p.id, m); } simulate(circuit, memory); draw(); });
-$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '' }; memory = new Map(); selected = null; draw(); });
+$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '', chips: circuit.chips }; memory = new Map(); selected = null; draw(); });
+// Package what is on the board into a reusable part. The switches become its inputs and the lamps
+// its outputs, which is the natural reading of a circuit you have just finished.
+$('makeChip').addEventListener('click', () => {
+  const { ins, outs } = chipPins(circuit);
+  if (!ins.length || !outs.length) { flash('A chip needs at least one switch and one lamp', true); return; }
+  if (circuit.parts.some((p) => isChip(p.type) && !circuit.chips[chipName(p.type)])) { flash('Something on the board is a chip I do not have', true); return; }
+  const name = (prompt('Name this chip', circuit.name || 'My chip') || '').trim().slice(0, 14);
+  if (!name) return;
+  if (PARTS[name]) { flash('That name is taken by a built-in part', true); return; }
+  remember();
+  circuit.chips = { ...circuit.chips, [name]: { parts: structuredClone(circuit.parts), wires: structuredClone(circuit.wires) } };
+  paintPalette();
+  flash(`Made "${name}" — it is in the parts list now, with ${ins.length} in and ${outs.length} out`);
+});
+
 $('panelBtn').addEventListener('click', () => {
   const side = $('side');
   // on a phone the panel is a pull-up sheet; on a wide screen it is a column that hides
@@ -436,9 +488,10 @@ function flash(msg, bad = false) {
 
 async function load(code) {
   const c = await decode(code);
-  circuit = { parts: c.parts, wires: c.wires, name: c.name };
+  circuit = { parts: c.parts, wires: c.wires, name: c.name, chips: c.chips || {} };
   memory = new Map();
   for (const id of c.on || []) memory.set(id, { on: true });
+  paintPalette();
   nextId = c.parts.length + 1;
   selected = null;
   draw();
@@ -452,7 +505,7 @@ for (const [name, ex] of Object.entries(EXAMPLES)) {
   b.innerHTML = `${esc(name)}<small>${esc(ex.why)}</small>`;
   b.addEventListener('click', () => {
     remember();
-    circuit = buildExample(name);
+    circuit = { ...buildExample(name), chips: circuit.chips };
     memory = new Map();
     nextId = circuit.parts.length + 1;
     selected = null; picked = null; paintPalette(); draw();

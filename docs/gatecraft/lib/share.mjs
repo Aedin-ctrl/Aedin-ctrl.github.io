@@ -29,11 +29,30 @@ async function inflate(bytes) {
 
 // Part ids are long and repetitive, so renumber them 0..n for storage and shorten the field names.
 // The wires then refer to parts by index, which is both smaller and order-independent.
+// A chip definition is just another circuit, packed the same way. They travel with the design, so
+// someone opening your link gets your chips too even though they have never seen them before.
+function packDef(def) {
+  const parts = def.parts || [], wires = def.wires || [];
+  const index = new Map(parts.map((p, i) => [p.id, i]));
+  return {
+    p: parts.map((p) => { const row = [p.type, Math.round(p.x), Math.round(p.y)]; if (p.label) row.push(p.label); return row; }),
+    w: wires.filter((x) => index.has(x.from[0]) && index.has(x.to[0]))
+            .map((x) => [index.get(x.from[0]), x.from[1], index.get(x.to[0]), x.to[1]]),
+  };
+}
+function unpackDef(d) {
+  const parts = (d.p || []).map(([type, x, y, label], i) => ({ id: 'c' + i, type, x, y, ...(label ? { label } : {}) }));
+  const wires = (d.w || []).map(([fi, fo, ti, tp]) => ({ from: ['c' + fi, fo], to: ['c' + ti, tp] }))
+    .filter((w) => parts[+w.from[0].slice(1)] && parts[+w.to[0].slice(1)]);
+  return { parts, wires };
+}
+
 function pack(circuit) {
   const parts = circuit.parts || [], wires = circuit.wires || [];
   const index = new Map(parts.map((p, i) => [p.id, i]));
   return {
     v: 1,
+    c: Object.fromEntries(Object.entries(circuit.chips || {}).map(([name, def]) => [name, packDef(def)])),
     p: parts.map((p) => {
       const row = [p.type, Math.round(p.x), Math.round(p.y)];
       if (p.label) row.push(p.label);
@@ -51,7 +70,8 @@ function unpack(data) {
   const parts = data.p.map(([type, x, y, label], i) => ({ id: 'p' + i, type, x, y, ...(label ? { label } : {}) }));
   const wires = (data.w || []).map(([fi, fo, ti, tp]) => ({ from: ['p' + fi, fo], to: ['p' + ti, tp] }))
     .filter((w) => parts[+w.from[0].slice(1)] && parts[+w.to[0].slice(1)]);
-  return { parts, wires, on: (data.s || []).map((i) => 'p' + i).filter((id) => parts[+id.slice(1)]), name: data.n || '' };
+  const chips = Object.fromEntries(Object.entries(data.c || {}).map(([name, d]) => [name, unpackDef(d)]));
+  return { parts, wires, chips, on: (data.s || []).map((i) => 'p' + i).filter((id) => parts[+id.slice(1)]), name: data.n || '' };
 }
 
 export async function encode(circuit) {
