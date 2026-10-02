@@ -494,7 +494,17 @@ $('panelBtn').addEventListener('click', () => {
 function paintTable() {
   const host = $('table');
   const t = truthTable(circuit);
-  if (!t) { host.innerHTML = '<p class="note">Add switches and lamps to see one.</p>'; return; }
+  if (!t) {
+    // A truth table needs switches you can set. A clocked circuit has none — it runs — so telling
+    // someone who just opened the counter to "add switches and lamps" is answering a question they
+    // did not ask. Say what to do with the thing actually on the board.
+    const clocked = circuit.parts.some((q) => q.type === 'clock');
+    const readout = circuit.parts.some((q) => q.type === 'num');
+    host.innerHTML = clocked
+      ? `<p class="note">This one runs on its own — press <b>Tick</b> to step the clock${readout ? ' and watch the number change' : ''}.</p>`
+      : '<p class="note">Add switches and lamps to see one.</p>';
+    return;
+  }
   if (t.tooBig) { host.innerHTML = `<p class="note">${t.tooBig} switches would make ${2 ** t.tooBig} rows — too many to show.</p>`; return; }
   const head = `<tr>${t.switches.map((s, i) => `<th class="${i === t.switches.length - 1 ? 'sep' : ''}">${esc(s)}</th>`).join('')}${t.lamps.map((l) => `<th>${esc(l)}</th>`).join('')}</tr>`;
   const rows = t.rows.map((r) => `<tr>${r.ins.map((v, i) => `<td class="v${v} ${i === r.ins.length - 1 ? 'sep' : ''}">${v}</td>`).join('')}${r.outs.map((v) => `<td class="v${v}">${v}</td>`).join('')}</tr>`).join('');
