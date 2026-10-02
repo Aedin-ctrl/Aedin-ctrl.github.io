@@ -280,7 +280,16 @@
       top.append(el('span','dot ' + (live ? tone : '')), el('span','now-state', live ? word : 'Not reporting'));
       top.append(el('span','now-when','updated ' + ago(s.age)));
       now.append(top);
-      if(live && s.note) now.append(el('div','now-what', 'On screen now: ' + s.note));
+      if(live && s.note){
+        // How long it has been up. The player froze on one article for eight minutes once, and
+        // nothing on this page would have shown it — the Pi was happily reporting "playing".
+        const upMin = s.itemSince ? Math.round((Date.now() - s.itemSince) / 60000) : null;
+        const stuck = upMin != null && upMin >= 10;
+        const line = el('div','now-what', 'On screen now: ' + s.note
+          + (upMin != null && upMin >= 3 ? `  ·  for ${upMin} min` : ''));
+        if(stuck) line.append(el('span','', '  — that is longer than anything should stay up'));
+        now.append(line);
+      }
       if(!live) now.append(el('div','now-what','Nothing has arrived for ' + ago(s.age) + '. The Pi may be off or offline.'));
 
       const t = s.today || {}, pi = s.pi || {};
