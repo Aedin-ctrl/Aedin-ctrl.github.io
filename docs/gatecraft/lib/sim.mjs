@@ -18,6 +18,11 @@ export const PARTS = {
   clock: { name: 'Clock',    ins: 0, outs: 1, w: 46, h: 32, clock: true,
            step: (_, mem) => [mem.on ? HIGH : LOW] },
   out:   { name: 'Lamp',     ins: 1, outs: 0, w: 40, h: 32, step: () => [] },
+  // A four-bit readout. The adder and counter examples produce binary you have to decode in your
+  // head, which is the point at which people stop following; this shows the number itself.
+  // Lowest bit at the top, matching the truth table's column order.
+  num:   { name: 'Number',   ins: 4, outs: 0, w: 52, h: 66, readout: true,
+           pinNames: { ins: ['1', '2', '4', '8'], outs: [] }, step: () => [] },
   not:   { name: 'NOT',      ins: 1, outs: 1, w: 54, h: 34, step: ([a]) => [a ? LOW : HIGH] },
   and:   { name: 'AND',      ins: 2, outs: 1, w: 58, h: 42, step: ([a, b]) => [a && b ? HIGH : LOW] },
   or:    { name: 'OR',       ins: 2, outs: 1, w: 58, h: 42, step: ([a, b]) => [a || b ? HIGH : LOW] },
@@ -37,6 +42,9 @@ export const PARTS = {
 };
 
 export const isSource = (type) => PARTS[type]?.ins === 0;
+
+// What a Number part is showing, as 0-15, from its four input wires (lowest bit first).
+export const readoutValue = (bits) => bits.reduce((n, b, i) => n + (b === HIGH ? 1 << i : 0), 0);
 
 // ---- chips: a circuit packaged up and reused ----
 //

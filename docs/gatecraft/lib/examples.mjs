@@ -48,7 +48,9 @@ export const EXAMPLES = {
     wires: [
       [0, 0, 1, 1],        // clock drives the first flip-flop
       [1, 1, 1, 0],        // its inverted output back to its own input: it toggles
-      [1, 0, 2, 1],        // the first one's output clocks the second
+      [1, 1, 2, 1],        // the first one's INVERTED output clocks the second — clocking from Q
+                           // instead counts DOWN (0,3,2,1), which is what this example used to do
+                           // while its caption promised 0,1,2,3
       [2, 1, 2, 0],        // which toggles too, so it counts at half the rate
       [1, 0, 3, 0], [2, 0, 4, 0],
     ],
@@ -70,6 +72,21 @@ export const EXAMPLES = {
       [4, 0, 6, 0],                       // the second chip's sum is the answer
       [4, 1, 5, 0], [3, 1, 5, 1],        // either chip carrying means we carry
       [5, 0, 7, 0],
+    ],
+  },
+
+  // The payoff for the readout: four flip-flops counting, shown as a number instead of four lamps
+  // you have to decode. Watching it run 0 to F is the clearest explanation of binary there is.
+  'Counting to fifteen': {
+    why: 'Four flip-flops counting 0 to F — watch the number',
+    parts: [['clock', 30, 170], ['dff', 150, 140], ['dff', 290, 140], ['dff', 430, 140], ['dff', 570, 140],
+            ['num', 720, 125]],
+    wires: [
+      [0, 0, 1, 1],                                  // the clock drives the first flip-flop
+      [1, 1, 1, 0], [2, 1, 2, 0], [3, 1, 3, 0], [4, 1, 4, 0],   // each one toggles itself
+      [1, 1, 2, 1], [2, 1, 3, 1], [3, 1, 4, 1],      // the INVERTED output clocks the next stage,
+                                                     // so each halves the rate and it counts UP
+      [1, 0, 5, 0], [2, 0, 5, 1], [3, 0, 5, 2], [4, 0, 5, 3],   // all four bits into the readout
     ],
   },
 

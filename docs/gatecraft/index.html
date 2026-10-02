@@ -135,7 +135,7 @@
 </form></dialog>
 
 <script type="module">
-import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS,
+import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS, readoutValue,
          CHIP, isChip, chipName, chipShape, defOf, chipPins } from './lib/sim.mjs';
 import { encode, decode, codeFromText } from './lib/share.mjs';
 import { EXAMPLES, buildExample } from './lib/examples.mjs';
@@ -174,7 +174,7 @@ const layers = { wires: el('g'), parts: el('g'), top: el('g') };
 board.append(layers.wires, layers.parts, layers.top);
 
 // ---------- palette ----------
-const ORDER = ['in', 'out', 'not', 'and', 'or', 'xor', 'nand', 'nor', 'xnor', 'dff', 'clock'];
+const ORDER = ['in', 'out', 'num', 'not', 'and', 'or', 'xor', 'nand', 'nor', 'xnor', 'dff', 'clock'];
 ORDER.forEach((type, i) => {
   const b = document.createElement('button');
   b.className = 'tool'; b.dataset.type = type;
@@ -238,6 +238,8 @@ function glyph(type, mini = false) {
     else bits.push(el('circle', { cx: ox + (w - 12) / 2 + 2, cy: mid, r: 3, fill: 'currentColor' }));
   } else if (type === 'out') {
     bits.push(el('circle', { cx: ox + w / 2, cy: mid, r: hh / 2, ...S }));
+  } else if (type === 'num') {
+    bits.push(el('rect', { x: ox + 6, y: top, width: w - 12, height: hh, rx: 5, ...S }));
   } else if (type === 'not') {
     bits.push(el('path', { d: `M${ox + 5} ${top}L${nose} ${mid}L${ox + 5} ${bot}Z`, ...S }));
   } else if (type === 'dff') {
@@ -290,6 +292,16 @@ function draw() {
     if ((p.type === 'in' || p.type === 'clock' || p.type === 'out') && on) body.setAttribute('color', 'var(--live)');
     body.append(...glyph(p.type));
     if (p.type === 'out' && on) body.append(el('circle', { cx: def.w / 2 + 2, cy: def.h / 2, r: def.h / 2 - 7, fill: 'var(--live)', opacity: .9 }));
+    if (p.type === 'num') {
+      // Read all four wires, not just the first: this is the one part whose whole job is the
+      // combination. Unconnected pins read low, so a half-wired readout still shows something.
+      const value = readoutValue([0, 1, 2, 3].map((i) => valueAt(circuit, values, p.id, 'in', i)));
+      if (value) body.setAttribute('color', 'var(--live)');
+      body.append(Object.assign(el('text', {
+        x: def.w / 2, y: def.h / 2 + 9, 'text-anchor': 'middle', fill: 'currentColor',
+        'font-size': 26, 'font-weight': 600, 'font-family': 'ui-monospace, monospace',
+      }), { textContent: value.toString(16).toUpperCase() }));
+    }
     if ((p.type === 'in' || p.type === 'clock') && on) body.append(el('rect', { x: 4, y: 5, width: def.w - 14, height: def.h - 10, rx: 5, fill: 'var(--live)', opacity: .18 }));
     g.append(body);
 
