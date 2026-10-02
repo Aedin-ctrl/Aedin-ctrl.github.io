@@ -28,3 +28,20 @@ fix is usually one line.
 
 Also installed here, all offline and keyless: `colorjs.io` (WCAG + APCA contrast, OKLCH palette
 ramps), `@iconify-json/lucide` + `@iconify/utils` (1,929 icons, no network), `svgo`, `sharp`.
+
+## Visual regression
+
+```sh
+cd tools
+npx playwright test --config playwright.config.mjs --update-snapshots   # baseline
+npx playwright test --config playwright.config.mjs                       # check
+BASE_URL=http://127.0.0.1:8911 npx playwright test --config playwright.config.mjs
+```
+
+Baselines live in `visual/*-snapshots/` and are per-platform (`-darwin`), so they only compare
+like with like. On failure Playwright writes expected/actual/diff PNGs next to the report.
+
+**The threshold matters more than it looks.** The obvious `maxDiffPixelRatio: 0.01` is useless: a
+1280x900 shot is 1.15M pixels, so 1% is 11,520 — enough to hide an entire text-colour change.
+Tested by recolouring `--ink` to red, which moved 1,595 pixels and **passed**. `maxDiffPixels: 600`
+with `threshold: 0.2` catches it while still tolerating antialiasing.
