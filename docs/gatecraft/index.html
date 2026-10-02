@@ -79,7 +79,12 @@
   .row{display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;}
 
   @media (max-width:900px){
-    .side{display:none;}
+    /* the panel becomes a sheet you pull up, rather than vanishing entirely */
+    .side{position:fixed; inset:auto 0 0 0; width:auto; max-height:62vh; z-index:40; display:none;
+      border-left:none; border-top:1px solid var(--strong); border-radius:14px 14px 0 0;
+      box-shadow:0 -10px 40px rgba(0,0,0,.18);}
+    .side.open{display:block;}
+    .side.hidden{display:none;}
     aside{width:72px;}
   }
 </style>
@@ -114,7 +119,7 @@
     <h2 style="margin-top:18px">Examples</h2>
     <div id="examples"></div>
     <h2 style="margin-top:18px">Keys</h2>
-    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>D</b> dark</p>
+    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark<br>Double-tap a switch or lamp to name it.</p>
   </div>
 </main>
 
@@ -144,6 +149,20 @@ let selected = null;          // { kind:'part'|'wire', id }
 let dragging = null;          // moving a part
 let wiring = null;            // drawing a wire from a pin
 let running = true, nextId = 1;
+
+// Undo. Circuits are small plain data, so the simplest correct thing is to keep whole snapshots
+// rather than trying to invert each action.
+const past = [], future = [];
+const snapshot = () => JSON.stringify({ parts: circuit.parts, wires: circuit.wires, name: circuit.name });
+function remember() { past.push(snapshot()); if (past.length > 60) past.shift(); future.length = 0; }
+function restore(json) {
+  const c = JSON.parse(json);
+  circuit = { parts: c.parts, wires: c.wires, name: c.name };
+  selected = null; wiring = null; dragging = null;
+  draw();
+}
+function undo() { if (!past.length) return; future.push(snapshot()); restore(past.pop()); flash('Undone'); }
+function redo() { if (!future.length) return; past.push(snapshot()); restore(future.pop()); flash('Redone'); }
 
 const board = $('board');
 const layers = { wires: el('g'), parts: el('g'), top: el('g') };
@@ -255,6 +274,17 @@ function draw() {
       }
     }
     g.addEventListener('pointerdown', (e) => startDrag(e, p));
+    // name a switch or lamp so the truth table has real column headings
+    if (p.type === 'in' || p.type === 'out') {
+      g.addEventListener('dblclick', (e) => {
+        e.stopPropagation(); e.preventDefault();
+        const name = prompt('Name this ' + (p.type === 'in' ? 'switch' : 'lamp'), p.label || '');
+        if (name === null) return;
+        remember();
+        if (name.trim()) p.label = name.trim().slice(0, 14); else delete p.label;
+        draw();
+      });
+    }
     layers.parts.append(g);
   }
 
@@ -277,6 +307,7 @@ board.addEventListener('pointerdown', (e) => {
   if (e.target !== board) return;
   selected = null;
   if (picked) {
+    remember();
     const p = at(e), def = PARTS[picked];
     circuit.parts.push({ id: 'p' + (nextId++), type: picked, x: snap(p.x - def.w / 2), y: snap(p.y - def.h / 2) });
     if (!e.shiftKey) { picked = null; paintPalette(); }
@@ -310,6 +341,7 @@ function endWire(p, side, i) {
   if (a.side === b.side) { wiring = null; return draw(); }         // out->out makes no sense
   if (a.side === 'in') [a, b] = [b, a];                            // always from an output
   if (a.part.id === b.part.id) { wiring = null; return draw(); }
+  remember();
   circuit.wires = circuit.wires.filter((w) => !(w.to[0] === b.part.id && w.to[1] === b.index));  // one source per input
   circuit.wires.push({ from: [a.part.id, a.index], to: [b.part.id, b.index] });
   wiring = null; draw();
@@ -317,8 +349,14 @@ function endWire(p, side, i) {
 
 addEventListener('keydown', (e) => {
   if (e.target.matches('textarea, input')) return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+    e.preventDefault();
+    if (e.shiftKey) redo(); else undo();
+    return;
+  }
   if (e.key === 'Escape') { picked = null; selected = null; wiring = null; paintPalette(); draw(); }
   if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selected) remember();
     if (selected?.kind === 'part') {
       circuit.parts = circuit.parts.filter((p) => p.id !== selected.id);
       circuit.wires = circuit.wires.filter((w) => w.from[0] !== selected.id && w.to[0] !== selected.id);
@@ -348,8 +386,13 @@ setInterval(() => {
 
 $('run').addEventListener('click', () => { running = !running; $('run').textContent = running ? 'Running' : 'Paused'; $('run').classList.toggle('on', !running); draw(); });
 $('step').addEventListener('click', () => { tick++; for (const p of circuit.parts) if (p.type === 'clock') { const m = memory.get(p.id) || {}; m.on = tick % 2 === 0; memory.set(p.id, m); } simulate(circuit, memory); draw(); });
-$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; circuit = { parts: [], wires: [], name: '' }; memory = new Map(); selected = null; draw(); });
-$('panelBtn').addEventListener('click', () => $('side').classList.toggle('hidden'));
+$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '' }; memory = new Map(); selected = null; draw(); });
+$('panelBtn').addEventListener('click', () => {
+  const side = $('side');
+  // on a phone the panel is a pull-up sheet; on a wide screen it is a column that hides
+  if (matchMedia('(max-width:900px)').matches) side.classList.toggle('open');
+  else side.classList.toggle('hidden');
+});
 
 // ---------- truth table ----------
 function paintTable() {
