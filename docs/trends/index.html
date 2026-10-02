@@ -37,6 +37,13 @@
   .now-state{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;}
   .now-when{margin-left:auto; font-size:12.5px; color:var(--faint);}
   .now-what{font-size:14px; color:var(--muted); margin-top:7px; overflow-wrap:anywhere;}
+  /* what the feed has learned to lean toward, so you can see it is actually adapting */
+  .lean{margin-top:12px; font-size:13px; color:var(--muted);}
+  .lean .bars{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
+  .lean .b{flex:1 1 90px; min-width:90px;}
+  .lean .b span{font-size:11.5px; color:var(--faint); display:flex; justify-content:space-between;}
+  .lean .b i{display:block; height:6px; border-radius:3px; background:var(--line); margin-top:3px; overflow:hidden;}
+  .lean .b i em{display:block; height:100%; border-radius:3px;}
 
   .stats{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,112px),1fr)); gap:9px; margin-top:14px;}
   .stat{background:var(--wash); border-radius:9px; padding:9px 11px;}
@@ -224,6 +231,29 @@
       if(pi.freeMB != null) stat('pi memory free', (pi.freeMB/1024).toFixed(1) + ' GB');
       if(pi.tempC != null) stat('pi temperature', pi.tempC + ' °C');
       now.append(stats);
+
+      // how the feed is leaning, learned from what she watches and skips
+      const w = s.weights;
+      if(w){
+        const max = Math.max(1, ...TOPICS.map(t => w[t] || 1));
+        const lean = el('div','lean');
+        lean.append(document.createTextNode(
+          s.picks ? `Learning on its own — ${s.picks} stories picked out so far as worth more of.`
+                  : 'Learning from what gets watched and what gets skipped.'));
+        const bars = el('div','bars');
+        for(const t of TOPICS){
+          const v = w[t] || 1;
+          const col = el('div','b');
+          const lab = el('span');
+          lab.append(el('b','', t), document.createTextNode(v.toFixed(2) + '\u00d7'));
+          const bar = el('i'); const fill = el('em');
+          fill.style.width = Math.round(100 * v / max) + '%';
+          fill.style.background = `var(--${t})`;
+          bar.append(fill); col.append(lab, bar); bars.append(col);
+        }
+        lean.append(bars);
+        now.append(lean);
+      }
       b.append(now);
 
       b.append(el('div','label','Where it gets the feed'));
