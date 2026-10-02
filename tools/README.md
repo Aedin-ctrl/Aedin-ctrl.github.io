@@ -45,3 +45,8 @@ like with like. On failure Playwright writes expected/actual/diff PNGs next to t
 1280x900 shot is 1.15M pixels, so 1% is 11,520 — enough to hide an entire text-colour change.
 Tested by recolouring `--ink` to red, which moved 1,595 pixels and **passed**. `maxDiffPixels: 600`
 with `threshold: 0.2` catches it while still tolerating antialiasing.
+
+**Canvases are masked.** `animations: 'disabled'` only stops CSS animations. A canvas driven by JS
+or WASM keeps painting, so Sandbit's falling sand differed on every run and failed the suite at
+random. `mask: [page.locator('canvas'), page.locator('video')]` covers them with a flat box and
+compares the chrome around them — which is what a visual regression is actually protecting.
