@@ -288,6 +288,12 @@
       const stat = (label, value) => { const n = el('div','stat'); n.append(el('b','',value), el('span','',label)); stats.append(n); };
       stat('shown today', String(t.seen || 0));
       stat('queued up', String(s.queue || 0));
+      // She is watching a television, so the split between video and reading is the thing that
+      // decides whether this feels like TV or a slideshow. It ran 19 articles to 1 video for a
+      // night before anyone could see it.
+      const mix = s.mix || {};
+      const vids = mix.video || 0, reads = Object.entries(mix).reduce((n,[k,v]) => k === 'video' ? n : n + v, 0);
+      if (vids + reads > 0) stat('queued: video / reading', vids + ' / ' + reads);
       if(pi.freeMB != null) stat('pi memory free', (pi.freeMB/1024).toFixed(1) + ' GB');
       if(pi.tempC != null) stat('pi temperature', pi.tempC + ' °C');
       now.append(stats);
