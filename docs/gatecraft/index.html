@@ -136,6 +136,7 @@
 <script type="module">
 import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS } from './lib/sim.mjs';
 import { encode, decode, codeFromText } from './lib/share.mjs';
+import { EXAMPLES, buildExample } from './lib/examples.mjs';
 
 const $ = (id) => document.getElementById(id);
 const SVG = 'http://www.w3.org/2000/svg';
@@ -444,31 +445,17 @@ async function load(code) {
 }
 
 // ---------- examples ----------
-const EXAMPLES = {
-  'Half adder': { why: 'Adds two bits: sum and carry',
-    parts: [['in',40,70,'A'],['in',40,170,'B'],['xor',190,60],['and',190,170],['out',330,72,'Sum'],['out',330,180,'Carry']],
-    wires: [[0,0,2,0],[1,0,2,1],[0,0,3,0],[1,0,3,1],[2,0,4,0],[3,0,5,0]] },
-  'Latch (remembers)': { why: 'Press Set, let go — it stays on',
-    parts: [['in',40,70,'Set'],['in',40,190,'Reset'],['nor',200,160],['nor',200,60],['out',350,70,'Q']],
-    wires: [[1,0,3,0],[2,0,3,1],[0,0,2,0],[3,0,2,1],[3,0,4,0]] },
-  'Flip-flop + clock': { why: 'Halves the clock — the start of counting',
-    parts: [['clock',40,110],['dff',200,90],['out',360,100,'Q']],
-    wires: [[0,0,1,1],[1,1,1,0],[1,0,2,0]] },
-  'Majority vote': { why: 'On when at least two of three are on',
-    parts: [['in',30,50,'A'],['in',30,140,'B'],['in',30,230,'C'],['and',170,50],['and',170,140],['and',170,230],['or',310,90],['or',430,150],['out',560,160,'Most']],
-    wires: [[0,0,3,0],[1,0,3,1],[1,0,4,0],[2,0,4,1],[0,0,5,0],[2,0,5,1],[3,0,6,0],[4,0,6,1],[6,0,7,0],[5,0,7,1],[7,0,8,0]] },
-};
+// Defined in lib/examples.mjs so the tests can prove each one computes what its caption claims.
 for (const [name, ex] of Object.entries(EXAMPLES)) {
   const b = document.createElement('button');
   b.className = 'ex';
   b.innerHTML = `${esc(name)}<small>${esc(ex.why)}</small>`;
   b.addEventListener('click', () => {
-    circuit = {
-      name,
-      parts: ex.parts.map(([type, x, y, label], i) => ({ id: 'e' + i, type, x, y, ...(label ? { label } : {}) })),
-      wires: ex.wires.map(([a, ao, b2, bi]) => ({ from: ['e' + a, ao], to: ['e' + b2, bi] })),
-    };
-    memory = new Map(); nextId = ex.parts.length + 1; selected = null; picked = null; paintPalette(); draw();
+    remember();
+    circuit = buildExample(name);
+    memory = new Map();
+    nextId = circuit.parts.length + 1;
+    selected = null; picked = null; paintPalette(); draw();
   });
   $('examples').append(b);
 }
