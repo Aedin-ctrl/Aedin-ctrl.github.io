@@ -81,6 +81,11 @@ let failed = 0;
 const tokenBlame = new Map();      // colour pair -> how many elements it breaks, across all pages
 const needed = new Map();          // ...and the ratio that pair actually has to reach
 
+// Both colour schemes. Checking only light mode missed a real failure: Gatecraft's dark `--faint`
+// passed against the page background but failed 4.42:1 against `--wash`, the raised panel surface.
+// A dark theme has more than one background, and the lightest one is the one that fails.
+const SCHEMES = ['light', 'dark'];
+
 const stubs = pages.filter((p) => p[2]).map((p) => p[0]);
 for (const [name, path, stub] of pages) {
   if (stub) continue;                 // a redirect to another site; not this repo's to fix
@@ -90,16 +95,27 @@ for (const [name, path, stub] of pages) {
   try {
     await page.goto(base + path, { waitUntil: 'load', timeout: 40000 });
     await page.waitForTimeout(2500);
-    await page.addScriptTag({ content: AXE });
-    const res = await page.evaluate(async (tags) =>
-      await window.axe.run(document, { runOnly: { type: 'tag', values: tags } }), TAGS);
 
-    const count = res.violations.reduce((a, v) => a + v.nodes.length, 0);
+    const byScheme = [];
+    for (const scheme of SCHEMES) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.waitForTimeout(500);
+      await page.addScriptTag({ content: AXE });
+      const r = await page.evaluate(async (tags) =>
+        await window.axe.run(document, { runOnly: { type: 'tag', values: tags } }), TAGS);
+      byScheme.push([scheme, r]);
+    }
+
+    const count = byScheme.reduce((a, [, r]) => a + r.violations.reduce((x, v) => x + v.nodes.length, 0), 0);
     if (!count) {
       console.log(`  ok   ${pad(name, 18)}${errs.length ? `  (${errs.length} page error${errs.length > 1 ? 's' : ''})` : ''}`);
     } else {
       failed += count;
       console.log(`  FAIL ${pad(name, 18)}${count} element${count === 1 ? '' : 's'}`);
+    }
+    for (const [scheme, res] of byScheme) {
+      if (!res.violations.length) continue;
+      console.log(`       ${scheme} mode:`);
       for (const v of res.violations) {
         console.log(`         ${pad(v.impact, 9)}${pad(v.id, 26)}x${v.nodes.length}  ${v.help}`);
         for (const n of v.nodes.slice(0, 3)) {
