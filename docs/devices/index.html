@@ -32,6 +32,19 @@
   .dot.bad{background:var(--bad);}
 
   /* One row per device; click to open everything running on it. */
+  /* The on/off switch. Turning it off stops the feed and the screen, and hides the Trends tab;
+     the Pi notices within a minute, so the label says so rather than looking stuck. */
+  .sw{display:flex; align-items:center; justify-content:space-between; gap:16px;
+      border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:0 0 16px;}
+  .sw-name{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
+  .sw-what{font-size:13px; color:var(--muted); margin-top:1px;}
+  .sw-toggle{flex-shrink:0; width:52px; height:30px; border-radius:999px; background:var(--off);
+             position:relative; transition:background .18s ease; cursor:pointer;}
+  .sw-toggle[aria-checked="true"]{background:var(--ok);}
+  .sw-toggle[disabled]{opacity:.55; cursor:default;}
+  .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
+           background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
+  .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
   .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
   .dev:hover, .dev.open{border-color:var(--line-strong);}
   .dev-sum{width:100%; display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center; padding:18px 20px; text-align:left;}
@@ -88,6 +101,16 @@
     </div>
     <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
   </div>
+  <div class="sw" id="swCard" hidden>
+    <div class="sw-text">
+      <div class="sw-name">Trend Scout</div>
+      <div class="sw-what" id="swWhat">the news feed on the television</div>
+    </div>
+    <button type="button" class="sw-toggle" id="swToggle" role="switch" aria-checked="false" aria-label="Trend Scout on or off">
+      <span class="sw-knob"></span>
+    </button>
+  </div>
+
   <div id="list" aria-live="polite"></div>
 </main>
 
@@ -222,7 +245,62 @@
     }
   }
 
-  $('refresh').addEventListener('click', load);
+  // ---- the on/off switch ----
+  // Writing needs the same key this page already has; the Pi reads the switch with its own token
+  // and acts on it within a minute, so the label reports "asking the Pi" rather than pretending it
+  // is instant.
+  let switchOn = null, flipping = false;
+
+  function paintSwitch(){
+    if(switchOn === null) return;
+    const t = $('swToggle');
+    $('swCard').hidden = false;
+    t.setAttribute('aria-checked', switchOn ? 'true' : 'false');
+    t.disabled = flipping;
+    $('swWhat').textContent = flipping
+      ? (switchOn ? 'starting it up on the Pi…' : 'stopping it on the Pi…')
+      : switchOn
+        ? 'the news feed is running on the television'
+        : 'off — the screen is blank and the Trends tab is hidden';
+  }
+
+  async function loadSwitch(){
+    if(!KEY) return;
+    try {
+      const r = await fetch(API + '/switch', { headers:{ Authorization:'Bearer ' + KEY }, cache:'no-store' });
+      if(!r.ok) return;
+      switchOn = (await r.json()).on !== false;
+      paintSwitch();
+    } catch(e){ /* leave it as it was rather than flicker */ }
+  }
+
+  async function flipSwitch(){
+    if(flipping || switchOn === null) return;
+    const want = !switchOn;
+    flipping = true; switchOn = want; paintSwitch();
+    try {
+      const r = await fetch(API + '/switch', {
+        method:'POST',
+        headers:{ Authorization:'Bearer ' + KEY, 'Content-Type':'application/json' },
+        body: JSON.stringify({ on: want }),
+      });
+      if(!r.ok) throw new Error(r.status);
+      switchOn = (await r.json()).on !== false;
+      // give the Pi's timer a moment, then stop showing the in-between wording
+      setTimeout(() => { flipping = false; paintSwitch(); load(); }, 65000);
+    } catch(e){
+      flipping = false;
+      switchOn = !want;                       // it did not take; show what is really true
+      paintSwitch();
+      $('swWhat').textContent = 'couldn’t reach the switch — nothing changed';
+    }
+    paintSwitch();
+  }
+
+  $('swToggle').addEventListener('click', flipSwitch);
+  $('refresh').addEventListener('click', () => { load(); loadSwitch(); });
+  loadSwitch();
+  setInterval(() => { if(!flipping) loadSwitch(); }, 20000);
   load();
   setInterval(load, 20000);
   setInterval(render, 5000);

@@ -144,6 +144,7 @@
   .tab-btn:hover{color:var(--muted);}
   .tab-secret{display:flex; margin-left:auto; padding-left:22px;}
   .tab-secret[hidden]{display:none;}
+  .tab-btn[hidden]{display:none;}
   .tab-secret .tab-btn:last-child{margin-right:0;}
   .tab-btn.active{
     color:var(--ink);
@@ -1108,7 +1109,33 @@
   function registerSecretRoutes(root){
     root.querySelectorAll('[data-secret-route]').forEach(t => {
       ROUTES[t.dataset.secretRoute] = { type:'iframe', src:t.dataset.src, title:t.dataset.title || 'Secret project', secret:true };
+      // these addresses carry the panel's read key; keep it so the Trends tab can ask whether
+      // Trend Scout is switched on at all
+      const k = /[#&?]k=([^&]+)/.exec(t.dataset.src || '');
+      if(k) panelKey = decodeURIComponent(k[1]);
     });
+  }
+
+  // The Trends tab only makes sense while Trend Scout is switched on, and that switch lives on the
+  // Devices tab. Off means the tab goes away too. It fails OPEN: a network blip must not hide a
+  // working tab, and the page re-checks while unlocked so flipping the switch is visible without
+  // reloading.
+  let panelKey = '';
+  const TRENDS_ROUTE = '/secret_projects/trends';
+  let trendsWatch = null;
+
+  async function refreshTrendsTab(){
+    const btn = document.querySelector('#secretTabs [data-tab="trends"]');
+    if(!btn || !panelKey) return;
+    let on = true;
+    try {
+      const r = await fetch('https://pi-status.pizza-calc-api.workers.dev/switch', {
+        headers:{ Authorization:'Bearer ' + panelKey }, cache:'no-store',
+      });
+      if(r.ok) on = (await r.json()).on !== false;
+    } catch(e){ return; }                      // leave the tab as it is
+    btn.hidden = !on;
+    if(!on && currentPath === TRENDS_ROUTE) navigateTo('/secret_projects');
   }
 
   const lockShackle = document.getElementById('lockShackle');
@@ -1118,6 +1145,14 @@
     lockShackle.setAttribute('d', open ? 'M7 11V7a5 5 0 0 1 9.9-1' : 'M7 11V7a5 5 0 0 1 10 0v4');
     document.getElementById('secretTabs').hidden = !open;
     if(!open && ROUTES[currentPath] && ROUTES[currentPath].secret) navigateTo('/');
+    clearInterval(trendsWatch); trendsWatch = null;
+    if(open){
+      refreshTrendsTab();
+      trendsWatch = setInterval(refreshTrendsTab, 20000);
+    } else {
+      const btn = document.querySelector('#secretTabs [data-tab="trends"]');
+      if(btn) btn.hidden = false;              // next unlock starts from a clean slate
+    }
   }
   document.getElementById('lockIcon').addEventListener('click', () => {
     if(secretUnlocked) setSecretUnlocked(false);
