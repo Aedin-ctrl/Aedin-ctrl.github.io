@@ -120,7 +120,7 @@
     <h2 style="margin-top:18px">Examples</h2>
     <div id="examples"></div>
     <h2 style="margin-top:18px">Keys</h2>
-    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark<br>Double-tap a switch or lamp to name it.</p>
+    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark<br>Double-tap a switch or lamp to name it, or a chip to look inside it.</p>
   </div>
 </main>
 
@@ -323,6 +323,7 @@ function draw() {
         }
       }
     }
+    if (isChip(p.type)) g.append(Object.assign(el('title'), { textContent: `${chipName(p.type)} — double-tap to look inside` }));
     g.addEventListener('pointerdown', (e) => startDrag(e, p));
     // name a switch or lamp so the truth table has real column headings
     if (p.type === 'in' || p.type === 'out') {
@@ -373,8 +374,38 @@ board.addEventListener('pointermove', (e) => {
 });
 addEventListener('pointerup', () => { dragging = null; if (wiring) { wiring = null; draw(); } });
 
+// Opening a chip to look inside it. This is deliberately NOT a native dblclick listener: every
+// interaction redraws the whole board, so the node the first click landed on is gone before the
+// second arrives and the browser never dispatches dblclick to it. Tracking the two presses
+// ourselves survives the redraw.
+let lastPress = { id: null, at: 0 };
+
+function openChip(p) {
+  const name = chipName(p.type);
+  const def = circuit.chips?.[name];
+  if (!def) { flash('I do not have that chip', true); return; }
+  if (!confirm(`Open "${name}" on the board to look inside?\n\nYour current design is replaced — undo brings it straight back, and the chip itself is unchanged.`)) return;
+  remember();
+  const n = (id) => `o_${id}`;
+  circuit = {
+    ...circuit,
+    name,
+    parts: def.parts.map((q) => ({ ...q, id: n(q.id) })),
+    wires: def.wires.map((w) => ({ from: [n(w.from[0]), w.from[1]], to: [n(w.to[0]), w.to[1]] })),
+    on: [],
+  };
+  memory = new Map();
+  selected = null;
+  dragging = null;
+  draw();
+}
+
 function startDrag(e, p) {
   e.stopPropagation();
+  const now = Date.now();
+  const again = lastPress.id === p.id && now - lastPress.at < 450;
+  lastPress = { id: p.id, at: now };
+  if (again && isChip(p.type)) { lastPress = { id: null, at: 0 }; openChip(p); return; }
   selected = { kind: 'part', id: p.id };
   if (p.type === 'in') {                                   // a switch is there to be flipped
     const mem = memory.get(p.id) || {};
