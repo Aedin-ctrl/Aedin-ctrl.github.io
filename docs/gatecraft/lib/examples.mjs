@@ -54,6 +54,25 @@ export const EXAMPLES = {
     ],
   },
 
+  // Shows what chips are for: the same full adder as above, but built from two half-adder chips
+  // instead of seven loose gates. Opening this is the quickest way to understand the feature.
+  'Full adder, from chips': {
+    why: 'The same thing again — but out of two reusable chips',
+    usesChip: 'Half adder',
+    parts: [
+      ['in', 40, 60, 'A'], ['in', 40, 150, 'B'], ['in', 40, 250, 'Carry in'],
+      ['chip:Half adder', 200, 60], ['chip:Half adder', 380, 150], ['or', 560, 240],
+      ['out', 560, 150, 'Sum'], ['out', 700, 252, 'Carry out'],
+    ],
+    wires: [
+      [0, 0, 3, 0], [1, 0, 3, 1],        // A and B into the first chip
+      [3, 0, 4, 0], [2, 0, 4, 1],        // its sum, plus the carry in, into the second
+      [4, 0, 6, 0],                       // the second chip's sum is the answer
+      [4, 1, 5, 0], [3, 1, 5, 1],        // either chip carrying means we carry
+      [5, 0, 7, 0],
+    ],
+  },
+
   'Majority vote': {
     why: 'On when at least two of three are on',
     parts: [['in', 30, 50, 'A'], ['in', 30, 140, 'B'], ['in', 30, 230, 'C'],
@@ -68,9 +87,15 @@ export const EXAMPLES = {
 export function buildExample(name) {
   const ex = EXAMPLES[name];
   if (!ex) throw new Error(`no example called ${name}`);
-  return {
+  const built = {
     name,
     parts: ex.parts.map(([type, x, y, label], i) => ({ id: 'e' + i, type, x, y, ...(label ? { label } : {}) })),
     wires: ex.wires.map(([a, ao, b, bi]) => ({ from: ['e' + a, ao], to: ['e' + b, bi] })),
   };
+  // an example that is built from a chip brings that chip's definition with it
+  if (ex.usesChip) {
+    const inner = buildExample(ex.usesChip);
+    built.chips = { [ex.usesChip]: { parts: inner.parts, wires: inner.wires } };
+  }
+  return built;
 }
