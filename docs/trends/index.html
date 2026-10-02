@@ -303,7 +303,7 @@
       // night before anyone could see it.
       const mix = s.mix || {};
       const vids = mix.video || 0, reads = Object.entries(mix).reduce((n,[k,v]) => k === 'video' ? n : n + v, 0);
-      if (vids + reads > 0) stat('queued: video / reading', vids + ' / ' + reads);
+      if (vids + reads > 0) stat('video / reading', vids + ' / ' + reads);
       if(pi.freeMB != null) stat('pi memory free', (pi.freeMB/1024).toFixed(1) + ' GB');
       if(pi.tempC != null) stat('pi temperature', pi.tempC + ' °C');
       now.append(stats);
