@@ -505,7 +505,10 @@ for (const [name, ex] of Object.entries(EXAMPLES)) {
   b.innerHTML = `${esc(name)}<small>${esc(ex.why)}</small>`;
   b.addEventListener('click', () => {
     remember();
-    circuit = { ...buildExample(name), chips: circuit.chips };
+    // Keep the chips you have made, but an example that brings its own definition must not have it
+    // clobbered — that silently broke the chip-built full adder, which then computed nothing.
+    const ex = buildExample(name);
+    circuit = { ...ex, chips: { ...circuit.chips, ...(ex.chips || {}) } };
     memory = new Map();
     nextId = circuit.parts.length + 1;
     selected = null; picked = null; paintPalette(); draw();
