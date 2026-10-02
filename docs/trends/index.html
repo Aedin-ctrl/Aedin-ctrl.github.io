@@ -71,6 +71,24 @@
   .sum .tag{font-size:12.5px; padding:3px 9px; border-radius:999px; background:var(--paper); border:1px solid var(--line);}
   .sum a{text-decoration:none; border-bottom:1px solid var(--line);}
 
+  /* the six-hourly catch-ups and the end-of-day roundup */
+  .brief{border:1px solid var(--line); border-radius:11px; padding:14px 16px; margin:10px 0;}
+  .brief > summary{cursor:pointer; list-style:none; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .brief > summary::-webkit-details-marker{display:none;}
+  .brief > summary::before{content:'+'; color:var(--faint); font-size:16px; width:12px;}
+  .brief[open] > summary::before{content:'\2212';}
+  .brief h3{font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;}
+  .brief .when{font-size:12.5px; color:var(--faint);}
+  .brief .peek{font-size:13px; color:var(--muted); width:100%; margin:4px 0 0 22px;}
+  .brief ul{list-style:none; margin:12px 0 0 22px; padding:0;}
+  .brief li{padding:7px 0; border-top:1px solid var(--line); font-size:14.5px;}
+  .brief li:first-child{border-top:none;}
+  .brief li a{text-decoration:none; border-bottom:1px solid var(--line);}
+  .brief li a:hover{border-color:var(--ink);}
+  .brief .by{display:block; font-size:12.5px; color:var(--faint);}
+  .brief .themes{margin:12px 0 0 22px; display:flex; gap:6px; flex-wrap:wrap;}
+  .roundup{border-color:var(--line-strong);}
+
   .day{margin-top:22px;}
   .day-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; padding-bottom:7px; border-bottom:1px solid var(--line-strong);}
   .day-head h2{font-size:16px;}
@@ -257,7 +275,46 @@
       head.append(el('small','', parts.join(' · ')));
       sec.append(head);
 
-      // the digest: only worth showing when nothing is being filtered, since it covers the whole day
+      // The catch-ups: what came through while you were not looking, newest stretch first.
+      if(!query && !likedOnly && !topic){
+        const mkList = (list) => {
+          const ul = el('ul');
+          for(const h of list){
+            const li = el('li');
+            if(h.url){ const a = el('a','', h.caption); a.href = h.url; a.target='_blank'; a.rel='noopener'; li.append(a); }
+            else li.append(document.createTextNode(h.caption));
+            if(h.liked) li.append(el('span','heart','♥'));
+            li.append(el('span','by', [h.author, h.topic, h.views ? num(h.views) + ' views' : ''].filter(Boolean).join(' · ')));
+            ul.append(li);
+          }
+          return ul;
+        };
+        // end of day first: the whole day in one place
+        if((d.headlines||[]).length){
+          const box = el('details','brief roundup');
+          if(dayName(d.date) === 'Today') box.open = true;
+          const sm = el('summary');
+          sm.append(el('h3','','The day in full'), el('span','when', `${d.count} things · ${d.liked||0} liked`));
+          sm.append(el('div','peek', d.summary || ''));
+          box.append(sm, mkList(d.headlines));
+          sec.append(box);
+        }
+        for(const w of [...(d.briefings||[])].reverse()){
+          const box = el('details','brief');
+          const sm = el('summary');
+          sm.append(el('h3','', w.name), el('span','when', `${String(w.from).padStart(2,'0')}:00–${String(w.to).padStart(2,'0')}:00 · ${w.count} things`));
+          if((w.themes||[]).length) sm.append(el('div','peek', 'Mostly about: ' + w.themes.map(t => t.word).join(', ')));
+          box.append(sm, mkList(w.headlines || []));
+          if((w.tickers||[]).length){
+            const tags = el('div','themes');
+            for(const t of w.tickers) tags.append(el('span','tag', `${t.symbol} ×${t.count}`));
+            box.append(tags);
+          }
+          sec.append(box);
+        }
+      }
+
+      // the numbers behind the day
       if(d.summary && !query && !likedOnly && !topic){
         const sum = el('div','sum');
         sum.append(el('div','lines', d.summary));
