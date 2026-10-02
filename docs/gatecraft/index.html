@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gatecraft</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Cpath d=%27M7 7h8a9 9 0 0 1 0 18H7z%27 fill=%27none%27 stroke=%27%23101114%27 stroke-width=%272.5%27 stroke-linejoin=%27round%27/%3E%3Cpath d=%27M2 12h5M2 20h5M25 16h5%27 stroke=%27%23101114%27 stroke-width=%272.5%27 stroke-linecap=%27round%27/%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#8b9099;
+    --line:#e3e5ea; --strong:#16171b; --wash:#f7f8f9;
+    --live:#1f9d55; --dead:#c3c7ce; --pick:#2f6df6; --bad:#c92a2a; --warn:#c98a06;
+    --grid:#eef0f3;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#101215; --ink:#eef0f3; --muted:#9aa2ad; --faint:#79818c;
+      --line:#262a31; --strong:#eef0f3; --wash:#171a1f; --grid:#1a1d22; --dead:#3a3f47;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#101215; --ink:#eef0f3; --muted:#9aa2ad; --faint:#79818c;
+    --line:#262a31; --strong:#eef0f3; --wash:#171a1f; --grid:#1a1d22; --dead:#3a3f47;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{background:var(--paper); color:var(--ink); line-height:1.5; overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; display:grid; grid-template-rows:auto 1fr;}
+  button{font:inherit; color:inherit; background:none; border:none; cursor:pointer;}
+  :focus-visible{outline:2px solid var(--pick); outline-offset:2px; border-radius:4px;}
+
+  header{display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .brand{font-weight:650; letter-spacing:-.01em; font-size:15px; margin-right:4px;}
+  .brand span{color:var(--faint); font-weight:400;}
+  .btn{padding:7px 12px; border:1px solid var(--line); border-radius:8px; font-size:13px; white-space:nowrap;}
+  .btn:hover{border-color:var(--strong);}
+  .btn.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .btn.ghost{border-color:transparent; color:var(--muted);}
+  .spacer{flex:1;}
+  .note{font-size:12.5px; color:var(--faint);}
+  .note.bad{color:var(--bad);} .note.warn{color:var(--warn);}
+
+  main{display:grid; grid-template-columns:auto 1fr auto; min-height:0;}
+  aside{border-right:1px solid var(--line); padding:10px; overflow-y:auto; width:92px; background:var(--wash);}
+  aside h2, .side h2{font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint); margin:4px 0 8px; font-weight:650;}
+  .tool{width:100%; display:grid; place-items:center; gap:3px; padding:7px 4px; border:1px solid transparent; border-radius:9px; margin-bottom:5px;}
+  .tool:hover{background:var(--paper); border-color:var(--line);}
+  .tool.on{background:var(--paper); border-color:var(--strong);}
+  .tool small{font-size:10.5px; color:var(--muted);}
+
+  .stage{position:relative; min-width:0; overflow:hidden;}
+  svg.board{width:100%; height:100%; display:block; touch-action:none; background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0/22px 22px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/22px 22px;}
+  .hint{position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); text-align:center; pointer-events:none; color:var(--faint);}
+  .hint b{display:block; font-size:17px; color:var(--muted); margin-bottom:4px; font-weight:600;}
+  .hint small{font-size:13px;}
+
+  .side{border-left:1px solid var(--line); width:250px; padding:12px; overflow-y:auto; background:var(--wash);}
+  .side.hidden{display:none;}
+  table{border-collapse:collapse; width:100%; font-size:12.5px; font-variant-numeric:tabular-nums;}
+  th,td{padding:3px 6px; text-align:center; border-bottom:1px solid var(--line);}
+  th{color:var(--faint); font-weight:600; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em;}
+  td.v1{color:var(--live); font-weight:650;} td.v0{color:var(--faint);}
+  .sep{border-right:1px solid var(--line);}
+  .ex{display:block; width:100%; text-align:left; padding:7px 9px; border-radius:8px; font-size:13px; border:1px solid transparent;}
+  .ex:hover{background:var(--paper); border-color:var(--line);}
+  .ex small{display:block; color:var(--faint); font-size:11.5px;}
+
+  dialog{border:none; border-radius:14px; padding:0; background:var(--paper); color:var(--ink);
+    box-shadow:0 20px 60px rgba(0,0,0,.25); max-width:min(560px,92vw);}
+  dialog::backdrop{background:rgba(0,0,0,.45);}
+  .dlg{padding:18px 20px 16px;}
+  .dlg h3{font-size:16px; margin-bottom:6px;}
+  .dlg p{font-size:13.5px; color:var(--muted); margin-bottom:12px;}
+  .dlg textarea{width:100%; height:110px; font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;
+    padding:9px; border:1px solid var(--line); border-radius:9px; background:var(--wash); color:var(--ink); resize:vertical;}
+  .row{display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;}
+
+  @media (max-width:900px){
+    .side{display:none;}
+    aside{width:72px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Gatecraft <span>· logic you can wire up</span></div>
+  <button class="btn" id="run">Running</button>
+  <button class="btn ghost" id="step">Tick</button>
+  <button class="btn ghost" id="clear">Clear</button>
+  <div class="spacer"></div>
+  <span class="note" id="note"></span>
+  <button class="btn ghost" id="panelBtn">Panel</button>
+  <button class="btn" id="save">Copy link</button>
+  <button class="btn ghost" id="load">Open…</button>
+</header>
+
+<main>
+  <aside id="palette"><h2>Parts</h2></aside>
+
+  <div class="stage">
+    <svg class="board" id="board"></svg>
+    <div class="hint" id="hint">
+      <b>Pick a part, click to place it</b>
+      <small>Drag from one pin to another to wire them. Click a switch to flip it.</small>
+    </div>
+  </div>
+
+  <div class="side" id="side">
+    <h2>Truth table</h2>
+    <div id="table"><p class="note">Add switches and lamps to see one.</p></div>
+    <h2 style="margin-top:18px">Examples</h2>
+    <div id="examples"></div>
+    <h2 style="margin-top:18px">Keys</h2>
+    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>D</b> dark</p>
+  </div>
+</main>
+
+<dialog id="dlg"><form method="dialog" class="dlg">
+  <h3 id="dlgTitle">Open a design</h3>
+  <p id="dlgText">Paste a Gatecraft link or code.</p>
+  <textarea id="dlgText2" spellcheck="false"></textarea>
+  <div class="row">
+    <button class="btn ghost" value="cancel">Cancel</button>
+    <button class="btn" id="dlgOk" value="ok">Open</button>
+  </div>
+</form></dialog>
+
+<script type="module">
+import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS } from './lib/sim.mjs';
+import { encode, decode, codeFromText } from './lib/share.mjs';
+
+const $ = (id) => document.getElementById(id);
+const SVG = 'http://www.w3.org/2000/svg';
+const el = (n, attrs = {}) => { const e = document.createElementNS(SVG, n); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
+const GRID = 22, snap = (v) => Math.round(v / GRID) * GRID;
+
+let circuit = { parts: [], wires: [], name: '' };
+let memory = new Map();
+let picked = null;            // part type chosen in the palette
+let selected = null;          // { kind:'part'|'wire', id }
+let dragging = null;          // moving a part
+let wiring = null;            // drawing a wire from a pin
+let running = true, nextId = 1;
+
+const board = $('board');
+const layers = { wires: el('g'), parts: el('g'), top: el('g') };
+board.append(layers.wires, layers.parts, layers.top);
+
+// ---------- palette ----------
+const ORDER = ['in', 'out', 'not', 'and', 'or', 'xor', 'nand', 'nor', 'xnor', 'dff', 'clock'];
+ORDER.forEach((type, i) => {
+  const b = document.createElement('button');
+  b.className = 'tool'; b.dataset.type = type;
+  b.title = `${PARTS[type].name}${i < 9 ? ` (${i + 1})` : ''}`;
+  const mini = el('svg', { width: 40, height: 26, viewBox: '0 0 60 40' });
+  mini.append(...glyph(type, true));
+  b.append(mini, Object.assign(document.createElement('small'), { textContent: PARTS[type].name.replace(' flip-flop', '-FF') }));
+  b.addEventListener('click', () => { picked = picked === type ? null : type; paintPalette(); });
+  $('palette').append(b);
+});
+function paintPalette(){ for (const b of $('palette').querySelectorAll('.tool')) b.classList.toggle('on', b.dataset.type === picked); }
+
+// ---------- how each part is drawn ----------
+// Standard engineering symbols, drawn from scratch: a D-shape for AND, a curved shield for OR,
+// a circle on the nose for an inverted output.
+function glyph(type, mini = false) {
+  const d = PARTS[type], w = mini ? 46 : d.w, h = mini ? 30 : d.h, ox = mini ? 7 : 0, oy = mini ? 5 : 0;
+  const S = { fill: 'var(--paper)', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linejoin': 'round' };
+  const L = { fill: 'none', stroke: 'currentColor', 'stroke-width': 2, 'stroke-linecap': 'round' };
+  const bits = [];
+  const mid = oy + h / 2, top = oy + 3, bot = oy + h - 3, hh = h - 6;
+  const inv = type === 'nand' || type === 'nor' || type === 'xnor' || type === 'not';
+  const nose = ox + w - (inv ? 12 : 4);          // where the body ends, leaving room for the bubble
+
+  if (type === 'in' || type === 'clock') {
+    bits.push(el('rect', { x: ox + 2, y: top, width: w - 12, height: hh, rx: 8, ...S }));
+    if (type === 'clock') bits.push(el('path', { d: `M${ox + 9} ${mid + 5}v-9h6v9h6v-9h5`, ...L }));
+    else bits.push(el('circle', { cx: ox + (w - 12) / 2 + 2, cy: mid, r: 3, fill: 'currentColor' }));
+  } else if (type === 'out') {
+    bits.push(el('circle', { cx: ox + w / 2, cy: mid, r: hh / 2, ...S }));
+  } else if (type === 'not') {
+    bits.push(el('path', { d: `M${ox + 5} ${top}L${nose} ${mid}L${ox + 5} ${bot}Z`, ...S }));
+  } else if (type === 'dff') {
+    bits.push(el('rect', { x: ox + 7, y: top, width: w - 14, height: hh, rx: 4, ...S }));
+    bits.push(el('path', { d: `M${ox + 7} ${mid + 5}l7 -5l-7 -5`, ...L }));      // the clock notch
+  } else if (type === 'and' || type === 'nand') {
+    // flat back, half-round front
+    const flat = ox + 6, r = hh / 2, straight = nose - flat - r;
+    bits.push(el('path', { d: `M${flat} ${top}h${straight}a${r} ${r} 0 0 1 0 ${hh}h${-straight}Z`, ...S }));
+  } else {
+    // OR family: a dished back and a pointed front
+    const back = ox + 4, dish = 9;
+    bits.push(el('path', { d: `M${back} ${top}q${dish} ${hh / 2} 0 ${hh}`
+      + `q${(nose - back) * 0.62} 0 ${nose - back} ${-hh / 2}`
+      + `q${-(nose - back) * 0.38} ${-hh / 2} ${-(nose - back)} ${-hh / 2}Z`, ...S }));
+    if (type === 'xor' || type === 'xnor') bits.push(el('path', { d: `M${back - 5} ${top}q${dish} ${hh / 2} 0 ${hh}`, ...L }));
+  }
+  if (inv) bits.push(el('circle', { cx: nose + 4.5, cy: mid, r: 4, ...S }));
+  return bits;
+}
+
+// ---------- drawing ----------
+function draw() {
+  const { values, settled } = running || !memory.get(NETS) ? simulate(circuit, memory) : { values: memory.get(NETS), settled: true };
+  for (const g of Object.values(layers)) g.replaceChildren();
+  $('hint').style.display = circuit.parts.length ? 'none' : '';
+
+  for (const [i, w] of circuit.wires.entries()) {
+    const a = pinPos(part(w.from[0]) || {}, 'out', w.from[1]);
+    const b = pinPos(part(w.to[0]) || {}, 'in', w.to[1]);
+    const live = valueAt(circuit, values, w.from[0], 'out', w.from[1]);
+    const dx = Math.max(26, Math.abs(b.x - a.x) * 0.5);
+    const path = el('path', {
+      d: `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}`,
+      fill: 'none', stroke: live ? 'var(--live)' : 'var(--dead)',
+      'stroke-width': selected?.kind === 'wire' && selected.id === i ? 4.5 : 2.5, 'stroke-linecap': 'round',
+    });
+    path.style.cursor = 'pointer';
+    path.addEventListener('pointerdown', (e) => { e.stopPropagation(); selected = { kind: 'wire', id: i }; draw(); });
+    layers.wires.append(path);
+  }
+
+  for (const p of circuit.parts) {
+    const def = PARTS[p.type]; if (!def) continue;
+    const g = el('g', { transform: `translate(${p.x} ${p.y})` });
+    g.style.cursor = 'grab';
+    const on = def.outs ? valueAt(circuit, values, p.id, 'out', 0) : valueAt(circuit, values, p.id, 'in', 0);
+
+    const body = el('g', { color: selected?.kind === 'part' && selected.id === p.id ? 'var(--pick)' : 'var(--ink)' });
+    if ((p.type === 'in' || p.type === 'clock' || p.type === 'out') && on) body.setAttribute('color', 'var(--live)');
+    body.append(...glyph(p.type));
+    if (p.type === 'out' && on) body.append(el('circle', { cx: def.w / 2 + 2, cy: def.h / 2, r: def.h / 2 - 7, fill: 'var(--live)', opacity: .9 }));
+    if ((p.type === 'in' || p.type === 'clock') && on) body.append(el('rect', { x: 4, y: 5, width: def.w - 14, height: def.h - 10, rx: 5, fill: 'var(--live)', opacity: .18 }));
+    g.append(body);
+
+    if (p.label) g.append(Object.assign(el('text', { x: def.w / 2, y: -7, 'text-anchor': 'middle', fill: 'var(--faint)', 'font-size': 11 }), { textContent: p.label }));
+
+    for (const side of ['in', 'out']) {
+      const n = side === 'in' ? def.ins : def.outs;
+      for (let i = 0; i < n; i++) {
+        const pos = pinPos({ ...p, x: 0, y: 0 }, side, i);
+        const lit = valueAt(circuit, values, p.id, side, i);
+        const dot = el('circle', { cx: pos.x, cy: pos.y, r: 5.5, fill: lit ? 'var(--live)' : 'var(--paper)', stroke: 'var(--strong)', 'stroke-width': 1.8 });
+        dot.style.cursor = 'crosshair';
+        dot.addEventListener('pointerdown', (e) => { e.stopPropagation(); startWire(p, side, i); });
+        dot.addEventListener('pointerup', (e) => { e.stopPropagation(); endWire(p, side, i); });
+        g.append(dot);
+        if (def.pinNames) {
+          const nm = def.pinNames[side === 'in' ? 'ins' : 'outs']?.[i];
+          if (nm) g.append(Object.assign(el('text', { x: pos.x + (side === 'in' ? 9 : -9), y: pos.y + 3.5, 'text-anchor': side === 'in' ? 'start' : 'end', fill: 'var(--faint)', 'font-size': 9.5 }), { textContent: nm }));
+        }
+      }
+    }
+    g.addEventListener('pointerdown', (e) => startDrag(e, p));
+    layers.parts.append(g);
+  }
+
+  if (wiring) layers.top.append(el('path', { d: `M${wiring.from.x} ${wiring.from.y}L${wiring.at.x} ${wiring.at.y}`, stroke: 'var(--pick)', 'stroke-width': 2.5, 'stroke-dasharray': '5 4', fill: 'none' }));
+
+  const loose = problems(circuit);
+  const note = $('note');
+  if (!settled) { note.textContent = 'This circuit never settles — something is oscillating.'; note.className = 'note warn'; }
+  else if (loose.length) { note.textContent = `${loose.length} input${loose.length > 1 ? 's' : ''} not connected`; note.className = 'note'; }
+  else { note.textContent = circuit.parts.length ? 'Settled' : ''; note.className = 'note'; }
+  paintTable();
+}
+
+const part = (id) => circuit.parts.find((p) => p.id === id);
+
+// ---------- interaction ----------
+const at = (e) => { const r = board.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+
+board.addEventListener('pointerdown', (e) => {
+  if (e.target !== board) return;
+  selected = null;
+  if (picked) {
+    const p = at(e), def = PARTS[picked];
+    circuit.parts.push({ id: 'p' + (nextId++), type: picked, x: snap(p.x - def.w / 2), y: snap(p.y - def.h / 2) });
+    if (!e.shiftKey) { picked = null; paintPalette(); }
+  }
+  draw();
+});
+board.addEventListener('pointermove', (e) => {
+  if (dragging) {
+    const p = at(e);
+    dragging.part.x = snap(p.x - dragging.dx); dragging.part.y = snap(p.y - dragging.dy);
+    draw();
+  } else if (wiring) { wiring.at = at(e); draw(); }
+});
+addEventListener('pointerup', () => { dragging = null; if (wiring) { wiring = null; draw(); } });
+
+function startDrag(e, p) {
+  e.stopPropagation();
+  selected = { kind: 'part', id: p.id };
+  if (p.type === 'in') {                                   // a switch is there to be flipped
+    const mem = memory.get(p.id) || {};
+    mem.on = !mem.on; memory.set(p.id, mem);
+  }
+  const pos = at(e);
+  dragging = { part: p, dx: pos.x - p.x, dy: pos.y - p.y };
+  draw();
+}
+function startWire(p, side, i) { const pos = pinPos(p, side, i); wiring = { part: p, side, index: i, from: pos, at: pos }; }
+function endWire(p, side, i) {
+  if (!wiring) return;
+  let a = wiring, b = { part: p, side, index: i };
+  if (a.side === b.side) { wiring = null; return draw(); }         // out->out makes no sense
+  if (a.side === 'in') [a, b] = [b, a];                            // always from an output
+  if (a.part.id === b.part.id) { wiring = null; return draw(); }
+  circuit.wires = circuit.wires.filter((w) => !(w.to[0] === b.part.id && w.to[1] === b.index));  // one source per input
+  circuit.wires.push({ from: [a.part.id, a.index], to: [b.part.id, b.index] });
+  wiring = null; draw();
+}
+
+addEventListener('keydown', (e) => {
+  if (e.target.matches('textarea, input')) return;
+  if (e.key === 'Escape') { picked = null; selected = null; wiring = null; paintPalette(); draw(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') {
+    if (selected?.kind === 'part') {
+      circuit.parts = circuit.parts.filter((p) => p.id !== selected.id);
+      circuit.wires = circuit.wires.filter((w) => w.from[0] !== selected.id && w.to[0] !== selected.id);
+    } else if (selected?.kind === 'wire') circuit.wires.splice(selected.id, 1);
+    selected = null; draw();
+  }
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= 9) { picked = ORDER[n - 1]; paintPalette(); }
+  if (e.key.toLowerCase() === 'd') {
+    const dark = document.documentElement.dataset.theme === 'dark';
+    document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('gatecraft-theme', dark ? 'light' : 'dark'); } catch {}
+  }
+});
+
+// ---------- the clock, and the loop ----------
+let tick = 0;
+setInterval(() => {
+  if (!running) return;
+  tick++;
+  let moved = false;
+  for (const p of circuit.parts) if (p.type === 'clock') {
+    const mem = memory.get(p.id) || {}; mem.on = tick % 2 === 0; memory.set(p.id, mem); moved = true;
+  }
+  if (moved || circuit.parts.some((p) => p.type === 'dff')) draw();
+}, 500);
+
+$('run').addEventListener('click', () => { running = !running; $('run').textContent = running ? 'Running' : 'Paused'; $('run').classList.toggle('on', !running); draw(); });
+$('step').addEventListener('click', () => { tick++; for (const p of circuit.parts) if (p.type === 'clock') { const m = memory.get(p.id) || {}; m.on = tick % 2 === 0; memory.set(p.id, m); } simulate(circuit, memory); draw(); });
+$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; circuit = { parts: [], wires: [], name: '' }; memory = new Map(); selected = null; draw(); });
+$('panelBtn').addEventListener('click', () => $('side').classList.toggle('hidden'));
+
+// ---------- truth table ----------
+function paintTable() {
+  const host = $('table');
+  const t = truthTable(circuit);
+  if (!t) { host.innerHTML = '<p class="note">Add switches and lamps to see one.</p>'; return; }
+  if (t.tooBig) { host.innerHTML = `<p class="note">${t.tooBig} switches would make ${2 ** t.tooBig} rows — too many to show.</p>`; return; }
+  const head = `<tr>${t.switches.map((s, i) => `<th class="${i === t.switches.length - 1 ? 'sep' : ''}">${esc(s)}</th>`).join('')}${t.lamps.map((l) => `<th>${esc(l)}</th>`).join('')}</tr>`;
+  const rows = t.rows.map((r) => `<tr>${r.ins.map((v, i) => `<td class="v${v} ${i === r.ins.length - 1 ? 'sep' : ''}">${v}</td>`).join('')}${r.outs.map((v) => `<td class="v${v}">${v}</td>`).join('')}</tr>`).join('');
+  host.innerHTML = `<table>${head}${rows}</table>`;
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// ---------- saving ----------
+$('save').addEventListener('click', async () => {
+  if (!circuit.parts.length) return;
+  const code = await encode({ ...circuit, on: [...memory].filter(([, m]) => m?.on).map(([id]) => id) });
+  const url = `${location.origin}${location.pathname}#d=${code}`;
+  history.replaceState(null, '', `#d=${code}`);
+  try { await navigator.clipboard.writeText(url); flash('Link copied — it holds the whole design'); }
+  catch { show('Your design', 'Copy this link:', url, false); }
+});
+$('load').addEventListener('click', () => show('Open a design', 'Paste a Gatecraft link or code.', '', true));
+
+function show(title, text, value, isOpen) {
+  $('dlgTitle').textContent = title; $('dlgText').textContent = text;
+  $('dlgText2').value = value; $('dlgOk').textContent = isOpen ? 'Open' : 'Done';
+  $('dlg').returnValue = ''; $('dlg').showModal();
+  $('dlgText2').select();
+  $('dlg').onclose = async () => {
+    if ($('dlg').returnValue !== 'ok' || !isOpen) return;
+    try { await load(codeFromText($('dlgText2').value)); flash('Opened'); }
+    catch (err) { flash("That doesn't look like a Gatecraft design", true); }
+  };
+}
+function flash(msg, bad = false) {
+  const n = $('note'); n.textContent = msg; n.className = 'note' + (bad ? ' bad' : '');
+  setTimeout(draw, 2600);
+}
+
+async function load(code) {
+  const c = await decode(code);
+  circuit = { parts: c.parts, wires: c.wires, name: c.name };
+  memory = new Map();
+  for (const id of c.on || []) memory.set(id, { on: true });
+  nextId = c.parts.length + 1;
+  selected = null;
+  draw();
+}
+
+// ---------- examples ----------
+const EXAMPLES = {
+  'Half adder': { why: 'Adds two bits: sum and carry',
+    parts: [['in',40,70,'A'],['in',40,170,'B'],['xor',190,60],['and',190,170],['out',330,72,'Sum'],['out',330,180,'Carry']],
+    wires: [[0,0,2,0],[1,0,2,1],[0,0,3,0],[1,0,3,1],[2,0,4,0],[3,0,5,0]] },
+  'Latch (remembers)': { why: 'Press Set, let go — it stays on',
+    parts: [['in',40,70,'Set'],['in',40,190,'Reset'],['nor',200,160],['nor',200,60],['out',350,70,'Q']],
+    wires: [[1,0,3,0],[2,0,3,1],[0,0,2,0],[3,0,2,1],[3,0,4,0]] },
+  'Flip-flop + clock': { why: 'Halves the clock — the start of counting',
+    parts: [['clock',40,110],['dff',200,90],['out',360,100,'Q']],
+    wires: [[0,0,1,1],[1,1,1,0],[1,0,2,0]] },
+  'Majority vote': { why: 'On when at least two of three are on',
+    parts: [['in',30,50,'A'],['in',30,140,'B'],['in',30,230,'C'],['and',170,50],['and',170,140],['and',170,230],['or',310,90],['or',430,150],['out',560,160,'Most']],
+    wires: [[0,0,3,0],[1,0,3,1],[1,0,4,0],[2,0,4,1],[0,0,5,0],[2,0,5,1],[3,0,6,0],[4,0,6,1],[6,0,7,0],[5,0,7,1],[7,0,8,0]] },
+};
+for (const [name, ex] of Object.entries(EXAMPLES)) {
+  const b = document.createElement('button');
+  b.className = 'ex';
+  b.innerHTML = `${esc(name)}<small>${esc(ex.why)}</small>`;
+  b.addEventListener('click', () => {
+    circuit = {
+      name,
+      parts: ex.parts.map(([type, x, y, label], i) => ({ id: 'e' + i, type, x, y, ...(label ? { label } : {}) })),
+      wires: ex.wires.map(([a, ao, b2, bi]) => ({ from: ['e' + a, ao], to: ['e' + b2, bi] })),
+    };
+    memory = new Map(); nextId = ex.parts.length + 1; selected = null; picked = null; paintPalette(); draw();
+  });
+  $('examples').append(b);
+}
+
+// ---------- go ----------
+try { const t = localStorage.getItem('gatecraft-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+if (location.hash.length > 3) load(codeFromText(location.hash)).catch(() => draw());
+else draw();
+addEventListener('resize', draw);
+</script>
+</body>
+</html>
