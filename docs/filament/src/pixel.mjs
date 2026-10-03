@@ -136,6 +136,18 @@ export class Screen {
     }
   }
 
+  /**
+   * Forget any lamplight over a region. Panels and titles need to resolve through one palette, or
+   * the letters that happen to fall inside a lamp pool come out a different colour from the rest
+   * of the sentence.
+   */
+  clearLit(x, y, w, h) {
+    x |= 0; y |= 0;
+    const x0 = Math.max(0, x), x1 = Math.min(W, x + w);
+    const y0 = Math.max(0, y), y1 = Math.min(H, y + h);
+    for (let yy = y0; yy < y1; yy++) this.lit.fill(0, yy * W + x0, yy * W + x1);
+  }
+
   text(x, y, str, c) {
     x |= 0; y |= 0;
     let cx = x;

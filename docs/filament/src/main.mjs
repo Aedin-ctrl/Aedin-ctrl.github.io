@@ -231,6 +231,10 @@ function restart() {
 // render
 // ---------------------------------------------------------------------------------------------
 function paletteFor() {
+  // The ending darkens the world. It reads as a moment rather than a dialog box, and it also gives
+  // the panel a guaranteed black backdrop to sit on — in daylight the backdrop is a bright blue
+  // and white text on it was unreadable.
+  if (scene === 'over') return [NIGHT, LIT];
   // dusk and dawn step through twilight rather than crossfading, because the hardware changed the
   // sky in steps and the stepping is what reads as "the world is changing"
   switch (state.phase) {
@@ -313,15 +317,20 @@ function drawPrompt() {
 function drawOver() {
   const won = state.over === 'win';
   drawCentred(won
-    ? ['the far light takes current', '', 'and something out there', 'answers with a light of its own',
-       '', 'press space']
-    : ['the dynamo is cold', '', 'the coast goes dark', '', 'press space']);
+    ? ['the far light', 'takes current', '', 'and far out on the water',
+       'something answers', 'with a light of its own', '', 'press space']
+    : ['the dynamo is cold', '', 'and the coast', 'goes dark behind you', '', 'press space']);
 }
 
+/** Lines are kept to 28 characters, which is the widest that fits inside the panel at 8px a glyph. */
 function drawCentred(lines) {
-  const h = lines.length * 10 + 12;
-  screen.rect(10, (H - h) / 2, W - 20, h, code(0, 0));
-  lines.forEach((l, i) => screen.centre((H - h) / 2 + 7 + i * 10, l, code(3, 3)));
+  const h = lines.length * 10 + 16;
+  const y = Math.round((H - h) / 2);
+  screen.clearLit(8, y, W - 16, h);
+  screen.rect(8, y, W - 16, h, code(0, 0));
+  screen.rect(8, y, W - 16, 1, code(3, 2));
+  screen.rect(8, y + h - 1, W - 16, 1, code(3, 2));
+  lines.forEach((l, i) => screen.centre(y + 9 + i * 10, l.slice(0, 28), code(3, 3)));
 }
 
 // ---------------------------------------------------------------------------------------------
