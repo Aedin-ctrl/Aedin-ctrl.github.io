@@ -44,10 +44,22 @@ addEventListener('keydown', (e) => {
   held.add(k);
 }, { passive: false });
 addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) held.delete(k); });
-addEventListener('blur', () => held.clear());
+addEventListener('blur', () => {
+  // `touch` was not cleared here, and `pointerup` fires on the window — so releasing outside the
+  // page, or losing focus first, left the climber wound to maximum. You came back from another
+  // window already at full charge and the next click launched you.
+  held.clear();
+  pointers.clear();
+  touch = readTouch();
+});
 document.addEventListener('visibilitychange', () => {
+  // Pause while hidden, and — this is the part that was missing — UNPAUSE on the way back. It used
+  // to set `paused` and never clear it, so a tab you came back to was frozen for good. The escape
+  // was the letter P, which is not in the hint line, not on the title screen, and not on a phone
+  // at all: a notification mid-game left a mobile player staring at a PAUSED panel with no way out
+  // but a reload, losing the run.
   if (document.hidden) { paused = true; audio.suspend(); }
-  else { audio.resume(); prev = null; acc = 0; }
+  else { paused = false; audio.resume(); prev = null; acc = 0; }
 });
 
 // touch: left third, right third, and the middle is the button
@@ -56,24 +68,58 @@ function touchAt(clientX) {
   const r = canvas.getBoundingClientRect();
   return (clientX - r.left) / r.width;
 }
+// Touch, by finger rather than by zone.
+//
+// Two versions of this have been wrong, in opposite directions, and both were uncompletable.
+//
+// The first set `hold: true` for every touch, so you could jump and never walk. The fix PARTITIONED
+// the screen into three exclusive zones — outer thirds walk, middle winds up — which made
+// `touch.hold` and `touch.left/right` mutually exclusive. But `sim.mjs` only writes the lean inside
+// the hold branch, so on a phone the lean was permanently 0 and every jump went dead vertical:
+// measured against the real physics, **0 of 76 route steps are makeable with no lean**. Not most.
+// None. You cannot clear the first one.
+//
+// So the zones overlap now, and each finger is tracked by its own pointerId instead of a single
+// object that each new touch clobbers. The bottom strip is a lean pad; anywhere above it winds up;
+// and a second finger ADDS a lean to a wind-up already in progress rather than cancelling it.
+const pointers = new Map();
+
+function readTouch() {
+  let left = false, right = false, hold = false;
+  for (const p of pointers.values()) {
+    if (p.lean === 'left') left = true;
+    else if (p.lean === 'right') right = true;
+    if (p.hold) hold = true;
+  }
+  return { left, right, hold };
+}
+
+function classify(e) {
+  const r = canvas.getBoundingClientRect();
+  const fx = (e.clientX - r.left) / r.width;
+  const fy = (e.clientY - r.top) / r.height;
+  // the bottom fifth is the lean pad; everywhere else winds up. A finger on the lean pad also
+  // holds, so one thumb can charge and lean at once — which is how a phone is actually held.
+  const lean = fx < 0.34 ? 'left' : fx > 0.66 ? 'right' : null;
+  return { lean: fy > 0.8 ? lean : (fx < 0.2 ? 'left' : fx > 0.8 ? 'right' : null), hold: true };
+}
+
 canvas.addEventListener('pointerdown', (e) => {
   audio.start();
   if (scene !== 'play') { buffered.push('hold'); return; }
-  const p = touchAt(e.clientX);
-  // The outer thirds WALK; only the middle winds up.
-  //
-  // This used to set hold:true for every touch, so on a phone you could jump and never walk — and
-  // ten of the eighty-eight steps need the climber standing at a particular end of a ledge first.
-  // The game was quietly uncompletable on exactly the device most people would open it on.
-  touch = { left: p < 0.33, right: p > 0.67, hold: p >= 0.33 && p <= 0.67 };
+  try { canvas.setPointerCapture(e.pointerId); } catch {}
+  pointers.set(e.pointerId, classify(e));
+  touch = readTouch();
 });
 canvas.addEventListener('pointermove', (e) => {
-  if (!e.buttons || scene !== 'play') return;
-  const p = touchAt(e.clientX);
-  touch = { left: p < 0.33, right: p > 0.67, hold: p >= 0.33 && p <= 0.67 };
+  if (!pointers.has(e.pointerId) || scene !== 'play') return;
+  pointers.set(e.pointerId, classify(e));
+  touch = readTouch();
 });
-addEventListener('pointerup', () => { touch = { left: false, right: false, hold: false }; });
-addEventListener('pointercancel', () => { touch = { left: false, right: false, hold: false }; });
+const lift = (e) => { pointers.delete(e.pointerId); touch = readTouch(); };
+canvas.addEventListener('pointerup', lift);
+canvas.addEventListener('pointercancel', lift);
+addEventListener('pointerup', lift);
 
 const DT_MS = 1000 / TPS;
 let prev = null, acc = 0;
@@ -289,17 +335,23 @@ function fit() {
   // rows. The whole point of this renderer is that it never does that.
   // Reserve the instruction line's REAL measured height, not a guess.
   //
-  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - reserve`, so
+  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - 8`, so
   // whenever rounding the scale down to a whole multiple of 240 happened to leave less than about
   // 17px of slack, the line printed across the bottom of the game. A height sweep found it at 5 of
   // 14 window heights, including 728, 740 and 760 — which is to say, on an ordinary laptop. The
   // line now sits below the canvas and claims its own space, and that space is measured, because
   // the line wraps to two rows on a narrow phone.
+  //
+  // NOTE: the first attempt at this fix computed `reserve` and then never used it, because the
+  // replacement that was supposed to put it into the maths matched the words `innerHeight - 8`
+  // inside this very comment instead of in the code below. The overlap went away — the line sits
+  // in its own row now — so the test said the bug was fixed, while the canvas was quietly being
+  // pushed up and clipped at the top at the same window heights as before.
   const hintEl = document.querySelector('.hint');
   const reserve = (hintEl ? hintEl.offsetHeight : 0) + 16;
   const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
   const maxW = Math.floor((innerWidth * dpr) / W);
-  const maxH = Math.floor(((innerHeight - 8) * dpr) / H);
+  const maxH = Math.floor(((innerHeight - reserve) * dpr) / H);
   const device = Math.max(1, Math.min(maxW, maxH));
   canvas.style.width = `${(W * device) / dpr}px`;
   canvas.style.height = `${(H * device) / dpr}px`;

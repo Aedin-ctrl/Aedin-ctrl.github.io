@@ -60,8 +60,13 @@ addEventListener('keyup', (e) => {
 // a key held when the window loses focus never sends keyup, and the lineman walks west forever
 addEventListener('blur', () => held.clear());
 document.addEventListener('visibilitychange', () => {
+  // Pause while hidden, and — this is the part that was missing — UNPAUSE on the way back. It used
+  // to set `paused` and never clear it, so a tab you came back to was frozen for good. The escape
+  // was the letter P, which is not in the hint line, not on the title screen, and not on a phone
+  // at all: a notification mid-game left a mobile player staring at a PAUSED panel with no way out
+  // but a reload, losing the run.
   if (document.hidden) { paused = true; audio.suspend(); }
-  else { audio.resume(); prev = null; acc = 0; }
+  else { paused = false; audio.resume(); prev = null; acc = 0; }
 });
 
 // pointer and touch, so it works on a phone without a keyboard
@@ -451,17 +456,23 @@ function fit() {
   // that is what this whole renderer is for.
   // Reserve the instruction line's REAL measured height, not a guess.
   //
-  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - reserve`, so
+  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - 8`, so
   // whenever rounding the scale down to a whole multiple of 240 happened to leave less than about
   // 17px of slack, the line printed across the bottom of the game. A height sweep found it at 5 of
   // 14 window heights, including 728, 740 and 760 — which is to say, on an ordinary laptop. The
   // line now sits below the canvas and claims its own space, and that space is measured, because
   // the line wraps to two rows on a narrow phone.
+  //
+  // NOTE: the first attempt at this fix computed `reserve` and then never used it, because the
+  // replacement that was supposed to put it into the maths matched the words `innerHeight - 8`
+  // inside this very comment instead of in the code below. The overlap went away — the line sits
+  // in its own row now — so the test said the bug was fixed, while the canvas was quietly being
+  // pushed up and clipped at the top at the same window heights as before.
   const hintEl = document.querySelector('.hint');
   const reserve = (hintEl ? hintEl.offsetHeight : 0) + 16;
   const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
   const device = Math.max(1, Math.min(
-    Math.floor((innerWidth * dpr) / W), Math.floor(((innerHeight - 8) * dpr) / H)));
+    Math.floor((innerWidth * dpr) / W), Math.floor(((innerHeight - reserve) * dpr) / H)));
   canvas.style.width = `${(W * device) / dpr}px`;
   canvas.style.height = `${(H * device) / dpr}px`;
 }
