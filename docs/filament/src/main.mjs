@@ -7,9 +7,13 @@ import { newGame, step, interact, whatIsHere, groundAt, RULES, TPS, satchelCap, 
 import { draw, updateCamera, addTrauma, camera } from './render.mjs';
 import * as audio from './audio.mjs';
 import * as particles from './particles.mjs';
+import { CREW } from './sprites.mjs';
 import { checkInvariants } from './invariants.mjs';
 
 const DEV = location.search.includes('dev');
+// Shake and hitstop are the only things here that could trouble anyone, so they are gated rather
+// than the game being flattened — a reduced-motion player still gets the whole thing.
+const CALM = matchMedia('(prefers-reduced-motion: reduce)');
 const canvas = document.getElementById('screen');
 const ctx = canvas.getContext('2d', { alpha: false });
 ctx.imageSmoothingEnabled = false;
@@ -23,7 +27,8 @@ let shownTick = 0;
 let paused = false;
 let role = 'archer';
 const ROLES = ['archer', 'lineman', 'winder'];
-let toast = null, toastT = 0;
+const SPRITE_FOR = CREW;
+let toast = null, toastT = 0, nudge = 0;
 let cascade = 0, cascadeAt = -1e9, relight = 0, relightAt = -1e9;
 
 // ---------------------------------------------------------------------------------------------
@@ -65,10 +70,22 @@ function pointerAt(clientX) {
   const r = canvas.getBoundingClientRect();
   return (clientX - r.left) / r.width;
 }
+function pointerAt0(clientY) {
+  const r = canvas.getBoundingClientRect();
+  return (clientY - r.top) / r.height;
+}
 canvas.addEventListener('pointerdown', (e) => {
   audio.start();
   const p = pointerAt(e.clientX);
+  const q = pointerAt0(e.clientY);
   if (scene !== 'play') { buffered.push('act'); return; }
+  // The top strip changes the tool.
+  //
+  // Touch had no way to cycle roles at all, so on a phone every single person you hired became an
+  // archer — you were stuck with the two starting winders for income and the one starting lineman
+  // doing every build, every cable and every night repair across the whole coast. The hint under
+  // the canvas says "up changes tools", which on a phone was simply a lie.
+  if (q < 0.14) { buffered.push('role'); return; }
   if (p < 0.35) touchDir = -1;
   else if (p > 0.65) touchDir = 1;
   else buffered.push('act');
@@ -103,9 +120,13 @@ function frame(now) {
 function tick() {
   const presses = buffered.splice(0, buffered.length);
 
-  for (const k of presses) {
-    if (k === 'mute') { toastFor(audio.toggleMute() ? 'sound off' : 'sound on'); }
-    if (k === 'pause' && scene === 'play') paused = !paused;
+  // Handled here and REMOVED from the queue. These used to be read above the hitstop gate while
+  // the gate pushed the same presses back on, so holding M through a twenty-frame beacon freeze
+  // toggled mute twenty-one times and wrote localStorage as often.
+  for (let i = presses.length - 1; i >= 0; i--) {
+    const k = presses[i];
+    if (k === 'mute') { toastFor(audio.toggleMute() ? 'sound off' : 'sound on'); presses.splice(i, 1); }
+    else if (k === 'pause') { if (scene === 'play') paused = !paused; presses.splice(i, 1); }
   }
 
   if (scene === 'title') {
@@ -137,11 +158,21 @@ function tick() {
   };
   if (presses.includes('act')) {
     const r = interact(state, role);
-    if (!r.ok && r.why === 'poor') audio.sfx.deny();
+    // Every press answers. Pressing the only action button in the game and getting silence is how
+    // a first-timer concludes it has not started yet — and there is nothing to do at the spot you
+    // begin on, so that silence was the very first thing that happened.
+    if (!r.ok) { audio.sfx.deny(); nudge = 10; }
   }
 
   step(state, input);
   consumeEvents();
+  // The camera, the shake and the toast clock belong on the TICK, not the frame. They were being
+  // advanced from render() with a hardcoded 1/60, so on a 120Hz display the camera lerped at
+  // double speed, the shake decayed in half the time and a toast lasted 0.75s instead of 1.5s —
+  // the simulation was frame-rate independent and the feel was not, in a game whose whole budget
+  // is feel.
+  updateCamera(state, 1 / TPS);
+  if (toastT > 0) toastT--;
   particles.update((x) => groundAt(state, x));
   particles.ride(state.monarch.x, groundAt(state, state.monarch.x) - 2, state.monarch.vx);
 
@@ -158,6 +189,9 @@ function tick() {
 }
 
 function toastFor(text) { toast = text; toastT = 90; }
+
+const shake = (n) => { if (!CALM.matches) addTrauma(n); };
+const freeze = (n) => { if (!CALM.matches) hitstop = n; };
 
 /**
  * Events -> sound and shake. This is the only place the two are connected, and the simulation
@@ -179,8 +213,8 @@ function consumeEvents() {
 
       case 'cable-cut':
         audio.sfx.cut();
-        addTrauma(0.7);
-        hitstop = 10;
+        shake(0.7);
+        freeze(10);
         particles.burst(e.x, groundAt(state, e.x) - 4, 6, 'spark', 1.2);
         cascade = 0; cascadeAt = now;
         break;
@@ -200,32 +234,33 @@ function consumeEvents() {
         break;
 
       case 'tower-reserve': audio.sfx.reserve(); break;
+      case 'behind': audio.sfx.behind(); toastFor('behind you'); break;
       case 'spliced': audio.sfx.spliced(); break;
       case 'cable-mended': audio.sfx.mended(); break;
       case 'cable-laid': audio.sfx.mended(); break;
       case 'tower-raised':
-        audio.sfx.build(); addTrauma(0.2);
+        audio.sfx.build(); shake(0.2);
         particles.burst(e.x, groundAt(state, e.x) - 2, 5, 'dust');
         break;
       case 'tower-raised-higher': audio.sfx.raised(); break;
       case 'tower-hit':
-        audio.sfx.towerHit(); addTrauma(0.45);
+        audio.sfx.towerHit(); shake(0.45);
         particles.burst(e.x, groundAt(state, e.x) - 14, 3, 'debris');
         break;
       case 'tower-fell':
-        audio.sfx.towerFell(); addTrauma(0.75); hitstop = 8;
+        audio.sfx.towerFell(); shake(0.75); freeze(8);
         particles.burst(e.x, groundAt(state, e.x) - 16, 10, 'debris', 1.3);
         break;
-      case 'dynamo-hit': audio.sfx.dynamoHit(); addTrauma(0.6); break;
-      case 'robbed': audio.sfx.robbed(); addTrauma(0.5); hitstop = 12; toastFor('robbed'); break;
+      case 'dynamo-hit': audio.sfx.dynamoHit(); shake(0.6); break;
+      case 'robbed': audio.sfx.robbed(); shake(0.5); freeze(12); toastFor('robbed'); break;
       case 'burn': audio.sfx.burn(); break;
       case 'dusk': audio.sfx.dusk(); audio.setWind(0.03); break;
       case 'dawn': audio.sfx.dawn(); audio.setWind(0.018); break;
       case 'beacon-fired':
-        audio.sfx.beacon(); addTrauma(1); hitstop = 20;
+        audio.sfx.beacon(); shake(1); freeze(20);
         particles.burst(e.x, groundAt(state, e.x) - 40, 14, 'spark', 1.6);
         break;
-      case 'splice-failed': audio.sfx.cut(); addTrauma(0.4); break;
+      case 'splice-failed': audio.sfx.cut(); shake(0.4); break;
     }
   }
   state.events.length = 0;
@@ -242,9 +277,15 @@ function restart() {
   state = newGame((Math.random() * 1e9) | 0);
   scene = 'play';
   hitstop = 0; paused = false; cascade = 0; relight = 0;
+  // all of this used to survive into the new run: a toast from the old game, the night wind level,
+  // the tool you happened to be holding, the elapsed clock the animations key off
+  toast = null; toastT = 0;
+  role = 'archer';
+  elapsed = 0;
   camera.x = 0; camera.trauma = 0;
   particles.clear();
   audio.music.setNight(false);
+  audio.setWind(0.018);
   audio.music.start();
   audio.sfx.select();
 }
@@ -276,7 +317,6 @@ function paletteFor() {
 }
 
 function render() {
-  updateCamera(state, 1 / 60);
   const [dark, light] = paletteFor();
   screen.setPalettes(dark, light);
 
@@ -288,10 +328,7 @@ function render() {
     else if (paused) drawCentred(['paused', '', 'press p']);
   }
 
-  if (toastT > 0) {
-    toastT--;
-    screen.centre(H - 20, toast, code(3, 3));
-  }
+  if (toastT > 0) screen.centre(H - 32, toast, code(3, 3));
   screen.present(ctx, imageData);
 }
 
@@ -352,27 +389,45 @@ function drawPrompt() {
   if (scene !== 'play' || state.over) return;
   const here = whatIsHere(state);
   const y = 6;
+
+  // What you have, beside what the thing under you costs.
+  //
+  // The prompt printed a price and the satchel was eight single pixels on a moving sprite, so the
+  // game showed an absolute cost and an eight-step relative bar and asked you to compare them.
+  // Having printed half the sentence, printing the other half is the honest fix.
+  const held = `${state.spark}`;
+  screen.rect(2, y - 2, screen.textWidth(held) + 6, 11, code(0, 0));
+  screen.text(5, y, held, code(1, 3));
+
   if (here) {
     const afford = state.spark >= here.cost;
     const text = `${here.label} ${here.cost}`;
     const w = screen.textWidth(text);
     screen.rect((W - w) / 2 - 4, y - 2, w + 8, 11, code(0, 0));
-    screen.centre(y, text, afford ? code(1, 3) : code(3, 2));
+    // unaffordable blinks as well as dimming: a colour-only affordance cannot be learned on a
+    // first encounter, because you have never seen the other state
+    const dim = !afford && (Math.floor(elapsed * 3) % 2 === 0);
+    screen.centre(y, text, afford ? code(1, 3) : dim ? code(3, 1) : code(3, 2));
   }
-  // the tool you would hand out next, so changing it is not a guess
-  screen.text(6, y, role, code(3, 2));
-  // nights survived, as tally marks, bottom left. The only number anywhere, and it is not a digit.
-  for (let i = 0; i < Math.min(12, state.nightNumber); i++) {
-    screen.vline(6 + i * 3, H - 10, 6, code(3, 3));
+  // The tool you would hand out next, as the person AND the word, down beside the night tally
+  // where there is room for both — the word alone was the weakest part of the indicator, and the
+  // sprite is the thing you will actually see walking around.
+  screen.sprite(6, H - 22, SPRITE_FOR[role], 4);
+  screen.text(16, H - 21, role, code(3, 2));
+  // nights survived, as tally marks
+  for (let i = 0; i < Math.min(20, state.nightNumber); i++) {
+    screen.vline(6 + i * 3, H - 11, 6, code(3, 3));
   }
 }
 
 function drawOver() {
   const won = state.over === 'win';
+  const s2 = state.stats;
+  const line = `${state.nightNumber} nights   ${s2.cutsSpliced + s2.cutsMended} breaks mended`;
   drawCentred(won
     ? ['the far light', 'takes current', '', 'and far out on the water',
-       'something answers', 'with a light of its own', '', 'press space']
-    : ['the dynamo is cold', '', 'and the coast', 'goes dark behind you', '', 'press space']);
+       'something answers', 'with a light of its own', '', line, 'press space']
+    : ['the dynamo is cold', '', 'and the coast', 'goes dark behind you', '', line, 'press space']);
 }
 
 /** Lines are kept to 28 characters, which is the widest that fits inside the panel at 8px a glyph. */
@@ -390,10 +445,15 @@ function drawCentred(lines) {
 // the window
 // ---------------------------------------------------------------------------------------------
 function fit() {
-  const scale = Math.max(1, Math.min(
-    Math.floor(innerWidth / W), Math.floor((innerHeight - 8) / H)));
-  canvas.style.width = `${W * scale}px`;
-  canvas.style.height = `${H * scale}px`;
+  // Integer in DEVICE pixels, not CSS pixels. At a devicePixelRatio of 1.25 or 1.5 — Windows at
+  // 125%, most Android — an integer CSS scale lands on 3.75 or 4.5 device pixels per source pixel,
+  // and `image-rendering: pixelated` then draws alternating 4px and 5px rows. Avoiding exactly
+  // that is what this whole renderer is for.
+  const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
+  const device = Math.max(1, Math.min(
+    Math.floor((innerWidth * dpr) / W), Math.floor(((innerHeight - 8) * dpr) / H)));
+  canvas.style.width = `${(W * device) / dpr}px`;
+  canvas.style.height = `${(H * device) / dpr}px`;
 }
 addEventListener('resize', fit);
 fit();

@@ -61,7 +61,11 @@ function noiseBuffer(short) {
 }
 
 export function start() {
-  if (started) return;
+  // Re-arm on EVERY gesture, before the started guard. WebKit has a third context state past
+  // running and suspended — 'interrupted' — entered on a call, on Siri, on an AirPods disconnect,
+  // and escapable only from a user gesture. Returning early here meant that once a phone
+  // interrupted the audio it never came back.
+  if (started) { if (ctx && ctx.state !== 'running') ctx.resume(); return; }
   const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return;
   ctx = new AC();
@@ -139,7 +143,8 @@ function noise({ at = 0, dur = 0.08, vol = 0.3, short = false, filter = 0 }) {
   s.connect(g); tail.connect(master);
   s.start(t0);
   s.stop(t0 + dur + 0.02);
-  s.onended = () => { try { s.disconnect(); g.disconnect(); } catch {} };
+  // the filter was never disconnected, and nearly every effect in this game is filtered
+  s.onended = () => { try { s.disconnect(); g.disconnect(); if (tail !== g) tail.disconnect(); } catch {} };
 }
 
 /** The absence of silence is what makes the coast feel inhabited rather than empty. */
@@ -180,7 +185,10 @@ export const sfx = {
     const now = ctx.currentTime;
     if (now - chainAt > 0.4) chain = 0;
     chainAt = now;
-    tone({ hz: note(76 + Math.min(chain, 14)), duty: 0.125, dur: 0.07, vol: 0.14 });
+    // Capped at eight and quieter than it was. Steady income never resets the chain, so this used
+    // to park a thin chirp fourteen semitones up and sit there permanently — the sound that makes
+    // someone reach for the mute key.
+    tone({ hz: note(74 + Math.min(chain, 8)), duty: 0.125, dur: 0.045, vol: 0.1 });
     chain++;
   },
   spend() { tone({ hz: note(64), duty: 0.25, dur: 0.06, vol: 0.13 }); },
@@ -248,10 +256,24 @@ export const sfx = {
     noise({ dur: 0.05, vol: 0.08, filter: 600 });
   },
 
+  /** Something is loose behind the line. Low, close, and nothing else in the game sounds like it. */
+  behind() {
+    tone({ hz: note(40), type: 'tri', dur: 0.7, vol: 0.45 });
+    tone({ hz: note(47), duty: 0.5, dur: 0.22, vol: 0.12, slideTo: note(43), steps: 4 });
+    noise({ at: 0.12, dur: 0.3, vol: 0.1, filter: 260 });
+  },
+
   reserve() { if (throttled('reserve', 900))
                 tone({ hz: note(59), duty: 0.125, dur: 0.06, vol: 0.1 }); },
 
-  dusk() { tone({ hz: note(52), type: 'tri', dur: 0.8, vol: 0.4 }); music.setNight(true); },
+  dusk() {
+    // the most important recurring beat in the game, and it used to be one long beep
+    tone({ hz: note(52), type: 'tri', dur: 0.5, vol: 0.4 });
+    tone({ hz: note(48), type: 'tri', dur: 0.5, vol: 0.4, at: 0.26 });
+    tone({ hz: note(45), type: 'tri', dur: 1.0, vol: 0.45, at: 0.52 });
+    noise({ at: 0.5, dur: 0.5, vol: 0.08, filter: 400 });
+    music.setNight(true);
+  },
   dawn() {
     for (let i = 0; i < 4; i++)
       tone({ hz: note(64 + [0, 4, 7, 12][i]), duty: 0.5, dur: 0.14, vol: 0.14, at: i * 0.09 });
@@ -310,7 +332,12 @@ export const music = {
   hush(s) { if (started) this.hushUntil = ctx.currentTime + s; },
 
   pump() {
-    if (!started || muted) return;
+    if (!started) return;
+    if (muted) {
+      // keep the clock moving while silent, or unmuting spins thousands of catch-up iterations
+      if (this.next < ctx.currentTime) { this.next = ctx.currentTime + 0.1; this.step = 0; }
+      return;
+    }
     const beat = this.night ? 0.3 : 0.36;
     while (this.next < ctx.currentTime + 0.18) {
       const at = this.next - ctx.currentTime;
@@ -336,4 +363,4 @@ export const music = {
 };
 
 export function suspend() { if (started && ctx.state === 'running') ctx.suspend(); }
-export function resume()  { if (started && ctx.state === 'suspended') ctx.resume(); }
+export function resume()  { if (started && ctx.state !== 'running') ctx.resume(); }

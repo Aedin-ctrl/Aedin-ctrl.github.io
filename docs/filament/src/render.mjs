@@ -59,6 +59,7 @@ export function draw(screen, state, t) {
   drawFar(screen, state);
   drawSea(screen, state, t);
   drawGround(screen, state);
+  drawRack(screen, state);
   drawShelters(screen, state);
   drawSites(screen, state);
   drawCable(screen, state, t);
@@ -76,7 +77,23 @@ function drawSky(screen, state, t) {
   screen.rect(0, 0, W, SKY_BOTTOM, code(SKY, 1));
   screen.dither(0, SKY_BOTTOM - 16, W, 10, code(SKY, 1), code(SKY, 2), 0);
   screen.rect(0, SKY_BOTTOM - 6, W, 6, code(SKY, 2));
-  // the one thing up there: a slow drift of cloud, dithered, a few cells tall
+  // Stars. A third of the frame was empty black above the horizon, in a game whose entire premise
+  // is that the sun went out — so the sky was the one place that should have been saying something.
+  // Positions come from the world x, so they hold still while everything else parallaxes.
+  for (let i = 0; i < 80; i++) {
+    // a proper avalanche mix; multiplying the index by one constant and slicing bits off it put
+    // the stars in visible rows, which is worse than no stars
+    let h = (i + 1) * 2654435761 >>> 0;
+    h ^= h >>> 15; h = Math.imul(h, 2246822519) >>> 0;
+    h ^= h >>> 13; h = Math.imul(h, 3266489917) >>> 0;
+    h ^= h >>> 16;
+    const span = W + 96;
+    const sxp = (((h % span) - Math.round(camX * 0.04)) % span + span) % span - 48;
+    const syp = 3 + ((h >>> 11) % (SKY_BOTTOM - 14));
+    screen.px(sxp, syp, code(SKY, (h >>> 7) % 4 === 0 ? 2 : 1));
+  }
+
+  // the one other thing up there: a slow drift of cloud, dithered, a few cells tall
   const drift = Math.round(t * 2) % (W + 120);
   for (let i = 0; i < 3; i++) {
     const x = ((i * 110) - drift + W + 120) % (W + 120) - 60;
@@ -152,6 +169,28 @@ function drawGround(screen, state) {
     }
     if ((wx * 40503 >>> 20) % 61 === 0) screen.px(x, g - 1, code(GROUND, 3));
   }
+}
+
+/** The tool rack. It was an invisible coordinate at x=16, so handing out tools was a place you
+ *  had to be told about rather than one you could see. */
+function drawRack(screen, state) {
+  const x = sx(16);
+  if (x < -20 || x > W + 20) return;
+  const g = Math.round(groundAt(state, 16)) + shakeY;
+  const waiting = state.units.some((u) => u.kind === 'follower');
+  screen.rect(x - 7, g - 14, 15, 2, code(STONE, 2));
+  screen.vline(x - 7, g - 14, 14, code(STONE, 1));
+  screen.vline(x + 7, g - 14, 14, code(STONE, 1));
+  // a bow, a hammer and a crank hanging off it, lit when somebody is waiting for one
+  const pal = waiting ? P_LIVE : P_DEAD;
+  screen.rect(x - 5, g - 12, 1, 6, code(pal, 3));
+  screen.px(x - 4, g - 12, code(pal, 2));
+  screen.px(x - 4, g - 7, code(pal, 2));
+  screen.rect(x - 1, g - 12, 2, 7, code(pal, 3));
+  screen.rect(x - 2, g - 12, 4, 2, code(pal, 2));
+  screen.rect(x + 4, g - 11, 1, 5, code(pal, 3));
+  screen.px(x + 5, g - 11, code(pal, 2));
+  screen.px(x + 3, g - 8, code(pal, 2));
 }
 
 function drawShelters(screen, state) {

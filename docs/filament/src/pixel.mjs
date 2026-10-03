@@ -51,7 +51,7 @@ export class Screen {
     this.luts = new Map();                    // palette set -> Uint32Array
     this.dark = null;                         // the set used where lit === 0
     this.light = null;                        // the set used where lit === 1
-    this.flash = 0;                           // frames of white-out remaining
+    this.flash = 0;     // frames of white-out remaining; set by whoever wants one
   }
 
   /** Both palette sets for this frame. Swapping these IS the day/night transition. */
@@ -170,7 +170,12 @@ export class Screen {
 
   /** Resolve the whole buffer through the two LUTs and hand it to the canvas. */
   present(ctx, imageData) {
-    const out = new Uint32Array(imageData.data.buffer);
+    // hoisted: this was allocating a fresh view over the same buffer sixty times a second
+    if (this._out === undefined || this._outFor !== imageData.data.buffer) {
+      this._out = new Uint32Array(imageData.data.buffer);
+      this._outFor = imageData.data.buffer;
+    }
+    const out = this._out;
     const dark = this.luts.get(this.dark);
     const light = this.luts.get(this.light);
     const fb = this.fb, lit = this.lit;

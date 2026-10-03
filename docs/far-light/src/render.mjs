@@ -37,7 +37,14 @@ export function draw(screen, state, t) {
   drawPlatforms(screen, state);
   if (state.screen >= 10) drawLamp(screen, state, t);
   drawClimber(screen, state, t);
-  particles.draw(screen, sx, shakeY);
+  // Particles need the Y transform too.
+  //
+  // This passed only `sx`, so every particle was drawn at its WORLD y — around 2850 at the base —
+  // into a buffer 240 pixels tall, and clipped. Every landing puff, skid, bounce spark, bonk and
+  // wind-up scuff in the whole climb was discarded; the only ones anyone ever saw were the win
+  // sparks, because the lamp room is the one screen where world y and screen y coincide.
+  // Straight copy-paste from Filament, where the camera is horizontal and passing sx alone is right.
+  particles.draw(screen, sx, sy, shakeY);
   drawLight(screen, state);
 }
 

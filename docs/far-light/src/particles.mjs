@@ -69,12 +69,12 @@ export function update(groundFor) {
  * Particles die through a three-entry palette ramp rather than by fading, because the hardware
  * could not blend and a fade is the loudest tell that something is not really 8-bit.
  */
-export function draw(screen, toScreenX, shakeY) {
+export function draw(screen, toScreenX, toScreenY, shakeY) {
   for (const p of list) {
     const k = KIND[p.kind];
     const age = p.t / p.life;
     const entry = k.entries[Math.min(2, Math.floor(age * 3))];
-    screen.px(toScreenX(p.x), Math.round(p.y) + shakeY, code(k.pal, entry));
+    screen.px(toScreenX(p.x), toScreenY(p.y) + shakeY, code(k.pal, entry));
   }
 }
 

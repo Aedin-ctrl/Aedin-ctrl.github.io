@@ -15,6 +15,7 @@ export function checkInvariants(state) {
 
   say(Number.isInteger(state.tick) && state.tick >= 0, `tick is ${state.tick}`);
   say(Number.isFinite(p.x) && Number.isFinite(p.y), `position is ${p.x},${p.y}`);
+  say(!state.healed, `position went non-finite ${state.healed} time(s) and was healed`);
   say(Number.isFinite(p.vx) && Number.isFinite(p.vy), `velocity is ${p.vx},${p.vy}`);
 
   // inside the shaft, always

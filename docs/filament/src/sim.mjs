@@ -76,7 +76,11 @@ export const RULES = {
   },
 };
 
-const BEACON_X = [760, 1560, 2380];
+// Measured: with beacons at 760/1560/2380 the first one lit at minute 9.7 on average, and 74% of
+// all nights across a run were played with zero beacons lit — so the escalation curve, which keys
+// off beacons, was never experienced. Minutes 2 to 10 of a 13-minute game contained no landmark
+// event at all.
+const BEACON_X = [420, 1100, 2000];
 
 // ---------------------------------------------------------------------------------------------
 // Terrain: a 1-D heightmap, used for drawing and for standing on. The world is a line, so there is
@@ -312,6 +316,22 @@ export function referenceFed(state, tower) {
   return true;
 }
 
+/**
+ * The hit flash.
+ *
+ * `hitT` was set to 11 whenever something struck a tower and then NEVER decremented anywhere in
+ * the project — it is only ever read, by the renderer, which pins the tower's cap to the live
+ * palette while it is non-zero. So one hit from one brute lit that tower's cap permanently AND
+ * killed its reserve flicker, which is the visible twelve-second countdown the whole capacitor
+ * mechanic depends on. The dynamo is hit constantly, so it was pinned from the first night.
+ *
+ * Nothing could catch it: it is pure render state, so no invariant covered it and no headless run
+ * ever looked at it.
+ */
+function stepHitFlash(state) {
+  for (const t of state.towers) if (t.hitT > 0) t.hitT--;
+}
+
 function stepCharge(state, instant = false) {
   // Unfed towers drain in ORDER, nearest the dynamo first, so a blackout propagates outward from
   // the break over a second or so instead of every lamp dying on the same frame. That ordering is
@@ -453,6 +473,7 @@ export function step(state, input = {}) {
   state.tick++;
   if (state.over) { state.overT++; return state; }
 
+  stepHitFlash(state);
   stepPhase(state);
   stepMonarch(state, input);
   stepUnits(state);
@@ -493,7 +514,7 @@ function stepPhase(state) {
         // tonight's length, and dawn becomes either already-past or unreachable.
         state.nightLen = RULES.nightLen[Math.min(state.nightNumber - 1, RULES.nightLen.length - 1)];
         const { budget, mix } = RULES.wave(state.nightsSinceBeacon - 1, state.beaconsLit, state.nightNumber);
-        state.wave = { budget, spent: 0, mix, nextAt: sec(1.5), taught: false };
+        state.wave = { budget, spent: 0, mix, nextAt: sec(1.5), taught: false, taught2: false, behind: false };
         state.events.push({ type: 'night', n: state.nightNumber });
       }
       break;
@@ -536,9 +557,42 @@ function spawnWave(state) {
 
   const frontier = spawnLine(state);
 
+  // ONE burst a night comes up behind the line.
+  //
+  // Everything used to spawn two hundred pixels beyond the furthest tower you had lit, bite the
+  // first bare cable it met there, and be burned off by dawn. The dynamo sits one to two thousand
+  // pixels behind that, so it could not be reached — not as a matter of balance but as a matter of
+  // geometry. Eight different tuning variants over a hundred and sixty-five measured games all
+  // ended the same way: every run won, the dynamo untouched at full health in every single one.
+  //
+  // This is the change the rest of the game was already built for and never got. A break behind
+  // you is what the capacitor countdown is for, what the lineman queue's "breaks nearest the
+  // dynamo first" rule is for, what the descending blackout phrase is for, and what the dynamo's
+  // own archer slots are for. None of it could ever fire while the only threat was out in front.
+  if (!w.behind && state.phaseT > sec(10) && state.nightNumber >= 2) {
+    w.behind = true;
+    const inner = state.segments.filter(
+      (sg) => sg.intact && sg.built >= 1 && Math.max(sg.ax, sg.bx) < frontier - 120);
+    if (inner.length) {
+      const seg = state.rng.pick(inner);
+      const at = (seg.ax + seg.bx) / 2 + state.rng.range(-18, 18);
+      const n = Math.min(2, w.budget - w.spent);
+      for (let i = 0; i < n; i++) state.enemies.push(makeEnemy(state, 'gnaw', at + i * 14));
+      w.spent += n;
+      state.events.push({ type: 'behind', x: at, n });
+      w.nextAt = sec(5);
+      return;
+    }
+  }
+
   // Night 2's lesson is scripted: one gnaw starts right on a bare segment, outside archer range,
   // so the player watches the cable go and learns the thesis in four seconds with no words.
-  if (state.nightNumber === 2 && !w.taught && state.segments.filter((s) => s.intact).length >= 2) {
+  // Night ONE, and only one intact segment needed.
+  //
+  // This used to wait for night two AND require two intact segments — so a first-timer who spent
+  // day one hiring instead of building never saw the one idea the whole game is about. The
+  // starting segment always exists, so now it always lands.
+  if (state.nightNumber === 1 && !w.taught && state.segments.some((s) => s.intact && s.built >= 1)) {
     w.taught = true;
     const bare = [...state.segments].filter((s) => s.built >= 1 && s.intact)
       .sort((a, b) => b.ax - a.ax)[0];
@@ -553,8 +607,8 @@ function spawnWave(state) {
   }
   // Night 3's lesson: the first snatch is guaranteed, so the player meets a thief before one can
   // ever matter.
-  if (state.nightNumber === 3 && !w.taught) {
-    w.taught = true;
+  if (state.nightNumber === 3 && !w.taught2) {
+    w.taught2 = true;
     state.enemies.push(makeEnemy(state, 'snatch', frontier));
     w.spent++;
     w.nextAt = sec(6);

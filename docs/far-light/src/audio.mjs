@@ -39,7 +39,13 @@ function makeNoise(short) {
 }
 
 export function start() {
-  if (started) return;
+  // Re-arm on EVERY gesture, before the started guard.
+  //
+  // WebKit has a third context state beyond running and suspended: 'interrupted', entered on a
+  // phone call, a Siri invocation, an AirPods disconnect. It can only be left from a user gesture,
+  // and visibilitychange is not one — so without this, audio on a phone stops for good the first
+  // time anything interrupts it and no amount of playing brings it back.
+  if (started) { if (ctx && ctx.state !== 'running') ctx.resume(); return; }
   const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
   if (!AC) return;
   ctx = new AC();
@@ -98,7 +104,9 @@ function noise({ at = 0, dur = 0.08, vol = 0.25, short = false, filter = 0 }) {
   }
   s.connect(g); tail.connect(master);
   s.start(t0); s.stop(t0 + dur + 0.02);
-  s.onended = () => { try { s.disconnect(); g.disconnect(); } catch {} };
+  // the filter was left connected to master for the lifetime of the page; almost every effect in
+  // the game is filtered, so that is thousands of orphaned nodes over a long session
+  s.onended = () => { try { s.disconnect(); g.disconnect(); if (tail !== g) tail.disconnect(); } catch {} };
 }
 
 let windGain = null, toneFilter = null;
@@ -215,7 +223,13 @@ export const music = {
   setHeight(h) { this.want = 45 + Math.round(Math.max(0, Math.min(1, h)) * 7); },
 
   pump() {
-    if (!started || muted) return;
+    if (!started) return;
+    if (muted) {
+      // keep the clock moving while silent, or unmuting runs thousands of catch-up iterations in
+      // one interval callback and drops a frame
+      if (this.next < ctx.currentTime) { this.next = ctx.currentTime + 0.1; this.step = 0; }
+      return;
+    }
     const beat = 0.46;
     while (this.next < ctx.currentTime + 0.3) {
       const at = this.next - ctx.currentTime;
@@ -242,5 +256,5 @@ export const music = {
 };
 
 export function suspend() { if (started && ctx.state === 'running') ctx.suspend(); }
-export function resume() { if (started && ctx.state === 'suspended') ctx.resume(); }
+export function resume() { if (started && ctx.state !== 'running') ctx.resume(); }
 export const isMuted = () => muted;

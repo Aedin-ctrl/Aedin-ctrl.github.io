@@ -137,6 +137,9 @@ export function checkInvariants(state) {
     say(Number.isFinite(t.charge) && t.charge >= 0 && t.charge <= RULES.capacitor.hold,
         `tower ${t.id} charge ${t.charge}`);
     say(t.hp <= t.maxHp, `tower ${t.id} hp ${t.hp} over max ${t.maxHp}`);
+    // pure render state, and it was stuck on forever because nothing decremented it
+    say(Number.isFinite(t.hitT) && t.hitT >= 0 && t.hitT <= 12,
+        `tower ${t.id} hit flash stuck at ${t.hitT}`);
     const slots = slotsOf(t);
     say(t.archers.length <= slots, `tower ${t.id} has ${t.archers.length} archers in ${slots} slots`);
     say(new Set(t.archers).size === t.archers.length, `tower ${t.id} lists an archer twice`);

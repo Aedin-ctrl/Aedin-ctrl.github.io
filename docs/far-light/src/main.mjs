@@ -25,6 +25,7 @@ let paused = false;
 let elapsed = 0;
 let hitstop = 0;
 let bestScreen = 0;
+let lastHeightSent = -1;
 
 const held = new Set();
 const buffered = [];
@@ -93,9 +94,15 @@ function frame(now) {
 
 function tick() {
   const presses = buffered.splice(0, buffered.length);
-  for (const k of presses) {
-    if (k === 'mute') audio.toggleMute();
-    if (k === 'pause' && scene === 'play') paused = !paused;
+
+  // Mute and pause are handled HERE, and removed from the queue, before anything can re-deliver
+  // them. They used to be handled above the hitstop gate while the gate pushed the same presses
+  // back on — so holding M through a twenty-frame beacon freeze toggled mute twenty-one times,
+  // wrote localStorage twenty-one times, and left you unable to predict which way it landed.
+  for (let i = presses.length - 1; i >= 0; i--) {
+    const k = presses[i];
+    if (k === 'mute') { audio.toggleMute(); presses.splice(i, 1); }
+    else if (k === 'pause') { if (scene === 'play') paused = !paused; presses.splice(i, 1); }
   }
 
   if (scene === 'title') {
@@ -132,8 +139,14 @@ function tick() {
     }
     return floor;
   });
-  audio.setHeight(heightOf(state));
-  audio.music.setHeight(heightOf(state));
+  // an AudioParam automation every tick is 72,000 scheduled events over twenty minutes for a
+  // value that changes slowly; only send it when it has actually moved
+  const h = Math.round(heightOf(state) * 40) / 40;
+  if (h !== lastHeightSent) {
+    lastHeightSent = h;
+    audio.setHeight(h);
+    audio.music.setHeight(h);
+  }
 
   if (state.over && scene === 'play') { scene = 'over'; audio.music.stop(); audio.sfx.win(); }
 }
@@ -270,9 +283,16 @@ function panel(lines, atBottom = false) {
 }
 
 function fit() {
-  const scale = Math.max(1, Math.min(Math.floor(innerWidth / W), Math.floor((innerHeight - 8) / H)));
-  canvas.style.width = `${W * scale}px`;
-  canvas.style.height = `${H * scale}px`;
+  // Integer scaling has to be integer in DEVICE pixels, not CSS pixels. At a devicePixelRatio of
+  // 1.25 or 1.5 — Windows at 125%, most Android — an integer CSS scale lands on 3.75 or 4.5 device
+  // pixels per source pixel, and `image-rendering: pixelated` then draws alternating 4px and 5px
+  // rows. The whole point of this renderer is that it never does that.
+  const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
+  const maxW = Math.floor((innerWidth * dpr) / W);
+  const maxH = Math.floor(((innerHeight - 8) * dpr) / H);
+  const device = Math.max(1, Math.min(maxW, maxH));
+  canvas.style.width = `${(W * device) / dpr}px`;
+  canvas.style.height = `${(H * device) / dpr}px`;
 }
 addEventListener('resize', fit);
 fit();
