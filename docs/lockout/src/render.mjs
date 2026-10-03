@@ -33,9 +33,29 @@ export function draw(screen, state, view, t) {
 
 // --- the hall ----------------------------------------------------------------------------------
 function drawHall(screen, state, t) {
-  // a high dark room: a band of lighter air near the ceiling, and a run of lockers along the back
-  screen.rect(0, 0, W, 18, code(HALL, 1));
-  screen.dither(0, 18, W, 10, code(HALL, 1), code(HALL, 0), 0);
+  // A high dark room: a lighting rig under the ceiling, a band of lit air beneath it, a run of
+  // lockers along the back wall, and the floor of the hall below the strip. Without all of it the
+  // screen was two thirds flat black with a box floating in the middle of it.
+  // the rig: dark housings with a bright tube under each, and a short dithered throw. Drawn with
+  // bright housings first, they read as a row of flags rather than as lights.
+  screen.rect(0, 0, W, 6, code(FAR, 1));
+  for (let x = 10; x < W; x += 38) {
+    // housing in stone grey, not the indigo of the far-detail palette — drawn in indigo with a
+    // white checkerboard under it, a row of these reads as bunting rather than as lighting
+    screen.rect(x, 1, 18, 5, code(FAR, 3));
+    screen.rect(x + 1, 2, 16, 2, code(BOX, 1));
+    screen.rect(x + 3, 6, 12, 1, code(BOX, 3));
+    screen.dither(x + 3, 7, 12, 3, code(BOX, 1), code(HALL, 1), 0);
+    screen.dither(x + 5, 10, 8, 4, code(HALL, 1), code(HALL, 0), 1);
+  }
+  // the air under the rig, and the far wall of the hall above the lockers
+  screen.dither(0, 15, W, 8, code(HALL, 1), code(HALL, 0), 0);
+  for (let y = 24; y < PISTE_Y - 48; y += 12) {
+    screen.dither(0, y, W, 1, code(HALL, 0), code(HALL, 1), (y / 12) & 1);
+  }
+  // the box hangs from the rig
+  screen.vline(W / 2 - 18, 6, BOX_Y - 6, code(FAR, 2));
+  screen.vline(W / 2 + 18, 6, BOX_Y - 6, code(FAR, 2));
   screen.rect(0, PISTE_Y - 44, W, 44, code(FAR, 1));
   screen.dither(0, PISTE_Y - 48, W, 5, code(HALL, 0), code(FAR, 1), 1);
   // lockers along the back wall, dithered down: at full strength they were a row of bright bars
@@ -59,7 +79,10 @@ function drawPiste(screen, state) {
   for (const dx of [-86, 86]) {
     for (let i = y + 4; i < y + 18; i += 4) screen.vline(W / 2 + dx, i, 2, code(PISTE, 2));
   }
+  // the floor of the hall in front of the strip, so the piste sits ON something
   screen.rect(0, y + 22, W, H - (y + 22), code(HALL, 0));
+  screen.dither(0, y + 22, W, 8, code(PISTE, 1), code(HALL, 0), 1);
+  screen.hline(0, y + 22, W, code(PISTE, 2));
 }
 
 /** Where each fencer stands, in screen x, for the current measure. */

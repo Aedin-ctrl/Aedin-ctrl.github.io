@@ -124,9 +124,13 @@ function tick() {
 
   step(state);
   consume();
+  // the music tightens as either of you approaches five
+  const near = Math.max(state.you.score, state.foe.score) / RULES.target;
+  audio.music.setTension(near);
 
   if (state.over && scene === 'play') {
     scene = 'over';
+    audio.music.stop();
     (state.over === 'win' ? audio.sfx.win
       : state.over === 'lose' ? audio.sfx.lose : audio.sfx.doubleOut)();
   }
@@ -188,6 +192,8 @@ function restart() {
   note = null; noteT = 0;
   fx.shake = 0;
   elapsed = 0;
+  audio.music.reset();
+  audio.music.start();
   audio.sfx.select();
 }
 

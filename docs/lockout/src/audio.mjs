@@ -53,6 +53,7 @@ export function start() {
   started = true;
   if (ctx.state === 'suspended') ctx.resume();
   room();
+  music.start();
 }
 
 export function toggleMute() {
@@ -167,6 +168,57 @@ export const sfx = {
     tone({ hz: note(52), type: 'tri', dur: 1.1, vol: 0.4 });
     tone({ hz: note(51), type: 'tri', dur: 1.1, vol: 0.34 });
     noise({ dur: 0.7, vol: 0.1, filter: 300 });
+  },
+};
+
+// ---------------------------------------------------------------------------------------------
+// Music: a pulse, not a tune.
+//
+// Both fencers are waiting for each other to commit, so the soundtrack is a heartbeat rather than
+// a melody — and it TIGHTENS as the bout does. The tempo is set by how close either of you is to
+// five, so a bout at 4-4 is noticeably faster than a bout at 0-0 without a single extra note.
+// ---------------------------------------------------------------------------------------------
+const FIG = [0, 0, 7, 0, 0, 5, 7, 3];
+
+export const music = {
+  timer: null, step: 0, next: 0, tension: 0,
+
+  start() {
+    if (this.timer || !started) return;
+    this.next = ctx.currentTime + 0.15;
+    this.timer = setInterval(() => this.pump(), 45);
+  },
+  stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } },
+  reset() { this.step = 0; this.tension = 0; },
+  /** 0 at nil-nil, 1 when somebody is one touch away. */
+  setTension(t) { this.tension = Math.max(0, Math.min(1, t)); },
+
+  pump() {
+    if (!started) return;
+    if (muted) {
+      if (this.next < ctx.currentTime) { this.next = ctx.currentTime + 0.1; this.step = 0; }
+      return;
+    }
+    const beat = 0.62 - this.tension * 0.2;
+    while (this.next < ctx.currentTime + 0.25) {
+      const at = this.next - ctx.currentTime;
+      if (at >= 0) {
+        const i = this.step % FIG.length;
+        if (i % 2 === 0) {
+          tone({ hz: note(33 + FIG[i]), type: 'tri', at, dur: beat * 0.8,
+                 vol: 0.22 + this.tension * 0.08 });
+        }
+        if (i === 2 || i === 6) {
+          tone({ hz: note(57 + FIG[i]), duty: 0.125, at, dur: beat * 0.35,
+                 vol: 0.035 + this.tension * 0.03 });
+        }
+        if (this.tension > 0.5 && i % 4 === 3) {
+          noise({ at, dur: 0.03, vol: 0.04, filter: 4200 });
+        }
+      }
+      this.next += beat;
+      this.step++;
+    }
   },
 };
 
