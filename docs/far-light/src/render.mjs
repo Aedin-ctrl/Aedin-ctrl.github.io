@@ -4,6 +4,7 @@ import { W, H, code } from './pixel.mjs';
 import { PLATFORMS, SH, SW, WALL, LAMP, SCREEN_COUNT, worldY } from './level.mjs';
 import { RULES, chargeOf } from './sim.mjs';
 import { cosmetic } from './rng.mjs';
+import * as particles from './particles.mjs';
 
 const OUT = 0, WALLP = 1, LEDGE = 2, DETAIL = 3;
 const P_YOU = 4, P_LIGHT = 5, P_IRON = 6, P_ACCENT = 7;
@@ -36,6 +37,7 @@ export function draw(screen, state, t) {
   drawPlatforms(screen, state);
   if (state.screen >= 10) drawLamp(screen, state, t);
   drawClimber(screen, state, t);
+  particles.draw(screen, sx, shakeY);
   drawLight(screen, state);
 }
 

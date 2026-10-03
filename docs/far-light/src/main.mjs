@@ -3,9 +3,11 @@
 import { Screen, W, H, code } from './pixel.mjs';
 import { bandFor, litFor, BASE, DAWN, SETS, validate } from './palette.mjs';
 import { newGame, step, RULES, TPS, chargeOf, heightOf } from './sim.mjs';
+import { PLATFORMS } from './level.mjs';
 import { SCREEN_COUNT } from './level.mjs';
 import { draw, updateCamera, addTrauma, camera } from './render.mjs';
 import * as audio from './audio.mjs';
+import * as particles from './particles.mjs';
 
 const DEV = location.search.includes('dev');
 const canvas = document.getElementById('screen');
@@ -102,25 +104,55 @@ function tick() {
   });
   consumeEvents();
 
-  if (state.p.charging) audio.sfx.winding(chargeOf(state));
+  if (state.p.charging) {
+    audio.sfx.winding(chargeOf(state));
+    // scuffs under the boots as the wind-up builds, faster the fuller it gets
+    if (chargeOf(state) > 0.35 && state.tick % Math.max(2, 7 - Math.floor(chargeOf(state) * 6)) === 0) {
+      particles.scuff(state.p.x, state.p.y + RULES.body.h);
+    }
+  }
+  particles.update((x) => {
+    // particles rest on whatever ledge is under them, so dust settles instead of falling forever
+    let floor = 12 * 240;
+    for (const b of PLATFORMS) {
+      if (x + 1 > b.x && x < b.x + b.w && b.y < floor && b.y > state.p.y - 40) floor = b.y;
+    }
+    return floor;
+  });
   audio.setHeight(heightOf(state));
+  audio.music.setHeight(heightOf(state));
 
-  if (state.over && scene === 'play') { scene = 'over'; audio.sfx.win(); }
+  if (state.over && scene === 'play') { scene = 'over'; audio.music.stop(); audio.sfx.win(); }
 }
 
 function consumeEvents() {
   for (const e of state.events) {
     switch (e.type) {
       case 'jump': audio.sfx.jump(e.power); break;
-      case 'land': audio.sfx.land(); addTrauma(0.18); break;
-      case 'skid': audio.sfx.skid(); addTrauma(0.3); break;
-      case 'bounce': audio.sfx.bounce(e.speed); addTrauma(0.22); break;
-      case 'bonk': audio.sfx.bonk(); addTrauma(0.4); hitstop = 4; break;
+      case 'land':
+        audio.sfx.land(); addTrauma(0.18);
+        particles.burst(e.x + 4, e.y + RULES.body.h, 3, 'dust', 0.6);
+        break;
+      case 'skid':
+        audio.sfx.skid(); addTrauma(0.3);
+        particles.burst(e.x + 4, e.y + RULES.body.h, 5, 'dust', 0.9);
+        break;
+      case 'bounce':
+        audio.sfx.bounce(e.speed); addTrauma(0.22);
+        particles.burst(e.x + 4, e.y + 6, 3, 'spark', 0.8);
+        break;
+      case 'bonk':
+        audio.sfx.bonk(); addTrauma(0.4); hitstop = 4;
+        particles.burst(e.x + 4, e.y, 5, 'debris', 1.1);
+        break;
       case 'up': audio.sfx.up(e.screen); bestScreen = Math.max(bestScreen, e.screen); break;
       // A fall is the only punishment this game has, so it gets the biggest reaction in it.
       case 'down': audio.sfx.down(e.lost); addTrauma(Math.min(1, 0.35 + e.lost * 0.25));
                    hitstop = Math.min(16, 6 + e.lost * 4); break;
-      case 'win': addTrauma(1); hitstop = 20; break;
+      case 'win':
+        addTrauma(1); hitstop = 20;
+        particles.burst(state.p.x + 4, state.p.y, 14, 'spark', 1.5);
+        break;
     }
   }
   state.events.length = 0;
@@ -128,9 +160,11 @@ function consumeEvents() {
 
 function restart() {
   state = newGame();
+  audio.music.start();
   scene = 'play';
   paused = false; hitstop = 0;
   camera.trauma = 0;
+  particles.clear();
   audio.sfx.select();
 }
 

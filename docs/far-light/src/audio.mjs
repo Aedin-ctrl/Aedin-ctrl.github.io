@@ -51,6 +51,7 @@ export function start() {
   started = true;
   if (ctx.state === 'suspended') ctx.resume();
   wind();
+  music.start();
 }
 
 export function toggleMute() {
@@ -168,6 +169,59 @@ export const sfx = {
     });
   },
   select() { tone({ hz: note(74), duty: 0.25, dur: 0.05, vol: 0.14 }); },
+};
+
+// ---------------------------------------------------------------------------------------------
+// Music: slow, sparse, and it climbs with you.
+//
+// A precision platformer cannot have a busy soundtrack — you are listening for the wind-up, and
+// anything with a beat makes you jump on the beat instead of when you meant to. So this is a long
+// triangle drone with a handful of notes over it, and the only thing that changes as you climb is
+// the ROOT: a tone higher per band. By the lamp room you are a fifth above where you started, and
+// the whole thing has brightened without ever having had a tune to follow.
+// ---------------------------------------------------------------------------------------------
+const FIG = [0, 7, 12, 7, 0, 5, 9, 5, 0, 7, 16, 7, 0, 3, 7, 3];
+
+export const music = {
+  on: false, step: 0, next: 0, timer: null, root: 45, want: 45,
+
+  start() {
+    if (this.timer || !started) return;
+    this.next = ctx.currentTime + 0.2;
+    // the AudioContext clock decides when notes sound; setInterval only decides when we schedule
+    this.timer = setInterval(() => this.pump(), 50);
+    this.on = true;
+  },
+  stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } this.on = false; },
+
+  /** 0 at the base, 1 at the lamp. Shifts the root up seven semitones over the whole climb. */
+  setHeight(h) { this.want = 45 + Math.round(Math.max(0, Math.min(1, h)) * 7); },
+
+  pump() {
+    if (!started || muted) return;
+    const beat = 0.46;
+    while (this.next < ctx.currentTime + 0.3) {
+      const at = this.next - ctx.currentTime;
+      if (at >= 0) {
+        const i = this.step % FIG.length;
+        // the root creeps toward the height rather than jumping, so a long fall lowers the music
+        // audibly but never lurches
+        if (this.step % 4 === 0) this.root += Math.sign(this.want - this.root);
+        if (i % 4 === 0) {
+          tone({ hz: note(this.root - 12), type: 'tri', at, dur: beat * 3.6, vol: 0.26 });
+        }
+        if (i % 2 === 0) {
+          tone({ hz: note(this.root + FIG[i]), duty: 0.125, at, dur: beat * 0.7, vol: 0.055 });
+        }
+        if (i === 6 || i === 14) {
+          tone({ hz: note(this.root + FIG[i] + 12), duty: 0.25, at: at + beat * 0.5,
+                 dur: beat * 0.5, vol: 0.035 });
+        }
+      }
+      this.next += beat;
+      this.step++;
+    }
+  },
 };
 
 export function suspend() { if (started && ctx.state === 'running') ctx.suspend(); }
