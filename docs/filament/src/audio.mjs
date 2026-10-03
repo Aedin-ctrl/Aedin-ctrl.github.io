@@ -243,6 +243,25 @@ export const sfx = {
              noise({ dur: 0.09, vol: 0.14, short: true, filter: 2000 }); },
 
   /** A tower coming back. Pitched up a step per tower, so a relight cascade is a fanfare. */
+  /** A beacon going out. The relight is a rising figure; this is that figure, falling. */
+  beaconLost() {
+    [0, 1, 2].forEach((i) => {
+      tone({ hz: note(64 - i * 7), duty: 0.5, dur: 0.22, vol: 0.18, at: i * 0.13 });
+      tone({ hz: note(40 - i * 7), type: 'tri', dur: 0.3, vol: 0.3, at: i * 0.13 });
+    });
+    noise({ dur: 0.35, vol: 0.16, filter: 420 });
+  },
+
+  /** Your satchel will not hold any more. A soft double knock, not an alarm. */
+  satchelFull() {
+    if (!throttled('satchelFull', 1400)) return;
+    tone({ hz: note(60), duty: 0.125, dur: 0.05, vol: 0.1 });
+    tone({ hz: note(60), duty: 0.125, dur: 0.05, vol: 0.1, at: 0.09 });
+  },
+
+  /** A thief reaching you with nothing to take. */
+  robbedNothing() { noise({ dur: 0.05, vol: 0.07, filter: 600 }); },
+
   relight(step = 0) {
     const base = 67 + Math.min(step, 8) * 2;
     for (let i = 0; i < 3; i++)

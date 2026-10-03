@@ -845,6 +845,11 @@ function gnaw(state, e, i) {
     if (!seg || !seg.intact || seg.built < 1) { e.state = 'walk'; e.target = null; e.bite = 0; return; }
     e.timer++;
     e.bite = e.timer / RULES.gnaw.bite;          // drives the visible fraying
+    // The chew. `audio.sfx.gnawing()` and its 160ms throttle were written for this, `main.mjs`
+    // handles the event, and nothing ever emitted it — so four things could be eating your cable
+    // at once and the game stayed silent until the snap. At night, outside the monarch's lamp, a
+    // gnaw mid-bite is an 8x8 sprite you have to already be looking at; the sound was the answer.
+    state.events.push({ type: 'gnawing', x: e.x });
     if (e.timer >= RULES.gnaw.bite) {
       // idempotent: two gnaws finishing on one segment is one cut, one job, one sound
       seg.intact = false; seg.spliced = false; seg.cutX = e.x;

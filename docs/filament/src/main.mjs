@@ -4,7 +4,7 @@
 import { Screen, W, H, code } from './pixel.mjs';
 import { DAY, NIGHT, LIT, TWILIGHT } from './palette.mjs';
 import { newGame, step, interact, whatIsHere, groundAt, RULES, TPS, satchelCap, isLit } from './sim.mjs';
-import { draw, updateCamera, addTrauma, camera } from './render.mjs';
+import { draw, updateCamera, addTrauma, camera, toolBox } from './render.mjs';
 import * as audio from './audio.mjs';
 import * as particles from './particles.mjs';
 import { CREW } from './sprites.mjs';
@@ -58,7 +58,7 @@ addEventListener('keyup', (e) => {
 });
 
 // a key held when the window loses focus never sends keyup, and the lineman walks west forever
-addEventListener('blur', () => held.clear());
+addEventListener('blur', () => { held.clear(); touchDir = 0; });
 document.addEventListener('visibilitychange', () => {
   // Pause while hidden, and — this is the part that was missing — UNPAUSE on the way back. It used
   // to set `paused` and never clear it, so a tab you came back to was frozen for good. The escape
@@ -84,13 +84,19 @@ canvas.addEventListener('pointerdown', (e) => {
   const p = pointerAt(e.clientX);
   const q = pointerAt0(e.clientY);
   if (scene !== 'play') { buffered.push('act'); return; }
-  // The top strip changes the tool.
+  // Tapping the tool indicator changes the tool — the thing that SHOWS your tool is the thing you
+  // press to change it, and the renderer says where that is.
   //
-  // Touch had no way to cycle roles at all, so on a phone every single person you hired became an
-  // archer — you were stuck with the two starting winders for income and the one starting lineman
-  // doing every build, every cable and every night repair across the whole coast. The hint under
-  // the canvas says "up changes tools", which on a phone was simply a lie.
-  if (q < 0.14) { buffered.push('role'); return; }
+  // This used to be the top 14% of the canvas: a magic fraction unrelated to anything drawn, and
+  // the price prompt is printed at y=6, inside it. So the only UI the game draws was a button that
+  // did the wrong thing — tapping `TOWER 12` cycled your tool instead of building the tower, and
+  // tapping the tool indicator walked you left.
+  const tb = toolBox();
+  const px = p * W, py = q * H;
+  if (px >= tb.x && px < tb.x + tb.w && py >= tb.y && py < tb.y + tb.h) {
+    buffered.push('role');
+    return;
+  }
   if (p < 0.35) touchDir = -1;
   else if (p > 0.65) touchDir = 1;
   else buffered.push('act');
@@ -215,6 +221,24 @@ function consumeEvents() {
       case 'hit': audio.sfx.hit(); break;
       case 'enemy-died': audio.sfx.died(); particles.burst(e.x, groundAt(state, e.x) - 6, 3, 'mote'); break;
       case 'gnawing': audio.sfx.gnawing(); break;
+
+      // Emitted by the simulation and, until now, listened to by nobody.
+      //
+      // `beacon-lost` is the one that matters: a brute putting out a beacon you relit happens
+      // roughly once a night — 170 times across 202 nights of reference play — and every one of
+      // them was silent. Lighting a beacon gets a shake and a freeze; losing one got nothing.
+      case 'beacon-lost':
+        audio.sfx.beaconLost();
+        if (!CALM.matches) addTrauma(0.7);
+        toastFor('a beacon has gone out');
+        break;
+      case 'satchel-full':
+        audio.sfx.satchelFull();
+        toastFor('satchel full');
+        break;
+      case 'robbed-nothing':
+        audio.sfx.robbedNothing();
+        break;
 
       case 'cable-cut':
         audio.sfx.cut();

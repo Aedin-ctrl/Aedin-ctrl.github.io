@@ -44,6 +44,17 @@ export function addTrauma(n) { camera.trauma = Math.min(1, camera.trauma + n); }
 let camX = 0, shakeX = 0, shakeY = 0;
 const sx = (worldX) => Math.round(worldX - camX) + shakeX;
 export const toScreenX = (worldX) => sx(worldX);
+
+/**
+ * Where the tool indicator is drawn, so the touch handler can ask instead of guessing.
+ *
+ * The tool was cycled by tapping the top 14% of the canvas — a magic fraction with no relationship
+ * to anything on screen — while the indicator itself is drawn at the BOTTOM. So on a phone the one
+ * piece of UI the game draws was in one place and the button that changes it was in another, and
+ * worse: the price prompt is drawn at y=6, inside that top strip, so tapping the thing that says
+ * `TOWER 12` cycled your tool instead of building the tower.
+ */
+export const toolBox = () => ({ x: 2, y: H - 26, w: 54, h: 24 });
 export const shakeOffsetY = () => shakeY;
 
 export function draw(screen, state, t) {

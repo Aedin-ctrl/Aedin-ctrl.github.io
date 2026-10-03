@@ -19,6 +19,17 @@ let camY = 0, shakeX = 0, shakeY = 0;
  */
 export function updateCamera(state) {
   camera.y = (SCREEN_COUNT - 1 - state.screen) * SH;
+}
+
+/**
+ * Decay the shake. Called once per TICK, never per rendered frame.
+ *
+ * It used to decay inside `updateCamera`, which `render()` calls — so it ran once per rAF rather
+ * than once per tick, and the fall shake, which is the game's biggest reaction, lasted half as long
+ * at 120Hz and a third as long at 144Hz. Measured: 34 sim ticks to decay at 60Hz, 0 at an unlocked
+ * frame rate. Every other thing in this game is on the tick clock; this was the one that was not.
+ */
+export function decayTrauma() {
   camera.trauma = Math.max(0, camera.trauma - 0.03);
 }
 export const addTrauma = (n) => { camera.trauma = Math.min(1, camera.trauma + n); };
@@ -26,11 +37,22 @@ export const addTrauma = (n) => { camera.trauma = Math.min(1, camera.trauma + n)
 const sy = (worldYv) => Math.round(worldYv - camY) + shakeY;
 const sx = (x) => Math.round(x) + shakeX;
 
-export function draw(screen, state, t) {
-  camY = camera.y;
+/**
+ * The shake offset, recomputed once per tick.
+ *
+ * These two draws came off the `cosmetic` stream inside `draw()`, i.e. once per rendered frame —
+ * two per tick at 60Hz and nearly five at 144Hz. The argument for a separate cosmetic stream is
+ * that visual juice can never change the game or a replay; that argument only held because no tool
+ * imports this file.
+ */
+export function shakeTick() {
   const amp = camera.trauma * camera.trauma;
   shakeX = Math.round(amp * 3 * (cosmetic.next() * 2 - 1));
   shakeY = Math.round(amp * 3 * (cosmetic.next() * 2 - 1));
+}
+
+export function draw(screen, state, t) {
+  camY = camera.y;
 
   screen.clear(code(OUT, 0));
   drawShaft(screen, state, t);
@@ -44,7 +66,10 @@ export function draw(screen, state, t) {
   // wind-up scuff in the whole climb was discarded; the only ones anyone ever saw were the win
   // sparks, because the lamp room is the one screen where world y and screen y coincide.
   // Straight copy-paste from Filament, where the camera is horizontal and passing sx alone is right.
-  particles.draw(screen, sx, sy, shakeY);
+  // `sy` already folds the shake in, and `particles.draw` added the fourth argument on top of it,
+  // so dust and sparks slid vertically against the ledges they are supposed to be sitting on during
+  // every landing.
+  particles.draw(screen, sx, sy, 0);
   drawLight(screen, state);
 }
 

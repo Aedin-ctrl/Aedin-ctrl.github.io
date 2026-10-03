@@ -5,7 +5,7 @@ import { bandFor, litFor, BASE, DAWN, SETS, validate } from './palette.mjs';
 import { newGame, step, RULES, TPS, chargeOf, heightOf } from './sim.mjs';
 import { PLATFORMS } from './level.mjs';
 import { SCREEN_COUNT } from './level.mjs';
-import { draw, updateCamera, addTrauma, camera } from './render.mjs';
+import { draw, updateCamera, decayTrauma, shakeTick, addTrauma, camera } from './render.mjs';
 import * as audio from './audio.mjs';
 import * as particles from './particles.mjs';
 
@@ -139,6 +139,11 @@ function frame(now) {
 }
 
 function tick() {
+  // The shake lives on the tick clock like everything else in this game. Decayed inside the render
+  // path it ran once per frame, so the fall — the biggest reaction the game has — was half as long
+  // on a 120Hz display and a third as long at 144.
+  decayTrauma();
+  shakeTick();
   const presses = buffered.splice(0, buffered.length);
 
   // Mute and pause are handled HERE, and removed from the queue, before anything can re-deliver
@@ -235,10 +240,18 @@ function consumeEvents() {
 function restart() {
   state = newGame();
   audio.music.start();
+  // Reset, or a second climb opens a fifth too high and slides back down over thirteen seconds —
+  // which is what `music.reset()` was written for, and nothing had ever called it.
+  audio.music.reset();
   scene = 'play';
   paused = false; hitstop = 0;
   camera.trauma = 0;
   particles.clear();
+  // and let go of whatever was being held. Press R while holding space — or hold space on the
+  // ending screen, which says `press space` — and the new run began already wound to full.
+  held.clear();
+  pointers.clear();
+  touch = readTouch();
   audio.sfx.select();
 }
 
@@ -270,7 +283,11 @@ function drawHud() {
     // unreached marks use entry 3 of the structure palette, which is the lightest thing the band
     // has — entry 1 is black at the base, where the player most needs to see how far there is to go
     screen.rect(W - 8, y, reached ? 5 : 3, 2,
-      reached ? code(5, 3) : code(3, everReached ? 3 : 2));
+      // Entry 3 for BOTH, which is what the comment above has always said and the code did not:
+      // never-reached marks were drawn in entry 2, and at the base of the tower that is the same
+      // dark blue as the mortar dither behind them. The altimeter was invisible in exactly the
+      // place "how far is there to go" is worth knowing.
+      reached ? code(5, 3) : code(3, 3));
   }
 }
 
@@ -367,6 +384,10 @@ if (DEV) {
     get state() { return state; },
     warp: (s) => { state.p.y = (SCREEN_COUNT - 1 - s) * 240 + 180; state.p.vy = 0; },
     pause: (v = true) => { paused = v; },
+    // the camera, so a test can check that the shake decays on the TICK clock rather than on the
+    // frame clock — which it did not, and which no tool could see because none import render.mjs
+    camera,
+    shake: (n) => addTrauma(n),
   };
 }
 
