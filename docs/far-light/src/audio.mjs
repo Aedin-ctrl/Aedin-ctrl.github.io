@@ -101,7 +101,7 @@ function noise({ at = 0, dur = 0.08, vol = 0.25, short = false, filter = 0 }) {
   s.onended = () => { try { s.disconnect(); g.disconnect(); } catch {} };
 }
 
-let windGain = null;
+let windGain = null, toneFilter = null;
 function wind() {
   const s = ctx.createBufferSource();
   s.buffer = noiseBuf; s.loop = true;
@@ -112,15 +112,17 @@ function wind() {
   s.connect(f); f.connect(g); g.connect(master);
   s.start();
   windGain = g;
+  toneFilter = f;          // this was never assigned, so the wind never brightened as you climbed
 }
 /** The wind gets louder as you climb. It is the only thing telling you how high you are. */
+let lastHeight = 0;
 export function setHeight(h) {
+  lastHeight = h;
   if (windGain && started) {
     windGain.gain.setTargetAtTime(0.012 + h * 0.05, ctx.currentTime, 1.2);
     if (toneFilter) toneFilter.frequency.setTargetAtTime(380 + h * 900, ctx.currentTime, 1.2);
   }
 }
-let toneFilter = null;
 
 let lastStep = -1;
 export const sfx = {
@@ -133,7 +135,13 @@ export const sfx = {
     const step = Math.min(7, Math.floor(c * 8));
     if (step === lastStep) return;
     lastStep = step;
-    tone({ hz: note(52 + step * 2), duty: 0.125, dur: 0.05, vol: 0.09 });
+    // A whole-tone staircase has no leading tone and no tonic, so nothing in it ever sounds like
+    // ARRIVAL — which is precisely what the top of a wind-up has to sound like. These are scale
+    // degrees instead, and the last step leaps a fourth onto the octave and changes duty, so full
+    // charge announces itself and you learn to wait for it.
+    const DEGREES = [0, 2, 4, 5, 7, 9, 11, 16];
+    tone({ hz: note(52 + DEGREES[step]), duty: step === 7 ? 0.5 : 0.125,
+           dur: step === 7 ? 0.11 : 0.05, vol: step === 7 ? 0.13 : 0.09 });
   },
   jump(power) {
     lastStep = -1;
@@ -160,6 +168,13 @@ export const sfx = {
     for (let i = 0; i < Math.min(lost, 5); i++)
       tone({ hz: note(56 - i * 3), type: 'tri', dur: 0.18, vol: 0.34, at: i * 0.11 });
     noise({ dur: 0.25, vol: 0.14, filter: 300 });
+    // the wind drops away under a fall, so the descent lands in a hole rather than on a bed
+    if (windGain && started) {
+      const now = ctx.currentTime;
+      windGain.gain.cancelScheduledValues(now);
+      windGain.gain.setTargetAtTime(0.002, now, 0.08);
+      windGain.gain.setTargetAtTime(0.012 + lastHeight * 0.05, now + 0.9, 0.7);
+    }
   },
   win() {
     const tune = [60, 67, 72, 76, 79, 84];
@@ -193,6 +208,8 @@ export const music = {
     this.on = true;
   },
   stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } this.on = false; },
+  /** Reset, or a second climb opens a fifth too high and slides back down over thirteen seconds. */
+  reset() { this.root = 45; this.want = 45; this.step = 0; },
 
   /** 0 at the base, 1 at the lamp. Shifts the root up seven semitones over the whole climb. */
   setHeight(h) { this.want = 45 + Math.round(Math.max(0, Math.min(1, h)) * 7); },

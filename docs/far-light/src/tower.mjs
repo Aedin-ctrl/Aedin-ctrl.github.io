@@ -4,7 +4,7 @@
 // so the climb is proven possible rather than hoped to be. Re-run the tool to rebuild it; run it
 // with --check to re-prove the committed one.
 //
-// seed 7 · 103 ledges · 88 on the route · 0 unmakeable steps
+// seed 7 · 106 ledges · 91 on the route · 0 unmakeable steps
 
 export const TOWER = [
   { x: 10, y: 2854, w: 236, h: 8, spine: true },
@@ -110,4 +110,7 @@ export const TOWER = [
   { x: 150, y: 248, w: 44, h: 6, spine: true },
   { x: 90, y: 214, w: 49, h: 6, spine: true },
   { x: 40, y: 180, w: 31, h: 6, spine: true },
+  { x: 10, y: 146, w: 33, h: 6, spine: true },
+  { x: 60, y: 112, w: 33, h: 6, spine: true },
+  { x: 120, y: 78, w: 31, h: 6, spine: true },
 ];

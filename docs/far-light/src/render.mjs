@@ -106,14 +106,19 @@ function drawPlatforms(screen, state) {
 }
 
 function drawLamp(screen, state, t) {
-  const x = sx(LAMP.x), y = sy(LAMP.y);
-  screen.rect(x - 22, y + 18, 44, 8, code(P_IRON, 2));
-  screen.rect(x - 16, y - 10, 32, 30, code(P_LIGHT, 1));
-  screen.rect(x - 12, y - 6, 24, 22, code(P_LIGHT, 2));
-  screen.rect(x - 7, y - 1, 14, 12, code(P_LIGHT, 3));
-  // the beam, out through the window, flickering on the 8px grid
+  // sits above head height, so the climber stands UNDER the lamp rather than inside it
+  const x = sx(LAMP.x), y = sy(LAMP.y) - 16;
+  screen.rect(x - 4, y + 26, 8, 12, code(P_IRON, 2));          // the column it stands on
+  screen.rect(x - 22, y + 24, 44, 4, code(P_IRON, 3));
+  screen.rect(x - 16, y - 10, 32, 32, code(P_LIGHT, 1));
+  screen.rect(x - 12, y - 6, 24, 24, code(P_LIGHT, 2));
+  screen.rect(x - 7, y - 1, 14, 14, code(P_LIGHT, 3));
+  screen.rect(x - 18, y - 12, 36, 2, code(P_IRON, 3));
+  screen.rect(x - 18, y + 22, 36, 2, code(P_IRON, 3));
+  // the beam, out of both sides of the gallery, flickering on the 8px grid
   const phase = Math.floor(t * 10) % 2;
-  screen.dither(x + 20, y - 4, SW - (x + 20), 16, code(P_LIGHT, 3), code(P_LIGHT, 2), phase);
+  screen.dither(x + 18, y - 2, SW - (x + 18), 16, code(P_LIGHT, 3), code(P_LIGHT, 2), phase);
+  screen.dither(0, y - 2, Math.max(0, x - 18), 16, code(P_LIGHT, 2), code(P_LIGHT, 3), phase);
 }
 
 function drawClimber(screen, state, t) {
@@ -139,13 +144,28 @@ function drawClimber(screen, state, t) {
     screen.vline(x + 6, top + h - 2, 2, code(P_YOU, 1));
   }
 
-  // the lamp they carry: the only light in the lower tower, and it leans the way they will go
-  const lx = x + (p.lean || p.face) * 5 + 3;
+  // The lamp leans the way the jump will ACTUALLY go.
+  //
+  // It used to fall back to `face` when lean was zero — so holding the button with no arrow down
+  // showed a lamp tilted sideways while the jump went straight up. Not a missing readout: a wrong
+  // one, and the kind that makes a player feel cheated on their first few jumps.
+  const lx = x + (p.charging ? p.lean : p.face) * 5 + 3;
   screen.rect(lx, top - 4, 3, 3, code(P_LIGHT, 3));
 
-  // winding up throws a few sparks off the feet, which is the one tell that the charge is full
-  if (p.charging && c > 0.92 && (state.tick % 4 === 0)) {
-    screen.px(x + cosmetic.int(-2, 9), y + RULES.body.h - cosmetic.int(0, 3), code(P_LIGHT, 3));
+  // A full charge has to be visible as well as audible: the staircase of tones is the real meter,
+  // and 'm mutes' is advertised on the title screen, so a muted player would otherwise be aiming
+  // with nothing but a four-pixel crouch.
+  if (p.charging && c > 0.9) {
+    const on = (state.tick % 6) < 3;
+    if (on) {
+      screen.hline(x, top - 1, 8, code(P_LIGHT, 3));
+      screen.hline(x, top + h, 8, code(P_LIGHT, 3));
+      screen.vline(x - 1, top, h, code(P_LIGHT, 3));
+      screen.vline(x + 8, top, h, code(P_LIGHT, 3));
+    }
+    if (state.tick % 3 === 0) {
+      screen.px(x + cosmetic.int(-2, 9), y + RULES.body.h - cosmetic.int(0, 3), code(P_LIGHT, 3));
+    }
   }
 }
 

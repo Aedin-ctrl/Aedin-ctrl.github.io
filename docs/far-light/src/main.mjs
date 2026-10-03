@@ -10,6 +10,9 @@ import * as audio from './audio.mjs';
 import * as particles from './particles.mjs';
 
 const DEV = location.search.includes('dev');
+// Shake and hitstop are the only things here that could trouble anyone; both are gated rather than
+// the whole game being flattened, so a reduced-motion player still gets the climb.
+const CALM = matchMedia('(prefers-reduced-motion: reduce)');
 const canvas = document.getElementById('screen');
 const ctx = canvas.getContext('2d', { alpha: false });
 ctx.imageSmoothingEnabled = false;
@@ -56,7 +59,17 @@ canvas.addEventListener('pointerdown', (e) => {
   audio.start();
   if (scene !== 'play') { buffered.push('hold'); return; }
   const p = touchAt(e.clientX);
-  touch = { left: p < 0.33, right: p > 0.67, hold: true };
+  // The outer thirds WALK; only the middle winds up.
+  //
+  // This used to set hold:true for every touch, so on a phone you could jump and never walk — and
+  // ten of the eighty-eight steps need the climber standing at a particular end of a ledge first.
+  // The game was quietly uncompletable on exactly the device most people would open it on.
+  touch = { left: p < 0.33, right: p > 0.67, hold: p >= 0.33 && p <= 0.67 };
+});
+canvas.addEventListener('pointermove', (e) => {
+  if (!e.buttons || scene !== 'play') return;
+  const p = touchAt(e.clientX);
+  touch = { left: p < 0.33, right: p > 0.67, hold: p >= 0.33 && p <= 0.67 };
 });
 addEventListener('pointerup', () => { touch = { left: false, right: false, hold: false }; });
 addEventListener('pointercancel', () => { touch = { left: false, right: false, hold: false }; });
@@ -126,31 +139,33 @@ function tick() {
 }
 
 function consumeEvents() {
+  const shake = (n) => { if (!CALM.matches) addTrauma(n); };
+  const freeze = (n) => { if (!CALM.matches) hitstop = n; };
   for (const e of state.events) {
     switch (e.type) {
       case 'jump': audio.sfx.jump(e.power); break;
       case 'land':
-        audio.sfx.land(); addTrauma(0.18);
+        audio.sfx.land(); shake(0.18);
         particles.burst(e.x + 4, e.y + RULES.body.h, 3, 'dust', 0.6);
         break;
       case 'skid':
-        audio.sfx.skid(); addTrauma(0.3);
+        audio.sfx.skid(); shake(0.3);
         particles.burst(e.x + 4, e.y + RULES.body.h, 5, 'dust', 0.9);
         break;
       case 'bounce':
-        audio.sfx.bounce(e.speed); addTrauma(0.22);
+        audio.sfx.bounce(e.speed); shake(0.22);
         particles.burst(e.x + 4, e.y + 6, 3, 'spark', 0.8);
         break;
       case 'bonk':
-        audio.sfx.bonk(); addTrauma(0.4); hitstop = 4;
+        audio.sfx.bonk(); shake(0.4); freeze(4);
         particles.burst(e.x + 4, e.y, 5, 'debris', 1.1);
         break;
       case 'up': audio.sfx.up(e.screen); bestScreen = Math.max(bestScreen, e.screen); break;
       // A fall is the only punishment this game has, so it gets the biggest reaction in it.
-      case 'down': audio.sfx.down(e.lost); addTrauma(Math.min(1, 0.35 + e.lost * 0.25));
-                   hitstop = Math.min(16, 6 + e.lost * 4); break;
+      case 'down': audio.sfx.down(e.lost); shake(Math.min(1, 0.35 + e.lost * 0.25));
+                   freeze(Math.min(16, 6 + e.lost * 4)); break;
       case 'win':
-        addTrauma(1); hitstop = 20;
+        shake(1); freeze(20);
         particles.burst(state.p.x + 4, state.p.y, 14, 'spark', 1.5);
         break;
     }
@@ -193,8 +208,10 @@ function drawHud() {
     const y = H - 14 - i * 7;
     const reached = i <= state.screen;
     const everReached = i <= bestScreen;
+    // unreached marks use entry 3 of the structure palette, which is the lightest thing the band
+    // has — entry 1 is black at the base, where the player most needs to see how far there is to go
     screen.rect(W - 8, y, reached ? 5 : 3, 2,
-      code(reached ? 5 : 3, reached ? 3 : (everReached ? 2 : 1)));
+      reached ? code(5, 3) : code(3, everReached ? 3 : 2));
   }
 }
 
@@ -216,25 +233,35 @@ function drawTitle() {
   screen.dither(0, 42, 112, 10, code(5, 2), code(5, 3), phase);
   screen.lamp(128, 48, 74);
 
-  screen.clearLit(0, 70, W, 50);
+  // clearLit only rotates the palette back; it does not erase. Without a solid band behind it the
+  // tower drew straight through the prose and 'SOMETHING OUT THERE' read as 'SOMETHING OOT THERE'.
+  screen.clearLit(0, 70, W, 46);
+  screen.rect(0, 70, W, 46, code(0, 0));
   screen.centre(78, 'THE FAR LIGHT', code(5, 3));
   screen.centre(96, 'something out there', code(3, 3));
   screen.centre(106, 'answered. go and see.', code(3, 3));
 
   screen.clearLit(0, 196, W, 44);
+  screen.rect(0, 196, W, 42, code(0, 0));
   if (Math.floor(elapsed * 2) % 2) screen.centre(202, 'hold space to wind up', code(5, 3));
   screen.centre(218, 'lean with the arrows', code(3, 3));
   screen.centre(228, 'let go to jump', code(3, 3));
 }
 
 function drawOver() {
-  panel(['you came up out of the dark', '', 'and the light on the water',
-         'was closer than it looked', '', 'press space']);
+  const mins = Math.floor(state.tick / TPS / 60);
+  const secs = Math.floor((state.tick / TPS) % 60);
+  panel(['you came up out of the dark', 'and the light on the water',
+         'was closer than it looked', '',
+         `${state.jumps} jumps  ${state.falls} falls  ${mins}:${String(secs).padStart(2, '0')}`,
+         'press space'], true);
 }
 
-function panel(lines) {
+function panel(lines, atBottom = false) {
   const h = lines.length * 10 + 16;
-  const y = Math.round((H - h) / 2);
+  // the ending sits low, so the thing you climbed eighty-eight ledges to see is not covered by a
+  // box of text congratulating you on seeing it
+  const y = atBottom ? H - h - 14 : Math.round((H - h) / 2);
   screen.clearLit(8, y, W - 16, h);
   screen.rect(8, y, W - 16, h, code(0, 0));
   screen.hline(8, y, W - 16, code(3, 2));

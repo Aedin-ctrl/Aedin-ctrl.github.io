@@ -81,16 +81,23 @@ export const HIGH = band('high', C.indigo,
   [C.indigo, C.slate, C.grey],
   [C.rose, C.pink, C.shell]);
 
-/** The lamp room, at dawn. */
-export const DAWN = band('dawn', C.slate,
-  [C.steel, C.blue, C.sky],
+/**
+ * The lamp room, at dawn.
+ *
+ * This was mid-grey walls, mid-grey ledges, mid-grey detail and a night-blue window — four of the
+ * eight sub-palettes resolving to the same ramp, so the payoff of a twelve-screen climb was a flat
+ * grey card with a cold window in it. The interior is now a warm dark, the stone is pale against
+ * it, and what you see through the glass is the sunrise you climbed up here to look at.
+ */
+export const DAWN = band('dawn', C.umber,
+  [C.salmon, C.peach, C.cream],
   [C.slate, C.grey, C.pale],
   [C.grey, C.pale, C.white],
-  [C.slate, C.grey, C.pale],
+  [C.brass, C.sand, C.pale],
   [C.umber, C.gold, C.cream],
   [C.gold, C.cream, C.white],
   [C.slate, C.grey, C.pale],
-  [C.salmon, C.peach, C.shell]);
+  [C.rose, C.salmon, C.peach]);
 
 /** Inside a lamp pool, whatever the band: warmer and a step brighter. */
 export const LIT = band('lit', C.indigo,
