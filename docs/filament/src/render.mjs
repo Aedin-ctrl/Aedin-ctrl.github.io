@@ -12,6 +12,7 @@ import { W, H, code } from './pixel.mjs';
 import { RULES, groundAt, isLit, towerLight, satchelCap, segmentAt, TPS } from './sim.mjs';
 import { cosmetic } from './rng.mjs';
 import * as S from './sprites.mjs';
+import * as particles from './particles.mjs';
 
 // sub-palette slots, named so the draws read as intent rather than as numbers
 const SKY = 0, GROUND = 1, SCRUB = 2, STONE = 3;
@@ -42,6 +43,8 @@ export function addTrauma(n) { camera.trauma = Math.min(1, camera.trauma + n); }
 /** Screen x for a world x, with the camera already rounded. */
 let camX = 0, shakeX = 0, shakeY = 0;
 const sx = (worldX) => Math.round(worldX - camX) + shakeX;
+export const toScreenX = (worldX) => sx(worldX);
+export const shakeOffsetY = () => shakeY;
 
 export function draw(screen, state, t) {
   camX = Math.round(camera.x);
@@ -64,6 +67,7 @@ export function draw(screen, state, t) {
   drawEnemies(screen, state, t);
   drawShots(screen, state);
   drawMonarch(screen, state, t);
+  particles.draw(screen, sx, shakeY);
   drawLamps(screen, state);
 }
 
