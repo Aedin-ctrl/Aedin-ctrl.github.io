@@ -34,11 +34,20 @@ const C = {
 const set = (name, backdrop, bg, spr) => ({ name, backdrop, bg, spr });
 
 // bg0 the hall · bg1 the piste · bg2 far detail · bg3 the box and the cards
-// spr0 you · spr1 your opponent · spr2 the red lamp · spr3 the green lamp
+// spr0 and spr1 the cards · spr2 YOU, red · spr3 YOUR OPPONENT, green
+//
+// You and your lamp are the same red and they and their lamp are the same green, so the box reads
+// as a legend for the piste. The fencers used to be ochre and blue against red and green lamps,
+// which meant the one thing the game asks you to do — look up and see who landed — needed a
+// translation step that nothing on screen provided.
 export const HALL = set('hall', C.black,
   [
     [C.black,  C.navy,   C.indigo],
     [C.slate,  C.grey,   C.pale],
+    // NOTE: entry 1 here is black, the same black as the backdrop — which is correct for a dark
+    // hall, but it means anything filled with `code(FAR, 1)` is invisible. Most of the upper half
+    // of this screen used to be drawn that way and simply was not there. The far wall is dithered
+    // out of entry 2 instead; see `drawHall`.
     [C.black,  C.indigo, C.slate],
     [C.slate,  C.grey,   C.pale],
   ],

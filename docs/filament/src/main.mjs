@@ -449,6 +449,16 @@ function fit() {
   // 125%, most Android — an integer CSS scale lands on 3.75 or 4.5 device pixels per source pixel,
   // and `image-rendering: pixelated` then draws alternating 4px and 5px rows. Avoiding exactly
   // that is what this whole renderer is for.
+  // Reserve the instruction line's REAL measured height, not a guess.
+  //
+  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - reserve`, so
+  // whenever rounding the scale down to a whole multiple of 240 happened to leave less than about
+  // 17px of slack, the line printed across the bottom of the game. A height sweep found it at 5 of
+  // 14 window heights, including 728, 740 and 760 — which is to say, on an ordinary laptop. The
+  // line now sits below the canvas and claims its own space, and that space is measured, because
+  // the line wraps to two rows on a narrow phone.
+  const hintEl = document.querySelector('.hint');
+  const reserve = (hintEl ? hintEl.offsetHeight : 0) + 16;
   const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
   const device = Math.max(1, Math.min(
     Math.floor((innerWidth * dpr) / W), Math.floor(((innerHeight - 8) * dpr) / H)));

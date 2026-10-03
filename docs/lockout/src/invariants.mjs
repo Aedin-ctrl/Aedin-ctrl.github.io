@@ -43,8 +43,15 @@ export function checkInvariants(state) {
     // a card is only in play between the reveal and the settle
     say(state.phase === 'choose' ? side.card === null : true,
         `${name} still has a card in play while choosing`);
+    // Being open is a one-exchange state, so it is a boolean and never anything else. If it ever
+    // became a counter that someone forgot to clear, a fencer would be permanently unable to
+    // parry and the game would still look like it was working.
+    say(side.open === true || side.open === false, `${name} open flag is ${side.open}`);
   }
 
+  // both fencers open at once would mean two parries were drawn onto nothing in one exchange,
+  // which `resolve` has no path to
+  say(!(state.you.open && state.foe.open), 'both fencers open at the same time');
   say(['win', 'lose', 'double-out', null].includes(state.over), `over is ${state.over}`);
   say(state.turns <= RULES.maxTurns, `${state.turns} turns, past the limit of ${RULES.maxTurns}`);
   say(state.quiet <= RULES.passive, `${state.quiet} quiet turns, past the passivity rule`);

@@ -50,8 +50,28 @@ export const RULES = {
  * Written as a table because the rules of a bout are a table. `you` and `foe` are 1 if that side
  * scores. `step` is how the measure changes: -1 opens, +1 closes.
  */
-function resolve(mine, theirs, reach, myStep, theirStep) {
+function resolve(mine, theirs, reach, myStep, theirStep, myOpen = false, theirOpen = false) {
   const hit = (c) => c === 'attack' && reach;
+
+  // A parry you are not able to make is not a parry.
+  //
+  // This is the triangle actually closing. Attack beats step and parry beats attack were always
+  // true, but step beat parry only in the design document: parry against step fell through to
+  // "nothing happens", and a wasted turn in this game costs nothing at all — no clock, no attrition,
+  // the discard reshuffles. So parry weakly dominated step from inside distance, which is 82% of
+  // turns, and a player who simply never attacked beat the reference opponent 64% of the time.
+  //
+  // The fix is the one the sport already uses. A parry that closes on nothing has committed your
+  // blade to a line the other fencer was never in, and you cannot find the next one in time. Draw
+  // the parry with a step and the parry AFTER it fails. Step beats parry — one exchange later.
+  if (myOpen && mine === 'parry') mine = 'open';
+  if (theirOpen && theirs === 'parry') theirs = 'open';
+
+  // being open is being open: an attack that reaches you lands
+  if (hit(theirs) && mine === 'open') return { you: 0, foe: 1, step: 0, kind: 'open-you' };
+  if (hit(mine) && theirs === 'open') return { you: 1, foe: 0, step: 0, kind: 'open-foe' };
+  if (mine === 'open') mine = 'parry';            // against anything else it is just a lost turn
+  if (theirs === 'open') theirs = 'parry';
 
   if (mine === 'attack' && theirs === 'attack') {
     return reach
@@ -68,6 +88,14 @@ function resolve(mine, theirs, reach, myStep, theirStep) {
   }
   if (hit(mine) && theirs === 'step') return { you: 1, foe: 0, step: theirStep, kind: 'touch-you' };
   if (hit(theirs) && mine === 'step') return { you: 0, foe: 1, step: myStep, kind: 'touch-foe' };
+
+  // the feint: a parry drawn onto nothing, which leaves that fencer open next exchange
+  if (mine === 'parry' && theirs === 'step') {
+    return { you: 0, foe: 0, step: theirStep, kind: 'drawn-you', opens: 'you' };
+  }
+  if (mine === 'step' && theirs === 'parry') {
+    return { you: 0, foe: 0, step: myStep, kind: 'drawn-foe', opens: 'foe' };
+  }
 
   // nobody landed: steps still move the measure, and two steps in opposite directions cancel
   if (mine === 'step' && theirs === 'step') {
@@ -91,8 +119,9 @@ export function newBout(seed = 1) {
     tick: 0,
     phase: 'choose', phaseT: 0,
     measure: 0,                                    // index into MEASURES
-    you: { score: 0, deck: freshDeck(rng), hand: [], discard: [], card: null, step: 1 },
-    foe: { score: 0, deck: freshDeck(rng), hand: [], discard: [], card: null, step: 1 },
+    // `open` is set by a parry that caught nothing and lasts exactly one exchange
+    you: { score: 0, deck: freshDeck(rng), hand: [], discard: [], card: null, step: 1, open: false },
+    foe: { score: 0, deck: freshDeck(rng), hand: [], discard: [], card: null, step: 1, open: false },
     last: null,
     turns: 0,
     quiet: 0,                                      // turns since anybody scored
@@ -180,7 +209,9 @@ export function play(state, card, dir = 1) {
   you.step = dir;
   you.hand.splice(i, 1);
 
-  state.foe.card = chooseFoe(state);
+  // the decision the tell was drawn from, not a fresh one
+  state.foe.card = state.foe.intent ?? chooseFoe(state);
+  state.foe.intent = null;
   state.foe.step = foeStep(state);
   const fi = state.foe.hand.indexOf(state.foe.card);
   if (fi >= 0) state.foe.hand.splice(fi, 1);
@@ -188,7 +219,11 @@ export function play(state, card, dir = 1) {
   // remember what you did from here, for next time
   const m = state.measure;
   state.memory[m] = state.memory[m] ?? { attack: 0, parry: 0, step: 0 };
-  state.memory[m][card]++;
+  // Decay, so the opponent's read of you is of what you have been doing LATELY. The counters only
+  // ever went up, so three parries in the opening drove its model negative for the rest of the
+  // bout and nothing you did afterwards could move it — which made a fixed strategy safe.
+  for (const k of CARDS) state.memory[m][k] *= 0.82;
+  state.memory[m][card] += 1;
 
   state.turns++;
   state.phase = 'reveal';
@@ -205,19 +240,36 @@ export function step(state) {
 
   switch (state.phase) {
     case 'choose':
-      // the tell: a fencer shifts their weight before they go
-      if (state.tell === null && state.phaseT > sec(0.4)) {
-        const would = chooseFoe(state);
-        state.tell = would === 'attack' && inDistance(state.measure) ? 'weight' : 'none';
-        if (state.tell === 'weight') state.events.push({ type: 'tell' });
+      // The tell: a fencer shifts their weight before they go.
+      //
+      // Three things were wrong with it. It was gated on half a second of thinking, so below 24
+      // ticks you got nothing and at 25 you got an oracle — a cliff, not a tell, and worth 28
+      // points of win rate for the single act of pausing. It was computed from a THROWAWAY call to
+      // chooseFoe, so it was not forecasting the decision the game would actually make, it was
+      // making a different one and being right 97% of the time by luck of the score gaps. And it
+      // was never exercised by any harness, which is how all of that survived 2000 bouts.
+      //
+      // It is now decided once, on the first tick, from the opponent's real committed choice, and
+      // it lies: it shows on most attacks and on some things that are not attacks. A tell you can
+      // trust completely is not a tell, it is a scoreboard.
+      if (state.tell === null) {
+        state.foe.intent = chooseFoe(state);
+        const attacking = state.foe.intent === 'attack' && inDistance(state.measure);
+        const show = attacking ? state.rng.next() < 0.72 : state.rng.next() < 0.16;
+        state.tell = show ? 'weight' : 'none';
+        if (show) state.events.push({ type: 'tell' });
       }
       break;
 
     case 'reveal':
       if (state.phaseT >= RULES.reveal) {
+        const wasOpen = { you: state.you.open, foe: state.foe.open };
         const r = resolve(state.you.card, state.foe.card, inDistance(state.measure),
-                          state.you.step, state.foe.step);
+                          state.you.step, state.foe.step, wasOpen.you, wasOpen.foe);
         state.last = r;
+        // being open lasts one exchange, and a new one can be opened by this exchange
+        state.you.open = r.opens === 'you';
+        state.foe.open = r.opens === 'foe';
         state.measure = Math.max(0, Math.min(MEASURES.length - 1, state.measure + r.step));
         state.you.score += r.you;
         state.foe.score += r.foe;
@@ -225,13 +277,15 @@ export function step(state) {
         state.phaseT = 0;
 
         // the referee's call
+        // The referee only resets the clock when the referee actually intervenes. It used to zero
+        // `quiet` whether or not the `measure < 2` branch fired, so a parry-against-parry stall
+        // from inside distance — exactly where a real referee steps in — reset the count every
+        // four turns and was never called at all.
         state.quiet = (r.you || r.foe) ? 0 : state.quiet + 1;
         if (state.quiet >= RULES.passive && !state.over) {
+          if (state.measure < 2) { state.measure = 2; state.events.push({ type: 'passivity' }); }
+          else { state.events.push({ type: 'passivity' }); }
           state.quiet = 0;
-          if (state.measure < 2) {
-            state.measure = 2;
-            state.events.push({ type: 'passivity' });
-          }
         }
         state.events.push({ type: 'result', ...r, measure: state.measure });
         if (r.you && r.foe) state.events.push({ type: 'double' });

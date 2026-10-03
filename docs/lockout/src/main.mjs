@@ -2,8 +2,8 @@
 
 import { Screen, W, H, code } from './pixel.mjs';
 import { HALL, LIT, SETS, validate } from './palette.mjs';
-import { newBout, step, play, RULES, TPS, MEASURES, inDistance, measureName } from './sim.mjs';
-import { draw, addShake, fx, stances } from './render.mjs';
+import { newBout, step, play, RULES, TPS, inDistance, measureName } from './sim.mjs';
+import { draw, addShake, fx, cardAt } from './render.mjs';
 import * as audio from './audio.mjs';
 
 const DEV = location.search.includes('dev');
@@ -18,8 +18,14 @@ let state = newBout((Math.random() * 1e9) | 0);
 let scene = 'title';
 let elapsed = 0;
 let paused = false;
-const view = { lampYou: 0, lampFoe: 0, selected: 0, dir: 1 };
+// Everything that used to be a wall-clock setTimeout is a tick counter here, so it obeys pause,
+// tab-switching and restart like the rest of the game.
+//   lampFoeIn  counts down to the SECOND lamp of a double — the lockout, drawn rather than simulated
+//   holdFoePip hides the opponent's new score pip for exactly as long, so the scoreboard cannot
+//              announce the double before the second lamp does
+const view = { lampYou: 0, lampFoe: 0, lampFoeIn: 0, holdFoePip: 0, selected: 0, dir: 1 };
 let note = null, noteT = 0;
+let queued = null;      // a card press that arrived while the last touch was still resolving
 
 const buffered = [];
 const KEYMAP = {
@@ -39,8 +45,11 @@ addEventListener('keydown', (e) => {
 }, { passive: false });
 
 document.addEventListener('visibilitychange', () => {
+  // Pause while hidden, and — this is the part that was missing — UNPAUSE on the way back. It used
+  // to set paused and never clear it, so coming back to the tab left the game frozen with only the
+  // letter P to save you, and the title screen does not mention the letter P.
   if (document.hidden) { paused = true; audio.suspend(); }
-  else { audio.resume(); prev = null; acc = 0; }
+  else { paused = false; audio.resume(); prev = null; acc = 0; }
 });
 
 // touch: tap a card to pick it, tap it again to play it; the strip toggles which way you step
@@ -50,18 +59,10 @@ canvas.addEventListener('pointerdown', (e) => {
   const x = ((e.clientX - r.left) / r.width) * W;
   const y = ((e.clientY - r.top) / r.height) * H;
   if (scene !== 'play') { buffered.push('ok'); return; }
-  if (y > H - 60) {
-    const n = state.you.hand.length;
-    const cw = 44, gap = 8;
-    const x0 = (W - (n * cw + (n - 1) * gap)) / 2;
-    for (let i = 0; i < n; i++) {
-      if (x >= x0 + i * (cw + gap) && x <= x0 + i * (cw + gap) + cw) {
-        buffered.push(view.selected === i ? 'ok' : `p${i + 1}`);
-        return;
-      }
-    }
-    return;
-  }
+  // ask the renderer where the cards are, rather than keeping a second, slightly wrong copy
+  const i = cardAt(state.you.hand.length, x, y);
+  if (i >= 0) { buffered.push(`p${i + 1}`); return; }
+  if (y > H - 60) return;                     // the card row, but between two cards: do nothing
   buffered.push(view.dir > 0 ? 'away' : 'toward');
 });
 
@@ -106,20 +107,35 @@ function tick() {
   if (view.lampYou > 0) view.lampYou--;
   if (view.lampFoe > 0) view.lampFoe--;
   if (noteT > 0) noteT--;
+  if (view.holdFoePip > 0) view.holdFoePip--;
+  // the second lamp of a double, on the game's own clock
+  if (view.lampFoeIn > 0 && --view.lampFoeIn === 0) view.lampFoe = Math.round(TPS * 1.3);
 
-  if (state.phase === 'choose') {
-    const n = state.you.hand.length;
-    for (const k of presses) {
-      if (k === 'left') { view.selected = (view.selected + n - 1) % n; audio.sfx.move(); }
-      if (k === 'right') { view.selected = (view.selected + 1) % n; audio.sfx.move(); }
-      if (k === 'toward' && view.dir !== 1) { view.dir = 1; audio.sfx.move(); say('closing'); }
-      if (k === 'away' && view.dir !== -1) { view.dir = -1; audio.sfx.move(); say('opening'); }
-      if (k === 'p1' || k === 'p2' || k === 'p3') {
-        const i = Number(k[1]) - 1;
-        if (i < n) { view.selected = i; commit(); }
-      }
-      if (k === 'ok') commit();
+  const choosing = state.phase === 'choose';
+  const n = state.you.hand.length;
+
+  for (const k of presses) {
+    // Choosing and stepping only move the cursor, so they work in any phase — there is no reason
+    // to ignore them for the 2.3 seconds a touch takes to resolve.
+    if (k === 'left') { view.selected = (view.selected + n - 1) % n; audio.sfx.move(); }
+    if (k === 'right') { view.selected = (view.selected + 1) % n; audio.sfx.move(); }
+    if (k === 'toward' && view.dir !== 1) { view.dir = 1; audio.sfx.move(); say('closing'); }
+    if (k === 'away' && view.dir !== -1) { view.dir = -1; audio.sfx.move(); say('opening'); }
+
+    // Playing a card can only happen on your turn — but a press that lands mid-resolve is now
+    // REMEMBERED rather than thrown away. The whole buffer used to be spliced and dropped every
+    // tick, so for most of every turn the game ate your keystrokes and said nothing.
+    if (k === 'p1' || k === 'p2' || k === 'p3' || k === 'ok') {
+      const i = k === 'ok' ? view.selected : Number(k[1]) - 1;
+      if (choosing) { if (i < n) { view.selected = i; commit(); } }
+      else { queued = i; say('ready'); }
     }
+  }
+
+  if (choosing && queued !== null) {
+    const i = queued;
+    queued = null;
+    if (i < state.you.hand.length) { view.selected = i; commit(); }
   }
 
   step(state);
@@ -148,6 +164,24 @@ function commit() {
 
 function say(text) { note = text; noteT = 90; }
 
+/**
+ * What just happened, in words.
+ *
+ * `resolve()` works out exactly why each exchange ended the way it did and puts it in `kind` — and
+ * the game then showed the player a lamp and a 1.1-second pose and nothing else. You lost a touch
+ * and were never told whether you were parried, out of distance, or simply beaten to it. The
+ * information already existed; it was only being thrown away.
+ */
+const CALL = {
+  'riposte-you': 'parried \u2014 riposte',
+  'riposte-foe': 'parried \u2014 their riposte',
+  'touch-you': 'touch',
+  'touch-foe': 'their touch',
+  'short': 'short \u2014 no distance',
+  'short-both': 'both short',
+  'nothing': 'both parried',
+};
+
 function consume() {
   for (const e of state.events) {
     switch (e.type) {
@@ -159,9 +193,14 @@ function consume() {
         break;
       case 'double':
         audio.sfx.box(true);
-        view.lampYou = TPS * 1.6;
-        // the second lamp follows the first by the lockout, which is the one number everyone knows
-        setTimeout(() => { view.lampFoe = TPS * 1.3; }, 260);
+        view.lampYou = Math.round(TPS * 1.6);
+        // The second lamp follows the first by the lockout — RULES.lockout, which until now was
+        // declared in sim.mjs and then ignored while this line said 260 instead. Real lockout is
+        // 40ms, which is two and a half frames and therefore invisible; the exaggeration is
+        // deliberate and now lives in one place, next to the comment that explains it.
+        view.lampFoeIn = RULES.lockout;
+        // and the scoreboard waits with it, so the pips cannot give the double away first
+        view.holdFoePip = RULES.lockout;
         if (!CALM.matches) addShake(1);
         say('double');
         break;
@@ -171,13 +210,13 @@ function consume() {
         if (!CALM.matches) addShake(0.55);
         break;
       case 'nothing':
-        if (e.kind === 'riposte-you' || e.kind === 'riposte-foe') audio.sfx.parry();
-        else if (e.kind.startsWith('short')) { audio.sfx.short(); say('short'); }
+        if (e.kind.startsWith('short')) audio.sfx.short();
         else audio.sfx.nothing();
         break;
       case 'result':
-        if (state.you.card === 'parry' && state.foe.card === 'attack') audio.sfx.parry();
-        if (state.you.card === 'attack' && state.foe.card === 'parry') audio.sfx.parry();
+        if (CALL[e.kind]) say(CALL[e.kind]);
+        // the sound of steel on steel, whichever side of it you were on
+        if (e.kind === 'riposte-you' || e.kind === 'riposte-foe') audio.sfx.parry();
         break;
     }
   }
@@ -188,8 +227,10 @@ function restart() {
   state = newBout((Math.random() * 1e9) | 0);
   scene = 'play';
   paused = false;
-  view.lampYou = 0; view.lampFoe = 0; view.selected = 0; view.dir = 1;
+  view.lampYou = 0; view.lampFoe = 0; view.lampFoeIn = 0; view.holdFoePip = 0;
+  view.selected = 0; view.dir = 1;
   note = null; noteT = 0;
+  queued = null;
   fx.shake = 0;
   elapsed = 0;
   audio.music.reset();
@@ -221,44 +262,71 @@ function drawChrome() {
   screen.centre(116, m, reach ? code(3, 3) : code(3, 2));
   if (reach) screen.rect((W - w) / 2, 125, w, 1, code(6, 3));
 
-  // which way your step would go, on the other side of the screen from the measure
-  const dirText = view.dir > 0 ? 'step in' : 'step out';
-  screen.text(W - 8 - screen.textWidth(dirText), 116, dirText, code(3, 2));
+  // Which way a STEP would go — shown only when step is the card under the cursor. It used to be
+  // on screen permanently, which reads as though it modifies whatever you play; `view.dir` is in
+  // fact only ever consulted when the card is a step.
+  if (state.you.hand[view.selected] === 'step' && state.phase === 'choose') {
+    const dirText = view.dir > 0 ? 'step in' : 'step out';
+    screen.text(W - 8 - screen.textWidth(dirText), 116, dirText, code(3, 3));
+  }
   if (noteT > 0) screen.centre(100, note, code(6, 3));
 }
 
 function drawTitle() {
   screen.clear(code(0, 0));
-  // the box, big, with both lamps lit — which is the whole idea in one picture
+
+  // The box, with the lockout happening on it, over and over.
+  //
+  // This used to alternate: the red lamp always on, the green one blinking on and off beside it —
+  // under a line of text that says both lights can come on at once. Half the time the picture
+  // contradicted the sentence. And the glow was thrown at a radius of 40 from a box only 50 tall,
+  // so the lit region washed out the left half of the panel and left the right half a flat grey
+  // slab: cold, it read as a draw-order fault rather than as a machine.
+  //
+  // Now it plays the actual event. One lamp, then the other a beat later, then both held, then
+  // dark — which is what a double looks like on a real box, and what the game is named after.
   const y = 54;
+  const CYCLE = 2.6;
+  const at = elapsed % CYCLE;
+  const first = at > 0.35 && at < 2.1;
+  const second = at > 0.72 && at < 2.1;      // the lockout, slowed until the eye can catch it
+
   screen.rect(W / 2 - 62, y, 124, 50, code(3, 1));
   screen.hline(W / 2 - 62, y, 124, code(3, 3));
   screen.hline(W / 2 - 62, y + 49, 124, code(3, 2));
-  const lamp = (cx, pal) => {
+  screen.vline(W / 2 - 62, y, 50, code(3, 2));
+  screen.vline(W / 2 + 61, y, 50, code(3, 2));
+
+  const lamp = (cx, on, pal) => {
     for (let dy = -13; dy <= 13; dy++) {
       for (let dx = -13; dx <= 13; dx++) {
-        if (dx * dx + dy * dy > 169) continue;
-        screen.px(cx + dx, y + 25 + dy, code(pal, dx * dx + dy * dy > 130 ? 2 : 3));
+        const r = dx * dx + dy * dy;
+        if (r > 169) continue;
+        const edge = r > 130;
+        screen.px(cx + dx, y + 25 + dy,
+                  code(on ? pal : 3, on ? (edge ? 2 : 3) : (edge ? 1 : 2)));
       }
     }
   };
-  const both = Math.floor(elapsed * 1.4) % 2 === 0;
-  lamp(W / 2 - 30, 6);
-  if (both) lamp(W / 2 + 30, 7);
-  screen.lamp(W / 2 - 30, y + 25, 40);
-  if (both) screen.lamp(W / 2 + 30, y + 25, 40);
+  lamp(W / 2 - 30, first, 6);
+  lamp(W / 2 + 30, second, 7);
+  // a throw that stays inside the machine rather than flooding the screen
+  if (first) screen.lamp(W / 2 - 30, y + 25, 21);
+  if (second) screen.lamp(W / 2 + 30, y + 25, 21);
 
-  screen.clearLit(0, 112, W, 60);
-  screen.rect(0, 112, W, 58, code(0, 0));
+  screen.clearLit(0, 110, W, 130);
+  screen.rect(0, 110, W, 130, code(0, 0));
   screen.centre(118, 'LOCKOUT', code(6, 3));
   screen.centre(136, 'both lights can come on', code(3, 3));
   screen.centre(146, 'at once. that is the point.', code(3, 3));
 
-  screen.clearLit(0, 184, W, 50);
-  screen.rect(0, 184, W, 50, code(0, 0));
-  if (Math.floor(elapsed * 2) % 2) screen.centre(190, 'press anything', code(6, 3));
-  screen.centre(206, '1 2 3 play a card', code(3, 3));
-  screen.centre(216, 'up and down change step', code(3, 3));
+  if (Math.floor(elapsed * 2) % 2) screen.centre(172, 'press anything', code(6, 3));
+  screen.centre(190, '1 2 3 play a card', code(3, 3));
+  screen.centre(200, 'up and down change step', code(3, 3));
+  // the triangle, stated once, because until recently it was only true in the design document
+  screen.centre(210, 'attack beats step', code(3, 2));
+  screen.centre(219, 'parry beats attack', code(3, 2));
+  screen.centre(228, 'step draws a parry out', code(3, 2));
 }
 
 function drawOver() {
@@ -281,6 +349,16 @@ function panel(lines) {
 }
 
 function fit() {
+  // Reserve the instruction line's REAL measured height, not a guess.
+  //
+  // It used to be fixed to the bottom of the window while the canvas took `innerHeight - reserve`, so
+  // whenever rounding the scale down to a whole multiple of 240 happened to leave less than about
+  // 17px of slack, the line printed across the bottom of the game. A height sweep found it at 5 of
+  // 14 window heights, including 728, 740 and 760 — which is to say, on an ordinary laptop. The
+  // line now sits below the canvas and claims its own space, and that space is measured, because
+  // the line wraps to two rows on a narrow phone.
+  const hintEl = document.querySelector('.hint');
+  const reserve = (hintEl ? hintEl.offsetHeight : 0) + 16;
   const dpr = Math.max(1, Math.min(4, window.devicePixelRatio || 1));
   const device = Math.max(1, Math.min(
     Math.floor((innerWidth * dpr) / W), Math.floor(((innerHeight - 8) * dpr) / H)));
