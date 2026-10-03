@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Games</title>
+<meta name="description" content="Games built from scratch — engines, simulations and the tools that verify them.">
+<meta name="color-scheme" content="light">
+<style>
+  /* Matches the host site: same self-hosted variable fonts, same tokens, same rhythm, so moving
+     from the projects list into this page does not feel like leaving. */
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    font-family:'Inter', system-ui, sans-serif; background:#f5f5f6; color:var(--ink);
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.01em; margin:0;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  .wrap{max-width:900px; margin:0 auto; padding:32px 22px 56px;}
+
+  .crumbs{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--faint); margin-bottom:22px;}
+  .crumbs button{font-size:13px; color:var(--faint); border-bottom:1px solid transparent;}
+  .crumbs button:hover{color:var(--ink); border-color:var(--faint);}
+  .crumbs .sep{opacity:.6;}
+  .crumbs .here{color:var(--ink);}
+
+  .head h1{font-size:26px;}
+  .head p{color:var(--muted); font-size:14px; max-width:620px; margin:8px 0 0;}
+
+  .shelf{margin-top:28px; border-top:1px solid var(--line-strong);}
+  .shelf-row{
+    display:grid; grid-template-columns:30px 1fr auto; gap:10px 18px;
+    align-items:start; padding:18px 0; border-bottom:1px solid var(--line);
+    width:100%; text-align:left;
+  }
+  .shelf-row:hover .row-title{text-decoration:underline; text-underline-offset:3px;}
+  .row-index{color:var(--faint); font-size:13px; font-family:'Space Grotesk', sans-serif; padding-top:2px;}
+  /* These are spans because a <button> may not contain block-level elements, so they have to be
+     told to stack — otherwise the title, the description and the tags run together as one
+     paragraph, which is exactly what they did the first time. */
+  .row-title{display:block; font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:16.5px;}
+  .row-desc{display:block; color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:4px; max-width:620px;}
+  .row-tags{display:block; color:var(--faint); font-size:12.5px; margin-top:6px;}
+  .row-go{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:2px;
+          white-space:nowrap; align-self:start; margin-top:2px;}
+  .shelf-row:hover .row-go{border-color:var(--ink);}
+
+  .note{margin-top:26px; color:var(--faint); font-size:12.5px; max-width:620px;}
+
+  /* the player: the whole viewport, with a thin bar to get back out */
+  .player{position:fixed; inset:0; background:#0a0a0c; display:none; flex-direction:column; z-index:10;}
+  .player.on{display:flex;}
+  .player-bar{
+    display:flex; align-items:center; gap:14px; padding:0 14px; height:38px; flex:none;
+    background:#0f1013; border-bottom:1px solid #1e2027; color:#9aa2ad; font-size:12.5px;
+  }
+  .player-bar button{color:#cfd5dd; font-size:12.5px;}
+  .player-bar button:hover{color:#fff;}
+  .player-bar .name{font-family:'Space Grotesk',sans-serif; font-weight:600; color:#fff;}
+  .player-bar .spacer{flex:1;}
+  .player iframe{flex:1; width:100%; border:0; background:#0a0a0c;}
+
+  @media (max-width:560px){
+    .shelf-row{grid-template-columns:24px 1fr; gap:6px 14px;}
+    .row-go{grid-column:2; justify-self:start;}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .shelf-row{transition:background .15s ease;}
+    .shelf-row:hover{background:rgba(0,0,0,.015);}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <button type="button" data-to="root">Games</button>
+    <span class="sep" aria-hidden="true">/</span>
+    <span class="here" id="crumbHere">Demos</span>
+  </nav>
+
+  <header class="head" id="head">
+    <h1 id="headTitle">Games</h1>
+    <p id="headSub">Built from scratch — the engine, the simulation, the sound and the tools that prove it works.</p>
+  </header>
+
+  <!-- level 1: the shelves -->
+  <div class="shelf" id="shelfRoot">
+    <button class="shelf-row" type="button" data-to="demos">
+      <span class="row-index">01</span>
+      <span>
+        <span class="row-title">Demos</span>
+        <span class="row-desc">Four small games sharing one hand-written engine: an indexed-colour framebuffer under NES palette rules, a four-voice synthesiser, and a seeded simulation with no dependencies and no asset files. Every pixel and every sound is generated at runtime.</span>
+        <span class="row-tags">4 games &middot; JavaScript, no libraries &middot; 2026</span>
+      </span>
+      <span class="row-go">Open</span>
+    </button>
+  </div>
+
+  <!-- level 2: the demos -->
+  <div class="shelf" id="shelfDemos" hidden></div>
+
+  <p class="note" id="note">Each one has a design document in its repository recording what broke and the check that now prevents it — including the bugs found by review rather than by the test suite, which were nearly all of them.</p>
+</div>
+
+<div class="player" id="player">
+  <div class="player-bar">
+    <button type="button" id="back">&larr; Back</button>
+    <span class="name" id="playingName"></span>
+    <span class="spacer"></span>
+    <span id="playingHint"></span>
+  </div>
+  <iframe id="frame" title="Game" allow="autoplay; fullscreen"></iframe>
+</div>
+
+<script type="module">
+const GAMES = [
+  {
+    slug: 'filament', name: 'Filament',
+    desc: 'The sun went out and what is left of the coast is strung along a copper line. You are the last lineman: hire a crew, build towers outward from the dynamo, and keep the circuit unbroken while things come out of the dark to cut it. It is a series circuit, so one break anywhere puts out everything beyond it.',
+    tags: 'Survival builder · 2000 runs, 239 game-hours of verification',
+    hint: 'arrows move · space acts · up changes tools',
+  },
+  {
+    slug: 'far-light', name: 'The Far Light',
+    desc: 'One verb: hold to wind up, lean, let go. No mid-air control and no second chances — a missed jump costs you the climb. Twelve screens of generated tower, every ledge proven reachable by a solver that imports the real physics rather than reimplementing it.',
+    tags: 'Precision climber · every step proven makeable',
+    hint: 'hold space · arrows lean · let go to jump',
+  },
+  {
+    slug: 'lockout', name: 'Lockout',
+    desc: 'An épée duel as a card game. Attack beats step, parry beats attack, and a parry that catches nothing leaves you open — but only from inside distance, and if you both attack from inside distance you both score. That last part is the whole reason this is épée and not foil.',
+    tags: 'Card duel · 16,000 bouts simulated, no dominant strategy',
+    hint: '1 2 3 play a card · left right choose · up down step',
+  },
+  {
+    slug: 'latch', name: 'Latch',
+    desc: 'A station that reboots every ten seconds, and every reboot you come back with an afterimage of everything you did in the last one. Stand on the plate to hold the door open, or walk through the door — never both. Each room prints the fewest discharges it can be done in, and that number is measured by a solver, not chosen.',
+    tags: 'Time-loop puzzle · every room proven minimal',
+    hint: 'arrows move · q abandons the discharge · r restarts',
+  },
+];
+
+const shelfDemos = document.getElementById('shelfDemos');
+const shelfRoot = document.getElementById('shelfRoot');
+const crumbHere = document.getElementById('crumbHere');
+const headTitle = document.getElementById('headTitle');
+const headSub = document.getElementById('headSub');
+const note = document.getElementById('note');
+const player = document.getElementById('player');
+const frame = document.getElementById('frame');
+
+shelfDemos.innerHTML = GAMES.map((g, i) => `
+  <button class="shelf-row" type="button" data-play="${g.slug}">
+    <span class="row-index">${String(i + 1).padStart(2, '0')}</span>
+    <span>
+      <span class="row-title">${g.name}</span>
+      <span class="row-desc">${g.desc}</span>
+      <span class="row-tags">${g.tags}</span>
+    </span>
+    <span class="row-go">Play</span>
+  </button>`).join('');
+
+const VIEWS = {
+  root: {
+    title: 'Games',
+    sub: 'Built from scratch — the engine, the simulation, the sound and the tools that prove it works.',
+    crumb: null,
+  },
+  demos: {
+    title: 'Demos',
+    sub: 'Four small games on one hand-written engine. No libraries, no asset files: every pixel and every sound is generated at runtime, inside a 25-colour budget and a 256×240 frame.',
+    crumb: 'Demos',
+  },
+};
+
+function show(view) {
+  const v = VIEWS[view];
+  headTitle.textContent = v.title;
+  headSub.textContent = v.sub;
+  shelfRoot.hidden = view !== 'root';
+  shelfDemos.hidden = view !== 'demos';
+  crumbHere.textContent = v.crumb ?? '';
+  crumbHere.previousElementSibling.style.visibility = v.crumb ? 'visible' : 'hidden';
+  note.hidden = view === 'root';
+  history.replaceState({ view }, '', view === 'root' ? '.' : '#demos');
+}
+
+function play(slug) {
+  const g = GAMES.find((x) => x.slug === slug);
+  if (!g) return;
+  document.getElementById('playingName').textContent = g.name;
+  document.getElementById('playingHint').textContent = g.hint;
+  frame.src = `../${slug}/`;
+  player.classList.add('on');
+  // Hand the keyboard to the game. Without this the first keypress goes to this page, which does
+  // not want it, and a game that says PRESS SPACE appears to be broken.
+  frame.addEventListener('load', () => {
+    try { frame.contentWindow.focus(); } catch { frame.focus(); }
+  }, { once: true });
+}
+
+function stop() {
+  player.classList.remove('on');
+  frame.src = 'about:blank';          // stop its audio and its loop
+}
+
+document.addEventListener('click', (e) => {
+  const to = e.target.closest('[data-to]');
+  if (to) { show(to.dataset.to); return; }
+  const go = e.target.closest('[data-play]');
+  if (go) play(go.dataset.play);
+});
+document.getElementById('back').addEventListener('click', stop);
+addEventListener('keydown', (e) => { if (e.key === 'Escape' && player.classList.contains('on')) stop(); });
+
+show(location.hash === '#demos' ? 'demos' : 'root');
+</script>
+</body>
+</html>
