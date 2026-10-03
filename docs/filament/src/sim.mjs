@@ -49,7 +49,17 @@ export const RULES = {
   lineman: { walk: 52, build: sec(3), cable: sec(1.6), repair: sec(1.2), lampPull: 110 },
   archer: { walk: 48, range: 68, period: sec(1.0), damage: 1 },
 
-  tower: { tier: [null, { hp: 8, slots: 2, light: 38 }, { hp: 14, slots: 3, light: 52 }] },
+  // Tier 2 buys REACH, not just hit points.
+  //
+  // It used to give +6 hp, +1 slot and +14 light and nothing else, and measured over 8 seeds a
+  // player who never upgraded finished three and a half minutes FASTER. None of the three bound:
+  // tower hp does not matter because a brute cannot get past the towers behind it anyway, slots
+  // were never the constraint (the reference player ends with seven archers posted and none
+  // waiting), and light is cosmetic. So 8 spark — two thirds of a whole tower — bought a taller
+  // sprite and cost you the game's own clock. Range is the one stat that changes where it is worth
+  // building, which is the only decision the map has.
+  tower: { tier: [null, { hp: 8, slots: 2, light: 38, range: 68 },
+                        { hp: 14, slots: 3, light: 52, range: 96 }] },
   beacon: { hp: 12, light: 68 },
   cableRun: 64,
   get maxSpan() { return this.cableRun * 2.2; },
@@ -719,7 +729,9 @@ function stepUnits(state) {
         if (Math.abs(u.x - post.x) > 4) { arrived = false; walkToward(u, post.x, RULES.archer.walk); break; }
         u.timer = Math.min(u.timer + 1, RULES.archer.period);
         if (u.timer >= RULES.archer.period && isLit(post)) {
-          const prey = nearestEnemy(state, u.x, RULES.archer.range);
+          // the post's reach, not a global constant: an archer on an upgraded tower shoots further
+          const reach = RULES.tower.tier[post.tier]?.range ?? RULES.archer.range;
+          const prey = nearestEnemy(state, u.x, reach);
           if (prey) {
             u.timer = 0;
             state.shots.push({ id: state.nextId++, x: u.x, y: groundAt(state, u.x) - 26,
