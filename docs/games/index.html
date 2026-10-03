@@ -38,8 +38,12 @@
   .head p{color:var(--muted); font-size:14px; max-width:620px; margin:8px 0 0;}
 
   .shelf{margin-top:28px; border-top:1px solid var(--line-strong);}
+  .shelf{display:grid; grid-template-columns:1fr auto;}
+  /* An explicit `display` beats the `hidden` attribute's UA `display:none`, so without this both
+     levels render at once and the hub shows its own index on top of the list it opened. */
+  .shelf[hidden]{display:none;}
   .shelf-row{
-    display:grid; grid-template-columns:30px 1fr auto; gap:10px 18px;
+    display:grid; grid-template-columns:30px 1fr; gap:10px 18px;
     align-items:start; padding:18px 0; border-bottom:1px solid var(--line);
     width:100%; text-align:left;
   }
@@ -54,6 +58,13 @@
   .row-go{font-size:13px; color:var(--ink); border-bottom:1px solid var(--faint); padding-bottom:2px;
           white-space:nowrap; align-self:start; margin-top:2px;}
   .shelf-row:hover .row-go{border-color:var(--ink);}
+  /* The actions sit outside the <button>, because a button may not contain a link — nesting an
+     <a> inside one is invalid and browsers disagree about which of the two a click belongs to. */
+  .row-acts{display:flex; flex-direction:column; align-items:flex-end; gap:7px; padding:18px 0;
+            border-bottom:1px solid var(--line);}
+  .row-src{font-size:12.5px; color:var(--muted); text-decoration:none;
+           border-bottom:1px solid var(--line); padding-bottom:2px; white-space:nowrap;}
+  .row-src:hover{color:var(--ink); border-color:var(--faint);}
 
   .note{margin-top:26px; color:var(--faint); font-size:12.5px; max-width:620px;}
 
@@ -103,14 +114,17 @@
         <span class="row-desc">Four small games sharing one hand-written engine: an indexed-colour framebuffer under NES palette rules, a four-voice synthesiser, and a seeded simulation with no dependencies and no asset files. Every pixel and every sound is generated at runtime.</span>
         <span class="row-tags">4 games &middot; JavaScript, no libraries &middot; 2026</span>
       </span>
-      <span class="row-go">Open</span>
     </button>
+    <span class="row-acts"><button class="row-go" type="button" data-to="demos">Open</button></span>
   </div>
 
   <!-- level 2: the demos -->
   <div class="shelf" id="shelfDemos" hidden></div>
 
-  <p class="note" id="note">Each one has a design document in its repository recording what broke and the check that now prevents it — including the bugs found by review rather than by the test suite, which were nearly all of them.</p>
+  <p class="note" id="note">Every game links to its source. Each repository carries a
+  <strong>design document</strong> recording the decisions, and a candid log of every bug with the
+  check that now prevents it — including the ones found by review rather than by the test suite,
+  which were nearly all of them.</p>
 </div>
 
 <div class="player" id="player">
@@ -168,8 +182,12 @@ shelfDemos.innerHTML = GAMES.map((g, i) => `
       <span class="row-desc">${g.desc}</span>
       <span class="row-tags">${g.tags}</span>
     </span>
-    <span class="row-go">Play</span>
-  </button>`).join('');
+  </button>
+  <span class="row-acts">
+    <button class="row-go" type="button" data-play="${g.slug}">Play</button>
+    <a class="row-src" href="https://github.com/Aedin-ctrl/${g.slug}" target="_blank"
+       rel="noopener">Source &amp; notes &nearr;</a>
+  </span>`).join('');
 
 const VIEWS = {
   root: {
