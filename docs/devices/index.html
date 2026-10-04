@@ -45,6 +45,35 @@
   .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
            background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
   .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
+  /* herdr gate. The link is not in this file in the clear -- #herdrCipher is AES-GCM and
+     the key is the word left sitting in the box plus the traffic lights, in order.
+     Pressing Enter is the decoy: it never unlocks and never clears what was typed. */
+  #herdrCard .dev-name, #herdrCard .dev-what{display:block;}
+  .gate-body{display:none; border-top:1px solid var(--line); padding:18px 20px 20px;}
+  .dev.open .gate-body{display:block;}
+  .g-ask{font-size:13.5px; color:var(--muted); margin:0 0 10px;}
+  .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .g-row input{flex:1 1 200px; min-width:0; font-family:inherit; font-size:14px; color:var(--ink);
+               background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 12px;}
+  .g-row input:focus{outline:none; border-color:var(--line-strong);}
+  .g-enter{font-size:13.5px; font-weight:600; padding:9px 16px; border:1px solid var(--line-strong);
+           border-radius:999px; transition:background .15s ease, color .15s ease;}
+  .g-enter:hover{background:var(--ink); color:var(--paper);}
+  .g-msg{font-size:13px; min-height:20px; margin-top:8px; color:var(--bad);}
+  .g-lights{display:flex; gap:9px; margin:6px 0 0;}
+  .g-light{width:15px; height:15px; border-radius:50%; border:1px solid rgba(0,0,0,.18); padding:0;
+           transition:transform .1s ease;}
+  .g-light:active{transform:scale(.88);}
+  .g-light[data-c="red"]{background:#ff5f57; border-color:#e0443e;}
+  .g-light[data-c="yellow"]{background:#febc2e; border-color:#dea123;}
+  .g-light[data-c="green"]{background:#28c840; border-color:#1aab29;}
+  .g-out p{font-size:13.5px; color:var(--muted); margin:0 0 12px;}
+  .g-out .open{display:inline-block; font-size:13.5px; font-weight:600; padding:9px 16px; color:inherit;
+               border:1px solid var(--line-strong); border-radius:999px; text-decoration:none;
+               transition:background .15s ease, color .15s ease;}
+  .g-out .open:hover{background:var(--ink); color:var(--paper);}
+  .g-url{font-family:ui-monospace, Menlo, monospace; font-size:12px; color:var(--faint);
+         margin:12px 0 0; overflow-wrap:anywhere;}
   .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
   .dev:hover, .dev.open{border-color:var(--line-strong);}
   .dev-sum{width:100%; display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center; padding:18px 20px; text-align:left;}
@@ -110,6 +139,39 @@
       <span class="sw-knob"></span>
     </button>
   </div>
+
+  <section class="dev" id="herdrCard">
+    <button type="button" class="dev-sum" id="herdrSum" aria-expanded="false" aria-controls="herdrBody">
+      <span class="dot" id="herdrDot"></span>
+      <span>
+        <span class="dev-name">herdr</span>
+        <span class="dev-what">the terminal, from anywhere on the tailnet</span>
+      </span>
+      <span class="dev-state" id="herdrState">Locked<small>password</small></span>
+      <span class="toggle"></span>
+    </button>
+    <div class="gate-body" id="herdrBody">
+      <div id="herdrGate">
+        <p class="g-ask">Enter the password.</p>
+        <div class="g-row">
+          <input id="herdrPw" type="password" autocomplete="off" autocapitalize="off"
+                 autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="herdrMsg">
+          <button type="button" class="g-enter" id="herdrGo">Enter</button>
+        </div>
+        <div class="g-msg" id="herdrMsg" role="status" aria-live="polite"></div>
+        <div class="g-lights" id="herdrLights" role="group" aria-label="Window buttons">
+          <button type="button" class="g-light" data-c="red" aria-label="Red"></button>
+          <button type="button" class="g-light" data-c="yellow" aria-label="Yellow"></button>
+          <button type="button" class="g-light" data-c="green" aria-label="Green"></button>
+        </div>
+      </div>
+      <div class="g-out" id="herdrOut" hidden></div>
+    </div>
+  </section>
+
+  <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit secret/herdr.json instead) -->
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"1wNon7DOgTCXlgZ2mcmRqA","iv":"gWB2XWEsIiispxKb","ct":"jzOV8IXFyYaR3qXa4AmoNBjBlrvkJijZPgfbMXO9fjCis-5sy7skGxid84cr2XM3_VcLalkmgQIXBw6dh4FH6L_QfSx6kmz03ZeCS9a734pGUK-EoQGU6LyCmHjoUquju4P6ybOWEmnVQBat307OMXgetYIvpqaEyBkKnKKQR_T7dqRs_xwHqc-MxI29nh1DTvI_jI3hLhzAgW14DPFnVbnldV8b32GKXgCziMJBoNF6s_xKRwi9YZArimXonbA149dr0IL4eDxFT5b8JOKir9deXY1JVJBxw3kkduKPyVU24-uUseVc-g"}</script>
+  <!-- herdr:end -->
 
   <div id="list" aria-live="polite"></div>
 </main>
@@ -304,6 +366,97 @@
   load();
   setInterval(load, 20000);
   setInterval(render, 5000);
+</script>
+
+<script>
+// ---- the herdr gate ----
+// docs/devices/index.html is public: the tab is hidden, the file is not. So the tailnet
+// URL is not written here. #herdrCipher is AES-GCM, and the key is PBKDF2-SHA256 over the
+// word still sitting in the box plus the traffic lights in the order they were clicked --
+// scripts/herdr-gate.mjs seals it from secret/herdr.json and derives the key identically.
+//
+// Pressing Enter is the decoy. It always reports a wrong password, it never unlocks, and
+// it deliberately leaves what was typed in the box -- the typed word is half the key, so
+// clearing it would throw away what the lights are about to be combined with.
+//
+// Wrong light sequences say nothing at all. A gate that reports which half was wrong is a
+// gate that can be searched half at a time.
+(function(){
+  const cipherEl = document.getElementById('herdrCipher');
+  if(!cipherEl) return;
+  const box = JSON.parse(cipherEl.textContent);
+  const card  = document.getElementById('herdrCard');
+  const sum   = document.getElementById('herdrSum');
+  const input = document.getElementById('herdrPw');
+  const msg   = document.getElementById('herdrMsg');
+  const gate  = document.getElementById('herdrGate');
+  const out   = document.getElementById('herdrOut');
+  let seq = [], unlocked = false, trying = false;
+
+  const unb64 = s => {
+    s = s.replace(/-/g, '+').replace(/_/g, '/');
+    while(s.length % 4) s += '=';
+    return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  };
+
+  // Must match secretFor() in scripts/herdr-gate.mjs.
+  async function tryOpen(word, lights){
+    const base = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(word.trim().toLowerCase() + '\n' + lights.join(' ')),
+      'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', hash:'SHA-256', salt: unb64(box.salt), iterations: box.iter }, base, 256);
+    const key = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
+    const pt  = await crypto.subtle.decrypt({ name:'AES-GCM', iv: unb64(box.iv) }, key, unb64(box.ct));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+
+  function reveal(p){
+    unlocked = true;
+    gate.hidden = true;
+    out.hidden = false;
+    const what = document.createElement('p');
+    what.textContent = p.what;
+    const a = document.createElement('a');
+    a.className = 'open'; a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = 'Open ' + p.name;
+    const note = document.createElement('p');
+    note.className = 'g-url';
+    note.textContent = p.note + ' \u2014 ' + p.url;
+    out.replaceChildren(what, a, note);
+    document.getElementById('herdrState').textContent = 'Unlocked';
+    document.getElementById('herdrDot').className = 'dot ok';
+    card.querySelector('.dev-what').textContent = 'herdr on the ' + p.name;
+    a.focus();
+  }
+
+  async function light(colour){
+    if(unlocked || trying) return;
+    seq.push(colour);
+    if(seq.length > box.n) seq = seq.slice(-box.n);   // a sliding window, so a wrong start is not a dead end
+    if(seq.length < box.n) return;
+    trying = true;
+    try { reveal(await tryOpen(input.value, seq)); }
+    catch(e){ /* wrong: say nothing */ }
+    trying = false;
+  }
+
+  function wrong(){
+    msg.textContent = 'Wrong password.';   // the input keeps what was typed, on purpose
+  }
+
+  document.getElementById('herdrGo').addEventListener('click', wrong);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
+  document.querySelectorAll('#herdrLights .g-light').forEach(b =>
+    b.addEventListener('click', () => light(b.dataset.c)));
+
+  sum.addEventListener('click', () => {
+    const nowOpen = !card.classList.contains('open');
+    card.classList.toggle('open', nowOpen);
+    sum.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+    if(nowOpen && !unlocked) input.focus();
+  });
+})();
 </script>
 </body>
 </html>
