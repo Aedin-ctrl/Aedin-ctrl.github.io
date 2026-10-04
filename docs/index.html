@@ -923,7 +923,7 @@
   }
 
   function navigateTo(rawPath){
-    releaseDotsOnNavigate();        // a tab that is going away keeps no claim on the dots
+    releaseRelayOnNavigate();        // a tab that is going away keeps no claim
     const path = normalizePath(rawPath);
     const ok = applyRoute(path);
     if(!ok){
@@ -1126,21 +1126,20 @@
     return openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
   }
 
-  // ---- the window buttons, lent out ----
-  // A secret tab (the herdr card, the Terminal page) has its own second password AND its
-  // own second combination -- but it does NOT get its own set of lights. It borrows these
-  // three, the ones already in the top-left corner. A tab claims them while it is waiting
-  // for a combination; the panel's own unlock always takes priority, and when nothing has
-  // claimed them they go back to being close / minimise / maximise.
-  let dotSink = null;
-  window.__claimDots  = fn => { dotSink = typeof fn === 'function' ? fn : null; };
-  window.__releaseDots = () => { dotSink = null; };
+  // ---- lent out ----
+  // A secret tab can have a lock of its own, and collects the rest of its key through here
+  // rather than drawing a duplicate set of its own controls. A tab claims this while it is
+  // waiting and releases it as soon as it is not; the panel's own unlock takes priority,
+  // and with nothing claiming it everything behaves normally.
+  let relaySink = null;
+  window.__claimRelay  = fn => { relaySink = typeof fn === 'function' ? fn : null; };
+  window.__releaseRelay = () => { relaySink = null; };
 
   function handleDot(id, defaultAction){
-    // The panel's own unlock wins; then a secret tab that has borrowed the dots; then the
-    // button does the ordinary thing it looks like it does.
+    // The panel's own unlock wins; then a tab that has claimed the relay; otherwise this
+    // does the ordinary thing it looks like it does.
     if(!secretArmed){
-      if(dotSink){ dotSink(DOT_COLORS[id]); return; }
+      if(relaySink){ relaySink(DOT_COLORS[id]); return; }
       defaultAction();
       return;
     }
@@ -1170,9 +1169,9 @@
 
   // Pages that only exist inside the sealed panel (their address carries a
   // key), e.g. <template data-secret-route="/secret_projects/devices" data-src="devices/#k=...">.
-  // Any navigation drops a tab's claim on the dots -- a tab that has gone away must not
-  // keep swallowing clicks that should close or minimise the window.
-  function releaseDotsOnNavigate(){ dotSink = null; }
+  // Any navigation drops a tab's claim -- one that has gone away must not keep
+  // swallowing input meant for the page itself.
+  function releaseRelayOnNavigate(){ relaySink = null; }
 
   function registerSecretRoutes(root){
     root.querySelectorAll('[data-secret-route]').forEach(t => {
@@ -1209,7 +1208,7 @@
   const lockShackle = document.getElementById('lockShackle');
   function setSecretUnlocked(open){
     secretUnlocked = open;
-    if(!open) dotSink = null;              // locking takes the borrowed dots back
+    if(!open) relaySink = null;              // locking takes the claim back
     addressEl.classList.toggle('unlocked', open);
     lockShackle.setAttribute('d', open ? 'M7 11V7a5 5 0 0 1 9.9-1' : 'M7 11V7a5 5 0 0 1 10 0v4');
     document.getElementById('secretTabs').hidden = !open;

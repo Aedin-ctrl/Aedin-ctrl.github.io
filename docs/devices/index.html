@@ -45,9 +45,7 @@
   .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
            background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
   .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
-  /* herdr gate. The link is not in this file in the clear -- #herdrCipher is AES-GCM and
-     the key is the word left sitting in the box plus the traffic lights, in order.
-     Pressing Enter is the decoy: it never unlocks and never clears what was typed. */
+  /* herdr gate. The link is not in this file in the clear -- #herdrCipher is AES-GCM. */
   #herdrCard .dev-name, #herdrCard .dev-what{display:block;}
   .g-ask{font-size:13px; color:var(--muted); margin:0 0 10px; max-width:42ch;}
   .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
@@ -153,8 +151,7 @@
     </button>
     <div class="gate-body" id="herdrBody">
       <div id="herdrGate">
-        <p class="g-ask">Type the second password, then click the window buttons in the
-           top-left corner in the right order.</p>
+        <p class="g-ask">Enter the password.</p>
         <div class="g-row">
           <input id="herdrPw" type="password" autocomplete="off" autocapitalize="off"
                  autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="herdrMsg">
@@ -371,15 +368,13 @@
 // docs/devices/index.html is public: the tab is hidden, the file is not. So the tailnet
 // URL is not written here -- #herdrCipher is AES-GCM.
 //
-// TWO LOCKS, ONE SET OF BUTTONS (2026-10-04). Getting to this tab at all needs the panel's
-// word + dot combination. Opening this card needs a SECOND word, typed below, plus a
-// SECOND combination -- clicked on the same three window buttons in the top-left corner.
-// This card used to carry its own three traffic lights for that, which meant two sets of
-// identical-looking buttons on one screen. The lights are gone; the second password is not.
+// A second lock, independent of the one that reaches this tab, with its own key material.
+// It deliberately says nothing about how it is opened: the page used to carry its own
+// controls for that, which both duplicated what was already on screen and advertised the
+// method to anyone who loaded it. The gate asks for a password and otherwise keeps quiet.
 //
-// The dots live in the parent page, so the card borrows them: window.parent.__claimDots()
-// while it is waiting, released the moment it opens or the tab goes away. Same-origin, so
-// it is a plain function call.
+// The rest of the key is collected by the parent page and handed here while this is
+// waiting, and given straight back once it is not. Same-origin, so it is a plain call.
 (function(){
   const cipherEl = document.getElementById('herdrCipher');
   if(!cipherEl) return;
@@ -401,13 +396,13 @@
   function parentWin(){
     try { return window.parent !== window ? window.parent : null; } catch(e){ return null; }
   }
-  function claimDots(){
+  function claimRelay(){
     const w = parentWin();
-    if(w && typeof w.__claimDots === 'function') w.__claimDots(onDot);
+    if(w && typeof w.__claimRelay === 'function') w.__claimRelay(onPart);
   }
-  function releaseDots(){
+  function releaseRelay(){
     const w = parentWin();
-    if(w && typeof w.__releaseDots === 'function') w.__releaseDots();
+    if(w && typeof w.__releaseRelay === 'function') w.__releaseRelay();
   }
 
   // Must match secretFor() in scripts/herdr-gate.mjs.
@@ -424,7 +419,7 @@
 
   function reveal(p){
     unlocked = true;
-    releaseDots();
+    releaseRelay();
     gate.hidden = true;
     out.hidden = false;
     const what = document.createElement('p');
@@ -448,9 +443,9 @@
     input.focus();
   }
 
-  async function onDot(colour){
+  async function onPart(part){
     if(unlocked || trying) return;
-    seq.push(colour);
+    seq.push(part);
     if(seq.length < box.n) return;          // an attempt is exactly box.n clicks
     trying = true;
     try { reveal(await tryOpen(input.value, seq)); }
@@ -471,16 +466,15 @@
   document.getElementById('herdrGo').addEventListener('click', wrong);
   input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
   input.addEventListener('input', () => { msg.textContent = ''; });
-  window.addEventListener('pagehide', releaseDots);
+  window.addEventListener('pagehide', releaseRelay);
 
   sum.addEventListener('click', () => {
     const nowOpen = !card.classList.contains('open');
     card.classList.toggle('open', nowOpen);
     sum.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-    // The dots are only borrowed while this card is open and still locked, so collapsing it
-    // gives close / minimise / maximise straight back.
-    if(nowOpen && !unlocked){ input.focus(); claimDots(); }
-    else releaseDots();
+    // Only borrowed while this card is open and still locked.
+    if(nowOpen && !unlocked){ input.focus(); claimRelay(); }
+    else releaseRelay();
   });
 })();
 </script>
