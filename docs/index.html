@@ -923,6 +923,7 @@
   }
 
   function navigateTo(rawPath){
+    releaseDotsOnNavigate();        // a tab that is going away keeps no claim on the dots
     const path = normalizePath(rawPath);
     const ok = applyRoute(path);
     if(!ok){
@@ -997,7 +998,7 @@
   // The exact secret that opened the panel. The Devices and Terminal pages are sealed
   // under the SAME word and dot order, so they ask for it here rather than showing a
   // second login of their own. Same-origin iframes only; it never goes in a URL.
-  let panelSecret = '';
+
   const DOT_COLORS = { dotClose:'red', dotMinimize:'yellow', dotMaximize:'green' };
   const fromB64 = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
 
@@ -1122,16 +1123,27 @@
   async function tryUnlock(word, sequence){
     const secret = word + '\n' + sequence.map(id => DOT_COLORS[id]).join(' ');
     const key = await pbkdf2(secret, fromB64(SECRET_BOX.salt), SECRET_BOX.iter, 256);
-    const html = await openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
-    if(html !== null) panelSecret = secret;   // the secret tabs are sealed under this too
-    return html;
+    return openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
   }
 
-  // How a secret tab asks for it. Same-origin, so the iframe can simply call this.
-  window.__panelSecret = () => panelSecret;
+  // ---- the window buttons, lent out ----
+  // A secret tab (the herdr card, the Terminal page) has its own second password AND its
+  // own second combination -- but it does NOT get its own set of lights. It borrows these
+  // three, the ones already in the top-left corner. A tab claims them while it is waiting
+  // for a combination; the panel's own unlock always takes priority, and when nothing has
+  // claimed them they go back to being close / minimise / maximise.
+  let dotSink = null;
+  window.__claimDots  = fn => { dotSink = typeof fn === 'function' ? fn : null; };
+  window.__releaseDots = () => { dotSink = null; };
 
   function handleDot(id, defaultAction){
-    if(!secretArmed){ defaultAction(); return; }
+    // The panel's own unlock wins; then a secret tab that has borrowed the dots; then the
+    // button does the ordinary thing it looks like it does.
+    if(!secretArmed){
+      if(dotSink){ dotSink(DOT_COLORS[id]); return; }
+      defaultAction();
+      return;
+    }
     secretSequence.push(id);
     if(secretSequence.length > SECRET_BOX.n) secretSequence.shift();
     if(++secretClicks >= SECRET_MAX_CLICKS) disarmSecret();
@@ -1158,6 +1170,10 @@
 
   // Pages that only exist inside the sealed panel (their address carries a
   // key), e.g. <template data-secret-route="/secret_projects/devices" data-src="devices/#k=...">.
+  // Any navigation drops a tab's claim on the dots -- a tab that has gone away must not
+  // keep swallowing clicks that should close or minimise the window.
+  function releaseDotsOnNavigate(){ dotSink = null; }
+
   function registerSecretRoutes(root){
     root.querySelectorAll('[data-secret-route]').forEach(t => {
       ROUTES[t.dataset.secretRoute] = { type:'iframe', src:t.dataset.src, title:t.dataset.title || 'Secret project', secret:true };
@@ -1193,7 +1209,7 @@
   const lockShackle = document.getElementById('lockShackle');
   function setSecretUnlocked(open){
     secretUnlocked = open;
-    if(!open) panelSecret = '';            // locking takes the tabs' key with it
+    if(!open) dotSink = null;              // locking takes the borrowed dots back
     addressEl.classList.toggle('unlocked', open);
     lockShackle.setAttribute('d', open ? 'M7 11V7a5 5 0 0 1 9.9-1' : 'M7 11V7a5 5 0 0 1 10 0v4');
     document.getElementById('secretTabs').hidden = !open;

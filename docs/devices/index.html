@@ -49,7 +49,23 @@
      the key is the word left sitting in the box plus the traffic lights, in order.
      Pressing Enter is the decoy: it never unlocks and never clears what was typed. */
   #herdrCard .dev-name, #herdrCard .dev-what{display:block;}
-  .g-locked{color:var(--faint); font-size:13.5px; margin:0;}
+  .g-ask{font-size:13px; color:var(--muted); margin:0 0 10px; max-width:42ch;}
+  .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .g-row input{flex:1 1 180px; min-width:0; font-family:inherit; font-size:14px; color:var(--ink);
+               background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 12px;}
+  .g-row input:focus{outline:none; border-color:var(--line-strong);}
+  .g-enter{font-size:13.5px; font-weight:600; padding:9px 16px; border:1px solid var(--line-strong);
+           border-radius:999px; transition:background .15s ease, color .15s ease;}
+  .g-enter:hover{background:var(--ink); color:var(--paper);}
+  .g-msg{font-size:13px; min-height:20px; margin-top:8px; color:var(--bad);}
+  .g-eye{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+         border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:0;
+         cursor:pointer; flex:0 0 auto; color:var(--ink); opacity:.65;}
+  .g-eye:hover{opacity:1;}
+  .g-eye svg{width:17px; height:17px; display:block;}
+  .g-eye .eye-off{display:none;}
+  .g-eye[aria-pressed="true"] .eye-on{display:none;}
+  .g-eye[aria-pressed="true"] .eye-off{display:block;}
   .gate-body{display:none; border-top:1px solid var(--line); padding:18px 20px 20px;}
   .dev.open .gate-body{display:block;}
   .g-out p{font-size:13.5px; color:var(--muted); margin:0 0 12px;}
@@ -136,13 +152,23 @@
       <span class="toggle"></span>
     </button>
     <div class="gate-body" id="herdrBody">
-      <p class="g-locked" id="herdrLocked" hidden>Open this from the panel.</p>
+      <div id="herdrGate">
+        <p class="g-ask">Type the second password, then click the window buttons in the
+           top-left corner in the right order.</p>
+        <div class="g-row">
+          <input id="herdrPw" type="password" autocomplete="off" autocapitalize="off"
+                 autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="herdrMsg">
+          <button type="button" class="g-eye" id="herdrEye" aria-pressed="false" aria-label="Show password" title="Show password"><svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.8 12s3.6-7 10.2-7 10.2 7 10.2 7-3.6 7-10.2 7S1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6.6 0 10.2 7 10.2 7a18 18 0 0 1-3.3 4.2M6.3 6.4A18 18 0 0 0 1.8 12s3.6 7 10.2 7a9.8 9.8 0 0 0 4.3-1M3 3l18 18"/></svg></button>
+          <button type="button" class="g-enter" id="herdrGo">Enter</button>
+        </div>
+        <div class="g-msg" id="herdrMsg" role="status" aria-live="polite"></div>
+      </div>
       <div class="g-out" id="herdrOut" hidden></div>
     </div>
   </section>
 
   <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
-  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"xFPciMd5HNLYlbX5LWgXgQ","iv":"LFDrxzDfO5Esd0kv","ct":"2keDmA37Tnq6w25I6_MTl15xd69wtz_8d976DtaSHjIw3TP4pGhN1d5jc7hmYLcd7Uan-_1AobjbqYu63_8ORKg166U9MS6bcKsyPPjInImPOVkOYGqUX4j_ca5Ai2FjU8cgmipyDIEE4tN1w9DFpzhUIQuGdQCCZesW7Itfz7j4N75_Y5AvjWWlfbwyTM86SVccVBNy5r6c86pPpequAt1YJyXNwPD_2fOMHJms5VGle7JhqHyBCCEzT191OzYfGUDMDiJ3RjxASu5imoERw2yS9mkTXnma70Yyo7Sfr8Etwn-pzGiIhA"}</script>
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"37L8989i0wb-WKJigotDCw","iv":"QkapF_U1Bjd_AFVh","ct":"RUzKMefItYE4SVCu1l0j3hrqv5qM5Lnor8G-e5KGUrEDsVSXLD79m7P-l4LJSkbQcatkMvzb9uEl39aU7nqbHePJaDv11PAeDLQRP9bbP92H0eVdh-Ntaj-MgbaM4PDhNQPdI46CXMEv1dzGLf6-TSUpawM-yTYUEG6nCDApvgo09uZJo0qZAufO-nU8KMz_I7IFrSpSvDS1AiC2MyHI7Y0u9QN9teTvHstGg_laORX4FEpV0fQg98ZuKu2IdtV-4ExEZyG0YAqEN53FW2TBgKfbFAAddr_0CWuUXQzPlKifS64W0TfOjw"}</script>
   <!-- herdr:end -->
 
   <div id="list" aria-live="polite"></div>
@@ -345,19 +371,26 @@
 // docs/devices/index.html is public: the tab is hidden, the file is not. So the tailnet
 // URL is not written here -- #herdrCipher is AES-GCM.
 //
-// THE KEY IS THE PANEL'S (2026-10-04). This card used to carry its own password box and
-// its own three traffic lights, so opening it meant logging in twice with two different
-// credentials: the dots at the top of the panel, then three more buttons here. Both are
-// gone. The card is sealed under the panel's word + dot order and asks the parent for it.
+// TWO LOCKS, ONE SET OF BUTTONS (2026-10-04). Getting to this tab at all needs the panel's
+// word + dot combination. Opening this card needs a SECOND word, typed below, plus a
+// SECOND combination -- clicked on the same three window buttons in the top-left corner.
+// This card used to carry its own three traffic lights for that, which meant two sets of
+// identical-looking buttons on one screen. The lights are gone; the second password is not.
+//
+// The dots live in the parent page, so the card borrows them: window.parent.__claimDots()
+// while it is waiting, released the moment it opens or the tab goes away. Same-origin, so
+// it is a plain function call.
 (function(){
   const cipherEl = document.getElementById('herdrCipher');
   if(!cipherEl) return;
   const box = JSON.parse(cipherEl.textContent);
-  const card   = document.getElementById('herdrCard');
   const sum    = document.getElementById('herdrSum');
+  const card   = document.getElementById('herdrCard');
+  const gate   = document.getElementById('herdrGate');
+  const input  = document.getElementById('herdrPw');
+  const msg    = document.getElementById('herdrMsg');
   const out    = document.getElementById('herdrOut');
-  const locked = document.getElementById('herdrLocked');
-  let unlocked = false;
+  let seq = [], unlocked = false, trying = false;
 
   const unb64 = s => {
     s = s.replace(/-/g, '+').replace(/_/g, '/');
@@ -365,21 +398,23 @@
     return Uint8Array.from(atob(s), c => c.charCodeAt(0));
   };
 
-  // The panel opened with a word and a dot order; this card is sealed under the same
-  // secret, so it asks the parent for it rather than showing a second set of buttons.
-  // Same-origin, so this is a plain function call. Opened on its own it stays shut --
-  // deliberately, because a gate here would be the second login all over again.
-  function panelSecret(){
-    try {
-      return (window.parent !== window && typeof window.parent.__panelSecret === 'function')
-        ? (window.parent.__panelSecret() || '') : '';
-    } catch(e){ return ''; }   // different origin: treat as no key
+  function parentWin(){
+    try { return window.parent !== window ? window.parent : null; } catch(e){ return null; }
+  }
+  function claimDots(){
+    const w = parentWin();
+    if(w && typeof w.__claimDots === 'function') w.__claimDots(onDot);
+  }
+  function releaseDots(){
+    const w = parentWin();
+    if(w && typeof w.__releaseDots === 'function') w.__releaseDots();
   }
 
-  // Must match secretFor() in scripts/herdr-gate.mjs and the panel's tryUnlock().
-  async function openBox(secret){
+  // Must match secretFor() in scripts/herdr-gate.mjs.
+  async function tryOpen(word, lights){
     const base = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveBits']);
+      'raw', new TextEncoder().encode(word.trim().toLowerCase() + '\n' + lights.join(' ')),
+      'PBKDF2', false, ['deriveBits']);
     const bits = await crypto.subtle.deriveBits(
       { name:'PBKDF2', hash:'SHA-256', salt: unb64(box.salt), iterations: box.iter }, base, 256);
     const key = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
@@ -389,8 +424,9 @@
 
   function reveal(p){
     unlocked = true;
+    releaseDots();
+    gate.hidden = true;
     out.hidden = false;
-    locked.hidden = true;
     const what = document.createElement('p');
     what.textContent = p.what;
     const a = document.createElement('a');
@@ -403,21 +439,48 @@
     document.getElementById('herdrState').textContent = 'Unlocked';
   }
 
-  (async () => {
-    const secret = panelSecret();
-    if(secret){
-      try { reveal(await openBox(secret)); return; }
-      catch(e){ /* the panel key did not fit: fall through */ }
-    }
-    locked.hidden = false;
-    document.getElementById('herdrState').textContent = 'Locked';
-  })();
+  // A failed attempt clears everything and says so. Enter cannot unlock anything -- the
+  // word is only half the key -- so it counts as a failed attempt too.
+  function wrong(){
+    seq = [];
+    input.value = '';
+    msg.textContent = 'Wrong password.';
+    input.focus();
+  }
+
+  async function onDot(colour){
+    if(unlocked || trying) return;
+    seq.push(colour);
+    if(seq.length < box.n) return;          // an attempt is exactly box.n clicks
+    trying = true;
+    try { reveal(await tryOpen(input.value, seq)); }
+    catch(e){ wrong(); }
+    trying = false;
+  }
+
+  const eye = document.getElementById('herdrEye');
+  eye.addEventListener('click', () => {
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    eye.title = show ? 'Hide password' : 'Show password';
+    input.focus();
+  });
+
+  document.getElementById('herdrGo').addEventListener('click', wrong);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
+  input.addEventListener('input', () => { msg.textContent = ''; });
+  window.addEventListener('pagehide', releaseDots);
 
   sum.addEventListener('click', () => {
     const nowOpen = !card.classList.contains('open');
     card.classList.toggle('open', nowOpen);
     sum.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-    if(nowOpen && !unlocked) input.focus();
+    // The dots are only borrowed while this card is open and still locked, so collapsing it
+    // gives close / minimise / maximise straight back.
+    if(nowOpen && !unlocked){ input.focus(); claimDots(); }
+    else releaseDots();
   });
 })();
 </script>
