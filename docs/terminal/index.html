@@ -66,34 +66,10 @@
   .kb kbd{font-family:ui-monospace,monospace; font-size:12px; background:var(--wash);
           border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:1px 5px;}
 
-  /* The gate. Everything that names the tailnet is ciphertext in #herdrCipher; the key is
-     the word left sitting in the box plus the three window lights, in order. Enter is the
-     decoy -- it never unlocks and never clears what was typed. */
-  .g-ask{font-size:13.5px; color:var(--muted); margin:0 0 10px;}
-  .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
-  .g-row input{flex:1 1 200px; min-width:0; font-family:inherit; font-size:14px; color:var(--ink);
-               background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 12px;}
-  .g-row input:focus{outline:none; border-color:var(--line-strong);}
-  .g-enter{font-size:13.5px; font-weight:600; padding:9px 16px; border:1px solid var(--line-strong);
-           border-radius:999px; transition:background .15s ease, color .15s ease;}
-  .g-enter:hover{background:var(--ink); color:var(--paper);}
-  .g-msg{font-size:13px; min-height:20px; margin-top:8px; color:var(--bad);}
-  .g-lights{display:flex; gap:9px; margin:6px 0 0;}
-  .g-light{width:15px; height:15px; border-radius:50%; border:1px solid rgba(0,0,0,.18); padding:0;
-           transition:transform .1s ease;}
-  .g-light:active{transform:scale(.88);}
-  .g-light[data-c="red"]{background:#ff5f57; border-color:#e0443e;}
-  .g-light[data-c="yellow"]{background:#febc2e; border-color:#dea123;}
-  .g-light[data-c="green"]{background:#28c840; border-color:#1aab29;}
-  .g-eye{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
-         border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:0;
-         cursor:pointer; flex:0 0 auto; color:var(--ink); opacity:.65;}
-  .g-eye:hover{opacity:1; border-color:var(--line-strong);}
-  .g-eye svg{width:17px; height:17px; display:block;}
-  .g-eye .eye-off{display:none;}
-  .g-eye[aria-pressed="true"] .eye-on{display:none;}
-  .g-eye[aria-pressed="true"] .eye-off{display:block;}
-  .gate{border:1px solid var(--line); border-radius:12px; padding:18px 20px 20px; max-width:460px;}
+  /* Everything that names the tailnet is ciphertext in #herdrCipher. There is no gate
+     here any more: the key is the panel's own word + dot order, handed down by the parent
+     page. Opened outside the panel this shows one line and nothing else. */
+  .locked{color:var(--faint); font-size:14px;}
 </style>
 </head>
 <body>
@@ -105,51 +81,28 @@
     </div>
   </div>
 
-  <div class="gate" id="gate">
-    <p class="g-ask">Enter the password.</p>
-    <div class="g-row">
-      <input id="pw" type="password" autocomplete="off" autocapitalize="off"
-             autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="msg">
-      <button type="button" class="g-eye" id="eye" aria-pressed="false" aria-label="Show password" title="Show password"><svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.8 12s3.6-7 10.2-7 10.2 7 10.2 7-3.6 7-10.2 7S1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6.6 0 10.2 7 10.2 7a18 18 0 0 1-3.3 4.2M6.3 6.4A18 18 0 0 0 1.8 12s3.6 7 10.2 7a9.8 9.8 0 0 0 4.3-1M3 3l18 18"/></svg></button>
-      <button type="button" class="g-enter" id="go">Enter</button>
-    </div>
-    <div class="g-msg" id="msg" role="status" aria-live="polite"></div>
-    <div class="g-lights" id="lights" role="group" aria-label="Window buttons">
-      <button type="button" class="g-light" data-c="red" aria-label="Red"></button>
-      <button type="button" class="g-light" data-c="yellow" aria-label="Yellow"></button>
-      <button type="button" class="g-light" data-c="green" aria-label="Green"></button>
-    </div>
-  </div>
+  <p class="locked" id="locked" hidden>Open this from the panel.</p>
 
   <div id="out"></div>
 </main>
 
 <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
-  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"Z1OgKEsSxg5piO1Y7125FA","iv":"rJbyjvkkyH2ctaB4","ct":"X-eh_3jim6_9QuJXSlw2aWQ6C76FtIZPZqGlZCB7h_X79exu6Myk_9TL5sidc4gfZhE7cv2ZSRv6Bc6FZh8xDSLWRVu9rZp8PaVPTsSTZukXcycH5YBpzI1Kc_Q3-cOqugzsd6WCkN_Fn2MOTThyCPdpBvL8tSPMiFV-rMePcEcLy1pyvy1711Sxn904En066AeTUNC7Aps3no4FK5TVpyLWnusw10iXizOOXxJPH3YYy87dADijDvMKSyxKV3L_gLJu6w1-Pw4KOUYTypYOpP1mJx5croODdeGy0GVNyQOzV-nKzxPC4m5ewYjNio9dyebelyQLajpA6JbRiraaSc3gItYuXq4TiPrWfkc0APiKJex_Iq0zWUCte10WO14onilwvCrbDcFjo4g99TApVz9pKMvC_7Xewn04svXmJrn4vRvSs9B2kd1QGWU_vHeL3mTMhX2stuqc2X1uKAJPDXdpkgnzmU0hL1CLFE1ScNFGJbRWZnHHgX5MhXYZYTFya8yDU9wvIPTZlPzcDdiz9LgmU8o2owY6haedfo2r23tFP4izHF_kwN4s4nCRyq-h_RrW39SdeFJrWOpypRayEnwq9ZpJwTFQ-00fC3ELxcInJNaeYgqCWZHnv-XSyGAFgKxw_eRULgLnk8n9gCrJjEvWf1yBNigFdGun5wp5vAa1YfOYqlYYCf1GO7VJ_mJXddZPTgLMrKxrGRupAy4zm6bL1teQ506w3EbrQBCvaPGYOaxWBX5omDkl4GaaKYl4O0dP-UxFxpD1Dtu6zSu1vQ7XKUPb_2vSt7B2Kt40sgORzk0T_Notc8ZWSXCVs86nx6SsxDOQ0H0vVhHbvC9wNqZHtF1Rg5ovbp3f3xP8CarQJYUjUkkBiDTViEeanhzR4XAE6QLCWryK-CKMNkDhk_oF1DdOd37V_AeL7BytruNxJceBReCb0K1-PDKLUaVn0x7cH2w5w4iP0lapE16AQViRvXma95y4UhcKvr7RK3xx29Tf_5WqqQe6yiARkmDj3EG2mwygz13LyHXGXpiGUBqCSK3byfa27z71_3TEnRc1yjpwb4MqWP7K73xAS7Hw5e_oVFPPFGEre5BAtbjD5rdtlkl_-pBnztpXe0BjDzLh8CgdR9EkP1AmXvTShj_aifEmWb2gXP4t6m0AD5J6hB8pxvhc2Ic5ctku9Q6if5obWQhUWk9KeqC-1VHmG8Enly7QT0crhc6oVhMOw5vLb9po0pG9X9OxnpVfKZQcx7szQlZx4LJh4ryn6awYPciVIkaYodtYXIdyJmfcyYszyWoKhKPakYoLW-GVSca6HLxGAXyev28LUqlNL-STfWLvy4LXHTR4dx6eIFmVPOIRcnv576JABrlRkenyCa_Ri4eDDNMPunC3GsudReI7q-XZRriPDl98FWnMMmiC5jRdxq_xFebS7CWHbBBL1JBhyTk-nnn9f1FcGnh9gktZpHjY6VcJJ85nZo7eBeZ1nEyMsr7oHtcQQ7pKNOsGz2j1PbTca9kzvgwL_r03c3C8xrY4Ag986TyLTyduKOItAe_C-2O9-2YTUv76Kq6yIPpW8yQveBfEbqB831hPHlmg3ZYu2XpmiWDuCCM_vHchlJD8IeoVB6EpecaqPMMlisVfdvmei8yXEWh4btBxhwxj1fmu22eeY-ag6n49glAn0b8Z6f-iP2FAlp3dmuSeMR4hvvm2jXw9JtTJLZDpHdPf_dUnstm58Gw9jEWlo8zvl3g6T0R6x6q3L9SxUR1iLXrulNFtEh-UPE_Q6FFA0JFLHE9J9PrrJeARMBFmKdxyrSsj_p96TOnTkuesr9dfmRtBxz20UjyjNoG0DFNWuSBcAPLbMgjS7_HyNg4ukZCFZQ-5SyAG5S-rCo88mJwJwR4RKStdf1khwXLY8lqozmLQ7gRNpq6UUgCiPCQMIItXIKutooUgtDeotNaWx720KvdpAg5QuAcAvPpg3sUqbpuWh_01pkLxtqAH-B3IJidMF1fRYCPZrXeIlTZuq07skN6q2xVtvmuI9CWI733_XeNM8bv9dtcqvPJf4rgsURSinMcXjanFZDLxY_RO0rUhn8e4MKRkzX4T6h-B6uLpvpxnQM9-g9-kMgAP7jccwP6tokv5SZTylShhJd9EKJy0kzsovzfviBjGXX6Xn3GC99PLXox-VP6DmkWEQBKY8d_0AhY4RIhFEPkBEqeBFYEpS2AQnXoe9jXZ8zUQb71kJnWyTtJOwRIwcB_d8sTcpKBCwd73VeztvfL2hkpQECbzdhJrrRld2NqzjUV0sddepMIzwgKUvM_Cy-_12qOi76zhQImwQ1SvWME5km8lE08GCcL4tbTnKwK4PO0SudYgwJgGooDT0GeQCRuTvz0_r9OBlBuChQPKGMeGHzvSqqyNB1NRuZZJtiw26igXygm7zX47N4ecLfvUHY5k3wDdXAdjCq3gVIXxP4tsR-CCAaVGKCeQsC-C5WfDppi_S9Fb1UvRm40kqM-xH5Y5Rf5pQ9WZw4pWGm7AB9GayJP2GyJFY35nlU8ydQ1fKYcwEs3atCYO_QRD77qRzqzZ8Z81x3zWXJLTi46NPqzvQS9bw34OfEX-PaZlj3i1wZFGSaaQ-vgrNfUdW_eA9x1ajN2ho8v7-mPYm0d4M6V7hIjRAj1Ern2MwQOauc2J3apusktOhbLcI-bj5r19CpgOI2i_oYAFgqqel3gaxeJK7Sp7cxOQ4fIzoIhY1gInkCLsz-rnDWNie8vs5hFq8k9uoUqnvkxcrwXrdcZdxKYeN7i_EpyL_AmGYCuAPpijrxiIZOGhhNENWve8Hw8SGu7KQ9-S-LKsfoZMoMbBeN-3sLIprvbYbkHqkDt5AX7DmC8WDCBcIgbhKykR09uaze6dpHf2xj30WAsiTje4gRon3cfPEoCNJjLwixhzUcdM0R1BFnOi2aZvmYxQw02kX4IFdyufZB6qSiLC_q9jLgUd1sFYo7NM1GG1-uMN-COnJ5SNXQs8BrsGv_L-OZ188yUFFtDItxOf_NckW-xKvgkjorq3rWJAc2txWhTHc4DSuymTSKFJUDkP2NX-KsL3gM4BIz1FfBPFWvvVawCBU5_7XKrmk15HU6fgMKDj_tDk_APyIsX7910ZZPlmCGdM1BL6JSWpDK_g1LzC6myJF6G2UpgYPOqgt29EsbnD6n-66trq8_q76CBn3zkHmnMsuFPLoTfeK9s9onJXDuA-arA3C6Z4aVFPLGjgqrQCw52uMOzzDtDCAUpPKeD0fwUpuLuWOWLfxbmhu6PI4Tdb_t7kE9x211-G9N8GQnx55FJ33XtheXV-b7DF0IIE1r5UNCPNJ76eS9Cn9XDvzdBGquvp6DbQX8WFqxDT-w98w92cn7Fnobf3Png-8fV3k19L4IFd5easCJy_btLbPEZOsDHc3n2cLrY7VlUr-rg6YxqRA_C3gd-DIkLVQBZa0WZl-PBson5ah763UFM3QV2iwzu9SyuTMQaubYSaP6SfhkvEPS-CwwwR1R_oThZmZ_J5iBw4GjBnwK-To045sgqtW5Lan4H5J3ToUMRTL-q5IXBs9xIiMvTTccVYqLnWhW1LLrZ01ZFFdaxHAgifdiI4fmEZi0j5KfciVB1JtVtQN0UgmFOyenikqNFNKPt0imgQx3IZ5elGHQzPeGPED5vv0Ndi2KKOA8RftjyeHEMLyrj6B0QfpWHMTdpej4_2QZE962vqopnO3ZgllwlnlBqVDDdldziBB5u5sv75R8XACDtd9izF6AGl03BQR2YaG6lzcMLtZFhHmna0JfaqBl0R3qrFjBuvj3AJsBWCVfUWduRT5rjLxVHSdv-j_BsW6kPKYbng1eA4ON5GsZb-BHeExgDjzWd2ME5MBA1FVGgAOJO8UIQeplPJvLppdNLTYgFdMIvV-sSMWeiLSPJKT0XifOavYhwmsgAdUkvu48k97HskB5SRodpEHBw76u1TKo_o_K18rUVxjGDqoE2dTzy01PL7KIvOrFH8xPPjq9f7Nx51P0UL5G1wCPToYOV1qfnzRhDzyooGGYJjGrAoeyhTQ9egmIJrnlB1Nb8BxLpH_oNJWDuyHsi8-MfLAUgqdPpOnG08NS8yLBLBHNzXISHrSw3vlKa4ZO9DOMqoW1KDU1aXCQKXvv0bM1HdaqIgFCX-KAITDESsNKgVX0fJeEs07oP0jVZBl0OOXwghUdSlc2a-Ug_THUTdUgRHfuGUr2Jbr1f2uuBzjX2Jkfz3TpwF3nnH3fucP9zCKOQgs3AOAMOv2dyQ3ySONevoo2bdvYi_q8cVP8FJSLx_XNYQ9ep4_lb-HsXlGuqLJ76m5_v6GaIDMIfhDnC9pZbiOFqWCRGMxkO96wbtcENZ9HEF2t3k4aPgbYURWvZV-Pf4yQh-phNdAgoDKRC7HFJREXfIb0p8VwCwtESUHsY2nx8zNZjwWExhbnN7QjDpgmq8I8kD71pbCuXfr5_MikriuWW0xC266mZn5ld99SwL_ExIR9m7sCOAYVVOEJf2WlODW9BEwJcOnGjCX2RFc34_clhWSkpVFCaYUEFd_5y_RIedTM5IHfdf2oUrB_ejmGuNrzyQW6aLBtfd49uIA7KmJqy8rPVKkrodKS4cD7jfoorXvtWXhgfE_fdL0cqP3UbbYcM1Lmfky1_n2emuFY2ptnoStNaaIEw0hH3dv7dhd2kiSZDE23jJfGHQId3Jxj2Od_dmWoDW1sd8N7-lUhdjEbf6rTj8OWlwwMF35s79xx97kzAh_z4y9ibhdEnTo2UPGWfkfKx80T0-Rh-vm7hoIZixf1oFhv6t-86ZLEWjdUgAqo6otvTp5fFHc-520veWo5W1IDfXknWJRf7bQ6bwmXPvAL0QYU5ckjYdiEfZaeeHnk48GCMM5f7CSFcyTsYOgnEaatIywKqTExSUKDR8vA4KnBjL9v7gCV9DwNLhcL7sjobinfx0KadhVBoBbNyo0_ci1Z2Yja5rWzb46tYMOU3zQZwqkdOVNeTEbdtm6RBlJWFFbF2bYrtDGpbst5LjYdKiw547SiLmS_RR4FgXM6sY9FFwShsA9G73hV4sPEkjs7naQ9SjDoFjkdBYMJ6qo6SYnOEqLj5YDBLWDJpnZu88HZ2OnbxaWdGkY909MQzEZFucs_Bsm23OCHZx1MhLPauZdL5nJFOwdiABuKppLm0MjhtxKE8E1qLuZppLejm7TWAuR0_9iglbJQ02xBwTvdklwLm3hv14qUQH-PWGfLlb8md-HLWl2ZLOnisrhur0Fm-8g3NxV3MXcwJoCFVHJ1awrLpER-V9YzlP1mDeTy0ci1ujrPmOYmunsATKMbs0t9OO3_Pt4R3HHOCN0qu7JvXYG6QPOzXwU2__jqwlQMqALClibO9cM1aJh44Sb_nVn8XVoNQODfjoVTw9oMvyj3uuL7DzBhz8n1cSAjdML29eIcUuwWS6TJZ98s141ijEsN9RSW0aEzHeE9LQuQfk3ETuialWZ99yM-Uc39L3ao8KV5UovKPc62HMfCYAG-Aj-ONszTLh-WZLD6f2L2KWqW8QZIMMDsXAnQL9uJeGbsEsI5aJsxgUaNdCZH5rQ45cbmu3M0nKTrU2t9DWmcN6GLibTzMXXhejcvrOv8oj7Fmt-iKWa6uckGuRI9IrO0SLUSleUIZuiPrm0WnAOTvQc_JeCaBMmIBQ2mRjt6pSFbTYHOoTGNtX9Ou0Sz2swoT2TbQIPdfuCu7I_OjTCYSfrpdoguLqkdKi2fSz04GU2uut9TNKmNDydGJbB0eh5C14O7IMgZXLmcNO_8Ry5nH4IUNJhLpGQDxRjWrowRLp2BRQvCSMurgjLGmmkbCCkhQw-HHBeuCr1MMjJ86e86oHyn7x768UBbnW8co6uK6KSoH3dmq5nWBSXAgLU824v_1cr0hW7HaN6-UBYBvKCulurz2AUixmLsuzNral2fs5e-Pxyg925HZl7DuQeuH8S_XA59nXgPeakukRDCrv86e5pTZNQp6H3nBOC2awwfLUvFvHCN2MLJ0UfQf2bRCIv5afQrJMJFQ1GPOI5DAENx0jawIi_QQWZQaA-T8rYbTyGWFnN2sGTGjvD7ECwsi2BrlOTDdA__M5AIZpNsR7wnNfTYdywBlfltikaNqKeTA5qwqamEhc6j1WXy9oUq_DIUvsw-i5WdO3CFEOcg9rEtkroR9daxv-rns0k_LGYlXpMZgCP-svW6W6kxJiaCQuCwBO3OOzHx7GYifcrQrXHAkHpNsLfOl1hi-FrgiOPk6ke1rVei_O7ypK1kVNgJkyPH_IMkcNJhOJ5SRAEf_7QMdq7_qVcgzJAsJ8Cn19TsPvHZl_hyzrjoHxXr9tnZvaz6HAxyBwYB3frCz11a_iURU8lX6-1LAQZwfFg1URzR8zcxb3S-xOBPIDv42M"}</script>
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"Q3x3ulfTbQdnhns48Vav9Q","iv":"5LWcXdo5kkeiy2t_","ct":"muE3N7RaV066E9PqDOQAbHeplbYKk2q0ZSEYZi9ETf1ui4ruJCOpdsTENtdarYPPifCkOCeC0-i3hAUenIwQb8mofT-Cp1a6Q7i_JuYliuggoEzXxWNysyI5Jh9oWKS2QpRyDU8l_zz1_BNn9J2-h_s46QG-DcJJFBldRiIxAFLeKpSlBw_6Rk8MX5-hTDmfzAIFe9WBtgaN48STzKKmKWv8YzcNulcsQCISVUcM0zNDwRRfhORv1VhZTfXHBDG5pBvkN8UI_3ONfiVETtNJnPXbIvnxSyWJlj-38biUlReRKml4vZmuwaodZ_DnqKhi4gU-2JBTlucyE6vKlgAhIn84yyxyZurxnrHaOEDrnxyZ52T8RhzuNUnxWv-TvvEe_ZA0dZ5jnhMWyr9VncUBT4cvWlAF2C0lvlVTnlZtiFmrYb1ZBk0-Ql95beBY8ZF1pclxXqDLyOY4_tAbP9z5a8fXEYhL8QMrsMbLB9I74HwyDjLs_B3BzDGX48jI-uHmGXYETU37goEFTml8mc34Z-LkL2kxqd3dwZvKlkClvwYXfRUi8fjmkF-YE6UnObFDEmZuF0hTCYaEwJnr7Ow1Tz43v3SRMMuWam3nWB59d7Z6AcjBVNcOp6braNcpmUspkmlIOktsSHy0VYLrZZxljjVbEIxNmXxOvIjrKQYuAcPLzhWFD57_LFIyQ0LZC3DIDCAruzKTVhJf9QWq-HwJEhon_4lxD9zkRe4MGToxJa8_TzutA9F4G2FjbsB1JRD3GiaQBw8Zvlqcu8tJrz01SjQpFdIFirqtZ2pOHEV8JXRJRJ6_P4zgWTXgWwRzP1ZCdKbbkqkBl7MMC96atC_h6n8Q2xc1Fhe3fzFxQLXfElgS8QAqFEG7xmRlXC88a6sr1DfygqcMtEo98KepquVREYwh94Jsz4sJoC4E7wTpuFz-s0NvPsP2jdhUlODq4QLYo_xzjaVvUjl72adE2zCwkWkys2DyLRuG1YJmaNnyDJKEhCTIySNbkCObpycZcoiFMH3JreKSSgt76RUfKnx4302X6ceBIel9tS3_Tomou-3rHvTOVj7teoN3rj-pIQ2xH2FWUm2oTfT9B_0uWhH1tA6Ym0_fo_PQAFKt4jPEPU-yLmbbdpWjsbCN-CcQMXRv2W1YuLaB1N-gucAmYaWJEy3fwRl_2HZUXJMGvT4ApG6KGMujJRflU5j3sFv717eebF--hj9fhq64kA3T940wARSt7iF0wUygoZrfCEzUWJIRtH_YjQ7EkpXFKIEXXYQmuNw5yI-iiSk7OPtMnt780GYxi9norYzwkXkGu-UUfkrI8sUzJKp5tBVGVCKNRIktM5rrrAhWHgcn67zaEmCvxj8IlLkJghLB9ROutO3_CoirlQiWskp2_dREVjtKS6m1qQE_DsoRO_QLdVO43ViUww-ILNZ0SgSdKXYVTj2u1poq5uvLvVYAZ599fdw1jbKGLc-qq0WiG4CY203x5Vq-tTs1-rzGtIrFFokMK362RASr-djXCgUFDHLGQG0qTF89RCQPnnBoo4zF8tp4Fd-KM_t03evDOWhFZMLfIIoMwL8TwzJjhDGiy_Radvfe_G5XarjtC6NrKgmhksg_XHHpbUGMa3i-kDznfjknd1l4SSjLpGUk6Bdh8V116eRPsb7SeJX0GH1DFD0r4Gji5lTtnJEBd2RebXtjSD6zHhRweB0jPpQNQsXjOOodLh-MYspChlfj90GwRpjJ87z33oXuJZnDqUcVDtsUZMUdOJ5q1rAxo6duseDSh5Xk4xIhpOkruhjqOSFwQh6zFARZ8OUvSnbkl7_wXa2D80iKzPkHifZYrNCmox-9RoLEIODb3fzCyXcT-CoejKHC5Q2MChpA3uk4sJXq_V1Tz554H2uDVH973qndsMm3I0hbWsGEYKvfgCf3ha9M01klq6XFiHj8BMFT482_NV40WgQzFxE0Tmg9ynwGVP6isd79k4OhaEaym8TrIjJMrYRalEyl7fY5-FyotHGZ2yAF-8R4WTIOBHOyIijIPMTBkMShrXOZWKZvFz1gVo8J8cAKaLzwXSXNchgLIvJrauRzVs7p6Y3-B5Y4dSF_P2Bj1_yEtHS_AGCSSkl9DyPOLw3W09t2-xxyyCctE_7naPx5TEX0j1Ek5oDi9cHOzo5fChP7-_O9crafEO8LNPrpJ1xYsj36_PpQX0ZdHhrw28khNyApyEDjDdtG57QP7QeIwXxSPZUeuifHVaWiy4OwnA3KtryHLi60RimpqcL1CYzKw582hkCH6M3FPQCSqQEeLLIimWUytfjaqc6xSHDIrXWY8aTFe_CQUWcN3gF_7NmjaEJjuBH1IvOXcLZNdSBKse9sOc2z3kfhFxnos5OhaYy9RTMegZttS-k99fqxIxm-5Q7N9zYIPH7bp360OTnHbsnyY1wQrcs6wvv6yKU5rR5yj1YJmlMNFyuUi4AvJ_oJZhU1MYzmJ4NLTWcOgX2I6X5JzpqdDBvD4BoZTm1iEUoYXINy4NXNzhE0aCjYg7Bwtzz4ZRgMu3BFY-plTwkUI8e4HTTFFZDINMzjyoL9t3QpINX8EXfePnxGVWGYriT5KJKUIbVousE7_VdEj1YKWNqdrSfqgyjlYEeEzcJVcTptCW0nB68UYsnDFF_DLM9bAFWl6JEzHzqJPrLOj2Qx9fXnClld4mVdDwep4-W4ix5GcTx5pLX7miYKx2gdO8h80qrtiLx7Bx7jUNnN1-V_efvAhoriY7JwukI-bHoRgfVoon-eHMauunOoU8NdnQ_x5PM_bUi-mCi-SvCvZ6Fj3p70ZKuklhrDh4i73IkN7mDNtA_Z87jQzMs13Oy31q020OqqihmYe_RJPhiNpI4Y9b0ly_VBGn3uOJuMFAjYxv-vURxVJz3TUGVE0SbH9LNEGSg09jPrnMBYzFahzgWDl6MgsGCMZkNdT4DGG3kZkNzMbKK2vpX2OVj5c8revVEWSfSt0Qjy6eVouNsKbWbDs27Mi5N_TCEufR5qnnlpo-MZ9cFu0OzBMfLTZCKVIoUP1fh2FNC09tzyFFcUjEra7o7vUC7E5jOlLytOcfRLlPchyizabxvZCOQ8kYy91iDVTnu7ke3UEbvZ_hHXQJ9dRln92c2EQBKeU6R0kWeH7U6nFvs6YDSUSTd0xBfWrraD6GgRt-KWzOxmf9dgrjR4Hko-fnithWu17KXlWAcp_0doTmiLFIvljCLKsk_xxr2rCQX2kw8pWa2g-4I88mG-rjWIMPS5JcsDQ3pWEpzmCT22m5Js6QTh5oxJqa6E2dKlBFXuigrtJLtYuYh1m9mUemR4Lzx215ie71202NrMgg9gRum8L78y5FfwHq8xe-QBBOLTgdVXuNpwpiHUpB6fO0tYyU1J8d3jTsSUit391NbkAHc6RwzY9ICkByqgQWdlBHkiHEPHip2p11w5vza0c8xCHyreBBkb7SAG9ny_u7fsqwl0R2mltksKeaez2gVmLyBDFkKy9Vr7SzIqygFfvwAeSV2slVp3hz0u0I2i7mxW4Kz800GW2rl3k4oLxJQcCLON5wzt-8Qm2frag5J51vaxVqP-oHdiDrwcJZ235IxRYyeHBfDD8JB60c5IQGJeW-k_u6KBe9tE1CnrqaGrR1bPT5pMz3EupYm73WH2Y-jF9u6Opp3tipZQn-YYHDogZNLoRixul-y_OGut9WHgSi6LqVF8a3J8-bUMTJ-9Xu7wf8ixXp1cU4m26QdbvTIZozWPmjivmhCivqrc3UfjTeXQIzehu1YAaQFbJ517OWxlNhC7GpUOgSE_xsj3ykGOzrl91ij23CNpxWax8Ue2x8dvMKUT8skWdIc_bVfkrnZxhO5dWDafUMsJUDJ121P7pv71tP6Ac5AbDnfkyDu8V2aqoYhrpG2qMOl6PvDVmfituOZHqJlTjuI6RIA8RIWnIGuWoOLt8gNXIqPcnxNze-AAKeObT0XrPSQxmvVqmU2KzmxdT3FHWK5uhzJiH8n5j_Gq1fRrDwAGJGj96DbhLip646K1jQhuYknm8ZZCef9PQvM-1pTv973E_MpQUalAseSgxbZmWSJxCxXGxyRG5vkaSSHU8qDRGaW0R8tRZUh5mWoeNI9IYOAI3F0dbpoCcbWTW6_75pHX9MS5p7QFjpZvXPIMaBrKR_KFWkq7TOgunFaa-XPEifugxVBN6_7ThGCAZlyiMSAHvKTxRWuT6WaUvvLNcxlPlCMR3n_iPuOzhnknfjMQc_SchRshCF21DUDe0LQn_KjffhH2aEt7s4Z_3N3C_elzMlwJrb-KgVH749NJeT5eVXhnMcLGpVnuOyQJzjIkCYrWaeq-XtBeHqQVFDdjsZ-qVlV0wGtbVPl1FJlPo2ee7sXMYYmEoZLi4Cx0GT2un6x6-Q-1d5eB9saBIKEwJtajfdDFYlchzyiqnZHQit4VH1UyzUFDrRZ52UyrYbMfqQ4ycpq0Ug8L7HsUVFLeAQc9pTparFyTPOCBs7NX1gMYx3atOwCS16UeFyjw9_KPYu4SzQQl9S7QGPwTrY-CuuRbmh6KfasE6ZFL0rOhl06x1jkWL9vTZtNtMcEUljAS5ZuoxPLrTQZhvLUVFOv_OBjWw2x3Hj9tiG1HwjiemKn-d84YphFoO5Kv4_E_UdaXU_fpy0iTM-QWMRHZ5h4Wfy495U8grU9UB_uaFDH7v5ouaZhS3w24KJ8AZKaijAngAROZe1oanWs-l6P2p0FSXQv21Owj7C099ikW6AUe-Bao__TDLZXdFdjAEFdY4JqshwP7FDmRKz3G5XG9rDvx64EE_gjDTk2nONP0EJ1UU3OPUgKA6awkyNWhJ5px6kxhTRv6VxXoFgy1rJJI4hNBIFBxd6gIdCG8nFkbYF2c3Bs8B1m3xl0OD2CKER_xRIGP7PF65T5GgH4A9SdYO4XXH4HN-BCKjKbyVymG720eu3J61Lb_hylyaiAHSA0bAZmLH81cU5MW23Fg0wgabyYwZj3achJrtsCAgJ52RI2zY7cu6IspT3sIOTXQs9pCG5WP9mJunhFmKV7Yj-cGd6Sz6MX6OYDi63opxhQF2OYdnHgtWHcmfrAKg_ymPEY7SwpQDQL_KNm89XZKJ8rSHp5gOeNx0IiIUaJ-UwyRWc-4XkDk3TG9Nx3j5o1Nj1hXziEWTnKIgz3r5yFei8iT9ZNM4H3RcepYMXZAVMLiXpJFLDkHsu-VZhBuqGbcVTnNo4vcKYVWIqukuQqP__pvhD5fNKnc7nUjb2sygJC6bytxVAOciejK76b21-LbB38ZJgpJZ5iWCRuOpopMlunbSIR3fJwaqaFsOqYCbyIs6e028V3UTR3mlPCZsNVOnYX9X_QB6UGJaroKzwXv2NdrmqEcteUT3QJxAm_QUu17PB3KCH_s_SnGRX08t_yrMQF4-rg-aowG3vTHWMjYlsmSYABuVuCnSprIQF3dbzrwLHxTPuk6bUR7Mxuo3L9TCGZGXS5CuMdKWmeMAR2zYscRKP1XycagusOEj904pD0dif9hFqSlx7a1GW10OP4AgE7za9z_0uCSUR5UGneLqIlVFgwEqK5navrHkdRzozF_IIQrk9KfKo0sEn7n4aJjh_LgCvQWnvk7SrpsQ6GbHhZ0tqComYY4RDdO6qW4sH-JudGV3NkIdSuSo2Iohn84QkuOra55qNtEGWt5d1JojO1vQO9TXGd_87OPyGOVfEQp4UL3icZANjjOGDEBe9dGNEq3Q_gYPWfr97h6AjsB55g_ZHfl2OpOmtIr2nPlxRR0jWSzxDBSx7an-42_ucPjEWhOjdzdwrpo5voJlPIvgvmKtNCh1d83XkwLwBOaWWEJbuaw3SwfSxw852KZVlEe-Md5Euuvvlf8Qf3ikAmY5NQwtlWjlPn6kgIhCUeGhUcFDk1Rs0oB-8Lk_ttqQhOo4BxJZeZh3aZ7UJrcm09Wu63BFbnK2nzzc8DXdF3IfZcPivgjgTnZGl3s9JXWrslgRlTj5nd4dU4XBFg-Pb4gtAqhC23d_jSEy-ZTsdZeWE1WkySKXbUtV0NmiHyhOT8-m2haayv1raGbTqoeVawBB8p4_RrAkL76DDcxL1f-lvsAU9oLeVrC2ZMLcJAmAFyolYIYBALnsCIGL8zI1dkDbF5QtL8xmCg8SEF-8HrPmXUB0NKlH_ayYLAWMtzUW519eIXFw4auXaZ30uQJ0q4GBLOhWvgm5frG6XeOHxSwM9L1aUa8QT9YRSxbtSF0KtCxrsJaFZ0SxDNRJ52LZhtPIvglsx3DNf4rYvhEXMassuCoNKM4dWFNjCgWNTpTwk6zXQ8MKcb4OB5X1X119DH5MuWPL0nDMTQfwVb8re4gZaUijpXonyY2d61kRQuqR3r_FF44RHic_khg7lBQ9Y5DwEI1quvNQeyDffo7Cgy3luGX"}</script>
   <!-- herdr:end -->
 
 <script>
 // This page is public: the tab is hidden, the file is not. Nothing below names a machine,
-// an address, a port or a user -- all of that is AES-GCM ciphertext in #herdrCipher, keyed
-// by PBKDF2-SHA256 over the word plus the light sequence. scripts/herdr-gate.mjs seals it
-// from secret/terminal.html and derives the key identically.
+// an address, a port or a user -- all of that is AES-GCM ciphertext in #herdrCipher.
 //
-// Pressing Enter cannot unlock anything: the word is only half the key, and nothing can be
-// checked until the light sequence completes. So Enter is treated as a failed attempt and
-// RESETS the gate -- box cleared, sequence cleared. (Asked for 2026-10-04. It used to say
-// "Wrong password." and keep the text, which read as a bug: you had typed the right word
-// and it told you it was wrong.)
-//
-// A completed-but-wrong light sequence resets the same way. That reveals only that an
-// attempt failed, which the absence of content already showed; it still never says WHICH
-// half was wrong, because a gate that does can be searched half at a time.
+// THE KEY IS THE PANEL'S (2026-10-04). This page used to carry its own password box and
+// its own three traffic lights, so reaching it meant logging in twice with two different
+// credentials: the dots at the top of the panel, then three more buttons here. Both the
+// box and the lights are gone. The panel already knows the secret, this page is sealed
+// under the same one, and it simply asks for it.
 (function(){
-  const box   = JSON.parse(document.getElementById('herdrCipher').textContent);
-  const gate  = document.getElementById('gate');
-  const input = document.getElementById('pw');
-  const msg   = document.getElementById('msg');
-  const out   = document.getElementById('out');
-  let seq = [], unlocked = false, trying = false;
+  const box  = JSON.parse(document.getElementById('herdrCipher').textContent);
+  const out  = document.getElementById('out');
+  const locked = document.getElementById('locked');
 
   const unb64 = s => {
     s = s.replace(/-/g, '+').replace(/_/g, '/');
@@ -157,11 +110,21 @@
     return Uint8Array.from(atob(s), c => c.charCodeAt(0));
   };
 
-  // Must match secretFor() in scripts/herdr-gate.mjs.
-  async function tryOpen(word, lights){
+  // The panel opened with a word and a dot order; this page is sealed under the same
+  // secret, so it asks the parent for it instead of showing a second set of buttons.
+  // Same-origin, so this is a plain function call. Opened on its own it stays shut --
+  // deliberately, because a gate here would be the second login all over again.
+  function panelSecret(){
+    try {
+      return (window.parent !== window && typeof window.parent.__panelSecret === 'function')
+        ? (window.parent.__panelSecret() || '') : '';
+    } catch(e){ return ''; }   // different origin: treat as no key
+  }
+
+  // Must match secretFor() in scripts/herdr-gate.mjs and the panel's tryUnlock().
+  async function open(secret){
     const base = await crypto.subtle.importKey(
-      'raw', new TextEncoder().encode(word.trim().toLowerCase() + '\n' + lights.join(' ')),
-      'PBKDF2', false, ['deriveBits']);
+      'raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveBits']);
     const bits = await crypto.subtle.deriveBits(
       { name:'PBKDF2', hash:'SHA-256', salt: unb64(box.salt), iterations: box.iter }, base, 256);
     const key = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
@@ -169,43 +132,14 @@
     return new TextDecoder().decode(pt);
   }
 
-  async function light(colour){
-    if(unlocked || trying) return;
-    seq.push(colour);
-    if(seq.length < box.n) return;   // an attempt is exactly box.n clicks; a failure resets
-    trying = true;
-    try {
-      const html = await tryOpen(input.value, seq);
-      unlocked = true;
-      gate.hidden = true;
-      out.innerHTML = html;
-    } catch(e){ wrong(); }      // a completed attempt that failed: reset and say so
-    trying = false;
-  }
-
-  function wrong(){
-    seq = [];
-    input.value = '';
-    msg.textContent = 'Wrong password.';
-    input.focus();
-  }
-
-  const eye = document.getElementById('eye');
-  eye.addEventListener('click', () => {
-    const show = input.type === 'password';
-    input.type = show ? 'text' : 'password';
-    eye.setAttribute('aria-pressed', String(show));
-    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    eye.title = show ? 'Hide password' : 'Show password';
-    input.focus();
-  });
-
-  document.getElementById('go').addEventListener('click', wrong);
-  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
-  input.addEventListener('input', () => { msg.textContent = ''; });
-  document.querySelectorAll('#lights .g-light').forEach(b =>
-    b.addEventListener('click', () => light(b.dataset.c)));
-  input.focus();
+  (async () => {
+    const secret = panelSecret();
+    if(secret){
+      try { out.innerHTML = await open(secret); return; }
+      catch(e){ /* panel key did not fit: fall through */ }
+    }
+    locked.hidden = false;
+  })();
 })();
 </script>
 </body>

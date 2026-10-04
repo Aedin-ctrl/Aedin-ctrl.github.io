@@ -994,6 +994,10 @@
   // scripts/secret.mjs, so the page source only holds ciphertext. The key
   // comes from the word typed in the address bar plus the dot colours.
   const SECRET_BOX = JSON.parse(document.getElementById('secretCipher').textContent);
+  // The exact secret that opened the panel. The Devices and Terminal pages are sealed
+  // under the SAME word and dot order, so they ask for it here rather than showing a
+  // second login of their own. Same-origin iframes only; it never goes in a URL.
+  let panelSecret = '';
   const DOT_COLORS = { dotClose:'red', dotMinimize:'yellow', dotMaximize:'green' };
   const fromB64 = s => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
 
@@ -1118,8 +1122,13 @@
   async function tryUnlock(word, sequence){
     const secret = word + '\n' + sequence.map(id => DOT_COLORS[id]).join(' ');
     const key = await pbkdf2(secret, fromB64(SECRET_BOX.salt), SECRET_BOX.iter, 256);
-    return openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
+    const html = await openSealed(key, SECRET_BOX.iv, SECRET_BOX.ct);
+    if(html !== null) panelSecret = secret;   // the secret tabs are sealed under this too
+    return html;
   }
+
+  // How a secret tab asks for it. Same-origin, so the iframe can simply call this.
+  window.__panelSecret = () => panelSecret;
 
   function handleDot(id, defaultAction){
     if(!secretArmed){ defaultAction(); return; }
@@ -1184,6 +1193,7 @@
   const lockShackle = document.getElementById('lockShackle');
   function setSecretUnlocked(open){
     secretUnlocked = open;
+    if(!open) panelSecret = '';            // locking takes the tabs' key with it
     addressEl.classList.toggle('unlocked', open);
     lockShackle.setAttribute('d', open ? 'M7 11V7a5 5 0 0 1 9.9-1' : 'M7 11V7a5 5 0 0 1 10 0v4');
     document.getElementById('secretTabs').hidden = !open;

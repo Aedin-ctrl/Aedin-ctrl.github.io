@@ -8,8 +8,19 @@
 //   docs/devices/index.html   the herdr card's link       <- secret/herdr.json "payload"
 //   docs/terminal/index.html  the whole Terminal page     <- secret/terminal.html
 //
+// THE KEY IS THE PANEL'S OWN (2026-10-04). These pages used to carry a second word and a
+// second light sequence of their own, so opening one meant logging in twice with different
+// credentials -- the panel's dots at the top of the page, and then three more buttons on
+// the page itself. They are sealed under secret/config.json now, the same word and dot
+// order that opens the panel, and the panel hands that secret down to the page. The second
+// set of buttons is gone.
+//
+// Consequence: CHANGING THE PANEL PASSWORD MEANS RE-SEALING THESE. Run this script again
+// after scripts/secret.mjs seal, or the Terminal and Devices pages stop opening.
+//
 // Plaintext lives in secret/ (gitignored; the repo is public):
-//   secret/herdr.json     {"word": ..., "dots": ["yellow", ...], "iterations": ..., "payload": {...}}
+//   secret/config.json    {"word": ..., "dots": [...]}  <- the key, shared with the panel
+//   secret/herdr.json     {"payload": {...}}            <- the herdr card's link
 //   secret/terminal.html  the Terminal page's inner HTML
 //
 //   node scripts/herdr-gate.mjs seal    encrypt both into their pages
@@ -19,7 +30,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const CONFIG = join(ROOT, 'secret/herdr.json');
+const CONFIG = join(ROOT, 'secret/herdr.json');        // the payload
+const PANEL  = join(ROOT, 'secret/config.json');       // the key -- shared with the panel
 const TARGETS = [
   { page: join(ROOT, 'docs/devices/index.html'),  indent: '  ',
     label: 'the herdr card',
@@ -43,6 +55,11 @@ function die(msg){ console.error('error: ' + msg); process.exit(1); }
 function loadConfig(){
   if(!existsSync(CONFIG)) die(`missing ${CONFIG}`);
   const c = JSON.parse(readFileSync(CONFIG, 'utf8'));
+  // The word and lights come from the PANEL's config, not this file's: one login, not two.
+  const panel = JSON.parse(readFileSync(PANEL, 'utf8'));
+  c.word = panel.word;
+  c.dots = panel.dots;
+  c.iterations = panel.iterations || c.iterations;
   if(!c.word || !Array.isArray(c.dots) || !c.dots.length) die('config needs "word" and "dots"');
   for(const d of c.dots) if(!DOT_COLORS.includes(d)) die(`dot "${d}" must be one of ${DOT_COLORS.join(', ')}`);
   if(!c.payload || !c.payload.url) die('config needs a "payload" with a "url"');
@@ -101,7 +118,7 @@ async function cmdOpen(){
     const box = boxIn(splitPage(t.page).inner);
     const key = await pbkdf2(secretFor(c.word, c.dots), unb64(box.salt), box.iter, 256);
     let text;
-    try { text = await unseal(key, box.iv, box.ct); } catch { die('wrong word or lights in secret/herdr.json'); }
+    try { text = await unseal(key, box.iv, box.ct); } catch { die('wrong word or lights in secret/config.json'); }
     console.log(`--- ${t.page.slice(ROOT.length + 1)}`);
     console.log(text);
   }
