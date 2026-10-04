@@ -45,6 +45,14 @@
   .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
            background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
   .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
+  .g-eye{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+         border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:0;
+         cursor:pointer; flex:0 0 auto; color:var(--ink); opacity:.65;}
+  .g-eye:hover{opacity:1;}
+  .g-eye svg{width:17px; height:17px; display:block;}
+  .g-eye .eye-off{display:none;}
+  .g-eye[aria-pressed="true"] .eye-on{display:none;}
+  .g-eye[aria-pressed="true"] .eye-off{display:block;}
   /* herdr gate. The link is not in this file in the clear -- #herdrCipher is AES-GCM and
      the key is the word left sitting in the box plus the traffic lights, in order.
      Pressing Enter is the decoy: it never unlocks and never clears what was typed. */
@@ -156,6 +164,7 @@
         <div class="g-row">
           <input id="herdrPw" type="password" autocomplete="off" autocapitalize="off"
                  autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="herdrMsg">
+          <button type="button" class="g-eye" id="herdrEye" aria-pressed="false" aria-label="Show password" title="Show password"><svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.8 12s3.6-7 10.2-7 10.2 7 10.2 7-3.6 7-10.2 7S1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6.6 0 10.2 7 10.2 7a18 18 0 0 1-3.3 4.2M6.3 6.4A18 18 0 0 0 1.8 12s3.6 7 10.2 7a9.8 9.8 0 0 0 4.3-1M3 3l18 18"/></svg></button>
           <button type="button" class="g-enter" id="herdrGo">Enter</button>
         </div>
         <div class="g-msg" id="herdrMsg" role="status" aria-live="polite"></div>
@@ -170,7 +179,7 @@
   </section>
 
   <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
-  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"Hl7wvCtzUi6TSsQ9Z17LIw","iv":"HIQjBVoiGgw-XIRO","ct":"oAFD_1OtB-Zqk7ZBEbXC-0UVARU2fe4EK9n8TaPDjjmIos7OP-SARKZu7jhQKTqvN7MHP4M8K8HU5ZS81unERHy7qr4vn93x4m_4SVEjLAlhvAt8gC8el_HvEVlUupfzeyN_iopNf1mtMnJCxQA4m1x4vkjxeb-bkaEKKmZsRnhsH2uJl3MHIgj1Ot9t9tXUd_DhFQgzzrC4eF4dIg5saPAWt5oj69oADauQAmvu8dJ84JXfcUlEw8sb7sM1H3fAWz4oaq_hHQTDvwGa8vcx25f_-vYRcu1wI-2ZTSCVwG3AtSWOlFqu8g"}</script>
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"WToElJAstDcV49APxG5NSg","iv":"f7v8EMp1fPXXkY7k","ct":"R_TJ-8zNP7cURLfyb4A1ocyRF_p3c8y534-sfXlvmxa6bILvNsrlOfPmLNZPcdigIHK7LJQK5XMQ9iUKt6UywJ4o4liw_EIsY77GDHtREihb3hXeEqZQ29CydeqDI6w2Hw9aKWou2uAEKfTTQUltIq4mnzL7Edp4Wk1jMsShWvtOUIldiaPCfgmTPukbG79LlgiIPsIpP1WGkk5_BxkG7hBNdwnerAoFee3FhkhaBiOjYWINk9Vj1na8JqADOHMtZOoJNMp0__yQB1uFaM1Nm_4obKDmUseMvmCaIGB16yH6ayTZhQ479w"}</script>
   <!-- herdr:end -->
 
   <div id="list" aria-live="polite"></div>
@@ -375,12 +384,14 @@
 // word still sitting in the box plus the traffic lights in the order they were clicked --
 // scripts/herdr-gate.mjs seals it from secret/herdr.json and derives the key identically.
 //
-// Pressing Enter is the decoy. It always reports a wrong password, it never unlocks, and
-// it deliberately leaves what was typed in the box -- the typed word is half the key, so
-// clearing it would throw away what the lights are about to be combined with.
+// Pressing Enter cannot unlock anything -- the word is only half the key, and nothing can
+// be checked until the light sequence completes. So Enter counts as a failed attempt and
+// RESETS the gate: box cleared, sequence cleared. (Asked for 2026-10-04; it used to report
+// a wrong password and keep the text, which read as a bug.)
 //
-// Wrong light sequences say nothing at all. A gate that reports which half was wrong is a
-// gate that can be searched half at a time.
+// A completed-but-wrong light sequence resets the same way. That reveals only that an
+// attempt failed, which the absence of content already showed. It still never says WHICH
+// half was wrong -- a gate that does can be searched half at a time.
 (function(){
   const cipherEl = document.getElementById('herdrCipher');
   if(!cipherEl) return;
@@ -433,20 +444,33 @@
   async function light(colour){
     if(unlocked || trying) return;
     seq.push(colour);
-    if(seq.length > box.n) seq = seq.slice(-box.n);   // a sliding window, so a wrong start is not a dead end
-    if(seq.length < box.n) return;
+    if(seq.length < box.n) return;   // an attempt is exactly box.n clicks; a failure resets
     trying = true;
     try { reveal(await tryOpen(input.value, seq)); }
-    catch(e){ /* wrong: say nothing */ }
+    catch(e){ wrong(); }             // a completed attempt that failed: reset and say so
     trying = false;
   }
 
   function wrong(){
-    msg.textContent = 'Wrong password.';   // the input keeps what was typed, on purpose
+    seq = [];
+    input.value = '';
+    msg.textContent = 'Wrong password.';
+    input.focus();
   }
+
+  const eye = document.getElementById('herdrEye');
+  eye.addEventListener('click', () => {
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    eye.title = show ? 'Hide password' : 'Show password';
+    input.focus();
+  });
 
   document.getElementById('herdrGo').addEventListener('click', wrong);
   input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
+  input.addEventListener('input', () => { msg.textContent = ''; });
   document.querySelectorAll('#herdrLights .g-light').forEach(b =>
     b.addEventListener('click', () => light(b.dataset.c)));
 
