@@ -71,6 +71,8 @@
                border:1px solid var(--line-strong); border-radius:999px; text-decoration:none;
                transition:background .15s ease, color .15s ease;}
   .g-out .open:hover{background:var(--ink); color:var(--paper);}
+  .g-out hr{border:0; border-top:1px solid var(--line); margin:18px 0;}
+  .g-out .m-what{margin:0 0 10px;}
   .g-url{font-family:ui-monospace, Menlo, monospace; font-size:12px; color:var(--faint);
          margin:12px 0 0; overflow-wrap:anywhere;}
   .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
@@ -165,7 +167,7 @@
   </section>
 
   <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
-  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"37L8989i0wb-WKJigotDCw","iv":"QkapF_U1Bjd_AFVh","ct":"RUzKMefItYE4SVCu1l0j3hrqv5qM5Lnor8G-e5KGUrEDsVSXLD79m7P-l4LJSkbQcatkMvzb9uEl39aU7nqbHePJaDv11PAeDLQRP9bbP92H0eVdh-Ntaj-MgbaM4PDhNQPdI46CXMEv1dzGLf6-TSUpawM-yTYUEG6nCDApvgo09uZJo0qZAufO-nU8KMz_I7IFrSpSvDS1AiC2MyHI7Y0u9QN9teTvHstGg_laORX4FEpV0fQg98ZuKu2IdtV-4ExEZyG0YAqEN53FW2TBgKfbFAAddr_0CWuUXQzPlKifS64W0TfOjw"}</script>
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"YHIAJT6jpEjm0Ue4cHqugg","iv":"DvSvlVI9yRegHl-Q","ct":"Tans3xH_VToJZzSj6Kmxhhpj5CjI-dIgb8x4nErBdgjFpW-6jeDLJjuoACdGNnCe0med3h4_i5FcAwNWi58d1WJav3jlSkTP7hBFWCzd03RnATdAgstPQnzPoZAXkK_DD0yxhBCqOYqROpicMbb5eDQUMt2zZX4v5AyOAw7PMnGiJedC3jX9ajjBuV45LE1ZrsXFt73gkbcGjjPbP1ked84Z-dzArnnk-G2MTYyhdWCJIPWpoq2sS7QC87daOg01sALLz7BMGzpCDXopXu7WAFzcdCGv_AWkQmXd6bEgd9j_mpR8O7IJbMC5eerX9PoMAth3N5fQ_tsQ7YYKl0FaPU4aegzmIAxcpdh4jkQAtZpZbjtoDY3fVGMcysjoJuComwc4AFnJht1dpSPLmRmubNlouFYuF8xcTJgaZIkF6L-0RsZiEiF0xqIjB7Xd27yCMvfdEpqysdGXih4-7N9rD9JMeaIfVV6surr6CivEHvUfqpeSpaPGdTQ_Id6U06YgWLXsPSt_tdUYNX781EWJhmP60btEErB5m74KYMX-RBdRS7nUae7oFHxjVc9qmKHx9naQGXfGmHPrkyOiaKTe-xnhXedmHKgCHbrMJ3vs6uu0SjrE5-cLMBcc"}</script>
   <!-- herdr:end -->
 
   <div id="list" aria-live="polite"></div>
@@ -422,15 +424,24 @@
     releaseRelay();
     gate.hidden = true;
     out.hidden = false;
-    const what = document.createElement('p');
-    what.textContent = p.what;
-    const a = document.createElement('a');
-    a.className = 'open'; a.href = p.url; a.target = '_blank'; a.rel = 'noopener';
-    a.textContent = 'Open ' + p.name;
-    const note = document.createElement('p');
-    note.className = 'g-url';
-    note.textContent = p.note + ' \u2014 ' + p.url;
-    out.replaceChildren(what, a, note);
+    // One entry per machine. The payload used to be a single object; a list keeps that
+    // working, because there is exactly one card and it should show everything behind it.
+    const machines = Array.isArray(p.machines) ? p.machines : [p];
+    const nodes = [];
+    machines.forEach((m, i) => {
+      if(i) nodes.push(document.createElement('hr'));
+      const what = document.createElement('p');
+      what.className = 'm-what';
+      what.textContent = m.what || m.name;
+      const a = document.createElement('a');
+      a.className = 'open'; a.href = m.url; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'Open ' + m.name;
+      const note = document.createElement('p');
+      note.className = 'g-url';
+      note.textContent = (m.note ? m.note + ' \u2014 ' : '') + m.url;
+      nodes.push(what, a, note);
+    });
+    out.replaceChildren(...nodes);
     document.getElementById('herdrState').textContent = 'Unlocked';
   }
 

@@ -16,7 +16,7 @@
 // password was not.
 //
 // Plaintext lives in secret/ (gitignored; the repo is public):
-//   secret/herdr.json     {"word": ..., "dots": ["yellow", ...], "iterations": ..., "payload": {...}}
+//   secret/herdr.json     {"word": ..., "dots": [...], "payload": {"machines": [{name,url,what,note}, ...]}}
 //   secret/terminal.html  the Terminal page's inner HTML
 //
 //   node scripts/herdr-gate.mjs seal    encrypt both into their pages
@@ -52,7 +52,15 @@ function loadConfig(){
   const c = JSON.parse(readFileSync(CONFIG, 'utf8'));
   if(!c.word || !Array.isArray(c.dots) || !c.dots.length) die('config needs "word" and "dots"');
   for(const d of c.dots) if(!DOT_COLORS.includes(d)) die(`dot "${d}" must be one of ${DOT_COLORS.join(', ')}`);
-  if(!c.payload || !c.payload.url) die('config needs a "payload" with a "url"');
+  // The payload is either one machine, or a list of them under "machines". The card shows
+  // every machine behind the gate, so there is no reason to have two cards.
+  const machines = c.payload && (Array.isArray(c.payload.machines) ? c.payload.machines
+                                                                   : [c.payload]);
+  if(!machines || !machines.length) die('config needs a "payload"');
+  machines.forEach((m, i) => {
+    if(!m || !m.url)  die(`payload machine ${i + 1} needs a "url"`);
+    if(!m.name)       die(`payload machine ${i + 1} needs a "name"`);
+  });
   return { iterations: 600000, ...c };
 }
 
