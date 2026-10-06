@@ -1,15 +1,25 @@
 {
-  "updated": "2026-10-06T14:46:31.532Z",
+  "updated": "2026-10-06T19:42:32.927Z",
   "episodes": [
     {
+      "id": "ep10",
+      "title": "A — WITH room tone + breath",
+      "day": "A/B test",
+      "synopsis": "Identical picture and narration. The gaps carry pink room tone at -56 dBFS, and sentence-rank pauses carry an inhale. 0.8% of samples are true digital zero.",
+      "video": "episodes/ep10.mp4",
+      "poster": "episodes/ep10.jpg",
+      "seconds": 86,
+      "bytes": 3224231
+    },
+    {
       "id": "ep01",
-      "title": "The Sky Is Full of Glass",
-      "day": "day 1",
-      "synopsis": "Two satellites collide over the Barents Sea and the cascade begins. Satellite television and internet go first. How to find news when the sky stops talking.",
+      "title": "B — WITHOUT (digital silence)",
+      "day": "A/B test",
+      "synopsis": "Identical picture and narration. Every gap is ffmpeg anullsrc: mathematical zeros. 17.3% of samples are true digital zero. This is what shipped before.",
       "video": "episodes/ep01.mp4",
       "poster": "episodes/ep01.jpg",
       "seconds": 86,
-      "bytes": 3024468
+      "bytes": 2737406
     }
   ]
 }
