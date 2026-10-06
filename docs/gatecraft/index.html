@@ -78,6 +78,31 @@
     padding:9px; border:1px solid var(--line); border-radius:9px; background:var(--wash); color:var(--ink); resize:vertical;}
   .row{display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;}
 
+  .tabs{display:flex; gap:3px; margin:-2px 0 10px; border-bottom:1px solid var(--line);}
+  .tab{padding:6px 8px; font-size:12.5px; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; border-radius:6px 6px 0 0;}
+  .tab:hover{color:var(--ink);}
+  .tab.on{color:var(--ink); border-bottom-color:var(--ink); font-weight:600;}
+  .pane{display:none;} .pane.on{display:block;}
+
+  .ovsum{font-size:11.5px; color:var(--faint); margin-bottom:8px;}
+  .ovcard{border:1px solid var(--line); border-radius:9px; padding:5px 7px 6px; margin-bottom:6px; background:var(--paper);}
+  .ovcard.on{border-color:var(--pick); box-shadow:0 0 0 2px color-mix(in srgb, var(--pick) 20%, transparent);}
+  .ovh{display:flex; align-items:baseline; gap:6px; width:100%; text-align:left; font-size:12.5px; padding:1px 2px; border-radius:6px;}
+  .ovh:hover{background:var(--wash);}
+  .ovh b{font:650 12px/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .ovh em{font-style:normal; color:var(--faint); font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ovcard ul{list-style:none; margin-top:2px;}
+  .prow{display:flex; align-items:center; gap:4px; font-size:11.5px; padding:2px 3px; border-radius:6px; cursor:pointer;}
+  .prow:hover{background:var(--wash);}
+  .prow.on{background:color-mix(in srgb, var(--pick) 16%, transparent);}
+  .pn{font:650 10.5px ui-monospace,Menlo,monospace; color:var(--faint); min-width:24px;}
+  .ar{color:var(--faint);}
+  .lnk{font:650 11px ui-monospace,Menlo,monospace; color:var(--pick); padding:1px 4px; border-radius:5px; border:1px solid transparent; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .lnk:hover{border-color:var(--pick);}
+  .none{color:var(--warn); font-size:11px;}
+  .bit{margin-left:auto; font:650 11px ui-monospace,Menlo,monospace; padding-left:4px;}
+  .bit.b1{color:var(--live);} .bit.b0{color:var(--faint);}
+
   @media (max-width:900px){
     /* the panel becomes a sheet you pull up, rather than vanishing entirely */
     .side{position:fixed; inset:auto 0 0 0; width:auto; max-height:62vh; z-index:40; display:none;
@@ -110,17 +135,32 @@
     <svg class="board" id="board"></svg>
     <div class="hint" id="hint">
       <b>Pick a part, click to place it</b>
-      <small>Drag from one pin to another to wire them. Click a switch to flip it.</small>
+      <small>Drag pin to pin to wire them up. Drag the end off an input to unplug it.<br>Click a switch to flip it.</small>
     </div>
   </div>
 
   <div class="side" id="side">
-    <h2>Truth table</h2>
-    <div id="table"><p class="note">Add switches and lamps to see one.</p></div>
-    <h2 style="margin-top:18px">Examples</h2>
-    <div id="examples"></div>
-    <h2 style="margin-top:18px">Keys</h2>
-    <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark<br>Double-tap a switch or lamp to name it, or a chip to look inside it.</p>
+    <div class="tabs" id="tabs">
+      <button class="tab on" data-tab="table">Table</button>
+      <button class="tab" data-tab="overview">Overview</button>
+      <button class="tab" data-tab="examples">Examples</button>
+    </div>
+    <div class="pane on" data-pane="table">
+      <h2>Truth table</h2>
+      <div id="table"><p class="note">Add switches and lamps to see one.</p></div>
+    </div>
+    <div class="pane" data-pane="overview">
+      <h2>What is wired to what</h2>
+      <div id="overview"></div>
+    </div>
+    <div class="pane" data-pane="examples">
+      <h2>Examples</h2>
+      <div id="examples"></div>
+      <h2 style="margin-top:18px">Keys</h2>
+      <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark · <b>L</b> names<br>
+      Drag pin to pin to wire. Drag the end off an input to unplug it. Tap a wire, then its ✕, to cut it.<br>
+      Double-tap a switch or lamp to name it, or a chip to look inside it.</p>
+    </div>
   </div>
 </main>
 
@@ -136,7 +176,8 @@
 
 <script type="module">
 import { PARTS, simulate, valueAt, truthTable, problems, pinPos, NETS, readoutValue,
-         CHIP, isChip, chipName, chipShape, defOf, chipPins } from './lib/sim.mjs';
+         CHIP, isChip, chipName, chipShape, defOf, chipPins,
+         autoLabels, pinLabel, connections } from './lib/sim.mjs';
 import { encode, decode, codeFromText } from './lib/share.mjs';
 import { EXAMPLES, buildExample } from './lib/examples.mjs';
 
@@ -153,7 +194,20 @@ let picked = null;            // part type chosen in the palette
 let selected = null;          // { kind:'part'|'wire', id }
 let dragging = null;          // moving a part
 let wiring = null;            // drawing a wire from a pin
-let running = true, nextId = 1;
+let running = true, nextId = 1, nextWire = 1;
+let focusPin = null;          // { partId, side, index } — the pin the overview is pointing at
+let hoverWire = null;         // wire id the pointer is over, so it can offer to cut it
+let showLabels = true;        // the AND2-1 style names, drawn above each part
+let labels = new Map();       // part id -> that name, recomputed every draw
+let lastValues = new Map();   // what the last simulation worked out, for the overview
+
+// Wires carry an id of their own. Selecting one by its position in the list was the bug behind
+// "I deleted the wrong wire": any edit that reorders the list silently moves the selection.
+function freshIds() {
+  for (const w of circuit.wires) if (!w.id) w.id = 'w' + nextWire++;
+  for (const p of circuit.parts) { const m = /^p(\d+)$/.exec(p.id); if (m) nextId = Math.max(nextId, +m[1] + 1); }
+}
+const labelOf = (id) => labels.get(id) || autoLabels(circuit).get(id) || id;
 
 // Undo. Circuits are small plain data, so the simplest correct thing is to keep whole snapshots
 // rather than trying to invert each action.
@@ -163,7 +217,8 @@ function remember() { past.push(snapshot()); if (past.length > 60) past.shift();
 function restore(json) {
   const c = JSON.parse(json);
   circuit = { parts: c.parts, wires: c.wires, name: c.name, chips: c.chips || {} };
-  selected = null; wiring = null; dragging = null;
+  freshIds();
+  selected = null; wiring = null; dragging = null; focusPin = null; hoverWire = null;
   paintPalette(); draw();
 }
 function undo() { if (!past.length) return; future.push(snapshot()); restore(past.pop()); flash('Undone'); }
@@ -264,22 +319,44 @@ function glyph(type, mini = false) {
 // ---------- drawing ----------
 function draw() {
   const { values, settled } = running || !memory.get(NETS) ? simulate(circuit, memory) : { values: memory.get(NETS), settled: true };
+  labels = autoLabels(circuit);
+  lastValues = values;
+  rebuildPins();
   for (const g of Object.values(layers)) g.replaceChildren();
   $('hint').style.display = circuit.parts.length ? 'none' : '';
 
-  for (const [i, w] of circuit.wires.entries()) {
+  for (const w of circuit.wires) {
     const a = pinPos(part(w.from[0]) || {}, 'out', w.from[1], circuit.chips);
     const b = pinPos(part(w.to[0]) || {}, 'in', w.to[1], circuit.chips);
     const live = valueAt(circuit, values, w.from[0], 'out', w.from[1]);
+    const chosen = selected?.kind === 'wire' && selected.id === w.id;
+    const traced = !!focusPin && onPin(w, focusPin);
     const dx = Math.max(26, Math.abs(b.x - a.x) * 0.5);
+    const d = `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}`;
+    // A fat invisible path under every wire. A 2.5px line is a cruel thing to ask anyone to hit,
+    // and missing it was most of why cutting a wire felt unreliable.
+    const hit = el('path', { d, fill: 'none', stroke: 'transparent', 'stroke-width': 18, 'stroke-linecap': 'round' });
+    hit.dataset.wire = w.id;
+    hit.style.cursor = 'pointer';
     const path = el('path', {
-      d: `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}`,
-      fill: 'none', stroke: live ? 'var(--live)' : 'var(--dead)',
-      'stroke-width': selected?.kind === 'wire' && selected.id === i ? 4.5 : 2.5, 'stroke-linecap': 'round',
+      d, fill: 'none',
+      stroke: chosen || traced ? 'var(--pick)' : live ? 'var(--live)' : 'var(--dead)',
+      'stroke-width': chosen || traced ? 4.5 : hoverWire === w.id ? 3.5 : 2.5,
+      'stroke-linecap': 'round',
+      opacity: focusPin && !traced ? 0.16 : 1,
     });
-    path.style.cursor = 'pointer';
-    path.addEventListener('pointerdown', (e) => { e.stopPropagation(); selected = { kind: 'wire', id: i }; draw(); });
-    layers.wires.append(path);
+    path.style.pointerEvents = 'none';
+    layers.wires.append(hit, path);
+    // the ✕ that cuts it. Delete needs a keyboard; this is the one way to disconnect with a finger,
+    // and it is what makes cutting a wire visibly different from drawing one.
+    if (chosen || hoverWire === w.id) {
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;   // the midpoint of that curve, exactly
+      const ring = el('circle', { cx: mx, cy: my, r: 9.5, fill: 'var(--paper)', stroke: 'var(--bad)', 'stroke-width': 1.6 });
+      const x = el('path', { d: `M${mx - 3.4} ${my - 3.4}L${mx + 3.4} ${my + 3.4}M${mx + 3.4} ${my - 3.4}L${mx - 3.4} ${my + 3.4}`,
+                             fill: 'none', stroke: 'var(--bad)', 'stroke-width': 2, 'stroke-linecap': 'round' });
+      for (const n of [ring, x]) { n.dataset.cut = w.id; n.style.cursor = 'pointer'; }
+      layers.top.append(ring, x);
+    }
   }
 
   for (const p of circuit.parts) {
@@ -305,6 +382,9 @@ function draw() {
     if ((p.type === 'in' || p.type === 'clock') && on) body.append(el('rect', { x: 4, y: 5, width: def.w - 14, height: def.h - 10, rx: 5, fill: 'var(--live)', opacity: .18 }));
     g.append(body);
 
+    // The name from the overview, drawn on the part, so the two can be read against each other.
+    if (showLabels) g.append(Object.assign(el('text', { x: def.w / 2, y: p.label ? -19 : -7, 'text-anchor': 'middle',
+      fill: 'var(--faint)', 'font-size': 9.5, 'font-family': 'ui-monospace, Menlo, monospace' }), { textContent: labels.get(p.id) || '' }));
     if (p.label) g.append(Object.assign(el('text', { x: def.w / 2, y: -7, 'text-anchor': 'middle', fill: 'var(--faint)', 'font-size': 11 }), { textContent: p.label }));
 
     for (const side of ['in', 'out']) {
@@ -312,11 +392,24 @@ function draw() {
       for (let i = 0; i < n; i++) {
         const pos = pinPos({ ...p, x: 0, y: 0 }, side, i, circuit.chips);
         const lit = valueAt(circuit, values, p.id, side, i);
+        // While a wire is being drawn, every pin it could legally land on wears a ring, and the
+        // one it would actually snap to wears a bigger one. Guessing was the other half of the
+        // problem: you could not tell whether you were about to connect until you let go.
+        const open = wiring && wiring.start.side !== side && wiring.start.partId !== p.id;
+        const aimed = wiring?.over && wiring.over.partId === p.id && wiring.over.side === side && wiring.over.index === i;
+        if (open) g.append(el('circle', { cx: pos.x, cy: pos.y, r: aimed ? 12 : 9, fill: 'none',
+          stroke: 'var(--pick)', 'stroke-width': aimed ? 2.5 : 1.2, opacity: aimed ? 1 : 0.4 }));
+        if (focusPin && focusPin.partId === p.id && focusPin.side === side && focusPin.index === i)
+          g.append(el('circle', { cx: pos.x, cy: pos.y, r: 11, fill: 'none', stroke: 'var(--pick)', 'stroke-width': 2.2 }));
         const dot = el('circle', { cx: pos.x, cy: pos.y, r: 5.5, fill: lit ? 'var(--live)' : 'var(--paper)', stroke: 'var(--strong)', 'stroke-width': 1.8 });
         dot.style.cursor = 'crosshair';
-        dot.addEventListener('pointerdown', (e) => { e.stopPropagation(); startWire(p, side, i); });
-        dot.addEventListener('pointerup', (e) => { e.stopPropagation(); endWire(p, side, i); });
         g.append(dot);
+        // how many wires leave this output, so fan-out is visible rather than a pile of overlaps
+        if (side === 'out') {
+          const fan = circuit.wires.filter((w) => w.from[0] === p.id && w.from[1] === i).length;
+          if (fan > 1) g.append(Object.assign(el('text', { x: pos.x + 1, y: pos.y - 8, 'text-anchor': 'middle',
+            fill: 'var(--faint)', 'font-size': 9, 'font-family': 'ui-monospace, Menlo, monospace' }), { textContent: '\u00d7' + fan }));
+        }
         if (def.pinNames) {
           const nm = def.pinNames[side === 'in' ? 'ins' : 'outs']?.[i];
           if (nm) g.append(Object.assign(el('text', { x: pos.x + (side === 'in' ? 9 : -9), y: pos.y + 3.5, 'text-anchor': side === 'in' ? 'start' : 'end', fill: 'var(--faint)', 'font-size': 9.5 }), { textContent: nm }));
@@ -324,22 +417,17 @@ function draw() {
       }
     }
     if (isChip(p.type)) g.append(Object.assign(el('title'), { textContent: `${chipName(p.type)} — double-tap to look inside` }));
-    g.addEventListener('pointerdown', (e) => startDrag(e, p));
-    // name a switch or lamp so the truth table has real column headings
-    if (p.type === 'in' || p.type === 'out') {
-      g.addEventListener('dblclick', (e) => {
-        e.stopPropagation(); e.preventDefault();
-        const name = prompt('Name this ' + (p.type === 'in' ? 'switch' : 'lamp'), p.label || '');
-        if (name === null) return;
-        remember();
-        if (name.trim()) p.label = name.trim().slice(0, 14); else delete p.label;
-        draw();
-      });
-    }
+    // No listeners on the part itself: every interaction redraws the whole board, so this node is
+    // gone before the gesture finishes. The board hit-tests the circuit data instead.
     layers.parts.append(g);
   }
 
-  if (wiring) layers.top.append(el('path', { d: `M${wiring.from.x} ${wiring.from.y}L${wiring.at.x} ${wiring.at.y}`, stroke: 'var(--pick)', 'stroke-width': 2.5, 'stroke-dasharray': '5 4', fill: 'none' }));
+  if (wiring) {
+    const a = wiring.anchor, b = wiring.over ? { x: wiring.over.x, y: wiring.over.y } : wiring.at;
+    layers.top.append(el('path', { d: `M${a.x} ${a.y}L${b.x} ${b.y}`, fill: 'none',
+      stroke: wiring.over ? 'var(--live)' : 'var(--pick)', 'stroke-width': wiring.over ? 3.5 : 2.5,
+      'stroke-dasharray': wiring.over ? '' : '5 4', 'stroke-linecap': 'round' }));
+  }
 
   const loose = problems(circuit);
   const note = $('note');
@@ -347,38 +435,192 @@ function draw() {
   else if (loose.length) { note.textContent = `${loose.length} input${loose.length > 1 ? 's' : ''} not connected`; note.className = 'note'; }
   else { note.textContent = circuit.parts.length ? 'Settled' : ''; note.className = 'note'; }
   paintTable();
+  paintOverview();
 }
+
+// does this wire touch that pin?
+const onPin = (w, f) => (f.side === 'out' && w.from[0] === f.partId && w.from[1] === f.index)
+                     || (f.side === 'in' && w.to[0] === f.partId && w.to[1] === f.index);
 
 const part = (id) => circuit.parts.find((p) => p.id === id);
 
 // ---------- interaction ----------
+//
+// Everything below hit-tests the circuit data rather than listening on the SVG nodes. The board is
+// rebuilt from scratch on every draw, so the node your finger went down on no longer exists by the
+// time it comes up — and on touch the browser sends the rest of the gesture to that dead node.
+// That was why wiring worked sometimes and not others.
 const at = (e) => { const r = board.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
 
+const COARSE = matchMedia('(pointer:coarse)').matches;
+const GRAB = COARSE ? 17 : 11;        // how near counts as grabbing a pin
+const DROP = GRAB + 11;               // dropping is more forgiving than grabbing, on purpose
+
+let pins = [];                        // every pin on the board, in board coordinates
+function rebuildPins() {
+  pins = [];
+  for (const p of circuit.parts) {
+    const def = defFor(p); if (!def) continue;
+    for (const side of ['in', 'out']) {
+      const n = side === 'in' ? def.ins : def.outs;
+      for (let i = 0; i < n; i++) {
+        const q = pinPos(p, side, i, circuit.chips);
+        pins.push({ partId: p.id, side, index: i, x: q.x, y: q.y });
+      }
+    }
+  }
+}
+function pinNear(x, y, side = null, reach = GRAB) {
+  let best = null, bestD = reach * reach;
+  for (const pin of pins) {
+    if (side && pin.side !== side) continue;
+    const d = (pin.x - x) ** 2 + (pin.y - y) ** 2;
+    if (d <= bestD) { bestD = d; best = pin; }
+  }
+  return best;
+}
+function partAt(x, y) {
+  for (let i = circuit.parts.length - 1; i >= 0; i--) {      // topmost first
+    const p = circuit.parts[i], def = defFor(p); if (!def) continue;
+    if (x >= p.x - 2 && x <= p.x + def.w + 2 && y >= p.y - 2 && y <= p.y + def.h + 2) return p;
+  }
+  return null;
+}
+// Let go anywhere over a gate and the wire lands on a sensible pin of it — the nearest one still
+// free, so wiring A and then B into an AND does not mean hitting the same 11px twice.
+function bestPinOn(p, want, x, y) {
+  const mine = pins.filter((q) => q.partId === p.id && q.side === want);
+  if (!mine.length) return null;
+  const free = want === 'in' ? mine.filter((q) => !circuit.wires.some((w) => w.to[0] === p.id && w.to[1] === q.index)) : mine;
+  const pool = free.length ? free : mine;
+  const dist = (q) => (q.x - x) ** 2 + (q.y - y) ** 2;
+  return pool.reduce((a, b) => (dist(b) < dist(a) ? b : a));
+}
+
+// ---- drawing and unplugging wires ----
+//
+// Starting from an input that already has a wire picks that wire up rather than starting a second
+// one, which is how every other tool behaves and is the gesture that was missing: there was no way
+// to unplug anything without a keyboard. Starting from an output always starts a NEW wire, because
+// one output feeding many inputs is the normal thing to want.
+function beginWire(pin, e) {
+  const held = pin.side === 'in' && circuit.wires.find((w) => w.to[0] === pin.partId && w.to[1] === pin.index);
+  if (held) {
+    remember();
+    circuit.wires = circuit.wires.filter((w) => w !== held);
+    const src = pins.find((q) => q.partId === held.from[0] && q.side === 'out' && q.index === held.from[1]);
+    if (src) {
+      wiring = { start: src, anchor: { x: src.x, y: src.y }, at: { x: pin.x, y: pin.y }, over: null, pulled: true, remembered: true };
+      return;
+    }
+  }
+  wiring = { start: pin, anchor: { x: pin.x, y: pin.y }, at: { x: pin.x, y: pin.y }, over: null, pulled: false, remembered: false };
+}
+
+function aimWire(x, y) {
+  const want = wiring.start.side === 'out' ? 'in' : 'out';
+  let over = pinNear(x, y, want, DROP);
+  if (!over) { const p = partAt(x, y); if (p && p.id !== wiring.start.partId) over = bestPinOn(p, want, x, y); }
+  wiring.over = over && over.partId !== wiring.start.partId ? over : null;
+}
+
+function finishWire(x, y) {
+  const w = wiring; wiring = null;
+  if (!w) return;
+  aimWireInto(w, x, y);
+  const target = w.over;
+  if (!target) {                                   // dropped on nothing
+    draw();
+    if (w.pulled) flash('Unplugged — that input is free again');
+    return;
+  }
+  const src = w.start.side === 'out' ? w.start : target;
+  const dst = w.start.side === 'out' ? target : w.start;
+  const replaced = circuit.wires.some((x2) => x2.to[0] === dst.partId && x2.to[1] === dst.index);
+  if (!w.remembered) remember();
+  circuit.wires = circuit.wires.filter((x2) => !(x2.to[0] === dst.partId && x2.to[1] === dst.index));
+  circuit.wires.push({ id: 'w' + nextWire++, from: [src.partId, src.index], to: [dst.partId, dst.index] });
+  selected = null; focusPin = null;
+  draw();
+  const names = autoLabels(circuit);
+  const pinOf = (q) => { const d = defFor(part(q.partId)); const n = q.side === 'in' ? d.ins : d.outs;
+                         return n > 1 ? ' ' + pinLabel(d, q.side, q.index, n) : ''; };
+  flash(replaced
+    ? `${names.get(dst.partId)}${pinOf(dst)} already had a wire — an input takes one, so it was replaced`
+    : `Connected ${names.get(src.partId)}${pinOf(src)} → ${names.get(dst.partId)}${pinOf(dst)}`);
+}
+// the same aiming the live drag does, so what you saw is what you get
+function aimWireInto(w, x, y) { const keep = wiring; wiring = w; aimWire(x, y); wiring = keep; }
+
 board.addEventListener('pointerdown', (e) => {
-  if (e.target !== board) return;
-  selected = null;
+  if (e.button > 0) return;
+  const pos = at(e);
+
+  const cut = e.target?.dataset?.cut;                      // the ✕ on a wire
+  if (cut) { cutWire(cut); return; }
+
+  const pin = pinNear(pos.x, pos.y);                       // a pin beats the part it sits on
+  if (pin) {
+    selected = null; focusPin = null;
+    grab(e);
+    beginWire(pin, e);
+    draw();
+    return;
+  }
+
+  const p = partAt(pos.x, pos.y);
+  if (p) { pressPart(e, p, pos); return; }
+
+  const wid = e.target?.dataset?.wire;                     // a wire in open space
+  if (wid) { selected = { kind: 'wire', id: wid }; focusPin = null; draw(); return; }
+
+  selected = null; focusPin = null;
   if (picked) {
     remember();
-    const p = at(e), def = defFor({ type: picked }) || PARTS[picked] || { w: 60, h: 40 };
-    circuit.parts.push({ id: 'p' + (nextId++), type: picked, x: snap(p.x - def.w / 2), y: snap(p.y - def.h / 2) });
+    const def = defFor({ type: picked }) || PARTS[picked] || { w: 60, h: 40 };
+    circuit.parts.push({ id: 'p' + (nextId++), type: picked, x: snap(pos.x - def.w / 2), y: snap(pos.y - def.h / 2) });
     if (!e.shiftKey) { picked = null; paintPalette(); }
   }
   draw();
 });
-board.addEventListener('pointermove', (e) => {
-  if (dragging) {
-    const p = at(e);
-    dragging.part.x = snap(p.x - dragging.dx); dragging.part.y = snap(p.y - dragging.dy);
-    draw();
-  } else if (wiring) { wiring.at = at(e); draw(); }
-});
-addEventListener('pointerup', () => { dragging = null; if (wiring) { wiring = null; draw(); } });
 
-// Opening a chip to look inside it. This is deliberately NOT a native dblclick listener: every
-// interaction redraws the whole board, so the node the first click landed on is gone before the
-// second arrives and the browser never dispatches dblclick to it. Tracking the two presses
-// ourselves survives the redraw.
+board.addEventListener('pointermove', (e) => {
+  const pos = at(e);
+  if (dragging) {
+    const p = part(dragging.id); if (!p) { dragging = null; return; }
+    p.x = snap(pos.x - dragging.dx); p.y = snap(pos.y - dragging.dy);
+    draw();
+    return;
+  }
+  if (wiring) { wiring.at = pos; aimWire(pos.x, pos.y); draw(); return; }
+  const wid = e.target?.dataset?.wire || null;             // offer to cut what you are hovering
+  if (wid !== hoverWire) { hoverWire = wid; draw(); }
+});
+
+board.addEventListener('pointerup', (e) => {
+  try { board.releasePointerCapture(e.pointerId); } catch {}
+  const pos = at(e);
+  dragging = null;
+  if (wiring) finishWire(pos.x, pos.y);
+});
+// a gesture that ends somewhere unexpected must not leave a wire hanging off the pointer
+addEventListener('pointerup', () => { dragging = null; if (wiring) { const w = wiring; wiring = null; draw(); if (w.pulled) flash('Unplugged'); } });
+addEventListener('pointercancel', () => { dragging = null; wiring = null; draw(); });
+board.addEventListener('pointerleave', () => { if (!wiring && !dragging && hoverWire) { hoverWire = null; draw(); } });
+
+const grab = (e) => { try { board.setPointerCapture(e.pointerId); } catch {} };
+
+function cutWire(id) {
+  remember();
+  circuit.wires = circuit.wires.filter((w) => w.id !== id);
+  selected = null; hoverWire = null; focusPin = null;
+  draw(); flash('Wire cut');
+}
+
+// Two presses on the same part, tracked by hand. A native dblclick never arrives: every press
+// redraws the board, so the node the first one landed on is gone before the second is dispatched.
 let lastPress = { id: null, at: 0 };
+let handledTwice = 0;
 
 function openChip(p) {
   const name = chipName(p.type);
@@ -394,39 +636,54 @@ function openChip(p) {
     wires: def.wires.map((w) => ({ from: [n(w.from[0]), w.from[1]], to: [n(w.to[0]), w.to[1]] })),
     on: [],
   };
+  freshIds();
   memory = new Map();
   selected = null;
   dragging = null;
+  wiring = null;
+  focusPin = null;
   draw();
 }
 
-function startDrag(e, p) {
-  e.stopPropagation();
+function renamePart(p) {
+  const name = prompt('Name this ' + (p.type === 'in' ? 'switch' : 'lamp'), p.label || '');
+  if (name === null) return;
+  remember();
+  if (name.trim()) p.label = name.trim().slice(0, 14); else delete p.label;
+  draw();
+}
+
+function pressPart(e, p, pos) {
   const now = Date.now();
   const again = lastPress.id === p.id && now - lastPress.at < 450;
   lastPress = { id: p.id, at: now };
-  if (again && isChip(p.type)) { lastPress = { id: null, at: 0 }; openChip(p); return; }
+  if (again) {
+    lastPress = { id: null, at: 0 };
+    handledTwice = now;
+    if (isChip(p.type)) { openChip(p); return; }
+    if (p.type === 'in' || p.type === 'out') { renamePart(p); return; }
+  }
   selected = { kind: 'part', id: p.id };
+  focusPin = null;
   if (p.type === 'in') {                                   // a switch is there to be flipped
     const mem = memory.get(p.id) || {};
     mem.on = !mem.on; memory.set(p.id, mem);
   }
-  const pos = at(e);
-  dragging = { part: p, dx: pos.x - p.x, dy: pos.y - p.y };
+  grab(e);
+  dragging = { id: p.id, dx: pos.x - p.x, dy: pos.y - p.y };
   draw();
 }
-function startWire(p, side, i) { const pos = pinPos(p, side, i, circuit.chips); wiring = { part: p, side, index: i, from: pos, at: pos }; }
-function endWire(p, side, i) {
-  if (!wiring) return;
-  let a = wiring, b = { part: p, side, index: i };
-  if (a.side === b.side) { wiring = null; return draw(); }         // out->out makes no sense
-  if (a.side === 'in') [a, b] = [b, a];                            // always from an output
-  if (a.part.id === b.part.id) { wiring = null; return draw(); }
-  remember();
-  circuit.wires = circuit.wires.filter((w) => !(w.to[0] === b.part.id && w.to[1] === b.index));  // one source per input
-  circuit.wires.push({ from: [a.part.id, a.index], to: [b.part.id, b.index] });
-  wiring = null; draw();
-}
+
+// Where a real double-click does get through, honour it too — but not twice.
+board.addEventListener('dblclick', (e) => {
+  if (Date.now() - handledTwice < 800) return;
+  const pos = at(e), p = partAt(pos.x, pos.y);
+  if (!p) return;
+  e.preventDefault();
+  handledTwice = Date.now();
+  if (isChip(p.type)) openChip(p);
+  else if (p.type === 'in' || p.type === 'out') renamePart(p);
+});
 
 addEventListener('keydown', (e) => {
   if (e.target.matches('textarea, input')) return;
@@ -435,17 +692,18 @@ addEventListener('keydown', (e) => {
     if (e.shiftKey) redo(); else undo();
     return;
   }
-  if (e.key === 'Escape') { picked = null; selected = null; wiring = null; paintPalette(); draw(); }
+  if (e.key === 'Escape') { picked = null; selected = null; wiring = null; focusPin = null; hoverWire = null; paintPalette(); draw(); }
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selected) remember();
     if (selected?.kind === 'part') {
       circuit.parts = circuit.parts.filter((p) => p.id !== selected.id);
       circuit.wires = circuit.wires.filter((w) => w.from[0] !== selected.id && w.to[0] !== selected.id);
-    } else if (selected?.kind === 'wire') circuit.wires.splice(selected.id, 1);
-    selected = null; draw();
+    } else if (selected?.kind === 'wire') circuit.wires = circuit.wires.filter((w) => w.id !== selected.id);
+    selected = null; focusPin = null; draw();
   }
   const n = parseInt(e.key, 10);
   if (n >= 1 && n <= 9) { picked = ORDER[n - 1]; paintPalette(); }
+  if (e.key.toLowerCase() === 'l') { showLabels = !showLabels; try { localStorage.setItem('gatecraft-labels', showLabels ? '1' : '0'); } catch {} draw(); }
   if (e.key.toLowerCase() === 'd') {
     const dark = document.documentElement.dataset.theme === 'dark';
     document.documentElement.dataset.theme = dark ? 'light' : 'dark';
@@ -467,7 +725,7 @@ setInterval(() => {
 
 $('run').addEventListener('click', () => { running = !running; $('run').textContent = running ? 'Running' : 'Paused'; $('run').classList.toggle('on', !running); draw(); });
 $('step').addEventListener('click', () => { tick++; for (const p of circuit.parts) if (p.type === 'clock') { const m = memory.get(p.id) || {}; m.on = tick % 2 === 0; memory.set(p.id, m); } simulate(circuit, memory); draw(); });
-$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '', chips: circuit.chips }; memory = new Map(); selected = null; draw(); });
+$('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '', chips: circuit.chips }; memory = new Map(); selected = null; focusPin = null; draw(); });
 // Package what is on the board into a reusable part. The switches become its inputs and the lamps
 // its outputs, which is the natural reading of a circuit you have just finished.
 $('makeChip').addEventListener('click', () => {
@@ -488,6 +746,88 @@ $('panelBtn').addEventListener('click', () => {
   // on a phone the panel is a pull-up sheet; on a wide screen it is a column that hides
   if (matchMedia('(max-width:900px)').matches) side.classList.toggle('open');
   else side.classList.toggle('hidden');
+});
+
+// ---------- the side panel ----------
+function setTab(which) {
+  for (const b of $('tabs').querySelectorAll('.tab')) b.classList.toggle('on', b.dataset.tab === which);
+  for (const s2 of $('side').querySelectorAll('.pane')) s2.classList.toggle('on', s2.dataset.pane === which);
+}
+$('tabs').addEventListener('click', (e) => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  setTab(b.dataset.tab);
+});
+
+// ---------- the overview ----------
+//
+// Everything on the board, named and numbered, with what each pin is wired to. The names are
+// worked out from the parts list every time (see autoLabels), so they renumber themselves when you
+// delete something rather than leaving a gap. Clicking a pin traces it on the board.
+let scrolledTo = null;
+
+function paintOverview() {
+  const host = $('overview');
+  if (!circuit.parts.length) {
+    host.innerHTML = '<p class="note">Nothing on the board yet. Whatever you place turns up here, named, with everything it is wired to.</p>';
+    return;
+  }
+  const loose = problems(circuit).length;
+  const sum = `${circuit.parts.length} part${circuit.parts.length > 1 ? 's' : ''} · ${circuit.wires.length} wire${circuit.wires.length === 1 ? '' : 's'}`
+    + (loose ? ` · <b style="color:var(--warn)">${loose} input${loose > 1 ? 's' : ''} not connected</b>` : '');
+
+  const lit = (v) => `<span class="bit b${v}">${v}</span>`;
+  const other = (partId, side, index) => {
+    const q = part(partId); if (!q) return '';
+    const d = defFor(q), n = d ? (side === 'in' ? d.ins : d.outs) : 0;
+    const pinName = n > 1 ? ' ' + pinLabel(d, side, index, n) : '';
+    return `<button class="lnk" data-go="${partId}" data-side="${side}" data-index="${index}">${esc(labels.get(partId) || partId)}${esc(pinName)}</button>`;
+  };
+
+  const cards = circuit.parts.map((p) => {
+    const def = defFor(p); if (!def) return '';
+    const rows = [];
+    for (const side of ['in', 'out']) {
+      const n = side === 'in' ? def.ins : def.outs;
+      for (let i = 0; i < n; i++) {
+        const links = connections(circuit, p.id, side, i);
+        const to = links.length
+          ? links.map((c) => other(c.partId, c.side, c.index)).join('')
+          : `<span class="none">${side === 'in' ? 'nothing wired in' : 'goes nowhere'}</span>`;
+        const on = focusPin && focusPin.partId === p.id && focusPin.side === side && focusPin.index === i;
+        rows.push(`<li class="prow${on ? ' on' : ''}" data-part="${p.id}" data-side="${side}" data-index="${i}">`
+          + `<span class="pn">${esc(pinLabel(def, side, i, n))}</span><span class="ar">${side === 'in' ? '←' : '→'}</span>`
+          + `${to}${lit(valueAt(circuit, lastValues, p.id, side, i))}</li>`);
+      }
+    }
+    const chosen = selected?.kind === 'part' && selected.id === p.id;
+    return `<div class="ovcard${chosen ? ' on' : ''}" data-card="${p.id}">`
+      + `<button class="ovh" data-go="${p.id}"><b>${esc(labels.get(p.id) || p.id)}</b>`
+      + `<em>${esc(p.label || def.name)}</em></button>`
+      + (rows.length ? `<ul>${rows.join('')}</ul>` : '') + '</div>';
+  });
+
+  host.innerHTML = `<p class="ovsum">${sum}</p>${cards.join('')}`;
+  // follow the board's selection, but only when it has just changed — otherwise the panel fights
+  // you for the scrollbar every time the clock ticks
+  const id = selected?.kind === 'part' ? selected.id : null;
+  if (id && id !== scrolledTo) host.querySelector(`[data-card="${id}"]`)?.scrollIntoView({ block: 'nearest' });
+  scrolledTo = id;
+}
+
+$('overview').addEventListener('click', (e) => {
+  const go = e.target.closest('[data-go]');
+  if (go) {
+    const id = go.dataset.go;
+    selected = { kind: 'part', id };
+    focusPin = go.dataset.side ? { partId: id, side: go.dataset.side, index: +go.dataset.index } : null;
+    scrolledTo = null; draw(); return;
+  }
+  const row = e.target.closest('.prow');
+  if (!row) return;
+  const same = focusPin && focusPin.partId === row.dataset.part && focusPin.side === row.dataset.side && focusPin.index === +row.dataset.index;
+  focusPin = same ? null : { partId: row.dataset.part, side: row.dataset.side, index: +row.dataset.index };
+  selected = { kind: 'part', id: row.dataset.part };
+  draw();
 });
 
 // ---------- truth table ----------
@@ -546,7 +886,8 @@ async function load(code) {
   for (const id of c.on || []) memory.set(id, { on: true });
   paintPalette();
   nextId = c.parts.length + 1;
-  selected = null;
+  freshIds();
+  selected = null; focusPin = null;
   draw();
 }
 
@@ -564,13 +905,17 @@ for (const [name, ex] of Object.entries(EXAMPLES)) {
     circuit = { ...ex, chips: { ...circuit.chips, ...(ex.chips || {}) } };
     memory = new Map();
     nextId = circuit.parts.length + 1;
-    selected = null; picked = null; paintPalette(); draw();
+    freshIds();
+    selected = null; picked = null; focusPin = null;
+    setTab('table');                     // the table is the point of the example
+    paintPalette(); draw();
   });
   $('examples').append(b);
 }
 
 // ---------- go ----------
 try { const t = localStorage.getItem('gatecraft-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+try { showLabels = localStorage.getItem('gatecraft-labels') !== '0'; } catch {}
 if (location.hash.length > 3) load(codeFromText(location.hash)).catch(() => draw());
 else draw();
 addEventListener('resize', draw);

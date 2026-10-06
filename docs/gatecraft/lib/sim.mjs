@@ -235,3 +235,52 @@ export function truthTable(circuit, { limit = 10 } = {}) {
   }
   return { switches: switches.map((s) => s.label || s.id), lamps: lamps.map((l) => l.label || l.id), rows };
 }
+
+// ---- names ----
+//
+// Every part gets a name you can say out loud: AND2-3 is the third two-input AND on the board.
+// The number is its position among its own kind in the parts list, worked out fresh every time
+// rather than stored — so deleting AND2-2 renumbers AND2-3 down to AND2-2 on its own, and a design
+// that arrived over a link is named exactly like one you just built.
+const CODES = { in: 'SW', out: 'LAMP', clock: 'CLK', num: 'NUM', dff: 'DFF' };
+
+export function partCode(part, chips) {
+  if (isChip(part.type)) return chipName(part.type).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10) || 'CHIP';
+  if (CODES[part.type]) return CODES[part.type];
+  const def = PARTS[part.type];
+  if (!def) return 'PART';
+  // how many inputs it takes is part of the name, because a three-input AND is a different part
+  return def.ins > 1 ? part.type.toUpperCase() + def.ins : part.type.toUpperCase();
+}
+
+export function autoLabels(circuit) {
+  const count = new Map(), names = new Map();
+  for (const p of circuit.parts || []) {
+    const code = partCode(p, circuit.chips);
+    const n = (count.get(code) || 0) + 1;
+    count.set(code, n);
+    names.set(p.id, `${code}-${n}`);
+  }
+  return names;
+}
+
+// What to call one pin. Parts that name their own pins (D, CLK, Q) keep those; everything else
+// gets A, B, C… so the overview has something to point at.
+const LETTERS = 'ABCDEFGH';
+export function pinLabel(def, side, index, total) {
+  const given = def?.pinNames?.[side === 'in' ? 'ins' : 'outs']?.[index];
+  if (given) return given;
+  if (total > 1) return LETTERS[index] || String(index + 1);
+  return side === 'in' ? 'in' : 'out';
+}
+
+// Everything attached to one pin, as plain data the overview can render. An input has at most one
+// (an input takes one wire); an output can have any number, which is the whole point of fan-out.
+export function connections(circuit, partId, side, index) {
+  const wires = circuit.wires || [];
+  return side === 'in'
+    ? wires.filter((w) => w.to[0] === partId && w.to[1] === index)
+           .map((w) => ({ wire: w, partId: w.from[0], side: 'out', index: w.from[1] }))
+    : wires.filter((w) => w.from[0] === partId && w.from[1] === index)
+           .map((w) => ({ wire: w, partId: w.to[0], side: 'in', index: w.to[1] }));
+}
