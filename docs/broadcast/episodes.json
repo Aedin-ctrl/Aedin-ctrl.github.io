@@ -1,25 +1,25 @@
 {
-  "updated": "2026-10-07T19:43:10.375Z",
+  "updated": "2026-10-07T19:45:07.182Z",
   "episodes": [
     {
       "id": "ep11",
-      "title": "A — spans + uneven pauses",
-      "day": "23.2s",
-      "synopsis": "Each sentence synthesised separately, then spliced with pauses of 0.40 / 0.45 / 0.50 / 0.55 / 0.75 / 1.15 / 1.35 / 1.45 / 1.70 s — chosen by what the line is doing, not on a pattern. Room tone and an inhale in every gap over 0.70 s.",
+      "title": "A2 — one pass, sentence gaps stretched",
+      "day": "19.0s",
+      "synopsis": "One continuous ZONOS2 pass, so the prosody never restarts. Only the 8 sentence-boundary pauses were lengthened, from the inside, by 0.20 to 1.35 s. The 4 within-sentence breaks are untouched.",
       "video": "episodes/ep11.mp4",
       "poster": "episodes/ep11.jpg",
-      "seconds": 23,
-      "bytes": 408438
+      "seconds": 19,
+      "bytes": 340483
     },
     {
       "id": "ep10",
-      "title": "B — one pass (what you picked)",
+      "title": "B — one pass, untouched",
       "day": "13.9s",
-      "synopsis": "The same ZONOS2 am_echo clone, but the whole script in a single call, so the breaks are the model's own punctuation pauses: short and evenly spaced.",
+      "synopsis": "The take you picked. Sentence breaks 183-344 ms.",
       "video": "episodes/ep10.mp4",
       "poster": "episodes/ep10.jpg",
       "seconds": 14,
-      "bytes": 249812
+      "bytes": 246949
     }
   ]
 }
