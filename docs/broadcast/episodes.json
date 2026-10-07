@@ -1,45 +1,45 @@
 {
-  "updated": "2026-10-07T02:52:58.880Z",
+  "updated": "2026-10-07T03:02:54.461Z",
   "episodes": [
     {
       "id": "ep13",
-      "title": "ZONOS2 — American Male",
-      "day": "15.0s",
-      "synopsis": "ZONOS2 8B MoE, cloned from its stock AmericanMale reference. Apache-2.0, fully local.",
+      "title": "ZONOS2 cloned from am_echo",
+      "day": "13.9s",
+      "synopsis": "ZONOS2 given am_echo's timbre as its clone reference. The voice you liked, with a 8B model's prosody.",
       "video": "episodes/ep13.mp4",
       "poster": "episodes/ep13.jpg",
-      "seconds": 15,
-      "bytes": 270975
+      "seconds": 14,
+      "bytes": 247830
     },
     {
       "id": "ep12",
-      "title": "ZONOS2 — American Female",
-      "day": "16.0s",
-      "synopsis": "ZONOS2 8B MoE, cloned from its stock AmericanFemale reference.",
+      "title": "ZONOS2 am_echo + calm",
+      "day": "15.8s",
+      "synopsis": "Same clone, with arousal pulled down 0.6 via ZONOS2's emotion direction vectors.",
       "video": "episodes/ep12.mp4",
       "poster": "episodes/ep12.jpg",
       "seconds": 16,
-      "bytes": 286044
+      "bytes": 276254
     },
     {
       "id": "ep11",
-      "title": "ZONOS2 — British Female",
-      "day": "21.2s",
-      "synopsis": "ZONOS2 8B MoE, cloned from its stock BritishFemale reference.",
+      "title": "ZONOS2 am_echo + slow rate",
+      "day": "16.3s",
+      "synopsis": "Same clone at speaking-rate 12.",
       "video": "episodes/ep11.mp4",
       "poster": "episodes/ep11.jpg",
-      "seconds": 21,
-      "bytes": 369449
+      "seconds": 16,
+      "bytes": 286496
     },
     {
       "id": "ep10",
       "title": "Kokoro am_echo (control)",
       "day": "13.5s",
-      "synopsis": "The incumbent. 82M params. Same lines, for comparison.",
+      "synopsis": "The incumbent, unchanged. Same lines.",
       "video": "episodes/ep10.mp4",
       "poster": "episodes/ep10.jpg",
       "seconds": 14,
-      "bytes": 188165
+      "bytes": 181139
     }
   ]
 }
