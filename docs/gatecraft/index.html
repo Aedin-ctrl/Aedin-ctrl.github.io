@@ -74,6 +74,24 @@
     padding:9px; border:1px solid var(--line); border-radius:9px; background:var(--wash); color:var(--ink); resize:vertical;}
   .row{display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap;}
 
+  /* Naming happens in the page, next to the thing being named. A browser prompt() is a grey slab
+     bolted to the top of the window that says the site's hostname — it belongs to the browser, not
+     to this. */
+  .namer{position:fixed; z-index:60; width:198px; padding:9px 10px 8px; border-radius:11px;
+    background:var(--paper); border:1px solid var(--line); box-shadow:0 12px 34px rgba(0,0,0,.18);}
+  .namer[hidden]{display:none;}
+  .namer label{display:block; font-size:10px; text-transform:uppercase; letter-spacing:.07em;
+    color:var(--faint); font-weight:650; margin-bottom:5px;}
+  .namer input{width:100%; font:13px/1.4 inherit; color:var(--ink); background:var(--wash);
+    border:1px solid var(--line); border-radius:7px; padding:6px 8px;}
+  .namer input:focus{outline:none; border-color:var(--pick); box-shadow:0 0 0 2px color-mix(in srgb, var(--pick) 20%, transparent);}
+  .namer .nrow{display:flex; gap:6px; align-items:center; margin-top:7px;}
+  .nbtn{font-size:12px; padding:4px 9px; border-radius:7px; border:1px solid var(--line); color:var(--muted);}
+  .nbtn:hover{border-color:var(--strong); color:var(--ink);}
+  .nbtn.go{background:var(--ink); color:var(--paper); border-color:var(--ink); margin-left:auto;}
+  .nbtn.go:hover{color:var(--paper);}
+  .namer small{display:block; margin-top:6px; font-size:10.5px; color:var(--faint);}
+
   .tabs{display:flex; gap:3px; margin:-2px 0 10px; border-bottom:1px solid var(--line);}
   .tab{padding:6px 8px; font-size:12.5px; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; border-radius:6px 6px 0 0;}
   .tab:hover{color:var(--ink);}
@@ -131,7 +149,7 @@
     <svg class="board" id="board"></svg>
     <div class="hint" id="hint">
       <b>Pick a part, click to place it</b>
-      <small>Drag pin to pin to wire them up. Drag the end off an input to unplug it.<br>Click a switch to flip it.</small>
+      <small>Drag pin to pin to wire them up. Drag the end off an input to unplug it.<br>Click a switch to flip it, or its name to rename it.</small>
     </div>
   </div>
 
@@ -155,10 +173,20 @@
       <h2 style="margin-top:18px">Keys</h2>
       <p class="note">1–9 pick a part · <b>Esc</b> deselect · <b>Delete</b> remove · <b>⌘Z</b> undo · <b>D</b> dark · <b>L</b> names<br>
       Drag pin to pin to wire. Drag the end off an input to unplug it. Tap a wire, then its ✕, to cut it.<br>
-      Double-tap a switch or lamp to name it, or a chip to look inside it.</p>
+      Click the name above a part to rename it. Double-tap a chip to look inside it.</p>
     </div>
   </div>
 </main>
+
+<div class="namer" id="namer" hidden>
+  <label for="namerIn" id="namerLab">Name this switch</label>
+  <input id="namerIn" maxlength="14" spellcheck="false" autocomplete="off">
+  <div class="nrow">
+    <button type="button" class="nbtn" id="namerClear">Clear</button>
+    <button type="button" class="nbtn go" id="namerOk">Done</button>
+  </div>
+  <small>Enter to save · Esc to cancel</small>
+</div>
 
 <dialog id="dlg"><form method="dialog" class="dlg">
   <h3 id="dlgTitle">Open a design</h3>
@@ -378,10 +406,23 @@ function draw() {
     if ((p.type === 'in' || p.type === 'clock') && on) body.append(el('rect', { x: 4, y: 5, width: def.w - 14, height: def.h - 10, rx: 5, fill: 'var(--live)', opacity: .18 }));
     g.append(body);
 
-    // The name from the overview, drawn on the part, so the two can be read against each other.
-    if (showLabels) g.append(Object.assign(el('text', { x: def.w / 2, y: p.label ? -19 : -7, 'text-anchor': 'middle',
+    // The name from the overview, drawn on the part so the two can be read against each other —
+    // and clickable, because the name is the obvious place to click to change the name. The body
+    // is left alone for what the part is for: clicking a switch flips it, twice included.
+    const named = el('g');
+    const tall = p.label && showLabels ? 30 : 17;
+    // stops 2px clear of the body: the name must never swallow a press meant for the part itself
+    named.append(el('rect', { x: -6, y: -tall - 2, width: def.w + 12, height: tall, fill: 'transparent' }));
+    if (showLabels) named.append(Object.assign(el('text', { x: def.w / 2, y: p.label ? -19 : -7, 'text-anchor': 'middle',
       fill: 'var(--faint)', 'font-size': 9.5, 'font-family': 'ui-monospace, Menlo, monospace' }), { textContent: labels.get(p.id) || '' }));
-    if (p.label) g.append(Object.assign(el('text', { x: def.w / 2, y: -7, 'text-anchor': 'middle', fill: 'var(--faint)', 'font-size': 11 }), { textContent: p.label }));
+    if (p.label) named.append(Object.assign(el('text', { x: def.w / 2, y: -7, 'text-anchor': 'middle', fill: 'var(--faint)', 'font-size': 11 }), { textContent: p.label }));
+    if (showLabels || p.label) {
+      for (const n of named.children) n.dataset.name = p.id;
+      named.dataset.name = p.id;
+      named.style.cursor = 'text';
+      named.append(Object.assign(el('title'), { textContent: `Click to name this ${def.name.toLowerCase()}` }));
+      g.append(named);
+    }
 
     for (const side of ['in', 'out']) {
       const n = side === 'in' ? def.ins : def.outs;
@@ -552,6 +593,10 @@ board.addEventListener('pointerdown', (e) => {
   if (e.button > 0) return;
   const pos = at(e);
 
+  const named = e.target?.dataset?.name;                   // the name written above a part
+  if (named) { const q = part(named); if (q) { e.preventDefault(); selected = { kind: 'part', id: named }; draw(); renamePart(q); return; } }
+  closeNamer(null);
+
   const cut = e.target?.dataset?.cut;                      // the ✕ on a wire
   if (cut) { cutWire(cut); return; }
 
@@ -641,23 +686,70 @@ function openChip(p) {
   draw();
 }
 
-function renamePart(p) {
-  const name = prompt('Name this ' + (p.type === 'in' ? 'switch' : 'lamp'), p.label || '');
-  if (name === null) return;
+async function renamePart(p) {
+  const def = defFor(p);
+  const where = board.getBoundingClientRect();
+  const name = await askName({
+    label: `Name this ${isChip(p.type) ? chipName(p.type) : (def?.name || 'part')}`,
+    value: p.label || '',
+    anchor: { left: where.left + p.x, top: where.top + p.y, width: def?.w || 50, height: def?.h || 36 },
+    allowClear: true,
+  });
+  if (name === null) return;                       // cancelled
   remember();
-  if (name.trim()) p.label = name.trim().slice(0, 14); else delete p.label;
+  if (name) p.label = name; else delete p.label;
+  selected = { kind: 'part', id: p.id };
   draw();
 }
+
+// ---- asking for a name, without handing the question to the browser ----
+//
+// prompt() is a grey slab at the top of the window with the site's hostname on it. This is a small
+// card beside the thing being named, which is also the only way it can show what it is naming.
+let namerDone = null;
+function askName({ label, value, anchor, placeholder = '', allowClear = false }) {
+  closeNamer(null);
+  const box = $('namer'), input = $('namerIn');
+  $('namerLab').textContent = label;
+  input.value = value;
+  input.placeholder = placeholder;
+  $('namerClear').hidden = !(allowClear && value);     // only where an empty name means something
+  box.hidden = false;
+  // measured after it is shown, so it can be kept on screen rather than half off the edge
+  const w = box.offsetWidth, h = box.offsetHeight, pad = 8;
+  let left = anchor.left + (anchor.width || 0) / 2 - w / 2;
+  let top = anchor.top - h - 10;
+  if (top < pad) top = anchor.top + (anchor.height || 0) + 10;        // no room above: go below
+  box.style.left = `${Math.max(pad, Math.min(left, innerWidth - w - pad))}px`;
+  box.style.top = `${Math.max(pad, Math.min(top, innerHeight - h - pad))}px`;
+  input.focus(); input.select();
+  return new Promise((resolve) => { namerDone = resolve; });
+}
+function closeNamer(answer) {
+  const done = namerDone; namerDone = null;
+  $('namer').hidden = true;
+  if (done) done(answer);
+}
+const namerValue = () => $('namerIn').value.trim().slice(0, 14);
+$('namerIn').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') { e.preventDefault(); closeNamer(namerValue()); }
+  if (e.key === 'Escape') { e.preventDefault(); closeNamer(null); }
+});
+$('namerIn').addEventListener('blur', () => { if (namerDone && !$('namer').matches(':focus-within')) setTimeout(() => { if (namerDone) closeNamer(null); }, 120); });
+$('namerOk').addEventListener('click', () => closeNamer(namerValue()));
+$('namerClear').addEventListener('click', () => closeNamer(''));
 
 function pressPart(e, p, pos) {
   const now = Date.now();
   const again = lastPress.id === p.id && now - lastPress.at < 450;
   lastPress = { id: p.id, at: now };
-  if (again) {
+  if (again && isChip(p.type)) {
+    // Only a chip does something different when pressed twice. A switch is there to be flipped,
+    // so pressing it twice flips it twice — naming moved onto the name above it.
     lastPress = { id: null, at: 0 };
     handledTwice = now;
-    if (isChip(p.type)) { openChip(p); return; }
-    if (p.type === 'in' || p.type === 'out') { renamePart(p); return; }
+    openChip(p);
+    return;
   }
   selected = { kind: 'part', id: p.id };
   focusPin = null;
@@ -674,11 +766,10 @@ function pressPart(e, p, pos) {
 board.addEventListener('dblclick', (e) => {
   if (Date.now() - handledTwice < 800) return;
   const pos = at(e), p = partAt(pos.x, pos.y);
-  if (!p) return;
+  if (!p || !isChip(p.type)) return;
   e.preventDefault();
   handledTwice = Date.now();
-  if (isChip(p.type)) openChip(p);
-  else if (p.type === 'in' || p.type === 'out') renamePart(p);
+  openChip(p);
 });
 
 addEventListener('keydown', (e) => {
@@ -688,7 +779,7 @@ addEventListener('keydown', (e) => {
     if (e.shiftKey) redo(); else undo();
     return;
   }
-  if (e.key === 'Escape') { picked = null; selected = null; wiring = null; focusPin = null; hoverWire = null; paintPalette(); draw(); }
+  if (e.key === 'Escape') { closeNamer(null); picked = null; selected = null; wiring = null; focusPin = null; hoverWire = null; paintPalette(); draw(); }
   if (e.key === 'Delete' || e.key === 'Backspace') {
     if (selected) remember();
     if (selected?.kind === 'part') {
@@ -724,11 +815,13 @@ $('step').addEventListener('click', () => { tick++; for (const p of circuit.part
 $('clear').addEventListener('click', () => { if (circuit.parts.length && !confirm('Clear the board?')) return; remember(); circuit = { parts: [], wires: [], name: '', chips: circuit.chips }; memory = new Map(); selected = null; focusPin = null; draw(); });
 // Package what is on the board into a reusable part. The switches become its inputs and the lamps
 // its outputs, which is the natural reading of a circuit you have just finished.
-$('makeChip').addEventListener('click', () => {
+$('makeChip').addEventListener('click', async () => {
   const { ins, outs } = chipPins(circuit);
   if (!ins.length || !outs.length) { flash('A chip needs at least one switch and one lamp', true); return; }
   if (circuit.parts.some((p) => isChip(p.type) && !circuit.chips[chipName(p.type)])) { flash('Something on the board is a chip I do not have', true); return; }
-  const name = (prompt('Name this chip', circuit.name || 'My chip') || '').trim().slice(0, 14);
+  const btn = $('makeChip').getBoundingClientRect();
+  const name = await askName({ label: 'Name this chip', value: circuit.name || '', placeholder: 'My chip',
+                               anchor: { left: btn.left, top: btn.top, width: btn.width, height: btn.height } });
   if (!name) return;
   if (PARTS[name]) { flash('That name is taken by a built-in part', true); return; }
   remember();
@@ -870,9 +963,13 @@ function show(title, text, value, isOpen) {
     catch (err) { flash("That doesn't look like a Gatecraft design", true); }
   };
 }
+// Each message clears the one before it. Without that, an older message's timer wipes a newer
+// message off the header early — the second of two quick actions would barely be readable.
+let flashTimer = 0;
 function flash(msg, bad = false) {
   const n = $('note'); n.textContent = msg; n.className = 'note' + (bad ? ' bad' : '');
-  setTimeout(draw, 2600);
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(draw, 2600);
 }
 
 async function load(code) {
