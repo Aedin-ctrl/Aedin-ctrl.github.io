@@ -200,6 +200,12 @@
   .highlight-mark{color:var(--faint); font-family:'Space Grotesk', sans-serif; font-size:13px; padding-top:1px;}
   .highlight-text{font-size:13.5px; color:var(--ink); line-height:1.5;}
   .highlight-text span{display:block; color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .side-col{display:flex; flex-direction:column; gap:20px;}
+  .now{border:1px solid var(--line); border-radius:12px; padding:26px 28px;}
+  .now-title{font-size:15px; color:var(--ink); display:block;}
+  .now-desc{color:var(--muted); font-size:13px; line-height:1.6; margin-top:6px;}
+  .now-meta{color:var(--faint); font-size:12.5px; margin-top:6px;}
+  .now .proj-link{display:inline-block; margin-top:12px;}
   .btn-primary, .btn-secondary{
     padding:11px 20px;
     border-radius:7px;
@@ -477,6 +483,7 @@
                 </div>
               </div>
             </div>
+            <div class="side-col">
             <div class="highlights">
               <div class="highlights-label">Highlights</div>
               <div class="highlight-item">
@@ -495,6 +502,14 @@
                 <span class="highlight-mark">04</span>
                 <span class="highlight-text">Captain, Northeastern Club Fencing <span>Leading the team into the 2026 national championship</span></span>
               </div>
+            </div>
+            <div class="now">
+              <div class="highlights-label">What I'm currently up to</div>
+              <span class="now-title">Gatecraft</span>
+              <p class="now-desc">A logic-gate designer that runs in the browser: drop switches, gates and lamps on a board, drag between pins to wire them up, and it simulates live &mdash; wires light up when they carry a 1. It works out the truth table for you, and latches and flip-flops hold their state properly because it settles the circuit the way real gates do.</p>
+              <p class="now-meta">JavaScript &middot; inline SVG &middot; settling logic simulator</p>
+              <button class="proj-link" data-path="/projects/gatecraft">View project</button>
+            </div>
             </div>
           </div>
         </section>
