@@ -1,25 +1,45 @@
 {
-  "updated": "2026-10-06T19:42:32.927Z",
+  "updated": "2026-10-07T02:52:58.880Z",
   "episodes": [
     {
-      "id": "ep10",
-      "title": "A — WITH room tone + breath",
-      "day": "A/B test",
-      "synopsis": "Identical picture and narration. The gaps carry pink room tone at -56 dBFS, and sentence-rank pauses carry an inhale. 0.8% of samples are true digital zero.",
-      "video": "episodes/ep10.mp4",
-      "poster": "episodes/ep10.jpg",
-      "seconds": 86,
-      "bytes": 3224231
+      "id": "ep13",
+      "title": "ZONOS2 — American Male",
+      "day": "15.0s",
+      "synopsis": "ZONOS2 8B MoE, cloned from its stock AmericanMale reference. Apache-2.0, fully local.",
+      "video": "episodes/ep13.mp4",
+      "poster": "episodes/ep13.jpg",
+      "seconds": 15,
+      "bytes": 270975
     },
     {
-      "id": "ep01",
-      "title": "B — WITHOUT (digital silence)",
-      "day": "A/B test",
-      "synopsis": "Identical picture and narration. Every gap is ffmpeg anullsrc: mathematical zeros. 17.3% of samples are true digital zero. This is what shipped before.",
-      "video": "episodes/ep01.mp4",
-      "poster": "episodes/ep01.jpg",
-      "seconds": 86,
-      "bytes": 2737406
+      "id": "ep12",
+      "title": "ZONOS2 — American Female",
+      "day": "16.0s",
+      "synopsis": "ZONOS2 8B MoE, cloned from its stock AmericanFemale reference.",
+      "video": "episodes/ep12.mp4",
+      "poster": "episodes/ep12.jpg",
+      "seconds": 16,
+      "bytes": 286044
+    },
+    {
+      "id": "ep11",
+      "title": "ZONOS2 — British Female",
+      "day": "21.2s",
+      "synopsis": "ZONOS2 8B MoE, cloned from its stock BritishFemale reference.",
+      "video": "episodes/ep11.mp4",
+      "poster": "episodes/ep11.jpg",
+      "seconds": 21,
+      "bytes": 369449
+    },
+    {
+      "id": "ep10",
+      "title": "Kokoro am_echo (control)",
+      "day": "13.5s",
+      "synopsis": "The incumbent. 82M params. Same lines, for comparison.",
+      "video": "episodes/ep10.mp4",
+      "poster": "episodes/ep10.jpg",
+      "seconds": 14,
+      "bytes": 188165
     }
   ]
 }
