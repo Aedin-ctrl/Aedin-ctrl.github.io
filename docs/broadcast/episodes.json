@@ -1,45 +1,25 @@
 {
-  "updated": "2026-10-07T03:02:54.461Z",
+  "updated": "2026-10-07T19:43:10.375Z",
   "episodes": [
     {
-      "id": "ep13",
-      "title": "ZONOS2 cloned from am_echo",
-      "day": "13.9s",
-      "synopsis": "ZONOS2 given am_echo's timbre as its clone reference. The voice you liked, with a 8B model's prosody.",
-      "video": "episodes/ep13.mp4",
-      "poster": "episodes/ep13.jpg",
-      "seconds": 14,
-      "bytes": 247830
-    },
-    {
-      "id": "ep12",
-      "title": "ZONOS2 am_echo + calm",
-      "day": "15.8s",
-      "synopsis": "Same clone, with arousal pulled down 0.6 via ZONOS2's emotion direction vectors.",
-      "video": "episodes/ep12.mp4",
-      "poster": "episodes/ep12.jpg",
-      "seconds": 16,
-      "bytes": 276254
-    },
-    {
       "id": "ep11",
-      "title": "ZONOS2 am_echo + slow rate",
-      "day": "16.3s",
-      "synopsis": "Same clone at speaking-rate 12.",
+      "title": "A — spans + uneven pauses",
+      "day": "23.2s",
+      "synopsis": "Each sentence synthesised separately, then spliced with pauses of 0.40 / 0.45 / 0.50 / 0.55 / 0.75 / 1.15 / 1.35 / 1.45 / 1.70 s — chosen by what the line is doing, not on a pattern. Room tone and an inhale in every gap over 0.70 s.",
       "video": "episodes/ep11.mp4",
       "poster": "episodes/ep11.jpg",
-      "seconds": 16,
-      "bytes": 286496
+      "seconds": 23,
+      "bytes": 408438
     },
     {
       "id": "ep10",
-      "title": "Kokoro am_echo (control)",
-      "day": "13.5s",
-      "synopsis": "The incumbent, unchanged. Same lines.",
+      "title": "B — one pass (what you picked)",
+      "day": "13.9s",
+      "synopsis": "The same ZONOS2 am_echo clone, but the whole script in a single call, so the breaks are the model's own punctuation pauses: short and evenly spaced.",
       "video": "episodes/ep10.mp4",
       "poster": "episodes/ep10.jpg",
       "seconds": 14,
-      "bytes": 181139
+      "bytes": 249812
     }
   ]
 }
