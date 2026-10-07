@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Terminal</title>
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b; --wash:#f6f6f7;
+    --ok:#1f9d55; --warn:#c98a06; --bad:#c92a2a; --off:#b8bcc4;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  main{max-width:980px; margin:0 auto; padding:32px clamp(16px,4vw,48px) 56px;}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:0 0 24px;}
+  .head h1{font-size:22px;}
+  .head p{color:var(--muted); font-size:14px; margin-top:4px;}
+  .fresh{font-size:12.5px; color:var(--faint); display:flex; align-items:center; gap:10px;}
+  .fresh button{font-size:12.5px; color:var(--ink); border-bottom:1px solid var(--faint);}
+
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--off); flex-shrink:0; display:inline-block;}
+  .dot.ok{background:var(--ok); box-shadow:0 0 0 3px rgba(31,157,85,.14);}
+  .dot.warn{background:var(--warn);}
+  .dot.bad{background:var(--bad);}
+
+  .m{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; transition:border-color .15s ease;}
+  .m:hover{border-color:var(--line-strong);}
+  .m-row{display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; padding:18px 20px;}
+  .m-name{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
+  .m-host{font-size:13px; color:var(--muted); margin-top:1px; overflow-wrap:anywhere;}
+  .m-state{font-size:13px; white-space:nowrap; text-align:right; color:var(--faint);}
+  .open{display:inline-block; font-size:13.5px; font-weight:600; padding:9px 16px;
+        border:1px solid var(--line-strong); border-radius:999px; text-decoration:none;
+        transition:background .15s ease, color .15s ease;}
+  .open:hover{background:var(--ink); color:var(--paper);}
+  .open[aria-disabled="true"]{opacity:.4; pointer-events:none;}
+
+  .note{border:1px solid var(--line); border-left:3px solid var(--warn); border-radius:8px;
+        padding:14px 16px; margin:22px 0 0; font-size:13.5px; color:var(--muted);}
+  .note b{color:var(--ink);}
+
+  details.setup{margin-top:26px; border-top:1px solid var(--line); padding-top:18px;}
+  details.setup summary{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+                        cursor:pointer; list-style:none;}
+  details.setup summary::-webkit-details-marker{display:none;}
+  details.setup summary::before{content:'+ '; color:var(--faint);}
+  details.setup[open] summary::before{content:'\2212 ';}
+  details.setup h3{font-size:14px; margin:18px 0 6px;}
+  details.setup p{font-size:13.5px; color:var(--muted); margin:0 0 8px;}
+  code{font-family:ui-monospace,'SF Mono',Menlo,monospace; font-size:12.5px;
+       background:var(--wash); border:1px solid var(--line); border-radius:6px;
+       padding:2px 6px; overflow-wrap:anywhere;}
+  pre{background:var(--wash); border:1px solid var(--line); border-radius:8px;
+      padding:12px 14px; overflow-x:auto; margin:0 0 10px;}
+  pre code{background:none; border:none; padding:0; font-size:12.5px; line-height:1.7;}
+  .kb{font-size:13.5px; color:var(--muted); margin:0 0 4px;}
+  .kb kbd{font-family:ui-monospace,monospace; font-size:12px; background:var(--wash);
+          border:1px solid var(--line); border-bottom-width:2px; border-radius:4px; padding:1px 5px;}
+
+  /* Everything that names the tailnet is ciphertext in #herdrCipher. */
+  .g-ask{font-size:13.5px; color:var(--muted); margin:0 0 10px; max-width:46ch;}
+  .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .g-row input{flex:1 1 200px; min-width:0; font-family:inherit; font-size:14px; color:var(--ink);
+               background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 12px;}
+  .g-row input:focus{outline:none; border-color:var(--line-strong);}
+  .g-enter{font-size:13.5px; font-weight:600; padding:9px 16px; border:1px solid var(--line-strong);
+           border-radius:999px; transition:background .15s ease, color .15s ease;}
+  .g-enter:hover{background:var(--ink); color:var(--paper);}
+  .g-msg{font-size:13px; min-height:20px; margin-top:8px; color:var(--bad);}
+  .g-eye{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
+         border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:0;
+         cursor:pointer; flex:0 0 auto; color:var(--ink); opacity:.65;}
+  .g-eye:hover{opacity:1; border-color:var(--line-strong);}
+  .g-eye svg{width:17px; height:17px; display:block;}
+  .g-eye .eye-off{display:none;}
+  .g-eye[aria-pressed="true"] .eye-on{display:none;}
+  .g-eye[aria-pressed="true"] .eye-off{display:block;}
+  .gate{border:1px solid var(--line); border-radius:12px; padding:18px 20px 20px; max-width:480px;}
+</style>
+</head>
+<body>
+<main>
+  <div class="head">
+    <div>
+      <h1>Terminal</h1>
+      <p>Claude Code and the other agents, from anywhere on the tailnet.</p>
+    </div>
+  </div>
+
+  <div class="gate" id="gate">
+    <p class="g-ask">Enter the password.</p>
+    <div class="g-row">
+      <input id="pw" type="password" autocomplete="off" autocapitalize="off"
+             autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="msg">
+      <button type="button" class="g-eye" id="eye" aria-pressed="false" aria-label="Show password" title="Show password"><svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.8 12s3.6-7 10.2-7 10.2 7 10.2 7-3.6 7-10.2 7S1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6.6 0 10.2 7 10.2 7a18 18 0 0 1-3.3 4.2M6.3 6.4A18 18 0 0 0 1.8 12s3.6 7 10.2 7a9.8 9.8 0 0 0 4.3-1M3 3l18 18"/></svg></button>
+      <button type="button" class="g-enter" id="go">Enter</button>
+    </div>
+    <div class="g-msg" id="msg" role="status" aria-live="polite"></div>
+  </div>
+
+  <div id="out"></div>
+</main>
+
+<!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
+  <script type="application/json" id="herdrCipher">{"v":1,"n":4,"iter":600000,"salt":"GvLS0hRUWjHSzrbFifPo-A","iv":"w4SdhAvgtOxqh79t","ct":"XOcHV0xUo0zzJiMY7a15jMTJQb-XUJytz65E8fJee6lvg8rv1AOrz5jtbVRchp_awCQR5v3M-EvitVnEjAXv19_hstEREM0xbnwnGf9lelPicYJmPeOnDNnX6lS66VfnlzxAIgVOOa2I7hyeVNKb0_UtgD0RCmwM1rihVUDYMvcoFA1jMZ1nJt9JTcqKXA96KjX8Bvy8Uswk7Le5kiZKqRk3TG1fCWrWNrL9HADuqcne-R7XnArGaYyjeLddQ2-VhOPBbt_iCr0CP472PmdyRZtoB14x9pnwfwFC-HlfbSPeXQSylXMcMRyQjMmiV2rE79heggXxVy0YMgcWdF8-Uu7tCGvupTl8xwH2n2g3SVl_neLOs1Pdvyn9m7ixUNGHmt0LJDzymIyfxy99Yl1cVyP_kN7Hr_Mu0PFAGGpEixRHg3Xgm9rYg0Rxs7hhCRGu5have0BKvWWlzFId2TUXFG37itYwIv1zQ0xVID6s4lVxGrtox19dXLgC2wtcJNvSwCnPSLx--YBjvzRiwpCSuSaZRmNXRZCHqCPlw5NQ4i0f1zc-YSAXwb6LPYTpXrtKRCCZfAWzwn8Int7z0x7b8vuoBFgl2gMGnQsV29cD24jQPKV-Sq37rhCU122GbbTkOH6Xqcqw6FrY8vokuo4k_HfMyzikc37KZADB9EKzUF2VD6-HNZYDAlr2SI2OAgO86FrAtLEREycs84uajOUGZklzkqwPJQXKRuXiVfbWxfqO1ne7VMjWCheGm7XZwY-Q5E6Haf1OotTF-ZArZYghxfH1yngpqG-kURgPCI031nM1HliQPRfbxhl3HT_vgDyHCheWaGQH8OI4eV3HdnsSwUQbwiLjXWuVCytTKXDSFb2Mvf7AI6QPjZbVyNXZhwIv79culfYnwteU_UKtQ32ggzhG4NMzp-O8-VR5UAV6iJgDsPtccyOCpxq0DPmxDvZR7QH6JeprdO2_Z0_qyFevOCbRUhRLQcquSTWRnnqQTteh2FsyRCAed132dzVMGbXo_KHrgt9kipUOob4W2krkaOMyp5XWrm4ijW0aEXt6fV2jGnEHD5ZteilqguXn11EsdbAVS8b6SfhvC4A0xvLWPJrJ3eQTTxhBaLze6jobKXZLsuajyJw2BqvaXk7Ucy0b__3QaYPIWWfzghysUqmVeYi5u36Z6Dv_syGAqPDc8kdr53-2DQT4G_qKiaaSvur-_Vt6jepBFMv_mz21CgIGKDl7yCOizOvkKeXhQZdxzAwcqFFIGKQZ3lYwxXqFoveGd15DXLVzZ_G0Wh1TnMpApTZm-CP3Wt5LgyAkiDgseoKX4RDlrO8zZDBgJj5Rc3CcoF0xJM_Lc84Xl09wGtWJPmsmUBBkvQvIhipJpgMmiZtOrRLqPyz3-KI9_M8EWPgKakA--yYb83yIX9aaesmMVXwbLrRNf4ygINk6SKkgMVaanAKYW2-Y_td1bq73iyooBnVmw0KDMZQXQtPZuLPHgi9tH0SNFlo4GzPdipXhFQpBt2wLYNFwwwXVjhr-gy059quSW3C4MUq5yChonwj2A4psL_sg88ioIIC8v9_nTgO1-KYrJPzzJ-A40Q1HMuuwAFG8HuusqBJHOP_c9sBRBm3wpbFR_B6swnQhuWH9qBDGZTPZ8nL-CnP7Ku9Au6TNKQ9smEvTDSmjj2kxOru8OgT0FjBc6MWExaeyzLLME0BR9_KVEYfCWAZQRkmhWlaAjxRn0bTC80Yv5qntqLc91BXdv-G0Nv4s-GUtXL3YG8NGMHORxM3ZsX7DERvt9mIDzCQ87hR3ELHX7_54UcEav_LeQS7Zbu3bSOWevtfZ6wkh6bNnqQb0qgDcTj6BCjsIghEz7Ga7baqtdvzt8udpsOuabRgKwcfsApnARHuR2Ql336mEpYRsvYcfuDvZRWWnC2HLUtu5udszqIWbYmHTL5sqMhaF76jkp6gKOQ0iMXDIVR6qScVQuz7YETfmllXgdmDK-EbrUaVuoRWbOb7NRn0EDZxljlVAUGLWJeKkzKTlu2AmpmcXOIMKcuadtGnE88qFBptAacbPnqQChS4xtVWmmILl67zk0Zt3pX-zmz0CaOteOMU5uddCjg2Uq9rIpQWwVShTkzdJlGfgZlZpTF_BC6b-7MPLLEO4OM_xG0kZPUgeWTLMQkZhOc6Pvzl0Ds2GQ_8NCGx0hEqYa7GwbUytjRjtoOR5Wr53AtY1qiNA4STa6U7HBI4nh1SKSbhqr66vlr8SAq_lFREN_6x23WDGvXpBob7iEJsqxeNp7dMR6-0sm6LHRlmQR_xxy9iNVOat3XzDtHuOdapBJBk_C2DmQOme6DX4V_WbTtYCfirnIzkq0CQa1irIDW0EqKkEfON-oVAV5U8UYVKxEqJuSgxa-mvWNmxIORY1t0n5GmCTPnOOjgs0t2NwFtNfgukbAbSkajy8ndAX7-vzfpqncbe48vSxO-91_0V-k9v1Lw4MtYWqNpcfShKpvhwdJB8_9T9UEYJusfPJR1Q4r6dy9zBmV-PsK-hHCkAptBQhnbJa4D32Z7JZzLgujviMMx192Uwc5HK16hsBJKBwddMF82fm-FiMmpvhqAhZ4R47CPTIGmz13X60Pa-cuDjxnEgA-atJEel0cqUm4wo0vfXs2qXj0cFkToGnxKLbRrNyOhazIwqaG4OE6gtLdK7put42roN8NuP-TNdwINF8tYxjxCyaZ6ldZLahg0EpbKkhCRVNK9OQ3ebxeW7uXH69eoN-FknxdNwkWA4hmBXWCXLcsekZ5XzIAVy3zbaXJ_mXBehN5JeHj8LBvrnaCpuVMei6BqzOp_AAw71ckwLJsFMbW2QV_qDa_g8wahNMEKAtKWHhnEqyswz0rqx8j7V-UCNpU8vED99y85HwQTxLEEh6VoDXOPaGC_sRFRDKfEZDvMeggspIALIDreCv52YoBW79Ik8h__awT2378FAY9QVyvYBH0fJPtXufV_EDR9jyMRLDzntCrlFmvhBg2XhbgfnP1-16J7Gydx6z3YsEEKFxFLD7AMHE7xddzibPRp5ste51XdawJkDdHbVtbL21RM2DycY5YKncFTBKscbcZ2ff2GTs_2B2sDkTwAtsG1xXiM3jQddtOYD3_HcCmvYjXzILRuloxvIC6KnPaR3J5j8DNr_3ZAydiYWagcRG96CZTDxrmxs9GNI5SdbXXx0QNWTM0MEP7-aMc4ux6UXjTaxxdVWptpUAV6LUCIAwfhSdV1UwXILxQS03wEJn2CHJhEOHF_Ed6BDTRPFGD0hzaVqsI-3s4wfZK2fJ5if3jAz-xlBorLryX05BPr3YLXmzV82Kv8-FAQfchEVvBXQBvFrxILKiZfRUNLyEfujOX-cxZJvx06rUhDCOfF4nSaOMUfEgkz961ZMMUniP7QF3q9QIWhOjZ_KL7e9rPmQLiWFObAyLR-_AXzIXW0E9h-ecREjQp8fB-9KBQGObxW1jfmUamSszCuldzAfpWUh6macfUJCGxKd3etzOBJRFGGk2ujr3sWwrkXtsK15NVYW1p3woxSOIuncgx0GlZXjRgySMJf1x0O92mfE7tJOnkNGXXdB6askT7NZVcyOGkUn0ZC5HJgUPkvmrlRVp0Ji8VpLLHtqIuvQl4NPMld6R8_tpCmyT9V98UMXFsYs4is4ylv2AlDhbqtfbFYb47Kx0KBXl_-BDRMQdEq-iegrP1bh_CZ98GotkaQCbqpnmq2c14KhT5_LsWr2OhQ91DpcNZPPz03HwJejGrTuAXYQ5Eg57ZcY9RY_AhFJAVgNk_jluxdS1aqwultVP0rhNzZCbvDQ2ZrQxnuRqa7yPia0x5aVbi7mnOCpFJVchKwIzx5aJXYXyc9Qq82xHMqHPOIGyAeAe7_Y-8F3UAJohRi4JzQtZ0e6qeapGY0LCzS22VS-JQm9ofk1G7IQqb_pQDHQFgZtmGxHcIOXVH3Ic-DHqL2A3CwlxB84b526p5Vxp7B4ciborNSN3TMObZB8DjV6VbZDprDQqMv5YNAPc5GIW0zVKt97CNiHskB4sTCtpnNZSQt8jjTKmq5lHnxW1V8EjOwNZbOpn-beHiDdL1zXK_eEnXP27tLvfmxa460pSvusoOmggRNEjUcpNKmvbMZ1LYBXqWfNFUxvlPOTKF_J86rhKiks8lhLvIkncjdfYP5lFzSvsX0qNA9Dey06Kek7tSHdCiTJ3Iq5sEaI1ynMu1dSnqTdQgD3TKj08SV4jEugtjh5RaXXSwq9VG1vjc7lNcCb636yd7jBArp56pWKi_n2ez_myK8SLPpEPG69HFa8ufW9FK4NIY7FjPIP30_wtYcEBluMIAXMwgQsr3t0p3mhbq_zU3IzDklN_kwaEBn_LLfFt57TEaH2iB2CAQxstULwSubA5ZuzDbJHYR06pHC3mMQclFTfwA8X05Ig3d6Bt5xEESTr6Q13xF8nAtMzB_bWBfps7p5ovQCs1EBDbVmm-egJEuzb1DYASVYOd5SBS7T8xhfMNU4MMN2sjabyPBJdMkhTsQBzdwLgZADlwdpe92F0jyuOI8PJ0jZAo3ARrfjDN54UgHydM72cOwaqJLQgr8_xtSwMvzr6jcwu6V5vsQcWWKKTzLg8EnzTWkYRBt1fRB7DSA-hfIQIASNtAaSYuh-URlio8gd6dJ82mmr5ouXQEgTHL40I3gNIru6H9Pz3eIX11XNhfD9Y8kB5lyTfsnuYeK1dp0GJweg12zWZ31PRSICWTpgGVWVxxaBR01NJ2A85PN_Oiy52e51SjdivQE-2mrlOZs6RYotUWap9lldzHfHEQP7hPsqYlL6lEczPaUn4XcahMm_hd2nsvuKPFwrC7F8Khwg-fOarJjgMs5HWUE739z0cGP8v24ZBmIqwBI6LbayOqEqSrfYEdtK5HEL7VQ5_uGqkCDJztaVgj6d4_WgGSCtV2AZ2JA4UuVhHnes86WaS20BvNLrbXffjLJ292-rNQH5zTte0iGRWh8cUp4oS0qo-2vzzMqlVP5V-i4-tAuhC0jI6i9F_eP56TYDn-ZNfOWFPoI5e01DgkrQAG_cCczIE1NPJw-lCfCNWvoZyRAB2B-SRLmcophWjN5VPKJDvaHxGDu6dSYLUTCq0Wpdu4xLqKM62LB8-xPBq1mdjlENph5i8HUzW96JP4qv9nQ44gKt1olNaOtAylEgdWOPYxpAVbiGU-wjaUnuS14bWbc8Aik53ZJzUbyVJpGegKzve_62nqszD9hxOVtuTJhmvw2OH_Pg9JpLz9IJDjpXM5cbBKXBeGOBzF9cp_NnKpe2f_RBGzc4-0PXSKynIo2slCjVR4NTAETTNl8n508BQ-jF4gNsZC4DdIUOisJC7O2uZ2s_cQKKEC6qfBfU9W-r94yn9TmQoRmfZ3Ju8Vy6tMBOoCdW4IcIwh9fJc7h4RXhATq8ZNE8C2DZQTNaAzfmgPC3J-nkyVmwLXCXy5AYgscLEr09Pk89APVyTJjH-7H7WylLGEz5JAL4zF8Ec1x5a2tODmUNjknRR5AMLNc_0-7Ef5yZV8NZZiY1LWxJbUv1MAvW_4IgDzZxWGtqJUR26k_FEATWluHySRR-zj7KpjPYdbA7BDkcG0r2HNPZAKUL_QCV1WCzsdNEgYsQlY0HAFCLAdbg0zvGVgmGWZkgEfpXaW9gcrRiKuABLw4qAcLckDirxVLb1megpgvwDqrQIQgeReNFD8mCOGX2pV3cVGzxFJQazXl3ItXbDDlyrBk7kAcZzVUKaPamzEGKNejv8WiUJ72LaEaQADr8MZFe5-Jjvef0Q0vcz4HueQ7ZWjv2JIo4PCuTcerWD-N4KyoW5dcZ20YU4RWOFs0CATFaJfe2szSUUNmcdFO0rZD1gMLMFw9PUI2XFhOdoREu-cidU5KBf783iKHO8CZEcDfCx6rOlcEsQ-TukFdeY0h_hOpvRkTlAfS4v8mBzRV28dsQ1BM7LT0Lrm6_PKqPEgHj9rbhmoPny_zNCrT0Z_5BznXHCzO8F1g3Mwej2fZ5g7SncOQwpOsKPKXjhtlrOQ9NggCijI-krvmO2Dj5Hb3Uxny9hnkGpkh760KJgA3HGU4gFViB3axApZzU4iVI6QpfMFS08DC5Ql5W9EK7Uybq12nelaEAx2Ffa1ip51qIysxtXMgs5W40I9Q2Ksi_Qe_0J9zfgApieHG_UZlHNpwqPK7-kjwGuqvlUmNpbd3kitv3MsRGQHZAjW1ZMzKSaJMH9k2TVjqXKA1EQ1PM4VAa6tWNED85Py8DUb5MZ8Bg39UOZYA4s0IcBvodYFwFD62ai_vFO2tsm18AwHj58nsMF3TGxKibBxloZCYFiGVsByoKdPLdGlWHCpPOuwVK-p6j6dvhnXwzY_Yn31DzUtiUkLi1PLaq1Kd0u7R8Q5-EdQgvPQVVh-f6dkiHyt7BszK-dhh_eDvTqWShbqz928jdT0xNnWByJPaB_AWu1-7YVgY7MqgGKTflxea-jUcMKRCJYNp95VYN6jRgbQAHE4LbYN6HHfebs4EjomfcCFXqlJ3-Y4zopgCbLgd6jG3zkzLQgXQQ4hQtWwJ5H3hxFUcdpnT3fE4FG051TxKjG_M8npsgmhscxcFWMucjcruBD2YB6lrMQVZJJabkOivIrM4hvmaTYNxpSRRDz1bxSPCl8cJCz-o7LDJyXwn4WwdPt-aDnDPitxDeTWYzhvuiPmHTAn-nQL9jLNnTZDwzsesWEJkW-SsOJCXyLYAebdr5yCT4Ju22yDBRYHZsG299KANM4_KHYPmRC0mZK6R-fsGqXe9UcPFPW14D09LumASBE0sdIEuaffoNT3VEeFRj0jr0Nr3PQUpKiIwLrZvABAQqDxWyEpdwZH4HXNJ52g5hccYYP7zL28epeY7va8JKoU1_yMj1rPiLrg3Z76aSVu7MA6cbT9fAG229vZkp3rh5OMZZQGgYL_XEs1xfgdjZa9WI-M7qI2akaDy3xS4-o8YULVX5unlMLDce-T2GbA2rf__fqJWrC_HLND9QndST7V5f5REmhgYIQNYjO4fMzPdTzszufMhmc0TBVAaPTI-EzIljwWOe7I7QLQGL3r6zLCXHPPVo0zzBd9HyEY5nU3ZHR22PYO0uRbGMot6OJfomPCW8LRT1Ctncpj2n8Q3iS5EuWA9GWuBwcP7b4LuLJSrsBD8I23q1LanE_3DX3CwQA6-7lSnBiiB35MQ6P3Bb-52qeoQoyj56jlAu9VdcG9DqF_hwi12egr9ZkJ2sdF-Gb4MZnbjFulc9crnuvDv2I11WGz_gFF1X1CrGg5Wl6pONvKa9a17eSU_Epy-rVSFNia0y_QUqjlVATdA6BJUMJd5pAddP_Iuab2v_PQR6UBt48vYq12DXFGyWKQX4pLQAMqYjH46fXO6H5XNO-3ahP1KiFIV9rfvpY_eSQf2r-gMVgVPQG0IPI1TQ"}</script>
+  <!-- herdr:end -->
+
+<script>
+// This page is public: the tab is hidden, the file is not. Nothing below names a machine,
+// an address, a port or a user -- all of that is AES-GCM ciphertext in #herdrCipher.
+//
+// A second lock, independent of the one that reaches this page, with its own key material.
+// It deliberately says nothing about how it is opened -- the page used to carry its own
+// controls for that, which both duplicated what was already on screen and advertised the
+// method to anyone who loaded it. The gate asks for a password and otherwise keeps quiet.
+//
+// The rest of the key is collected by the parent page and handed here while this waits.
+(function(){
+  const box   = JSON.parse(document.getElementById('herdrCipher').textContent);
+  const gate  = document.getElementById('gate');
+  const input = document.getElementById('pw');
+  const msg   = document.getElementById('msg');
+  const out   = document.getElementById('out');
+  let seq = [], unlocked = false, trying = false;
+
+  const unb64 = s => {
+    s = s.replace(/-/g, '+').replace(/_/g, '/');
+    while(s.length % 4) s += '=';
+    return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+  };
+
+  function parentWin(){
+    try { return window.parent !== window ? window.parent : null; } catch(e){ return null; }
+  }
+  function claimRelay(){
+    const w = parentWin();
+    if(w && typeof w.__claimRelay === 'function') w.__claimRelay(onPart);
+  }
+  function releaseRelay(){
+    const w = parentWin();
+    if(w && typeof w.__releaseRelay === 'function') w.__releaseRelay();
+  }
+
+  // Must match secretFor() in scripts/herdr-gate.mjs.
+  async function tryOpen(word, lights){
+    const base = await crypto.subtle.importKey(
+      'raw', new TextEncoder().encode(word.trim().toLowerCase() + '\n' + lights.join(' ')),
+      'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name:'PBKDF2', hash:'SHA-256', salt: unb64(box.salt), iterations: box.iter }, base, 256);
+    const key = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
+    const pt  = await crypto.subtle.decrypt({ name:'AES-GCM', iv: unb64(box.iv) }, key, unb64(box.ct));
+    return new TextDecoder().decode(pt);
+  }
+
+  function wrong(){
+    seq = [];
+    input.value = '';
+    msg.textContent = 'Wrong password.';
+    input.focus();
+  }
+
+  async function onPart(part){
+    if(unlocked || trying) return;
+    seq.push(part);
+    if(seq.length < box.n) return;          // an attempt is exactly box.n clicks
+    trying = true;
+    try {
+      const html = await tryOpen(input.value, seq);
+      unlocked = true;
+      releaseRelay();
+      gate.hidden = true;
+      out.innerHTML = html;
+    } catch(e){ wrong(); }
+    trying = false;
+  }
+
+  const eye = document.getElementById('eye');
+  eye.addEventListener('click', () => {
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    eye.setAttribute('aria-pressed', String(show));
+    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    eye.title = show ? 'Hide password' : 'Show password';
+    input.focus();
+  });
+
+  document.getElementById('go').addEventListener('click', wrong);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
+  input.addEventListener('input', () => { msg.textContent = ''; });
+  window.addEventListener('pagehide', releaseRelay);
+
+  claimRelay();
+  input.focus();
+})();
+</script>
+</body>
+</html>

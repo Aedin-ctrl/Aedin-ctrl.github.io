@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Filament</title>
+<meta name="description" content="The sun went out. What is left of the world is strung along a copper line, and you are the last lineman. An 8-bit survival builder.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0c'/%3E%3Cpath d='M4 22h24' stroke='%23ef9a49' stroke-width='2'/%3E%3Crect x='13' y='6' width='6' height='16' fill='%23aeaeae'/%3E%3Crect x='11' y='4' width='10' height='4' fill='%23ef9a49'/%3E%3C/svg%3E">
+<style>
+  html,body{margin:0;height:100%;background:#0a0a0c;overflow:hidden;}
+  /* a column, so the instruction line has its own room and can never print over the game */
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+       font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#6d7076;
+       touch-action:none;-webkit-user-select:none;user-select:none;}
+  canvas{
+    display:block;
+    image-rendering:pixelated;image-rendering:crisp-edges;
+    background:#000;
+    box-shadow:0 0 0 1px #24262b, 0 24px 60px -30px #000;
+  }
+  /* the one piece of non-game chrome: a line for anyone who lands here with no sound on */
+  .hint{margin:0;flex:none;padding:0 10px;text-align:center;font-size:11px;letter-spacing:.06em;}
+  @media (prefers-reduced-motion:reduce){.hint{opacity:.7;}}
+  noscript{color:#aeaeae;text-align:center;max-width:40ch;}
+</style>
+</head>
+<body>
+<canvas id="screen" width="256" height="240" aria-label="Filament, an 8-bit game. Arrow keys move, space acts."></canvas>
+<p class="hint">arrows move &middot; space acts &middot; up changes tools &middot; m mutes &middot; r restarts</p>
+<noscript>Filament needs JavaScript — the whole game, including every pixel and every sound, is generated at runtime.</noscript>
+<script type="module" src="src/main.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Trends</title>
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b; --wash:#f6f6f7;
+    --ok:#1f9d55; --warn:#c98a06; --bad:#c92a2a; --off:#b8bcc4;
+    --ai:#4f6bd8; --tech:#1f9d55; --finance:#b8860b; --like:#c92a2a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  main{max-width:980px; margin:0 auto; padding:32px clamp(16px,4vw,48px) 64px;}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin:0 0 24px;}
+  .head h1{font-size:22px;}
+  .head p{color:var(--muted); font-size:14px; margin-top:4px;}
+  .fresh{font-size:12.5px; color:var(--faint); display:flex; align-items:center; gap:10px;}
+  .fresh button{font-size:12.5px; color:var(--ink); border-bottom:1px solid var(--faint);}
+
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--off); flex-shrink:0; display:inline-block;}
+  .dot.ok{background:var(--ok); box-shadow:0 0 0 3px rgba(31,157,85,.14);}
+  .dot.warn{background:var(--warn);}
+
+  .now{border:1px solid var(--line-strong); border-radius:12px; padding:18px 20px; margin-bottom:12px;}
+  .now-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .now-state{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;}
+  .now-when{margin-left:auto; font-size:12.5px; color:var(--faint);}
+  .now-what{font-size:14px; color:var(--muted); margin-top:7px; overflow-wrap:anywhere;}
+  /* what the feed has learned to lean toward, so you can see it is actually adapting */
+  .lean{margin-top:12px; font-size:13px; color:var(--muted);}
+  .lean .bars{display:flex; gap:8px; margin-top:6px; flex-wrap:wrap;}
+  .lean .b{flex:1 1 90px; min-width:90px;}
+  .lean .b span{font-size:11.5px; color:var(--faint); display:flex; justify-content:space-between;}
+  .lean .b i{display:block; height:6px; border-radius:3px; background:var(--line); margin-top:3px; overflow:hidden;}
+  .lean .b i em{display:block; height:100%; border-radius:3px;}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,112px),1fr)); gap:9px; margin-top:14px;}
+  .stat{background:var(--wash); border-radius:9px; padding:9px 11px;}
+  .stat b{display:block; font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; font-variant-numeric:tabular-nums;}
+  .stat span{font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint);}
+
+  /* Charts are drawn by hand as inline SVG: no library, no gridlines, no legends, no axes.
+     Everything inherits currentColor so one theme rule covers the lot. */
+  .charts{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:18px 22px;}
+  .chart h4{font-family:'Space Grotesk',sans-serif; font-size:11px; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--faint); font-weight:600; margin-bottom:7px;}
+  .spark{display:flex; align-items:baseline; gap:9px; padding:3px 0;}
+  .spark b{font-size:13px; min-width:58px;}
+  .spark .n{font-size:12.5px; color:var(--faint); font-variant-numeric:tabular-nums;}
+  .chart svg{overflow:visible;}
+  .spark-note{font-size:11.5px; color:var(--faint); margin-top:5px;}
+  .rise{display:grid; grid-template-columns:auto 1fr auto; gap:3px 9px; align-items:center; font-size:13px;}
+  .rise .w{font-weight:500;}
+  .rise .d{font-size:12px; color:var(--faint); font-variant-numeric:tabular-nums; text-align:right;}
+
+  .label{font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); margin:26px 0 8px;}
+
+  .srcs{display:grid; grid-template-columns:repeat(auto-fill, minmax(min(100%,210px),1fr)); gap:9px;}
+  .src{border:1px solid var(--line); border-radius:10px; padding:11px 13px; display:flex; gap:10px; align-items:center;}
+  .src div{min-width:0;}
+  .src b{font-size:14px; font-weight:600; display:block;}
+  .src small{font-size:12px; color:var(--faint);}
+
+  /* looking things up again */
+  .find{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:6px;}
+  .find input{flex:1 1 260px; font:inherit; font-size:15px; padding:11px 14px; border:1px solid var(--line);
+    border-radius:10px; color:var(--ink); background:var(--paper);}
+  .find input:focus{outline:none; border-color:var(--line-strong);}
+  .chip{font-size:13px; padding:9px 14px; border:1px solid var(--line); border-radius:999px; white-space:nowrap;}
+  .chip.on{border-color:var(--line-strong); background:var(--ink); color:#fff;}
+  .found{font-size:12.5px; color:var(--faint); margin:0 0 4px;}
+
+  /* the day's digest, worked out from what came through */
+  .sum{background:var(--wash); border-radius:11px; padding:14px 16px; margin:10px 0 4px; font-size:14px; color:var(--ink);}
+  .sum .lines{color:var(--muted);}
+  .sum .rows{display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%,240px),1fr)); gap:14px; margin-top:12px;}
+  .sum h4{font-family:'Space Grotesk',sans-serif; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint); font-weight:600; margin-bottom:5px;}
+  .sum ol{margin:0; padding-left:18px; font-size:13.5px;}
+  .sum ol li{margin-bottom:3px;}
+  .sum .tags{display:flex; gap:6px; flex-wrap:wrap;}
+  .sum .tag{font-size:12.5px; padding:3px 9px; border-radius:999px; background:var(--paper); border:1px solid var(--line);}
+  .sum a{text-decoration:none; border-bottom:1px solid var(--line);}
+
+  /* the six-hourly catch-ups and the end-of-day roundup */
+  .brief{border:1px solid var(--line); border-radius:11px; padding:14px 16px; margin:10px 0;}
+  .brief > summary{cursor:pointer; list-style:none; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .brief > summary::-webkit-details-marker{display:none;}
+  .brief > summary::before{content:'+'; color:var(--faint); font-size:16px; width:12px;}
+  .brief[open] > summary::before{content:'\2212';}
+  .brief h3{font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;}
+  .brief .when{font-size:12.5px; color:var(--faint);}
+  .brief .peek{font-size:13px; color:var(--muted); width:100%; margin:4px 0 0 22px;}
+  .brief ul{list-style:none; margin:12px 0 0 22px; padding:0;}
+  .brief li{padding:7px 0; border-top:1px solid var(--line); font-size:14.5px;}
+  .brief li:first-child{border-top:none;}
+  .brief li a{text-decoration:none; border-bottom:1px solid var(--line);}
+  .brief li a:hover{border-color:var(--ink);}
+  .brief .by{display:block; font-size:12.5px; color:var(--faint);}
+  .brief .themes{margin:12px 0 0 22px; display:flex; gap:6px; flex-wrap:wrap;}
+  .roundup{border-color:var(--line-strong);}
+
+  .day{margin-top:22px;}
+  .day-head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; padding-bottom:7px; border-bottom:1px solid var(--line-strong);}
+  .day-head h2{font-size:16px;}
+  .day-head small{font-size:12.5px; color:var(--faint);}
+
+  .item{display:grid; grid-template-columns:auto 1fr auto; gap:3px 12px; align-items:baseline; padding:13px 0; border-bottom:1px solid var(--line);}
+  .pill{font-size:10px; text-transform:uppercase; letter-spacing:.05em; font-weight:600; padding:2px 7px; border-radius:999px; color:#fff; align-self:center;}
+  .pill.ai{background:var(--ai);} .pill.tech{background:var(--tech);} .pill.finance{background:var(--finance);}
+  .it-cap{font-size:15px; font-weight:500; overflow-wrap:anywhere;}
+  .it-cap a{text-decoration:none; border-bottom:1px solid var(--line);}
+  .it-cap a:hover{border-color:var(--ink);}
+  .heart{color:var(--like); margin-left:6px;}
+  .it-who{grid-column:2; font-size:12.5px; color:var(--faint);}
+  .it-num{font-size:12.5px; color:var(--faint); white-space:nowrap; text-align:right;}
+  mark{background:#fff2a8; color:inherit; border-radius:2px;}
+
+  .more{margin-top:14px; font-size:13.5px; color:var(--ink); border-bottom:1px solid var(--faint);}
+  .empty{color:var(--faint); font-size:13.5px; padding:16px 0;}
+</style>
+</head>
+<body>
+<main>
+  <div class="head">
+    <div>
+      <h1>Trends</h1>
+      <p>The feed running on the Pi, and everything it has shown.</p>
+    </div>
+    <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
+  </div>
+  <div id="body" aria-live="polite"><p class="empty">Loading…</p></div>
+</main>
+
+<script>
+  // Same Worker as the Devices view. The Pi posts its live state every minute and the day's
+  // history every few minutes. The read key only exists inside the sealed secret panel, which
+  // opens this page as trends/#k=KEY.
+  const API = 'https://pi-status.pizza-calc-api.workers.dev';
+  const KEY = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+  const LIVE_SECONDS = 180;
+  const TOPICS = ['ai', 'tech', 'finance'];
+  const PAGE = 60;                 // rows shown per day before "show more"
+  const $ = id => document.getElementById(id);
+
+  let data = null, query = '', likedOnly = false, topic = '', shown = {};
+
+  function el(tag, cls, text){
+    const n = document.createElement(tag);
+    if(cls) n.className = cls;
+    if(text != null) n.textContent = text;
+    return n;
+  }
+  const ago = s => s < 60 ? `${Math.max(0, Math.round(s))}s ago` : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`;
+  const num = n => n == null ? '' : n >= 1e6 ? (n / 1e6).toFixed(1).replace('.0','') + 'M' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n);
+  const clock = ms => new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  // A sparkline is a word-sized graphic, not a chart: no axes, no ticks, no grid. The last point is
+  // marked so the eye lands on "where it is now". min/max are passed in so a row of them stays
+  // comparable — scaling each one to its own range is the usual way small multiples get ruined.
+  function sparkline(values, min, max, w = 108, h = 22, pad = 3) {
+    const n = values.length;
+    if (n < 2) return '';
+    const span = (max - min) || 1;
+    const x = i => pad + (i * (w - 2*pad)) / (n - 1);
+    const y = v => (h - pad) - ((v - min) / span) * (h - 2*pad);
+    const pts = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img"`
+      + ` aria-label="${esc(values[n-1])} most recently, over ${n} days">`
+      + `<polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.25"`
+      + ` stroke-linejoin="round" stroke-linecap="round"/>`
+      + `<circle cx="${x(n-1).toFixed(1)}" cy="${y(values[n-1]).toFixed(1)}" r="2" fill="currentColor"/></svg>`;
+  }
+
+  // Bars share a left baseline and start at zero, which is the most accurately read arrangement.
+  // The value is printed at the end of each bar so no axis is needed.
+  function hbars(rows, w = 250, rowH = 17, gap = 4, labelW = 104) {
+    const max = Math.max(1, ...rows.map(r => r.value));
+    const trackW = w - labelW - 42;
+    const h = rows.length * (rowH + gap) - gap;
+    const body = rows.map((r, i) => {
+      const y = i * (rowH + gap), bw = (r.value / max) * trackW, ty = y + rowH * 0.74;
+      return `<text x="0" y="${ty}" font-size="11.5" fill="currentColor" opacity=".72">${esc(r.label)}</text>`
+        + `<rect x="${labelW}" y="${y+2}" width="${bw.toFixed(1)}" height="${rowH-4}" rx="2"`
+        + ` fill="${r.color || 'currentColor'}" opacity="${r.color ? .85 : .4}"/>`
+        + `<text x="${(labelW+bw+5).toFixed(1)}" y="${ty}" font-size="11" fill="currentColor"`
+        + ` opacity=".5">${esc(r.display ?? r.value)}</text>`;
+    }).join('');
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="bar chart">${body}</svg>`;
+  }
+
+  // Change is shown as change — a bar either side of a centre line — rather than leaving the reader
+  // to subtract two numbers.
+  function deltaBar(pct, w = 74, h = 13, cap = 200) {
+    const mid = w / 2, p = Math.max(-cap, Math.min(cap, pct));
+    const len = Math.abs(p) / cap * (mid - 1);
+    const x = p >= 0 ? mid : mid - len;
+    return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(Math.round(pct))} percent change">`
+      + `<line x1="${mid}" y1="1" x2="${mid}" y2="${h-1}" stroke="currentColor" opacity=".22"/>`
+      + `<rect x="${x.toFixed(1)}" y="3" width="${Math.max(1,len).toFixed(1)}" height="${h-6}" rx="1.5"`
+      + ` fill="${p >= 0 ? 'var(--ok)' : 'var(--bad)'}" opacity=".8"/></svg>`;
+  }
+
+  // "Today", "Yesterday", then the weekday and date — easier to think back through than 2026-09-30
+  function dayName(iso){
+    const d = new Date(iso + 'T12:00:00');
+    const today = new Date(); today.setHours(12,0,0,0);
+    const diff = Math.round((today - d) / 86400000);
+    if(diff === 0) return 'Today';
+    if(diff === 1) return 'Yesterday';
+    return d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  const STATE = {
+    playing:  ['ok',   'Playing'],
+    starting: ['warn', 'Starting up'],
+    digesting:['ok',   'Writing the digest'],
+    resting:  ['off',  'Resting'],
+    stopped:  ['off',  'Stopped'],
+    setup:    ['warn', 'Being set up'],
+  };
+  const SOURCE_NAME = { youtube: 'YouTube', reddit: 'Reddit', hackernews: 'Hacker News' };
+
+  // highlight what was searched for, so the row she wants is obvious
+  function caption(text, q){
+    const box = el('span');
+    if(!q){ box.append(document.createTextNode(text)); return box; }
+    const i = text.toLowerCase().indexOf(q);
+    if(i < 0){ box.append(document.createTextNode(text)); return box; }
+    box.append(document.createTextNode(text.slice(0, i)), el('mark', '', text.slice(i, i + q.length)), document.createTextNode(text.slice(i + q.length)));
+    return box;
+  }
+
+  function matches(it){
+    if(likedOnly && !it.liked) return false;
+    if(topic && it.topic !== topic) return false;
+    if(!query) return true;
+    return ((it.caption || '') + ' ' + (it.author || '')).toLowerCase().includes(query);
+  }
+
+  function itemRow(it){
+    const row = el('div','item');
+    row.append(el('span','pill ' + (it.topic||''), it.topic || '—'));
+    const cap = el('div','it-cap');
+    const text = it.caption || '(no title)';
+    if(it.url){
+      const a = el('a'); a.href = it.url; a.target = '_blank'; a.rel = 'noopener';
+      a.append(caption(text, query)); cap.append(a);
+    } else cap.append(caption(text, query));
+    if(it.liked){ const h = el('span','heart','♥'); h.title = 'she liked this'; cap.append(h); }
+    row.append(cap);
+    const bits = [it.at ? clock(it.at) : '', num(it.views) ? num(it.views) + ' views' : ''].filter(Boolean);
+    row.append(el('span','it-num', bits.join(' · ')));
+    row.append(el('div','it-who', it.author || ''));
+    return row;
+  }
+
+  function render(){
+    const b = $('body');
+    b.replaceChildren();
+    if(!data){ b.append(el('p','empty','Could not reach the Pi status service.')); return; }
+    const s = data.status;
+
+    // what it is doing right now
+    if(s){
+      const live = s.age < LIVE_SECONDS;
+      const [tone, word] = STATE[s.state] || ['warn', s.state || 'Unknown'];
+      const now = el('section','now');
+      const top = el('div','now-top');
+      top.append(el('span','dot ' + (live ? tone : '')), el('span','now-state', live ? word : 'Not reporting'));
+      top.append(el('span','now-when','updated ' + ago(s.age)));
+      now.append(top);
+      if(live && s.note){
+        // How long it has been up. The player froze on one article for eight minutes once, and
+        // nothing on this page would have shown it — the Pi was happily reporting "playing".
+        const upMin = s.itemSince ? Math.round((Date.now() - s.itemSince) / 60000) : null;
+        const stuck = upMin != null && upMin >= 10;
+        const line = el('div','now-what', 'On screen now: ' + s.note
+          + (upMin != null && upMin >= 3 ? `  ·  for ${upMin} min` : ''));
+        if(stuck) line.append(el('span','', '  — that is longer than anything should stay up'));
+        now.append(line);
+      }
+      if(!live) now.append(el('div','now-what','Nothing has arrived for ' + ago(s.age) + '. The Pi may be off or offline.'));
+
+      const t = s.today || {}, pi = s.pi || {};
+      const stats = el('div','stats');
+      const stat = (label, value) => { const n = el('div','stat'); n.append(el('b','',value), el('span','',label)); stats.append(n); };
+      stat('shown today', String(t.seen || 0));
+      stat('queued up', String(s.queue || 0));
+      // She is watching a television, so the split between video and reading is the thing that
+      // decides whether this feels like TV or a slideshow. It ran 19 articles to 1 video for a
+      // night before anyone could see it.
+      const mix = s.mix || {};
+      const vids = mix.video || 0, reads = Object.entries(mix).reduce((n,[k,v]) => k === 'video' ? n : n + v, 0);
+      if (vids + reads > 0) stat('video / reading', vids + ' / ' + reads);
+      if(pi.freeMB != null) stat('pi memory free', (pi.freeMB/1024).toFixed(1) + ' GB');
+      if(pi.tempC != null) stat('pi temperature', pi.tempC + ' °C');
+      now.append(stats);
+
+      // how the feed is leaning, learned from what she watches and skips
+      const w = s.weights;
+      if(w){
+        const max = Math.max(1, ...TOPICS.map(t => w[t] || 1));
+        const lean = el('div','lean');
+        lean.append(document.createTextNode(
+          s.picks ? `Learning on its own — ${s.picks} stories picked out so far as worth more of.`
+                  : 'Learning from what gets watched and what gets skipped.'));
+        const bars = el('div','bars');
+        for(const t of TOPICS){
+          const v = w[t] || 1;
+          const col = el('div','b');
+          const lab = el('span');
+          lab.append(el('b','', t), document.createTextNode(v.toFixed(2) + '\u00d7'));
+          const bar = el('i'); const fill = el('em');
+          fill.style.width = Math.round(100 * v / max) + '%';
+          fill.style.background = `var(--${t})`;
+          bar.append(fill); col.append(lab, bar); bars.append(col);
+        }
+        lean.append(bars);
+        now.append(lean);
+      }
+      b.append(now);
+
+      b.append(el('div','label','Where it gets the feed'));
+      const srcs = el('div','srcs');
+      for(const [name, v] of Object.entries(s.sources || {})){
+        const ok = v.health === 'ok';
+        const card = el('div','src');
+        card.append(el('span','dot ' + (ok ? 'ok' : v.health === 'unknown' ? '' : 'warn')));
+        const txt = el('div');
+        txt.append(el('b','', SOURCE_NAME[name] || name), el('small','', ok ? `${v.items} items last check` : (v.detail || v.health)));
+        card.append(txt); srcs.append(card);
+      }
+      if(srcs.children.length) b.append(srcs);
+    }
+
+    // ---- the shape of it, at a glance ----
+    const days = (data.days || []);
+    if(days.length){
+      const oldestFirst = [...days].reverse();
+      b.append(el('div','label','The shape of it'));
+      const charts = el('div','charts');
+
+      // When things actually came through today, hour by hour, split by subject. The per-day
+      // sparklines below need three days before they say anything; this says something on day one,
+      // and it is the picture that answers "what was going on while I was asleep".
+      const todayItems = (days[0] && days[0].items) || [];
+      if(todayItems.length > 8){
+        const byHour = Array.from({length:24}, () => ({ ai:0, tech:0, finance:0, total:0 }));
+        for(const it of todayItems){
+          if(!it.at) continue;
+          const slot = byHour[new Date(it.at).getHours()];
+          if(!slot) continue;
+          if(TOPICS.includes(it.topic)) slot[it.topic]++;
+          slot.total++;
+        }
+        const peak = Math.max(1, ...byHour.map(h => h.total));
+        const W = 260, H = 84, bw = W / 24;
+        const hour = h => h === 0 ? '12am' : h === 12 ? '12pm' : (h % 12) + (h < 12 ? 'am' : 'pm');
+        let body = '';
+        for(let h = 0; h < 24; h++){
+          let y = H;
+          for(const t of TOPICS){
+            const n = byHour[h][t]; if(!n) continue;
+            const bh = (n / peak) * (H - 4);
+            y -= bh;
+            body += `<rect x="${(h*bw+0.8).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw-1.6).toFixed(1)}" height="${bh.toFixed(1)}" fill="var(--${t})" opacity=".85"/>`;
+          }
+          if(h % 6 === 0) body += `<text x="${(h*bw).toFixed(1)}" y="${H+11}" font-size="9" fill="var(--faint)">${hour(h)}</text>`;
+        }
+        const busiest = byHour.reduce((bi, x, i, a) => x.total > a[bi].total ? i : bi, 0);
+        const box = el('div','chart');
+        box.append(el('h4','','When it came through today'));
+        const holder = el('div');
+        holder.innerHTML = `<svg width="100%" height="${H+14}" viewBox="0 0 ${W} ${H+14}" role="img" aria-label="items per hour today">${body}</svg>`;
+        box.append(holder);
+        box.append(el('div','spark-note', `Busiest around ${hour(busiest)} \u00b7 ${peak} in that hour`));
+        charts.append(box);
+      }
+
+      // one sparkline per subject, all on the same scale so the three are comparable
+      if(oldestFirst.length >= 3){
+        const series = {};
+        for(const t of TOPICS) series[t] = oldestFirst.map(d => (d.byTopic||{})[t] || 0);
+        const all = TOPICS.flatMap(t => series[t]);
+        const lo = Math.min(...all), hi = Math.max(...all);
+        const box = el('div','chart');
+        box.append(el('h4','', `Each day, last ${oldestFirst.length} days`));
+        for(const t of TOPICS){
+          const row = el('div','spark');
+          const name = el('b',''); name.textContent = t; name.style.color = `var(--${t})`;
+          const svg = el('span'); svg.style.color = `var(--${t})`;
+          svg.innerHTML = sparkline(series[t], lo, hi);
+          row.append(name, svg, el('span','n', String(series[t][series[t].length-1] ?? 0)));
+          box.append(row);
+        }
+        charts.append(box);
+      }
+
+      // where today's material actually came from
+      const today0 = days[0];
+      if(today0 && (today0.items||[]).length){
+        const bySrc = {};
+        for(const it of today0.items){ const k = it.author || 'unknown'; bySrc[k] = (bySrc[k]||0)+1; }
+        const rows = Object.entries(bySrc).sort((a,b)=>b[1]-a[1]).slice(0,7)
+          .map(([label, value]) => ({ label: label.length > 17 ? label.slice(0,16)+'…' : label, value }));
+        if(rows.length){
+          const box = el('div','chart');
+          box.append(el('h4','','Where it came from today'));
+          const holder = el('div'); holder.innerHTML = hbars(rows);
+          box.append(holder);
+          charts.append(box);
+        }
+      }
+
+      // the subject mix today, as one strip rather than a pie
+      if(today0 && today0.byTopic){
+        const rows = TOPICS.map(t => ({ label: t, value: today0.byTopic[t] || 0, color: `var(--${t})` }))
+                           .filter(r => r.value > 0);
+        if(rows.length){
+          const box = el('div','chart');
+          box.append(el('h4','','Subject mix today'));
+          const holder = el('div'); holder.innerHTML = hbars(rows);
+          box.append(holder);
+          charts.append(box);
+        }
+      }
+
+      // words that jumped, shown as the jump itself
+      const rising = (today0 && today0.rising) || [];
+      if(rising.length){
+        const box = el('div','chart');
+        box.append(el('h4','','Words that jumped since yesterday'));
+        const grid = el('div','rise');
+        for(const r of rising.slice(0,7)){
+          const pct = r.before > 0 ? Math.round(100 * (r.count - r.before) / r.before) : 100;
+          grid.append(el('span','w', r.word));
+          const bar = el('span'); bar.innerHTML = deltaBar(pct);
+          grid.append(bar);
+          grid.append(el('span','d', (r.before ? (pct > 0 ? '+' : '') + pct + '%' : 'new') + ` · ${r.count}`));
+        }
+        box.append(grid);
+        charts.append(box);
+      }
+
+      if(charts.children.length) b.append(charts);
+    }
+
+    // everything it has shown, by day, searchable
+    b.append(el('div','label','Everything it has shown'));
+    const find = el('div','find');
+    const input = el('input');
+    input.type = 'search';
+    input.placeholder = 'Search for something she saw…';
+    input.value = query;
+    input.addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); shown = {}; render(); input.focus(); });
+    find.append(input);
+    const chip = (label, on, fn) => { const c = el('button','chip' + (on ? ' on' : ''), label); c.type='button'; c.addEventListener('click', fn); find.append(c); };
+    chip('♥ liked', likedOnly, () => { likedOnly = !likedOnly; shown = {}; render(); });
+    for(const t of TOPICS) chip(t, topic === t, () => { topic = topic === t ? '' : t; shown = {}; render(); });
+    b.append(find);
+
+    if(!days.length){
+      b.append(el('p','empty','Nothing saved yet. The Pi sends its history every few minutes.'));
+      $('fresh').textContent = 'checked ' + new Date().toLocaleTimeString();
+      return;
+    }
+
+    let total = 0;
+    const sections = [];
+    for(const d of days){
+      const items = (d.items || []).filter(matches);
+      total += items.length;
+      if(!items.length) continue;
+      const sec = el('section','day');
+      const head = el('div','day-head');
+      head.append(el('h2','', dayName(d.date)));
+      const parts = [`${d.count} shown`];
+      if(d.liked) parts.push(`${d.liked} liked`);
+      if(d.watchedMinutes) parts.push(`${d.watchedMinutes} min watched`);
+      head.append(el('small','', parts.join(' · ')));
+      sec.append(head);
+
+      // The catch-ups: what came through while you were not looking, newest stretch first.
+      if(!query && !likedOnly && !topic){
+        const mkList = (list) => {
+          const ul = el('ul');
+          for(const h of list){
+            const li = el('li');
+            if(h.url){ const a = el('a','', h.caption); a.href = h.url; a.target='_blank'; a.rel='noopener'; li.append(a); }
+            else li.append(document.createTextNode(h.caption));
+            if(h.liked) li.append(el('span','heart','♥'));
+            li.append(el('span','by', [h.author, h.topic, h.views ? num(h.views) + ' views' : ''].filter(Boolean).join(' · ')));
+            ul.append(li);
+          }
+          return ul;
+        };
+        // end of day first: the whole day in one place
+        if((d.headlines||[]).length){
+          const box = el('details','brief roundup');
+          if(dayName(d.date) === 'Today') box.open = true;
+          const sm = el('summary');
+          sm.append(el('h3','','The day in full'), el('span','when', `${d.count} things · ${d.liked||0} liked`));
+          sm.append(el('div','peek', d.summary || ''));
+          box.append(sm, mkList(d.headlines));
+          sec.append(box);
+        }
+        for(const w of [...(d.briefings||[])].reverse()){
+          const box = el('details','brief');
+          const sm = el('summary');
+          sm.append(el('h3','', w.name), el('span','when', `${String(w.from).padStart(2,'0')}:00–${String(w.to).padStart(2,'0')}:00 · ${w.count} things`));
+          if((w.themes||[]).length) sm.append(el('div','peek', 'Mostly about: ' + w.themes.map(t => t.word).join(', ')));
+          box.append(sm, mkList(w.headlines || []));
+          if((w.tickers||[]).length){
+            const tags = el('div','themes');
+            for(const t of w.tickers) tags.append(el('span','tag', `${t.symbol} ×${t.count}`));
+            box.append(tags);
+          }
+          sec.append(box);
+        }
+      }
+
+      // the numbers behind the day
+      if(d.summary && !query && !likedOnly && !topic){
+        const sum = el('div','sum');
+        sum.append(el('div','lines', d.summary));
+        const rows = el('div','rows');
+        if((d.top||[]).length){
+          const col = el('div'); col.append(el('h4','','Biggest that day'));
+          const ol = el('ol');
+          for(const t of d.top.slice(0,4)){
+            const li = el('li');
+            if(t.url){ const a = el('a','', t.caption); a.href = t.url; a.target='_blank'; a.rel='noopener'; li.append(a); }
+            else li.append(document.createTextNode(t.caption));
+            li.append(el('span','it-num', ' — ' + (t.views ? num(t.views) + ' views' : t.author)));
+            ol.append(li);
+          }
+          col.append(ol); rows.append(col);
+        }
+        if((d.creators||[]).length){
+          const col = el('div'); col.append(el('h4','','Watched most'));
+          const ol = el('ol');
+          for(const c of d.creators.slice(0,4)) ol.append(el('li','', `${c.name} — ${c.count}`));
+          col.append(ol); rows.append(col);
+        }
+        if((d.rising||[]).length){
+          const col = el('div'); col.append(el('h4','','Words that jumped'));
+          const tags = el('div','tags');
+          for(const r of d.rising.slice(0,8)){
+            const t = el('span','tag', r.word);
+            t.title = `${r.count} today, ${r.before} the day before`;
+            tags.append(t);
+          }
+          col.append(tags); rows.append(col);
+        }
+        if((d.tickers||[]).length){
+          const col = el('div'); col.append(el('h4','','Tickers mentioned'));
+          const tags = el('div','tags');
+          for(const t of d.tickers) tags.append(el('span','tag', `${t.symbol} ×${t.count}`));
+          col.append(tags); rows.append(col);
+        }
+        if(rows.children.length) sum.append(rows);
+        sec.append(sum);
+      }
+
+      const limit = shown[d.date] || PAGE;
+      for(const it of items.slice(0, limit)) sec.append(itemRow(it));
+      if(items.length > limit){
+        const more = el('button','more', `Show ${Math.min(PAGE, items.length - limit)} more from ${dayName(d.date).toLowerCase()}`);
+        more.type = 'button';
+        more.addEventListener('click', () => { shown[d.date] = limit + PAGE; render(); });
+        sec.append(more);
+      }
+      sections.push(sec);
+    }
+
+    if(query || likedOnly || topic) b.append(el('p','found', total ? `${total} ${total === 1 ? 'match' : 'matches'}` : 'Nothing matches that.'));
+    for(const sec of sections) b.append(sec);
+    if(!sections.length && !(query || likedOnly || topic)) b.append(el('p','empty','Nothing shown yet.'));
+
+    $('fresh').textContent = 'checked ' + new Date().toLocaleTimeString();
+  }
+
+  async function load(){
+    if(!KEY){ data = null; render(); return; }
+    try{
+      const r = await fetch(API + '/trends?days=30', { headers: { Authorization: 'Bearer ' + KEY }, cache: 'no-store' });
+      data = r.ok ? await r.json() : null;
+    }catch{ data = null; }
+    render();
+  }
+  $('refresh').addEventListener('click', load);
+  load();
+  // refresh quietly, but never while she is in the middle of typing a search
+  setInterval(() => { if(!document.activeElement || document.activeElement.tagName !== 'INPUT') load(); }, 60000);
+</script>
+</body>
+</html>

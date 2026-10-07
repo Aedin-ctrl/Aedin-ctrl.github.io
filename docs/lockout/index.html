@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lockout</title>
+<meta name="description" content="An épée card duel. Attack beats step, parry beats attack, step beats parry — and if you both land inside the lockout, you both score.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#08080b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2308080b'/%3E%3Ccircle cx='10' cy='16' r='7' fill='%23bd3c30'/%3E%3Ccircle cx='22' cy='16' r='7' fill='%2300793d'/%3E%3C/svg%3E">
+<style>
+  html,body{margin:0;height:100%;background:#08080b;overflow:hidden;}
+  /* a column, so the instruction line has its own room and can never print over the game */
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+       font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#5e6168;
+       touch-action:none;-webkit-user-select:none;user-select:none;}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;
+         box-shadow:0 0 0 1px #1e2025, 0 24px 60px -30px #000;}
+  .hint{margin:0;flex:none;padding:0 10px;text-align:center;font-size:11px;letter-spacing:.06em;}
+  noscript{color:#aeaeae;text-align:center;max-width:40ch;}
+</style>
+</head>
+<body>
+<canvas id="screen" width="256" height="240" aria-label="Lockout, an 8-bit epee card duel. Press 1, 2 or 3 to play a card; up and down choose whether your step closes or opens the distance."></canvas>
+<p class="hint">1 2 3 play a card &middot; left right choose &middot; up down step &middot; m mutes &middot; r restarts</p>
+<noscript>Lockout needs JavaScript — every pixel and every sound is generated at runtime.</noscript>
+<script type="module" src="src/main.mjs"></script>
+</body>
+</html>

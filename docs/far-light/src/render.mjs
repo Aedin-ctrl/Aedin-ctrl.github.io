@@ -1,0 +1,209 @@
+// Draws the tower. Reads the state, never writes it.
+
+import { W, H, code } from './pixel.mjs';
+import { PLATFORMS, SH, SW, WALL, LAMP, SCREEN_COUNT, worldY } from './level.mjs';
+import { RULES, chargeOf } from './sim.mjs';
+import { cosmetic } from './rng.mjs';
+import * as particles from './particles.mjs';
+
+const OUT = 0, WALLP = 1, LEDGE = 2, DETAIL = 3;
+const P_YOU = 4, P_LIGHT = 5, P_IRON = 6, P_ACCENT = 7;
+
+export const camera = { y: 0, trauma: 0 };
+let camY = 0, shakeX = 0, shakeY = 0;
+
+/**
+ * The camera snaps a whole screen at a time rather than scrolling. That is a deliberate copy of
+ * what Jump King does: a smooth camera makes a two-screen fall feel like a long slide, while a
+ * snap makes it feel like two screens, which is the entire punishment the game has.
+ */
+export function updateCamera(state) {
+  camera.y = (SCREEN_COUNT - 1 - state.screen) * SH;
+}
+
+/**
+ * Decay the shake. Called once per TICK, never per rendered frame.
+ *
+ * It used to decay inside `updateCamera`, which `render()` calls — so it ran once per rAF rather
+ * than once per tick, and the fall shake, which is the game's biggest reaction, lasted half as long
+ * at 120Hz and a third as long at 144Hz. Measured: 34 sim ticks to decay at 60Hz, 0 at an unlocked
+ * frame rate. Every other thing in this game is on the tick clock; this was the one that was not.
+ */
+export function decayTrauma() {
+  camera.trauma = Math.max(0, camera.trauma - 0.03);
+}
+export const addTrauma = (n) => { camera.trauma = Math.min(1, camera.trauma + n); };
+
+const sy = (worldYv) => Math.round(worldYv - camY) + shakeY;
+const sx = (x) => Math.round(x) + shakeX;
+
+/**
+ * The shake offset, recomputed once per tick.
+ *
+ * These two draws came off the `cosmetic` stream inside `draw()`, i.e. once per rendered frame —
+ * two per tick at 60Hz and nearly five at 144Hz. The argument for a separate cosmetic stream is
+ * that visual juice can never change the game or a replay; that argument only held because no tool
+ * imports this file.
+ */
+export function shakeTick() {
+  const amp = camera.trauma * camera.trauma;
+  shakeX = Math.round(amp * 3 * (cosmetic.next() * 2 - 1));
+  shakeY = Math.round(amp * 3 * (cosmetic.next() * 2 - 1));
+}
+
+export function draw(screen, state, t) {
+  camY = camera.y;
+
+  screen.clear(code(OUT, 0));
+  drawShaft(screen, state, t);
+  drawPlatforms(screen, state);
+  if (state.screen >= 10) drawLamp(screen, state, t);
+  drawClimber(screen, state, t);
+  // Particles need the Y transform too.
+  //
+  // This passed only `sx`, so every particle was drawn at its WORLD y — around 2850 at the base —
+  // into a buffer 240 pixels tall, and clipped. Every landing puff, skid, bounce spark, bonk and
+  // wind-up scuff in the whole climb was discarded; the only ones anyone ever saw were the win
+  // sparks, because the lamp room is the one screen where world y and screen y coincide.
+  // Straight copy-paste from Filament, where the camera is horizontal and passing sx alone is right.
+  // `sy` already folds the shake in, and `particles.draw` added the fourth argument on top of it,
+  // so dust and sparks slid vertically against the ledges they are supposed to be sitting on during
+  // every landing.
+  particles.draw(screen, sx, sy, 0);
+  drawLight(screen, state);
+}
+
+// --- the shaft ---------------------------------------------------------------------------------
+function drawShaft(screen, state, t) {
+  // The two side walls. Entry 1 is the darkest the band has, so the shaft is near-black at the
+  // base and genuinely stone by the lamp room — the palette does the work, not the drawing.
+  for (const side of [0, 1]) {
+    const x0 = side ? SW - WALL : 0;
+    screen.rect(x0, 0, WALL, H, code(WALLP, 1));
+    screen.vline(side ? SW - WALL : WALL - 1, 0, H, code(WALLP, 2));
+    for (let y = -(((camY % 16) + 16) % 16); y < H; y += 16) {
+      screen.dither(x0, y, WALL, 1, code(WALLP, 1), code(WALLP, 2), 0);
+    }
+  }
+
+  // The back wall: courses of stone, offset every other row.
+  //
+  // Dithered rather than solid, and sparse rather than every eight pixels. The darkest colour this
+  // palette has below the mortar is a saturated indigo, so a solid line every course turned the
+  // whole screen into a bright blue brick grid. Checkerboarding it halves the weight the way the
+  // hardware would have, and the result reads as stonework you can just make out instead of a
+  // wallpaper sample.
+  for (let y = -(((camY % 16) + 16) % 16); y < H; y += 16) {
+    const row = Math.floor((camY + y) / 16);
+    screen.dither(WALL, y, SW - WALL * 2, 1, code(OUT, 0), code(WALLP, 2), 0);
+    for (let x = WALL + ((row % 2) ? 0 : 24); x < SW - WALL; x += 48) {
+      screen.dither(x, y, 1, 16, code(OUT, 0), code(WALLP, 2), 1);
+    }
+  }
+
+  // windows: one per screen, alternating sides, showing whatever is outside at this height
+  for (let s = 0; s < SCREEN_COUNT; s++) {
+    const wy = worldY(s, 40 + (s % 3) * 22);
+    const y = sy(wy);
+    if (y < -60 || y > H + 20) continue;
+    const left = s % 2 === 0;
+    const x = left ? 34 : SW - 34 - 40;
+    screen.rect(x, y, 40, 46, code(OUT, 1));
+    // the sea, moving slowly, and a horizon that is only visible once you are above the weather
+    for (let i = 0; i < 40; i++) {
+      const wyy = y + 30 + Math.round(2 * Math.sin((i + t * 8) * 0.4));
+      screen.px(x + i, wyy, code(OUT, 2));
+    }
+    screen.rect(x, y + 36, 40, 10, code(OUT, 1));
+    screen.rect(x - 2, y - 2, 44, 2, code(DETAIL, 2));
+    screen.rect(x - 2, y + 46, 44, 2, code(DETAIL, 2));
+    screen.vline(x + 20, y, 46, code(DETAIL, 2));
+    screen.rect(x - 2, y - 2, 2, 50, code(DETAIL, 2));
+    screen.rect(x + 40, y - 2, 2, 50, code(DETAIL, 2));
+  }
+}
+
+function drawPlatforms(screen, state) {
+  for (const b of PLATFORMS) {
+    const y = sy(b.y);
+    if (y < -20 || y > H + 20) continue;
+    screen.rect(sx(b.x), y, b.w, b.h, code(LEDGE, 2));
+    screen.hline(sx(b.x), y, b.w, code(LEDGE, 3));
+    screen.hline(sx(b.x), y + b.h - 1, b.w, code(LEDGE, 1));
+    // iron brackets underneath, every 16px, so a ledge reads as bolted to the wall
+    for (let i = 4; i < b.w - 2; i += 16) {
+      screen.vline(sx(b.x + i), y + b.h, 3, code(P_IRON, 2));
+    }
+  }
+}
+
+function drawLamp(screen, state, t) {
+  // sits above head height, so the climber stands UNDER the lamp rather than inside it
+  const x = sx(LAMP.x), y = sy(LAMP.y) - 16;
+  screen.rect(x - 4, y + 26, 8, 12, code(P_IRON, 2));          // the column it stands on
+  screen.rect(x - 22, y + 24, 44, 4, code(P_IRON, 3));
+  screen.rect(x - 16, y - 10, 32, 32, code(P_LIGHT, 1));
+  screen.rect(x - 12, y - 6, 24, 24, code(P_LIGHT, 2));
+  screen.rect(x - 7, y - 1, 14, 14, code(P_LIGHT, 3));
+  screen.rect(x - 18, y - 12, 36, 2, code(P_IRON, 3));
+  screen.rect(x - 18, y + 22, 36, 2, code(P_IRON, 3));
+  // the beam, out of both sides of the gallery, flickering on the 8px grid
+  const phase = Math.floor(t * 10) % 2;
+  screen.dither(x + 18, y - 2, SW - (x + 18), 16, code(P_LIGHT, 3), code(P_LIGHT, 2), phase);
+  screen.dither(0, y - 2, Math.max(0, x - 18), 16, code(P_LIGHT, 2), code(P_LIGHT, 3), phase);
+}
+
+function drawClimber(screen, state, t) {
+  const p = state.p;
+  const c = chargeOf(state);
+  const x = sx(p.x), y = sy(p.y);
+
+  // the crouch IS the charge meter. There is no bar anywhere on screen.
+  const squash = p.charging ? Math.round(c * 4) : 0;
+  const h = RULES.body.h - squash;
+  const top = y + squash;
+
+  screen.rect(x + 1, top + 4, 6, h - 4, code(P_YOU, 2));         // body
+  screen.rect(x + 2, top, 4, 4, code(P_YOU, 3));                 // head
+  screen.px(x + (p.face > 0 ? 6 : 1), top + 1, code(P_YOU, 1));  // the way they are looking
+
+  // legs: together when winding up, apart in flight
+  if (p.onGround) {
+    screen.vline(x + 2, top + h - 2, 2, code(P_YOU, 1));
+    screen.vline(x + 5, top + h - 2, 2, code(P_YOU, 1));
+  } else {
+    screen.vline(x + 1, top + h - 3, 3, code(P_YOU, 1));
+    screen.vline(x + 6, top + h - 2, 2, code(P_YOU, 1));
+  }
+
+  // The lamp leans the way the jump will ACTUALLY go.
+  //
+  // It used to fall back to `face` when lean was zero — so holding the button with no arrow down
+  // showed a lamp tilted sideways while the jump went straight up. Not a missing readout: a wrong
+  // one, and the kind that makes a player feel cheated on their first few jumps.
+  const lx = x + (p.charging ? p.lean : p.face) * 5 + 3;
+  screen.rect(lx, top - 4, 3, 3, code(P_LIGHT, 3));
+
+  // A full charge has to be visible as well as audible: the staircase of tones is the real meter,
+  // and 'm mutes' is advertised on the title screen, so a muted player would otherwise be aiming
+  // with nothing but a four-pixel crouch.
+  if (p.charging && c > 0.9) {
+    const on = (state.tick % 6) < 3;
+    if (on) {
+      screen.hline(x, top - 1, 8, code(P_LIGHT, 3));
+      screen.hline(x, top + h, 8, code(P_LIGHT, 3));
+      screen.vline(x - 1, top, h, code(P_LIGHT, 3));
+      screen.vline(x + 8, top, h, code(P_LIGHT, 3));
+    }
+    if (state.tick % 3 === 0) {
+      screen.px(x + cosmetic.int(-2, 9), y + RULES.body.h - cosmetic.int(0, 3), code(P_LIGHT, 3));
+    }
+  }
+}
+
+function drawLight(screen, state) {
+  const p = state.p;
+  // the climber's own lamp: small, so the shaft stays dark and the climb stays a commitment
+  screen.lamp(sx(p.x + 4), sy(p.y + 2), 34);
+  if (state.screen >= 10) screen.lamp(sx(LAMP.x), sy(LAMP.y + 6), 92);
+}
