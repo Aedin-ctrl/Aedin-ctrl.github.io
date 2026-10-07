@@ -12,12 +12,8 @@
     --live:#1f9d55; --dead:#c3c7ce; --pick:#2f6df6; --bad:#c92a2a; --warn:#c98a06;
     --grid:#eef0f3;
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#101215; --ink:#eef0f3; --muted:#9aa2ad; --faint:#7b848f;
-      --line:#262a31; --strong:#eef0f3; --wash:#171a1f; --grid:#1a1d22; --dead:#3a3f47;
-    }
-  }
+  /* Gatecraft is a white page. It used to follow the system setting, which meant it turned dark
+     on you without being asked; dark is now something you choose, with D, and it is remembered. */
   :root[data-theme="dark"]{
     --paper:#101215; --ink:#eef0f3; --muted:#9aa2ad; --faint:#7b848f;
     --line:#262a31; --strong:#eef0f3; --wash:#171a1f; --grid:#1a1d22; --dead:#3a3f47;
