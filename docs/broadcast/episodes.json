@@ -1,25 +1,25 @@
 {
-  "updated": "2026-10-07T19:52:08.762Z",
+  "updated": "2026-10-07T19:55:07.555Z",
   "episodes": [
     {
       "id": "ep11",
-      "title": "A3 — tightened, no breath",
+      "title": "A4 — silence only",
       "day": "17.3s",
-      "synopsis": "Inhale removed, room tone softened, gaps trimmed ~33%. Sentences that belong together now run closer: 0.15-0.18 s added where a thought continues, 1.05 s at the turn. Still well above the model's own 183-344 ms.",
+      "synopsis": "No room tone, no inhale, no synthesised anything. The gaps are pure silence with 25 ms cosine fades at each join. Max waveform step at the 8 joins: 0.0004.",
       "video": "episodes/ep11.mp4",
       "poster": "episodes/ep11.jpg",
       "seconds": 17,
-      "bytes": 305442
+      "bytes": 265684
     },
     {
       "id": "ep10",
-      "title": "A2 — previous",
-      "day": "19.0s",
-      "synopsis": "Longer gaps, with the synthetic inhale.",
+      "title": "B — model's own breaks",
+      "day": "13.9s",
+      "synopsis": "The untouched single pass, for reference. Sentence breaks 183-344 ms.",
       "video": "episodes/ep10.mp4",
       "poster": "episodes/ep10.jpg",
-      "seconds": 19,
-      "bytes": 334109
+      "seconds": 14,
+      "bytes": 247338
     }
   ]
 }
