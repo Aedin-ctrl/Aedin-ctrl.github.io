@@ -302,13 +302,15 @@
   .contact-line{color:var(--muted); font-size:14px; margin-top:10px; max-width:420px; line-height:1.6;}
   /* Two addresses side by side; each one offers the visitor's own mail app,
      a Gmail compose window, or just the text to paste wherever they like. */
+  /* Addresses and socials on the left, the reasons to write on the right --
+     same 1.3/1 split the home page uses. */
+  .contact-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:56px; align-items:start; width:100%; margin-top:28px;}
+  .contact-side{display:flex; flex-direction:column; gap:20px;}
   .mail-grid{
     display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
     gap:16px;
     width:100%;
-    max-width:720px;
-    margin-top:28px;
   }
   .mail-card{border:1px solid var(--line); border-radius:12px; padding:22px 24px;}
   .mail-label{font-size:11.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--faint);}
@@ -339,9 +341,9 @@
 
   .contact-meta{
     display:flex; gap:44px; flex-wrap:wrap;
-    margin-top:34px; padding-top:28px;
+    margin-top:30px; padding-top:26px;
     border-top:1px solid var(--line);
-    width:100%; max-width:720px;
+    width:100%;
   }
   .contact-meta-block .highlights-label{margin-bottom:10px;}
   .contact-fact{font-size:13px; color:var(--muted);}
@@ -350,6 +352,25 @@
   .social-row{display:flex; gap:22px; flex-wrap:wrap;}
   .social-row a{font-size:13px; color:var(--muted); border-bottom:1px solid transparent;}
   .social-row a:hover{color:var(--ink); border-color:var(--faint);}
+
+  .avail{display:flex; gap:12px; border:1px solid var(--line-strong); border-radius:12px; padding:20px 22px;}
+  .avail-dot{
+    width:8px; height:8px; border-radius:50%;
+    background:var(--ink); flex:none; margin-top:5px;
+    animation:availPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes availPulse{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  @media (prefers-reduced-motion:reduce){ .avail-dot{animation:none;} }
+  .avail-title{font-size:14px; color:var(--ink); font-family:'Space Grotesk', sans-serif; font-weight:500; display:block;}
+  .avail-desc{color:var(--muted); font-size:12.5px; line-height:1.6; margin-top:5px;}
+
+  .resume-cta{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:20px; flex-wrap:wrap;
+    border:1px solid var(--line); border-radius:12px;
+    padding:20px 24px; margin-top:24px;
+  }
+  .resume-cta-row{display:flex; gap:8px; flex-wrap:wrap;}
 
   .penguin-wrap{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -421,6 +442,7 @@
 
   @media (max-width:900px){
     .general-grid{grid-template-columns:1fr; gap:36px;}
+    .contact-grid{grid-template-columns:1fr; gap:30px;}
   }
   @media (max-width:640px){
     .project-row{grid-template-columns:24px 1fr; gap:6px 14px;}
@@ -742,62 +764,112 @@
             <h2 class="panel-heading" style="margin-bottom:0;">Say hello</h2>
             <p class="contact-line">The fastest way to reach me is email &mdash; I check it more than anything else. Either address reaches me; school is best for anything formal.</p>
 
-            <div class="mail-grid">
-              <div class="mail-card">
-                <div class="mail-label">School</div>
-                <a class="mail-addr" href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>
-                <div class="mail-actions">
-                  <a class="mail-btn" href="mailto:lai.ae@northeastern.edu" aria-label="Email lai.ae@northeastern.edu in your mail app">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-                    Mail app
-                  </a>
-                  <a class="mail-btn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=lai.ae%40northeastern.edu" target="_blank" rel="noopener noreferrer" aria-label="Compose to lai.ae@northeastern.edu in Gmail">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/><path d="M15.5 15.5l3.2 3.2m0 0v-2.6m0 2.6h-2.6"/></svg>
-                    Gmail
-                  </a>
-                  <button type="button" class="mail-btn copy-btn" data-copy="lai.ae@northeastern.edu" aria-label="Copy lai.ae@northeastern.edu">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
-                    <span class="copy-text">Copy</span>
-                  </button>
+            <div class="contact-grid">
+              <div class="contact-main">
+                <div class="mail-grid">
+                  <div class="mail-card">
+                    <div class="mail-label">School</div>
+                    <a class="mail-addr" href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>
+                    <div class="mail-actions">
+                      <a class="mail-btn" href="mailto:lai.ae@northeastern.edu" aria-label="Email lai.ae@northeastern.edu in your mail app">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                        Mail app
+                      </a>
+                      <a class="mail-btn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=lai.ae%40northeastern.edu" target="_blank" rel="noopener noreferrer" aria-label="Compose to lai.ae@northeastern.edu in Gmail">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/><path d="M15.5 15.5l3.2 3.2m0 0v-2.6m0 2.6h-2.6"/></svg>
+                        Gmail
+                      </a>
+                      <button type="button" class="mail-btn copy-btn" data-copy="lai.ae@northeastern.edu" aria-label="Copy lai.ae@northeastern.edu">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+                        <span class="copy-text">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mail-card">
+                    <div class="mail-label">Personal</div>
+                    <a class="mail-addr" href="mailto:aedinlai@gmail.com">aedinlai@gmail.com</a>
+                    <div class="mail-actions">
+                      <a class="mail-btn" href="mailto:aedinlai@gmail.com" aria-label="Email aedinlai@gmail.com in your mail app">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                        Mail app
+                      </a>
+                      <a class="mail-btn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=aedinlai%40gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Compose to aedinlai@gmail.com in Gmail">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/><path d="M15.5 15.5l3.2 3.2m0 0v-2.6m0 2.6h-2.6"/></svg>
+                        Gmail
+                      </a>
+                      <button type="button" class="mail-btn copy-btn" data-copy="aedinlai@gmail.com" aria-label="Copy aedinlai@gmail.com">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+                        <span class="copy-text">Copy</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="contact-meta">
+                  <div class="contact-meta-block">
+                    <div class="highlights-label">Elsewhere</div>
+                    <div class="social-row">
+                      <a href="https://github.com/Aedin-ctrl" target="_blank" rel="noopener noreferrer">GitHub</a>
+                      <a href="https://www.linkedin.com/in/aedin-lai-a35a4a327" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+                      <a href="https://www.instagram.com/aedin.lai" target="_blank" rel="noopener noreferrer">Instagram</a>
+                    </div>
+                  </div>
+                  <div class="contact-meta-block">
+                    <div class="highlights-label">Prefer to text</div>
+                    <a class="phone-link" href="tel:+19787993296">978&middot;799&middot;3296</a>
+                  </div>
+                  <div class="contact-meta-block">
+                    <div class="highlights-label">My local time</div>
+                    <!-- Ticks once a minute; falls back to the plain label if the
+                         browser has no time zone data (see startContactClock). -->
+                    <p class="contact-fact"><span id="contactClock">Boston, MA</span></p>
+                  </div>
+                </div>
+
+                <div class="resume-cta">
+                  <div>
+                    <span class="now-title">Resume</span>
+                    <p class="now-desc">Experience, education, and leadership in one page.</p>
+                  </div>
+                  <div class="resume-cta-row">
+                    <a class="mail-btn" href="resume.pdf" download>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M12 3v12"/><path d="M7.5 11L12 15.5 16.5 11"/><path d="M4 19h16"/></svg>
+                      Download PDF
+                    </a>
+                    <button type="button" class="mail-btn" data-path="/resume">Read it here</button>
+                  </div>
                 </div>
               </div>
 
-              <div class="mail-card">
-                <div class="mail-label">Personal</div>
-                <a class="mail-addr" href="mailto:aedinlai@gmail.com">aedinlai@gmail.com</a>
-                <div class="mail-actions">
-                  <a class="mail-btn" href="mailto:aedinlai@gmail.com" aria-label="Email aedinlai@gmail.com in your mail app">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-                    Mail app
-                  </a>
-                  <a class="mail-btn" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=aedinlai%40gmail.com" target="_blank" rel="noopener noreferrer" aria-label="Compose to aedinlai@gmail.com in Gmail">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M3 7l9 6 9-6"/><path d="M15.5 15.5l3.2 3.2m0 0v-2.6m0 2.6h-2.6"/></svg>
-                    Gmail
-                  </a>
-                  <button type="button" class="mail-btn copy-btn" data-copy="aedinlai@gmail.com" aria-label="Copy aedinlai@gmail.com">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
-                    <span class="copy-text">Copy</span>
-                  </button>
+              <div class="contact-side">
+                <div class="avail">
+                  <span class="avail-dot" aria-hidden="true"></span>
+                  <div>
+                    <span class="avail-title">Looking for a Spring 2028 co-op</span>
+                    <p class="avail-desc">Electrical &amp; computer engineering &mdash; embedded systems, hardware bring-up, infrastructure. Happy to talk before then.</p>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            <div class="contact-meta">
-              <div class="contact-meta-block">
-                <div class="highlights-label">Elsewhere</div>
-                <div class="social-row">
-                  <a href="https://github.com/Aedin-ctrl" target="_blank" rel="noopener noreferrer">GitHub</a>
-                  <a href="https://www.linkedin.com/in/aedin-lai-a35a4a327" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                  <a href="https://www.instagram.com/aedin.lai" target="_blank" rel="noopener noreferrer">Instagram</a>
+                <div class="highlights">
+                  <div class="highlights-label">Good to reach me about</div>
+                  <div class="highlight-item">
+                    <span class="highlight-mark">01</span>
+                    <span class="highlight-text">Co-op and internship roles <span>Hardware, embedded, or data center infrastructure</span></span>
+                  </div>
+                  <div class="highlight-item">
+                    <span class="highlight-mark">02</span>
+                    <span class="highlight-text">Anything on this site <span>How it was built, or a bug you hit using it</span></span>
+                  </div>
+                  <div class="highlight-item">
+                    <span class="highlight-mark">03</span>
+                    <span class="highlight-text">Building something together <span>Especially if it needs hardware and software to meet</span></span>
+                  </div>
+                  <div class="highlight-item">
+                    <span class="highlight-mark">04</span>
+                    <span class="highlight-text">Fencing <span>Epee, collegiate club programs, or coming to a meet</span></span>
+                  </div>
                 </div>
-              </div>
-              <div class="contact-meta-block">
-                <div class="highlights-label">Prefer to text</div>
-                <a class="phone-link" href="tel:+19787993296">978&middot;799&middot;3296</a>
-              </div>
-              <div class="contact-meta-block">
-                <div class="highlights-label">Based in</div>
-                <p class="contact-fact">Boston, MA &mdash; Eastern Time</p>
               </div>
             </div>
           </div>
@@ -1340,6 +1412,27 @@
   document.querySelectorAll('.dot-hit').forEach(el => el.addEventListener('keydown', (e) => {
     if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); el.click(); }
   }));
+
+  // "4:21 PM in Boston" on the contact panel, so a visitor abroad can see
+  // whether it is a reasonable hour before they call. Fixed to America/New_York
+  // rather than the visitor's own zone -- it is my clock, not theirs.
+  (function startContactClock(){
+    const el = document.getElementById('contactClock');
+    if(!el) return;
+    let fmt;
+    try{
+      fmt = new Intl.DateTimeFormat('en-US', {
+        timeZone:'America/New_York', hour:'numeric', minute:'2-digit'
+      });
+      fmt.format(new Date());
+    }catch{
+      return;                                 // no tz data: leave the plain label
+    }
+    const tick = () => { el.textContent = fmt.format(new Date()) + ' in Boston'; };
+    tick();
+    // Line up with the top of the next minute, then run once a minute.
+    setTimeout(() => { tick(); setInterval(tick, 60000); }, (60 - new Date().getSeconds()) * 1000);
+  })();
 
   // Copy-to-clipboard on the contact cards. The address is still a plain
   // mailto: link above, so this is a convenience, never the only way to get it.
