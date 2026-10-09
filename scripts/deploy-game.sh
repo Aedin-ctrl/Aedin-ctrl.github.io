@@ -2,7 +2,7 @@
 #
 # Copy one of the 8-bit games into docs/ for publishing.
 #
-#   scripts/deploy-game.sh ~/Desktop/Lockout lockout
+#   scripts/deploy-game.sh ~/Desktop/Projects/Games/Lockout lockout
 #
 # This exists because the ad-hoc version of it deleted the whole site. It built its destination
 # from a shell variable that came out empty — zsh does not word-split an unquoted variable the way

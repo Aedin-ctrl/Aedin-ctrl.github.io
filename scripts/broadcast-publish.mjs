@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Copies finished Broadcast episodes into the site and rebuilds the manifest the
 // Broadcast page reads. The episodes themselves are generated elsewhere (see
-// ~/Desktop/Broadcast); this only publishes what is already rendered.
+// ~/Desktop/Projects/Broadcast); this only publishes what is already rendered.
 //
 //   node scripts/broadcast-publish.mjs            publish every episode found
 //   node scripts/broadcast-publish.mjs --keep 20  publish, but keep only the newest 20 on the site
@@ -20,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SRC = process.env.BROADCAST_DIR || join(homedir(), 'Desktop/Broadcast');
+const SRC = process.env.BROADCAST_DIR || join(homedir(), 'Desktop/Projects/Broadcast');
 const DEST = join(ROOT, 'docs/broadcast/episodes');
 const MANIFEST = join(ROOT, 'docs/broadcast/episodes.json');
 
