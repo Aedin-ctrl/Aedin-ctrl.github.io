@@ -391,6 +391,40 @@
   .resume-fallback a{color:var(--ink); border-bottom:1px solid var(--faint);}
   .resume-fallback a:hover{border-color:var(--ink);}
 
+  /* The resume view: Aedin's own PDF on the left, shown exactly as the file is,
+     with the right-hand column free for notes and the projects worth opening.
+     The PDF column is narrower than the panel, which is what makes the page
+     render smaller and fit without the panel scrolling. */
+  .resume-split{
+    display:grid; grid-template-columns:minmax(0,1fr) 19rem;
+    gap:24px; align-items:start;
+  }
+  /* The notes run longer than one page of PDF, so the column matches the
+     document's height and scrolls inside itself. The panel stays put, which is
+     the same reason .resume-frame sizes itself off the viewport. */
+  .resume-aside{
+    min-width:0;
+    max-height:min(calc(100vh - 290px), 1040px);
+    overflow-y:auto; overscroll-behavior:contain;
+  }
+  .resume-aside-h{
+    font-family:'Space Grotesk', sans-serif; font-size:14px; font-weight:500;
+    color:var(--ink); margin:0 0 6px;
+  }
+  .resume-aside-note{color:var(--muted); font-size:12.5px; line-height:1.6; margin:0 0 2px;}
+  .resume-links{list-style:none; margin:0; padding:0;}
+  .resume-links li{padding:13px 0; border-top:1px solid var(--line);}
+  .resume-links li:last-child{border-bottom:1px solid var(--line);}
+  .resume-links a{
+    font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:500;
+    color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);
+  }
+  .resume-links a:hover, .resume-links a:focus-visible{border-color:var(--ink);}
+  .resume-links p{color:var(--muted); font-size:12.5px; line-height:1.6; margin:5px 0 0;}
+  .resume-aside-foot{margin:14px 0 0; color:var(--faint); font-size:12.5px; line-height:1.6;}
+  .resume-aside-foot a{color:var(--ink); border-bottom:1px solid var(--faint); text-decoration:none;}
+  .resume-aside-foot a:hover{border-color:var(--ink);}
+
   /* Links tab: title on the left, the way in on the right. */
   .link-list{list-style:none; margin:0; padding:0;}
   .link-item{
@@ -473,6 +507,9 @@
   @media (max-width:900px){
     .general-grid{grid-template-columns:1fr; gap:36px;}
     .contact-grid{grid-template-columns:1fr; gap:30px;}
+    /* Stacked: the resume first, the notes under it, no inner scrolling. */
+    .resume-split{grid-template-columns:minmax(0,1fr); gap:28px;}
+    .resume-aside{max-height:none; overflow:visible;}
   }
   @media (max-width:640px){
     .project-row{grid-template-columns:24px 1fr; gap:6px 14px;}
@@ -757,15 +794,57 @@
                thing that tells it the file changed.
                <object> fallback content renders on browsers that will not display a PDF
                inline (most mobile ones), so there is always a way in. -->
-          <div class="resume-doc">
-            <object class="resume-frame" data="resume.pdf?v=20261013d#view=FitH&amp;toolbar=0&amp;navpanes=0" type="application/pdf"
-                    title="Aedin Lai resume, PDF">
-              <p class="resume-fallback">
-                This browser will not display the PDF inline.
-                <a href="resume.pdf?v=20261013d" target="_blank" rel="noopener noreferrer">Open the resume in a new tab</a>,
-                or use Download PDF above.
-              </p>
-            </object>
+          <div class="resume-split">
+            <div class="resume-doc">
+              <object class="resume-frame" data="resume.pdf?v=20261013d#view=FitH&amp;toolbar=0&amp;navpanes=0" type="application/pdf"
+                      title="Aedin Lai resume, PDF">
+                <p class="resume-fallback">
+                  This browser will not display the PDF inline.
+                  <a href="resume.pdf?v=20261013d" target="_blank" rel="noopener noreferrer">Open the resume in a new tab</a>,
+                  or use Download PDF above.
+                </p>
+              </object>
+            </div>
+
+            <aside class="resume-aside">
+              <h3 class="resume-aside-h">Projects you can open</h3>
+              <p class="resume-aside-note">The resume names a few of these. All of them run in a browser &mdash; nothing to install.</p>
+              <ul class="resume-links">
+                <li>
+                  <a href="gatecraft/">Gatecraft</a>
+                  <p>Build a logic circuit, watch it settle, read the truth table it fills in. Designs save into the URL.</p>
+                </li>
+                <li>
+                  <a href="sandbit/">Sandbit</a>
+                  <p>The falling-sand engine from the resume: 27 materials, rigid bodies, electrical conduction.</p>
+                </li>
+                <li>
+                  <a href="https://football.aedinlai.com">Game Day Board</a>
+                  <p>Fantasy football board running on a Raspberry Pi, scoring a 12-team league off live NFL box scores.</p>
+                </li>
+                <li>
+                  <a href="hand-playground/">Hand Playground</a>
+                  <p>Webcam hand tracking driving six toys, all on-device.</p>
+                </li>
+                <li>
+                  <a href="doodle-life/">DoodleLife</a>
+                  <p>Draw something, it gets recognised, then your own lines get up and move.</p>
+                </li>
+                <li>
+                  <a href="gym/">Marino Tracker</a>
+                  <p>The gym occupancy tracker from the resume, counting live every 10 minutes.</p>
+                </li>
+                <li>
+                  <a href="games/">Games</a>
+                  <p>Four built from scratch: Filament, The Far Light, Lockout, Latch.</p>
+                </li>
+                <li>
+                  <a href="broadcast/">Broadcast</a>
+                  <p>A serial radio drama written and voiced overnight on a Pi.</p>
+                </li>
+              </ul>
+              <p class="resume-aside-foot">More at <a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a>.</p>
+            </aside>
           </div>
         </section>
 
