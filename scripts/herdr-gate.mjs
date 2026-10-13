@@ -98,7 +98,8 @@ async function cmdSeal(){
     // each other even though one key opens both.
     const salt = rand(16);
     const key = await pbkdf2(secretFor(c.word, c.dots), salt, c.iterations, 256);
-    const box = { v: 1, n: c.dots.length, iter: c.iterations, salt: b64(salt), ...(await seal(key, text)) };
+    // No run length in the box; the page settles on a pause instead.
+    const box = { v: 1, iter: c.iterations, salt: b64(salt), ...(await seal(key, text)) };
     const { before, after } = splitPage(t.page);
     writeFileSync(t.page, `${before}\n${t.indent}<script type="application/json" id="herdrCipher">${JSON.stringify(box)}</script>\n${t.indent}${after}`);
     // Round-trip check, so a bad seal never gets committed.

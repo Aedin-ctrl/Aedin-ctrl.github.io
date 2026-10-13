@@ -73,7 +73,9 @@ async function cmdSeal(){
   const panel = readFileSync(PANEL, 'utf8');
   const salt = rand(16);
   const key = await pbkdf2(secretFor(c.word, c.dots), salt, c.iterations, 256);
-  const box = { v: 1, n: c.dots.length, iter: c.iterations, salt: b64(salt), tempSalt: c.tempSalt, ...(await seal(key, panel)) };
+  // The run length is deliberately absent: the page settles on a pause instead,
+  // so a reader of the box cannot tell how long a correct run is.
+  const box = { v: 1, iter: c.iterations, salt: b64(salt), tempSalt: c.tempSalt, ...(await seal(key, panel)) };
   const { before, after } = splitIndex();
   const indent = '          ';
   writeFileSync(INDEX, `${before}\n${indent}<script type="application/json" id="secretCipher">${JSON.stringify(box)}</script>\n${indent}${after}`);
