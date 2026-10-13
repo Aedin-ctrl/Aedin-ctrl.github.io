@@ -411,6 +411,21 @@
   .resume-pagewrap{position:relative;}
   .resume-page{display:block; inline-size:100%; block-size:auto;}
   .resume-anchor{position:absolute; inset-inline:0; height:1px; pointer-events:none;}
+  /* Clicking a comment points at the lines it is about, then gets out of the
+     way. It is a pointer, not a highlight: if it stayed, it would be another
+     indicator to look at. */
+  .resume-flash{
+    position:absolute; inset-inline:0; pointer-events:none;
+    background:rgba(16,17,20,.085); border-radius:3px;
+    opacity:0; top:0; height:0;
+  }
+  .resume-flash.lit{animation:resumeFlash .62s ease-out forwards;}
+  @keyframes resumeFlash{
+    0%{opacity:0;} 14%{opacity:1;} 46%{opacity:1;} 100%{opacity:0;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .resume-flash.lit{animation-duration:.01s;}
+  }
 
   /* ---- the commentary ---- */
   .resume-aside{
@@ -866,6 +881,7 @@
                   <div class="resume-anchor" data-sec="cap" style="top:81.010%"></div>
                   <div class="resume-anchor" data-sec="marx" style="top:84.910%"></div>
                   <div class="resume-anchor" data-sec="skills" style="top:89.330%"></div>
+                  <div class="resume-flash" id="resumeFlash" aria-hidden="true"></div>
                   <div class="sr-only">
                   <h3>Education</h3>
                   <p>Northeastern University, Boston, MA. Expected May 2029. Candidate for Bachelor of Science in Electrical and Computer Engineering. Relevant coursework: Embedded Design, Computing Fundamentals for Engineers, Physics 2, Calculus 2.</p>
@@ -1401,42 +1417,68 @@
         for(const el of items) el.setAttribute('aria-current', el.dataset.sec === sec ? 'true' : 'false');
       }
 
-      // The page travels its whole range across the whole commentary.
+      // Where the reading line is, as a fraction of the whole page.
       //
-      // Aligning each note with its own section was tried and is wrong here:
-      // the page has about 170px of travel against the column's 1500, so it
-      // reached the bottom two notches in and then sat dead for the rest of
-      // the read. Mapping the two ranges onto each other instead means the
-      // page is always moving under you, which is the point -- there is no
-      // indicator any more, so the movement has to carry the sense of place.
-      function focusFromNotes(){
-        const mid = midOf(notes);
-        let best = secs[0], bestD = Infinity;
-        for(const sec of secs){
-          const d = Math.abs(noteMid(bySec.get(sec)) - mid);
-          if(d < bestD){ bestD = d; best = sec; }
+      // The line is not fixed on screen. Scrolled to the top it sits at the top
+      // of the pane; scrolled to the bottom it sits at the bottom. So it sweeps
+      // the entire document even though the pane itself only travels ~170px:
+      //
+      //   lineY = scrollTop + progress x paneHeight
+      //         = progress x (maxScroll + paneHeight)
+      //         = progress x documentHeight
+      //
+      // which is why this is just the scroll progress. It is also why the two
+      // columns can share one number: progress is the same in both.
+      let progress = 0;
+
+      function sectionAtLine(){
+        let found = secs[0];
+        for(const sec of secs){ if(yOf.get(sec) <= progress + 0.0005) found = sec; else break; }
+        return found;
+      }
+
+      function apply(from){
+        const nMax = maxOf(notes), pMax = maxOf(scroller);
+        if(from !== notes && nMax >= 2){
+          const t = progress * nMax;
+          if(Math.abs(notes.scrollTop - t) > 1) notes.scrollTop = t;
         }
-        return best;
+        if(from !== scroller && pMax >= 2){
+          const t = progress * pMax;
+          if(Math.abs(scroller.scrollTop - t) > 0.5) scroller.scrollTop = t;
+        }
+        focusOn(sectionAtLine());
       }
 
       function notesDrivePage(){
-        if(!page.offsetHeight) return;
-        focusOn(focusFromNotes());
-        const nMax = maxOf(notes), pMax = maxOf(scroller);
-        if(pMax < 2) return;
-        const target = nMax < 2 ? 0 : (notes.scrollTop / nMax) * pMax;
-        if(Math.abs(scroller.scrollTop - target) > 0.5) scroller.scrollTop = target;
+        const nMax = maxOf(notes);
+        progress = nMax < 2 ? 0 : notes.scrollTop / nMax;
+        apply(notes);
       }
 
-      // And the same the other way, so either column drives the pair.
       function pageDrivesNotes(){
-        const nMax = maxOf(notes), pMax = maxOf(scroller);
-        if(nMax < 2 || pMax < 2) return;
-        const target = (scroller.scrollTop / pMax) * nMax;
-        if(Math.abs(notes.scrollTop - target) > 1) notes.scrollTop = target;
-        focusOn(focusFromNotes());
+        const pMax = maxOf(scroller);
+        if(pMax < 2) return;
+        progress = scroller.scrollTop / pMax;
+        apply(scroller);
       }
 
+      // Put the line over a section, and point at it briefly.
+      const flash = document.getElementById('resumeFlash');
+      function flashSection(sec){
+        if(!flash) return;
+        const i = secs.indexOf(sec);
+        const from = yOf.get(sec);
+        const to = i + 1 < secs.length ? yOf.get(secs[i + 1]) : 0.985;
+        flash.style.top = (from * 100).toFixed(3) + '%';
+        flash.style.height = Math.max(1.2, (to - from) * 100).toFixed(3) + '%';
+        flash.classList.remove('lit');
+        void flash.offsetWidth;                 // restart the animation
+        flash.classList.add('lit');
+      }
+
+      // Whichever column the reader is touching owns the gesture; the other is
+      // driven and its scroll events are ignored, so there is nothing to echo.
       for(const el of [notes, scroller]){
         for(const ev of ['wheel', 'touchstart', 'touchmove', 'pointerdown', 'keydown']){
           el.addEventListener(ev, () => claim(el), { passive: true });
@@ -1461,14 +1503,15 @@
       // Clicking a note brings it to the middle of the column; the page comes
       // with it, because the two are wired together.
       function go(sec){
-        const el = bySec.get(sec);
-        if(!el) return;
-        focusOn(sec);
-        // Scroll the column only; the page is carried along by the coupling,
-        // the same as if the reader had scrolled here themselves. The claim
-        // has to outlast the animation, or the page stops following halfway.
-        claim(notes, 1100);
-        notes.scrollTo({ top: clamp(noteMid(el) - notes.clientHeight / 2, 0, maxOf(notes)), behavior: 'smooth' });
+        if(!bySec.has(sec)) return;
+        // Land the line a little inside the section rather than exactly on its
+        // first line, so the section it is "over" is unambiguous.
+        const i = secs.indexOf(sec);
+        const to = i + 1 < secs.length ? yOf.get(secs[i + 1]) : 0.985;
+        progress = clamp(yOf.get(sec) + Math.min(0.012, (to - yOf.get(sec)) / 3), 0, 1);
+        claim(notes, 160);
+        apply(null);
+        flashSection(sec);
       }
       notes.addEventListener('click', (e) => {
         if(e.target.closest('a')) return;
