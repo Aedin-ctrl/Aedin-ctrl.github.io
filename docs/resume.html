@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aedin Lai</title>
+<meta name="description" content="Aedin Lai — electrical and computer engineering at Northeastern. Data centre infrastructure, instrumented hardware, and software that runs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#101114;
+    --muted:#6b7280;
+    --line:#e6e7eb;
+    --tint:#f7f8fa;
+    --live:#14487a;          /* used ONLY for things you can open */
+    --display:'Space Grotesk', ui-sans-serif, sans-serif;
+    --body:'Inter', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font:400 15px/1.5 var(--body);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Figures are the subject of this page: 160 to 300 VMs, cohorts of 40-50,
+     80+ test swings, A25, #103. Tabular and a shade heavier, so the eye
+     catches the measurements while scanning. */
+  .n{font-variant-numeric:tabular-nums; font-weight:600; letter-spacing:-.01em}
+
+  .sheet{
+    max-width:70rem; margin:0 auto; padding:4.5rem 2rem 6rem;
+    display:grid; grid-template-columns:minmax(0,1fr) 18rem; gap:0 4rem;
+    align-items:start;
+  }
+  /* DOM order is main, then rail. The grid puts the rail on the right, so the
+     reading order of the document stays linear for print and for anything that
+     parses the text rather than the layout. */
+  .main{grid-column:1; min-width:0}
+  .rail{grid-column:2; grid-row:1 / span 2; position:sticky; top:4.5rem}
+
+  /* ---- masthead ---- */
+  .name{
+    font:700 clamp(2.6rem,6vw,3.9rem)/.92 var(--display);
+    letter-spacing:-.035em; margin:0;
+  }
+  .where{margin:1rem 0 0; color:var(--muted); font-size:.9375rem}
+  /* No separator glyphs: space does the work, which keeps the line calm and
+     keeps each item selectable on its own. */
+  .contact{
+    list-style:none; margin:1.5rem 0 0; padding:0;
+    display:flex; flex-wrap:wrap; gap:.3rem 1.6rem; font-size:.875rem;
+  }
+  .contact a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:1px}
+  .contact a:hover{border-bottom-color:var(--ink)}
+  .contact .tel{color:var(--muted); font-variant-numeric:tabular-nums}
+
+  /* ---- sections ---- */
+  section{margin:3.25rem 0 0}
+  h2{
+    font:600 .9375rem/1 var(--display); letter-spacing:.005em;
+    margin:0 0 1.35rem; padding-bottom:.6rem; border-bottom:1px solid var(--ink);
+  }
+
+  .role{margin:0 0 1.9rem}
+  .role:last-child{margin-bottom:0}
+  /* Employer and date share a baseline: the only justified relationship on the
+     page, because it is the one comparison a reader actually makes. */
+  .role-top{display:flex; justify-content:space-between; align-items:baseline; gap:1rem}
+  .org{font:600 1.0625rem/1.3 var(--display); letter-spacing:-.015em; margin:0}
+  .when{
+    font:500 .8125rem/1.3 var(--display); color:var(--muted);
+    font-variant-numeric:tabular-nums; white-space:nowrap; flex:none;
+  }
+  .title{margin:.2rem 0 0; font-size:.9375rem; color:#3a3d44}
+  .note{margin:.2rem 0 0; font-size:.84375rem; color:var(--muted)}
+
+  ul.bullets{margin:.65rem 0 0; padding:0 0 0 1.05rem; list-style:none}
+  ul.bullets li{position:relative; margin:.4rem 0; font-size:.9375rem; line-height:1.5; max-width:46rem}
+  ul.bullets li::before{
+    content:''; position:absolute; left:-1.05rem; top:.62em;
+    width:4px; height:1px; background:var(--muted);
+  }
+
+  /* ---- skills ---- */
+  .skills{margin:0; display:grid; gap:.55rem}
+  .skills div{display:grid; grid-template-columns:8.5rem minmax(0,1fr); gap:1rem; font-size:.9375rem}
+  .skills dt{font:500 .875rem/1.5 var(--display); color:var(--muted)}
+  .skills dd{margin:0}
+
+  /* ---- the right rail: software that is running now ---- */
+  .rail h2{border-bottom-color:var(--line)}
+  .rail-intro{font-size:.84375rem; color:var(--muted); margin:0 0 1.15rem; line-height:1.45}
+  .live{list-style:none; margin:0; padding:0}
+  .live li{padding:.8rem 0; border-top:1px solid var(--line)}
+  .live li:first-child{border-top:0; padding-top:0}
+  .live a{
+    display:inline-block; font:600 .9375rem/1.25 var(--display); letter-spacing:-.012em;
+    color:var(--live); text-decoration:none;
+    border-bottom:1.5px solid rgba(20,72,122,.28);
+  }
+  .live a:hover,.live a:focus-visible{border-bottom-color:var(--live)}
+  .live p{margin:.25rem 0 0; font-size:.8125rem; line-height:1.45; color:var(--muted)}
+  .live .host{display:block; margin-top:.2rem; font:400 .75rem/1 var(--display); color:#9aa0aa}
+  .rail-more{
+    margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line);
+    font-size:.8125rem; color:var(--muted); line-height:1.5;
+  }
+  .rail-more a{color:var(--live)}
+
+  .print-links{display:none}
+
+  a:focus-visible{outline:2px solid var(--live); outline-offset:3px; border-radius:2px}
+
+  /* ---- narrow screens: one column, rail after the content ---- */
+  @media (max-width:860px){
+    .sheet{grid-template-columns:minmax(0,1fr); gap:0; padding:2.75rem 1.25rem 4rem}
+    .main,.rail{grid-column:1}
+    .rail{grid-row:auto; position:static; margin-top:3.25rem}
+  }
+
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* =========================================================
+     PRINT: a different medium, not a screenshot of this one.
+     One column, one page, no rail chrome, no colour. The text
+     order is already linear in the DOM, so a parser reads it
+     top to bottom the way a person would.
+     ========================================================= */
+  @media print{
+    /* Narrow margins buy width, and width is the cheapest way to buy height:
+       every line that stops wrapping is a line saved. */
+    @page{size:letter; margin:0.34in 0.42in}
+    html,body{background:#fff}
+    body{font-size:8.3pt; line-height:1.17; color:#000}
+    .sheet{display:block; max-width:none; margin:0; padding:0}
+    .main,.rail{grid-column:auto}
+    .rail{position:static; margin:0}
+
+    .name{font-size:16pt; line-height:1; letter-spacing:-.03em}
+    /* The location line is screen furniture: the Education block already
+       states the school, the city and the degree. */
+    .where{display:none}
+    .contact{margin:.16rem 0 0; gap:0 .85rem; font-size:8.3pt}
+    .contact a{border-bottom:0; color:#000}
+    .contact .tel{color:#000}
+
+    section{margin:.34rem 0 0}
+    h2{font-size:8.8pt; margin:0 0 .12rem; padding-bottom:.05rem; border-bottom:.6pt solid #000}
+
+    .role{margin:0 0 .145rem}
+    .org{font-size:9pt}
+    .when{font-size:8pt; color:#333}
+    .title{font-size:8.3pt; margin:0; color:#111}
+    .note{font-size:8pt; margin:0; color:#444}
+
+    ul.bullets{margin:.04rem 0 0; padding-left:.58rem}
+    ul.bullets li{margin:0; font-size:8.3pt; line-height:1.17; max-width:none}
+    ul.bullets li::before{left:-.58rem; top:.57em; width:3px; background:#555}
+
+    .skills{gap:0}
+    .skills div{grid-template-columns:5.9rem minmax(0,1fr); gap:.4rem; font-size:8.3pt}
+    .skills dt{font-size:8.2pt; color:#333}
+
+    /* The rail collapses to one compact run of links. Same information, a
+       couple of lines instead of a column, and the order is already linear. */
+    .rail h2,.rail-intro,.rail-more,.live{display:none}
+    .print-links{
+      display:block; margin:.3rem 0 0; padding-top:.16rem;
+      border-top:.6pt solid #000; font-size:8.2pt; line-height:1.25; color:#000;
+    }
+
+    a{color:#000; text-decoration:none}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <main class="main">
+    <header>
+      <h1 class="name">Aedin Lai</h1>
+      <p class="where">Electrical &amp; Computer Engineering, Northeastern University. Boston, MA.</p>
+      <ul class="contact">
+        <li class="tel">(978) 799-3296</li>
+        <li><a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a></li>
+        <li><a href="https://www.linkedin.com/in/aedin-lai-a35a4a327">linkedin.com/in/aedin-lai</a></li>
+        <li><a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a></li>
+        <li><a href="https://aedinlai.com">aedinlai.com</a></li>
+      </ul>
+    </header>
+
+    <section>
+      <h2>Education</h2>
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Northeastern University</p>
+          <p class="when">Expected May <span class="n">2029</span></p>
+        </div>
+        <p class="title">Candidate for Bachelor of Science in Electrical &amp; Computer Engineering &mdash; Boston, MA</p>
+        <p class="note">Coursework: Calculus <span class="n">2</span>, Physics <span class="n">2</span>, Chemistry, Cornerstone of Engineering <span class="n">2</span>, First-Year Writing</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Experience</h2>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">SingleStore</p>
+          <p class="when">June &ndash; September <span class="n">2026</span></p>
+        </div>
+        <p class="title">Data Center Infrastructure Intern &mdash; Boston, MA</p>
+        <ul class="bullets">
+          <li>Led hardware deployment for a phased data center expansion, scaling a private cloud platform from <span class="n">160</span> to <span class="n">300+</span> VMs</li>
+          <li>Redesigned a single-push rollout into an incremental &ldquo;two racks at a time&rdquo; strategy to cut disruption to live workloads</li>
+          <li>Delivered capacity across three cohorts of <span class="n">40&ndash;50</span> VMs, hitting or landing within one week of every target date</li>
+          <li>Diagnosed a Linux kernel storage defect and a multi-week NFS instability, deploying fixes that restored full fleet capacity and system stability</li>
+          <li>Supported a full Oakland-to-Boston data center relocation, migrating the platform from bare-metal to virtualized infrastructure</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">PEACE Foundation, Yale University School of Medicine</p>
+          <p class="when"><span class="n">2023 &ndash; 2024</span></p>
+        </div>
+        <p class="title">Research Intern &mdash; New Haven, CT</p>
+        <p class="note">Supervisor: Dr. Kun Liu, Associate Professor of Sports Neuroscience</p>
+        <ul class="bullets">
+          <li>Designed, built, and improved a full-body balance measurement device to study cognition and movement in neurological patients</li>
+          <li>Automated data collection using custom hardware across ASD, Alzheimer&rsquo;s, Parkinson&rsquo;s, and schizophrenia patient populations</li>
+          <li>Presented findings at ISEC <span class="n">2024</span> and co-authored results accepted for publication in JAMA <span class="n">(2025)</span></li>
+          <li>Co-developed a Yale study assessing stressors and emotional health in Division I, III, and club collegiate fencing athletes</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Projects</h2>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">One-Inch Punch Arcade Machine</p>
+          <p class="when">Fall <span class="n">2025</span></p>
+        </div>
+        <p class="title">Lead Constructor &amp; Designer &mdash; Northeastern University, GE1501</p>
+        <ul class="bullets">
+          <li>Worked hands-on for the whole build &mdash; mechanical construction, electronics, and scoring software &mdash; from concept to expo launch</li>
+          <li>Designed a &ldquo;one-inch punch&rdquo; mechanism using dual laser sensors, and wrote the scoring logic converting swing velocity into a live score</li>
+          <li>Built the wooden frame, pendulum-and-magnet reset system, and laser-cut acrylic paneling entirely from scratch</li>
+          <li>Validated durability through <span class="n">80+</span> personal stress-test swings, catching and fixing structural wobble before launch</li>
+          <li>Built a layered-sponge padding system that safely absorbed harder hits than originally scoped</li>
+          <li>Identified a paddle material limit from full-force hits during a full expo day of play and proposed a rubber-composite redesign</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Cal Tracker</p>
+          <p class="when">September <span class="n">2025</span></p>
+        </div>
+        <p class="title">Self-hosted calorie tracker &mdash; Python, HTML/CSS, Raspberry Pi</p>
+        <ul class="bullets">
+          <li>Built and self-hosted a real-time calorie tracking web app on a Raspberry Pi with a lightweight front-end/back-end and persistent local storage</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Hallway Marathon Event Site</p>
+          <p class="when">November <span class="n">2025</span></p>
+        </div>
+        <p class="title">hallway-marathon.github.io</p>
+        <ul class="bullets">
+          <li>Designed and built an event website from scratch (HTML, CSS, JavaScript, no frameworks) with live betting odds and competitor stats for a multi-university competition</li>
+          <li>Independently managed all content, deployment, and live updates throughout the event</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Leadership &amp; athletics</h2>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Northeastern University Club Fencing</p>
+          <p class="when"><span class="n">2025</span> &ndash; Present</p>
+        </div>
+        <p class="title">Captain</p>
+        <ul class="bullets">
+          <li>Anchor the epee team to the <span class="n">2026</span> Collegiate Fencing Club National Championship</li>
+          <li>Lead team operations &mdash; scheduling, logistics, recruitment, and practice design &mdash; for the full roster</li>
+          <li>Serve as primary contact for tournament registration, travel, and university representation at competitions</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Marx Fencing Academy</p>
+          <p class="when"><span class="n">2018 &ndash; 2025</span></p>
+        </div>
+        <p class="title">Competitive epee fencer</p>
+        <ul class="bullets">
+          <li>USA Fencing rating <span class="n">A25</span>; ranked <span class="n">#103</span> nationally and <span class="n">#122</span> globally</li>
+          <li>Top-<span class="n">16</span> World Cup finish; All-American <span class="n">2021&ndash;2025</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Skills</h2>
+      <dl class="skills">
+        <div><dt>Programming</dt><dd>Python, Java, C#, SQL, MATLAB, HTML/CSS, JavaScript</dd></div>
+        <div><dt>Hardware &amp; CAD</dt><dd>Raspberry Pi, embedded systems, sensor integration, SolidWorks, AutoCAD</dd></div>
+        <div><dt>Tools</dt><dd>Git, GitHub, Pandas, Linux, VS Code</dd></div>
+      </dl>
+    </section>
+  </main>
+
+  <aside class="rail" aria-labelledby="live-h">
+    <h2 id="live-h">Running now</h2>
+    <p class="rail-intro">Side projects you can open and use in a browser. Each one is live, not a screenshot.</p>
+    <ul class="live">
+      <li>
+        <a href="https://aedinlai.com/gatecraft/">Gatecraft</a>
+        <p>Logic-gate designer with a settling simulator and a live truth table. Circuits save into the URL.</p>
+        <span class="host">aedinlai.com/gatecraft</span>
+      </li>
+      <li>
+        <a href="https://football.aedinlai.com">Game Day Board</a>
+        <p>Fantasy board on a Raspberry Pi. Reads live NFL box scores, scores a 12-team league, projects totals.</p>
+        <span class="host">football.aedinlai.com</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/sandbit/">Sandbit</a>
+        <p>Falling-sand and rigid-body physics sandbox, written in Rust and compiled to WebAssembly.</p>
+        <span class="host">aedinlai.com/sandbit</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/hand-playground/">Hand Playground</a>
+        <p>Webcam hand tracking driving six different toys, all running on-device in the browser.</p>
+        <span class="host">aedinlai.com/hand-playground</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/doodle-life/">DoodleLife</a>
+        <p>Draw something, it gets recognised, and then your own lines get up and move.</p>
+        <span class="host">aedinlai.com/doodle-life</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/games/">Games</a>
+        <p>Four browser games built from scratch: Filament, The Far Light, Lockout, and Latch.</p>
+        <span class="host">aedinlai.com/games</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/gym/">Marino Tracker</a>
+        <p>Live occupancy for the campus gym, served through a Cloudflare Worker.</p>
+        <span class="host">aedinlai.com/gym</span>
+      </li>
+      <li>
+        <a href="https://aedinlai.com/broadcast/">Broadcast</a>
+        <p>A daily serial radio drama, written and voiced on a Raspberry Pi overnight.</p>
+        <span class="host">aedinlai.com/broadcast</span>
+      </li>
+    </ul>
+    <p class="rail-more">The rest of what I build is at <a href="https://aedinlai.com">aedinlai.com</a>.</p>
+    <!-- Print carries the same links as one compact line; the column layout is
+         a screen idea and a printed resume has no room for it. -->
+    <p class="print-links">Live projects: <a href="https://aedinlai.com">aedinlai.com</a>/gatecraft, /sandbit, /hand-playground, /doodle-life, /games, /gym, /broadcast, and football.aedinlai.com</p>
+  </aside>
+
+</div>
+</body>
+</html>
