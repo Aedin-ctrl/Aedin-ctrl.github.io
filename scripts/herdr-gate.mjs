@@ -108,7 +108,9 @@ async function cmdSeal(){
     if(back !== text) die(`round-trip check failed for ${t.page}`);
     console.log(`sealed ${t.label} into ${t.page.slice(ROOT.length + 1)} (${text.length} chars)`);
   }
-  console.log(`  word: ${c.word}   lights: ${c.dots.join(' ')}`);
+  // Deliberately does not echo the word or the colours: `seal` is run in a
+  // terminal, and shell scrollback and CI logs are not a place for either.
+  console.log(`  key: ${c.dots.length} colours, from secret/herdr.json`);
 }
 
 async function cmdOpen(){
