@@ -113,6 +113,9 @@
   }
   .rail-more a{color:var(--live)}
 
+  .more-proj{margin:.1rem 0 0; font-size:.875rem; color:var(--muted)}
+  .more-proj a{color:var(--ink)}
+
   .print-links{display:none}
 
   a:focus-visible{outline:2px solid var(--live); outline-offset:3px; border-radius:2px}
@@ -163,6 +166,7 @@
     ul.bullets li{margin:0; font-size:8.3pt; line-height:1.17; max-width:none}
     ul.bullets li::before{left:-.58rem; top:.57em; width:3px; background:#555}
 
+    .more-proj{font-size:8.3pt; margin:.02rem 0 0; color:#333}
     .skills{gap:0}
     .skills div{grid-template-columns:5.9rem minmax(0,1fr); gap:.4rem; font-size:8.3pt}
     .skills dt{font-size:8.2pt; color:#333}
@@ -185,13 +189,12 @@
   <main class="main">
     <header>
       <h1 class="name">Aedin Lai</h1>
-      <p class="where">Electrical &amp; Computer Engineering, Northeastern University. Boston, MA.</p>
       <ul class="contact">
-        <li class="tel">(978) 799-3296</li>
-        <li><a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a></li>
-        <li><a href="https://www.linkedin.com/in/aedin-lai-a35a4a327">linkedin.com/in/aedin-lai</a></li>
-        <li><a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a></li>
         <li><a href="https://aedinlai.com">aedinlai.com</a></li>
+        <li><a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a></li>
+        <li><a href="https://www.linkedin.com/in/aedin-lai-a35a4a327">linkedin.com/in/aedin-lai</a></li>
+        <li><a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a></li>
+        <li class="tel">(978) 799-3296</li>
       </ul>
     </header>
 
@@ -203,7 +206,7 @@
           <p class="when">Expected May <span class="n">2029</span></p>
         </div>
         <p class="title">Candidate for Bachelor of Science in Electrical &amp; Computer Engineering &mdash; Boston, MA</p>
-        <p class="note">Coursework: Calculus <span class="n">2</span>, Physics <span class="n">2</span>, Chemistry, Cornerstone of Engineering <span class="n">2</span>, First-Year Writing</p>
+        <p class="note">Relevant coursework: Embedded Design, Computing Fundamentals for Engineers, Physics <span class="n">2</span>, Calculus <span class="n">2</span></p>
       </div>
     </section>
 
@@ -218,9 +221,9 @@
         <p class="title">Data Center Infrastructure Intern &mdash; Boston, MA</p>
         <ul class="bullets">
           <li>Led hardware deployment for a phased data center expansion, scaling a private cloud platform from <span class="n">160</span> to <span class="n">300+</span> VMs</li>
-          <li>Redesigned a single-push rollout into an incremental &ldquo;two racks at a time&rdquo; strategy to cut disruption to live workloads</li>
-          <li>Delivered capacity across three cohorts of <span class="n">40&ndash;50</span> VMs, hitting or landing within one week of every target date</li>
-          <li>Diagnosed a Linux kernel storage defect and a multi-week NFS instability, deploying fixes that restored full fleet capacity and system stability</li>
+          <li>Replaced a single-push rollout with a phased &ldquo;two racks at a time&rdquo; plan, bringing three cohorts of <span class="n">40&ndash;50</span> VMs online while limiting disruption to live workloads</li>
+          <li>Diagnosed a Linux kernel storage defect and a multi-week NFS instability, restoring full fleet capacity</li>
+          <li>Built a Go audit tool and REST API that checks power supply, memory, NIC, and drive health across the server fleet via iDRAC</li>
           <li>Supported a full Oakland-to-Boston data center relocation, migrating the platform from bare-metal to virtualized infrastructure</li>
         </ul>
       </div>
@@ -235,8 +238,7 @@
         <ul class="bullets">
           <li>Designed, built, and improved a full-body balance measurement device to study cognition and movement in neurological patients</li>
           <li>Automated data collection using custom hardware across ASD, Alzheimer&rsquo;s, Parkinson&rsquo;s, and schizophrenia patient populations</li>
-          <li>Presented findings at ISEC <span class="n">2024</span> and co-authored results accepted for publication in JAMA <span class="n">(2025)</span></li>
-          <li>Co-developed a Yale study assessing stressors and emotional health in Division I, III, and club collegiate fencing athletes</li>
+          <li>Presented at an international conference (ISEC <span class="n">2024</span>); co-authored a study accepted to JAMA <span class="n">(2025)</span></li>
         </ul>
       </div>
     </section>
@@ -246,42 +248,55 @@
 
       <div class="role">
         <div class="role-top">
+          <p class="org">aedinlai.com &mdash; personal site &amp; project hub</p>
+          <p class="when">February <span class="n">2025</span> &ndash; Present</p>
+        </div>
+        <p class="title">JavaScript, Cloudflare Workers, SQL, GitHub Actions</p>
+        <ul class="bullets">
+          <li>Built a framework-free single-page site hosting my live projects and a daily auto-generated news feed</li>
+          <li>Engineered a gym occupancy tracker that records live counts every <span class="n">10</span> minutes into a serverless SQL database</li>
+          <li>Designed a serverless SQL API for a shared pizza-pricing app, with per-IP rate limiting and owner-only edits</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
+          <p class="org">Sandbit &mdash; pixel physics engine</p>
+          <p class="when">September <span class="n">2026</span></p>
+        </div>
+        <p class="title">Rust, WebAssembly, WebGL</p>
+        <ul class="bullets">
+          <li>Built a <span class="n">5,700</span>-line Rust/WebAssembly falling-sand engine simulating <span class="n">27</span> materials, including electrical conduction</li>
+          <li>Implemented rigid-body physics with contact manifolds, buoyancy, and rope and motor joints for pixel objects</li>
+          <li>Verified with <span class="n">30</span> physics tests, fuzzing, and a headless player that runs all <span class="n">15</span> levels across <span class="n">5</span> random seeds</li>
+        </ul>
+      </div>
+
+      <div class="role">
+        <div class="role-top">
           <p class="org">One-Inch Punch Arcade Machine</p>
-          <p class="when">Fall <span class="n">2025</span></p>
+          <p class="when">September &ndash; December <span class="n">2025</span></p>
         </div>
-        <p class="title">Lead Constructor &amp; Designer &mdash; Northeastern University, GE1501</p>
+        <p class="title">Cornerstone of Engineering &mdash; laser sensors, electronics, mechanical design</p>
         <ul class="bullets">
-          <li>Worked hands-on for the whole build &mdash; mechanical construction, electronics, and scoring software &mdash; from concept to expo launch</li>
-          <li>Designed a &ldquo;one-inch punch&rdquo; mechanism using dual laser sensors, and wrote the scoring logic converting swing velocity into a live score</li>
-          <li>Built the wooden frame, pendulum-and-magnet reset system, and laser-cut acrylic paneling entirely from scratch</li>
-          <li>Validated durability through <span class="n">80+</span> personal stress-test swings, catching and fixing structural wobble before launch</li>
-          <li>Built a layered-sponge padding system that safely absorbed harder hits than originally scoped</li>
-          <li>Identified a paddle material limit from full-force hits during a full expo day of play and proposed a rubber-composite redesign</li>
+          <li>Designed a dual-laser-sensor trigger and wrote scoring logic that converts swing velocity into a live score</li>
+          <li>Led the full build, from electronics to a pendulum-and-magnet auto-reset, and validated it with <span class="n">80+</span> full-force stress tests</li>
+          <li>Identified a paddle material limit during a full day of expo play and proposed a rubber-composite redesign</li>
         </ul>
       </div>
 
       <div class="role">
         <div class="role-top">
-          <p class="org">Cal Tracker</p>
-          <p class="when">September <span class="n">2025</span></p>
-        </div>
-        <p class="title">Self-hosted calorie tracker &mdash; Python, HTML/CSS, Raspberry Pi</p>
-        <ul class="bullets">
-          <li>Built and self-hosted a real-time calorie tracking web app on a Raspberry Pi with a lightweight front-end/back-end and persistent local storage</li>
-        </ul>
-      </div>
-
-      <div class="role">
-        <div class="role-top">
-          <p class="org">Hallway Marathon Event Site</p>
+          <p class="org">Hallway Marathon &mdash; event website</p>
           <p class="when">November <span class="n">2025</span></p>
         </div>
-        <p class="title">hallway-marathon.github.io</p>
+        <p class="title">HTML, CSS, JavaScript</p>
         <ul class="bullets">
-          <li>Designed and built an event website from scratch (HTML, CSS, JavaScript, no frameworks) with live betting odds and competitor stats for a multi-university competition</li>
-          <li>Independently managed all content, deployment, and live updates throughout the event</li>
+          <li>Built a framework-free event site with live betting odds and competitor stats, run live for a multi-university race</li>
         </ul>
       </div>
+
+      <p class="more-proj">More projects at <a href="https://aedinlai.com">aedinlai.com</a> and <a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a></p>
     </section>
 
     <section>
@@ -294,9 +309,7 @@
         </div>
         <p class="title">Captain</p>
         <ul class="bullets">
-          <li>Anchor the epee team to the <span class="n">2026</span> Collegiate Fencing Club National Championship</li>
-          <li>Lead team operations &mdash; scheduling, logistics, recruitment, and practice design &mdash; for the full roster</li>
-          <li>Serve as primary contact for tournament registration, travel, and university representation at competitions</li>
+          <li>Recruit new fencers and design practices; anchor the epee squad at the <span class="n">2026</span> Collegiate Club National Championship</li>
         </ul>
       </div>
 
@@ -307,8 +320,7 @@
         </div>
         <p class="title">Competitive epee fencer</p>
         <ul class="bullets">
-          <li>USA Fencing rating <span class="n">A25</span>; ranked <span class="n">#103</span> nationally and <span class="n">#122</span> globally</li>
-          <li>Top-<span class="n">16</span> World Cup finish; All-American <span class="n">2021&ndash;2025</span></li>
+          <li>Nationally ranked <span class="n">#103</span> in the U.S.; Top-<span class="n">16</span> World Cup finish; All-American <span class="n">2021&ndash;2025</span></li>
         </ul>
       </div>
     </section>
@@ -316,9 +328,9 @@
     <section>
       <h2>Skills</h2>
       <dl class="skills">
-        <div><dt>Programming</dt><dd>Python, Java, C#, SQL, MATLAB, HTML/CSS, JavaScript</dd></div>
-        <div><dt>Hardware &amp; CAD</dt><dd>Raspberry Pi, embedded systems, sensor integration, SolidWorks, AutoCAD</dd></div>
-        <div><dt>Tools</dt><dd>Git, GitHub, Pandas, Linux, VS Code</dd></div>
+        <div><dt>Programming</dt><dd>Python, Java, C#, Rust, SQL, MATLAB, JavaScript, HTML/CSS</dd></div>
+        <div><dt>Hardware &amp; CAD</dt><dd>Quartus Prime, Raspberry Pi, sensor integration, SolidWorks, Fusion 360, AutoCAD, laser cutting</dd></div>
+        <div><dt>Tools</dt><dd>Git, GitHub Actions, Linux, Cloudflare Workers, WebAssembly, VS Code</dd></div>
       </dl>
     </section>
   </main>
