@@ -377,99 +377,98 @@
   }
   .resume-cta-row{display:flex; gap:8px; flex-wrap:wrap;}
 
-  /* The resume view: the page on the left, notes keyed to its sections on the
-     right, and the two kept in step.
-
-     The page is an image rendered from the PDF rather than an embedded viewer.
-     That is the whole reason the syncing works: a browser's PDF viewer is a
-     sealed box -- its scroll position cannot be read or set, and it fires no
-     scroll events -- so a <object> can never be tied to anything. An image in
-     a scroll container we own can. The PDF itself stays one click away. */
+  /* The resume view: the page on the left as a fixed reference, the commentary
+     on the right as the thing you read.
+     
+     That way round because of the geometry: a one-page resume is barely taller
+     than the window, so its scroll position cannot possibly select between ten
+     sections -- there are only a couple of hundred pixels of travel. The notes
+     are long, so they scroll, and the page marks whichever note is being read.
+     Scrolling the page still drives the notes over the range it has.
+     
+     The page is an image rendered from the PDF, not an embedded viewer: a
+     browser's PDF viewer cannot be read or driven by script, so it could never
+     be tied to anything. The PDF itself is one click away. */
   .resume-split{
     display:grid;
-    grid-template-columns:1.3fr 1fr;
-    grid-template-rows:min(calc(100vh - 300px), 1040px);
-    grid-template-rows:min(calc(100dvh - 300px), 1040px);
-    gap:26px;
+    grid-template-columns:1.04fr 1fr;
+    grid-template-rows:min(calc(100vh - 300px), 980px);
+    grid-template-rows:min(calc(100dvh - 300px), 980px);
+    gap:30px;
   }
+
+  /* A gutter down the left of the page carries the marker, so nothing is ever
+     painted over the resume's own text. */
   .resume-doc{
-    border:1px solid var(--line); border-radius:12px;
-    background:var(--paper); overflow:hidden;
-    min-height:0; position:relative;
+    display:grid; grid-template-columns:11px minmax(0,1fr); gap:9px;
+    min-height:0; min-width:0;
+  }
+  .resume-rail{position:relative; border-radius:4px; background:var(--line);}
+  .resume-mark{
+    position:absolute; inset-inline:0; border-radius:4px; background:var(--ink);
+    transition:top .28s cubic-bezier(.4,0,.2,1), height .28s cubic-bezier(.4,0,.2,1);
+    top:0; height:0;
   }
   .resume-scroll{
     block-size:100%; overflow-y:auto; overscroll-behavior:contain;
-    scroll-behavior:smooth; background:#f2f3f5;
+    scroll-behavior:smooth;
+    border:1px solid var(--line); border-radius:12px; background:var(--paper);
   }
   .resume-pagewrap{position:relative;}
   .resume-page{display:block; inline-size:100%; block-size:auto;}
-  /* The band over the page showing which part a note is about. Positioned in
-     percentages of the page, so it holds at any width without recalculating. */
-  .resume-mark{
-    position:absolute; inset-inline:0; pointer-events:none;
-    background:rgba(16,17,20,.07);
-    border-left:3px solid var(--ink);
-    opacity:0; transition:opacity .18s ease, top .22s ease, height .22s ease;
-  }
-  .resume-mark.on{opacity:1;}
-  @media (prefers-reduced-motion:reduce){ .resume-mark{transition:opacity .18s ease;} }
+  .resume-anchor{position:absolute; inset-inline:0; height:1px; pointer-events:none;}
 
+  /* ---- the commentary ---- */
   .resume-aside{
     min-width:0; min-height:0; overflow-y:auto; overscroll-behavior:contain;
-    scroll-behavior:smooth; padding-right:4px;
+    scroll-behavior:smooth; padding-right:6px;
   }
-
-  /* A group per section of the resume, labelled the way that page labels its
-     own sections. */
-  .ra-group{margin:0 0 20px;}
-  .ra-group:last-child{margin-bottom:4px;}
+  .ra-lede{
+    margin:0 0 18px; color:var(--muted); font-size:12.5px; line-height:1.6;
+    padding-bottom:14px; border-bottom:1px solid var(--line);
+  }
+  .ra-group{margin:0 0 4px;}
   .ra-head{
-    font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:600;
-    letter-spacing:.09em; text-transform:uppercase; color:var(--ink);
-    margin:0 0 6px; padding-bottom:5px; border-bottom:1px solid var(--line-strong);
+    font-family:'Space Grotesk', sans-serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--faint);
+    margin:22px 0 2px;
   }
+  .ra-group:first-of-type .ra-head{margin-top:0;}
 
-  /* Every entry is a button: it scrolls the page on the left to the line it
-     names. Styled as text, because it reads as a note, not a control. */
+  /* Reading one note means the others step back. Focus by contrast, not by a
+     grey box behind the live one. */
   .ra-item{
-    display:block; inline-size:100%; text-align:left;
-    background:none; border:0; border-bottom:1px solid var(--line);
-    padding:10px 10px 10px 12px; margin:0; cursor:pointer; font:inherit;
-    border-left:2px solid transparent;
-    transition:background-color .15s ease, border-left-color .15s ease;
+    display:block; inline-size:100%; text-align:left; font:inherit;
+    background:none; border:0; border-top:1px solid var(--line);
+    padding:14px 0 15px; margin:0; cursor:pointer;
+    opacity:.44; transition:opacity .2s ease;
   }
-  .ra-item:last-child{border-bottom:0;}
-  .ra-item:hover{background:#f7f8fa;}
-  .ra-item:focus-visible{outline:2px solid var(--ink); outline-offset:-2px;}
-  /* The entry matching whatever part of the page is in view. */
-  .ra-item[aria-current="true"]{background:#f2f3f5; border-left-color:var(--ink);}
+  .ra-item:first-of-type{border-top:0;}
+  .ra-item:hover{opacity:.78;}
+  .ra-item:focus-visible{outline:2px solid var(--ink); outline-offset:3px; border-radius:3px; opacity:1;}
+  .ra-item[aria-current="true"]{opacity:1; cursor:default;}
+
   .ra-ref{
-    font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:500;
-    color:var(--ink); margin:0; line-height:1.35; display:block;
+    display:block; font-family:'Space Grotesk', sans-serif; font-size:13.5px;
+    font-weight:600; letter-spacing:-.012em; color:var(--ink); line-height:1.3;
   }
   .ra-when{
-    display:block; margin-top:2px; color:var(--faint); font-size:11.5px;
-    font-variant-numeric:tabular-nums;
+    display:block; margin-top:3px; color:var(--faint); font-size:11px;
+    font-variant-numeric:tabular-nums; letter-spacing:.02em;
   }
-  .ra-note{color:var(--muted); font-size:12px; line-height:1.55; margin:5px 0 0;}
-  .ra-none{color:var(--faint); font-size:12px; line-height:1.55; margin:5px 0 0; font-style:italic;}
-  .ra-links{margin:6px 0 0; display:flex; flex-wrap:wrap; gap:4px 14px;}
+  /* The point of the whole column: what the line on the left had no room for. */
+  .ra-more{
+    display:block; margin-top:9px; color:#3c4046; font-size:12.5px; line-height:1.62;
+  }
+  .ra-more + .ra-more{margin-top:7px;}
+  .ra-more b{font-weight:600; color:var(--ink);}
+  .ra-links{margin-top:10px; display:flex; flex-wrap:wrap; gap:5px 14px;}
   .ra-links a{
     font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500;
     color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);
   }
   .ra-links a:hover, .ra-links a:focus-visible{border-color:var(--ink);}
 
-  /* Skills: the claim, and the line of the resume that backs it. */
-  .ra-skill{display:grid; grid-template-columns:7.4rem minmax(0,1fr); gap:3px 10px; padding:8px 0; border-bottom:1px solid var(--line);}
-  .ra-skill:last-of-type{border-bottom:0;}
-  .ra-skill dt{font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500; color:var(--ink);}
-  .ra-skill dd{margin:0; color:var(--muted); font-size:12px; line-height:1.5;}
-  .ra-skill dd a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);}
-  .ra-skill dd a:hover{border-color:var(--ink);}
-
-  /* The resume's text, for screen readers and for find-in-page: an image of a
-     document is not a document. */
   .sr-only{
     position:absolute; inline-size:1px; block-size:1px; padding:0; margin:-1px;
     overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
@@ -477,6 +476,7 @@
 
   @media (prefers-reduced-motion:reduce){
     .resume-scroll, .resume-aside{scroll-behavior:auto;}
+    .resume-mark{transition:none;}
   }
 
   /* Links tab: title on the left, the way in on the right. */
@@ -563,9 +563,9 @@
     .contact-grid{grid-template-columns:1fr; gap:30px;}
     /* Stacked: the resume first, the notes under it, no inner scrolling. */
     .resume-split{grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; gap:30px;}
-    /* Stacked, the page is narrow enough to show whole: let the box hug it
-       rather than standing a fixed height with white space underneath. */
-    .resume-doc{block-size:auto;}
+    /* Stacked: the page whole, the commentary under it, nothing nested that
+       scrolls inside something else that scrolls. */
+    .resume-doc{block-size:auto; grid-template-columns:5px minmax(0,1fr); gap:7px;}
     .resume-scroll{block-size:auto; overflow:visible;}
     .resume-aside{overflow:visible; padding-right:0;}
     .ra-skill{grid-template-columns:minmax(0,1fr);}
@@ -842,7 +842,7 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-heading">Resume</h2>
-              <p class="panel-sub">The page on the left, its sections on the right. Click one to find it.</p>
+              <p class="panel-sub">The page on the left. On the right, what the bullets had no room for.</p>
             </div>
             <a class="btn-outline" href="resume.pdf?v=20261013d" download>Download PDF</a>
           </div>
@@ -855,14 +855,23 @@
                inline (most mobile ones), so there is always a way in. -->
           <div class="resume-split">
             <div class="resume-doc">
-              <div class="resume-scroll" id="resumeScroll" tabindex="0" role="group" aria-label="Resume, scrollable">
+              <div class="resume-rail" aria-hidden="true"><div class="resume-mark" id="resumeMark"></div></div>
+              <div class="resume-scroll" id="resumeScroll" tabindex="0" role="group" aria-label="Resume page, scrollable">
                 <div class="resume-pagewrap">
                   <img class="resume-page" id="resumePage" src="resume-page.webp" width="1530" height="1980"
                        loading="lazy" decoding="async"
                        alt="Aedin Lai's one-page resume. The full text follows for screen readers.">
-                  <div class="resume-mark" id="resumeMark" aria-hidden="true"></div>
-                </div>
-                <div class="sr-only">
+                  <div class="resume-anchor" data-sec="edu" style="top:12.940%"></div>
+                  <div class="resume-anchor" data-sec="ss" style="top:20.500%"></div>
+                  <div class="resume-anchor" data-sec="yale" style="top:33.960%"></div>
+                  <div class="resume-anchor" data-sec="site" style="top:45.290%"></div>
+                  <div class="resume-anchor" data-sec="sand" style="top:53.970%"></div>
+                  <div class="resume-anchor" data-sec="arcade" style="top:62.650%"></div>
+                  <div class="resume-anchor" data-sec="hall" style="top:71.330%"></div>
+                  <div class="resume-anchor" data-sec="cap" style="top:81.010%"></div>
+                  <div class="resume-anchor" data-sec="marx" style="top:84.910%"></div>
+                  <div class="resume-anchor" data-sec="skills" style="top:89.330%"></div>
+                  <div class="sr-only">
                   <h3>Education</h3>
                   <p>Northeastern University, Boston, MA. Expected May 2029. Candidate for Bachelor of Science in Electrical and Computer Engineering. Relevant coursework: Embedded Design, Computing Fundamentals for Engineers, Physics 2, Calculus 2.</p>
                   <h3>Experience</h3>
@@ -879,100 +888,97 @@
                   <h3>Skills</h3>
                   <p>Programming: Python, Java, C#, Rust, SQL, MATLAB, JavaScript, HTML/CSS. Hardware and CAD: Quartus Prime, Raspberry Pi, sensor integration, SolidWorks, Fusion 360, AutoCAD, laser cutting. Tools: Git, GitHub Actions, Linux, Cloudflare Workers, WebAssembly, VS Code.</p>
                 </div>
+                </div>
               </div>
             </div>
 
-            <aside class="resume-aside" id="resumeNotes" aria-label="Resume sections">
+            <aside class="resume-aside" id="resumeNotes" aria-label="Notes on the resume">
+              <p class="ra-lede">A r&eacute;sum&eacute; bullet is a sentence with the workings cut out. This is what got cut &mdash; the decisions, the things that broke, the numbers behind the numbers. Pick a line to find it on the page.</p>
 
               <div class="ra-group">
-                <h3 class="ra-head" id="ra-h-edu">Education</h3>
-                <button type="button" class="ra-item" data-y="0.1294" aria-describedby="ra-h-edu">
+                <h3 class="ra-head">Education</h3>
+                <button type="button" class="ra-item" data-sec="edu">
                   <span class="ra-ref">Northeastern University</span>
-                  <span class="ra-when">Expected May 2029</span>
+                  <span class="ra-when">BS Electrical &amp; Computer Engineering &middot; Expected May 2029</span>
                 </button>
               </div>
 
               <div class="ra-group">
-                <h3 class="ra-head" id="ra-h-exp">Experience</h3>
-                <button type="button" class="ra-item" data-y="0.2050" aria-describedby="ra-h-exp">
-                  <span class="ra-ref">Data Center Infrastructure Intern &mdash; SingleStore</span>
+                <h3 class="ra-head">Experience</h3>
+                <button type="button" class="ra-item" data-sec="ss">
+                  <span class="ra-ref">Data Center Infrastructure Intern, SingleStore</span>
                   <span class="ra-when">June &ndash; September 2026</span>
+                  <span class="ra-more"><b>Why iDRAC matters:</b> it is Dell's out-of-band management controller &mdash; a small computer on the motherboard with its own network port. Querying it means power supply, memory, NIC and drive health can be read <i>without</i> touching the operating system, so the audit tool sees a machine that has hung, or never booted, as clearly as a healthy one.</span>
+                  <span class="ra-more"><b>Why two racks at a time:</b> a single-push rollout puts every live workload at risk on one change. Phasing it trades elapsed time for a blast radius you can recover from.</span>
                 </button>
-                <button type="button" class="ra-item" data-y="0.3396" aria-describedby="ra-h-exp">
-                  <span class="ra-ref">Research Intern &mdash; PEACE Foundation, Yale</span>
+                <button type="button" class="ra-item" data-sec="yale">
+                  <span class="ra-ref">Research Intern, PEACE Foundation &mdash; Yale School of Medicine</span>
                   <span class="ra-when">2023 &ndash; 2024</span>
+                  <span class="ra-more"><b>What the device was measuring:</b> balance is one of the earliest things to degrade in Parkinson's, and how a person sways while standing still is measurable long before it is visible. That is why one rig gets pointed at ASD, Alzheimer's, Parkinson's and schizophrenia populations: the same signal reads differently in each.</span>
                 </button>
               </div>
 
               <div class="ra-group">
-                <h3 class="ra-head" id="ra-h-proj">Projects</h3>
-                <button type="button" class="ra-item" data-y="0.4529" aria-describedby="ra-h-proj">
+                <h3 class="ra-head">Projects</h3>
+                <button type="button" class="ra-item" data-sec="site">
                   <span class="ra-ref">aedinlai.com &mdash; Personal Site &amp; Project Hub</span>
-                  <span class="ra-when">February 2025 &ndash; Present</span>
-                  <span class="ra-note">The three things those bullets name, each running here:</span>
+                  <span class="ra-when">February 2025 &ndash; Present &middot; you are standing in it</span>
+                  <span class="ra-more"><b>The gym counts are not sensors.</b> They are staff headcounts from Northeastern's public facility feed, refreshed every 30 to 60 minutes. A tracker that drew them as live truth would be lying, so every room shows the age of its count, anything over an hour is flagged stale, and over two hours it is treated as closed.</span>
+                  <span class="ra-more"><b>It records itself twice.</b> A Cloudflare Worker writes to a D1 database on a ten-minute cron, and a GitHub Action writes the same readings to a JSON file every fifteen. The page merges both and dedupes by room and timestamp &mdash; built after the Worker's cron was slow to start and a gap appeared in the history.</span>
+                  <span class="ra-more"><b>The pizza API is mostly about abuse.</b> Thirty adds an hour per IP, delete restricted to whoever created the row by a token held in their own browser, and a separate admin key held back.</span>
                   <span class="ra-links">
-                    <a href="news/" data-stop>Daily news feed</a>
                     <a href="gym/" data-stop>Gym occupancy</a>
                     <a href="pizza/" data-stop>Pizza pricing</a>
+                    <a href="news/" data-stop>News archive</a>
                   </span>
                 </button>
-                <button type="button" class="ra-item" data-y="0.5397" aria-describedby="ra-h-proj">
+                <button type="button" class="ra-item" data-sec="sand">
                   <span class="ra-ref">Sandbit &mdash; Pixel Physics Engine</span>
-                  <span class="ra-when">September 2026</span>
+                  <span class="ra-when">September 2026 &middot; Rust, WebAssembly, WebGL</span>
+                  <span class="ra-more"><b>Written in one night</b>, 1:30 to 9am, then tuned for weeks &mdash; because the physics is chaotic and tuning it kept quietly breaking levels that had passed the day before.</span>
+                  <span class="ra-more"><b>No wasm-bindgen.</b> Raw <code>extern "C"</code> exports over shared memory, so the JavaScript side reads the pixel grid directly instead of marshalling it across the boundary every frame.</span>
+                  <span class="ra-more"><b>Three things that had to be got right,</b> each found by it looking wrong: rigid bodies need two contact points per face or crates spin as they land; ropes need slack and a position-only joint pass, because a velocity bias double-corrects and pumps energy into the rope until it explodes; and a body stamped into water has to push the displaced liquid into the cells it just vacated, or the water simply disappears.</span>
+                  <span class="ra-more"><b>How it is tested:</b> 30 unit tests, a fuzzer, and a headless player that actually plays all 15 levels on 5 random seeds &mdash; the only way to catch a physics change that makes a level unwinnable rather than merely wrong.</span>
                   <span class="ra-links"><a href="sandbit/" data-stop>Open Sandbit</a></span>
                 </button>
-                <button type="button" class="ra-item" data-y="0.6265" aria-describedby="ra-h-proj">
+                <button type="button" class="ra-item" data-sec="arcade">
                   <span class="ra-ref">One-Inch Punch Arcade Machine</span>
-                  <span class="ra-when">September &ndash; December 2025</span>
-                  <span class="ra-none">A physical machine &mdash; nothing to open.</span>
+                  <span class="ra-when">September &ndash; December 2025 &middot; Cornerstone of Engineering</span>
+                  <span class="ra-more"><b>How a laser pair becomes a speed:</b> two beams a known distance apart, and the gap between the two breaks is the time taken to cross it. Distance over time is the velocity the score is computed from &mdash; no accelerometer, no calibration drift.</span>
+                  <span class="ra-more"><b>The failures were mechanical, not electrical.</b> Structural wobble showed up over 80-odd full-force test swings and was fixed before the expo; the paddle material gave out during a full day of strangers hitting it, which is the sort of limit no bench test finds.</span>
                 </button>
-                <button type="button" class="ra-item" data-y="0.7133" aria-describedby="ra-h-proj">
+                <button type="button" class="ra-item" data-sec="hall">
                   <span class="ra-ref">Hallway Marathon &mdash; Event Website</span>
-                  <span class="ra-when">November 2025</span>
+                  <span class="ra-when">November 2025 &middot; HTML, CSS, JavaScript</span>
+                  <span class="ra-more"><b>Run live, which is the hard part.</b> Odds and standings had to be edited between heats while people were watching the page, with no CMS and no framework &mdash; the deployment was the event.</span>
                   <span class="ra-links"><a href="https://hallway-marathon.github.io" target="_blank" rel="noopener noreferrer" data-stop>hallway-marathon.github.io</a></span>
                 </button>
               </div>
 
               <div class="ra-group">
-                <h3 class="ra-head" id="ra-h-lead">Leadership &amp; athletics</h3>
-                <button type="button" class="ra-item" data-y="0.8101" aria-describedby="ra-h-lead">
-                  <span class="ra-ref">Captain &mdash; Northeastern Club Fencing</span>
+                <h3 class="ra-head">Leadership &amp; athletics</h3>
+                <button type="button" class="ra-item" data-sec="cap">
+                  <span class="ra-ref">Captain, Northeastern Club Fencing</span>
                   <span class="ra-when">2025 &ndash; Present</span>
                 </button>
-                <button type="button" class="ra-item" data-y="0.8491" aria-describedby="ra-h-lead">
-                  <span class="ra-ref">Competitive Epee Fencer &mdash; Marx Fencing Academy</span>
+                <button type="button" class="ra-item" data-sec="marx">
+                  <span class="ra-ref">Competitive Epee Fencer, Marx Fencing Academy</span>
                   <span class="ra-when">2018 &ndash; 2025</span>
+                  <span class="ra-more"><b>Scale, for anyone who does not follow fencing:</b> All-American is the top eight at a national championship, and holding it five years running means it was not one good weekend. A Top-16 World Cup finish is against adult international fields, not an age category.</span>
                 </button>
               </div>
 
               <div class="ra-group">
                 <h3 class="ra-head">Skills</h3>
-                <button type="button" class="ra-item" data-y="0.8933">
-                  <span class="ra-ref">Where the list was used</span>
-                  <span class="ra-when">Every claim, and the line above that backs it</span>
+                <button type="button" class="ra-item" data-sec="skills">
+                  <span class="ra-ref">Where the list was actually used</span>
+                  <span class="ra-when">A skills list proves nothing on its own</span>
+                  <span class="ra-more"><b>Rust and WebAssembly</b> &mdash; Sandbit's engine, and the only reason the browser can step a pixel grid 60 times a second.</span>
+                  <span class="ra-more"><b>Cloudflare Workers and SQL</b> &mdash; the gym recorder's cron and D1 table, and the pizza API's rate limiting.</span>
+                  <span class="ra-more"><b>GitHub Actions</b> &mdash; the backup gym recorder, and the job that publishes a news day.</span>
+                  <span class="ra-more"><b>Sensor integration</b> &mdash; the arcade machine's laser trigger, and the Yale balance rig.</span>
+                  <span class="ra-more"><b>Quartus Prime, SolidWorks, Fusion 360, MATLAB</b> &mdash; coursework so far rather than shipped work, and listed as such.</span>
                 </button>
-                <dl style="margin:8px 0 0;">
-                  <div class="ra-skill">
-                    <dt>Rust, WebAssembly</dt>
-                    <dd><a href="sandbit/">Sandbit</a> &mdash; the engine and its 27 materials</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>Cloudflare Workers, SQL</dt>
-                    <dd>The <a href="gym/">gym tracker</a> and <a href="pizza/">pizza API</a> in the first project</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>GitHub Actions</dt>
-                    <dd>The daily news feed on this site</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>Sensor integration</dt>
-                    <dd>The arcade machine's laser trigger, and the Yale balance device</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>JavaScript, HTML/CSS</dt>
-                    <dd>This site and the Hallway Marathon site, both framework-free</dd>
-                  </div>
-                </dl>
               </div>
             </aside>
           </div>
@@ -1369,109 +1375,109 @@
       wired = true;
 
       const items = [...notes.querySelectorAll('.ra-item')];
-      if(!items.length) return;
-      const yOf = el => parseFloat(el.dataset.y) || 0;
-      items.sort((a, b) => yOf(a) - yOf(b));
+      const anchors = [...scroller.querySelectorAll('.resume-anchor')];
+      if(!items.length || !anchors.length) return;
 
-      // Each note covers the page from its own line down to the next one's.
-      const spans = items.map((el, i) => ({
-        el, from: yOf(el), to: i + 1 < items.length ? yOf(items[i + 1]) : 0.985,
-      }));
-      const spanOf = el => spans.find(sp => sp.el === el);
-      const pageHeight = () => page.offsetHeight || 0;
+      const bySec = new Map(items.map(el => [el.dataset.sec, el]));
+      const anchorOf = new Map(anchors.map(el => [el.dataset.sec, el]));
+      const order = anchors.map(el => el.dataset.sec);
+      const topPct = sec => parseFloat(anchorOf.get(sec).style.top) || 0;
 
-      // One piece of state. The band on the page and the highlighted note are
-      // two views of it, so they cannot disagree.
       let current = null;
-      // Only scrolling the reader does re-picks the section. A smooth scroll
-      // that a click started is still a scroll, and letting it re-pick made
-      // clicking a late section land on whatever happened to be at the top.
-      let userDriving = false;
-      let handScrollUntil = 0;          // notes scrolled by hand: leave them alone
-      let selfScroll = false;
+      // Tracking only answers scrolling the reader actually did. A click is a
+      // decision, and it holds until they scroll again -- the last note can
+      // never reach the top of its own column, so a tracker that kept running
+      // would drag the choice off it immediately.
+      let drivingNotes = false;
+      let drivingPage = false;
+      let started = false;
 
-      function setCurrent(el, follow){
-        if(!el || el === current) return;
-        current = el;
-        for(const x of items) x.setAttribute('aria-current', x === el ? 'true' : 'false');
-        const sp = spanOf(el);
-        if(sp && mark){
-          mark.style.top = (sp.from * 100).toFixed(3) + '%';
-          mark.style.height = ((sp.to - sp.from) * 100).toFixed(3) + '%';
-          mark.classList.add('on');
-        }
-        if(follow && Date.now() > handScrollUntil){
-          selfScroll = true;
-          el.scrollIntoView({ block: 'nearest' });
-          setTimeout(() => { selfScroll = false; }, 140);
-        }
+      function setCurrent(sec){
+        if(!sec || sec === current) return;
+        const item = bySec.get(sec);
+        if(!item) return;
+        current = sec;
+        for(const el of items) el.setAttribute('aria-current', el === item ? 'true' : 'false');
+        // The marker spans this section down to where the next one starts.
+        const i = order.indexOf(sec);
+        const from = topPct(sec);
+        const to = i + 1 < order.length ? topPct(order[i + 1]) : 98.5;
+        mark.style.top = from.toFixed(3) + '%';
+        mark.style.height = Math.max(1.2, to - from).toFixed(3) + '%';
       }
 
-      // Which section the page is showing: the last one to have started above
-      // the top of the view, allowing a little slack so a heading just above
-      // the edge still counts.
-      function fromScroll(){
-        if(!userDriving) return;
-        const h = pageHeight();
-        if(!h) return;
-        const probe = scroller.scrollTop + 24;
-        let found = items[0];
-        for(const el of items){ if(yOf(el) * h <= probe) found = el; else break; }
-        setCurrent(found, true);
+      // Reading down the notes moves the marker: whichever note is nearest the
+      // top of the column is the one being read.
+      for(const ev of ['wheel', 'touchmove', 'keydown']){
+        notes.addEventListener(ev, () => { drivingNotes = true; }, { passive: true });
+        scroller.addEventListener(ev, () => { drivingPage = true; }, { passive: true });
       }
 
+      let notesQueued = false;
       notes.addEventListener('scroll', () => {
-        if(!selfScroll) handScrollUntil = Date.now() + 1200;
+        if(notesQueued || !drivingNotes) return;
+        notesQueued = true;
+        requestAnimationFrame(() => {
+          notesQueued = false;
+          const line = notes.getBoundingClientRect().top + 90;
+          let best = items[0], bestD = Infinity;
+          for(const el of items){
+            const d = Math.abs(el.getBoundingClientRect().top - line);
+            if(d < bestD){ bestD = d; best = el; }
+          }
+          setCurrent(best.dataset.sec);
+        });
       }, { passive: true });
 
-      // What counts as the reader scrolling the page.
-      const driving = () => { userDriving = true; };
-      for(const ev of ['wheel', 'touchmove', 'pointerdown', 'keydown']){
-        scroller.addEventListener(ev, driving, { passive: true });
-      }
-
-      let queued = false;
-      scroller.addEventListener('scroll', () => {
-        if(queued) return;
-        queued = true;
-        requestAnimationFrame(() => { queued = false; fromScroll(); });
-      }, { passive: true });
-
-      function pick(item){
-        const h = pageHeight();
-        if(!h) return;
-        userDriving = false;            // an explicit choice holds until you scroll
-        setCurrent(item, false);
-        // Scroll only if the band is not already on screen. Most of this page
-        // is visible at once, so moving it when nothing was hidden is noise.
-        const sp = spanOf(item);
-        const canScroll = scroller.scrollHeight > scroller.clientHeight + 4;
-        if(!canScroll){
-          // Stacked on a phone: the whole page already shows, but it may be off
-          // screen above the notes, so bring the page to the reader instead.
-          scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-          return;
+      // Scrolling the page does the same, over the range it has. IntersectionObserver
+      // against the scroll container, so it reports real visibility rather than
+      // arithmetic on scrollTop.
+      const seen = new Set();
+      const io = new IntersectionObserver((entries) => {
+        for(const e of entries){
+          if(e.isIntersecting) seen.add(e.target.dataset.sec);
+          else seen.delete(e.target.dataset.sec);
         }
-        const top = sp.from * h, bottom = sp.to * h;
-        const viewTop = scroller.scrollTop, viewBottom = viewTop + scroller.clientHeight;
-        if(top < viewTop + 8 || bottom > viewBottom - 8){
-          scroller.scrollTo({ top: Math.max(0, top - scroller.clientHeight * 0.18), behavior: 'smooth' });
+        if(!seen.size) return;
+        const first = order.find(sec => seen.has(sec));
+        if(!first) return;
+        if(!started){ started = true; setCurrent(first); return; }  // opening: no scrolling
+        if(!drivingPage) return;
+        snapTo(first, { page: false });
+      }, { root: scroller, rootMargin: '-8px 0px -72% 0px', threshold: 0 });
+      anchors.forEach(el => io.observe(el));
+
+      // Bring a note to the top of its column, which is the "snap" of it.
+      function snapTo(sec, { page = true, notesCol = true } = {}){
+        setCurrent(sec);
+        const item = bySec.get(sec);
+        if(notesCol && item){
+          const top = item.offsetTop - notes.offsetTop - 8;
+          if(Math.abs(notes.scrollTop - top) > 4) notes.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        }
+        if(page){
+          const h = page.offsetHeight;
+          const target = (topPct(sec) / 100) * h - 10;
+          const max = scroller.scrollHeight - scroller.clientHeight;
+          if(max > 4) scroller.scrollTo({ top: Math.min(Math.max(0, target), max), behavior: 'smooth' });
+          else scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
       }
 
       notes.addEventListener('click', (e) => {
-        if(e.target.closest('a')) return;   // a link inside a note is a link, not a jump
+        if(e.target.closest('a')) return;      // a link in a note is a link
         const item = e.target.closest('.ra-item');
-        if(item) pick(item);
+        if(!item) return;
+        drivingNotes = false; drivingPage = false;   // the choice holds until they scroll
+        snapTo(item.dataset.sec);
       });
-      // Tabbing through the notes walks the page with it.
-      notes.addEventListener('focusin', (e) => {
+      notes.addEventListener('keydown', (e) => {
+        if(e.key !== 'Enter' && e.key !== ' ') return;
         const item = e.target.closest('.ra-item');
-        if(item) pick(item);
+        if(item){ drivingNotes = false; drivingPage = false; snapTo(item.dataset.sec); }
       });
 
-      // Open on the top of the page.
-      const start = () => { current = null; setCurrent(items[0], false); };
+      const start = () => { started = true; setCurrent(order[0]); };
       if(page.complete && page.naturalHeight) start();
       else page.addEventListener('load', start, { once: true });
     };
