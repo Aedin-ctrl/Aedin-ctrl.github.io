@@ -399,9 +399,13 @@
 
   /* No position indicator. The page moving under you is the indicator. */
   .resume-doc{min-height:0; min-width:0;}
+  /* No scroll-behavior:smooth here. It applies to scrollTop writes as well as
+     to the reader's own scrolling, so every coupled update animated over a
+     third of a second, lagged behind the hand, and fought the next input --
+     which is what the springing was. Smoothness is asked for explicitly, by
+     the one place that wants it. */
   .resume-scroll{
     block-size:100%; overflow-y:auto; overscroll-behavior:contain;
-    scroll-behavior:smooth;
     border:1px solid var(--line); border-radius:12px; background:var(--paper);
   }
   .resume-pagewrap{position:relative;}
@@ -411,7 +415,7 @@
   /* ---- the commentary ---- */
   .resume-aside{
     min-width:0; min-height:0; overflow-y:auto; overscroll-behavior:contain;
-    scroll-behavior:smooth; padding-right:6px;
+    padding-right:6px;
   }
   .ra-lede{
     margin:0 0 18px; color:var(--muted); font-size:12.5px; line-height:1.6;
@@ -465,7 +469,7 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    .resume-scroll, .resume-aside{scroll-behavior:auto;}
+    .ra-item{transition:none;}
   }
 
   /* Links tab: title on the left, the way in on the right. */
@@ -1376,7 +1380,13 @@
       // page down with it, and the note in the middle of the column is the one
       // in focus. There is no separate position indicator: the page moving
       // under you is the indicator.
-      let echo = 0;                    // our own scroll, not the reader's
+      // Whichever column the reader is actually touching owns the gesture.
+      // The other is driven, and its scroll events are ignored outright --
+      // a timer that tried to tell our own writes from real scrolling let
+      // some echoes through and swallowed some real events, and the two
+      // columns ended up pushing each other back and forth.
+      let driver = null, owns = 0;
+      const claim = (el, ms) => { driver = el; owns = Date.now() + (ms || 320); };
       let current = null;
 
       const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
@@ -1415,10 +1425,7 @@
         const nMax = maxOf(notes), pMax = maxOf(scroller);
         if(pMax < 2) return;
         const target = nMax < 2 ? 0 : (notes.scrollTop / nMax) * pMax;
-        if(Math.abs(scroller.scrollTop - target) > 0.5){
-          echo = Date.now() + 90;
-          scroller.scrollTop = target;        // not smooth: it tracks the hand
-        }
+        if(Math.abs(scroller.scrollTop - target) > 0.5) scroller.scrollTop = target;
       }
 
       // And the same the other way, so either column drives the pair.
@@ -1426,22 +1433,27 @@
         const nMax = maxOf(notes), pMax = maxOf(scroller);
         if(nMax < 2 || pMax < 2) return;
         const target = (scroller.scrollTop / pMax) * nMax;
-        if(Math.abs(notes.scrollTop - target) > 1){
-          echo = Date.now() + 90;
-          notes.scrollTop = target;
-        }
+        if(Math.abs(notes.scrollTop - target) > 1) notes.scrollTop = target;
         focusOn(focusFromNotes());
+      }
+
+      for(const el of [notes, scroller]){
+        for(const ev of ['wheel', 'touchstart', 'touchmove', 'pointerdown', 'keydown']){
+          el.addEventListener(ev, () => claim(el), { passive: true });
+        }
       }
 
       let queuedN = false, queuedP = false;
       notes.addEventListener('scroll', () => {
-        if(Date.now() < echo || queuedN) return;
+        if(driver !== notes || Date.now() > owns || queuedN) return;
+        owns = Date.now() + 320;            // still scrolling: keep the claim
         queuedN = true;
         requestAnimationFrame(() => { queuedN = false; notesDrivePage(); });
       }, { passive: true });
 
       scroller.addEventListener('scroll', () => {
-        if(Date.now() < echo || queuedP) return;
+        if(driver !== scroller || Date.now() > owns || queuedP) return;
+        owns = Date.now() + 320;
         queuedP = true;
         requestAnimationFrame(() => { queuedP = false; pageDrivesNotes(); });
       }, { passive: true });
@@ -1453,7 +1465,9 @@
         if(!el) return;
         focusOn(sec);
         // Scroll the column only; the page is carried along by the coupling,
-        // the same as if the reader had scrolled here themselves.
+        // the same as if the reader had scrolled here themselves. The claim
+        // has to outlast the animation, or the page stops following halfway.
+        claim(notes, 1100);
         notes.scrollTo({ top: clamp(noteMid(el) - notes.clientHeight / 2, 0, maxOf(notes)), behavior: 'smooth' });
       }
       notes.addEventListener('click', (e) => {
