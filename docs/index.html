@@ -377,100 +377,107 @@
   }
   .resume-cta-row{display:flex; gap:8px; flex-wrap:wrap;}
 
-  /* Resume: the PDF rendered in place. Height tracks the viewport so a full page
-     is visible without the panel itself scrolling on a normal laptop. */
-  .resume-doc{
-    border:1px solid var(--line); border-radius:12px;
-    overflow:hidden; background:var(--paper);
-  }
-  .resume-frame{
-    display:block; width:100%; border:0;
-    height:min(calc(100vh - 290px), 1040px); min-height:460px;
-  }
-  .resume-fallback{padding:28px 24px; color:var(--muted); font-size:13.5px; line-height:1.7;}
-  .resume-fallback a{color:var(--ink); border-bottom:1px solid var(--faint);}
-  .resume-fallback a:hover{border-color:var(--ink);}
+  /* The resume view: the page on the left, notes keyed to its sections on the
+     right, and the two kept in step.
 
-  /* The resume view: Aedin's own PDF on the left, shown exactly as the file is,
-     with the right-hand column annotating it section by section.
-
-     The row height is declared once here and both columns take it. The document
-     box carries the paper's aspect ratio, so its WIDTH is derived from that
-     height -- a whole page always fits, rather than being cropped at whatever
-     width the grid happened to give it. Narrower column, smaller page, more of
-     the resume readable at once. */
+     The page is an image rendered from the PDF rather than an embedded viewer.
+     That is the whole reason the syncing works: a browser's PDF viewer is a
+     sealed box -- its scroll position cannot be read or set, and it fires no
+     scroll events -- so a <object> can never be tied to anything. An image in
+     a scroll container we own can. The PDF itself stays one click away. */
   .resume-split{
     display:grid;
-    grid-template-columns:1.32fr 1fr;
-    grid-template-rows:min(calc(100vh - 290px), 1040px);
-    grid-template-rows:min(calc(100dvh - 290px), 1040px);
-    gap:28px;
+    grid-template-columns:1.3fr 1fr;
+    grid-template-rows:min(calc(100vh - 300px), 1040px);
+    grid-template-rows:min(calc(100dvh - 300px), 1040px);
+    gap:26px;
   }
-  /* The document keeps a viewport-height box and the page scrolls inside it,
-     the way any PDF viewer behaves. Its column is narrower than the panel,
-     which is what renders the page smaller: more of the resume at a glance.
-     Sizing the box by paper ratio instead was tried and is worse -- the column
-     gets so narrow that Chrome's viewer draws the text too small to read. */
-  .resume-frame{block-size:100%; min-block-size:0;}
+  .resume-doc{
+    border:1px solid var(--line); border-radius:12px;
+    background:var(--paper); overflow:hidden;
+    min-height:0; position:relative;
+  }
+  .resume-scroll{
+    block-size:100%; overflow-y:auto; overscroll-behavior:contain;
+    scroll-behavior:smooth; background:#f2f3f5;
+  }
+  .resume-pagewrap{position:relative;}
+  .resume-page{display:block; inline-size:100%; block-size:auto;}
+  /* The band over the page showing which part a note is about. Positioned in
+     percentages of the page, so it holds at any width without recalculating. */
+  .resume-mark{
+    position:absolute; inset-inline:0; pointer-events:none;
+    background:rgba(16,17,20,.07);
+    border-left:3px solid var(--ink);
+    opacity:0; transition:opacity .18s ease, top .22s ease, height .22s ease;
+  }
+  .resume-mark.on{opacity:1;}
+  @media (prefers-reduced-motion:reduce){ .resume-mark{transition:opacity .18s ease;} }
 
-  /* The notes run longer than a page of PDF, so this column takes the same
-     height and scrolls inside itself. The panel itself never scrolls, which is
-     the point of sizing the row off the viewport. */
   .resume-aside{
     min-width:0; min-height:0; overflow-y:auto; overscroll-behavior:contain;
-    padding-right:4px;
-    /* Queried below, so the notes answer their own column width rather than
-       the viewport's -- the column is a component, not a page breakpoint. */
-    container-type:inline-size;
+    scroll-behavior:smooth; padding-right:4px;
   }
 
-  /* Each group answers a section of the resume, and is labelled the way that
-     document labels its own sections -- caps with a rule under them. Quoting
-     the page's typography is what ties the two columns together, so the caps
-     here are the content's doing rather than decoration. */
-  .ra-group{margin:0 0 22px;}
+  /* A group per section of the resume, labelled the way that page labels its
+     own sections. */
+  .ra-group{margin:0 0 20px;}
   .ra-group:last-child{margin-bottom:4px;}
   .ra-head{
     font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:600;
     letter-spacing:.09em; text-transform:uppercase; color:var(--ink);
-    margin:0 0 3px; padding-bottom:5px; border-bottom:1px solid var(--line-strong);
+    margin:0 0 6px; padding-bottom:5px; border-bottom:1px solid var(--line-strong);
   }
-  .ra-intro{color:var(--muted); font-size:12px; line-height:1.55; margin:8px 0 2px;}
 
-  /* An entry leads with the resume's own wording, so the eye can find the line
-     it belongs to on the left. */
-  .ra-item{padding:11px 0; border-bottom:1px solid var(--line);}
-  .ra-item:last-child{border-bottom:0; padding-bottom:2px;}
+  /* Every entry is a button: it scrolls the page on the left to the line it
+     names. Styled as text, because it reads as a note, not a control. */
+  .ra-item{
+    display:block; inline-size:100%; text-align:left;
+    background:none; border:0; border-bottom:1px solid var(--line);
+    padding:10px 10px 10px 12px; margin:0; cursor:pointer; font:inherit;
+    border-left:2px solid transparent;
+    transition:background-color .15s ease, border-left-color .15s ease;
+  }
+  .ra-item:last-child{border-bottom:0;}
+  .ra-item:hover{background:#f7f8fa;}
+  .ra-item:focus-visible{outline:2px solid var(--ink); outline-offset:-2px;}
+  /* The entry matching whatever part of the page is in view. */
+  .ra-item[aria-current="true"]{background:#f2f3f5; border-left-color:var(--ink);}
   .ra-ref{
     font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:500;
-    color:var(--ink); margin:0; line-height:1.35;
+    color:var(--ink); margin:0; line-height:1.35; display:block;
   }
-  .ra-note{color:var(--muted); font-size:12px; line-height:1.55; margin:4px 0 0; max-width:34rem;}
-  .ra-cols{display:grid; grid-template-columns:minmax(0,1fr); gap:0 26px; align-content:start;}
-  /* Wide enough for two readable measures: projects beside the rest, skills
-     across the foot where its two-column rows have room to breathe. */
-  @container (min-width:40rem){
-    .ra-cols{grid-template-columns:repeat(2, minmax(0,1fr));}
-    .ra-g-skills{grid-column:1 / -1;}
+  .ra-when{
+    display:block; margin-top:2px; color:var(--faint); font-size:11.5px;
+    font-variant-numeric:tabular-nums;
   }
+  .ra-note{color:var(--muted); font-size:12px; line-height:1.55; margin:5px 0 0;}
+  .ra-none{color:var(--faint); font-size:12px; line-height:1.55; margin:5px 0 0; font-style:italic;}
   .ra-links{margin:6px 0 0; display:flex; flex-wrap:wrap; gap:4px 14px;}
   .ra-links a{
     font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500;
     color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);
   }
   .ra-links a:hover, .ra-links a:focus-visible{border-color:var(--ink);}
-  .ra-none{color:var(--faint); font-size:12px; line-height:1.55; margin:4px 0 0; font-style:italic;}
 
-  /* Skills: the claim on the left of the row, where it was actually used on the right. */
-  .ra-skill{display:grid; grid-template-columns:7.2rem minmax(0,1fr); gap:3px 10px; padding:8px 0; border-bottom:1px solid var(--line);}
-  .ra-skill:last-child{border-bottom:0;}
+  /* Skills: the claim, and the line of the resume that backs it. */
+  .ra-skill{display:grid; grid-template-columns:7.4rem minmax(0,1fr); gap:3px 10px; padding:8px 0; border-bottom:1px solid var(--line);}
+  .ra-skill:last-of-type{border-bottom:0;}
   .ra-skill dt{font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500; color:var(--ink);}
   .ra-skill dd{margin:0; color:var(--muted); font-size:12px; line-height:1.5;}
   .ra-skill dd a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);}
   .ra-skill dd a:hover{border-color:var(--ink);}
-  .ra-foot{margin:16px 0 0; color:var(--faint); font-size:12px; line-height:1.55;}
-  .ra-foot a{color:var(--ink); border-bottom:1px solid var(--faint); text-decoration:none;}
-  .ra-foot a:hover{border-color:var(--ink);}
+
+  /* The resume's text, for screen readers and for find-in-page: an image of a
+     document is not a document. */
+  .sr-only{
+    position:absolute; inline-size:1px; block-size:1px; padding:0; margin:-1px;
+    overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .resume-scroll, .resume-aside{scroll-behavior:auto;}
+  }
 
   /* Links tab: title on the left, the way in on the right. */
   .link-list{list-style:none; margin:0; padding:0;}
@@ -556,7 +563,10 @@
     .contact-grid{grid-template-columns:1fr; gap:30px;}
     /* Stacked: the resume first, the notes under it, no inner scrolling. */
     .resume-split{grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; gap:30px;}
-    .resume-frame{block-size:min(calc(100vh - 290px), 1040px); min-height:460px;}
+    /* Stacked, the page is narrow enough to show whole: let the box hug it
+       rather than standing a fixed height with white space underneath. */
+    .resume-doc{block-size:auto;}
+    .resume-scroll{block-size:auto; overflow:visible;}
     .resume-aside{overflow:visible; padding-right:0;}
     .ra-skill{grid-template-columns:minmax(0,1fr);}
   }
@@ -832,7 +842,7 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-heading">Resume</h2>
-              <p class="panel-sub">The one-page version on the left, with context and links on the right.</p>
+              <p class="panel-sub">The page on the left, its sections on the right. Click one to find it.</p>
             </div>
             <a class="btn-outline" href="resume.pdf?v=20261013d" download>Download PDF</a>
           </div>
@@ -845,129 +855,125 @@
                inline (most mobile ones), so there is always a way in. -->
           <div class="resume-split">
             <div class="resume-doc">
-              <object class="resume-frame" data="resume.pdf?v=20261013d#view=FitH&amp;toolbar=0&amp;navpanes=0" type="application/pdf"
-                      title="Aedin Lai resume, PDF">
-                <p class="resume-fallback">
-                  This browser will not display the PDF inline.
-                  <a href="resume.pdf?v=20261013d" target="_blank" rel="noopener noreferrer">Open the resume in a new tab</a>,
-                  or use Download PDF above.
-                </p>
-              </object>
+              <div class="resume-scroll" id="resumeScroll" tabindex="0" role="group" aria-label="Resume, scrollable">
+                <div class="resume-pagewrap">
+                  <img class="resume-page" id="resumePage" src="resume-page.webp" width="1530" height="1980"
+                       loading="lazy" decoding="async"
+                       alt="Aedin Lai's one-page resume. The full text follows for screen readers.">
+                  <div class="resume-mark" id="resumeMark" aria-hidden="true"></div>
+                </div>
+                <div class="sr-only">
+                  <h3>Education</h3>
+                  <p>Northeastern University, Boston, MA. Expected May 2029. Candidate for Bachelor of Science in Electrical and Computer Engineering. Relevant coursework: Embedded Design, Computing Fundamentals for Engineers, Physics 2, Calculus 2.</p>
+                  <h3>Experience</h3>
+                  <p>Data Center Infrastructure Intern, SingleStore, Boston, MA, June to September 2026. Led hardware deployment for a phased data center expansion, scaling a private cloud platform from 160 to 300 plus VMs. Replaced a single-push rollout with a phased two-racks-at-a-time plan, bringing three cohorts of 40 to 50 VMs online while limiting disruption to live workloads. Diagnosed a Linux kernel storage defect and a multi-week NFS instability, restoring full fleet capacity. Built a Go audit tool and REST API that checks power supply, memory, NIC and drive health across the server fleet via iDRAC. Supported a full Oakland-to-Boston data center relocation, migrating the platform from bare-metal to virtualized infrastructure.</p>
+                  <p>Research Intern, PEACE Foundation, Yale University School of Medicine, New Haven, CT, 2023 to 2024. Supervisor: Dr. Kun Liu, Associate Professor of Sports Neuroscience. Designed, built and improved a full-body balance measurement device to study cognition and movement in neurological patients. Automated data collection using custom hardware across ASD, Alzheimer's, Parkinson's and schizophrenia patient populations. Presented at an international conference, ISEC 2024, and co-authored a study accepted to JAMA in 2025.</p>
+                  <h3>Projects</h3>
+                  <p>aedinlai.com, personal site and project hub, February 2025 to present. JavaScript, Cloudflare Workers, SQL, GitHub Actions. Built a framework-free single-page site hosting live projects and a daily auto-generated news feed. Engineered a gym occupancy tracker that records live counts every 10 minutes into a serverless SQL database. Designed a serverless SQL API for a shared pizza-pricing app, with per-IP rate limiting and owner-only edits.</p>
+                  <p>Sandbit, pixel physics engine, September 2026. Rust, WebAssembly, WebGL. Built a 5,700-line Rust and WebAssembly falling-sand engine simulating 27 materials, including electrical conduction. Implemented rigid-body physics with contact manifolds, buoyancy, and rope and motor joints for pixel objects. Verified with 30 physics tests, fuzzing, and a headless player that runs all 15 levels across 5 random seeds.</p>
+                  <p>One-Inch Punch Arcade Machine, Cornerstone of Engineering, September to December 2025. Laser sensors, electronics, mechanical design. Designed a dual-laser-sensor trigger and wrote scoring logic that converts swing velocity into a live score. Led the full build, from electronics to a pendulum-and-magnet auto-reset, and validated it with 80 plus full-force stress tests. Identified a paddle material limit during a full day of expo play and proposed a rubber-composite redesign.</p>
+                  <p>Hallway Marathon event website, November 2025. HTML, CSS, JavaScript. Built a framework-free event site with live betting odds and competitor stats, run live for a multi-university race.</p>
+                  <h3>Leadership and athletics</h3>
+                  <p>Captain, Northeastern University Club Fencing, 2025 to present. Recruits new fencers and designs practices; anchors the epee squad at the 2026 Collegiate Club National Championship.</p>
+                  <p>Competitive Epee Fencer, Marx Fencing Academy, 2018 to 2025. Nationally ranked 103 in the U.S.; Top-16 World Cup finish; All-American 2021 to 2025.</p>
+                  <h3>Skills</h3>
+                  <p>Programming: Python, Java, C#, Rust, SQL, MATLAB, JavaScript, HTML/CSS. Hardware and CAD: Quartus Prime, Raspberry Pi, sensor integration, SolidWorks, Fusion 360, AutoCAD, laser cutting. Tools: Git, GitHub Actions, Linux, Cloudflare Workers, WebAssembly, VS Code.</p>
+                </div>
+              </div>
             </div>
 
-            <aside class="resume-aside" aria-label="Notes on the resume">
-              <div class="ra-cols">
+            <aside class="resume-aside" id="resumeNotes" aria-label="Resume sections">
 
               <div class="ra-group">
-                <h3 class="ra-head">Projects</h3>
-                <p class="ra-intro">The four on the resume, and what you can actually open.</p>
-
-                <div class="ra-item">
-                  <p class="ra-ref">aedinlai.com &mdash; Personal Site &amp; Project Hub</p>
-                  <p class="ra-note">You are reading it. The three things that bullet list mentions each run here:</p>
-                  <p class="ra-links">
-                    <a href="news/">Daily news feed</a>
-                    <a href="gym/">Gym occupancy</a>
-                    <a href="pizza/">Pizza pricing</a>
-                  </p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Sandbit &mdash; Pixel Physics Engine</p>
-                  <p class="ra-note">Draw sand, water and fire, then wire something up and watch the current find its way through it.</p>
-                  <p class="ra-links"><a href="sandbit/">Open Sandbit</a></p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">One-Inch Punch Arcade Machine</p>
-                  <p class="ra-note">The dual-laser trigger times a swing across a known gap, which is where the velocity comes from.</p>
-                  <p class="ra-none">A physical machine &mdash; nothing to open.</p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Hallway Marathon &mdash; Event Website</p>
-                  <p class="ra-note">Ran live through the race, odds and standings updating as heats finished.</p>
-                  <p class="ra-links"><a href="https://hallway-marathon.github.io" target="_blank" rel="noopener noreferrer">hallway-marathon.github.io</a></p>
-                </div>
+                <h3 class="ra-head" id="ra-h-edu">Education</h3>
+                <button type="button" class="ra-item" data-y="0.1294" aria-describedby="ra-h-edu">
+                  <span class="ra-ref">Northeastern University</span>
+                  <span class="ra-when">Expected May 2029</span>
+                </button>
               </div>
 
               <div class="ra-group">
-                <h3 class="ra-head">Not on the page</h3>
-                <p class="ra-intro">One page only holds so much. These are live too.</p>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Gatecraft</p>
-                  <p class="ra-note">Build a logic circuit, watch it settle, read the truth table it fills in for you. Closest thing here to the Embedded Design coursework.</p>
-                  <p class="ra-links"><a href="gatecraft/">Open Gatecraft</a></p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Game Day Board</p>
-                  <p class="ra-note">Scores a 12-team fantasy league off live NFL box scores, projections and all, on the same Pi as the rest.</p>
-                  <p class="ra-links"><a href="https://football.aedinlai.com" target="_blank" rel="noopener noreferrer">football.aedinlai.com</a></p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Hand Playground &amp; MemeMatch</p>
-                  <p class="ra-note">Webcam hand and face tracking, running on-device &mdash; no frames leave the browser.</p>
-                  <p class="ra-links">
-                    <a href="hand-playground/">Hand Playground</a>
-                    <a href="meme-match/">MemeMatch</a>
-                  </p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">DoodleLife</p>
-                  <p class="ra-note">Draw something, it gets recognised, then your own lines get up and move.</p>
-                  <p class="ra-links"><a href="doodle-life/">Open DoodleLife</a></p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Games</p>
-                  <p class="ra-note">Four, built from scratch: Filament, The Far Light, Lockout, Latch.</p>
-                  <p class="ra-links"><a href="games/">Open Games</a></p>
-                </div>
-
-                <div class="ra-item">
-                  <p class="ra-ref">Broadcast</p>
-                  <p class="ra-note">A radio serial that writes and voices a new episode overnight, unattended.</p>
-                  <p class="ra-links"><a href="broadcast/">Open Broadcast</a></p>
-                </div>
+                <h3 class="ra-head" id="ra-h-exp">Experience</h3>
+                <button type="button" class="ra-item" data-y="0.2050" aria-describedby="ra-h-exp">
+                  <span class="ra-ref">Data Center Infrastructure Intern &mdash; SingleStore</span>
+                  <span class="ra-when">June &ndash; September 2026</span>
+                </button>
+                <button type="button" class="ra-item" data-y="0.3396" aria-describedby="ra-h-exp">
+                  <span class="ra-ref">Research Intern &mdash; PEACE Foundation, Yale</span>
+                  <span class="ra-when">2023 &ndash; 2024</span>
+                </button>
               </div>
 
-              <div class="ra-group ra-g-skills">
+              <div class="ra-group">
+                <h3 class="ra-head" id="ra-h-proj">Projects</h3>
+                <button type="button" class="ra-item" data-y="0.4529" aria-describedby="ra-h-proj">
+                  <span class="ra-ref">aedinlai.com &mdash; Personal Site &amp; Project Hub</span>
+                  <span class="ra-when">February 2025 &ndash; Present</span>
+                  <span class="ra-note">The three things those bullets name, each running here:</span>
+                  <span class="ra-links">
+                    <a href="news/" data-stop>Daily news feed</a>
+                    <a href="gym/" data-stop>Gym occupancy</a>
+                    <a href="pizza/" data-stop>Pizza pricing</a>
+                  </span>
+                </button>
+                <button type="button" class="ra-item" data-y="0.5397" aria-describedby="ra-h-proj">
+                  <span class="ra-ref">Sandbit &mdash; Pixel Physics Engine</span>
+                  <span class="ra-when">September 2026</span>
+                  <span class="ra-links"><a href="sandbit/" data-stop>Open Sandbit</a></span>
+                </button>
+                <button type="button" class="ra-item" data-y="0.6265" aria-describedby="ra-h-proj">
+                  <span class="ra-ref">One-Inch Punch Arcade Machine</span>
+                  <span class="ra-when">September &ndash; December 2025</span>
+                  <span class="ra-none">A physical machine &mdash; nothing to open.</span>
+                </button>
+                <button type="button" class="ra-item" data-y="0.7133" aria-describedby="ra-h-proj">
+                  <span class="ra-ref">Hallway Marathon &mdash; Event Website</span>
+                  <span class="ra-when">November 2025</span>
+                  <span class="ra-links"><a href="https://hallway-marathon.github.io" target="_blank" rel="noopener noreferrer" data-stop>hallway-marathon.github.io</a></span>
+                </button>
+              </div>
+
+              <div class="ra-group">
+                <h3 class="ra-head" id="ra-h-lead">Leadership &amp; athletics</h3>
+                <button type="button" class="ra-item" data-y="0.8101" aria-describedby="ra-h-lead">
+                  <span class="ra-ref">Captain &mdash; Northeastern Club Fencing</span>
+                  <span class="ra-when">2025 &ndash; Present</span>
+                </button>
+                <button type="button" class="ra-item" data-y="0.8491" aria-describedby="ra-h-lead">
+                  <span class="ra-ref">Competitive Epee Fencer &mdash; Marx Fencing Academy</span>
+                  <span class="ra-when">2018 &ndash; 2025</span>
+                </button>
+              </div>
+
+              <div class="ra-group">
                 <h3 class="ra-head">Skills</h3>
-                <p class="ra-intro">Where each one on that list was actually used.</p>
-                <dl style="margin:0;">
+                <button type="button" class="ra-item" data-y="0.8933">
+                  <span class="ra-ref">Where the list was used</span>
+                  <span class="ra-when">Every claim, and the line above that backs it</span>
+                </button>
+                <dl style="margin:8px 0 0;">
                   <div class="ra-skill">
                     <dt>Rust, WebAssembly</dt>
                     <dd><a href="sandbit/">Sandbit</a> &mdash; the engine and its 27 materials</dd>
                   </div>
                   <div class="ra-skill">
                     <dt>Cloudflare Workers, SQL</dt>
-                    <dd><a href="gym/">Gym occupancy</a> and <a href="pizza/">pizza pricing</a>, both serverless</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>Raspberry Pi, Linux</dt>
-                    <dd><a href="https://football.aedinlai.com" target="_blank" rel="noopener noreferrer">Game Day Board</a> and <a href="broadcast/">Broadcast</a> run as services on one</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>Sensor integration</dt>
-                    <dd>The arcade machine's laser trigger and the Yale balance device</dd>
-                  </div>
-                  <div class="ra-skill">
-                    <dt>JavaScript, HTML/CSS</dt>
-                    <dd>This site and everything linked from it, no frameworks</dd>
+                    <dd>The <a href="gym/">gym tracker</a> and <a href="pizza/">pizza API</a> in the first project</dd>
                   </div>
                   <div class="ra-skill">
                     <dt>GitHub Actions</dt>
-                    <dd>Builds this site and regenerates the news feed daily</dd>
+                    <dd>The daily news feed on this site</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>Sensor integration</dt>
+                    <dd>The arcade machine's laser trigger, and the Yale balance device</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>JavaScript, HTML/CSS</dt>
+                    <dd>This site and the Hallway Marathon site, both framework-free</dd>
                   </div>
                 </dl>
               </div>
-
-              </div>
-              <p class="ra-foot">Source for most of it is on <a href="https://github.com/Aedin-ctrl" target="_blank" rel="noopener noreferrer">github.com/Aedin-ctrl</a>.</p>
             </aside>
           </div>
         </section>
@@ -1339,7 +1345,137 @@
     panelsViewport.style.display = '';
     panels.forEach(p => p.classList.toggle('active', p.id === id));
     panelsViewport.scrollTop = 0;
+    if(id === 'resume') syncResume();
   }
+
+  // ---- resume: keep the page and its notes in step ----
+  //
+  // Each note carries data-y, the position of the line it names as a fraction
+  // of the page's height. Those fractions come out of the PDF itself, so they
+  // stay true however the image is scaled.
+  //
+  // Clicking a note scrolls the page to that line. Scrolling the page marks
+  // the note whose section is showing and brings it into view. The notes
+  // column can still be scrolled by hand, and doing so is left alone -- an
+  // automatic scroll that fights the one you are making is worse than none.
+  const syncResume = (() => {
+    let wired = false;
+    return function syncResume(){
+      const scroller = document.getElementById('resumeScroll');
+      const notes = document.getElementById('resumeNotes');
+      const page = document.getElementById('resumePage');
+      const mark = document.getElementById('resumeMark');
+      if(!scroller || !notes || !page || wired) return;
+      wired = true;
+
+      const items = [...notes.querySelectorAll('.ra-item')];
+      if(!items.length) return;
+      const yOf = el => parseFloat(el.dataset.y) || 0;
+      items.sort((a, b) => yOf(a) - yOf(b));
+
+      // Each note covers the page from its own line down to the next one's.
+      const spans = items.map((el, i) => ({
+        el, from: yOf(el), to: i + 1 < items.length ? yOf(items[i + 1]) : 0.985,
+      }));
+      const spanOf = el => spans.find(sp => sp.el === el);
+      const pageHeight = () => page.offsetHeight || 0;
+
+      // One piece of state. The band on the page and the highlighted note are
+      // two views of it, so they cannot disagree.
+      let current = null;
+      // Only scrolling the reader does re-picks the section. A smooth scroll
+      // that a click started is still a scroll, and letting it re-pick made
+      // clicking a late section land on whatever happened to be at the top.
+      let userDriving = false;
+      let handScrollUntil = 0;          // notes scrolled by hand: leave them alone
+      let selfScroll = false;
+
+      function setCurrent(el, follow){
+        if(!el || el === current) return;
+        current = el;
+        for(const x of items) x.setAttribute('aria-current', x === el ? 'true' : 'false');
+        const sp = spanOf(el);
+        if(sp && mark){
+          mark.style.top = (sp.from * 100).toFixed(3) + '%';
+          mark.style.height = ((sp.to - sp.from) * 100).toFixed(3) + '%';
+          mark.classList.add('on');
+        }
+        if(follow && Date.now() > handScrollUntil){
+          selfScroll = true;
+          el.scrollIntoView({ block: 'nearest' });
+          setTimeout(() => { selfScroll = false; }, 140);
+        }
+      }
+
+      // Which section the page is showing: the last one to have started above
+      // the top of the view, allowing a little slack so a heading just above
+      // the edge still counts.
+      function fromScroll(){
+        if(!userDriving) return;
+        const h = pageHeight();
+        if(!h) return;
+        const probe = scroller.scrollTop + 24;
+        let found = items[0];
+        for(const el of items){ if(yOf(el) * h <= probe) found = el; else break; }
+        setCurrent(found, true);
+      }
+
+      notes.addEventListener('scroll', () => {
+        if(!selfScroll) handScrollUntil = Date.now() + 1200;
+      }, { passive: true });
+
+      // What counts as the reader scrolling the page.
+      const driving = () => { userDriving = true; };
+      for(const ev of ['wheel', 'touchmove', 'pointerdown', 'keydown']){
+        scroller.addEventListener(ev, driving, { passive: true });
+      }
+
+      let queued = false;
+      scroller.addEventListener('scroll', () => {
+        if(queued) return;
+        queued = true;
+        requestAnimationFrame(() => { queued = false; fromScroll(); });
+      }, { passive: true });
+
+      function pick(item){
+        const h = pageHeight();
+        if(!h) return;
+        userDriving = false;            // an explicit choice holds until you scroll
+        setCurrent(item, false);
+        // Scroll only if the band is not already on screen. Most of this page
+        // is visible at once, so moving it when nothing was hidden is noise.
+        const sp = spanOf(item);
+        const canScroll = scroller.scrollHeight > scroller.clientHeight + 4;
+        if(!canScroll){
+          // Stacked on a phone: the whole page already shows, but it may be off
+          // screen above the notes, so bring the page to the reader instead.
+          scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          return;
+        }
+        const top = sp.from * h, bottom = sp.to * h;
+        const viewTop = scroller.scrollTop, viewBottom = viewTop + scroller.clientHeight;
+        if(top < viewTop + 8 || bottom > viewBottom - 8){
+          scroller.scrollTo({ top: Math.max(0, top - scroller.clientHeight * 0.18), behavior: 'smooth' });
+        }
+      }
+
+      notes.addEventListener('click', (e) => {
+        if(e.target.closest('a')) return;   // a link inside a note is a link, not a jump
+        const item = e.target.closest('.ra-item');
+        if(item) pick(item);
+      });
+      // Tabbing through the notes walks the page with it.
+      notes.addEventListener('focusin', (e) => {
+        const item = e.target.closest('.ra-item');
+        if(item) pick(item);
+      });
+
+      // Open on the top of the page.
+      const start = () => { current = null; setCurrent(items[0], false); };
+      if(page.complete && page.naturalHeight) start();
+      else page.addEventListener('load', start, { once: true });
+    };
+  })();
 
   function navigateTo(rawPath){
     releaseRelayOnNavigate();        // a tab that is going away keeps no claim
