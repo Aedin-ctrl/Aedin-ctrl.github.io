@@ -392,38 +392,85 @@
   .resume-fallback a:hover{border-color:var(--ink);}
 
   /* The resume view: Aedin's own PDF on the left, shown exactly as the file is,
-     with the right-hand column free for notes and the projects worth opening.
-     The PDF column is narrower than the panel, which is what makes the page
-     render smaller and fit without the panel scrolling. */
+     with the right-hand column annotating it section by section.
+
+     The row height is declared once here and both columns take it. The document
+     box carries the paper's aspect ratio, so its WIDTH is derived from that
+     height -- a whole page always fits, rather than being cropped at whatever
+     width the grid happened to give it. Narrower column, smaller page, more of
+     the resume readable at once. */
   .resume-split{
-    display:grid; grid-template-columns:minmax(0,1fr) 19rem;
-    gap:24px; align-items:start;
+    display:grid;
+    grid-template-columns:1.32fr 1fr;
+    grid-template-rows:min(calc(100vh - 290px), 1040px);
+    grid-template-rows:min(calc(100dvh - 290px), 1040px);
+    gap:28px;
   }
-  /* The notes run longer than one page of PDF, so the column matches the
-     document's height and scrolls inside itself. The panel stays put, which is
-     the same reason .resume-frame sizes itself off the viewport. */
+  /* The document keeps a viewport-height box and the page scrolls inside it,
+     the way any PDF viewer behaves. Its column is narrower than the panel,
+     which is what renders the page smaller: more of the resume at a glance.
+     Sizing the box by paper ratio instead was tried and is worse -- the column
+     gets so narrow that Chrome's viewer draws the text too small to read. */
+  .resume-frame{block-size:100%; min-block-size:0;}
+
+  /* The notes run longer than a page of PDF, so this column takes the same
+     height and scrolls inside itself. The panel itself never scrolls, which is
+     the point of sizing the row off the viewport. */
   .resume-aside{
-    min-width:0;
-    max-height:min(calc(100vh - 290px), 1040px);
-    overflow-y:auto; overscroll-behavior:contain;
+    min-width:0; min-height:0; overflow-y:auto; overscroll-behavior:contain;
+    padding-right:4px;
+    /* Queried below, so the notes answer their own column width rather than
+       the viewport's -- the column is a component, not a page breakpoint. */
+    container-type:inline-size;
   }
-  .resume-aside-h{
-    font-family:'Space Grotesk', sans-serif; font-size:14px; font-weight:500;
-    color:var(--ink); margin:0 0 6px;
+
+  /* Each group answers a section of the resume, and is labelled the way that
+     document labels its own sections -- caps with a rule under them. Quoting
+     the page's typography is what ties the two columns together, so the caps
+     here are the content's doing rather than decoration. */
+  .ra-group{margin:0 0 22px;}
+  .ra-group:last-child{margin-bottom:4px;}
+  .ra-head{
+    font-family:'Space Grotesk', sans-serif; font-size:11px; font-weight:600;
+    letter-spacing:.09em; text-transform:uppercase; color:var(--ink);
+    margin:0 0 3px; padding-bottom:5px; border-bottom:1px solid var(--line-strong);
   }
-  .resume-aside-note{color:var(--muted); font-size:12.5px; line-height:1.6; margin:0 0 2px;}
-  .resume-links{list-style:none; margin:0; padding:0;}
-  .resume-links li{padding:13px 0; border-top:1px solid var(--line);}
-  .resume-links li:last-child{border-bottom:1px solid var(--line);}
-  .resume-links a{
-    font-family:'Space Grotesk', sans-serif; font-size:13.5px; font-weight:500;
+  .ra-intro{color:var(--muted); font-size:12px; line-height:1.55; margin:8px 0 2px;}
+
+  /* An entry leads with the resume's own wording, so the eye can find the line
+     it belongs to on the left. */
+  .ra-item{padding:11px 0; border-bottom:1px solid var(--line);}
+  .ra-item:last-child{border-bottom:0; padding-bottom:2px;}
+  .ra-ref{
+    font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:500;
+    color:var(--ink); margin:0; line-height:1.35;
+  }
+  .ra-note{color:var(--muted); font-size:12px; line-height:1.55; margin:4px 0 0; max-width:34rem;}
+  .ra-cols{display:grid; grid-template-columns:minmax(0,1fr); gap:0 26px; align-content:start;}
+  /* Wide enough for two readable measures: projects beside the rest, skills
+     across the foot where its two-column rows have room to breathe. */
+  @container (min-width:40rem){
+    .ra-cols{grid-template-columns:repeat(2, minmax(0,1fr));}
+    .ra-g-skills{grid-column:1 / -1;}
+  }
+  .ra-links{margin:6px 0 0; display:flex; flex-wrap:wrap; gap:4px 14px;}
+  .ra-links a{
+    font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500;
     color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);
   }
-  .resume-links a:hover, .resume-links a:focus-visible{border-color:var(--ink);}
-  .resume-links p{color:var(--muted); font-size:12.5px; line-height:1.6; margin:5px 0 0;}
-  .resume-aside-foot{margin:14px 0 0; color:var(--faint); font-size:12.5px; line-height:1.6;}
-  .resume-aside-foot a{color:var(--ink); border-bottom:1px solid var(--faint); text-decoration:none;}
-  .resume-aside-foot a:hover{border-color:var(--ink);}
+  .ra-links a:hover, .ra-links a:focus-visible{border-color:var(--ink);}
+  .ra-none{color:var(--faint); font-size:12px; line-height:1.55; margin:4px 0 0; font-style:italic;}
+
+  /* Skills: the claim on the left of the row, where it was actually used on the right. */
+  .ra-skill{display:grid; grid-template-columns:7.2rem minmax(0,1fr); gap:3px 10px; padding:8px 0; border-bottom:1px solid var(--line);}
+  .ra-skill:last-child{border-bottom:0;}
+  .ra-skill dt{font-family:'Space Grotesk', sans-serif; font-size:12px; font-weight:500; color:var(--ink);}
+  .ra-skill dd{margin:0; color:var(--muted); font-size:12px; line-height:1.5;}
+  .ra-skill dd a{color:var(--ink); text-decoration:none; border-bottom:1px solid var(--faint);}
+  .ra-skill dd a:hover{border-color:var(--ink);}
+  .ra-foot{margin:16px 0 0; color:var(--faint); font-size:12px; line-height:1.55;}
+  .ra-foot a{color:var(--ink); border-bottom:1px solid var(--faint); text-decoration:none;}
+  .ra-foot a:hover{border-color:var(--ink);}
 
   /* Links tab: title on the left, the way in on the right. */
   .link-list{list-style:none; margin:0; padding:0;}
@@ -508,8 +555,10 @@
     .general-grid{grid-template-columns:1fr; gap:36px;}
     .contact-grid{grid-template-columns:1fr; gap:30px;}
     /* Stacked: the resume first, the notes under it, no inner scrolling. */
-    .resume-split{grid-template-columns:minmax(0,1fr); gap:28px;}
-    .resume-aside{max-height:none; overflow:visible;}
+    .resume-split{grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; gap:30px;}
+    .resume-frame{block-size:min(calc(100vh - 290px), 1040px); min-height:460px;}
+    .resume-aside{overflow:visible; padding-right:0;}
+    .ra-skill{grid-template-columns:minmax(0,1fr);}
   }
   @media (max-width:640px){
     .project-row{grid-template-columns:24px 1fr; gap:6px 14px;}
@@ -783,7 +832,7 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-heading">Resume</h2>
-              <p class="panel-sub">Education, experience, and leadership.</p>
+              <p class="panel-sub">The one-page version on the left, with context and links on the right.</p>
             </div>
             <a class="btn-outline" href="resume.pdf?v=20261013d" download>Download PDF</a>
           </div>
@@ -806,44 +855,119 @@
               </object>
             </div>
 
-            <aside class="resume-aside">
-              <h3 class="resume-aside-h">Projects you can open</h3>
-              <p class="resume-aside-note">The resume names a few of these. All of them run in a browser &mdash; nothing to install.</p>
-              <ul class="resume-links">
-                <li>
-                  <a href="gatecraft/">Gatecraft</a>
-                  <p>Build a logic circuit, watch it settle, read the truth table it fills in. Designs save into the URL.</p>
-                </li>
-                <li>
-                  <a href="sandbit/">Sandbit</a>
-                  <p>The falling-sand engine from the resume: 27 materials, rigid bodies, electrical conduction.</p>
-                </li>
-                <li>
-                  <a href="https://football.aedinlai.com">Game Day Board</a>
-                  <p>Fantasy football board running on a Raspberry Pi, scoring a 12-team league off live NFL box scores.</p>
-                </li>
-                <li>
-                  <a href="hand-playground/">Hand Playground</a>
-                  <p>Webcam hand tracking driving six toys, all on-device.</p>
-                </li>
-                <li>
-                  <a href="doodle-life/">DoodleLife</a>
-                  <p>Draw something, it gets recognised, then your own lines get up and move.</p>
-                </li>
-                <li>
-                  <a href="gym/">Marino Tracker</a>
-                  <p>The gym occupancy tracker from the resume, counting live every 10 minutes.</p>
-                </li>
-                <li>
-                  <a href="games/">Games</a>
-                  <p>Four built from scratch: Filament, The Far Light, Lockout, Latch.</p>
-                </li>
-                <li>
-                  <a href="broadcast/">Broadcast</a>
-                  <p>A serial radio drama written and voiced overnight on a Pi.</p>
-                </li>
-              </ul>
-              <p class="resume-aside-foot">More at <a href="https://github.com/Aedin-ctrl">github.com/Aedin-ctrl</a>.</p>
+            <aside class="resume-aside" aria-label="Notes on the resume">
+              <div class="ra-cols">
+
+              <div class="ra-group">
+                <h3 class="ra-head">Projects</h3>
+                <p class="ra-intro">The four on the resume, and what you can actually open.</p>
+
+                <div class="ra-item">
+                  <p class="ra-ref">aedinlai.com &mdash; Personal Site &amp; Project Hub</p>
+                  <p class="ra-note">You are reading it. The three things that bullet list mentions each run here:</p>
+                  <p class="ra-links">
+                    <a href="news/">Daily news feed</a>
+                    <a href="gym/">Gym occupancy</a>
+                    <a href="pizza/">Pizza pricing</a>
+                  </p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Sandbit &mdash; Pixel Physics Engine</p>
+                  <p class="ra-note">Draw sand, water and fire, then wire something up and watch the current find its way through it.</p>
+                  <p class="ra-links"><a href="sandbit/">Open Sandbit</a></p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">One-Inch Punch Arcade Machine</p>
+                  <p class="ra-note">The dual-laser trigger times a swing across a known gap, which is where the velocity comes from.</p>
+                  <p class="ra-none">A physical machine &mdash; nothing to open.</p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Hallway Marathon &mdash; Event Website</p>
+                  <p class="ra-note">Ran live through the race, odds and standings updating as heats finished.</p>
+                  <p class="ra-links"><a href="https://hallway-marathon.github.io" target="_blank" rel="noopener noreferrer">hallway-marathon.github.io</a></p>
+                </div>
+              </div>
+
+              <div class="ra-group">
+                <h3 class="ra-head">Not on the page</h3>
+                <p class="ra-intro">One page only holds so much. These are live too.</p>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Gatecraft</p>
+                  <p class="ra-note">Build a logic circuit, watch it settle, read the truth table it fills in for you. Closest thing here to the Embedded Design coursework.</p>
+                  <p class="ra-links"><a href="gatecraft/">Open Gatecraft</a></p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Game Day Board</p>
+                  <p class="ra-note">Scores a 12-team fantasy league off live NFL box scores, projections and all, on the same Pi as the rest.</p>
+                  <p class="ra-links"><a href="https://football.aedinlai.com" target="_blank" rel="noopener noreferrer">football.aedinlai.com</a></p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Hand Playground &amp; MemeMatch</p>
+                  <p class="ra-note">Webcam hand and face tracking, running on-device &mdash; no frames leave the browser.</p>
+                  <p class="ra-links">
+                    <a href="hand-playground/">Hand Playground</a>
+                    <a href="meme-match/">MemeMatch</a>
+                  </p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">DoodleLife</p>
+                  <p class="ra-note">Draw something, it gets recognised, then your own lines get up and move.</p>
+                  <p class="ra-links"><a href="doodle-life/">Open DoodleLife</a></p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Games</p>
+                  <p class="ra-note">Four, built from scratch: Filament, The Far Light, Lockout, Latch.</p>
+                  <p class="ra-links"><a href="games/">Open Games</a></p>
+                </div>
+
+                <div class="ra-item">
+                  <p class="ra-ref">Broadcast</p>
+                  <p class="ra-note">A radio serial that writes and voices a new episode overnight, unattended.</p>
+                  <p class="ra-links"><a href="broadcast/">Open Broadcast</a></p>
+                </div>
+              </div>
+
+              <div class="ra-group ra-g-skills">
+                <h3 class="ra-head">Skills</h3>
+                <p class="ra-intro">Where each one on that list was actually used.</p>
+                <dl style="margin:0;">
+                  <div class="ra-skill">
+                    <dt>Rust, WebAssembly</dt>
+                    <dd><a href="sandbit/">Sandbit</a> &mdash; the engine and its 27 materials</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>Cloudflare Workers, SQL</dt>
+                    <dd><a href="gym/">Gym occupancy</a> and <a href="pizza/">pizza pricing</a>, both serverless</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>Raspberry Pi, Linux</dt>
+                    <dd><a href="https://football.aedinlai.com" target="_blank" rel="noopener noreferrer">Game Day Board</a> and <a href="broadcast/">Broadcast</a> run as services on one</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>Sensor integration</dt>
+                    <dd>The arcade machine's laser trigger and the Yale balance device</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>JavaScript, HTML/CSS</dt>
+                    <dd>This site and everything linked from it, no frameworks</dd>
+                  </div>
+                  <div class="ra-skill">
+                    <dt>GitHub Actions</dt>
+                    <dd>Builds this site and regenerates the news feed daily</dd>
+                  </div>
+                </dl>
+              </div>
+
+              </div>
+              <p class="ra-foot">Source for most of it is on <a href="https://github.com/Aedin-ctrl" target="_blank" rel="noopener noreferrer">github.com/Aedin-ctrl</a>.</p>
             </aside>
           </div>
         </section>
