@@ -1390,7 +1390,6 @@
       // would drag the choice off it immediately.
       let drivingNotes = false;
       let drivingPage = false;
-      let started = false;
 
       function setCurrent(sec){
         if(!sec || sec === current) return;
@@ -1429,39 +1428,52 @@
         });
       }, { passive: true });
 
-      // Scrolling the page does the same, over the range it has. IntersectionObserver
-      // against the scroll container, so it reports real visibility rather than
-      // arithmetic on scrollTop.
-      const seen = new Set();
-      const io = new IntersectionObserver((entries) => {
-        for(const e of entries){
-          if(e.isIntersecting) seen.add(e.target.dataset.sec);
-          else seen.delete(e.target.dataset.sec);
+      // Scrolling the page does the same, over the small range it has.
+      //
+      // Worked out straight from the scroll position rather than with an
+      // IntersectionObserver: the observer keeps a running set of what is on
+      // screen, and that set goes stale when a smooth scroll coalesces its
+      // events -- it answered "Leadership" for a page scrolled 60px from the
+      // top. This cannot go stale, because it holds nothing.
+      function fromPageScroll(){
+        const h = page.offsetHeight;
+        if(!h) return;
+        const probe = scroller.scrollTop + scroller.clientHeight * 0.28;
+        let found = order[0];
+        for(const sec of order){
+          if((topPct(sec) / 100) * h <= probe) found = sec; else break;
         }
-        if(!seen.size) return;
-        const first = order.find(sec => seen.has(sec));
-        if(!first) return;
-        if(!started){ started = true; setCurrent(first); return; }  // opening: no scrolling
-        if(!drivingPage) return;
-        snapTo(first, { page: false });
-      }, { root: scroller, rootMargin: '-8px 0px -72% 0px', threshold: 0 });
-      anchors.forEach(el => io.observe(el));
+        setCurrent(found);
+      }
 
-      // Bring a note to the top of its column, which is the "snap" of it.
-      function snapTo(sec, { page = true, notesCol = true } = {}){
+      let pageQueued = false;
+      scroller.addEventListener('scroll', () => {
+        if(pageQueued || !drivingPage) return;
+        pageQueued = true;
+        requestAnimationFrame(() => { pageQueued = false; if(drivingPage) fromPageScroll(); });
+      }, { passive: true });
+
+      // Snap the PAGE to a section. Nothing scrolls the notes column on its
+      // own: being moved while you are reading it is worse than having to
+      // scroll it yourself.
+      //
+      // The option here used to be called `page`, which shadowed the <img> of
+      // the same name, so the height came out undefined, the target came out
+      // NaN and scrollTo did nothing at all. Clicking never moved the page.
+      function snapTo(sec, movePage){
         setCurrent(sec);
-        const item = bySec.get(sec);
-        if(notesCol && item){
-          const top = item.offsetTop - notes.offsetTop - 8;
-          if(Math.abs(notes.scrollTop - top) > 4) notes.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        if(!movePage) return;
+        const h = page.offsetHeight;
+        const max = scroller.scrollHeight - scroller.clientHeight;
+        if(!h) return;
+        if(max <= 4){
+          // The page fits: there is nothing to scroll, so bring the page
+          // itself into view instead (it may be above the notes on a phone).
+          scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          return;
         }
-        if(page){
-          const h = page.offsetHeight;
-          const target = (topPct(sec) / 100) * h - 10;
-          const max = scroller.scrollHeight - scroller.clientHeight;
-          if(max > 4) scroller.scrollTo({ top: Math.min(Math.max(0, target), max), behavior: 'smooth' });
-          else scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-        }
+        const target = (topPct(sec) / 100) * h - scroller.clientHeight * 0.3;
+        scroller.scrollTo({ top: Math.min(Math.max(0, target), max), behavior: 'smooth' });
       }
 
       notes.addEventListener('click', (e) => {
@@ -1469,15 +1481,15 @@
         const item = e.target.closest('.ra-item');
         if(!item) return;
         drivingNotes = false; drivingPage = false;   // the choice holds until they scroll
-        snapTo(item.dataset.sec);
+        snapTo(item.dataset.sec, true);
       });
       notes.addEventListener('keydown', (e) => {
         if(e.key !== 'Enter' && e.key !== ' ') return;
         const item = e.target.closest('.ra-item');
-        if(item){ drivingNotes = false; drivingPage = false; snapTo(item.dataset.sec); }
+        if(item){ drivingNotes = false; drivingPage = false; snapTo(item.dataset.sec, true); }
       });
 
-      const start = () => { started = true; setCurrent(order[0]); };
+      const start = () => setCurrent(order[0]);
       if(page.complete && page.naturalHeight) start();
       else page.addEventListener('load', start, { once: true });
     };
