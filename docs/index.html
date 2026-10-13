@@ -397,18 +397,8 @@
     gap:30px;
   }
 
-  /* A gutter down the left of the page carries the marker, so nothing is ever
-     painted over the resume's own text. */
-  .resume-doc{
-    display:grid; grid-template-columns:11px minmax(0,1fr); gap:9px;
-    min-height:0; min-width:0;
-  }
-  .resume-rail{position:relative; border-radius:4px; background:var(--line);}
-  .resume-mark{
-    position:absolute; inset-inline:0; border-radius:4px; background:var(--ink);
-    transition:top .28s cubic-bezier(.4,0,.2,1), height .28s cubic-bezier(.4,0,.2,1);
-    top:0; height:0;
-  }
+  /* No position indicator. The page moving under you is the indicator. */
+  .resume-doc{min-height:0; min-width:0;}
   .resume-scroll{
     block-size:100%; overflow-y:auto; overscroll-behavior:contain;
     scroll-behavior:smooth;
@@ -476,7 +466,6 @@
 
   @media (prefers-reduced-motion:reduce){
     .resume-scroll, .resume-aside{scroll-behavior:auto;}
-    .resume-mark{transition:none;}
   }
 
   /* Links tab: title on the left, the way in on the right. */
@@ -565,9 +554,12 @@
     .resume-split{grid-template-columns:minmax(0,1fr); grid-template-rows:auto auto; gap:30px;}
     /* Stacked: the page whole, the commentary under it, nothing nested that
        scrolls inside something else that scrolls. */
-    .resume-doc{block-size:auto; grid-template-columns:5px minmax(0,1fr); gap:7px;}
+    .resume-doc{block-size:auto;}
     .resume-scroll{block-size:auto; overflow:visible;}
     .resume-aside{overflow:visible; padding-right:0;}
+    /* Stacked, nothing scrolls inside anything, so there is no "in focus" to
+       mark. Dimming nine notes out of ten would just make them hard to read. */
+    .ra-item{opacity:1;}
     .ra-skill{grid-template-columns:minmax(0,1fr);}
   }
   @media (max-width:640px){
@@ -855,7 +847,6 @@
                inline (most mobile ones), so there is always a way in. -->
           <div class="resume-split">
             <div class="resume-doc">
-              <div class="resume-rail" aria-hidden="true"><div class="resume-mark" id="resumeMark"></div></div>
               <div class="resume-scroll" id="resumeScroll" tabindex="0" role="group" aria-label="Resume page, scrollable">
                 <div class="resume-pagewrap">
                   <img class="resume-page" id="resumePage" src="resume-page.webp" width="1530" height="1980"
@@ -1370,7 +1361,6 @@
       const scroller = document.getElementById('resumeScroll');
       const notes = document.getElementById('resumeNotes');
       const page = document.getElementById('resumePage');
-      const mark = document.getElementById('resumeMark');
       if(!scroller || !notes || !page || wired) return;
       wired = true;
 
@@ -1378,120 +1368,109 @@
       const anchors = [...scroller.querySelectorAll('.resume-anchor')];
       if(!items.length || !anchors.length) return;
 
+      const yOf = new Map(anchors.map(el => [el.dataset.sec, parseFloat(el.style.top) / 100]));
+      const secs = items.map(el => el.dataset.sec).filter(sec => yOf.has(sec));
       const bySec = new Map(items.map(el => [el.dataset.sec, el]));
-      const anchorOf = new Map(anchors.map(el => [el.dataset.sec, el]));
-      const order = anchors.map(el => el.dataset.sec);
-      const topPct = sec => parseFloat(anchorOf.get(sec).style.top) || 0;
 
+      // The two columns are one scroll. Reading down the commentary walks the
+      // page down with it, and the note in the middle of the column is the one
+      // in focus. There is no separate position indicator: the page moving
+      // under you is the indicator.
+      let echo = 0;                    // our own scroll, not the reader's
       let current = null;
-      // Tracking only answers scrolling the reader actually did. A click is a
-      // decision, and it holds until they scroll again -- the last note can
-      // never reach the top of its own column, so a tracker that kept running
-      // would drag the choice off it immediately.
-      let drivingNotes = false;
-      let drivingPage = false;
 
-      function setCurrent(sec){
-        if(!sec || sec === current) return;
-        const item = bySec.get(sec);
-        if(!item) return;
+      const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+      const maxOf = el => Math.max(0, el.scrollHeight - el.clientHeight);
+      const midOf = el => el.scrollTop + el.clientHeight / 2;
+      // Where a note sits in its column, measured to its middle.
+      const noteMid = el => el.offsetTop - notes.offsetTop + el.offsetHeight / 2;
+
+      function focusOn(sec){
+        if(sec === current) return;
         current = sec;
-        for(const el of items) el.setAttribute('aria-current', el === item ? 'true' : 'false');
-        // The marker spans this section down to where the next one starts.
-        const i = order.indexOf(sec);
-        const from = topPct(sec);
-        const to = i + 1 < order.length ? topPct(order[i + 1]) : 98.5;
-        mark.style.top = from.toFixed(3) + '%';
-        mark.style.height = Math.max(1.2, to - from).toFixed(3) + '%';
+        for(const el of items) el.setAttribute('aria-current', el.dataset.sec === sec ? 'true' : 'false');
       }
 
-      // Reading down the notes moves the marker: whichever note is nearest the
-      // top of the column is the one being read.
-      for(const ev of ['wheel', 'touchmove', 'keydown']){
-        notes.addEventListener(ev, () => { drivingNotes = true; }, { passive: true });
-        scroller.addEventListener(ev, () => { drivingPage = true; }, { passive: true });
+      // The page travels its whole range across the whole commentary.
+      //
+      // Aligning each note with its own section was tried and is wrong here:
+      // the page has about 170px of travel against the column's 1500, so it
+      // reached the bottom two notches in and then sat dead for the rest of
+      // the read. Mapping the two ranges onto each other instead means the
+      // page is always moving under you, which is the point -- there is no
+      // indicator any more, so the movement has to carry the sense of place.
+      function focusFromNotes(){
+        const mid = midOf(notes);
+        let best = secs[0], bestD = Infinity;
+        for(const sec of secs){
+          const d = Math.abs(noteMid(bySec.get(sec)) - mid);
+          if(d < bestD){ bestD = d; best = sec; }
+        }
+        return best;
       }
 
-      let notesQueued = false;
+      function notesDrivePage(){
+        if(!page.offsetHeight) return;
+        focusOn(focusFromNotes());
+        const nMax = maxOf(notes), pMax = maxOf(scroller);
+        if(pMax < 2) return;
+        const target = nMax < 2 ? 0 : (notes.scrollTop / nMax) * pMax;
+        if(Math.abs(scroller.scrollTop - target) > 0.5){
+          echo = Date.now() + 90;
+          scroller.scrollTop = target;        // not smooth: it tracks the hand
+        }
+      }
+
+      // And the same the other way, so either column drives the pair.
+      function pageDrivesNotes(){
+        const nMax = maxOf(notes), pMax = maxOf(scroller);
+        if(nMax < 2 || pMax < 2) return;
+        const target = (scroller.scrollTop / pMax) * nMax;
+        if(Math.abs(notes.scrollTop - target) > 1){
+          echo = Date.now() + 90;
+          notes.scrollTop = target;
+        }
+        focusOn(focusFromNotes());
+      }
+
+      let queuedN = false, queuedP = false;
       notes.addEventListener('scroll', () => {
-        if(notesQueued || !drivingNotes) return;
-        notesQueued = true;
-        requestAnimationFrame(() => {
-          notesQueued = false;
-          const line = notes.getBoundingClientRect().top + 90;
-          let best = items[0], bestD = Infinity;
-          for(const el of items){
-            const d = Math.abs(el.getBoundingClientRect().top - line);
-            if(d < bestD){ bestD = d; best = el; }
-          }
-          setCurrent(best.dataset.sec);
-        });
+        if(Date.now() < echo || queuedN) return;
+        queuedN = true;
+        requestAnimationFrame(() => { queuedN = false; notesDrivePage(); });
       }, { passive: true });
 
-      // Scrolling the page does the same, over the small range it has.
-      //
-      // Worked out straight from the scroll position rather than with an
-      // IntersectionObserver: the observer keeps a running set of what is on
-      // screen, and that set goes stale when a smooth scroll coalesces its
-      // events -- it answered "Leadership" for a page scrolled 60px from the
-      // top. This cannot go stale, because it holds nothing.
-      function fromPageScroll(){
-        const h = page.offsetHeight;
-        if(!h) return;
-        const probe = scroller.scrollTop + scroller.clientHeight * 0.28;
-        let found = order[0];
-        for(const sec of order){
-          if((topPct(sec) / 100) * h <= probe) found = sec; else break;
-        }
-        setCurrent(found);
-      }
-
-      let pageQueued = false;
       scroller.addEventListener('scroll', () => {
-        if(pageQueued || !drivingPage) return;
-        pageQueued = true;
-        requestAnimationFrame(() => { pageQueued = false; if(drivingPage) fromPageScroll(); });
+        if(Date.now() < echo || queuedP) return;
+        queuedP = true;
+        requestAnimationFrame(() => { queuedP = false; pageDrivesNotes(); });
       }, { passive: true });
 
-      // Snap the PAGE to a section. Nothing scrolls the notes column on its
-      // own: being moved while you are reading it is worse than having to
-      // scroll it yourself.
-      //
-      // The option here used to be called `page`, which shadowed the <img> of
-      // the same name, so the height came out undefined, the target came out
-      // NaN and scrollTo did nothing at all. Clicking never moved the page.
-      function snapTo(sec, movePage){
-        setCurrent(sec);
-        if(!movePage) return;
-        const h = page.offsetHeight;
-        const max = scroller.scrollHeight - scroller.clientHeight;
-        if(!h) return;
-        if(max <= 4){
-          // The page fits: there is nothing to scroll, so bring the page
-          // itself into view instead (it may be above the notes on a phone).
-          scroller.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-          return;
-        }
-        const target = (topPct(sec) / 100) * h - scroller.clientHeight * 0.3;
-        scroller.scrollTo({ top: Math.min(Math.max(0, target), max), behavior: 'smooth' });
+      // Clicking a note brings it to the middle of the column; the page comes
+      // with it, because the two are wired together.
+      function go(sec){
+        const el = bySec.get(sec);
+        if(!el) return;
+        focusOn(sec);
+        // Scroll the column only; the page is carried along by the coupling,
+        // the same as if the reader had scrolled here themselves.
+        notes.scrollTo({ top: clamp(noteMid(el) - notes.clientHeight / 2, 0, maxOf(notes)), behavior: 'smooth' });
       }
-
       notes.addEventListener('click', (e) => {
-        if(e.target.closest('a')) return;      // a link in a note is a link
+        if(e.target.closest('a')) return;
         const item = e.target.closest('.ra-item');
-        if(!item) return;
-        drivingNotes = false; drivingPage = false;   // the choice holds until they scroll
-        snapTo(item.dataset.sec, true);
+        if(item) go(item.dataset.sec);
       });
       notes.addEventListener('keydown', (e) => {
         if(e.key !== 'Enter' && e.key !== ' ') return;
         const item = e.target.closest('.ra-item');
-        if(item){ drivingNotes = false; drivingPage = false; snapTo(item.dataset.sec, true); }
+        if(item){ e.preventDefault(); go(item.dataset.sec); }
       });
 
-      const start = () => setCurrent(order[0]);
+      const start = () => { focusOn(secs[0]); notesDrivePage(); };
       if(page.complete && page.naturalHeight) start();
       else page.addEventListener('load', start, { once: true });
+      addEventListener('resize', () => notesDrivePage(), { passive: true });
     };
   })();
 
