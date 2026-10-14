@@ -48,6 +48,10 @@ const rand = n => globalThis.crypto.getRandomValues(new Uint8Array(n));
 function die(msg){ console.error('error: ' + msg); process.exit(1); }
 
 function loadConfig(){
+  // Sealing is retired here too, for the same reason as scripts/secret.mjs: ciphertext
+  // on a public CDN can be taken away and ground offline forever. The devices payload
+  // and the Terminal page now live on the Pi, behind the "herdr" lock.
+  die('sealing is retired -- these payloads live on the Pi now (vault lock "herdr")');
   if(!existsSync(CONFIG)) die(`missing ${CONFIG}`);
   const c = JSON.parse(readFileSync(CONFIG, 'utf8'));
   if(!c.word || !Array.isArray(c.dots) || !c.dots.length) die('config needs "word" and "dots"');
