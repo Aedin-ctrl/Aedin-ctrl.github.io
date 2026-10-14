@@ -464,10 +464,13 @@
   }
   /* Laid back, a card is its title and a line. Standing forward, it opens. */
   .ra-sum{display:block; margin-top:7px; color:var(--muted); font-size:12.5px; line-height:1.55;}
-  .ra-item[aria-current="true"] .ra-sum{display:none;}
-  .ra-item:not([aria-current="true"]) .ra-more,
-  .ra-item:not([aria-current="true"]) .ra-links,
-  .ra-item:not([aria-current="true"]) .ra-none{display:none;}
+  /* Being highlighted and being open are separate: the highlight lands at
+     once, the card opens only if it is still the live one half a second later.
+     Scrolling past a card should not flap it open and shut. */
+  .ra-item[data-open="true"] .ra-sum{display:none;}
+  .ra-item:not([data-open="true"]) .ra-more,
+  .ra-item:not([data-open="true"]) .ra-links,
+  .ra-item:not([data-open="true"]) .ra-none{display:none;}
   .ra-item:first-of-type{border-top:0;}
   .ra-item[data-pos="above"]{transform:perspective(1000px) translateZ(-88px) rotateX(7deg);}
   .ra-item[data-pos="below"]{transform:perspective(1000px) translateZ(-88px) rotateX(-7deg);}
@@ -1447,9 +1450,51 @@
       // Where a note sits in its column, measured to its middle.
       const noteMid = el => el.offsetTop - notes.offsetTop + el.offsetHeight / 2;
 
-      function focusOn(sec){
-        if(sec === current) return;
+      let openTimer = 0;
+      let adjusting = false;
+      const DWELL = 480;
+
+      // A card opening or closing changes the column's height, and progress is
+      // measured against that height -- so the same scroll offset suddenly
+      // means a different place on the page, the line jumps, another card goes
+      // live, and it opens, and round it goes. Measured before this: the live
+      // card ran marx, skills, cap, skills, hall, skills.
+      //
+      // Progress is the thing that is true. After any height change the scroll
+      // offsets are written back from it, and the scroll events that causes are
+      // ignored.
+      function reanchor(){
+        adjusting = true;
+        const nMax = maxOf(notes), pMax = maxOf(scroller);
+        if(nMax >= 2) notes.scrollTop = progress * nMax;
+        if(pMax >= 2) scroller.scrollTop = progress * pMax;
+        requestAnimationFrame(() => { adjusting = false; });
+      }
+
+      function openCard(sec){
+        for(const el of items){
+          if(el.dataset.sec === sec) el.dataset.open = 'true';
+          else delete el.dataset.open;
+        }
+        reanchor();
+      }
+
+      function focusOn(sec, now){
+        if(sec === current){
+          // Already the live one. A click still opens it at once; a scroll
+          // that lands here again just keeps waiting on the dwell.
+          if(now){ clearTimeout(openTimer); openCard(sec); }
+          return;
+        }
         current = sec;
+        clearTimeout(openTimer);
+        // Close whatever was open the moment the line leaves it, so only one
+        // card is ever open and the column cannot grow twice over.
+        let wasOpen = false;
+        for(const el of items){ if(el.dataset.open) wasOpen = true; delete el.dataset.open; }
+        if(wasOpen) reanchor();           // closing shrinks the column too
+        if(now) openCard(sec);
+        else openTimer = setTimeout(() => openCard(sec), DWELL);
         const at = secs.indexOf(sec);
         for(const el of items){
           const on = el.dataset.sec === sec;
@@ -1531,14 +1576,14 @@
 
       let queuedN = false, queuedP = false;
       notes.addEventListener('scroll', () => {
-        if(driver !== notes || Date.now() > owns || queuedN) return;
+        if(adjusting || driver !== notes || Date.now() > owns || queuedN) return;
         owns = Date.now() + 320;            // still scrolling: keep the claim
         queuedN = true;
         requestAnimationFrame(() => { queuedN = false; notesDrivePage(); });
       }, { passive: true });
 
       scroller.addEventListener('scroll', () => {
-        if(driver !== scroller || Date.now() > owns || queuedP) return;
+        if(adjusting || driver !== scroller || Date.now() > owns || queuedP) return;
         owns = Date.now() + 320;
         queuedP = true;
         requestAnimationFrame(() => { queuedP = false; pageDrivesNotes(); });
@@ -1557,7 +1602,7 @@
         // Open the card FIRST. A card that opens changes the column's height,
         // so a scroll offset worked out before that lands somewhere else -- it
         // was landing on the card above the one that had been clicked.
-        focusOn(sec);
+        focusOn(sec, true);               // a click is deliberate: open it now
         void notes.scrollHeight;          // settle the layout before measuring
 
         // Place both columns directly and let nobody own the gesture, so the
