@@ -444,18 +444,34 @@
   }
   .ra-group:first-of-type .ra-head{margin-top:0;}
 
-  /* Reading one note means the others step back. Focus by contrast, not by a
-     grey box behind the live one. */
+  /* The comments read as a stack of cards: the live one stands forward and
+     dark, the rest lie back and dim, and the ones above and below it tilt away
+     in opposite directions the way a rolodex does.
+     
+     Perspective is set per card rather than on the column, so each recedes by
+     the same amount. Set on the scrolling parent instead, cards far from its
+     centre get skewed by their distance from the vanishing point, and the ones
+     at the top and bottom look bent. */
   .ra-item{
     display:block; inline-size:100%; text-align:left; font:inherit;
     background:none; border:0; border-top:1px solid var(--line);
-    padding:14px 0 15px; margin:0; cursor:pointer;
-    opacity:.44; transition:opacity .2s ease;
+    padding:14px 2px 15px; margin:0; cursor:pointer;
+    transform-origin:left center;
+    transform:perspective(1000px) translateZ(-88px);
+    opacity:.4;
+    transition:transform .3s cubic-bezier(.2,.7,.25,1), opacity .26s ease;
   }
   .ra-item:first-of-type{border-top:0;}
-  .ra-item:hover{opacity:.78;}
+  .ra-item[data-pos="above"]{transform:perspective(1000px) translateZ(-88px) rotateX(7deg);}
+  .ra-item[data-pos="below"]{transform:perspective(1000px) translateZ(-88px) rotateX(-7deg);}
+  .ra-item:hover{opacity:.72;}
   .ra-item:focus-visible{outline:2px solid var(--ink); outline-offset:3px; border-radius:3px; opacity:1;}
-  .ra-item[aria-current="true"]{opacity:1; cursor:default;}
+  /* Forward, upright, and at full strength. */
+  .ra-item[aria-current="true"]{
+    opacity:1; cursor:default;
+    transform:perspective(1000px) translateZ(0) rotateX(0deg);
+  }
+  .ra-item[aria-current="true"] .ra-more{color:var(--ink);}
 
   .ra-ref{
     display:block; font-family:'Space Grotesk', sans-serif; font-size:13.5px;
@@ -484,7 +500,7 @@
   }
 
   @media (prefers-reduced-motion:reduce){
-    .ra-item{transition:none;}
+    .ra-item{transition:none; transform:none !important;}
   }
 
   /* Links tab: title on the left, the way in on the right. */
@@ -577,8 +593,11 @@
     .resume-scroll{block-size:auto; overflow:visible;}
     .resume-aside{overflow:visible; padding-right:0;}
     /* Stacked, nothing scrolls inside anything, so there is no "in focus" to
-       mark. Dimming nine notes out of ten would just make them hard to read. */
-    .ra-item{opacity:1;}
+       mark. Dimming nine notes out of ten would just make them hard to read,
+       and laying them back would only make them harder. */
+    /* The [data-pos] rules are attribute selectors and outrank a bare class,
+       so the flattening has to match them. */
+    .ra-item, .ra-item[data-pos]{opacity:1; transform:none;}
     .ra-skill{grid-template-columns:minmax(0,1fr);}
   }
   @media (max-width:640px){
@@ -1414,7 +1433,15 @@
       function focusOn(sec){
         if(sec === current) return;
         current = sec;
-        for(const el of items) el.setAttribute('aria-current', el.dataset.sec === sec ? 'true' : 'false');
+        const at = secs.indexOf(sec);
+        for(const el of items){
+          const on = el.dataset.sec === sec;
+          el.setAttribute('aria-current', on ? 'true' : 'false');
+          // Which way a card lies back: the ones before the live one tilt one
+          // way and the ones after it the other.
+          const i = secs.indexOf(el.dataset.sec);
+          el.dataset.pos = on ? 'on' : (i > -1 && i < at ? 'above' : 'below');
+        }
       }
 
       // Where the reading line is, as a fraction of the whole page.
