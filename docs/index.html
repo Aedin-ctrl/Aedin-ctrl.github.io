@@ -246,7 +246,7 @@
   .proj-index{color:var(--faint); font-size:13px; font-family:'Space Grotesk', sans-serif;}
   .proj-title{font-size:16.5px; display:inline; color:var(--ink);}
   .proj-desc{color:var(--muted); font-size:13.5px; line-height:1.55; margin-top:4px; max-width:720px;}
-  #projects .proj-desc{min-height:3.1em;}  /* two lines, so every row is the same height */
+  #projects .proj-desc{min-height:1.55em;}  /* one line; rows stay even */
   .proj-tags{color:var(--faint); font-size:12.5px; margin-top:6px;}
   /* Boxed to match Download PDF rather than the old underline. */
   .proj-link{
@@ -769,8 +769,8 @@
             <div class="now">
               <div class="highlights-label">What I'm currently up to</div>
               <span class="now-title">Gatecraft</span>
-              <p class="now-desc">A logic-gate designer that runs in the browser: drop switches, gates and lamps on a board, drag between pins to wire them up, and it simulates live &mdash; wires light up when they carry a 1. It works out the truth table for you, and latches and flip-flops hold their state properly because it settles the circuit the way real gates do.</p>
-              <p class="now-meta">JavaScript &middot; inline SVG &middot; settling logic simulator</p>
+              <p class="now-desc">A logic-gate designer in the browser. Drop down switches, gates and lamps, wire them together, and it runs the circuit live and works out the truth table.</p>
+              <p class="now-meta">Built with JavaScript and inline SVG</p>
               <button class="proj-link" data-path="/projects/gatecraft">View project</button>
             </div>
             </div>
@@ -780,141 +780,135 @@
         <section class="panel" id="projects">
           <div class="panel-head">
             <div>
-              <h2 class="panel-heading">Selected work</h2>
-              <p class="panel-sub">A few projects I'm proud to have shipped, from sketch to production.</p>
+              <h2 class="panel-heading">Projects</h2>
+              <p class="panel-sub" id="projSub">Things I've built, in the order I built them.</p>
             </div>
+            <button type="button" class="btn-outline" id="projToggle"
+                    aria-expanded="false" aria-controls="projOther">Other projects</button>
           </div>
 
+          <div id="projMain">
           <div class="project-row">
             <span class="proj-index">01</span>
             <div>
               <span class="proj-title">One-Inch Punch Arcade Machine</span>
-              <p class="proj-desc">Led the design and build of a full-scale arcade punching machine for Northeastern's GE1501: laser sensors score each swing, with a hand-built frame and auto-reset pendulum.</p>
-              <p class="proj-tags">Mechanical design &middot; electronics &middot; scoring software &mdash; Fall 2025</p>
+              <p class="proj-desc">An arcade punching machine I helped build for a first-year engineering class. Laser sensors score each punch and the pendulum resets itself.</p>
+              <p class="proj-tags">Built with laser sensors, a hand-built wooden frame and scoring software &mdash; Fall 2025</p>
             </div>
           </div>
-
           <div class="project-row">
             <span class="proj-index">02</span>
             <div>
-              <span class="proj-title">Cal Tracker</span>
-              <p class="proj-desc">A calorie and protein tracker for my friends: pick a person, look up a food by portion or weight, and keep a daily total. Started as a Flask app on a Raspberry Pi.</p>
-              <p class="proj-tags">JavaScript &middot; originally Python/Flask on a Raspberry Pi</p>
-            </div>
-            <button class="proj-link" data-path="/projects/cal-tracker">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">03</span>
-            <div>
-              <span class="proj-title">Hallway Marathon Event Site</span>
-              <p class="proj-desc">An event site built from scratch for a multi-university race, with live betting odds and competitor stats, run and updated live throughout the event.</p>
-              <p class="proj-tags">HTML &middot; CSS &middot; JavaScript</p>
-            </div>
-            <button class="proj-link" data-path="/projects/hallway-marathon">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">04</span>
-            <div>
-              <span class="proj-title">Casino</span>
-              <p class="proj-desc">Ten casino and card-game practice tools (blackjack, poker, baccarat, craps, roulette, mahjong), merged from separate sites into one hub.</p>
-              <p class="proj-tags">HTML &middot; CSS &middot; JavaScript</p>
-            </div>
-            <button class="proj-link" data-path="/projects/casino">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">05</span>
-            <div>
-              <span class="proj-title">Marino Tracker</span>
-              <p class="proj-desc">Shows how packed Northeastern's Marino Center is, room by room, and logs the counts every 10 minutes to find the quietest time to go.</p>
-              <p class="proj-tags">JavaScript &middot; GitHub Actions &middot; web scraping &mdash; 2026</p>
-            </div>
-            <button class="proj-link" data-path="/projects/marino-tracker">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">06</span>
-            <div>
-              <span class="proj-title">Pizza Calc</span>
-              <p class="proj-desc">Works out a pizza's real price per square inch for any shape, size, toppings or deal, and rates it against a shared list anyone can add to.</p>
-              <p class="proj-tags">JavaScript &middot; Cloudflare Workers &middot; SQL &mdash; 2026</p>
-            </div>
-            <button class="proj-link" data-path="/projects/pizza-calc">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">07</span>
-            <div>
               <span class="proj-title">Sandbit</span>
-              <p class="proj-desc">An 8-bit physics sandbox: falling sand, water, fire, lava and electricity, plus objects made of pixels that float, burn, shatter and swing on ropes. Fifteen small challenges.</p>
-              <p class="proj-tags">Rust &middot; WebAssembly &middot; WebGL &mdash; 2026</p>
+              <p class="proj-desc">A falling-sand sandbox with sand, water, fire, lava and electricity, plus objects that float, burn and shatter.</p>
+              <p class="proj-tags">Built in Rust, compiled to WebAssembly, drawn with WebGL &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/sandbit">View project</button>
           </div>
-
           <div class="project-row">
-            <span class="proj-index">08</span>
+            <span class="proj-index">03</span>
             <div>
               <span class="proj-title">Hand Playground</span>
-              <p class="proj-desc">Your webcam turns your hands into sleek gloves you play with: fingerspell ASL letters, build molecules, wire up marble runs, play a theremin and drums, and throw lightning, galaxies and lasers between your fingers. Everything runs on your device.</p>
-              <p class="proj-tags">JavaScript &middot; MediaPipe hand tracking &middot; Web Audio &middot; Canvas &mdash; 2026</p>
+              <p class="proj-desc">Tracks your hands through the webcam, then lets you use them in six small demos: ASL letters, molecules, marble runs, a theremin, drums and lightning.</p>
+              <p class="proj-tags">Built with JavaScript. Hand tracking from Google's MediaPipe, sound from the Web Audio API &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/hand-playground">View project</button>
           </div>
-
           <div class="project-row">
-            <span class="proj-index">09</span>
+            <span class="proj-index">04</span>
             <div>
               <span class="proj-title">MemeMatch</span>
-              <p class="proj-desc">Make a face at your webcam and it tells you which emoji or hamster meme you are, with a matching mask on you and on it. It reads your expression and which fingers are out, and you can train it on your own face in about a minute. Everything runs on your device.</p>
-              <p class="proj-tags">JavaScript &middot; MediaPipe face + gesture tracking &middot; Canvas &mdash; 2026</p>
+              <p class="proj-desc">Reads your face and fingers through the webcam and tells you which emoji or hamster meme you match.</p>
+              <p class="proj-tags">Built with JavaScript. Face and gesture tracking from Google's MediaPipe &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/meme-match">View project</button>
           </div>
-
           <div class="project-row">
-            <span class="proj-index">10</span>
-            <div>
-              <span class="proj-title">DoodleLife</span>
-              <p class="proj-desc">Draw something and it comes alive as what it is, using your own wobbly lines: fish swim, birds flap, cats walk on their legs, cars drive, flowers sway. They chase each other, eat food you scribble, and night falls when you draw a moon. A neural network recognises the doodle right on your device.</p>
-              <p class="proj-tags">JavaScript &middot; DoodleNet (Quick, Draw!) in plain JS &middot; Canvas &mdash; 2026</p>
-            </div>
-            <button class="proj-link" data-path="/projects/doodle-life">View project</button>
-          </div>
-
-          <div class="project-row">
-            <span class="proj-index">11</span>
+            <span class="proj-index">05</span>
             <div>
               <span class="proj-title">Gatecraft</span>
-              <p class="proj-desc">Wire up logic gates and watch them work. Drop switches, gates and lamps on the board, drag between pins to connect them, and it simulates live &mdash; wires light up when they carry a 1. It works out the truth table for you, so you can check a circuit does what you think. Latches and flip-flops hold their state properly, because it settles the circuit the way real gates do. A whole design saves into the link, so sharing one is sharing a URL.</p>
-              <p class="proj-tags">JavaScript &middot; Inline SVG &middot; Settling logic simulator &mdash; 2026</p>
+              <p class="proj-desc">Build logic circuits out of switches, gates and lamps and watch them run. It works out the truth table for you, and a whole design saves into the link.</p>
+              <p class="proj-tags">Built with JavaScript and inline SVG. The simulator settles the circuit the way real gates do, so latches and flip-flops hold state &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/gatecraft">View project</button>
           </div>
-
           <div class="project-row">
-            <span class="proj-index">12</span>
+            <span class="proj-index">06</span>
             <div>
               <span class="proj-title">Games</span>
-              <p class="proj-desc">Games built from scratch &mdash; the engine, the simulation, the sound, and the tools that prove it works. Inside: four demos sharing one hand-written engine, with no libraries and no asset files, where every pixel and every sound is generated at runtime inside a 25-colour budget. Each has a design document recording what broke and the check that now prevents it.</p>
-              <p class="proj-tags">JavaScript &middot; 4 demos on one engine &middot; solvers, soak harnesses and invariants &mdash; 2026</p>
+              <p class="proj-desc">Four small games running on one engine I wrote myself, with no libraries and no image or sound files.</p>
+              <p class="proj-tags">Built with JavaScript. Every pixel and every sound is generated while the game runs &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/games">View project</button>
           </div>
+          </div>
 
+          <div id="projOther" hidden>
           <div class="project-row">
-            <span class="proj-index">13</span>
+            <span class="proj-index">01</span>
+            <div>
+              <span class="proj-title">Cal Tracker</span>
+              <p class="proj-desc">Tracks calories and protein for me and my friends. Pick a person, look up a food, keep a daily total.</p>
+              <p class="proj-tags">Built with JavaScript. Started as a Python/Flask app on a Raspberry Pi</p>
+            </div>
+            <button class="proj-link" data-path="/projects/cal-tracker">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">02</span>
+            <div>
+              <span class="proj-title">Hallway Marathon Event Site</span>
+              <p class="proj-desc">An event site for a hallway race between a few universities, with live odds and competitor stats. I updated it during the race.</p>
+              <p class="proj-tags">Built with HTML, CSS and JavaScript</p>
+            </div>
+            <button class="proj-link" data-path="/projects/hallway-marathon">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">03</span>
+            <div>
+              <span class="proj-title">Casino</span>
+              <p class="proj-desc">Ten card-game and casino practice tools in one place: blackjack, poker, baccarat, craps, roulette and mahjong.</p>
+              <p class="proj-tags">Built with HTML, CSS and JavaScript</p>
+            </div>
+            <button class="proj-link" data-path="/projects/casino">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">04</span>
+            <div>
+              <span class="proj-title">Marino Tracker</span>
+              <p class="proj-desc">Shows how busy Northeastern's gym is, room by room, and saves the count every 10 minutes so you can see the quiet times.</p>
+              <p class="proj-tags">Built with JavaScript and GitHub Actions. Counts scraped from the gym's own page &mdash; 2026</p>
+            </div>
+            <button class="proj-link" data-path="/projects/marino-tracker">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">05</span>
+            <div>
+              <span class="proj-title">Pizza Calc</span>
+              <p class="proj-desc">Works out a pizza's price per square inch for any shape, size or deal, and compares it against a shared list.</p>
+              <p class="proj-tags">Built with JavaScript, Cloudflare Workers and SQL &mdash; 2026</p>
+            </div>
+            <button class="proj-link" data-path="/projects/pizza-calc">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">06</span>
+            <div>
+              <span class="proj-title">DoodleLife</span>
+              <p class="proj-desc">Draw something and it works out what you drew, then your own lines get up and move around.</p>
+              <p class="proj-tags">Built with JavaScript. Drawing recognition from DoodleNet, trained on Google's Quick, Draw! data &mdash; 2026</p>
+            </div>
+            <button class="proj-link" data-path="/projects/doodle-life">View project</button>
+          </div>
+          <div class="project-row">
+            <span class="proj-index">07</span>
             <div>
               <span class="proj-title">Broadcast</span>
-              <p class="proj-desc">A serial told one short episode at a time, set in the days after a satellite collision fills low orbit with debris and closes the sky. Each episode is written, voiced and cut without a person in the loop &mdash; script, narration, images and the final video all generated, then published here. Every episode stays up, newest first, so the story reads as an archive rather than a feed.</p>
-              <p class="proj-tags">JavaScript &middot; generated script, speech and video &middot; ffmpeg &mdash; 2026</p>
+              <p class="proj-desc">A serial story set after a satellite collision closes off the sky, posted one episode at a time. Each episode is written, voiced and cut without me in the loop.</p>
+              <p class="proj-tags">Built with JavaScript. Script, narration and images generated, video assembled with ffmpeg &mdash; 2026</p>
             </div>
             <button class="proj-link" data-path="/projects/broadcast">View project</button>
           </div>
+          </div>
         </section>
-
         <section class="panel" id="resume">
           <div class="panel-head">
             <div>
@@ -1737,6 +1731,25 @@
     });
   }
   wirePathLinks(document);
+
+  // Projects tab: swap the main list for the smaller one-off projects.
+  (() => {
+    const toggle = document.getElementById('projToggle');
+    const mainList = document.getElementById('projMain');
+    const otherList = document.getElementById('projOther');
+    const sub = document.getElementById('projSub');
+    if(!toggle || !mainList || !otherList) return;
+    const SUBS = ["Things I've built, in the order I built them.", 'Smaller one-off projects.'];
+    let showingOther = false;
+    toggle.addEventListener('click', () => {
+      showingOther = !showingOther;
+      mainList.hidden = showingOther;
+      otherList.hidden = !showingOther;
+      toggle.textContent = showingOther ? 'Back to projects' : 'Other projects';
+      toggle.setAttribute('aria-expanded', String(showingOther));
+      if(sub) sub.textContent = SUBS[showingOther ? 1 : 0];
+    });
+  })();
   buttons.forEach(b => b.addEventListener('click', () => { disarmSecret(); navigateTo(b.dataset.route || '/' + (b.dataset.tab === 'general' ? '' : b.dataset.tab)); }));
 
   addressInput.addEventListener('focus', () => addressInput.select());
