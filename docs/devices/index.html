@@ -45,36 +45,6 @@
   .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
            background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
   .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
-  /* herdr gate. The link is not in this file at all -- the Pi holds it. */
-  #herdrCard .dev-name, #herdrCard .dev-what{display:block;}
-  .g-ask{font-size:13px; color:var(--muted); margin:0 0 10px; max-width:42ch;}
-  .g-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
-  .g-row input{flex:1 1 180px; min-width:0; font-family:inherit; font-size:14px; color:var(--ink);
-               background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:9px 12px;}
-  .g-row input:focus{outline:none; border-color:var(--line-strong);}
-  .g-enter{font-size:13.5px; font-weight:600; padding:9px 16px; border:1px solid var(--line-strong);
-           border-radius:999px; transition:background .15s ease, color .15s ease;}
-  .g-enter:hover{background:var(--ink); color:var(--paper);}
-  .g-msg{font-size:13px; min-height:20px; margin-top:8px; color:var(--bad);}
-  .g-eye{display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px;
-         border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:0;
-         cursor:pointer; flex:0 0 auto; color:var(--ink); opacity:.65;}
-  .g-eye:hover{opacity:1;}
-  .g-eye svg{width:17px; height:17px; display:block;}
-  .g-eye .eye-off{display:none;}
-  .g-eye[aria-pressed="true"] .eye-on{display:none;}
-  .g-eye[aria-pressed="true"] .eye-off{display:block;}
-  .gate-body{display:none; border-top:1px solid var(--line); padding:18px 20px 20px;}
-  .dev.open .gate-body{display:block;}
-  .g-out p{font-size:13.5px; color:var(--muted); margin:0 0 12px;}
-  .g-out .open{display:inline-block; font-size:13.5px; font-weight:600; padding:9px 16px; color:inherit;
-               border:1px solid var(--line-strong); border-radius:999px; text-decoration:none;
-               transition:background .15s ease, color .15s ease;}
-  .g-out .open:hover{background:var(--ink); color:var(--paper);}
-  .g-out hr{border:0; border-top:1px solid var(--line); margin:18px 0;}
-  .g-out .m-what{margin:0 0 10px;}
-  .g-url{font-family:ui-monospace, Menlo, monospace; font-size:12px; color:var(--faint);
-         margin:12px 0 0; overflow-wrap:anywhere;}
   .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
   .dev:hover, .dev.open{border-color:var(--line-strong);}
   .dev-sum{width:100%; display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center; padding:18px 20px; text-align:left;}
@@ -140,34 +110,6 @@
       <span class="sw-knob"></span>
     </button>
   </div>
-
-  <section class="dev" id="herdrCard">
-    <button type="button" class="dev-sum" id="herdrSum" aria-expanded="false" aria-controls="herdrBody">
-      <span class="dot" id="herdrDot"></span>
-      <span>
-        <span class="dev-name">herdr</span>
-        <span class="dev-what">the terminal, from anywhere on the tailnet</span>
-      </span>
-      <span class="dev-state" id="herdrState">Locked<small>password</small></span>
-      <span class="toggle"></span>
-    </button>
-    <div class="gate-body" id="herdrBody">
-      <div id="herdrGate">
-        <p class="g-ask">Enter the password.</p>
-        <div class="g-row">
-          <input id="herdrPw" type="password" autocomplete="off" autocapitalize="off"
-                 autocorrect="off" spellcheck="false" aria-label="Password" aria-describedby="herdrMsg">
-          <button type="button" class="g-eye" id="herdrEye" aria-pressed="false" aria-label="Show password" title="Show password"><svg class="eye-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.8 12s3.6-7 10.2-7 10.2 7 10.2 7-3.6 7-10.2 7S1.8 12 1.8 12Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 5.2A9.9 9.9 0 0 1 12 5c6.6 0 10.2 7 10.2 7a18 18 0 0 1-3.3 4.2M6.3 6.4A18 18 0 0 0 1.8 12s3.6 7 10.2 7a9.8 9.8 0 0 0 4.3-1M3 3l18 18"/></svg></button>
-          <button type="button" class="g-enter" id="herdrGo">Enter</button>
-        </div>
-        <div class="g-msg" id="herdrMsg" role="status" aria-live="polite"></div>
-      </div>
-      <div class="g-out" id="herdrOut" hidden></div>
-    </div>
-  </section>
-
-  <!-- herdr:begin (sealed by scripts/herdr-gate.mjs; edit the plaintext in secret/ instead) -->
-  <!-- herdr:end -->
 
   <div id="list" aria-live="polite"></div>
 </main>
@@ -362,132 +304,6 @@
   load();
   setInterval(load, 20000);
   setInterval(render, 5000);
-</script>
-
-<script>
-// ---- the herdr card ----
-// docs/devices/index.html is public: the tab is hidden, the file is not. So the tailnet
-// URL is not in this file at all -- the Pi holds it and checks the key itself.
-//
-// A second lock, independent of the one that reaches this tab, with its own key material.
-// It deliberately says nothing about how it is opened: the page used to carry its own
-// controls for that, which both duplicated what was already on screen and advertised the
-// method to anyone who loaded it. The gate asks for a password and otherwise keeps quiet.
-//
-// The rest of the key is collected by the parent page and handed here while this is
-// waiting, and given straight back once it is not. Same-origin, so it is a plain call.
-(function(){
-  // Nothing on this page is a secret any more, because nothing on this page IS the
-  // secret: the machines live on the Pi and are sent only after the Pi has checked the
-  // key. This file is public and that is now fine.
-  const VAULT = 'https://vault.aedinlai.com';
-  const sum    = document.getElementById('herdrSum');
-  const card   = document.getElementById('herdrCard');
-  const gate   = document.getElementById('herdrGate');
-  const input  = document.getElementById('herdrPw');
-  const msg    = document.getElementById('herdrMsg');
-  const out    = document.getElementById('herdrOut');
-  let seq = [], unlocked = false, trying = false;
-
-  function parentWin(){
-    try { return window.parent !== window ? window.parent : null; } catch(e){ return null; }
-  }
-  function claimRelay(){
-    const w = parentWin();
-    if(w && typeof w.__claimRelay === 'function') w.__claimRelay(onPart);
-  }
-  function releaseRelay(){
-    const w = parentWin();
-    if(w && typeof w.__releaseRelay === 'function') w.__releaseRelay();
-  }
-
-  // Throws for anything that is not a correct key -- a wrong one, too many attempts, or
-  // the Pi being off -- so the caller's existing catch still means "wrong", and none of
-  // those cases can be told apart from here.
-  async function tryOpen(word, lights){
-    const res = await fetch(VAULT + '/unlock/herdr', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ word, dots: lights, part: 'devices' }),
-    });
-    if(!res.ok) throw new Error('denied');
-    return res.json();
-  }
-
-  function reveal(p){
-    unlocked = true;
-    releaseRelay();
-    gate.hidden = true;
-    out.hidden = false;
-    // One entry per machine. The payload used to be a single object; a list keeps that
-    // working, because there is exactly one card and it should show everything behind it.
-    const machines = Array.isArray(p.machines) ? p.machines : [p];
-    const nodes = [];
-    machines.forEach((m, i) => {
-      if(i) nodes.push(document.createElement('hr'));
-      const what = document.createElement('p');
-      what.className = 'm-what';
-      what.textContent = m.what || m.name;
-      const a = document.createElement('a');
-      a.className = 'open'; a.href = m.url; a.target = '_blank'; a.rel = 'noopener';
-      a.textContent = 'Open ' + m.name;
-      const note = document.createElement('p');
-      note.className = 'g-url';
-      note.textContent = (m.note ? m.note + ' \u2014 ' : '') + m.url;
-      nodes.push(what, a, note);
-    });
-    out.replaceChildren(...nodes);
-    document.getElementById('herdrState').textContent = 'Unlocked';
-  }
-
-  function wrong(){
-    seq = [];
-    input.value = '';
-    msg.textContent = 'Wrong password.';
-    input.focus();
-  }
-
-  let partTimer = null;
-  async function attempt(){
-    if(unlocked || trying) return;
-    const run = seq.slice();
-    seq = [];
-    trying = true;
-    try { reveal(await tryOpen(input.value, run)); }
-    catch(e){ wrong(); }
-    trying = false;
-  }
-  function onPart(part){
-    if(unlocked || trying) return;
-    seq.push(part);
-    clearTimeout(partTimer);
-    partTimer = setTimeout(attempt, 900);
-  }
-
-  const eye = document.getElementById('herdrEye');
-  eye.addEventListener('click', () => {
-    const show = input.type === 'password';
-    input.type = show ? 'text' : 'password';
-    eye.setAttribute('aria-pressed', String(show));
-    eye.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    eye.title = show ? 'Hide password' : 'Show password';
-    input.focus();
-  });
-
-  document.getElementById('herdrGo').addEventListener('click', wrong);
-  input.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); wrong(); } });
-  input.addEventListener('input', () => { msg.textContent = ''; });
-  window.addEventListener('pagehide', releaseRelay);
-
-  sum.addEventListener('click', () => {
-    const nowOpen = !card.classList.contains('open');
-    card.classList.toggle('open', nowOpen);
-    sum.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-    // Only borrowed while this card is open and still locked.
-    if(nowOpen && !unlocked){ input.focus(); claimRelay(); }
-    else releaseRelay();
-  });
-})();
 </script>
 </body>
 </html>
