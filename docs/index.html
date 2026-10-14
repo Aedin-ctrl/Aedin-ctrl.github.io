@@ -459,8 +459,15 @@
     transform-origin:left center;
     transform:perspective(1000px) translateZ(-88px);
     opacity:.4;
-    transition:transform .3s cubic-bezier(.2,.7,.25,1), opacity .26s ease;
+    /* Fast. The mark has to land with the scroll, not catch up to it. */
+    transition:transform .09s linear, opacity .09s linear;
   }
+  /* Laid back, a card is its title and a line. Standing forward, it opens. */
+  .ra-sum{display:block; margin-top:7px; color:var(--muted); font-size:12.5px; line-height:1.55;}
+  .ra-item[aria-current="true"] .ra-sum{display:none;}
+  .ra-item:not([aria-current="true"]) .ra-more,
+  .ra-item:not([aria-current="true"]) .ra-links,
+  .ra-item:not([aria-current="true"]) .ra-none{display:none;}
   .ra-item:first-of-type{border-top:0;}
   .ra-item[data-pos="above"]{transform:perspective(1000px) translateZ(-88px) rotateX(7deg);}
   .ra-item[data-pos="below"]{transform:perspective(1000px) translateZ(-88px) rotateX(-7deg);}
@@ -930,6 +937,7 @@
                 <button type="button" class="ra-item" data-sec="edu">
                   <span class="ra-ref">Northeastern University</span>
                   <span class="ra-when">BS Electrical &amp; Computer Engineering &middot; Expected May 2029</span>
+                  <span class="ra-sum">Electrical and computer engineering, and the two courses that feed the projects below.</span>
                 </button>
               </div>
 
@@ -938,12 +946,14 @@
                 <button type="button" class="ra-item" data-sec="ss">
                   <span class="ra-ref">Data Center Infrastructure Intern, SingleStore</span>
                   <span class="ra-when">June &ndash; September 2026</span>
+                  <span class="ra-sum">Scaling a private cloud from 160 to 300+ VMs, and the out-of-band tooling that watched it.</span>
                   <span class="ra-more"><b>Why iDRAC matters:</b> it is Dell's out-of-band management controller &mdash; a small computer on the motherboard with its own network port. Querying it means power supply, memory, NIC and drive health can be read <i>without</i> touching the operating system, so the audit tool sees a machine that has hung, or never booted, as clearly as a healthy one.</span>
                   <span class="ra-more"><b>Why two racks at a time:</b> a single-push rollout puts every live workload at risk on one change. Phasing it trades elapsed time for a blast radius you can recover from.</span>
                 </button>
                 <button type="button" class="ra-item" data-sec="yale">
                   <span class="ra-ref">Research Intern, PEACE Foundation &mdash; Yale School of Medicine</span>
                   <span class="ra-when">2023 &ndash; 2024</span>
+                  <span class="ra-sum">A balance rig for neurological patients, and what standing still can measure.</span>
                   <span class="ra-more"><b>What the device was measuring:</b> balance is one of the earliest things to degrade in Parkinson's, and how a person sways while standing still is measurable long before it is visible. That is why one rig gets pointed at ASD, Alzheimer's, Parkinson's and schizophrenia populations: the same signal reads differently in each.</span>
                 </button>
               </div>
@@ -953,6 +963,7 @@
                 <button type="button" class="ra-item" data-sec="site">
                   <span class="ra-ref">aedinlai.com &mdash; Personal Site &amp; Project Hub</span>
                   <span class="ra-when">February 2025 &ndash; Present &middot; you are standing in it</span>
+                  <span class="ra-sum">This site, and the three services the line on the left names.</span>
                   <span class="ra-more"><b>The gym counts are not sensors.</b> They are staff headcounts from Northeastern's public facility feed, refreshed every 30 to 60 minutes. A tracker that drew them as live truth would be lying, so every room shows the age of its count, anything over an hour is flagged stale, and over two hours it is treated as closed.</span>
                   <span class="ra-more"><b>It records itself twice.</b> A Cloudflare Worker writes to a D1 database on a ten-minute cron, and a GitHub Action writes the same readings to a JSON file every fifteen. The page merges both and dedupes by room and timestamp &mdash; built after the Worker's cron was slow to start and a gap appeared in the history.</span>
                   <span class="ra-more"><b>The pizza API is mostly about abuse.</b> Thirty adds an hour per IP, delete restricted to whoever created the row by a token held in their own browser, and a separate admin key held back.</span>
@@ -965,6 +976,7 @@
                 <button type="button" class="ra-item" data-sec="sand">
                   <span class="ra-ref">Sandbit &mdash; Pixel Physics Engine</span>
                   <span class="ra-when">September 2026 &middot; Rust, WebAssembly, WebGL</span>
+                  <span class="ra-sum">A falling-sand engine in Rust, written overnight and tuned for weeks after.</span>
                   <span class="ra-more"><b>Written in one night</b>, 1:30 to 9am, then tuned for weeks &mdash; because the physics is chaotic and tuning it kept quietly breaking levels that had passed the day before.</span>
                   <span class="ra-more"><b>No wasm-bindgen.</b> Raw <code>extern "C"</code> exports over shared memory, so the JavaScript side reads the pixel grid directly instead of marshalling it across the boundary every frame.</span>
                   <span class="ra-more"><b>Three things that had to be got right,</b> each found by it looking wrong: rigid bodies need two contact points per face or crates spin as they land; ropes need slack and a position-only joint pass, because a velocity bias double-corrects and pumps energy into the rope until it explodes; and a body stamped into water has to push the displaced liquid into the cells it just vacated, or the water simply disappears.</span>
@@ -974,12 +986,14 @@
                 <button type="button" class="ra-item" data-sec="arcade">
                   <span class="ra-ref">One-Inch Punch Arcade Machine</span>
                   <span class="ra-when">September &ndash; December 2025 &middot; Cornerstone of Engineering</span>
+                  <span class="ra-sum">Two laser beams, a known gap, and the time between them is the score.</span>
                   <span class="ra-more"><b>How a laser pair becomes a speed:</b> two beams a known distance apart, and the gap between the two breaks is the time taken to cross it. Distance over time is the velocity the score is computed from &mdash; no accelerometer, no calibration drift.</span>
                   <span class="ra-more"><b>The failures were mechanical, not electrical.</b> Structural wobble showed up over 80-odd full-force test swings and was fixed before the expo; the paddle material gave out during a full day of strangers hitting it, which is the sort of limit no bench test finds.</span>
                 </button>
                 <button type="button" class="ra-item" data-sec="hall">
                   <span class="ra-ref">Hallway Marathon &mdash; Event Website</span>
                   <span class="ra-when">November 2025 &middot; HTML, CSS, JavaScript</span>
+                  <span class="ra-sum">An event site run live, edited between heats while people watched.</span>
                   <span class="ra-more"><b>Run live, which is the hard part.</b> Odds and standings had to be edited between heats while people were watching the page, with no CMS and no framework &mdash; the deployment was the event.</span>
                   <span class="ra-links"><a href="https://hallway-marathon.github.io" target="_blank" rel="noopener noreferrer" data-stop>hallway-marathon.github.io</a></span>
                 </button>
@@ -990,10 +1004,12 @@
                 <button type="button" class="ra-item" data-sec="cap">
                   <span class="ra-ref">Captain, Northeastern Club Fencing</span>
                   <span class="ra-when">2025 &ndash; Present</span>
+                  <span class="ra-sum">Running the squad: recruiting, practice design, and a national championship.</span>
                 </button>
                 <button type="button" class="ra-item" data-sec="marx">
                   <span class="ra-ref">Competitive Epee Fencer, Marx Fencing Academy</span>
                   <span class="ra-when">2018 &ndash; 2025</span>
+                  <span class="ra-sum">What A25, #103 and five straight years of All-American actually mean.</span>
                   <span class="ra-more"><b>Scale, for anyone who does not follow fencing:</b> All-American is the top eight at a national championship, and holding it five years running means it was not one good weekend. A Top-16 World Cup finish is against adult international fields, not an age category.</span>
                 </button>
               </div>
@@ -1003,6 +1019,7 @@
                 <button type="button" class="ra-item" data-sec="skills">
                   <span class="ra-ref">Where the list was actually used</span>
                   <span class="ra-when">A skills list proves nothing on its own</span>
+                  <span class="ra-sum">Where each item on that list was actually used.</span>
                   <span class="ra-more"><b>Rust and WebAssembly</b> &mdash; Sandbit's engine, and the only reason the browser can step a pixel grid 60 times a second.</span>
                   <span class="ra-more"><b>Cloudflare Workers and SQL</b> &mdash; the gym recorder's cron and D1 table, and the pizza API's rate limiting.</span>
                   <span class="ra-more"><b>GitHub Actions</b> &mdash; the backup gym recorder, and the job that publishes a news day.</span>
@@ -1536,8 +1553,19 @@
         const i = secs.indexOf(sec);
         const to = i + 1 < secs.length ? yOf.get(secs[i + 1]) : 0.985;
         progress = clamp(yOf.get(sec) + Math.min(0.012, (to - yOf.get(sec)) / 3), 0, 1);
-        claim(notes, 160);
-        apply(null);
+
+        // Open the card FIRST. A card that opens changes the column's height,
+        // so a scroll offset worked out before that lands somewhere else -- it
+        // was landing on the card above the one that had been clicked.
+        focusOn(sec);
+        void notes.scrollHeight;          // settle the layout before measuring
+
+        // Place both columns directly and let nobody own the gesture, so the
+        // scroll events this causes are ignored rather than re-read.
+        driver = null;
+        const nMax = maxOf(notes), pMax = maxOf(scroller);
+        if(nMax >= 2) notes.scrollTop = progress * nMax;
+        if(pMax >= 2) scroller.scrollTop = progress * pMax;
         flashSection(sec);
       }
       notes.addEventListener('click', (e) => {
