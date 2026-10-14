@@ -69,6 +69,11 @@ function splitIndex(){
 }
 
 async function cmdSeal(){
+  // Sealing is retired. The panel is no longer encrypted into docs/index.html at all:
+  // ciphertext on a public CDN can be taken away and ground offline forever, and the
+  // whole point of moving to the Pi was to make every guess cost a round trip that is
+  // counted and rate-limited. Putting a box back in the page would undo that silently.
+  die('sealing is retired -- the panel lives on the Pi now. Use: node scripts/vault.mjs push');
   const c = loadConfig();
   const panel = readFileSync(PANEL, 'utf8');
   const salt = rand(16);
