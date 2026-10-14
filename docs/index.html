@@ -463,14 +463,49 @@
     transition:transform .09s linear, opacity .09s linear;
   }
   /* Laid back, a card is its title and a line. Standing forward, it opens. */
-  .ra-sum{display:block; margin-top:7px; color:var(--muted); font-size:12.5px; line-height:1.55;}
+  /* The sentence does not blink out when the card opens -- it rolls up as the
+     detail rolls down, so one is clearly becoming the other. */
+  .ra-sum{
+    display:block; margin-top:7px; color:var(--muted); font-size:12.5px;
+    line-height:1.55; overflow:hidden; max-block-size:6em;
+    transition:max-block-size .46s cubic-bezier(.22,.78,.26,1),
+               margin-top .46s cubic-bezier(.22,.78,.26,1),
+               opacity .2s ease;
+  }
   /* Being highlighted and being open are separate: the highlight lands at
      once, the card opens only if it is still the live one half a second later.
      Scrolling past a card should not flap it open and shut. */
-  .ra-item[data-open="true"] .ra-sum{display:none;}
-  .ra-item:not([data-open="true"]) .ra-more,
-  .ra-item:not([data-open="true"]) .ra-links,
-  .ra-item:not([data-open="true"]) .ra-none{display:none;}
+  .ra-item[data-open="true"] .ra-sum{max-block-size:0; margin-top:0; opacity:0;}
+  /* Fallback only: without the script the detail is never wrapped, so it stays
+     hidden the way it always was. Once wrapped these no longer match. */
+  .ra-item:not([data-open="true"]) > .ra-more,
+  .ra-item:not([data-open="true"]) > .ra-links,
+  .ra-item:not([data-open="true"]) > .ra-none{display:none;}
+
+  /* The detail does not appear, it floats out of the sentence. A grid row is
+     the only box CSS will animate from nothing to its own height -- height
+     cannot be transitioned to auto -- so the wrapper is a one-row grid going
+     0fr to 1fr and the inner span is what gets clipped on the way. */
+  .ra-detail{
+    display:grid; grid-template-rows:0fr;
+    transition:grid-template-rows .62s cubic-bezier(.22,.78,.26,1);
+  }
+  .ra-detail-in{overflow:hidden; min-block-size:0;}
+  .ra-item[data-open="true"] .ra-detail{grid-template-rows:1fr;}
+  /* The paragraphs rise into place a beat behind the box, and each a beat
+     behind the one above it, so it reads as unfolding rather than as a panel
+     being revealed. */
+  .ra-detail-in > *{
+    opacity:0; transform:translateY(8px);
+    transition:opacity .3s ease, transform .5s cubic-bezier(.22,.78,.26,1);
+  }
+  .ra-item[data-open="true"] .ra-detail-in > *{opacity:1; transform:none;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(1){transition-delay:.08s;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(2){transition-delay:.15s;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(3){transition-delay:.22s;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(4){transition-delay:.29s;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(5){transition-delay:.34s;}
+  .ra-item[data-open="true"] .ra-detail-in > :nth-child(n+6){transition-delay:.38s;}
   .ra-item:first-of-type{border-top:0;}
   .ra-item[data-pos="above"]{transform:perspective(1000px) translateZ(-88px) rotateX(7deg);}
   .ra-item[data-pos="below"]{transform:perspective(1000px) translateZ(-88px) rotateX(-7deg);}
@@ -511,6 +546,8 @@
 
   @media (prefers-reduced-motion:reduce){
     .ra-item{transition:none; transform:none !important;}
+    .ra-sum, .ra-detail, .ra-detail-in > *{transition:none;}
+    .ra-detail-in > *{transform:none;}
   }
 
   /* Links tab: title on the left, the way in on the right. */
@@ -1427,6 +1464,22 @@
       const anchors = [...scroller.querySelectorAll('.resume-anchor')];
       if(!items.length || !anchors.length) return;
 
+      // Each card's detail needs a box that can be animated from no height to
+      // its own height, and that box is a grid row. Wrapping here rather than
+      // in the markup keeps the ten cards readable as prose.
+      for(const el of items){
+        const body = [...el.children].filter(c =>
+          c.classList.contains('ra-more') || c.classList.contains('ra-links') || c.classList.contains('ra-none'));
+        if(!body.length) continue;
+        const wrap = document.createElement('span');
+        wrap.className = 'ra-detail';
+        const inner = document.createElement('span');
+        inner.className = 'ra-detail-in';
+        wrap.appendChild(inner);
+        el.insertBefore(wrap, body[0]);
+        for(const c of body) inner.appendChild(c);
+      }
+
       const yOf = new Map(anchors.map(el => [el.dataset.sec, parseFloat(el.style.top) / 100]));
       const secs = items.map(el => el.dataset.sec).filter(sec => yOf.has(sec));
       const bySec = new Map(items.map(el => [el.dataset.sec, el]));
@@ -1441,7 +1494,15 @@
       // some echoes through and swallowed some real events, and the two
       // columns ended up pushing each other back and forth.
       let driver = null, owns = 0;
-      const claim = (el, ms) => { driver = el; owns = Date.now() + (ms || 320); };
+      // Touching a column also calls off any settling still running, and drops
+      // the guard in the same breath. The guard exists to ignore our own writes;
+      // claim only fires on a real wheel, touch or key, and that arrives before
+      // the scroll event it causes. Leaving it up for the rest of the animation
+      // swallowed the first scroll after a click outright.
+      const claim = (el, ms) => {
+        driver = el; owns = Date.now() + (ms || 320);
+        settleUntil = 0; adjusting = false;
+      };
       let current = null;
 
       const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
@@ -1453,6 +1514,10 @@
       let openTimer = 0;
       let adjusting = false;
       const DWELL = 480;
+      // How long a card takes to float open. Matches the grid-row transition
+      // in the stylesheet; the two have to agree or the columns stop tracking
+      // part-way through.
+      const OPEN_MS = 620;
 
       // A card opening or closing changes the column's height, and progress is
       // measured against that height -- so the same scroll offset suddenly
@@ -1463,12 +1528,33 @@
       // Progress is the thing that is true. After any height change the scroll
       // offsets are written back from it, and the scroll events that causes are
       // ignored.
-      function reanchor(){
-        adjusting = true;
+      // ...and because the card now floats open over half a second rather than
+      // snapping, the height is not one new number -- it is a different number
+      // every frame of the animation. So this does not run once; it runs for as
+      // long as the card is still moving.
+      let settleUntil = 0, settling = false;
+      function place(){
         const nMax = maxOf(notes), pMax = maxOf(scroller);
         if(nMax >= 2) notes.scrollTop = progress * nMax;
         if(pMax >= 2) scroller.scrollTop = progress * pMax;
-        requestAnimationFrame(() => { adjusting = false; });
+      }
+      function reanchor(ms){
+        settleUntil = Math.max(settleUntil, Date.now() + (ms == null ? OPEN_MS + 60 : ms));
+        adjusting = true;
+        place();
+        if(settling) return;
+        settling = true;
+        const step = () => {
+          // The reader taking over ends it early -- claim() zeroes the deadline.
+          if(Date.now() >= settleUntil){
+            settling = false;
+            requestAnimationFrame(() => { adjusting = false; });
+            return;
+          }
+          place();
+          requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
       }
 
       function openCard(sec){
@@ -1602,15 +1688,13 @@
         // Open the card FIRST. A card that opens changes the column's height,
         // so a scroll offset worked out before that lands somewhere else -- it
         // was landing on the card above the one that had been clicked.
-        focusOn(sec, true);               // a click is deliberate: open it now
-        void notes.scrollHeight;          // settle the layout before measuring
-
         // Place both columns directly and let nobody own the gesture, so the
-        // scroll events this causes are ignored rather than re-read.
+        // scroll events this causes are ignored rather than re-read. The card
+        // is still growing underneath, so reanchor keeps rewriting both offsets
+        // from progress until it has finished.
         driver = null;
-        const nMax = maxOf(notes), pMax = maxOf(scroller);
-        if(nMax >= 2) notes.scrollTop = progress * nMax;
-        if(pMax >= 2) scroller.scrollTop = progress * pMax;
+        focusOn(sec, true);               // a click is deliberate: open it now
+        reanchor();
         flashSection(sec);
       }
       notes.addEventListener('click', (e) => {
