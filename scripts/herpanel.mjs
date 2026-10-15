@@ -9,6 +9,7 @@
 //   secret/us/code.txt        the passphrase she types
 //
 //   node scripts/herpanel.mjs build
+//   node scripts/herpanel.mjs cull 007,112,143   drop those photos for good
 //
 // Everything is AES-GCM under one PBKDF2-SHA256 key derived from the
 // passphrase. docs/us/ holds only ciphertext; secret/ is gitignored.
@@ -56,6 +57,34 @@ async function enc(key, bytes){
   const out = new Uint8Array(iv.length + ct.length);
   out.set(iv); out.set(ct, iv.length);
   return Buffer.from(out);
+}
+
+// --- cull: drop photos permanently, then build ---
+if (process.argv[2] === 'cull'){
+  const ids = (process.argv[3] || '').split(',').map(x => x.trim()).filter(Boolean);
+  if (!ids.length) die('usage: cull 007,112,143');
+  const mPath = join(SRC, 'manifest.json');
+  if (!existsSync(mPath)) die(`missing ${mPath}`);
+  const m = JSON.parse(readFileSync(mPath, 'utf8'));
+  const drop = new Set(ids);
+  const unknown = ids.filter(id => !m.items.some(i => i.n === id));
+  if (unknown.length) die(`not in the manifest: ${unknown.join(', ')}`);
+  for (const id of drop)
+    for (const dir of ['full', 'thumb']){
+      const f = join(SRC, dir, id + '.jpg');
+      if (existsSync(f)) rmSync(f);
+    }
+  const before = m.items.length;
+  m.items = m.items.filter(i => !drop.has(i.n));
+  // a chapter can empty out entirely; renumber what is left so c still indexes
+  const live = [...new Set(m.items.map(i => i.c))].sort((a, b) => a - b);
+  const remap = new Map(live.map((c, i) => [c, i]));
+  m.chapters = live.map(c => m.chapters[c]);
+  m.items = m.items.map(i => ({ ...i, c: remap.get(i.c) }));
+  writeFileSync(mPath, JSON.stringify(m, null, 1));
+  console.log(`culled ${before - m.items.length}: ${before} -> ${m.items.length} photos, `
+    + `${m.chapters.length} chapters. Now run: node scripts/herpanel.mjs build`);
+  process.exit(0);
 }
 
 const need = p => existsSync(p) || die(`missing ${p}`);
