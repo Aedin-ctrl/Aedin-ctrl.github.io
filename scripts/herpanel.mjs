@@ -5,6 +5,7 @@
 //   secret/us/full/NNN.jpg    full photos (1600px), loaded only when tapped
 //   secret/us/manifest.json   chapter titles + each photo's date, in display order
 //   secret/us/message.txt     the note; first line is the heading
+//   secret/us/ps.txt          optional closing note, sealed in an envelope at the end
 //   secret/us/code.txt        the passphrase she types
 //
 //   node scripts/herpanel.mjs build
@@ -64,6 +65,8 @@ need(join(SRC, 'message.txt')); need(join(SRC, 'code.txt'));
 const code = readFileSync(join(SRC, 'code.txt'), 'utf8').trim();
 if (!code) die('secret/us/code.txt is empty');
 const message = readFileSync(join(SRC, 'message.txt'), 'utf8').trim();
+const psPath = join(SRC, 'ps.txt');
+const ps = existsSync(psPath) ? readFileSync(psPath, 'utf8').trim() : '';
 
 need(join(SRC, 'manifest.json'));
 const manifest = JSON.parse(readFileSync(join(SRC, 'manifest.json'), 'utf8'));
@@ -111,7 +114,7 @@ for (const it of items) {
 // --- the note and the layout index ---
 writeFileSync(join(OUT, 'meta.bin'),
   await enc(key, Buffer.from(JSON.stringify(
-    { v: 1, message, chapters: manifest.chapters, items, packs }), 'utf8')));
+    { v: 1, message, ps, chapters: manifest.chapters, items, packs }), 'utf8')));
 
 // --- site 404: forwards aedinlai.com/<code> to the panel, 404s on anything else ---
 // Only the code's SHA-256 ships, never the code.

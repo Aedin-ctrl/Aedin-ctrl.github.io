@@ -8,22 +8,26 @@
 <link rel="icon" href="data:,">
 <style>
   @font-face{font-family:'Inter';src:url('../fonts/Inter-latin.woff2') format('woff2');font-weight:100 900;font-display:swap}
-  @font-face{font-family:'Space Grotesk';src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');font-weight:300 700;font-display:swap}
   :root{
-    --paper:#fbf7f2; --ink:#1a1714; --muted:#857a70; --line:#e8ded2;
-    --accent:#b4553f; --shadow:rgba(60,40,25,.16); --edge:#fff;
+    --paper:#fbf6ef; --ink:#1f1a15; --muted:#8a7d71; --line:#e9dfd2;
+    --accent:#b4553f; --shadow:rgba(70,45,25,.17); --edge:#fff; --card:#fffdfa;
+    --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
   }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-    --paper:#15130f; --ink:#f3ece2; --muted:#9a8f82; --line:#2c2821;
-    --accent:#e0917a; --shadow:rgba(0,0,0,.55); --edge:#211d17;
+    --paper:#15120e; --ink:#f4ece1; --muted:#9c9083; --line:#2d2821;
+    --accent:#e0917a; --shadow:rgba(0,0,0,.6); --edge:#231e18; --card:#1d1913;
   }}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{margin:0;background:var(--paper);color:var(--ink);line-height:1.6;
        font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  /* paper grain — warmth without an image request */
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
+  @media (prefers-color-scheme: dark){ body::before{opacity:.25} }
 
   /* ---------- lock ---------- */
-  #lock{min-height:100svh;display:grid;place-items:center;padding:24px}
+  #lock{min-height:100svh;display:grid;place-items:center;padding:24px;position:relative;z-index:2}
   #lock form{width:100%;max-width:320px;text-align:center}
   #lock label{display:block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
               color:var(--muted);margin-bottom:18px}
@@ -37,55 +41,60 @@
   #msg{min-height:1.4em;margin-top:16px;font-size:14px;color:var(--muted)}
   #msg.bad{color:var(--accent)}
 
-  /* ---------- the note ---------- */
-  #panel{display:none}
-  #note{max-width:33rem;margin:0 auto;padding:22vh 24px 14vh;text-align:center}
-  #note h1{font-family:'Space Grotesk',sans-serif;font-weight:500;letter-spacing:-.02em;
-           font-size:clamp(30px,8vw,52px);line-height:1.1;margin:0 0 .9em}
+  #panel{display:none;position:relative;z-index:2}
+  #note{max-width:33rem;margin:0 auto;padding:20vh 24px 12vh;text-align:center}
+  #note h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,8.5vw,56px);
+           line-height:1.08;margin:0 0 .85em;letter-spacing:-.01em}
   #note p{margin:0 0 1.15em;font-size:clamp(16px,2.4vw,18px);white-space:pre-wrap}
-  #cue{margin-top:12vh;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  #cue{margin-top:10vh;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
   #cue span{display:block;margin-top:10px;font-size:18px;animation:bob 2.4s ease-in-out infinite}
   @keyframes bob{0%,100%{translate:0 0}50%{translate:0 6px}}
 
-  /* ---------- chapters ---------- */
-  .chapter{padding:0 0 16vh}
-  /* reserve a lane for the rail so its labels never sit over a photo */
-  @media(min-width:900px){ .chapter{padding-right:210px} }
+  /* ---------- toolbar ---------- */
+  #bar{position:sticky;top:0;z-index:50;display:flex;gap:8px;justify-content:center;
+       flex-wrap:wrap;padding:12px;background:color-mix(in srgb,var(--paper) 88%,transparent);
+       backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  #bar button{font:inherit;font-size:13px;padding:7px 14px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);background:var(--card);color:var(--ink);
+    transition:border-color .18s, color .18s}
+  #bar button:hover{border-color:var(--accent);color:var(--accent)}
+  #bar button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  #bar .n{font-variant-numeric:tabular-nums}
+
+  .chapter{padding:0 0 15vh}
   .chapter:not(:first-of-type){content-visibility:auto;contain-intrinsic-size:auto 1200px}
-  .chead{position:sticky;top:0;z-index:30;padding:18px 0 14px;text-align:center;
-         background:linear-gradient(var(--paper) 62%,transparent)}
-  .chead h2{font-family:'Space Grotesk',sans-serif;font-weight:500;margin:0;
-            font-size:clamp(17px,3.4vw,22px);letter-spacing:-.01em}
+  @media(min-width:900px){ .chapter{padding-right:210px} }
+  .chead{position:sticky;top:52px;z-index:30;padding:16px 0 26px;text-align:center;
+         background:linear-gradient(var(--paper) 0 72%,transparent)}
+  .chead h2{font-family:var(--serif);font-weight:400;margin:0;font-size:clamp(19px,3.6vw,25px)}
   .chead .cnt{display:block;margin-top:3px;font-size:11px;letter-spacing:.16em;
               text-transform:uppercase;color:var(--muted)}
 
-  /* the pile: tight columns, overlapping, slightly tilted */
   .cluster{columns:2;column-gap:8px;padding:0 12px;max-width:1240px;margin:0 auto}
   @media(min-width:640px){.cluster{columns:3;column-gap:12px;padding-inline:32px}}
   @media(min-width:1040px){.cluster{columns:4;column-gap:14px;padding-inline:56px}}
   .ph{break-inside:avoid;display:block;width:100%;margin:0 0 -22px;padding:0;border:0;
       background:none;cursor:zoom-in;line-height:0;position:relative;
-      transition:scale .22s ease, filter .22s ease}
+      transition:scale .22s ease}
   .ph img{width:100%;height:auto;display:block;background:var(--line);
           border:5px solid var(--edge);border-radius:2px;box-shadow:0 7px 24px var(--shadow)}
   .ph:hover,.ph:focus-visible{scale:1.05;z-index:40;rotate:0deg;outline:none}
   .ph:focus-visible img{outline:2px solid var(--accent);outline-offset:3px}
+  .ph.hid{display:none}
+  /* the heart sits on the photo and only shows on hover, or once it is set */
+  .fav{position:absolute;right:9px;bottom:9px;z-index:5;width:30px;height:30px;padding:0;
+       border:0;border-radius:999px;cursor:pointer;line-height:1;font-size:15px;
+       background:rgba(255,255,255,.86);color:#b9b0a6;opacity:0;transition:opacity .18s, scale .18s;
+       box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .ph:hover .fav,.ph:focus-within .fav,.fav[aria-pressed="true"]{opacity:1}
+  .fav[aria-pressed="true"]{color:var(--accent)}
+  .fav:hover{scale:1.15}
 
-  /* photos rise in as they scroll into view */
-  @supports (animation-timeline: view()){
-    @media (prefers-reduced-motion: no-preference){
-      @keyframes rise{from{opacity:0;translate:0 26px}}
-      .ph{animation:rise linear both;animation-timeline:view();
-          animation-range:entry 0% entry 55%}
-    }
-  }
-
-  /* ---------- chapter rail ---------- */
   #rail{position:fixed;right:18px;top:50%;translate:0 -50%;z-index:60;display:none;
         flex-direction:column;gap:9px;align-items:flex-end}
   @media(min-width:900px){#rail.on{display:flex}}
   #rail button{display:flex;align-items:center;gap:8px;background:none;border:0;cursor:pointer;
-               color:var(--muted);font:inherit;font-size:11px;letter-spacing:.06em;padding:2px 0}
+               color:var(--muted);font:inherit;font-size:11px;padding:2px 0}
   #rail .dot{width:7px;height:7px;border-radius:999px;background:var(--line);
              border:1px solid var(--muted);transition:background .2s, scale .2s}
   #rail .lbl{opacity:0;transition:opacity .2s;white-space:nowrap}
@@ -93,20 +102,55 @@
   #rail button[aria-current="true"]{color:var(--ink)}
   #rail button[aria-current="true"] .dot{background:var(--accent);border-color:var(--accent);scale:1.3}
 
+  /* ---------- envelope ---------- */
+  #env{max-width:30rem;margin:0 auto;padding:4vh 24px 22vh;text-align:center}
+  #envBtn{font:inherit;cursor:pointer;background:var(--card);border:1px solid var(--line);
+    border-radius:4px;padding:34px 28px;width:100%;color:var(--ink);
+    box-shadow:0 8px 26px var(--shadow);transition:scale .2s, border-color .2s}
+  #envBtn:hover{scale:1.02;border-color:var(--accent)}
+  #envBtn .seal{display:block;font-size:30px;margin-bottom:10px}
+  #envBtn .lab{font-family:var(--serif);font-size:19px}
+  #envText{display:none;font-family:var(--serif);font-size:clamp(17px,2.6vw,20px);
+           white-space:pre-wrap;text-align:left;line-height:1.75}
+  #envText.on{display:block}
+
   /* ---------- lightbox ---------- */
-  #box{position:fixed;inset:0;background:rgba(10,8,6,.94);display:none;place-items:center;
-       z-index:100;padding:16px;backdrop-filter:blur(4px)}
-  #box.on{display:grid}
-  #big{max-width:100%;max-height:88svh;border-radius:3px;box-shadow:0 10px 50px rgba(0,0,0,.6)}
-  #box .nav{position:absolute;top:0;bottom:0;width:28%;border:0;background:none;cursor:pointer}
+  dialog#box{border:0;padding:0;max-width:100vw;max-height:100svh;width:100%;height:100%;
+    background:transparent;color:#fff;overscroll-behavior:contain}
+  dialog#box::backdrop{background:rgba(12,9,6,.95);overflow:hidden;overscroll-behavior:contain;
+    backdrop-filter:blur(4px)}
+  #stage{position:absolute;inset:0;display:grid;place-items:center;padding:16px}
+  #flip{perspective:1400px;max-width:100%;max-height:86svh;cursor:pointer;border:0;
+        background:none;padding:0}
+  #inner{position:relative;transition:rotate .55s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+  #flip[aria-pressed="true"] #inner{rotate:y 180deg}
+  #big{display:block;max-width:100%;max-height:86svh;border-radius:3px;
+       box-shadow:0 10px 50px rgba(0,0,0,.6);backface-visibility:hidden}
+  #back{position:absolute;inset:0;rotate:y 180deg;backface-visibility:hidden;
+    background:var(--card);color:var(--ink);border-radius:3px;display:grid;place-content:center;
+    gap:8px;padding:28px;text-align:center;font-family:var(--serif)}
+  #back .d{font-size:clamp(19px,3.4vw,26px)}
+  #back .day{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+             font-family:'Inter',sans-serif}
+  #box .nav{position:absolute;top:0;bottom:0;width:26%;border:0;background:none;cursor:pointer}
+  #box .nav:focus{outline:none}
+  #box .nav:focus-visible{outline:2px solid rgba(255,255,255,.7);outline-offset:-8px;border-radius:8px}
+  #flip:focus{outline:none}
+  #flip:focus-visible{outline:2px solid rgba(255,255,255,.8);outline-offset:6px;border-radius:4px}
   #box .prev{left:0}#box .next{right:0}
   #close{position:absolute;top:14px;right:16px;width:40px;height:40px;border:0;border-radius:999px;
-         background:rgba(255,255,255,.14);color:#fff;font-size:21px;cursor:pointer;line-height:1}
-  #cap{position:absolute;bottom:16px;left:0;right:0;text-align:center;color:rgba(255,255,255,.72);
-       font-size:13px;letter-spacing:.04em;pointer-events:none}
-  #cap b{display:block;font-weight:500;color:#fff;margin-bottom:2px}
+         background:rgba(255,255,255,.16);color:#fff;font-size:21px;cursor:pointer;z-index:3}
+  #favBig{position:absolute;top:14px;right:66px;width:40px;height:40px;border:0;border-radius:999px;
+    background:rgba(255,255,255,.16);color:#fff;font-size:17px;cursor:pointer;z-index:3}
+  #favBig[aria-pressed="true"]{color:#ff8e73}
+  #cap{position:absolute;bottom:14px;left:0;right:0;text-align:center;
+       color:rgba(255,255,255,.7);font-size:12px;letter-spacing:.05em;pointer-events:none}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
     *{animation:none!important;transition:none!important}}
+  @supports (animation-timeline: view()){ @media (prefers-reduced-motion: no-preference){
+    @keyframes rise{from{opacity:0;translate:0 26px}}
+    .ph{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 55%}
+  }}
 </style>
 </head>
 <body>
@@ -122,99 +166,120 @@
 
 <main id="panel">
   <section id="note"></section>
+  <div id="bar" hidden>
+    <button id="shuffle" type="button">show me one</button>
+    <button id="onlyFav" type="button" aria-pressed="false">hearts <span class="n" id="favN">0</span></button>
+    <button id="toTop" type="button">back to the start</button>
+  </div>
   <div id="chapters"></div>
+  <section id="env" hidden>
+    <button id="envBtn" type="button"><span class="seal" aria-hidden="true">✉</span><span class="lab">one more thing</span></button>
+    <div id="envText"></div>
+  </section>
 </main>
 
 <nav id="rail" aria-label="chapters"></nav>
 
-<div id="box" role="dialog" aria-modal="true" aria-label="photo">
-  <button class="nav prev" id="prev" aria-label="previous"></button>
-  <img id="big" alt="">
-  <button class="nav next" id="next" aria-label="next"></button>
-  <button id="close" aria-label="close">&times;</button>
+<dialog id="box" closedby="any" aria-label="photo">
+  <div id="stage">
+    <button class="nav prev" id="prev" aria-label="previous"></button>
+    <button id="flip" type="button" aria-pressed="false" aria-label="flip the photo over">
+      <div id="inner"><img id="big" alt=""><div id="back"></div></div>
+    </button>
+    <button class="nav next" id="next" aria-label="next"></button>
+  </div>
+  <button id="favBig" type="button" aria-pressed="false" aria-label="heart this one">♥</button>
+  <button id="close" type="button" aria-label="close">&times;</button>
   <div id="cap"></div>
-</div>
+</dialog>
 
 <script type="module">
 const $ = s => document.querySelector(s);
 const sub = crypto.subtle;
 const unb64 = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
+const START = new Date('2025-10-17T12:00:00');   // day one
 
-let KEY = null, BUILD = '', ITEMS = [], CHAPS = [], URLS = [], open = -1;
+let KEY=null, BUILD='', ITEMS=[], CHAPS=[], URLS=[], open=-1, favOnly=false;
+let FAVS = new Set();
+try { FAVS = new Set(JSON.parse(localStorage.getItem('us.favs') || '[]')); } catch {}
+const saveFavs = () => { try { localStorage.setItem('us.favs', JSON.stringify([...FAVS])); } catch {} };
 
-const dec = async b => new Uint8Array(await sub.decrypt({name:'AES-GCM', iv:b.slice(0,12)}, KEY, b.slice(12)));
-async function grab(path){
-  const r = await fetch(`${path}?b=${BUILD}`, { cache:'force-cache' });
-  if (!r.ok) throw new Error(path);
-  return new Uint8Array(await r.arrayBuffer());
-}
+const dec = async b => new Uint8Array(await sub.decrypt({name:'AES-GCM',iv:b.slice(0,12)}, KEY, b.slice(12)));
+async function grab(p){ const r = await fetch(`${p}?b=${BUILD}`,{cache:'force-cache'});
+  if(!r.ok) throw new Error(p); return new Uint8Array(await r.arrayBuffer()); }
 
 async function unlock(code){
   if (!code) return;
-  $('#go').disabled = true; $('#msg').className = ''; $('#msg').textContent = 'one moment…';
-  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));
+  $('#go').disabled = true; $('#msg').className=''; $('#msg').textContent='one moment…';
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r,0)));
   try {
-    const p = await (await fetch('params.json', { cache:'no-cache' })).json();
+    const p = await (await fetch('params.json',{cache:'no-cache'})).json();
     BUILD = p.build || '0';
     const base = await sub.importKey('raw', new TextEncoder().encode(code), 'PBKDF2', false, ['deriveBits']);
-    const bits = await sub.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:unb64(p.salt), iterations:p.iterations}, base, 256);
+    const bits = await sub.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:unb64(p.salt),iterations:p.iterations}, base, 256);
     KEY = await sub.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
     reveal(JSON.parse(new TextDecoder().decode(await dec(await grab('meta.bin')))));
   } catch {
-    $('#msg').className = 'bad'; $('#msg').textContent = "that's not it";
-    $('#go').disabled = false; $('#code').select();
+    $('#msg').className='bad'; $('#msg').textContent="that's not it";
+    $('#go').disabled=false; $('#code').select();
   }
 }
 $('#f').addEventListener('submit', e => { e.preventDefault(); unlock($('#code').value.trim().toLowerCase()); });
+const fromHash = decodeURIComponent(location.hash.replace(/^#/,'')).trim().toLowerCase();
+if (fromHash) { history.replaceState(null,'',location.pathname); unlock(fromHash); }
 
-// A code in the hash (typed, or forwarded by the site's 404 page) opens it directly.
-const fromHash = decodeURIComponent(location.hash.replace(/^#/, '')).trim().toLowerCase();
-if (fromHash) { history.replaceState(null, '', location.pathname); unlock(fromHash); }
-
-const rnd = i => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); };
-const pretty = d => new Date(d + 'T12:00:00').toLocaleDateString('en-US',
-  { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+const rnd = i => { const x = Math.sin(i*12.9898)*43758.5453; return x - Math.floor(x); };
+const pretty = d => new Date(d+'T12:00:00').toLocaleDateString('en-US',
+  {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+const dayNo = d => Math.round((new Date(d+'T12:00:00') - START) / 86400000);
+const dayLabel = d => { const n = dayNo(d);
+  return n >= 0 ? `day ${n + 1}` : `${-n} day${n === -1 ? '' : 's'} before day one`; };
 
 function reveal(meta){
   const [head, ...rest] = meta.message.split('\n');
   const note = $('#note');
   const h = document.createElement('h1'); h.textContent = head; note.append(h);
-  for (const para of rest.join('\n').split(/\n{2,}/)) {
-    if (!para.trim()) continue;
+  for (const para of rest.join('\n').split(/\n{2,}/)){
+    if(!para.trim()) continue;
     const el = document.createElement('p'); el.textContent = para.trim(); note.append(el);
   }
   const cue = document.createElement('div');
-  cue.id = 'cue'; cue.innerHTML = 'keep going<span aria-hidden="true">&darr;</span>';
+  cue.id='cue'; cue.innerHTML = 'keep going<span aria-hidden="true">&darr;</span>';
   note.append(cue);
 
   ITEMS = meta.items; CHAPS = meta.chapters; URLS = new Array(ITEMS.length);
-  $('#lock').style.display = 'none';
-  $('#panel').style.display = 'block';
-  buildChapters();
-  buildRail();
+  $('#lock').style.display='none'; $('#panel').style.display='block';
+  buildChapters(); buildRail();
+  $('#bar').hidden = false; refreshFavN();
+  if (meta.ps) { $('#env').hidden = false; $('#envText').textContent = meta.ps; }
   loadPacks(meta.packs);
 }
 
 function buildChapters(){
   const wrap = $('#chapters');
   CHAPS.forEach((title, ci) => {
-    const mine = ITEMS.map((it, i) => ({ it, i })).filter(o => o.it.c === ci);
+    const mine = ITEMS.map((it,i)=>({it,i})).filter(o=>o.it.c===ci);
     const sec = document.createElement('section');
-    sec.className = 'chapter'; sec.id = 'ch' + ci;
+    sec.className='chapter'; sec.id='ch'+ci;
     sec.innerHTML = `<div class="chead"><h2>${title}</h2>
-      <span class="cnt">${mine.length} photo${mine.length === 1 ? '' : 's'}</span></div>`;
-    const cl = document.createElement('div'); cl.className = 'cluster';
-    for (const { it, i } of mine) {
+      <span class="cnt">${mine.length} photo${mine.length===1?'':'s'}</span></div>`;
+    const cl = document.createElement('div'); cl.className='cluster';
+    for (const {it,i} of mine){
       const b = document.createElement('button');
-      b.className = 'ph'; b.type = 'button';
-      b.style.rotate = `${(rnd(i) - .5) * 5}deg`;
-      b.style.marginLeft = `${(rnd(i + 7) - .5) * 7}%`;
-      b.style.zIndex = Math.floor(rnd(i + 99) * 20);
+      b.className='ph'; b.type='button'; b.dataset.i = i;
+      b.style.rotate = `${(rnd(i)-.5)*5}deg`;
+      b.style.marginLeft = `${(rnd(i+7)-.5)*7}%`;
+      b.style.zIndex = Math.floor(rnd(i+99)*20);
       b.setAttribute('aria-label', pretty(it.d));
       const img = document.createElement('img');
-      img.width = it.w; img.height = it.h; img.alt = '';
+      img.width=it.w; img.height=it.h; img.alt='';
       img.style.aspectRatio = `${it.w} / ${it.h}`;
-      b.append(img);
+      const fav = document.createElement('button');
+      fav.className='fav'; fav.type='button'; fav.textContent='♥';
+      fav.setAttribute('aria-pressed', String(FAVS.has(it.n)));
+      fav.setAttribute('aria-label','heart this one');
+      fav.addEventListener('click', e => { e.stopPropagation(); toggleFav(it.n); });
+      b.append(img, fav);
       b.addEventListener('click', () => show(i));
       cl.append(b);
     }
@@ -222,71 +287,111 @@ function buildChapters(){
   });
 }
 
+function toggleFav(n){
+  FAVS.has(n) ? FAVS.delete(n) : FAVS.add(n);
+  saveFavs();
+  document.querySelectorAll('.ph').forEach(p => {
+    const it = ITEMS[+p.dataset.i];
+    p.querySelector('.fav').setAttribute('aria-pressed', String(FAVS.has(it.n)));
+  });
+  if (open >= 0) $('#favBig').setAttribute('aria-pressed', String(FAVS.has(ITEMS[open].n)));
+  refreshFavN();
+  if (favOnly) applyFilter();
+}
+const refreshFavN = () => { $('#favN').textContent = FAVS.size; };
+
+function applyFilter(){
+  document.querySelectorAll('.ph').forEach(p =>
+    p.classList.toggle('hid', favOnly && !FAVS.has(ITEMS[+p.dataset.i].n)));
+  document.querySelectorAll('.chapter').forEach(sec =>
+    sec.hidden = favOnly && !sec.querySelector('.ph:not(.hid)'));
+}
+$('#onlyFav').addEventListener('click', () => {
+  favOnly = !favOnly;
+  $('#onlyFav').setAttribute('aria-pressed', String(favOnly));
+  applyFilter();
+  if (favOnly && !FAVS.size) $('#favN').textContent = '0';
+});
+$('#shuffle').addEventListener('click', () => {
+  const pool = favOnly ? ITEMS.map((it,i)=>i).filter(i=>FAVS.has(ITEMS[i].n)) : ITEMS.map((_,i)=>i);
+  if (pool.length) show(pool[Math.floor(Math.random()*pool.length)]);
+});
+$('#toTop').addEventListener('click', () => scrollTo({top:0, behavior:'smooth'}));
+$('#envBtn').addEventListener('click', () => {
+  $('#envText').classList.add('on'); $('#envBtn').hidden = true;
+  $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
+});
+
 function buildRail(){
   const rail = $('#rail');
   CHAPS.forEach((title, ci) => {
-    const b = document.createElement('button');
-    b.type = 'button';
+    const b = document.createElement('button'); b.type='button';
     b.innerHTML = `<span class="lbl">${title}</span><span class="dot"></span>`;
-    b.addEventListener('click', () => document.getElementById('ch' + ci)
-      .scrollIntoView({ behavior:'smooth', block:'start' }));
+    b.addEventListener('click', () => document.getElementById('ch'+ci)
+      .scrollIntoView({behavior:'smooth', block:'start'}));
     rail.append(b);
   });
   rail.classList.add('on');
   const btns = [...rail.children];
-  const io = new IntersectionObserver(es => {
-    for (const e of es) if (e.isIntersecting) {
-      const ci = +e.target.id.slice(2);
-      btns.forEach((b, i) => b.setAttribute('aria-current', String(i === ci)));
-    }
-  }, { rootMargin: '-45% 0px -45% 0px' });
-  CHAPS.forEach((_, ci) => io.observe(document.getElementById('ch' + ci)));
+  const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting){
+    const ci = +e.target.id.slice(2);
+    btns.forEach((b,i) => b.setAttribute('aria-current', String(i===ci)));
+  }}, {rootMargin:'-45% 0px -45% 0px'});
+  CHAPS.forEach((_,ci) => io.observe(document.getElementById('ch'+ci)));
 }
 
 async function loadPacks(packs){
   let at = 0;
   const imgs = [...document.querySelectorAll('.ph img')];
-  for (const name of packs) {
+  for (const name of packs){
     try {
       const raw = await dec(await grab(name));
       const view = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
       let o = 0;
-      while (o < raw.length) {
+      while (o < raw.length){
         const len = view.getUint32(o, true); o += 4;
-        const url = URL.createObjectURL(new Blob([raw.slice(o, o + len)], { type:'image/jpeg' }));
+        const url = URL.createObjectURL(new Blob([raw.slice(o,o+len)],{type:'image/jpeg'}));
         o += len;
         if (imgs[at]) imgs[at].src = url;
         at++;
       }
-    } catch { /* a failed pack just leaves placeholders */ }
+    } catch {}
   }
 }
 
 async function show(i){
   if (i < 0 || i >= ITEMS.length) return;
   open = i;
-  $('#box').classList.add('on');
-  $('#cap').innerHTML = `<b>${pretty(ITEMS[i].d)}</b>${i + 1} of ${ITEMS.length}`;
-  $('#big').src = document.querySelectorAll('.ph img')[i]?.src || '';
-  $('#close').focus();
+  const it = ITEMS[i];
+  const dlg = $('#box');
+  if (!dlg.open) { dlg.showModal(); $('#close').focus(); }
+  $('#flip').setAttribute('aria-pressed','false');
+  $('#back').innerHTML = `<div class="d">${pretty(it.d)}</div><div class="day">${dayLabel(it.d)}</div>`;
+  $('#favBig').setAttribute('aria-pressed', String(FAVS.has(it.n)));
+  $('#cap').textContent = `${i+1} of ${ITEMS.length} · tap the photo to turn it over`;
+  $('#big').src = document.querySelector(`.ph[data-i="${i}"] img`)?.src || '';
   if (!URLS[i]) {
     try { URLS[i] = URL.createObjectURL(
-      new Blob([await dec(await grab(`f/${ITEMS[i].n}.bin`))], { type:'image/jpeg' })); }
+      new Blob([await dec(await grab(`f/${it.n}.bin`))],{type:'image/jpeg'})); }
     catch { return; }
   }
   if (open === i) $('#big').src = URLS[i];
 }
 
-const shut = () => { $('#box').classList.remove('on'); open = -1; };
-$('#close').addEventListener('click', shut);
-$('#prev').addEventListener('click', () => show(open - 1));
-$('#next').addEventListener('click', () => show(open + 1));
-$('#box').addEventListener('click', e => { if (e.target === $('#box')) shut(); });
+$('#flip').addEventListener('click', e => {
+  e.stopPropagation();
+  const f = $('#flip');
+  f.setAttribute('aria-pressed', f.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+});
+$('#favBig').addEventListener('click', () => { if (open >= 0) toggleFav(ITEMS[open].n); });
+$('#close').addEventListener('click', () => $('#box').close());
+$('#prev').addEventListener('click', () => show(open-1));
+$('#next').addEventListener('click', () => show(open+1));
+$('#box').addEventListener('close', () => { open = -1; });
 addEventListener('keydown', e => {
-  if (!$('#box').classList.contains('on')) return;
-  if (e.key === 'Escape') shut();
-  if (e.key === 'ArrowLeft') show(open - 1);
-  if (e.key === 'ArrowRight') show(open + 1);
+  if (!$('#box').open) return;
+  if (e.key === 'ArrowLeft') show(open-1);
+  if (e.key === 'ArrowRight') show(open+1);
 });
 </script>
 </body>
