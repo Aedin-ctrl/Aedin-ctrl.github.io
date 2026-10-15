@@ -1803,7 +1803,7 @@
   const DOT_COLORS = { dotClose:'red', dotMinimize:'yellow', dotMaximize:'green' };
 
   // Must match normalize() in the vault's server.js.
-  function normalizeSecretWord(typed){ return typed.trim().replace(/\s+/g, ' '); }
+  function normalizeSecretWord(typed){ return typed.trim().toLowerCase().replace(/\s+/g, ' '); }
 
   // Resolves to the payload, or null for anything else at all -- a wrong key, too many
   // attempts, or the Pi being off. The caller cannot tell those apart, and neither can
