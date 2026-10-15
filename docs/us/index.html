@@ -42,12 +42,10 @@
   #msg.bad{color:var(--accent)}
 
   #panel{display:none;position:relative;z-index:2}
-  #note{max-width:33rem;margin:0 auto;padding:20vh 24px 12vh;text-align:center}
+  #note{max-width:33rem;margin:0 auto;padding:14vh 24px 7vh;text-align:center}
   #note h1{font-family:var(--serif);font-weight:400;font-size:clamp(32px,8.5vw,56px);
            line-height:1.08;margin:0 0 .85em;letter-spacing:-.01em}
   #note p{margin:0 0 1.15em;font-size:clamp(16px,2.4vw,18px);white-space:pre-wrap}
-  #cue{margin-top:10vh;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
-  #cue span{display:block;margin-top:10px;font-size:18px;animation:bob 2.4s ease-in-out infinite}
   @keyframes bob{0%,100%{translate:0 0}50%{translate:0 6px}}
 
   /* ---------- toolbar ---------- */
@@ -81,9 +79,15 @@
   .ph.hid{display:none}
 
   /* ---------- the running count since the 17th ---------- */
-  #tick{text-align:center;padding:1vh 24px 8vh;color:var(--muted);
-        font-size:13px;letter-spacing:.09em;font-variant-numeric:tabular-nums}
-  #tick b{font-weight:500;color:var(--ink)}
+  #tick{margin:7vh auto 0;padding:0 12px;max-width:40rem}
+  #tick .grp{display:flex;justify-content:center;gap:4px}
+  #tick .grp + .grp{margin-top:14px}
+  #tick .u{flex:1 1 0;min-width:0;max-width:7rem}
+  #tick b{display:block;font-family:var(--serif);font-weight:400;
+          font-size:clamp(24px,5.6vw,38px);line-height:1.05;
+          font-variant-numeric:tabular-nums;color:var(--ink)}
+  #tick span{display:block;margin-top:3px;font-size:9.5px;letter-spacing:.12em;
+             text-transform:uppercase;color:var(--muted)}
 
   /* ---------- penguin ---------- */
   #peng{position:relative;text-align:center;padding:0 0 10vh;z-index:2}
@@ -193,7 +197,7 @@
 </div>
 
 <main id="panel">
-  <section id="note"></section>
+  <section id="note"><div id="tick" hidden></div></section>
   <div id="bar" hidden>
     <button id="shuffle" type="button">show me one</button>
     <button id="showGone" type="button" aria-pressed="false">removed <span class="n" id="goneN">0</span></button>
@@ -201,7 +205,6 @@
     <button id="restore" type="button" hidden>put them all back</button>
     <button id="toTop" type="button">back to the start</button>
   </div>
-  <div id="tick" hidden></div>
   <div id="chapters"></div>
   <div id="peng" hidden>
     <button id="pengBtn" type="button" aria-label="a penguin">
@@ -294,9 +297,7 @@ function reveal(meta){
     if(!para.trim()) continue;
     const el = document.createElement('p'); el.textContent = para.trim(); note.append(el);
   }
-  const cue = document.createElement('div');
-  cue.id='cue'; cue.innerHTML = 'keep going<span aria-hidden="true">&darr;</span>';
-  note.append(cue);
+  note.append($('#tick'));
 
   ITEMS = meta.items; CHAPS = meta.chapters; URLS = new Array(ITEMS.length);
   $('#lock').style.display='none'; $('#panel').style.display='block';
@@ -436,21 +437,53 @@ $('#envBtn').addEventListener('click', () => {
   $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
 });
 
-// Midnight, not noon: the live clock needs the real day boundary, while the
-// per-photo day labels stay on START to keep date-only maths off DST edges.
+// Midnight local, so the day rolls over when it actually does. The per-photo
+// day labels stay on START, which keeps that date-only maths clear of DST.
 const TICK_FROM = new Date('2025-10-17T00:00:00');
+
+// Each unit is the remainder of the one before it. Years and months are
+// calendar steps, not fixed lengths, so they are walked rather than divided;
+// the day count is walked too, so a DST change cannot shift it by an hour.
+function sinceParts(now){
+  let years = now.getFullYear() - TICK_FROM.getFullYear();
+  const at = new Date(TICK_FROM);
+  at.setFullYear(TICK_FROM.getFullYear() + years);
+  if (at > now){ years--; at.setFullYear(TICK_FROM.getFullYear() + years); }
+
+  let months = 0;
+  for (;;){
+    const next = new Date(at); next.setMonth(next.getMonth() + 1);
+    if (next > now) break;
+    at.setTime(next.getTime()); months++;
+  }
+
+  let totalDays = 0;
+  for (;;){
+    const next = new Date(at); next.setDate(next.getDate() + 1);
+    if (next > now) break;
+    at.setTime(next.getTime()); totalDays++;
+  }
+
+  let ms = now - at;
+  const hours = Math.floor(ms / 3600000); ms -= hours * 3600000;
+  const minutes = Math.floor(ms / 60000); ms -= minutes * 60000;
+  return { years, months, weeks: Math.floor(totalDays / 7), days: totalDays % 7,
+           hours, minutes, seconds: Math.floor(ms / 1000) };
+}
+
 function startTick(){
   const el = $('#tick');
   el.hidden = false;
-  const pad = n => String(n).padStart(2, '0');
+  // date units on one line, clock units on the next, so it never wraps lopsided
+  const rows = [
+    [['years','year'],['months','month'],['weeks','week'],['days','day']],
+    [['hours','hour'],['minutes','minute'],['seconds','second']]
+  ];
   const paint = () => {
-    let ms = Date.now() - TICK_FROM;
-    if (ms < 0) ms = 0;
-    const d = Math.floor(ms / 86400000);
-    const h = Math.floor(ms / 3600000) % 24;
-    const m = Math.floor(ms / 60000) % 60;
-    const sec = Math.floor(ms / 1000) % 60;
-    el.innerHTML = `<b>${d.toLocaleString()}</b> days &middot; ${pad(h)}:${pad(m)}:${pad(sec)}`;
+    const p = sinceParts(new Date());
+    el.innerHTML = rows.map(row => '<div class="grp">' + row.map(([key, one]) =>
+      `<div class="u"><b>${p[key]}</b><span>${p[key] === 1 ? one : key}</span></div>`
+    ).join('') + '</div>').join('');
   };
   paint();
   setInterval(paint, 1000);
