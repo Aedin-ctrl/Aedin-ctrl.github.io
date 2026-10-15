@@ -9,20 +9,20 @@
 <style>
   @font-face{font-family:'Inter';src:url('../fonts/Inter-latin.woff2') format('woff2');font-weight:100 900;font-display:swap}
   :root{
-    --paper:#fbf6ef; --ink:#1f1a15; --muted:#8a7d71; --line:#e9dfd2;
-    --accent:#b4553f; --shadow:rgba(70,45,25,.17); --edge:#fff; --card:#fffdfa;
+    --paper:#eef4fb; --ink:#131d2b; --muted:#6c8099; --line:#d6e3f0;
+    --accent:#2f6fb5; --shadow:rgba(25,55,95,.18); --edge:#fff; --card:#fbfdff;
     --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
   }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-    --paper:#15120e; --ink:#f4ece1; --muted:#9c9083; --line:#2d2821;
-    --accent:#e0917a; --shadow:rgba(0,0,0,.6); --edge:#231e18; --card:#1d1913;
+    --paper:#0b1119; --ink:#e7eef7; --muted:#8398b0; --line:#1d2836;
+    --accent:#6fa9e8; --shadow:rgba(0,0,0,.6); --edge:#18212e; --card:#121b26;
   }}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;overflow-x:clip}
   body{margin:0;background:var(--paper);color:var(--ink);line-height:1.6;
        font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   /* paper grain — warmth without an image request */
-  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.5;
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.38;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
   @media (prefers-color-scheme: dark){ body::before{opacity:.25} }
 
@@ -92,6 +92,22 @@
           font-variant-numeric:tabular-nums;color:var(--ink)}
   #tick span{display:block;margin-top:3px;font-size:9.5px;letter-spacing:.12em;
              text-transform:uppercase;color:var(--muted)}
+
+  /* ---------- scrapbook cutouts in the margins ---------- */
+  .chapter{position:relative}
+  .deco{position:absolute;pointer-events:none;user-select:none;z-index:1;
+        filter:drop-shadow(0 6px 14px var(--shadow))}
+  .deco svg{display:block;width:100%;height:auto}
+  @media(max-width:640px){ .deco{scale:.62} }
+  @media (prefers-reduced-motion: no-preference){
+    @supports (animation-timeline: view()){
+      @keyframes drift{from{translate:0 42px;rotate:-5deg}to{translate:0 -42px;rotate:5deg}}
+      .deco{animation:drift linear both;animation-timeline:view();animation-range:cover}
+    }
+  }
+  /* the outer pair only appear once there is real room beside the board */
+  .deco.far{display:none}
+  @media(min-width:1500px){ .deco.far{display:block} }
 
   /* ---------- penguin ---------- */
   #peng{position:relative;text-align:center;padding:0 0 10vh;z-index:2}
@@ -253,6 +269,52 @@
 </dialog>
 
 <script type="module">
+// Drawn rather than fetched: the page makes no outside requests, and a sticker
+// that is a path scales to any screen without shipping another file.
+const PENGUIN = (pose) => {
+  const body = '#1d3550', belly = '#ffffff', bill = '#f4a63d';
+  const head = `<circle cx="55" cy="36" r="25" fill="${body}"/>
+    <circle cx="47" cy="33" r="5.5" fill="#fff"/><circle cx="63" cy="33" r="5.5" fill="#fff"/>
+    <circle cx="48" cy="34" r="2.6" fill="${body}"/><circle cx="64" cy="34" r="2.6" fill="${body}"/>
+    <path d="M55 41 l-7 8 h14z" fill="${bill}"/>`;
+  if (pose === 'slide')
+    return `<svg viewBox="0 0 150 90" xmlns="http://www.w3.org/2000/svg">
+      <g paint-order="stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round">
+        <path d="M118 74 q16 4 22 -4 q-8 -10 -22 -6z" fill="${bill}"/>
+        <path d="M20 52 C20 30 45 22 78 26 C110 30 132 44 132 58 C132 72 108 78 74 76 C40 74 20 68 20 52z" fill="${body}"/>
+        <path d="M34 56 C34 44 54 40 78 43 C104 46 120 54 120 62 C120 70 100 72 74 70 C46 68 34 64 34 56z" fill="${belly}"/>
+        <circle cx="36" cy="43" r="5" fill="#fff"/><circle cx="35" cy="44" r="2.4" fill="${body}"/>
+        <path d="M22 46 l-11 3 l11 5z" fill="${bill}"/>
+      </g></svg>`;
+  const wave = pose === 'wave';
+  return `<svg viewBox="0 0 110 150" xmlns="http://www.w3.org/2000/svg">
+    <g paint-order="stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round">
+      <path d="M38 120 q-12 12 1 15 h16 q7 -3 2 -15z" fill="${bill}"/>
+      <path d="M72 120 q12 12 -1 15 h-16 q-7 -3 -2 -15z" fill="${bill}"/>
+      ${wave ? `<path d="M84 60 q22 -18 18 -34 q-12 -4 -24 16z" fill="${body}"/>`
+             : `<path d="M86 58 q16 16 10 36 q-12 4 -18 -18z" fill="${body}"/>`}
+      <path d="M24 58 q-16 16 -10 36 q12 4 18 -18z" fill="${body}"/>
+      <path d="M55 14 C32 14 22 40 22 72 C22 106 34 126 55 126 C76 126 88 106 88 72 C88 40 78 14 55 14z" fill="${body}"/>
+      <ellipse cx="55" cy="84" rx="21" ry="34" fill="${belly}"/>
+      ${head}
+    </g></svg>`;
+};
+
+// little hand-drawn marks to break up the margins
+const DOODLE = (kind) => {
+  const c = 'var(--accent)';
+  if (kind === 'sparkle')
+    return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 4 C33 22 38 27 56 30 C38 33 33 38 30 56 C27 38 22 33 4 30 C22 27 27 22 30 4z"
+            fill="none" stroke="${c}" stroke-width="3.5" stroke-linejoin="round"/></svg>`;
+  if (kind === 'squiggle')
+    return `<svg viewBox="0 0 90 34" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 22 q11 -20 22 0 t22 0 t22 0" fill="none" stroke="${c}"
+            stroke-width="3.5" stroke-linecap="round"/></svg>`;
+  return `<svg viewBox="0 0 60 56" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 52 C6 36 4 20 14 12 C22 6 30 12 30 18 C30 12 38 6 46 12 C56 20 54 36 30 52z"
+            fill="none" stroke="${c}" stroke-width="3.5" stroke-linejoin="round"/></svg>`;
+};
 const $ = s => document.querySelector(s);
 const sub = crypto.subtle;
 const unb64 = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
@@ -342,7 +404,9 @@ function buildChapters(){
       wirePhoto(b, i);
       board.append(b);
     }
-    sec.append(board); wrap.append(sec);
+    sec.append(board);
+    decorate(sec, ci);
+    wrap.append(sec);
   });
   layout();
 }
@@ -395,6 +459,48 @@ function wirePhoto(b, i){
       b.style.transform = `perspective(700px) rotateY(${px * 13}deg) rotateX(${-py * 13}deg)`;
     });
     b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+  }
+}
+
+// Cutouts live in the gap under each board and, on a wide screen, out beyond
+// the board's edge. They are decoration, so they are hidden from readers and
+// never take a pointer event.
+const CUTOUTS = [
+  { art: () => PENGUIN('stand'), w: 132 },
+  { art: () => PENGUIN('wave'),  w: 126 },
+  { art: () => PENGUIN('slide'), w: 178 },
+  { art: () => DOODLE('sparkle'), w: 50 },
+  { art: () => DOODLE('heart'),   w: 46 },
+  { art: () => DOODLE('squiggle'), w: 84 },
+];
+function decorate(sec, ci){
+  const add = (pick, css, cls = '') => {
+    const d = document.createElement('div');
+    d.className = 'deco ' + cls;
+    d.setAttribute('aria-hidden', 'true');
+    d.style.width = pick.w + 'px';
+    Object.assign(d.style, css);
+    d.innerHTML = pick.art();
+    sec.append(d);
+  };
+  const r = k => rnd(ci * 7 + k);
+  const left = ci % 2 === 0;
+  // one under the board, tucked into the gap between chapters
+  const main = CUTOUTS[Math.floor(r(1) * 3)];                 // always a penguin
+  add(main, { bottom: (3 + r(2) * 6) + 'vh',
+              [left ? 'left' : 'right']: (2 + r(3) * 7) + '%',
+              rotate: ((r(4) - .5) * 24) + 'deg' });
+  // a small mark on the other side
+  const mark = CUTOUTS[3 + Math.floor(r(5) * 3)];
+  add(mark, { bottom: (6 + r(6) * 7) + 'vh',
+              [left ? 'right' : 'left']: (3 + r(7) * 8) + '%',
+              rotate: ((r(8) - .5) * 40) + 'deg', opacity: .75 });
+  // and out in the margin, where a wide screen leaves room beside the board
+  if (ci % 2 === 1){
+    const edge = CUTOUTS[Math.floor(r(9) * 3)];
+    add(edge, { top: (26 + r(10) * 34) + '%',
+                [left ? 'right' : 'left']: '8px',
+                rotate: ((r(11) - .5) * 26) + 'deg', opacity: .9 }, 'far');
   }
 }
 
