@@ -70,17 +70,42 @@
   .chead .cnt{display:block;margin-top:3px;font-size:11px;letter-spacing:.16em;
               text-transform:uppercase;color:var(--muted)}
 
-  .cluster{columns:2;column-gap:8px;padding:0 12px;max-width:1240px;margin:0 auto}
-  @media(min-width:640px){.cluster{columns:3;column-gap:12px;padding-inline:32px}}
-  @media(min-width:1040px){.cluster{columns:4;column-gap:14px;padding-inline:56px}}
-  .ph{break-inside:avoid;display:block;width:100%;margin:0 0 -22px;padding:0;border:0;
-      background:none;cursor:zoom-in;line-height:0;position:relative;
-      transition:scale .22s ease}
+  /* the board: photos packed tight and overlapping, laid out by script */
+  .board{position:relative;margin:0 auto;max-width:1180px}
+  .ph{position:absolute;display:block;padding:0;border:0;background:none;
+      cursor:zoom-in;line-height:0;transition:scale .2s ease, rotate .2s ease}
   .ph img{width:100%;height:auto;display:block;background:var(--line);
-          border:5px solid var(--edge);border-radius:2px;box-shadow:0 7px 24px var(--shadow)}
-  .ph:hover,.ph:focus-visible{scale:1.05;z-index:40;rotate:0deg;outline:none}
+          border:4px solid var(--edge);border-radius:2px;box-shadow:0 6px 18px var(--shadow)}
+  .ph:hover,.ph:focus-visible{scale:1.14;rotate:0deg;z-index:45!important;outline:none}
   .ph:focus-visible img{outline:2px solid var(--accent);outline-offset:3px}
   .ph.hid{display:none}
+
+  /* ---------- counters ---------- */
+  #tally{display:flex;flex-wrap:wrap;justify-content:center;gap:12px 34px;
+         padding:2vh 24px 9vh;text-align:center}
+  #tally div{min-width:92px}
+  #tally b{display:block;font-family:var(--serif);font-weight:400;
+           font-size:clamp(30px,6.5vw,46px);line-height:1.1;font-variant-numeric:tabular-nums}
+  #tally span{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--muted)}
+
+  /* ---------- penguin ---------- */
+  #peng{position:relative;text-align:center;padding:0 0 10vh;z-index:2}
+  #pengBtn{background:none;border:0;cursor:pointer;padding:8px;opacity:.26;
+           transition:opacity .25s}
+  #pengBtn:hover,#pengBtn:focus-visible{opacity:1;outline:none}
+  #pengBtn svg{width:46px;height:auto;display:block}
+  #pengBtn svg path,#pengBtn svg circle{fill:none;stroke:var(--ink);stroke-width:2.5;
+    stroke-linecap:round;stroke-linejoin:round}
+  #pengBtn svg .eye{fill:var(--ink);stroke:none}
+  #pengBtn.go{animation:waddle 3.4s ease-in-out}
+  @keyframes waddle{
+    0%{translate:0 0;rotate:0deg}
+    12%{rotate:-7deg} 24%{rotate:7deg} 36%{rotate:-7deg} 48%{rotate:7deg}
+    50%{translate:38vw 0} 60%{rotate:-7deg} 72%{rotate:7deg} 84%{rotate:-7deg}
+    100%{translate:0 0;rotate:0deg}}
+  #pengSay{min-height:1.5em;margin-top:10px;font-family:var(--serif);font-size:16px;
+           color:var(--muted);opacity:0;transition:opacity .4s}
+  #pengSay.on{opacity:1}
   /* the heart sits on the photo and only shows on hover, or once it is set */
   .fav{position:absolute;right:9px;bottom:9px;z-index:5;width:30px;height:30px;padding:0;
        border:0;border-radius:999px;cursor:pointer;line-height:1;font-size:15px;
@@ -171,7 +196,26 @@
     <button id="onlyFav" type="button" aria-pressed="false">hearts <span class="n" id="favN">0</span></button>
     <button id="toTop" type="button">back to the start</button>
   </div>
+  <div id="tally" hidden></div>
   <div id="chapters"></div>
+  <div id="peng" hidden>
+    <button id="pengBtn" type="button" aria-label="a penguin">
+      <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="100" cy="52" r="30" />
+        <path d="M62,88 C42,118 37,168 47,203 C57,223 143,223 153,203 C163,168 158,118 138,88" />
+        <path d="M79,92 C66,127 66,177 81,212" />
+        <path d="M121,92 C134,127 134,177 119,212" />
+        <path d="M57,108 C42,138 42,168 57,193" />
+        <path d="M143,108 C158,138 158,168 143,193" />
+        <path d="M92,68 L84,80 L100,84 Z" />
+        <path d="M68,220 L58,233 L80,228" />
+        <path d="M132,220 L142,233 L120,228" />
+        <circle class="eye" cx="88" cy="47" r="3.2" />
+        <circle class="eye" cx="112" cy="47" r="3.2" />
+      </svg>
+    </button>
+    <div id="pengSay" role="status" aria-live="polite"></div>
+  </div>
   <section id="env" hidden>
     <button id="envBtn" type="button"><span class="seal" aria-hidden="true">✉</span><span class="lab">one more thing</span></button>
     <div id="envText"></div>
@@ -251,6 +295,7 @@ function reveal(meta){
   $('#lock').style.display='none'; $('#panel').style.display='block';
   buildChapters(); buildRail();
   $('#bar').hidden = false; refreshFavN();
+  buildTally(); $('#peng').hidden = false;
   if (meta.ps) { $('#env').hidden = false; $('#envText').textContent = meta.ps; }
   loadPacks(meta.packs);
 }
@@ -263,17 +308,14 @@ function buildChapters(){
     sec.className='chapter'; sec.id='ch'+ci;
     sec.innerHTML = `<div class="chead"><h2>${title}</h2>
       <span class="cnt">${mine.length} photo${mine.length===1?'':'s'}</span></div>`;
-    const cl = document.createElement('div'); cl.className='cluster';
+    const board = document.createElement('div');
+    board.className='board'; board.dataset.ci = ci;
     for (const {it,i} of mine){
       const b = document.createElement('button');
       b.className='ph'; b.type='button'; b.dataset.i = i;
-      b.style.rotate = `${(rnd(i)-.5)*5}deg`;
-      b.style.marginLeft = `${(rnd(i+7)-.5)*7}%`;
-      b.style.zIndex = Math.floor(rnd(i+99)*20);
       b.setAttribute('aria-label', pretty(it.d));
       const img = document.createElement('img');
       img.width=it.w; img.height=it.h; img.alt='';
-      img.style.aspectRatio = `${it.w} / ${it.h}`;
       const fav = document.createElement('button');
       fav.className='fav'; fav.type='button'; fav.textContent='♥';
       fav.setAttribute('aria-pressed', String(FAVS.has(it.n)));
@@ -281,11 +323,63 @@ function buildChapters(){
       fav.addEventListener('click', e => { e.stopPropagation(); toggleFav(it.n); });
       b.append(img, fav);
       b.addEventListener('click', () => show(i));
-      cl.append(b);
+      board.append(b);
     }
-    sec.append(cl); wrap.append(sec);
+    sec.append(board); wrap.append(sec);
   });
+  layout();
 }
+
+// Pack each board tight: photos advance less than their own width, so they
+// overlap, and each row sits up into the one above it.
+function layout(){
+  for (const board of document.querySelectorAll('.board')){
+    const W0 = board.clientWidth;
+    if (!W0) continue;
+    const per = W0 < 520 ? 3.1 : W0 < 900 ? 4.4 : 5.6;
+    const base = W0 / per;
+    const pad = base * 0.14;            // room for the tilt to overhang
+    const W = W0 - pad * 2;
+    const kids = [...board.children].filter(k => !k.classList.contains('hid'));
+
+    // gather into rows, each row filled until it would overrun
+    const OVER = 0.78;                  // how far a photo advances vs its width
+    const rows = []; let row = [], span = 0;
+    kids.forEach((b, k) => {
+      const it = ITEMS[+b.dataset.i];
+      const w = base * (0.84 + rnd(k + 3) * 0.42);
+      if (row.length && span + w > W){ rows.push({ row, span: span + row.at(-1).w * (1 - OVER) }); row = []; span = 0; }
+      row.push({ b, w, r: it.h / it.w, k });
+      span += w * OVER;
+    });
+    if (row.length) rows.push({ row, span: span + row.at(-1).w * (1 - OVER) });
+
+    let top = 0, bottom = 0;
+    rows.forEach((R, ri) => {
+      // stretch the row so it reaches both edges — no dead space on the right
+      const fit = R.span > 0 ? W / R.span : 1;
+      const scale = ri === rows.length - 1 ? Math.min(fit, 1.35) : fit;
+      let x = 0, rowMax = 0;
+      for (const { b, w, r, k } of R.row){
+        const sw = w * scale, sh = sw * r;
+        const jitter = (rnd(k + 17) - 0.5) * base * 0.16;
+        const y = top + jitter;
+        b.style.width = sw + 'px';
+        b.style.left = (pad + x) + 'px';
+        b.style.top = y + 'px';
+        b.style.rotate = `${(rnd(k) - 0.5) * 10}deg`;
+        b.style.zIndex = String(Math.floor(rnd(k + 99) * 30));
+        rowMax = Math.max(rowMax, sh);
+        bottom = Math.max(bottom, y + sh);
+        x += sw * OVER;
+      }
+      top += rowMax * 0.70;             // next row rides up into this one
+    });
+    board.style.height = Math.ceil(bottom + pad) + 'px';
+  }
+}
+let relayout;
+addEventListener('resize', () => { clearTimeout(relayout); relayout = setTimeout(layout, 160); });
 
 function toggleFav(n){
   FAVS.has(n) ? FAVS.delete(n) : FAVS.add(n);
@@ -305,6 +399,7 @@ function applyFilter(){
     p.classList.toggle('hid', favOnly && !FAVS.has(ITEMS[+p.dataset.i].n)));
   document.querySelectorAll('.chapter').forEach(sec =>
     sec.hidden = favOnly && !sec.querySelector('.ph:not(.hid)'));
+  layout();
 }
 $('#onlyFav').addEventListener('click', () => {
   favOnly = !favOnly;
@@ -320,6 +415,27 @@ $('#toTop').addEventListener('click', () => scrollTo({top:0, behavior:'smooth'})
 $('#envBtn').addEventListener('click', () => {
   $('#envText').classList.add('on'); $('#envBtn').hidden = true;
   $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+function buildTally(){
+  // elapsed days, so the anniversary itself reads exactly 365
+  const days = Math.floor((Date.now() - START) / 86400000);
+  const t = $('#tally');
+  t.innerHTML = `
+    <div><b>${days.toLocaleString()}</b><span>days</span></div>
+    <div><b>${ITEMS.length}</b><span>photos</span></div>
+    <div><b>${CHAPS.length}</b><span>chapters</span></div>`;
+  t.hidden = false;
+}
+
+const PENG = ['you found it', 'hi', 'she likes penguins', '🐧'];
+let pengN = 0;
+$('#pengBtn').addEventListener('click', () => {
+  const b = $('#pengBtn'), say = $('#pengSay');
+  b.classList.remove('go'); void b.offsetWidth; b.classList.add('go');
+  say.textContent = PENG[pengN++ % PENG.length];
+  say.classList.add('on');
+  clearTimeout(say._t); say._t = setTimeout(() => say.classList.remove('on'), 3200);
 });
 
 function buildRail(){
