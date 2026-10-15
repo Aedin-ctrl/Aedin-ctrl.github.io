@@ -18,7 +18,7 @@
     --accent:#e0917a; --shadow:rgba(0,0,0,.6); --edge:#231e18; --card:#1d1913;
   }}
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;overflow-x:clip}
   body{margin:0;background:var(--paper);color:var(--ink);line-height:1.6;
        font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   /* paper grain — warmth without an image request */
@@ -71,10 +71,14 @@
   /* the board: photos packed tight and overlapping, laid out by script */
   .board{position:relative;margin:0 auto;max-width:1600px}
   .ph{position:absolute;display:block;padding:0;border:0;background:none;
-      cursor:zoom-in;line-height:0;transition:scale .2s ease, rotate .2s ease}
+      cursor:grab;line-height:0;touch-action:none;
+      -webkit-user-select:none;user-select:none;
+      transition:scale .2s ease, rotate .2s ease, transform .18s ease}
+  .ph.dragging{cursor:grabbing;transition:none;z-index:60!important}
+  .ph.dragging img{box-shadow:0 22px 50px rgba(60,40,25,.4)}
   .ph img{width:100%;height:auto;display:block;background:var(--line);
           border:4px solid var(--edge);border-radius:2px;box-shadow:0 6px 18px var(--shadow)}
-  .ph:hover,.ph:focus-visible{scale:1.14;rotate:0deg;z-index:45!important;outline:none}
+  .ph:hover,.ph:focus-visible{scale:1.12;rotate:0deg;z-index:45!important;outline:none}
   .ph:focus-visible img{outline:2px solid var(--accent);outline-offset:3px}
   .ph.hid{display:none}
 
@@ -131,11 +135,25 @@
   #envBtn:hover{scale:1.02;border-color:var(--accent)}
   #envBtn .seal{display:block;font-size:30px;margin-bottom:10px}
   #envBtn .lab{font-family:var(--serif);font-size:19px}
+  #envBtn.opening{animation:unseal .5s ease forwards}
+  @keyframes unseal{
+    30%{scale:1.04 .96}
+    100%{scale:.9;opacity:0;translate:0 -14px}
+  }
   #envText{display:none;font-family:var(--serif);font-size:clamp(17px,2.6vw,20px);
            white-space:pre-wrap;text-align:left;line-height:1.75}
-  #envText.on{display:block}
+  #envText.on{display:block;animation:slipOut .62s cubic-bezier(.2,.7,.3,1) backwards}
+  @keyframes slipOut{
+    from{opacity:0;translate:0 26px;clip-path:inset(100% 0 0 0)}
+    to  {opacity:1;translate:0 0;clip-path:inset(0 0 0 0)}
+  }
 
   /* ---------- lightbox ---------- */
+  /* the photo flies from the board into the lightbox */
+  ::view-transition-group(photo){animation-duration:.46s;
+    animation-timing-function:cubic-bezier(.2,.7,.25,1)}
+  ::view-transition-old(photo),::view-transition-new(photo){
+    animation:none;mix-blend-mode:normal;height:100%;object-fit:cover}
   dialog#box{border:0;padding:0;max-width:100vw;max-height:100svh;width:100%;height:100%;
     background:transparent;color:#fff;overscroll-behavior:contain}
   dialog#box::backdrop{background:rgba(12,9,6,.95);overflow:hidden;overscroll-behavior:contain;
@@ -165,9 +183,16 @@
        color:rgba(255,255,255,.7);font-size:12px;letter-spacing:.05em;pointer-events:none}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}
     *{animation:none!important;transition:none!important}}
+  /* a print coming up in the tray: blurred and washed out, then it settles */
   @supports (animation-timeline: view()){ @media (prefers-reduced-motion: no-preference){
-    @keyframes rise{from{opacity:0;translate:0 26px}}
-    .ph{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 55%}
+    @keyframes develop{
+      from{opacity:0; translate:0 22px;
+           filter:blur(9px) saturate(.15) brightness(1.35) contrast(.75)}
+      55% {opacity:1}
+      to  {opacity:1; translate:0 0; filter:none}
+    }
+    .ph{animation:develop linear both;animation-timeline:view();
+        animation-range:entry 0% entry 62%}
   }}
 </style>
 </head>
@@ -237,6 +262,16 @@ let KEY=null, BUILD='', ITEMS=[], CHAPS=[], URLS=[], open=-1;
 // The cull tool is gone; anything dropped was dropped at build time instead.
 try { localStorage.removeItem('us.gone'); } catch {}
 
+// Where she has nudged photos to. Stored as an offset from wherever the
+// layout puts each one, not an absolute spot, so a resize still re-packs
+// the board and her arrangement rides on top of the new positions.
+let NUDGE = {};
+try { NUDGE = JSON.parse(localStorage.getItem('us.nudge') || '{}'); } catch {}
+let saveTimer;
+const saveNudge = () => { clearTimeout(saveTimer); saveTimer = setTimeout(() => {
+  try { localStorage.setItem('us.nudge', JSON.stringify(NUDGE)); } catch {}
+}, 400); };
+
 const dec = async b => new Uint8Array(await sub.decrypt({name:'AES-GCM',iv:b.slice(0,12)}, KEY, b.slice(12)));
 async function grab(p){ const r = await fetch(`${p}?b=${BUILD}`,{cache:'force-cache'});
   if(!r.ok) throw new Error(p); return new Uint8Array(await r.arrayBuffer()); }
@@ -304,12 +339,63 @@ function buildChapters(){
       const img = document.createElement('img');
       img.width=it.w; img.height=it.h; img.alt='';
       b.append(img);
-      b.addEventListener('click', () => show(i));
+      wirePhoto(b, i);
       board.append(b);
     }
     sec.append(board); wrap.append(sec);
   });
   layout();
+}
+
+// A photo is both draggable and clickable. Dragging only begins once the
+// pointer has travelled far enough that it cannot have been a click, and the
+// photo opens on release only if that never happened.
+const DRAG_SLOP = 5;
+function wirePhoto(b, i){
+  const id = () => ITEMS[+b.dataset.i].n;
+  let sx = 0, sy = 0, ox = 0, oy = 0, moved = false, live = false;
+
+  b.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    live = true; moved = false;
+    sx = e.clientX; sy = e.clientY;
+    const n = NUDGE[id()] || [0, 0];
+    ox = n[0]; oy = n[1];
+    try { b.setPointerCapture(e.pointerId); } catch {}
+  });
+
+  b.addEventListener('pointermove', e => {
+    if (!live) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!moved && Math.hypot(dx, dy) < DRAG_SLOP) return;
+    if (!moved){ moved = true; b.classList.add('dragging'); }
+    NUDGE[id()] = placeAt(b, [ox + dx, oy + dy]);
+  });
+
+  const finish = () => {
+    if (!live) return;
+    live = false;
+    if (moved){ b.classList.remove('dragging'); saveNudge(); }
+    else show(i, b.querySelector('img'));
+  };
+  b.addEventListener('pointerup', finish);
+  b.addEventListener('pointercancel', () => { live = false; b.classList.remove('dragging'); });
+  b.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); show(i); }
+  });
+
+  // leans toward the pointer, only where there is a real one
+  if (matchMedia('(hover: hover)').matches &&
+      matchMedia('(prefers-reduced-motion: no-preference)').matches){
+    b.addEventListener('pointermove', e => {
+      if (moved) return;
+      const r = b.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - .5;
+      const py = (e.clientY - r.top) / r.height - .5;
+      b.style.transform = `perspective(700px) rotateY(${px * 13}deg) rotateX(${-py * 13}deg)`;
+    });
+    b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+  }
 }
 
 // Pack each board tight: photos advance less than their own width, so they
@@ -375,6 +461,8 @@ function layout(){
     for (const q of placed){
       const y = q.y - lift;
       q.b.style.width = q.sw + 'px';
+      q.b.dataset.bx = q.left;          // where the packing put it
+      q.b.dataset.by = y;
       q.b.style.left = q.left + 'px';
       q.b.style.top = y + 'px';
       q.b.style.rotate = `${(rnd(q.k) - 0.5) * 13}deg`;
@@ -383,6 +471,35 @@ function layout(){
     }
     board.style.height = Math.ceil(bottom + pad) + 'px';
   }
+  applyNudges();
+}
+function applyNudges(){
+  for (const b of document.querySelectorAll('.ph')){
+    const id = ITEMS[+b.dataset.i].n;
+    const n = NUDGE[id];
+    const used = placeAt(b, n);
+    // a narrower window can make an old nudge unreachable; keep what fits
+    if (n && (used[0] !== n[0] || used[1] !== n[1])) NUDGE[id] = used;
+  }
+}
+// A photo dragged off the right edge would widen the page and give the whole
+// site a horizontal scrollbar, so movement is clamped to its own board.
+function placeAt(b, n){
+  const bx = +b.dataset.bx, by = +b.dataset.by;
+  const board = b.parentElement;
+  // A tilted photo's corners reach past its own width, so the usable area
+  // shrinks by however far the rotation makes it bulge.
+  const w = b.offsetWidth, h = b.offsetHeight;
+  const rad = Math.abs(parseFloat(b.style.rotate) || 0) * Math.PI / 180;
+  const bulgeX = (w * Math.cos(rad) + h * Math.sin(rad) - w) / 2;
+  const bulgeY = (h * Math.cos(rad) + w * Math.sin(rad) - h) / 2;
+  const maxX = Math.max(bulgeX, board.clientWidth - w - bulgeX);
+  const maxY = Math.max(bulgeY, board.clientHeight - h - bulgeY);
+  const left = Math.min(Math.max(bx + (n ? n[0] : 0), bulgeX), maxX);
+  const top  = Math.min(Math.max(by + (n ? n[1] : 0), bulgeY), maxY);
+  b.style.left = left + 'px';
+  b.style.top  = top + 'px';
+  return [Math.round(left - bx), Math.round(top - by)];
 }
 let relayout;
 addEventListener('resize', () => { clearTimeout(relayout); relayout = setTimeout(layout, 160); });
@@ -392,8 +509,15 @@ $('#shuffle').addEventListener('click', () => {
 });
 $('#toTop').addEventListener('click', () => scrollTo({top:0, behavior:'smooth'}));
 $('#envBtn').addEventListener('click', () => {
-  $('#envText').classList.add('on'); $('#envBtn').hidden = true;
-  $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
+  const btn = $('#envBtn');
+  btn.disabled = true; btn.classList.add('opening');
+  const reveal = () => {
+    btn.hidden = true;
+    $('#envText').classList.add('on');
+    $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
+  };
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  reduced ? reveal() : btn.addEventListener('animationend', reveal, { once:true });
 });
 
 // Midnight local, so the day rolls over when it actually does. The per-photo
@@ -495,16 +619,49 @@ async function loadPacks(packs){
   }
 }
 
-async function show(i){
+let morphNamed = null;
+function clearMorphName(){
+  if (morphNamed){ morphNamed.style.viewTransitionName = ''; morphNamed = null; }
+  $('#big').style.viewTransitionName = '';
+}
+
+async function show(i, morphFrom){
   if (i < 0 || i >= ITEMS.length) return;
   open = i;
   const it = ITEMS[i];
   const dlg = $('#box');
-  if (!dlg.open) { dlg.showModal(); $('#close').focus(); }
+  const opening = !dlg.open;
+
   $('#flip').setAttribute('aria-pressed','false');
   $('#back').innerHTML = `<div class="d">${pretty(it.d)}</div><div class="day">${dayLabel(it.d)}</div>`;
   $('#cap').textContent = `${i+1} of ${ITEMS.length} · tap the photo to turn it over`;
-  $('#big').src = document.querySelector(`.ph[data-i="${i}"] img`)?.src || '';
+
+  // Put the thumbnail in first: the morph needs something with real
+  // dimensions to fly to, and a src set a moment ago is still 0x0.
+  const thumb = document.querySelector(`.ph[data-i="${i}"] img`);
+  $('#big').src = thumb?.src || '';
+  if ($('#big').src){ try { await $('#big').decode(); } catch {} }
+
+  if (opening && morphFrom && document.startViewTransition){
+    // Exactly one element may carry the name on each side of the update, so
+    // the thumbnail wears it going in and hands it over inside the callback.
+    clearMorphName();
+    morphFrom.style.viewTransitionName = 'photo';
+    morphNamed = morphFrom;
+    try {
+      await document.startViewTransition(() => {
+        morphFrom.style.viewTransitionName = '';
+        morphNamed = null;
+        $('#big').style.viewTransitionName = 'photo';
+        dlg.showModal();
+      }).finished;
+    } catch { if (!dlg.open) dlg.showModal(); }
+    $('#big').style.viewTransitionName = '';
+  } else if (opening){
+    dlg.showModal();
+  }
+  if (opening) $('#close').focus();
+
   if (!URLS[i]) {
     try { URLS[i] = URL.createObjectURL(
       new Blob([await dec(await grab(`f/${it.n}.bin`))],{type:'image/jpeg'})); }
@@ -521,7 +678,7 @@ $('#flip').addEventListener('click', e => {
 $('#close').addEventListener('click', () => $('#box').close());
 $('#prev').addEventListener('click', () => show(open-1));
 $('#next').addEventListener('click', () => show(open+1));
-$('#box').addEventListener('close', () => { open = -1; });
+$('#box').addEventListener('close', () => { open = -1; clearMorphName(); });
 addEventListener('keydown', e => {
   if (!$('#box').open) return;
   if (e.key === 'ArrowLeft') show(open-1);
