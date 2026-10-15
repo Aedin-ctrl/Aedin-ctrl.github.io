@@ -190,9 +190,11 @@ writeFileSync(join(OUT, 'params.json'),
 
 // This repo lives under ~/Desktop, which iCloud syncs. Rewriting a file it is
 // mid-upload makes iCloud keep BOTH as "name 2.bin", and those stale copies
-// would otherwise be committed and served. Sweep them after every build.
+// would otherwise be committed and served. They pile up in the plaintext
+// folders too, where a copy of a culled photo can outlive the cull. Sweep
+// both sides after every build.
 let stale = 0;
-for (const dir of [OUT, join(OUT, 'f')])
+for (const dir of [OUT, join(OUT, 'f'), join(SRC, 'thumb'), join(SRC, 'full')])
   for (const f of readdirSync(dir))
     if (f.includes(' ')) { rmSync(join(dir, f)); stale++; }
 if (stale) console.log(`removed ${stale} iCloud conflict copies`);
