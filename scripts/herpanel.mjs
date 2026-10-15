@@ -3,6 +3,7 @@
 //
 //   secret/us/thumb/NNN.jpg   collage thumbnails (500px)
 //   secret/us/full/NNN.jpg    full photos (1600px), loaded only when tapped
+//   secret/us/manifest.json   chapter titles + each photo's date, in display order
 //   secret/us/message.txt     the note; first line is the heading
 //   secret/us/code.txt        the passphrase she types
 //
@@ -64,7 +65,9 @@ const code = readFileSync(join(SRC, 'code.txt'), 'utf8').trim();
 if (!code) die('secret/us/code.txt is empty');
 const message = readFileSync(join(SRC, 'message.txt'), 'utf8').trim();
 
-const names = readdirSync(join(SRC, 'thumb')).filter(f => /\.jpg$/i.test(f)).sort();
+need(join(SRC, 'manifest.json'));
+const manifest = JSON.parse(readFileSync(join(SRC, 'manifest.json'), 'utf8'));
+const names = manifest.items.map(i => i.n + '.jpg');
 if (!names.length) die('no thumbnails');
 
 const salt = rand(16);
@@ -90,7 +93,8 @@ for (const n of names) {
   const { w, h } = jpegSize(jpg);
   const len = Buffer.alloc(4); len.writeUInt32LE(jpg.length);
   buf.push(len, jpg); bytes += jpg.length + 4;
-  items.push({ n: n.replace(/\.jpg$/i, ''), w, h, p: packs.length });
+  const m = manifest.items[items.length];
+  items.push({ n: m.n, w, h, p: packs.length, d: m.date, c: m.c });
   if (bytes >= PACK_BYTES) await flush();
 }
 await flush();
@@ -106,7 +110,8 @@ for (const it of items) {
 
 // --- the note and the layout index ---
 writeFileSync(join(OUT, 'meta.bin'),
-  await enc(key, Buffer.from(JSON.stringify({ v: 1, message, items, packs }), 'utf8')));
+  await enc(key, Buffer.from(JSON.stringify(
+    { v: 1, message, chapters: manifest.chapters, items, packs }), 'utf8')));
 
 // --- site 404: forwards aedinlai.com/<code> to the panel, 404s on anything else ---
 // Only the code's SHA-256 ships, never the code.
@@ -151,5 +156,15 @@ writeFileSync(join(ROOT, 'docs/404.html'), `<!doctype html>
 writeFileSync(join(OUT, 'params.json'),
   JSON.stringify({ salt: b64(salt), iterations: ITERATIONS, packs: packs.length, build: b64(rand(6)) }));
 
-console.log(`docs/us/  ${items.length} thumbs in ${packs.length} packs, ${full} full photos`);
+// This repo lives under ~/Desktop, which iCloud syncs. Rewriting a file it is
+// mid-upload makes iCloud keep BOTH as "name 2.bin", and those stale copies
+// would otherwise be committed and served. Sweep them after every build.
+let stale = 0;
+for (const dir of [OUT, join(OUT, 'f')])
+  for (const f of readdirSync(dir))
+    if (f.includes(' ')) { rmSync(join(dir, f)); stale++; }
+if (stale) console.log(`removed ${stale} iCloud conflict copies`);
+
+console.log(`docs/us/  ${items.length} photos in ${manifest.chapters.length} chapters, `
+  + `${packs.length} thumb packs, ${full} full`);
 console.log(`passphrase: "${code}"  (case and surrounding space ignored)`);
