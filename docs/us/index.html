@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>&nbsp;</title>
+<link rel="icon" href="data:,">
+<style>
+  @font-face{font-family:'Inter';src:url('../fonts/Inter-latin.woff2') format('woff2');font-weight:100 900;font-display:swap}
+  @font-face{font-family:'Space Grotesk';src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');font-weight:300 700;font-display:swap}
+  :root{
+    --paper:#fbf7f2; --ink:#1a1714; --muted:#7a7068; --line:#e8ded2;
+    --accent:#b4553f; --shadow:rgba(60,40,25,.18);
+  }
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --paper:#17150f; --ink:#f3ece2; --muted:#9a8f82; --line:#2e2a22;
+    --accent:#e0917a; --shadow:rgba(0,0,0,.5);
+  }}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+       -webkit-font-smoothing:antialiased;line-height:1.6}
+
+  /* ---------- lock ---------- */
+  #lock{min-height:100svh;display:grid;place-items:center;padding:24px}
+  #lock form{width:100%;max-width:320px;text-align:center}
+  #lock label{display:block;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+              color:var(--muted);margin-bottom:18px}
+  #code{width:100%;padding:13px 14px;font:inherit;font-size:17px;text-align:center;
+        background:transparent;color:var(--ink);border:0;border-bottom:1.5px solid var(--line);
+        border-radius:0;outline:none;transition:border-color .2s}
+  #code:focus{border-bottom-color:var(--accent)}
+  #go{margin-top:22px;padding:11px 26px;font:inherit;font-size:15px;cursor:pointer;
+      background:var(--ink);color:var(--paper);border:0;border-radius:999px;transition:opacity .2s}
+  #go:hover{opacity:.85}
+  #go[disabled]{opacity:.45;cursor:default}
+  #msg{min-height:1.4em;margin-top:16px;font-size:14px;color:var(--muted)}
+  #msg.bad{color:var(--accent)}
+
+  /* ---------- note ---------- */
+  #panel{display:none}
+  #note{max-width:34rem;margin:0 auto;padding:16vh 24px 10vh;text-align:center}
+  #note h1{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:clamp(28px,7vw,44px);
+           line-height:1.15;margin:0 0 1.2em;letter-spacing:-.02em}
+  #note p{margin:0 0 1.15em;font-size:clamp(16px,2.4vw,18px);color:var(--ink);white-space:pre-wrap}
+  #note p:last-child{margin-bottom:0}
+
+  /* ---------- collage ---------- */
+  #wall{padding:0 14px 18vh;columns:2;column-gap:10px}
+  @media(min-width:620px){#wall{columns:3;column-gap:14px;padding-inline:28px}}
+  @media(min-width:1000px){#wall{columns:4;column-gap:16px;padding-inline:48px}}
+  @media(min-width:1400px){#wall{columns:5}}
+  .ph{break-inside:avoid;margin:0 0 -14px;padding:0;border:0;background:none;display:block;
+      width:100%;cursor:zoom-in;position:relative;line-height:0;
+      transition:transform .22s ease, filter .22s ease}
+  .ph img{width:100%;height:auto;display:block;border-radius:2px;
+          box-shadow:0 6px 22px var(--shadow);background:var(--line)}
+  .ph:hover,.ph:focus-visible{transform:scale(1.035) rotate(0deg)!important;z-index:50;outline:none}
+  .ph:focus-visible img{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* ---------- lightbox ---------- */
+  #box{position:fixed;inset:0;background:rgba(10,8,6,.93);display:none;place-items:center;
+       z-index:100;padding:16px;backdrop-filter:blur(3px)}
+  #box.on{display:grid}
+  #box img{max-width:100%;max-height:92svh;border-radius:3px;box-shadow:0 10px 50px rgba(0,0,0,.6)}
+  #box .nav{position:absolute;top:0;bottom:0;width:30%;border:0;background:none;cursor:pointer;color:#fff0}
+  #box .prev{left:0}#box .next{right:0}
+  #close{position:absolute;top:14px;right:16px;width:40px;height:40px;border:0;border-radius:999px;
+         background:rgba(255,255,255,.14);color:#fff;font-size:21px;cursor:pointer;line-height:1}
+  #count{position:absolute;bottom:14px;left:0;right:0;text-align:center;color:rgba(255,255,255,.6);
+         font-size:13px;letter-spacing:.08em}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="lock">
+  <form id="f">
+    <label for="code">enter the code</label>
+    <input id="code" type="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <br><button id="go" type="submit">open</button>
+    <div id="msg" role="status" aria-live="polite"></div>
+  </form>
+</div>
+
+<main id="panel">
+  <section id="note"></section>
+  <div id="wall"></div>
+</main>
+
+<div id="box" role="dialog" aria-modal="true" aria-label="photo">
+  <button class="nav prev" id="prev" aria-label="previous"></button>
+  <img id="big" alt="">
+  <button class="nav next" id="next" aria-label="next"></button>
+  <button id="close" aria-label="close">&times;</button>
+  <div id="count"></div>
+</div>
+
+<script type="module">
+const $ = s => document.querySelector(s);
+const sub = crypto.subtle;
+const unb64 = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
+
+let KEY = null, ITEMS = [], URLS = [], open = -1;
+
+const dec = async bytes =>
+  new Uint8Array(await sub.decrypt({ name:'AES-GCM', iv: bytes.slice(0,12) }, KEY, bytes.slice(12)));
+
+let BUILD = '';
+async function grab(path){
+  // Immutable per build id, so caching hard is safe.
+  const r = await fetch(`${path}?b=${BUILD}`, { cache:'force-cache' });
+  if (!r.ok) throw new Error(path);
+  return new Uint8Array(await r.arrayBuffer());
+}
+
+async function unlock(code){
+  if (!code) return;
+  $('#go').disabled = true; $('#msg').className = ''; $('#msg').textContent = 'one moment…';
+  await new Promise(r => requestAnimationFrame(() => setTimeout(r, 0)));  // let the text paint
+  try {
+    const p = await (await fetch('params.json', { cache:'no-cache' })).json();
+    BUILD = p.build || '0';
+    const base = await sub.importKey('raw', new TextEncoder().encode(code), 'PBKDF2', false, ['deriveBits']);
+    const bits = await sub.deriveBits(
+      { name:'PBKDF2', hash:'SHA-256', salt: unb64(p.salt), iterations: p.iterations }, base, 256);
+    KEY = await sub.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
+    const meta = JSON.parse(new TextDecoder().decode(await dec(await grab('meta.bin'))));
+    reveal(meta);
+  } catch {
+    $('#msg').className = 'bad'; $('#msg').textContent = "that's not it";
+    $('#go').disabled = false; $('#code').select();
+  }
+}
+
+$('#f').addEventListener('submit', e => { e.preventDefault(); unlock($('#code').value.trim().toLowerCase()); });
+
+// A code in the hash (typed, or forwarded by 404.html) opens it directly.
+const fromHash = decodeURIComponent(location.hash.replace(/^#/, '')).trim().toLowerCase();
+if (fromHash) {
+  history.replaceState(null, '', location.pathname);   // don't leave the code in the bar
+  unlock(fromHash);
+}
+
+function reveal(meta){
+  const [head, ...rest] = meta.message.split('\n');
+  $('#note').innerHTML = '';
+  const h = document.createElement('h1'); h.textContent = head; $('#note').append(h);
+  for (const para of rest.join('\n').split(/\n{2,}/)) {
+    if (!para.trim()) continue;
+    const el = document.createElement('p'); el.textContent = para.trim(); $('#note').append(el);
+  }
+  ITEMS = meta.items; URLS = new Array(ITEMS.length);
+  $('#lock').style.display = 'none';
+  $('#panel').style.display = 'block';
+  buildWall();
+  loadPacks(meta.packs);
+}
+
+// Deterministic jitter, so the scatter is the same every visit.
+const rnd = i => { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); };
+
+function buildWall(){
+  const wall = $('#wall');
+  ITEMS.forEach((it, i) => {
+    const b = document.createElement('button');
+    b.className = 'ph'; b.type = 'button';
+    b.style.transform = `rotate(${(rnd(i) - .5) * 5.5}deg)`;
+    b.style.zIndex = Math.floor(rnd(i + 99) * 20);
+    b.style.marginLeft = `${(rnd(i + 7) - .5) * 9}%`;
+    const img = document.createElement('img');
+    img.width = it.w; img.height = it.h; img.alt = '';
+    img.style.aspectRatio = `${it.w} / ${it.h}`;
+    b.append(img); b.addEventListener('click', () => show(i));
+    wall.append(b);
+  });
+}
+
+async function loadPacks(packs){
+  let at = 0;
+  for (const name of packs) {
+    try {
+      const raw = await dec(await grab(name));
+      let o = 0;
+      const view = new DataView(raw.buffer, raw.byteOffset, raw.byteLength);
+      while (o < raw.length) {
+        const len = view.getUint32(o, true); o += 4;
+        const url = URL.createObjectURL(new Blob([raw.slice(o, o + len)], { type:'image/jpeg' }));
+        o += len;
+        const img = $('#wall').children[at]?.firstChild;
+        if (img) img.src = url;
+        at++;
+      }
+    } catch { /* a pack that fails just leaves placeholders */ }
+  }
+}
+
+async function show(i){
+  if (i < 0 || i >= ITEMS.length) return;
+  open = i;
+  $('#box').classList.add('on');
+  $('#count').textContent = `${i + 1} / ${ITEMS.length}`;
+  $('#big').src = $('#wall').children[i].firstChild.src || '';   // thumb first, then swap
+  $('#close').focus();
+  if (!URLS[i]) {
+    try {
+      URLS[i] = URL.createObjectURL(
+        new Blob([await dec(await grab(`f/${ITEMS[i].n}.bin`))], { type:'image/jpeg' }));
+    } catch { return; }
+  }
+  if (open === i) $('#big').src = URLS[i];
+}
+
+const shut = () => { $('#box').classList.remove('on'); open = -1; };
+$('#close').addEventListener('click', shut);
+$('#prev').addEventListener('click', () => show(open - 1));
+$('#next').addEventListener('click', () => show(open + 1));
+$('#box').addEventListener('click', e => { if (e.target === $('#box')) shut(); });
+addEventListener('keydown', e => {
+  if (!$('#box').classList.contains('on')) return;
+  if (e.key === 'Escape') shut();
+  if (e.key === 'ArrowLeft') show(open - 1);
+  if (e.key === 'ArrowRight') show(open + 1);
+});
+</script>
+</body>
+</html>
