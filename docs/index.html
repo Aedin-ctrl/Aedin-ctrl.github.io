@@ -1803,7 +1803,7 @@
   const DOT_COLORS = { dotClose:'red', dotMinimize:'yellow', dotMaximize:'green' };
 
   // Must match normalize() in the vault's server.js.
-  function normalizeSecretWord(typed){ return typed.trim().toLowerCase().replace(/\s+/g, ' '); }
+  function normalizeSecretWord(typed){ return typed.trim().replace(/\s+/g, ' '); }
 
   // Resolves to the payload, or null for anything else at all -- a wrong key, too many
   // attempts, or the Pi being off. The caller cannot tell those apart, and neither can
@@ -1863,7 +1863,7 @@
   let secretLoaded = false;
   let secretTimer = null;
   const SECRET_MAX_CLICKS = 24;
-  const SECRET_SETTLE_MS = 900;
+  const SECRET_SETTLE_MS = 2500;
 
   function armSecret(typed){
     secretArmed = true;
