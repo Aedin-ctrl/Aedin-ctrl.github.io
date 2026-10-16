@@ -99,7 +99,6 @@
   .deco{position:absolute;pointer-events:none;user-select:none;z-index:1;
         filter:drop-shadow(0 6px 14px var(--shadow))}
   .deco svg{display:block;width:100%;height:auto}
-  @media(max-width:640px){ .deco{scale:.62} }
   @media (prefers-reduced-motion: no-preference){
     @supports (animation-timeline: view()){
       @keyframes drift{from{translate:0 26px}to{translate:0 -26px}}
@@ -415,7 +414,7 @@ const TRINKETS = ['blueheart','blueheart','blueheart','heart-lightblue',
 function decorate(sec, ci){
   const r = k => rnd(ci * 31 + k);
   // scale the clutter to the chapter, so a long one does not end up bare
-  const n = 16 + Math.round(r(0) * 9);
+  const n = 5 + Math.round(r(0) * 4);
 
   for (let k = 0; k < n; k++){
     const bird = k % 5 === 0;                       // roughly one in five
@@ -428,10 +427,9 @@ function decorate(sec, ci){
     d.setAttribute('aria-hidden', 'true');
     d.style.width = w + 'px';
     d.dataset.seed = ci * 101 + k;        // placed once the photos are down
-    // nothing sits upright
-    const turn = (r(k * 5 + 5) - .5) * 96;
-    d.style.rotate = (Math.abs(turn) < 8 ? turn + 14 : turn) + 'deg';
-    if (r(k * 5 + 6) > .5) d.style.scale = '-1 1';
+    // upright, leaning a little one way or the other
+    d.style.rotate = ((r(k * 5 + 5) - .5) * 26) + 'deg';
+    if (r(k * 5 + 6) > .5) d.dataset.flip = '1';
     // most ride over the photos — tucked behind a dense board they simply
     // vanish — but leave some underneath so it layers rather than floats
     d.style.zIndex = r(k * 5 + 7) > .22 ? 48 : 0;
@@ -518,24 +516,32 @@ function layout(){
   placeDecor();
 }
 
-// A cutout may touch a photo's border but never its middle: that is where
-// the faces are. Each photo gets a protected core — everything but its outer
-// fifth — and a cutout is only dropped somewhere that misses every core.
+// Cutouts belong in the background, not on the photos. Every photo claims
+// its whole box plus a margin, and a cutout is only dropped where it misses
+// all of them — so they end up in the gaps the board leaves behind.
 function placeDecor(only){
   for (const sec of (only ? [only] : document.querySelectorAll('.chapter'))){
     const sr = sec.getBoundingClientRect();
     if (!sr.width || !sr.height) continue;
     const cores = [...sec.querySelectorAll('.ph:not(.hid)')].map(ph => {
       const r = ph.getBoundingClientRect();
-      const ix = r.width * 0.2, iy = r.height * 0.2;
-      return { l: r.left - sr.left + ix, t: r.top - sr.top + iy,
-               r: r.right - sr.left - ix, b: r.bottom - sr.top - iy };
+      const pad = 7;                       // keep off the white photo border too
+      return { l: r.left - sr.left - pad, t: r.top - sr.top - pad,
+               r: r.right - sr.left + pad, b: r.bottom - sr.top + pad };
     });
+    const taken = [];                    // what has already been put down
+    // CSS shrinks cutouts on a phone; reserving their full width there meant
+    // hardly any found a home
+    const small = innerWidth <= 640;
+    const shrink = small ? 0.62 : 1;
+    const GAP = small ? 24 : 44;         // breathing room between cutouts
     for (const d of sec.querySelectorAll('.deco')){
       const seed = +d.dataset.seed;
-      const w = parseFloat(d.style.width) || 40;   // Twemoji art is square
-      // The box it will actually occupy is bigger than w: it is rotated, and
-      // it drifts vertically as the chapter scrolls. Test against that.
+      const W = parseFloat(d.style.width) || 40;   // Twemoji art is square
+      const w = W * shrink;                        // what it actually renders at
+      // CSS scales about the centre, so the drawn box sits inset from the
+      // left/top we set. Work in drawn coordinates and back the offset out.
+      const off = (W - w) / 2;
       const turn = Math.abs(parseFloat(d.style.rotate) || 0) * Math.PI / 180;
       const spread = w * (Math.cos(turn) + Math.sin(turn));
       const mx = (spread - w) / 2 + 4;
@@ -544,9 +550,19 @@ function placeDecor(only){
       for (let t = 0; t < 110 && !done; t++){
         const x = rnd(seed * 7 + t * 3 + 1) * Math.max(1, sr.width  - w);
         const y = rnd(seed * 7 + t * 3 + 2) * Math.max(1, sr.height - w);
-        const clear = !cores.some(c =>
+        const offPhotos = !cores.some(c =>
           x - mx < c.r && x + w + mx > c.l && y - my < c.b && y + w + my > c.t);
-        if (clear){ d.style.left = x + 'px'; d.style.top = y + 'px'; done = true; }
+        const apart = !taken.some(o =>
+          x - GAP < o.r && x + w + GAP > o.l && y - GAP < o.b && y + w + GAP > o.t);
+        if (offPhotos && apart){
+          // flip and shrink share one property; set them together or the
+          // inline flip silently cancels the shrink
+          d.style.scale = (d.dataset.flip ? -shrink : shrink) + ' ' + shrink;
+          d.style.left = (x - off) + 'px';
+          d.style.top  = (y - off) + 'px';
+          taken.push({ l: x, t: y, r: x + w, b: y + w });
+          done = true;
+        }
       }
       // nowhere clear in a crowded chapter: better absent than over a face
       d.style.display = done ? '' : 'none';
