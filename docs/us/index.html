@@ -102,13 +102,10 @@
   @media(max-width:640px){ .deco{scale:.62} }
   @media (prefers-reduced-motion: no-preference){
     @supports (animation-timeline: view()){
-      @keyframes drift{from{translate:0 42px;rotate:-5deg}to{translate:0 -42px;rotate:5deg}}
+      @keyframes drift{from{translate:0 26px}to{translate:0 -26px}}
       .deco{animation:drift linear both;animation-timeline:view();animation-range:cover}
     }
   }
-  /* the outer pair only appear once there is real room beside the board */
-  .deco.far{display:none}
-  @media(min-width:1500px){ .deco.far{display:block} }
 
   /* ---------- penguin ---------- */
   #peng{position:relative;text-align:center;padding:0 0 10vh;z-index:2}
@@ -408,45 +405,41 @@ function wirePhoto(b, i){
 // Twemoji, CC-BY 4.0, credited in docs/licenses.txt. Shipped from this
 // origin rather than a CDN: the page has never made an outside request and
 // loading art from one would tell a third party she is reading it.
-const CUTOUTS = [
-  { src: 'penguin',   w: 118 },
-  { src: 'penguin',   w: 96, flip: true },
-  { src: 'penguin',   w: 136 },
-  { src: 'blueheart', w: 54 },
-  { src: 'sparkles',  w: 62 },
-  { src: 'snowflake', w: 56 },
-  { src: 'fish',      w: 64, flip: true },
-  { src: 'ice',       w: 58 },
-];
+// Penguins are the anchor, hearts are the filler. Snowflakes are gone.
+const BIRDS  = ['penguin'];
+// Only the blue hearts: the pink ones fought the navy. Stars stay — they
+// pick up the orange in the penguin's beak and feet.
+const TRINKETS = ['blueheart','blueheart','blueheart','heart-lightblue',
+                  'heart-lightblue','heart-lightblue','blueheart',
+                  'sparkles','star','star-glow','heart-lightblue','blueheart'];
 function decorate(sec, ci){
-  const add = (pick, css, cls = '') => {
+  const r = k => rnd(ci * 31 + k);
+  // scale the clutter to the chapter, so a long one does not end up bare
+  const n = 34 + Math.round(r(0) * 16);
+
+  for (let k = 0; k < n; k++){
+    const bird = k % 5 === 0;                       // roughly one in five
+    const src = bird ? BIRDS[0] : TRINKETS[Math.floor(r(k * 3 + 1) * TRINKETS.length)];
+    const w = bird ? 58 + r(k * 3 + 2) * 104        // penguins 58–162
+                   : 28 + r(k * 3 + 2) * 62;        // trinkets 28–90
+
     const d = document.createElement('div');
-    d.className = 'deco ' + cls;
+    d.className = 'deco';
     d.setAttribute('aria-hidden', 'true');
-    d.style.width = pick.w + 'px';
-    Object.assign(d.style, css);
-    if (pick.flip) d.style.scale = '-1 1';
-    d.innerHTML = `<img src="art/${pick.src}.svg" alt="" width="${pick.w}" loading="lazy">`;
+    d.style.width = w + 'px';
+    // right across the chapter, including over the photos
+    d.style.left = (r(k * 5 + 3) * 92) + '%';
+    d.style.top  = (r(k * 5 + 4) * 93) + '%';
+    // nothing sits upright
+    const turn = (r(k * 5 + 5) - .5) * 96;
+    d.style.rotate = (Math.abs(turn) < 8 ? turn + 14 : turn) + 'deg';
+    if (r(k * 5 + 6) > .5) d.style.scale = '-1 1';
+    // most ride over the photos — tucked behind a dense board they simply
+    // vanish — but leave some underneath so it layers rather than floats
+    d.style.zIndex = r(k * 5 + 7) > .22 ? 48 : 0;
+    d.style.opacity = bird ? 1 : (.72 + r(k * 5 + 8) * .28);
+    d.innerHTML = `<img src="art/${src}.svg" alt="" width="${Math.round(w)}" loading="lazy">`;
     sec.append(d);
-  };
-  const r = k => rnd(ci * 7 + k);
-  const left = ci % 2 === 0;
-  // one under the board, tucked into the gap between chapters
-  const main = CUTOUTS[Math.floor(r(1) * 3)];                 // always a penguin
-  add(main, { bottom: (3 + r(2) * 6) + 'vh',
-              [left ? 'left' : 'right']: (2 + r(3) * 7) + '%',
-              rotate: ((r(4) - .5) * 24) + 'deg' });
-  // a small mark on the other side
-  const mark = CUTOUTS[3 + Math.floor(r(5) * 5)];
-  add(mark, { bottom: (6 + r(6) * 7) + 'vh',
-              [left ? 'right' : 'left']: (3 + r(7) * 8) + '%',
-              rotate: ((r(8) - .5) * 40) + 'deg', opacity: .75 });
-  // and out in the margin, where a wide screen leaves room beside the board
-  if (ci % 2 === 1){
-    const edge = CUTOUTS[Math.floor(r(9) * 3)];
-    add(edge, { top: (26 + r(10) * 34) + '%',
-                [left ? 'right' : 'left']: '8px',
-                rotate: ((r(11) - .5) * 26) + 'deg', opacity: .9 }, 'far');
   }
 }
 
