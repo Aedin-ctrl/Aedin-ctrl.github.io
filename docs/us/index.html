@@ -620,9 +620,10 @@ $('#envBtn').addEventListener('click', () => {
   reduced ? reveal() : btn.addEventListener('animationend', reveal, { once:true });
 });
 
-// Midnight local, so the day rolls over when it actually does. The per-photo
-// day labels stay on START, which keeps that date-only maths clear of DST.
-const TICK_FROM = new Date('2025-10-17T00:00:00');
+// 9am on the 17th — the actual hour, so the count reads exactly one year at
+// 9am on the anniversary rather than nine hours past it. The per-photo day
+// labels stay on START, which keeps that date-only maths clear of DST.
+const TICK_FROM = new Date('2025-10-17T09:00:00');
 
 // Each unit is the remainder of the one before it. Years and months are
 // calendar steps, not fixed lengths, so they are walked rather than divided;
