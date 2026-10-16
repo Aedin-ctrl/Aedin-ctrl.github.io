@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <meta name="robots" content="noindex, nofollow">
 <title>&nbsp;</title>
 <link rel="icon" href="data:,">
@@ -10,15 +11,14 @@
   @font-face{font-family:'Inter';src:url('../fonts/Inter-latin.woff2') format('woff2');font-weight:100 900;font-display:swap}
   @font-face{font-family:'Great Vibes';src:url('../fonts/GreatVibes-latin.woff2') format('woff2');font-weight:400;font-display:swap}
   :root{
+    /* this one is always on paper: no dark variant, so a phone set to dark
+       mode still opens it the way it was meant to look */
+    color-scheme: light;
     /* navy, with the text itself navy rather than black */
     --paper:#eef3fa; --ink:#13294b; --muted:#64789a; --line:#d3dfee;
     --accent:#1b3a6b; --shadow:rgba(19,41,75,.18); --edge:#fff; --card:#fbfcff;
     --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
   }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-    --paper:#0a1322; --ink:#e6edf8; --muted:#7f93b0; --line:#1a2537;
-    --accent:#7fb0ef; --shadow:rgba(0,0,0,.62); --edge:#16202f; --card:#101a28;
-  }}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;overflow-x:clip}
   body{margin:0;background:var(--paper);color:var(--ink);line-height:1.6;
@@ -26,7 +26,6 @@
   /* paper grain — warmth without an image request */
   body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.38;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
-  @media (prefers-color-scheme: dark){ body::before{opacity:.25} }
 
   /* ---------- lock ---------- */
   #lock{min-height:100svh;display:grid;place-items:center;padding:24px;position:relative;z-index:2}
