@@ -430,9 +430,10 @@ function decorate(sec, ci){
     // upright, leaning a little one way or the other
     d.style.rotate = ((r(k * 5 + 5) - .5) * 26) + 'deg';
     if (r(k * 5 + 6) > .5) d.dataset.flip = '1';
-    // most ride over the photos — tucked behind a dense board they simply
-    // vanish — but leave some underneath so it layers rather than floats
-    d.style.zIndex = r(k * 5 + 7) > .22 ? 48 : 0;
+    // Under the sticky chapter heading (z 30) and the toolbar (z 50), so a
+    // heading travelling down the chapter always passes over a cutout. They
+    // no longer overlap photos at all, so their order against those is moot.
+    d.style.zIndex = 20;
     d.style.opacity = bird ? 1 : (.72 + r(k * 5 + 8) * .28);
     d.innerHTML = `<img src="art/${src}.svg" alt="" width="${Math.round(w)}" loading="lazy">`;
     sec.append(d);
@@ -523,12 +524,15 @@ function placeDecor(only){
   for (const sec of (only ? [only] : document.querySelectorAll('.chapter'))){
     const sr = sec.getBoundingClientRect();
     if (!sr.width || !sr.height) continue;
-    const cores = [...sec.querySelectorAll('.ph:not(.hid)')].map(ph => {
-      const r = ph.getBoundingClientRect();
-      const pad = 7;                       // keep off the white photo border too
+    const box = (el, pad) => {
+      const r = el.getBoundingClientRect();
       return { l: r.left - sr.left - pad, t: r.top - sr.top - pad,
                r: r.right - sr.left + pad, b: r.bottom - sr.top + pad };
-    });
+    };
+    const cores = [...sec.querySelectorAll('.ph:not(.hid)')].map(ph => box(ph, 7));
+    // the heading and its count are words; keep clear of them too
+    const head = sec.querySelector('.chead');
+    if (head) cores.push(box(head, 12));
     const taken = [];                    // what has already been put down
     // CSS shrinks cutouts on a phone; reserving their full width there meant
     // hardly any found a home
