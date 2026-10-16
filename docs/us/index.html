@@ -75,11 +75,11 @@
       cursor:grab;line-height:0;touch-action:none;
       -webkit-user-select:none;user-select:none;
       transition:scale .2s ease, rotate .2s ease, transform .18s ease}
-  .ph.dragging{cursor:grabbing;transition:none;z-index:60!important}
+  .ph.dragging{cursor:grabbing;transition:none;z-index:95!important}
   .ph.dragging img{box-shadow:0 22px 50px rgba(60,40,25,.4)}
   .ph img{width:100%;height:auto;display:block;background:var(--line);
           border:4px solid var(--edge);border-radius:2px;box-shadow:0 6px 18px var(--shadow)}
-  .ph:hover,.ph:focus-visible{scale:1.12;rotate:0deg;z-index:45!important;outline:none}
+  .ph:hover,.ph:focus-visible{scale:1.12;rotate:0deg;z-index:90!important;outline:none}
   .ph:focus-visible img{outline:2px solid var(--accent);outline-offset:3px}
   .ph.hid{display:none}
 
@@ -415,7 +415,7 @@ const TRINKETS = ['blueheart','blueheart','blueheart','heart-lightblue',
 function decorate(sec, ci){
   const r = k => rnd(ci * 31 + k);
   // scale the clutter to the chapter, so a long one does not end up bare
-  const n = 34 + Math.round(r(0) * 16);
+  const n = 16 + Math.round(r(0) * 9);
 
   for (let k = 0; k < n; k++){
     const bird = k % 5 === 0;                       // roughly one in five
@@ -427,9 +427,7 @@ function decorate(sec, ci){
     d.className = 'deco';
     d.setAttribute('aria-hidden', 'true');
     d.style.width = w + 'px';
-    // right across the chapter, including over the photos
-    d.style.left = (r(k * 5 + 3) * 92) + '%';
-    d.style.top  = (r(k * 5 + 4) * 93) + '%';
+    d.dataset.seed = ci * 101 + k;        // placed once the photos are down
     // nothing sits upright
     const turn = (r(k * 5 + 5) - .5) * 96;
     d.style.rotate = (Math.abs(turn) < 8 ? turn + 14 : turn) + 'deg';
@@ -517,6 +515,43 @@ function layout(){
     board.style.height = Math.ceil(bottom + pad) + 'px';
   }
   applyNudges();
+  placeDecor();
+}
+
+// A cutout may touch a photo's border but never its middle: that is where
+// the faces are. Each photo gets a protected core — everything but its outer
+// fifth — and a cutout is only dropped somewhere that misses every core.
+function placeDecor(only){
+  for (const sec of (only ? [only] : document.querySelectorAll('.chapter'))){
+    const sr = sec.getBoundingClientRect();
+    if (!sr.width || !sr.height) continue;
+    const cores = [...sec.querySelectorAll('.ph:not(.hid)')].map(ph => {
+      const r = ph.getBoundingClientRect();
+      const ix = r.width * 0.2, iy = r.height * 0.2;
+      return { l: r.left - sr.left + ix, t: r.top - sr.top + iy,
+               r: r.right - sr.left - ix, b: r.bottom - sr.top - iy };
+    });
+    for (const d of sec.querySelectorAll('.deco')){
+      const seed = +d.dataset.seed;
+      const w = parseFloat(d.style.width) || 40;   // Twemoji art is square
+      // The box it will actually occupy is bigger than w: it is rotated, and
+      // it drifts vertically as the chapter scrolls. Test against that.
+      const turn = Math.abs(parseFloat(d.style.rotate) || 0) * Math.PI / 180;
+      const spread = w * (Math.cos(turn) + Math.sin(turn));
+      const mx = (spread - w) / 2 + 4;
+      const my = (spread - w) / 2 + 34;            // 26px of drift, plus slack
+      let done = false;
+      for (let t = 0; t < 110 && !done; t++){
+        const x = rnd(seed * 7 + t * 3 + 1) * Math.max(1, sr.width  - w);
+        const y = rnd(seed * 7 + t * 3 + 2) * Math.max(1, sr.height - w);
+        const clear = !cores.some(c =>
+          x - mx < c.r && x + w + mx > c.l && y - my < c.b && y + w + my > c.t);
+        if (clear){ d.style.left = x + 'px'; d.style.top = y + 'px'; done = true; }
+      }
+      // nowhere clear in a crowded chapter: better absent than over a face
+      d.style.display = done ? '' : 'none';
+    }
+  }
 }
 function applyNudges(){
   for (const b of document.querySelectorAll('.ph')){
@@ -637,6 +672,15 @@ function buildRail(){
     rail.append(b);
   });
   rail.classList.add('on');
+  const seen = new WeakSet();
+  const io2 = new IntersectionObserver(es => {
+    for (const e of es) if (e.isIntersecting && !seen.has(e.target)){
+      seen.add(e.target);
+      placeDecor(e.target);
+    }
+  }, { rootMargin: '200% 0px' });
+  document.querySelectorAll('.chapter').forEach(c => io2.observe(c));
+
   const btns = [...rail.children];
   const io = new IntersectionObserver(es => { for (const e of es) if (e.isIntersecting){
     const ci = +e.target.id.slice(2);
