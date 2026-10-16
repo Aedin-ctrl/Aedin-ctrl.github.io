@@ -6,6 +6,7 @@
 //   secret/us/manifest.json   chapter titles + each photo's date, in display order
 //   secret/us/message.txt     the note; first line is the heading
 //   secret/us/ps.txt          optional closing note, sealed in an envelope at the end
+//   secret/us/ps.jpg          optional photo to sit with that closing note
 //   secret/us/code.txt        the passphrase she types
 //
 //   node scripts/herpanel.mjs build
@@ -96,6 +97,8 @@ if (!code) die('secret/us/code.txt is empty');
 const message = readFileSync(join(SRC, 'message.txt'), 'utf8').trim();
 const psPath = join(SRC, 'ps.txt');
 const ps = existsSync(psPath) ? readFileSync(psPath, 'utf8').trim() : '';
+// the photo that sits with the closing note, if there is one
+const psPic = ['ps.jpg', 'ps.jpeg', 'ps.png'].map(f => join(SRC, f)).find(existsSync);
 
 need(join(SRC, 'manifest.json'));
 const manifest = JSON.parse(readFileSync(join(SRC, 'manifest.json'), 'utf8'));
@@ -141,9 +144,16 @@ for (const it of items) {
 }
 
 // --- the note and the layout index ---
+if (psPic){
+  writeFileSync(join(OUT, 'ps.bin'), await enc(key, readFileSync(psPic)));
+  console.log(`sealed the closing photo (${psPic.split('/').pop()})`);
+}
+
 writeFileSync(join(OUT, 'meta.bin'),
   await enc(key, Buffer.from(JSON.stringify(
-    { v: 1, message, ps, chapters: manifest.chapters, items, packs }), 'utf8')));
+    { v: 1, message, ps, psPic: !!psPic,
+      psType: psPic && psPic.endsWith('.png') ? 'image/png' : 'image/jpeg',
+      chapters: manifest.chapters, items, packs }), 'utf8')));
 
 // --- site 404: forwards aedinlai.com/<code> to the panel, 404s on anything else ---
 // Only the code's SHA-256 ships, never the code.

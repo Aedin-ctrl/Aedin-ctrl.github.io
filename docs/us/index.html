@@ -150,6 +150,10 @@
     30%{scale:1.04 .96}
     100%{scale:.9;opacity:0;translate:0 -14px}
   }
+  #envPic{display:none;max-width:min(26rem,100%);width:100%;height:auto;margin:0 auto 26px;
+          border:7px solid var(--edge);border-radius:3px;box-shadow:0 10px 30px var(--shadow);
+          rotate:-1.4deg}
+  #envPic.on{display:block;animation:slipOut .7s cubic-bezier(.2,.7,.3,1) backwards}
   #envText{display:none;font-family:var(--serif);font-size:clamp(17px,2.6vw,20px);
            white-space:pre-wrap;text-align:left;line-height:1.75}
   #envText.on{display:block;animation:slipOut .62s cubic-bezier(.2,.7,.3,1) backwards}
@@ -232,7 +236,8 @@
   </div>
   <section id="env" hidden>
     <button id="envBtn" type="button"><span class="seal" aria-hidden="true">✉</span><span class="lab">one more thing</span></button>
-    <div id="envText"></div>
+    <img id="envPic" alt="">
+  <div id="envText"></div>
   </section>
 </main>
 
@@ -316,7 +321,11 @@ function reveal(meta){
   buildChapters(); buildRail();
   $('#bar').hidden = false;
   startTick(); $('#peng').hidden = false;
-  if (meta.ps) { $('#env').hidden = false; $('#envText').textContent = meta.ps; }
+  if (meta.ps || meta.psPic){
+    $('#env').hidden = false;
+    if (meta.ps) $('#envText').textContent = meta.ps;
+    if (meta.psPic) loadClosingPic(meta.psType || 'image/jpeg');
+  }
   loadPacks(meta.packs);
 }
 
@@ -608,11 +617,19 @@ $('#shuffle').addEventListener('click', () => {
   if (ITEMS.length) show(Math.floor(Math.random() * ITEMS.length));
 });
 $('#toTop').addEventListener('click', () => scrollTo({top:0, behavior:'smooth'}));
+async function loadClosingPic(type){
+  try {
+    $('#envPic').src = URL.createObjectURL(
+      new Blob([await dec(await grab('ps.bin'))], { type }));
+  } catch { /* no photo is fine; the note still opens */ }
+}
+
 $('#envBtn').addEventListener('click', () => {
   const btn = $('#envBtn');
   btn.disabled = true; btn.classList.add('opening');
   const reveal = () => {
     btn.hidden = true;
+    if ($('#envPic').src) $('#envPic').classList.add('on');
     $('#envText').classList.add('on');
     $('#envText').scrollIntoView({behavior:'smooth', block:'center'});
   };
