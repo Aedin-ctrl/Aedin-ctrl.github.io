@@ -9,13 +9,14 @@
 <style>
   @font-face{font-family:'Inter';src:url('../fonts/Inter-latin.woff2') format('woff2');font-weight:100 900;font-display:swap}
   :root{
-    --paper:#eef4fb; --ink:#131d2b; --muted:#6c8099; --line:#d6e3f0;
-    --accent:#2f6fb5; --shadow:rgba(25,55,95,.18); --edge:#fff; --card:#fbfdff;
+    /* navy, with the text itself navy rather than black */
+    --paper:#eef3fa; --ink:#13294b; --muted:#6b7f9e; --line:#d3dfee;
+    --accent:#1e4f9c; --shadow:rgba(19,41,75,.18); --edge:#fff; --card:#fbfcff;
     --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
   }
   @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-    --paper:#0b1119; --ink:#e7eef7; --muted:#8398b0; --line:#1d2836;
-    --accent:#6fa9e8; --shadow:rgba(0,0,0,.6); --edge:#18212e; --card:#121b26;
+    --paper:#0a1322; --ink:#e6edf8; --muted:#7f93b0; --line:#1a2537;
+    --accent:#7fb0ef; --shadow:rgba(0,0,0,.62); --edge:#16202f; --card:#101a28;
   }}
   *{box-sizing:border-box}
   html{scroll-behavior:smooth;overflow-x:clip}
@@ -114,10 +115,7 @@
   #pengBtn{background:none;border:0;cursor:pointer;padding:8px;opacity:.26;
            transition:opacity .25s}
   #pengBtn:hover,#pengBtn:focus-visible{opacity:1;outline:none}
-  #pengBtn svg{width:46px;height:auto;display:block}
-  #pengBtn svg path,#pengBtn svg circle{fill:none;stroke:var(--ink);stroke-width:2.5;
-    stroke-linecap:round;stroke-linejoin:round}
-  #pengBtn svg .eye{fill:var(--ink);stroke:none}
+  #pengBtn img{width:52px;height:auto;display:block}
   #pengBtn.go{animation:waddle 3.4s ease-in-out}
   @keyframes waddle{
     0%{translate:0 0;rotate:0deg}
@@ -232,19 +230,7 @@
   <div id="chapters"></div>
   <div id="peng" hidden>
     <button id="pengBtn" type="button" aria-label="a penguin">
-      <svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <circle cx="100" cy="52" r="30" />
-        <path d="M62,88 C42,118 37,168 47,203 C57,223 143,223 153,203 C163,168 158,118 138,88" />
-        <path d="M79,92 C66,127 66,177 81,212" />
-        <path d="M121,92 C134,127 134,177 119,212" />
-        <path d="M57,108 C42,138 42,168 57,193" />
-        <path d="M143,108 C158,138 158,168 143,193" />
-        <path d="M92,68 L84,80 L100,84 Z" />
-        <path d="M68,220 L58,233 L80,228" />
-        <path d="M132,220 L142,233 L120,228" />
-        <circle class="eye" cx="88" cy="47" r="3.2" />
-        <circle class="eye" cx="112" cy="47" r="3.2" />
-      </svg>
+      <img src="art/penguin.svg" alt="" width="52">
     </button>
     <div id="pengSay" role="status" aria-live="polite"></div>
   </div>
@@ -269,52 +255,6 @@
 </dialog>
 
 <script type="module">
-// Drawn rather than fetched: the page makes no outside requests, and a sticker
-// that is a path scales to any screen without shipping another file.
-const PENGUIN = (pose) => {
-  const body = '#1d3550', belly = '#ffffff', bill = '#f4a63d';
-  const head = `<circle cx="55" cy="36" r="25" fill="${body}"/>
-    <circle cx="47" cy="33" r="5.5" fill="#fff"/><circle cx="63" cy="33" r="5.5" fill="#fff"/>
-    <circle cx="48" cy="34" r="2.6" fill="${body}"/><circle cx="64" cy="34" r="2.6" fill="${body}"/>
-    <path d="M55 41 l-7 8 h14z" fill="${bill}"/>`;
-  if (pose === 'slide')
-    return `<svg viewBox="0 0 150 90" xmlns="http://www.w3.org/2000/svg">
-      <g paint-order="stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round">
-        <path d="M118 74 q16 4 22 -4 q-8 -10 -22 -6z" fill="${bill}"/>
-        <path d="M20 52 C20 30 45 22 78 26 C110 30 132 44 132 58 C132 72 108 78 74 76 C40 74 20 68 20 52z" fill="${body}"/>
-        <path d="M34 56 C34 44 54 40 78 43 C104 46 120 54 120 62 C120 70 100 72 74 70 C46 68 34 64 34 56z" fill="${belly}"/>
-        <circle cx="36" cy="43" r="5" fill="#fff"/><circle cx="35" cy="44" r="2.4" fill="${body}"/>
-        <path d="M22 46 l-11 3 l11 5z" fill="${bill}"/>
-      </g></svg>`;
-  const wave = pose === 'wave';
-  return `<svg viewBox="0 0 110 150" xmlns="http://www.w3.org/2000/svg">
-    <g paint-order="stroke" stroke="#fff" stroke-width="7" stroke-linejoin="round">
-      <path d="M38 120 q-12 12 1 15 h16 q7 -3 2 -15z" fill="${bill}"/>
-      <path d="M72 120 q12 12 -1 15 h-16 q-7 -3 -2 -15z" fill="${bill}"/>
-      ${wave ? `<path d="M84 60 q22 -18 18 -34 q-12 -4 -24 16z" fill="${body}"/>`
-             : `<path d="M86 58 q16 16 10 36 q-12 4 -18 -18z" fill="${body}"/>`}
-      <path d="M24 58 q-16 16 -10 36 q12 4 18 -18z" fill="${body}"/>
-      <path d="M55 14 C32 14 22 40 22 72 C22 106 34 126 55 126 C76 126 88 106 88 72 C88 40 78 14 55 14z" fill="${body}"/>
-      <ellipse cx="55" cy="84" rx="21" ry="34" fill="${belly}"/>
-      ${head}
-    </g></svg>`;
-};
-
-// little hand-drawn marks to break up the margins
-const DOODLE = (kind) => {
-  const c = 'var(--accent)';
-  if (kind === 'sparkle')
-    return `<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-      <path d="M30 4 C33 22 38 27 56 30 C38 33 33 38 30 56 C27 38 22 33 4 30 C22 27 27 22 30 4z"
-            fill="none" stroke="${c}" stroke-width="3.5" stroke-linejoin="round"/></svg>`;
-  if (kind === 'squiggle')
-    return `<svg viewBox="0 0 90 34" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 22 q11 -20 22 0 t22 0 t22 0" fill="none" stroke="${c}"
-            stroke-width="3.5" stroke-linecap="round"/></svg>`;
-  return `<svg viewBox="0 0 60 56" xmlns="http://www.w3.org/2000/svg">
-      <path d="M30 52 C6 36 4 20 14 12 C22 6 30 12 30 18 C30 12 38 6 46 12 C56 20 54 36 30 52z"
-            fill="none" stroke="${c}" stroke-width="3.5" stroke-linejoin="round"/></svg>`;
-};
 const $ = s => document.querySelector(s);
 const sub = crypto.subtle;
 const unb64 = s => Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')), c => c.charCodeAt(0));
@@ -465,13 +405,18 @@ function wirePhoto(b, i){
 // Cutouts live in the gap under each board and, on a wide screen, out beyond
 // the board's edge. They are decoration, so they are hidden from readers and
 // never take a pointer event.
+// Twemoji, CC-BY 4.0, credited in docs/licenses.txt. Shipped from this
+// origin rather than a CDN: the page has never made an outside request and
+// loading art from one would tell a third party she is reading it.
 const CUTOUTS = [
-  { art: () => PENGUIN('stand'), w: 132 },
-  { art: () => PENGUIN('wave'),  w: 126 },
-  { art: () => PENGUIN('slide'), w: 178 },
-  { art: () => DOODLE('sparkle'), w: 50 },
-  { art: () => DOODLE('heart'),   w: 46 },
-  { art: () => DOODLE('squiggle'), w: 84 },
+  { src: 'penguin',   w: 118 },
+  { src: 'penguin',   w: 96, flip: true },
+  { src: 'penguin',   w: 136 },
+  { src: 'blueheart', w: 54 },
+  { src: 'sparkles',  w: 62 },
+  { src: 'snowflake', w: 56 },
+  { src: 'fish',      w: 64, flip: true },
+  { src: 'ice',       w: 58 },
 ];
 function decorate(sec, ci){
   const add = (pick, css, cls = '') => {
@@ -480,7 +425,8 @@ function decorate(sec, ci){
     d.setAttribute('aria-hidden', 'true');
     d.style.width = pick.w + 'px';
     Object.assign(d.style, css);
-    d.innerHTML = pick.art();
+    if (pick.flip) d.style.scale = '-1 1';
+    d.innerHTML = `<img src="art/${pick.src}.svg" alt="" width="${pick.w}" loading="lazy">`;
     sec.append(d);
   };
   const r = k => rnd(ci * 7 + k);
@@ -491,7 +437,7 @@ function decorate(sec, ci){
               [left ? 'left' : 'right']: (2 + r(3) * 7) + '%',
               rotate: ((r(4) - .5) * 24) + 'deg' });
   // a small mark on the other side
-  const mark = CUTOUTS[3 + Math.floor(r(5) * 3)];
+  const mark = CUTOUTS[3 + Math.floor(r(5) * 5)];
   add(mark, { bottom: (6 + r(6) * 7) + 'vh',
               [left ? 'right' : 'left']: (3 + r(7) * 8) + '%',
               rotate: ((r(8) - .5) * 40) + 'deg', opacity: .75 });
