@@ -100,7 +100,7 @@
        padding:2px 7px; border-radius:999px; border:1px solid var(--rule); color:var(--ink2);}
   .tag.live{color:var(--good);} .tag.feeeaten{color:var(--warn);} .tag.taxeaten{color:var(--s2);}
   .tag.dead{color:var(--muted);} .tag.unsized{color:var(--s2);}
-  .tag.belowcash{color:var(--muted);}
+  .tag.belowcash{color:var(--muted);} .tag.nosize{color:var(--bad);}
   .opp[data-verdict="unsized"]{border-color:color-mix(in srgb, var(--s2) 35%, var(--line));}
   .risk{margin-top:10px; padding:9px 12px; border-radius:8px; background:var(--warnbg);
         border:1px solid color-mix(in srgb, var(--warn) 45%, var(--line)); font-size:12.5px;}
@@ -478,6 +478,10 @@
     v.append(L.verdict === "unsized"
       ? "One venue does not publish resting depth for this market, so there is no honest "
         + "size for this trade. The figures above assume a fill that may not exist."
+      : L.verdict === "no-size"
+      ? "The quoted prices cross, but walking both order books there is no quantity at "
+        + "which this actually clears \u2014 the second contract costs more than the first, "
+        + "and the fee is charged on what you really pay. See the capacity table below."
       : msg);
     body.appendChild(v);
 
@@ -492,6 +496,38 @@
           + " to 1 against you." : ".")
       + " This is an exposure, not a probability: nothing here can estimate how likely it is.");
     body.appendChild(risk);
+
+    // how far this actually goes before the edge dies
+    if (row.capacity && row.capacity.curve && row.capacity.curve.length) {
+      const cap = row.capacity;
+      const d = el("details"); d.style.marginTop = "11px";
+      const sm = el("summary");
+      sm.style.cssText = "cursor:pointer;font-size:12.5px;color:var(--ink2);";
+      sm.textContent = "Capacity \u2014 the edge is "
+        + pct(1 - cap.touch_unit) + " at the touch and "
+        + pct(1 - cap.deep_unit) + " once the book is exhausted"
+        + (cap.best ? ", peaking at " + money(cap.best.profit) + " on "
+            + num(cap.best.contracts) + " contracts" : "");
+      d.appendChild(sm);
+      const rows = cap.curve.map(pt => {
+        const r = [num(pt.contracts), money(pt.cost), money(pt.fees),
+                   cents(pt.unit), money(pt.profit)];
+        r.cls = [null, null, "neg", null, pt.profit > 0 ? "pos" : "neg"];
+        return r;
+      });
+      const wrap = el("div"); wrap.style.marginTop = "9px";
+      wrap.appendChild(table([{ h: "Contracts" }, { h: "Cost" }, { h: "Fees" },
+        { h: "Blended price" }, { h: "Profit before tax" }], rows,
+        "Filling both books level by level"));
+      const warn = el("p", null, "Sizes are as each venue reports them. Kalshi's depth "
+        + "fields are read as contract counts, which is not confirmed \u2014 the values "
+        + "come back fractional, and contracts should not be. Treat the scale here as "
+        + "indicative and the shape of the curve as the point.");
+      warn.style.cssText = "font-size:11.5px;color:var(--muted);margin-top:7px;";
+      wrap.appendChild(warn);
+      d.appendChild(wrap);
+      body.appendChild(d);
+    }
 
     // settlement warning
     const rules = Object.values(row.sides).flat().map(s => s.rules).filter(Boolean);
@@ -520,6 +556,9 @@
       if (quotes.length !== 2) return;
       const L = buildLedger(quotes, inp.bankroll, inp.tax, vmap, row.days_to_settle);
       if (!L) return;
+      // The collector walked the real order book for this row and found no
+      // size at which it clears. That beats anything computed from the quote.
+      if (row.capacity && !row.capacity.max_profitable_contracts) L.verdict = "no-size";
       row._L = L;
       if (L.verdict === "live") live++;
       if (L.verdict === "unsized") unsized++;
