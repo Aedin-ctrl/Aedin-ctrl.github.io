@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Far Light</title>
+<meta name="description" content="A one-verb climb up a lighthouse. Hold to wind up, lean, let go. No air control, no checkpoints — falling costs you only the height you had.">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07070a">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307070a'/%3E%3Cpath d='M12 30V12h8v18z' fill='%23aeaeae'/%3E%3Crect x='10' y='5' width='12' height='7' fill='%23f8d7a8'/%3E%3Cpath d='M22 8h9M1 8h9' stroke='%23ef9a49' stroke-width='2'/%3E%3C/svg%3E">
+<style>
+  html,body{margin:0;height:100%;background:#07070a;overflow:hidden;}
+  /* a column, so the instruction line has its own room and can never print over the game */
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+       font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:#5f626a;
+       touch-action:none;-webkit-user-select:none;user-select:none;}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;background:#000;
+         box-shadow:0 0 0 1px #1f2126, 0 24px 60px -30px #000;}
+  .hint{margin:0;flex:none;padding:0 10px;text-align:center;font-size:11px;letter-spacing:.06em;}
+  noscript{color:#aeaeae;text-align:center;max-width:40ch;}
+</style>
+</head>
+<body>
+<canvas id="screen" width="256" height="240" aria-label="The Far Light, an 8-bit climbing game. Hold space to wind up a jump, arrows to lean, release to jump."></canvas>
+<p class="hint">hold space &middot; lean with arrows &middot; let go to jump &middot; m mutes &middot; r restarts</p>
+<noscript>The Far Light needs JavaScript — every pixel and every sound is generated at runtime.</noscript>
+<script type="module" src="src/main.mjs"></script>
+</body>
+</html>

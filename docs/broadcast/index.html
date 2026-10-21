@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadcast</title>
+<meta name="description" content="A daily serial from the days after the sky closed — every episode, newest first.">
+<meta name="color-scheme" content="light">
+<style>
+  /* Matches the host site: same self-hosted variable fonts, same tokens, same rhythm, so moving
+     from the projects list into this page does not feel like leaving. */
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; min-height:100%;}
+  body{
+    font-family:'Inter', system-ui, sans-serif; background:#f5f5f6; color:var(--ink);
+    font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; font-weight:600; letter-spacing:-0.01em; margin:0;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  .wrap{max-width:900px; margin:0 auto; padding:32px 22px 56px;}
+  .head h1{font-size:26px;}
+  .head p{color:var(--muted); font-size:14px; max-width:620px; margin:8px 0 0;}
+
+  /* The player. A 16:9 box so the page does not jump when the poster arrives. */
+  .now{margin-top:26px;}
+  .screen{aspect-ratio:16/9; width:100%; background:#000; border-radius:12px; overflow:hidden;
+          border:1px solid var(--line-strong);}
+  .screen video{width:100%; height:100%; display:block;}
+  .now-meta{margin-top:14px;}
+  .eyebrow{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint);
+           font-variant-numeric:tabular-nums;}
+  .now-meta h2{font-size:21px; margin-top:4px;}
+  .now-meta p.syn{color:var(--muted); font-size:14.5px; margin:8px 0 0; max-width:640px;}
+
+  .arch-h{font-size:13px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint);
+          font-weight:600; margin:38px 0 0; padding-bottom:10px; border-bottom:1px solid var(--line-strong);}
+  .arch{list-style:none; margin:0; padding:0;}
+  .arch li{border-bottom:1px solid var(--line);}
+  .ep{display:grid; grid-template-columns:132px 1fr; gap:16px; width:100%; text-align:left;
+      padding:16px 10px 16px 0; border-radius:8px; transition:background .15s ease;}
+  .ep:hover{background:#eeeef0;}
+  .ep[aria-current="true"]{background:#e9e9ec;}
+  .ep-thumb{aspect-ratio:16/9; width:100%; border-radius:7px; background:#000; object-fit:cover;
+            border:1px solid var(--line); display:block;}
+  .ep-no{font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--faint);
+         font-variant-numeric:tabular-nums;}
+  .ep-title{font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:16px; margin-top:2px;
+            display:block;}
+  .ep-syn{color:var(--muted); font-size:13.5px; margin:5px 0 0;}
+  .ep[aria-current="true"] .ep-no::after{content:' · playing'; color:var(--ink);}
+
+  .msg{color:var(--muted); font-size:14px; padding:40px 0; text-align:center;}
+
+  @media (max-width:560px){
+    .ep{grid-template-columns:96px 1fr; gap:12px;}
+    .ep-syn{display:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <h1>Broadcast</h1>
+    <p>A serial told one short episode at a time, from the days after a satellite collision
+    closed the sky. Written, voiced and cut by machine, then published here. Newest first.</p>
+  </header>
+
+  <section class="now" id="now" hidden aria-labelledby="nowTitle">
+    <div class="screen">
+      <video id="player" controls preload="metadata" playsinline></video>
+    </div>
+    <div class="now-meta">
+      <p class="eyebrow" id="nowMeta"></p>
+      <h2 id="nowTitle"></h2>
+      <p class="syn" id="nowSyn"></p>
+    </div>
+  </section>
+
+  <h2 class="arch-h" id="archH" hidden>Every episode</h2>
+  <ol class="arch" id="arch"></ol>
+
+  <p class="msg" id="msg">Loading episodes&hellip;</p>
+</div>
+
+<script>
+// Episodes and their metadata come from episodes.json, which scripts/broadcast-publish.mjs
+// regenerates whenever new ones are rendered. Nothing about the list is hard-coded here, so
+// publishing a new episode needs no change to this page.
+(function(){
+  const $ = id => document.getElementById(id);
+  const player = $('player'), arch = $('arch'), msg = $('msg');
+  let current = null;
+
+  const mmss = s => s == null ? null : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+  // "day 1" -> "Day 1"; anything else is shown as written.
+  const dayLabel = d => d ? d.charAt(0).toUpperCase() + d.slice(1) : null;
+
+  function play(ep, startPlaying){
+    current = ep.id;
+    player.poster = ep.poster || '';
+    player.src = ep.video;
+    $('nowTitle').textContent = ep.title;
+    $('nowSyn').textContent = ep.synopsis;
+    $('nowMeta').textContent = [dayLabel(ep.day), mmss(ep.seconds)].filter(Boolean).join(' · ');
+    $('now').hidden = false;
+    for(const b of arch.querySelectorAll('.ep'))
+      b.setAttribute('aria-current', b.dataset.id === ep.id ? 'true' : 'false');
+    if(startPlaying){
+      // A click is a user gesture, so this is allowed to start; if the browser still
+      // refuses, the controls are right there.
+      player.play().catch(() => {});
+      $('now').scrollIntoView({ behavior:'smooth', block:'start' });
+    }
+  }
+
+  function row(ep, i){
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'ep'; b.dataset.id = ep.id;
+    b.setAttribute('aria-current', 'false');
+
+    const img = document.createElement('img');
+    img.className = 'ep-thumb';
+    img.src = ep.poster || '';
+    img.alt = '';                 // decorative: the title next to it already names the episode
+    // Everything past the first couple of rows is below the fold on every screen size.
+    if(i > 1) img.loading = 'lazy';
+    img.decoding = 'async';
+
+    const text = document.createElement('span');
+    const no = document.createElement('span');
+    no.className = 'ep-no';
+    no.textContent = [dayLabel(ep.day), mmss(ep.seconds)].filter(Boolean).join(' · ');
+    const t = document.createElement('span');
+    t.className = 'ep-title'; t.textContent = ep.title;
+    const syn = document.createElement('p');
+    syn.className = 'ep-syn'; syn.textContent = ep.synopsis;
+    text.append(no, t, syn);
+
+    b.append(img, text);
+    b.addEventListener('click', () => play(ep, true));
+    li.append(b);
+    return li;
+  }
+
+  fetch('episodes.json', { cache:'no-cache' })
+    .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(data => {
+      const eps = data.episodes || [];
+      if(!eps.length){ msg.textContent = 'No episodes have been published yet.'; return; }
+      msg.hidden = true;
+      $('archH').hidden = false;
+      eps.forEach((ep, i) => arch.append(row(ep, i)));
+      play(eps[0], false);        // newest, cued up but not playing
+    })
+    .catch(() => { msg.textContent = 'Couldn’t load the episode list.'; });
+
+  // When one finishes, roll into the next older one, the way a channel would.
+  player.addEventListener('ended', () => {
+    const rows = [...arch.querySelectorAll('.ep')];
+    const i = rows.findIndex(b => b.dataset.id === current);
+    if(i > -1 && rows[i + 1]) rows[i + 1].click();
+  });
+})();
+</script>
+</body>
+</html>

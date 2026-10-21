@@ -1,0 +1,18 @@
+{
+  "name": "aedinlai-design-tools",
+  "private": true,
+  "type": "module",
+  "description": "Checks for the site. Lives outside docs/, so none of this is published.",
+  "dependencies": {
+    "@iconify-json/lucide": "^1.2.138",
+    "@iconify/utils": "^3.1.7",
+    "axe-core": "^4.13.0",
+    "colorjs.io": "^0.7.1",
+    "playwright-core": "^1.63.0",
+    "sharp": "^0.35.5",
+    "svgo": "^4.1.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Privacy: connect-src 'self' blocks MediaPipe's usage-stats POST to odml.pa.googleapis.com
+       (research/10). Camera frames never leave the page. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; style-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Hand Playground</title>
+  <link rel="stylesheet" href="src/style.css">
+  <script type="module" src="src/main.js"></script>
+</head>
+<body>
+  <video id="feed" autoplay muted playsinline></video>
+  <div id="vignette"></div>
+  <canvas id="scene"></canvas>
+  <div id="nudge" class="nudge"><div class="glyph"></div>Raise a hand to the camera</div>
+  <div id="quality" class="quality"></div>
+
+  <div class="ui top">
+    <nav id="tabs" class="tabs"></nav>
+  </div>
+  <div id="mode-ui"></div>
+
+  <div id="hint" class="hint"></div>
+
+  <div class="ui bottom">
+    <div id="status" class="chip status">Starting camera…</div>
+    <button id="retry" hidden>Try again</button>
+    <button id="rec" data-hand title="Record a clip of the canvas (not your camera), up to 15 s">● Record</button>
+    <button id="labels" data-hand title="Finger labels (L)">Labels on</button>
+    <button id="cam" data-hand title="Show or hide the camera feed">Hide camera</button>
+    <button id="sound" data-hand title="Sound (M)">🔈 Click for sound</button>
+  </div>
+
+  <pre id="hud" class="hud" hidden></pre>
+</body>
+</html>

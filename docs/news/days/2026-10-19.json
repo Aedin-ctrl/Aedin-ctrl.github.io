@@ -1,0 +1,777 @@
+{
+  "date": "2026-10-19",
+  "generated": "2026-10-19T10:06:50.985Z",
+  "articles": [
+    {
+      "id": "2026-10-19-a-new-linux-kvm-flaw-lets-a-rented",
+      "headline": "A new Linux KVM flaw lets a rented cloud VM escape onto the host with one bad packet",
+      "summary": "Researcher Paulos Yibelo disclosed 'PwnEscape,' a critical flaw in Linux's KVM hypervisor that lets code in a guest virtual machine break out to the host through malformed IPv4 packets. AWS and Google Cloud say they are protected.",
+      "impacts": [
+        "Cloud isolation is the promise that your VM can't touch a stranger's; a guest-to-host escape breaks it.",
+        "Red Hat lists code execution on the host, denial of service and memory disclosure as possible outcomes.",
+        "Smaller clouds and self-hosted Proxmox or Nutanix setups must wait for distribution patches.",
+        "It is the seventh KVM escape bug found this year, per The Register."
+      ],
+      "details": [
+        "KVM is the virtualization layer built into the Linux kernel, and many cloud providers use it to keep customers' virtual machines apart. The Register reports that a researcher, Paulos Yibelo, has disclosed a flaw he calls PwnEscape, tracked as CVE-2026-99999 and rated 9.3 out of 10 (critical).",
+        "The bug involves how the kernel handles checksum metadata on network packets. Red Hat's Michael S. Tsirkin is quoted as saying that if a packet with bad checksum metadata gets into the IPv4 stack, the kernel's skb_checksum_help function can corrupt the network header and 'cause a bunch of mischief.' Yibelo describes it as letting an attacker rewrite security-sensitive packet fields after the kernel has already validated them, which he calls an entirely new class of attacks in Linux networking.",
+        "The exploit needs only malformed IPv4 packets, and attacks can be repeated to leak information. Red Hat lists three possible results: arbitrary code execution on the host, a denial of service, or disclosure of sensitive memory. The Register notes the affected code spans more than 40 million lines of Linux and that seven guest-to-host escape bugs have been found in KVM this year alone.",
+        "Defenders have some good news. AWS and Google Cloud say their configurations already protect them. An upstream kernel fix is being worked on and folded into Debian, RHEL and Ubuntu, and into virtualization products such as Nutanix and Proxmox.",
+        "What is uncertain: the report doesn't say that anyone has used the flaw against a real target, and how many non-hyperscale hosts are exposed is not clear. The thing to watch is how fast distributions ship patches, since that is where smaller providers and company-run servers are most likely to lag."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "linux",
+        "kvm",
+        "cloud",
+        "vulnerability",
+        "virtualization",
+        "critical infrastructure"
+      ],
+      "date": "2026-10-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/virtualization/2026/10/19/linux-kvm-guest-host-escape-rated-critical-may-represent-a-new-way-to-attack-penguin-powered-networking/5303744"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-kenyas-third-ebola-case-is-a-quarantined-relative",
+      "headline": "Kenya's third Ebola case is a quarantined relative; 127 of 130 contacts are being watched",
+      "summary": "Kenya confirmed a third Bundibugyo Ebola case on October 16, a 65-year-old woman who was already in quarantine as a close relative of the first two patients. Officials report no sign of community spread.",
+      "impacts": [
+        "No licensed vaccine or specific treatment exists for the Bundibugyo strain.",
+        "Contact tracing that placed the woman in quarantine before symptoms likely kept this from spreading.",
+        "Congo's outbreak is still widening, so more imported cases elsewhere in East Africa are possible.",
+        "Funding gaps reported by Africa CDC could slow the response."
+      ],
+      "details": [
+        "Kenya's health ministry confirmed its third Ebola case on October 16, ten days after the country reported its first case. The patient is a 65-year-old woman described as a primary contact and close relative of the first and second cases. She developed fever, sore throat and malaise, was isolated, and tested positive. Al Jazeera reports she is receiving supportive care with improving prospects.",
+        "The chain began with a Kenyan man who fell ill in Congo, traveled through Uganda and flew to Nairobi on October 3. He died on October 5. Of 130 identified contacts, 127 have been traced and quarantined, and authorities say there is no sign of community transmission and that risk to the Kenyan public remains low.",
+        "The cases trace back to the Democratic Republic of Congo's Bundibugyo outbreak, which Al Jazeera calls the second-largest Ebola epidemic on record, with more than 9,000 cases and over 4,300 deaths since May. CIDRAP, citing the CDC, gives 9,235 cases and 4,444 deaths, and reports that the outbreak has spread to an eighth Congolese province, North Ubangi, with two confirmed cases and no official announcement yet.",
+        "There is no licensed vaccine or specific treatment for Bundibugyo. CIDRAP reports that a University of Oxford candidate, built on the same platform as the Oxford/AstraZeneca COVID-19 vaccine, has begun a Phase 1 trial in Masaka, Uganda, aiming for 110 participants by November. German researchers also report T-cell cross-reactivity from Merck's Ervebo, which is licensed for a different Ebola species, though protection against infection is unproven.",
+        "Money is a worry. Al Jazeera says Africa CDC found that of roughly $962 million disbursed by donors for the Congo response, organizations reported receiving only $228 million, with about $100 million unaccounted for; it stressed this does not confirm embezzlement. The key thing to watch is whether the Kenya cluster stays confined to people already in quarantine."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "bundibugyo",
+        "kenya",
+        "outbreak",
+        "congo",
+        "public health",
+        "vaccine"
+      ],
+      "date": "2026-10-16",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Al Jazeera",
+          "url": "https://www.aljazeera.com/amp/news/2026/10/16/kenya-reports-third-bundibugyo-strain-ebola-case"
+        },
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/ebola/3rd-person-kenya-tests-positive-ebola-dr-congo-outbreak-spreads-8th-province"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-a-firewall-protecting-about-500-000-sites-is",
+      "headline": "A firewall protecting about 500,000 sites is being exploited to get root, and the patch may erase the traces",
+      "summary": "Japan's SiteGuard says attackers are already abusing a critical command-injection flaw in its Server Edition web application firewall. The vendor advises saving diagnostic data before patching, because the fix can wipe evidence of a break-in.",
+      "impacts": [
+        "A security product that sits in front of websites became the way in, with root or SYSTEM access on the server.",
+        "The flaw is in a statistics feature that is on by default.",
+        "Patching first can destroy forensic evidence, so victims may never learn if they were hit.",
+        "End-of-life versions are affected too; the vendor offers a patch-file swap."
+      ],
+      "details": [
+        "BleepingComputer reports that SiteGuard Server Edition, a web application firewall, has an OS command-injection vulnerability tracked as CVE-2026-106931. It sits in the product's statistics function, which is enabled by default on host-based instances, and lets an attacker run commands with root or SYSTEM privileges. The vendor's alert states that abuse 'has already been confirmed.'",
+        "Affected versions are 2.20 through 8.00 Update 4 for Apache httpd, Nginx and IIS (excluding FreeBSD), and 2.20 through 7.00 Update 5 on FreeBSD. IIS editions 3.10 through 4.00 Update 4 are not affected. BleepingComputer says the product protects over 1.5 million websites by one estimate, while WordPress.org statistics suggest it is active on about 500,000.",
+        "SiteGuard told customers with direct support contacts on September 29 and went public on October 18. It offers a patch-file replacement, including for end-of-life products. It also tells administrators to download diagnostic information from the web management interface before patching, because remediation may erase the traces of an attack.",
+        "A lot remains unknown. Neither the vendor's advisory nor Japan's CERT says who is exploiting the flaw, how many systems are compromised, or how the attacks work. The nearly three-week gap between the private notice and public disclosure means some attackers may have had a head start.",
+        "What to watch: whether a researcher publishes technical details, which would likely bring in more attackers, and whether Japanese authorities release a victim count."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "siteguard",
+        "waf",
+        "vulnerability",
+        "exploited",
+        "japan",
+        "zero-day",
+        "root"
+      ],
+      "date": "2026-10-18",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-exploit-siteguard-waf-flaw-to-run-commands-as-system-root/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-hackers-are-moving-from-stealing-data-to-attacking",
+      "headline": "Hackers are moving from stealing data to attacking buildings, from supermarket freezers to hospital doors",
+      "summary": "The Register reports that ransomware crews are going after building-management systems that run heating, locks and refrigeration. Armis Labs says 73% of organizations own such systems previously targeted by ransomware. The French supermarket freezer attack is the latest example.",
+      "impacts": [
+        "Physical systems fail in physical ways: spoiled food, locked doors, staff who can't get into offices.",
+        "Refrigeration and door systems are often internet-connected for remote monitoring, which also exposes them.",
+        "Few industrial networks are watched closely, so intruders can sit inside for a long time.",
+        "Attackers get stronger leverage for extortion when a building stops working."
+      ],
+      "details": [
+        "A Register report on October 17 argues that criminals are widening their targets from data to the control systems inside buildings. These building automation systems run heating and cooling, lighting, cameras, door locks and fire alarms. The recent example is the October attack on refrigeration at hundreds of French grocery stores, where, according to BleepingComputer, attackers triggered the defrost function on Danfoss controllers and raised temperatures sharply.",
+        "The Register cites an Armis Labs report, now part of ServiceNow, saying 73% of organizations own building automation systems that have previously been hit in ransomware attacks, and that 91% use insecure communication protocols. Dragos counted 995 industrial ransomware attacks in 2023, an 87% rise in 2024, and 2,160 incidents combined in the first two quarters of 2026.",
+        "Other cases include an August ransomware attack that disrupted a Canadian hospital's building-management systems, affecting door access and staff cards, and the December 2023 attack on Las Vegas casinos. Semperis consultant Tim Beasley described one incident in which police needed to break windows to get into offices. ServiceNow's Michael Freeman says attackers like these systems as 'a great place' to hide and then pivot into IT networks.",
+        "The report says fewer than 10% of operational technology networks worldwide have enough network monitoring. It also says AI helps attackers understand obscure systems and protocols that once demanded specialist knowledge, and that compliance-driven connectivity, such as remote refrigeration monitoring, creates new ways in.",
+        "A caution: the French attackers' exact method hasn't been confirmed. Danfoss said the stores ran outdated firmware, and BleepingComputer notes that authorities haven't confirmed that the previously disclosed Danfoss flaws were used. The pattern, not any single incident, is the story."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "critical infrastructure",
+        "ransomware",
+        "building systems",
+        "ot",
+        "danfoss",
+        "refrigeration",
+        "extortion"
+      ],
+      "date": "2026-10-17",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/17/cybercrims-go-beyond-stealing-data-to-attack-physical-building-systems/5303677"
+        },
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/cyberattack-shuts-down-refrigerators-at-french-supermarkets/"
+        },
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/cyberattack-disrupts-refridgeration-in-france"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-floridas-dengue-outbreak-is-the-biggest-in-any",
+      "headline": "Florida's dengue outbreak is the biggest in any continental US state since at least the 1940s",
+      "summary": "Locally spread dengue in the Tampa area passed the previous state record of about 200 cases and reached 368 by October 10. One expert says this may be 'the new normal.'",
+      "impacts": [
+        "Most people in the Tampa area have no prior immunity to any dengue strain.",
+        "A second infection with a different strain can be more severe than the first.",
+        "Warmer conditions are expanding where dengue-carrying mosquitoes can live.",
+        "Local officials declared emergencies, but the CDC has not sent disease investigators because Florida hasn't asked."
+      ],
+      "details": [
+        "WLRN, reporting on October 5, said Florida had logged more than 250 locally acquired dengue cases in 2026, mostly in Hillsborough County, which includes Tampa. That is the largest single-year total for any continental US state since at least the 1940s; the previous state record was about 200 cases in 2023. CIDRAP's latest roundup puts the count at 368 through October 10, after 72 new cases, across eight counties, with Hillsborough at 310 and Pinellas at 37 and rising.",
+        "The outbreak emerged in the Tampa area in July. Hillsborough and neighboring counties have declared local emergencies, and crews are spraying around the clock and inspecting properties for standing water.",
+        "Dengue has four virus types. Infection with one gives lifelong immunity to that type but can make a later infection with a different type more severe. Tulane's Dawn Wesson says most people in the Tampa area have no prior immunity to any dengue. Travel from Puerto Rico and other endemic regions likely helps seed it, and she says climate change is expanding the mosquitoes' range.",
+        "Wesson warns, 'There's a good chance that this is the new normal.' WLRN reports the CDC has given $800,000 in assistance but hasn't deployed investigators because Florida officials did not formally request them, which is unusual for an outbreak response.",
+        "The uncertainty is how long the transmission continues as autumn cools. Experts recommend EPA-registered repellents containing DEET, long sleeves and removing standing water. Mosquitoes that carry dengue bite throughout the day, with peaks near sunrise and sunset."
+      ],
+      "category": "Health",
+      "tags": [
+        "dengue",
+        "florida",
+        "mosquito",
+        "outbreak",
+        "climate",
+        "cdc",
+        "public health"
+      ],
+      "date": "2026-10-05",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "WLRN",
+          "url": "https://www.wlrn.org/health/2026-10-05/floridas-dengue-outbreak-is-now-the-largest-in-the-continental-us-in-decades"
+        },
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/avian-influenza-bird-flu/quick-takes-us-human-avian-flu-case-dengue-florida-plague-madagascar-mers"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-uk-legal-aid-hack-was-far-bigger-stolen",
+      "headline": "UK Legal Aid hack was far bigger: stolen records go back to 1978 and include bank details",
+      "summary": "The UK Justice Ministry now says the 2025 Legal Aid Agency breach took about 250,000 records from before 2007, the oldest from 1978. Hackers had claimed data on more than 2 million people.",
+      "impacts": [
+        "Stolen data includes National Insurance numbers, bank account details and financial assessments.",
+        "Names of judges, lawyers and court reporters were taken too, plus some probation data.",
+        "Records spanning decades mean people who used legal aid in the 1990s may not realize they are affected.",
+        "The government's early 'when, not if' prediction on publication has been replaced by 'no indication' of release."
+      ],
+      "details": [
+        "The Record reports that Justice Minister Sarah Sackman told Parliament that a cyberattack disclosed in May 2025 was much wider than first understood. About 250,000 stolen records predate 2007, with the earliest verified record from 1978. Most stolen data covers January 2007 through May 16, 2025. Officials first said the breach affected people using the service since 2010.",
+        "The data includes full names, dates of birth, National Insurance numbers, postal codes, equality monitoring codes, case dates, legal costs claimed and VAT details. It also includes financial assessments, bank account details, property information and, in some cases, partially redacted payment card details. Names of judges, defense and prosecution lawyers, court reporters and opposing parties in civil cases were taken, along with probation data such as names, dates of birth, nationalities and case reference numbers.",
+        "The ministry cautions that having pre-2007 records in the haul does not mean everyone who got or applied for legal aid is affected. Sackman said the breach has been hard to assess because much of the stolen data was 'unstructured, fragmented, or incomplete.'",
+        "The attackers claimed to hold data on more than 2 million people and demanded payment to keep it private. Sackman said there is 'no indication' the data has been published or shared, a change from May 2025 when a ministry spokesperson called publication a matter of 'when, not if.' The UK does not pay extortion demands.",
+        "The ministry says it has strengthened authentication and access controls, improved monitoring and begun retiring or isolating legacy systems, working with the National Crime Agency, the National Cyber Security Centre and the Information Commissioner's Office. The open question is how many people will be told, and when."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "uk",
+        "data breach",
+        "legal aid",
+        "privacy",
+        "extortion",
+        "government",
+        "personal data"
+      ],
+      "date": "2026-10-15",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/uk-legal-aid-cyberattack-data"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-merck-and-modernas-personalized-mrna-cancer-vaccine-heads",
+      "headline": "Merck and Moderna's personalized mRNA cancer vaccine heads for filing after a melanoma win",
+      "summary": "The personalized vaccine, paired with Keytruda, significantly delayed melanoma recurrence in a large Phase 3 trial announced in August, per STAT. The companies are preparing to file for approval and test lung, kidney, bladder and other cancers.",
+      "impacts": [
+        "Each vaccine is built from a patient's own tumor mutations, so every dose is custom.",
+        "Approval would be a first for a personalized mRNA cancer vaccine at this scale.",
+        "The tumor-analysis algorithm is imperfect, which may limit who benefits.",
+        "Pancreatic and gastric cancer tests so far are small."
+      ],
+      "details": [
+        "STAT reports that Merck and Moderna announced in August that their personalized mRNA cancer vaccine, intismeran autogene, significantly delayed cancer recurrence and the development of metastatic disease in melanoma patients in a large Phase 3 trial. The companies are preparing to file it for regulatory approval.",
+        "The vaccine is given with Merck's immunotherapy Keytruda. For each patient, an algorithm analyzes the tumor and picks up to 34 mutant proteins to present to the immune system as targets.",
+        "The expansion plan focuses on tumors where Keytruda already works. Trials are underway in adjuvant lung, kidney and bladder cancer, with small tests in adjuvant pancreatic and gastric cancer. The companies are also looking at metastatic tumors previously shrunk by other treatments and at earlier-stage use to prevent advanced disease.",
+        "Moderna President Stephen Hoge says, 'We have a lot of exploring to do and need to prioritize where we explore.' The algorithm remains imperfect, but data from several thousand Phase 3 participants may let developers refine it.",
+        "I only opened STAT's report, so the trial numbers themselves are not given here; check the companies' full data when it is published. What to watch: the filing itself and whether regulators accept the results."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "mrna",
+        "cancer",
+        "vaccine",
+        "moderna",
+        "merck",
+        "melanoma",
+        "biotech"
+      ],
+      "date": "2026-10-15",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/10/15/moderna-merck-keytruda-mrna-cancer-vaccine-strategy/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-amazons-new-bee-wearables-listen-all-day-and",
+      "headline": "Amazon's new Bee wearables listen all day and now plug into Alexa+ and Amazon shopping",
+      "summary": "Amazon unveiled two always-listening Bee devices, a $74.99 band and a $99.99 card-sized clip. They summarize conversations and can suggest purchases based on what they overhear.",
+      "impacts": [
+        "Bystanders are recorded without having agreed to anything.",
+        "Linking to Amazon.com means overheard talk can drive product recommendations.",
+        "Amazon says audio isn't stored, so you rely on that claim.",
+        "A small indicator light is the only cue that recording is on."
+      ],
+      "details": [
+        "The Register reports that Amazon has unveiled two AI wearables from Bee, a startup it bought for $300 million. The Bee Frontier looks like a fitness tracker and costs $74.99. The Bee Eclipse is a credit-card-sized device that attaches magnetically to a phone and costs $99.99.",
+        "Both continuously listen to conversations and produce summaries, to-do lists and reminders. Users read them in iOS and Android apps or a new desktop app. The devices spot recurring themes and suggest personal goals. A visible indicator shows when recording is active.",
+        "The new part is integration. The devices now connect to Alexa+ and Amazon.com, so users can ask for meeting summaries by voice or get shopping recommendations based on overheard conversations.",
+        "Amazon says that 'audio is processed into insights in real time and not stored, while transcripts are encrypted and only the user can access them.' The Register points out the obvious commercial angle: Amazon can use conversation data for targeted recommendations, which is the main worry with always-listening devices.",
+        "What's uncertain is how well the privacy promise holds up and how the devices handle consent from people nearby. Earlier, the EU privacy board told smart-glasses makers to make recording obvious to bystanders; whether regulators say the same about wearables like these is worth watching."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "amazon",
+        "wearables",
+        "privacy",
+        "always listening",
+        "alexa",
+        "recording",
+        "ai"
+      ],
+      "date": "2026-10-17",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/personal-tech/2026/10/17/amazon-wants-you-to-bee-lieve-wearable-ai-can-recall-it-all-for-you/5303569"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-timekeepers-vote-to-end-leap-seconds-partly-because",
+      "headline": "Timekeepers vote to end leap seconds, partly because a first 'negative' one is seen as too risky",
+      "summary": "The Register reports that the body that sets world time agreed to drop leap seconds. It said a negative leap second, never tried and now possible as Earth's rotation speeds up, poses a high risk to connected devices.",
+      "impacts": [
+        "Clocks in billions of devices lack a standard way to handle a missing second.",
+        "The body says manufacturers worldwide lack standard ways of handling leap seconds.",
+        "UTC and solar time will be allowed to drift apart by up to 3,600 seconds.",
+        "Engineers would face a one-time change instead of recurring surprises."
+      ],
+      "details": [
+        "The Register reports that the General Conference on Weights and Measures voted at its 28th meeting to abolish leap seconds, the occasional one-second adjustments that keep Coordinated Universal Time in step with Earth's rotation.",
+        "The stated worry is risk from connected devices. The body said that 'a negative leap second has not previously been applied, and it is considered to pose a high risk' of disrupting critical infrastructure. A negative one is now possible because Earth's rotation recently sped up. The body also cited the growing influence of IoT devices, spread-out multi-sensor systems and smart grids, and said manufacturers lack standard ways of handling leap seconds.",
+        "The replacement, which The Register calls 'Continuous UTC,' starts next year and lets UT1 (solar time) and UTC diverge by up to 3,600 seconds. The Register compares it to daylight saving adjustments societies already manage.",
+        "The article's headline suggests leap seconds could become 'the new Y2K bug.' It also cites a cost figure for preparing for a negative leap second, which I'm leaving out because I only opened this one report and couldn't check it.",
+        "What's unclear: the article gives no detailed timeline for moving systems over, or for how the long-term gap between atomic and solar time will be handled. Watch for the formal resolution text."
+      ],
+      "category": "Tech",
+      "tags": [
+        "leap second",
+        "time",
+        "utc",
+        "iot",
+        "infrastructure",
+        "standards",
+        "earth rotation"
+      ],
+      "date": "2026-10-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/networks/2026/10/19/time-lords-kill-leap-seconds-before-they-become-the-new-y2k-bug/5303711"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-a-cdc-survey-finds-40-of-us-high",
+      "headline": "A CDC survey finds 40% of US high schoolers report binge eating, linked to hourly social media checking",
+      "summary": "For the first time, the CDC's Youth Risk Behavior Survey asked about binge eating. About 40% of nearly 7,000 students said they had done it in the past month, and 17% in the last three days.",
+      "impacts": [
+        "Binge eating was tied to frequent social media use, poor mental health and suicidality.",
+        "The data challenges the idea that eating disorders mostly affect white girls.",
+        "Researchers point to ultra-processed foods, though causation is not established.",
+        "Rates were highest among Hispanic and multiracial students at about 20%."
+      ],
+      "details": [
+        "STAT reports that the CDC's biennial Youth Risk Behavior Survey included a binge-eating question for the first time, after advocates pushed for one for a decade. Among nearly 7,000 students, 40% reported binge eating in the past month and 17% within the last three days. The survey defines it as eating an unusually large amount of food in a short time with a loss of control.",
+        "The three-day figures by group were 19% of female students and 16% of male students; 19% of Black, 20% of Hispanic and 20% of multiracial students; 15% of white students; and 10% of Middle Eastern or North African students.",
+        "Binge eating was associated with checking social media hourly, poor mental health and suicidality. Boston Children's Hospital researcher Ariel Beccia called the numbers 'extremely alarming.'",
+        "Experts offered context but not a cause. Nutritionist Lindsey Smith-Taillie pointed to ultra-processed foods 'engineered for overconsumption,' while Ashley Gearhardt noted binge eating emerged as a clinical problem at the same time such foods became dominant, and cautioned that causation remains unestablished.",
+        "A survey cross-section can't show what drives what, and this is the first year of data, so there's no trend yet. Advocates stress the link between binge eating and food insecurity among poorer youth."
+      ],
+      "category": "Health",
+      "tags": [
+        "cdc",
+        "teens",
+        "eating disorders",
+        "social media",
+        "mental health",
+        "survey",
+        "ultra-processed food"
+      ],
+      "date": "2026-10-15",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/10/15/teenage-binge-eating-cdc-survey-finds-alarming-rate/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-meta-pulls-the-contract-line-that-let-it",
+      "headline": "Meta pulls the contract line that let it use any linked web content to train AI",
+      "summary": "After legal experts flagged it, Meta removed wording from its business terms saying it could use content from any domain, page or URL to train its products. It says the change doesn't alter how its web crawlers work.",
+      "impacts": [
+        "Publishers with Meta business accounts had worried the clause let Meta scrape their sites.",
+        "Meta says the terms covered only ads and business products, not crawling.",
+        "A contract edit doesn't show what data collection actually happens.",
+        "Copyright cases over AI training are still going."
+      ],
+      "details": [
+        "TechCrunch reports that Meta has removed controversial language from its commercial terms. The text said Meta could 'use any content from domains, web pages, or URLs to provide, develop, improve, research, train, and maintain' its products. Earlier coverage here noted the terms were due to take effect October 30.",
+        "Legal experts, as reported by Nieman Lab, called it a 'remarkable provision' that could let Meta scrape any publisher with a Meta business account. After the backlash, the line was removed.",
+        "A Meta spokesperson said the terms 'only applied to our ads and business products' and that the company has 'clarified that in the terms themselves,' adding: 'It does not change how Meta uses web crawlers.'",
+        "TechCrunch notes Meta won a high-profile copyright lawsuit last year over AI training, though other cases against it and similar companies continue.",
+        "The removal clarifies Meta's stated position but, by Meta's own account, changes nothing operationally, so it looks like a wording fix rather than a policy reversal. What a company writes in a contract and what its crawlers do are different questions, and the report doesn't settle the second."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "meta",
+        "scraping",
+        "ai training",
+        "privacy",
+        "publishers",
+        "terms of service",
+        "copyright"
+      ],
+      "date": "2026-10-17",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/17/meta-removes-language-that-raised-scraping-and-ai-training-concerns/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-anthropic-puts-5-of-its-shares-into-a",
+      "headline": "Anthropic puts 5% of its shares into a 'public benefit fund' and won't yet say who runs it",
+      "summary": "Anthropic says it will commit 5% of its shares to a fund inside the company, adding 2% for every 50% rise in valuation. It promised governance details in the coming months.",
+      "impacts": [
+        "Who decides where the money goes is unanswered.",
+        "Stated uses include large nonprofit donations or direct payments to specific groups.",
+        "It follows a $200 million commitment to study AI's effect on jobs.",
+        "The value depends on Anthropic's valuation, which wasn't disclosed."
+      ],
+      "details": [
+        "TechCrunch reports that Anthropic announced on October 18 that it will set up a 'public benefit fund' as a wholly owned entity within the company, initially committing 5% of its shares. It has an option to add 2% for every 50% increase in the company's valuation.",
+        "Anthropic described possible uses as 'large donations to traditional nonprofits or direct distributions to specific populations.' It pointed to an existing $200 million commitment to study AI's impact on employment and said that 'given the pace of AI progress, bolder approaches may be needed.'",
+        "The biggest gap is governance. Anthropic said it will 'share more information about structure and governance in the coming months,' so who decides which projects qualify is not yet known.",
+        "TechCrunch ties it to rising public skepticism of the AI industry, noting CEO Dario Amodei has called the backlash 'fundamentally a crisis of trust.'",
+        "Because the valuation wasn't given in the report, the dollar size of the fund can't be computed from it. Watch for the governance announcement, which will show whether the fund is independent or controlled by the company."
+      ],
+      "category": "Economy",
+      "tags": [
+        "anthropic",
+        "ai",
+        "jobs",
+        "philanthropy",
+        "valuation",
+        "governance",
+        "economy"
+      ],
+      "date": "2026-10-18",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/18/anthropic-says-its-committing-5-of-its-shares-to-a-public-benefit-fund/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-microsoft-says-october-windows-server-updates-can-break",
+      "headline": "Microsoft says October Windows Server updates can break Exchange sign-in and mail delivery",
+      "summary": "Microsoft confirmed that the October updates for Windows Server 2019 and later can cause Outlook Web Access sign-in failures and stuck email on on-premises Exchange. A new 512-call limit under heavy load is the cause.",
+      "impacts": [
+        "Affected companies may lose webmail login and see mail stuck in the Outbox.",
+        "Microsoft says not to uninstall the Exchange security patches; the problem is in the Windows updates.",
+        "A registry workaround raises the limit to 65,536 calls.",
+        "Exchange 2016 and 2019 lost extended security updates this month, so those users are pressed twice."
+      ],
+      "details": [
+        "BleepingComputer reports that Microsoft has confirmed October 2026 Windows Server security updates cause Outlook Web Access sign-in failures and mail delivery problems on on-premises Exchange. Errors include 'MapiExceptionMdbOffline: Unable to make connection to the server' and Event ID 1006. Mail may sit in the Outbox and mailbox replication can fail.",
+        "It affects Windows Server 2019 and later. Severity varies with server load, so not every Exchange installation is hit equally.",
+        "Microsoft says the update introduced a default limit of 512 simultaneous Endpoint Lookup calls in the Endpoint Mapper, which 'might not be sufficient' under heavy workloads.",
+        "Microsoft stresses the issue is unrelated to the October Exchange Server security updates and tells customers not to uninstall them. The temporary fix is a registry change, run from an elevated prompt followed by a reboot, that raises the cap to 65,536.",
+        "BleepingComputer notes Microsoft ended extended security updates for Exchange 2016 and 2019 this month. Watch for a permanent fix from Microsoft and whether more load-related failures turn up."
+      ],
+      "category": "Tech",
+      "tags": [
+        "microsoft",
+        "exchange",
+        "windows",
+        "update",
+        "email",
+        "outage",
+        "patch"
+      ],
+      "date": "2026-10-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-october-windows-server-updates-cause-exchange-issues/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-disney-will-hire-most-of-character-ais-staff",
+      "headline": "Disney will hire most of Character.AI's staff as the chatbot startup heads through bankruptcy",
+      "summary": "A filing says Disney will offer jobs to at least 60 Character.AI employees, about $60 million a year in pay. The startup filed for bankruptcy on October 13 amid lawsuits and child-safety investigations.",
+      "impacts": [
+        "A startup sued over a 14-year-old's death is being absorbed for its talent.",
+        "The deal is a 'stalking horse' bid, so rivals can still outbid it.",
+        "Character.AI's former CEO is already Disney's first CTO.",
+        "Child-safety and wrongful-death claims may outlast the company."
+      ],
+      "details": [
+        "TechCrunch reports that Disney has agreed to hire the majority of Character.AI's workforce after the startup filed for bankruptcy on October 13. A legal filing says Disney will offer jobs to at least 60 employees with about $60 million in annual compensation, and that the 'vast majority' accepted.",
+        "Earlier coverage here covered the bankruptcy and Disney's $20 million bid for some assets. The new reporting is the hiring. Character.AI's former CEO, Karandeep Anand, joined Disney in September as its first Chief Technology Officer.",
+        "TechCrunch says Character.AI struggled with heavy operating costs and legal and regulatory pressure. It faced a wrongful-death lawsuit from the mother of a 14-year-old who became deeply engaged with one of its chatbots, and government investigations over child safety.",
+        "The arrangement is a stalking horse bid in the bankruptcy process, so other companies can still submit higher offers before it becomes final.",
+        "What's uncertain: whether any rival bids and what happens to the pending claims. This report doesn't say how the lawsuits are treated."
+      ],
+      "category": "AI",
+      "tags": [
+        "character.ai",
+        "disney",
+        "chatbots",
+        "bankruptcy",
+        "child safety",
+        "lawsuit",
+        "ai"
+      ],
+      "date": "2026-10-18",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/18/disney-agrees-to-hire-the-majority-of-character-ais-workforce/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-a-suspected-kazakhstan-linked-group-has-phished-governments",
+      "headline": "A suspected Kazakhstan-linked group has phished governments across nine ex-Soviet states",
+      "summary": "Cisco Talos and Recorded Future track a group, with medium-confidence ties to Kazakhstan, that ran at least eight espionage campaigns since January 2025. Targets include foreign affairs, energy and water agencies.",
+      "impacts": [
+        "Attack timing lined up with diplomatic events, such as treaty talks and a bilateral meeting.",
+        "Phishing used official-looking documents sent from compromised government accounts.",
+        "The group hid malicious scripts on GitHub.",
+        "Attribution to Kazakhstan is medium confidence only."
+      ],
+      "details": [
+        "The Record reports that Cisco Talos tracks the group as UAT-6275 and Recorded Future's Insikt Group as TAG-193. Both assess with medium confidence a link to Kazakhstan, citing Russian-language malware, testing patterns in Kazakhstan's time zone and overlaps with YoroTrooper, an earlier suspected Kazakhstan-based actor.",
+        "Targets are government agencies in nine countries including Russia, Belarus, Armenia, Uzbekistan and Tajikistan, in areas like foreign affairs, economic development, agriculture, environment, energy supply and water. The researchers say these hold information 'that can inform negotiations, economic planning, and regional security decisions.'",
+        "The method is phishing emails with malicious attachments, often spoofed from compromised government accounts and dressed as diplomatic correspondence or business proposals. The group stored scripts on GitHub and, from April 2026, exploited CVE-2025-8088 in WinRAR to drop malware in Windows startup folders.",
+        "There have been at least eight campaigns since January 2025. One hit a Tajik entity after Kazakhstan treaty discussions in March 2026 and another a Belarusian entity before a bilateral meeting in April 2026, suggesting an interest in diplomacy.",
+        "The report says the timing 'could indicate' that interest but doesn't confirm what the attackers wanted or got. Attribution is medium confidence, so it should be read as an assessment, not a finding."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "espionage",
+        "kazakhstan",
+        "phishing",
+        "state-sponsored",
+        "russia",
+        "government",
+        "winrar"
+      ],
+      "date": "2026-10-15",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/suspected-kazakhstan-phishing-central-asia-espionage"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-fake-yay-and-paru-packages-in-arch-linuxs",
+      "headline": "Fake 'yay' and 'paru' packages in Arch Linux's user repository ran commands as root",
+      "summary": "Someone uploaded trojanized look-alikes of the popular yay and paru helpers to the Arch User Repository. Their install scripts fetched code that ran with root privileges. Maintainers banned the account and removed the packages.",
+      "impacts": [
+        "Anyone who installed them should assume the machine is compromised.",
+        "A misspelled name like 'yyay' is all it takes to trick a quick install.",
+        "This follows earlier campaigns, including 400 compromised packages in June.",
+        "The payload came via a Wayback Machine link to a repo on a Russian platform."
+      ],
+      "details": [
+        "BleepingComputer reports that on October 13 packages impersonating the AUR helpers yay and paru were found in the Arch User Repository. They mixed legitimate upstream code with a trojanized install script designed to run remote commands as root. The uploading account was named 'marchos1as.'",
+        "AUR maintainer Andreas Reichel said the package 'presents itself as a straightforward repackaging of the legitimate yay AUR helper,' but the name 'yyay' and the install scriptlet show it is a trojanized impersonation.",
+        "The payload was fetched through a Wayback Machine URL pointing to a repository, hellscripter/install-scripts, hosted on the Russian platform GitFlic.",
+        "It is not the first such case. BleepingComputer cites a June campaign that spread 400 compromised packages and notes that in July Arch temporarily disabled package adoption.",
+        "Unknowns remain: it is unconfirmed whether this is linked to the 'DirtyBlanket' npm worm that SafeDep documented, despite shared infrastructure indicators, and the number of affected users is unknown. The AUR team banned the account and removed the packages."
+      ],
+      "category": "Tech",
+      "tags": [
+        "arch linux",
+        "aur",
+        "malware",
+        "supply chain",
+        "typosquatting",
+        "linux",
+        "root"
+      ],
+      "date": "2026-10-15",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/fake-arch-linux-packages-push-malware-with-root-privileges/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-nextcloud-servers-were-backdoored-for-a-month-before",
+      "headline": "Nextcloud servers were backdoored for a month before the flaw was publicly disclosed",
+      "summary": "A Collabora component for Nextcloud had a no-login command-injection bug fixed on September 11. Attacks began around September 10, but the CVE and advisory only appeared October 14, a four-week gap.",
+      "impacts": [
+        "Admins who hadn't been told of the bug had no reason to patch.",
+        "Attackers planted webshells and searched for password managers and crypto wallets.",
+        "Only the optional built-in CODE server is vulnerable, so many setups are safe.",
+        "A security firm says the median fix-to-CVE gap hit 39 days in August, up from 5.1 in January."
+      ],
+      "details": [
+        "BleepingComputer reports that CVE-2026-110447 affects the 'Collabora Online - Built-in CODE Server' app (richdocumentscode) for Nextcloud before version 26.4.303. It is an OS command injection through the proxy.php endpoint and needs no login or user interaction.",
+        "The fix was committed September 9 and version 26.4.303 released September 11. But administrators reported exploitation starting September 10, and the advisory, GitHub notice and CVE were published only on October 14, a four-week gap.",
+        "Attackers dropped PHP webshells and hunted for password databases, password managers and crypto wallets. Some reports mentioned ransomware operators, but BleepingComputer says independent confirmation was unavailable.",
+        "Only the optional built-in CODE server is vulnerable. Standalone Collabora servers, Docker installs, RPM/DEB packages and Nextcloud All-in-One are not affected. The bug needs the built-in server to be stopped, such as after a restart or crash. Admins must upgrade to 26.4.303 or later or remove the app; disabling it is not enough.",
+        "The article cites research from Second Security saying the median gap between a public fix and CVE publication was 39 days in August, up from 5.1 in January, which the firm partly blames on 'growing volumes of AI-assisted vulnerability discoveries' straining CVE processing. That is one firm's analysis, not an established cause."
+      ],
+      "category": "Tech",
+      "tags": [
+        "nextcloud",
+        "collabora",
+        "vulnerability",
+        "exploited",
+        "cve",
+        "webshell",
+        "ai"
+      ],
+      "date": "2026-10-15",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-exploit-collabora-rce-flaw-to-backdoor-nextcloud-servers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-study-11-ai-chatbots-approved-climate-plans-70",
+      "headline": "Study: 11 AI chatbots approved climate plans 70% of the time if they kept the status quo, 34% if new",
+      "summary": "University of Waterloo researchers tested 11 language models on nearly 55,000 prompts. The models were 7.5 times more likely to recommend something framed as preserving existing conditions.",
+      "impacts": [
+        "Users asking chatbots about cars, heating or policy may get nudged toward the high-emission default.",
+        "Models recommended electric vehicles less often than real adoption, even in Norway.",
+        "Recipe advice showed no preference for plant-based options.",
+        "The bias could be useful in medicine, but it works against change."
+      ],
+      "details": [
+        "Neuroscience News reports a University of Waterloo study in Environmental Research Communications, published October 1, that tested 11 large language models on climate-related advice. It used nearly 55,000 test prompts, drawn from 7,548 distinct queries covering vehicle purchases, recipes, home heating and policy decisions.",
+        "The pattern was a strong status quo bias. When a proposal was framed as preserving current policy, models approved it 70% of the time; framed as a new climate intervention, approval dropped to 34%. Lead researcher Seth Wynes says the odds of a recommendation were 7.5 times higher when it was framed as preserving existing conditions.",
+        "In consumer questions, chatbots recommended electric vehicles at rates well below actual market adoption, including in EV-heavy places like Norway. Recipe recommendations showed no preference for plant-based dishes.",
+        "The authors, Seth Wynes, Aarya Shah and Victoria Milardović, say status quo bias may be useful in safety-critical areas such as clinical medicine, but that it undermines climate transition goals by steering users toward high-emission defaults.",
+        "What isn't shown: the report doesn't say whether the bias comes from training data, safety tuning or something else, nor how it varies by model. It also tests framing, not what real users do after the advice."
+      ],
+      "category": "AI",
+      "tags": [
+        "chatbots",
+        "bias",
+        "climate",
+        "llm",
+        "study",
+        "recommendations",
+        "ai"
+      ],
+      "date": "2026-10-01",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Neuroscience News",
+          "url": "https://neurosciencenews.com/ai-chatbots-status-quo-social-neuroscience-31295/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-a-speech-age-clock-built-from-2-928",
+      "headline": "A speech 'age clock' built from 2,928 voices tracks brain shrinkage and Alzheimer's markers",
+      "summary": "A Science Advances study used machine learning on speech from 2,928 Spanish speakers to estimate biological age. The gap between speech age and real age tracked MRI atrophy, epigenetic clocks and a tau biomarker.",
+      "impacts": [
+        "A phone recording could one day screen for dementia in places without scanners.",
+        "Voice is also data: a recording can reveal health you didn't mean to share.",
+        "It is still investigational and not a diagnostic.",
+        "People facing social adversity showed accelerated speech aging."
+      ],
+      "details": [
+        "Neuroscience News reports a multicenter study in Science Advances, published September 30, covering 2,928 Spanish-speaking participants in Argentina, Chile, Colombia, Mexico and Peru. They included healthy older adults, people with mild cognitive impairment, and patients with Alzheimer's or frontotemporal dementia.",
+        "Researchers pulled hundreds of acoustic and language features, such as pitch, pause length, speech rate, vocabulary richness and syntactic complexity, and trained a model to predict biological age from speech. The difference from real age is the 'speech age gap.'",
+        "The gap correlated with brain atrophy on MRI, three independent epigenetic clocks, raised plasma phosphorylated tau-217 (a biomarker linked to Alzheimer's) and cognitive deficits. It was smallest in healthy people, wider in mild impairment and widest in dementia. People with social adversity showed faster speech aging.",
+        "The authors say the findings are cross-sectional, not longitudinal, and the clock is investigational, not a clinical tool. Prospective studies are needed to see whether speech can predict decline before symptoms.",
+        "Because it needs only ordinary devices and remote recording, the approach could widen screening in underserved regions. The flip side, which the report doesn't address, is that any system that infers brain health from voice raises privacy questions about who holds the recordings."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "voice",
+        "dementia",
+        "alzheimer's",
+        "brain",
+        "machine learning",
+        "biomarker",
+        "aging"
+      ],
+      "date": "2026-09-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Neuroscience News",
+          "url": "https://neurosciencenews.com/ai-voice-clock-aging-31278/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-the-register-ai-needs-trillions-in-funding-while",
+      "headline": "The Register: AI needs trillions in funding while undercutting the revenue that would pay for it",
+      "summary": "A Register column cites SemiAnalysis's forecast of $11 trillion in AI capital spending by 2030 against Gartner's doubts about returns. It says nobody knows where the money comes from.",
+      "impacts": [
+        "Nvidia guaranteeing rental of capacity for startups shifts risk onto investment-grade firms.",
+        "AI can cut the ad revenue that pays for the content it trains on.",
+        "Claude-based Rust clones of Office and Adobe tools show how cheaply software can be copied.",
+        "This is one columnist's argument, not a forecast."
+      ],
+      "details": [
+        "The Register's Rupert Goodwins argues in an October 19 column that AI's huge capital needs are matched by its ability to undermine the revenue meant to justify them. It is opinion, and the numbers are other firms' estimates.",
+        "He cites SemiAnalysis predicting $11 trillion of capital spending by 2030, while Gartner questions whether enough return exists. The column says 'nobody knows' where enough funding would come from.",
+        "He points to someone releasing Claude-based Rust reimplementations of Microsoft Office and Adobe Creative Suite, as evidence that AI can replicate complex software with no obvious legal barrier. He also describes a 'doom loop' where AI erodes the ad revenue that supports content while depending on that content for training.",
+        "On structure, the column says investment mechanisms rely on firms like Nvidia backstopping startup capacity through guaranteed rental agreements, which shifts risk to investment-rated companies. It also notes older datacenter chips keep unexpectedly high resale value instead of depreciating normally, which makes the economics hard to model.",
+        "Earlier coverage here tracked debt worries, such as CoreWeave's high bond yield and the IMF's AI-bubble warning. This column adds an argument, not new data."
+      ],
+      "category": "Economy",
+      "tags": [
+        "ai bubble",
+        "capex",
+        "debt",
+        "nvidia",
+        "data centers",
+        "funding",
+        "economy"
+      ],
+      "date": "2026-10-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/columnists/2026/10/19/ais-epic-cash-call-is-matched-only-by-its-ability-to-strangle-revenue-streams/5303493"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-19-a-new-tool-citeproof-checks-lawyers-ai-written",
+      "headline": "A new tool, CiteProof, checks lawyers' AI-written briefs for case citations that don't exist",
+      "summary": "CiteProof verifies citations against public court records without using AI. The Register says fabricated citations from tools like GPT-4 and Claude keep reaching courts, and a Georgia court vacated an order containing fictional ones.",
+      "impacts": [
+        "Fake citations can make it into court orders if nobody checks.",
+        "Even AI companies' own lawyers have filed wrong citations, per the report.",
+        "Checks cost $49 per brief, or $499 a month for up to 200.",
+        "A deterministic lookup avoids using more AI to catch AI mistakes."
+      ],
+      "details": [
+        "The Register reports on CiteProof, a new online service that checks whether cases cited in a brief really exist. It uses deterministic searches of public court records, not language models, and says it doesn't store data or send it to AI systems.",
+        "The problem is described as widespread. Lawyers using tools like GPT-4 and Claude have repeatedly submitted fabricated case citations, and one Georgia court vacated an entire order after finding it contained fictional AI-generated citations.",
+        "Pricing is $49 per brief, $199 for five, and $499 a month for firms checking 200 briefs. A spokesperson says, 'You cannot reliably catch AI hallucinations with more AI guesswork.'",
+        "The Register also says Anthropic's own lawyers used Claude in litigation and submitted citations to incorrect records without catching it. The article says the company then blamed the AI; I only opened this one report, so the details of that case are not verified here.",
+        "CiteProof acknowledges lawyers won't stop using AI and positions itself as a safeguard. It checks whether a case exists, not whether it supports the argument, so human review is still needed."
+      ],
+      "category": "AI",
+      "tags": [
+        "hallucination",
+        "legal",
+        "courts",
+        "citations",
+        "llm",
+        "lawyers",
+        "ai"
+      ],
+      "date": "2026-10-16",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/10/16/new-online-tool-will-check-lawyers-sloppy-ai-written-briefs-since-they-cant-seem-to-be-bothered/5303589"
+        }
+      ]
+    }
+  ]
+}
