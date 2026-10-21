@@ -58,7 +58,9 @@
            color:var(--muted); font-weight:600;}
   tbody tr:last-child>*{border-block-end:none;}
   tbody th{font-weight:600; text-align:left; background:var(--surface);}
-  .what{display:block; font-size:11px; color:var(--muted); font-weight:400;}
+  .what{display:block; font-size:11px; color:var(--muted); font-weight:400;
+        white-space:normal;}
+  tbody th{max-width:19rem;}
   .pos{color:var(--good);} .neg{color:var(--bad);} .dim{color:var(--muted);}
   .warn{color:var(--warn);}
 
@@ -86,8 +88,8 @@
   <header>
     <div>
       <h1>Cross-venue sports arbitrage</h1>
-      <p class="sub">The same contract priced on Kalshi and Polymarket at once. Only gaps of
-        1&percnt; or wider are listed, and every figure is after trading fees and tax.</p>
+      <p class="sub">The same contract priced on Kalshi and Polymarket at once. Only bets that
+        still make money once fees and tax come out, ranked by what they actually return.</p>
     </div>
     <span class="stamp" id="stamp">loading</span>
   </header>
@@ -104,9 +106,15 @@
   <div id="board"></div>
 
   <h2>What the columns mean</h2>
-  <p class="note"><b>Gap</b> is how far the two venues' prices are from adding to a dollar &mdash; the
-    raw arbitrage, before anything is taken out. <b>In</b> is what you would have to put up across
-    both venues; <b>keep</b> is what is left after fees and tax, whichever way the event lands.</p>
+  <p class="note"><b>Return</b> is what the bet actually pays, after everything. Under each bet is
+    the arithmetic behind it: the <b>gap</b> between the two venues' prices, less fees, less tax.
+    <b>In</b> is what you put up across both venues and <b>keep</b> is what comes back, whichever
+    way the event lands.</p>
+  <p class="note">A positive gap is not enough on its own, which is why the board does not list
+    one. Kalshi's fee is largest in the middle of the price range, so a 1&percnt; gap on a
+    30&cent; contract loses money &mdash; the fee there is 1.47&percnt; of the payout and no amount
+    of size fixes it. Only the tails are cheap enough for a thin gap to survive, which is why
+    nearly everything here is a longshot.</p>
   <p class="note"><b>Risk&nbsp;:&nbsp;win</b> is the part most arbitrage maths leaves out. The two legs
     only cancel if both venues settle the same way. If they do not &mdash; a different season or
     scope than it looks, an oracle result that departs from the league's official one, a void on
@@ -114,9 +122,9 @@
     &ldquo;in&rdquo; column goes, to win what is in &ldquo;keep&rdquo;. That ratio is the number
     worth looking at. It is an exposure, not a probability: nothing here can estimate how likely
     it is.</p>
-  <p class="note">Kalshi's fee is <b>0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price)</b> per contract, so it peaks
-    at a coin flip (1.75&cent;) and collapses at the tails (0.33&cent; at 5&cent; or 95&cent;). That is
-    why almost everything that survives is a longshot. Polymarket is modelled at no trading fee.</p>
+  <p class="note">The fee is <b>0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price)</b> per contract on Kalshi:
+    1.75&cent; at a coin flip, 0.33&cent; at 5&cent; or 95&cent;. Polymarket is modelled at no trading
+    fee. Tax assumes both legs are exchange contracts that net against each other.</p>
 
   <footer id="foot"></footer>
 </main>
@@ -166,13 +174,15 @@
     const v = $("#verdict");
     v.textContent = "";
     if (!rows.length) {
-      v.innerHTML = "<b>Nothing at " + (floor * 100).toFixed(0) + "% or wider"
-        + (when && when !== "all" ? " closing in that window" : " right now") + ".</b> ";
+      v.innerHTML = "<b>Nothing clears fees and tax"
+        + (when && when !== "all" ? " in that window" : " right now") + ".</b> ";
       v.append("That is the usual state of this board.");
     } else {
-      v.innerHTML = "<b>" + rows.length + " gap" + (rows.length === 1 ? "" : "s") + " of "
-        + (floor * 100).toFixed(0) + "% or wider";
-      const tail = ", widest " + pct(best.gross_edge) + " on " + best.label + ". "
+      const top = rows.reduce((a, r) =>
+        (!a || r.ledger.net_edge > a.ledger.net_edge) ? r : a, null);
+      v.innerHTML = "<b>" + rows.length + " bet" + (rows.length === 1 ? "" : "s")
+        + " that clear fees and tax";
+      const tail = ", best " + pct(top.ledger.net_edge) + " on " + top.label + ". "
         + (beats.length
             ? beats.length + " of them beat leaving the money in cash."
             : "None of them beats leaving the money in cash — the ones that clear fees and "
@@ -190,7 +200,7 @@
       return;
     }
 
-    const cols = ["Bet", "Buy", "Against", "Gap", "In", "Keep", "Risk : win", "Closes"];
+    const cols = ["Bet", "Buy", "Against", "Return", "In", "Keep", "Risk : win", "Closes"];
     const tw = el("div", "tw"); tw.tabIndex = 0; tw.setAttribute("role", "region");
     tw.setAttribute("aria-label", "Cross-venue price gaps of 1% or wider");
     const t = el("table"), thead = el("thead"), hr = el("tr");
@@ -198,7 +208,7 @@
     thead.appendChild(hr); t.appendChild(thead);
 
     const tb = el("tbody");
-    rows.slice().sort((a, b) => b.gross_edge - a.gross_edge).forEach(r => {
+    rows.slice().sort((a, b) => b.ledger.net_edge - a.ledger.net_edge).forEach(r => {
       const L = r.ledger;
       const legs = L.legs || [];
       const nm = k => (d.venueName && d.venueName[k]) || k;
@@ -206,9 +216,17 @@
 
       const th = el("th"); th.scope = "row";
       th.appendChild(document.createTextNode(r.label));
+      // gap minus fees minus tax is the return, shown so a row explains
+      // itself: a 1% gap on a 30c contract loses money, because Kalshi's fee
+      // at 30c is 1.47% of payout, and that was not visible before.
+      const taxOut = (L.outcomes || []).filter(o => !o.divergence);
+      const taxPct = taxOut.length && L.payout_total
+        ? taxOut.reduce((a, o) => a + o.tax, 0) / taxOut.length / L.payout_total : 0;
       th.appendChild(el("span", "what",
-        r.league.toUpperCase()
-        + (r.polls_clearing > 1 ? " · standing for " + r.polls_clearing + " polls" : "")));
+        r.league.toUpperCase() + " · " + pct(r.gross_edge) + " gap \u2212 "
+        + (L.fee_pct_of_payout * 100).toFixed(2) + "% fee \u2212 "
+        + (taxPct * 100).toFixed(2) + "% tax"
+        + (r.polls_clearing > 1 ? " · " + r.polls_clearing + " polls" : "")));
       tr.appendChild(th);
 
       const cell = (txt, cls, label) => {
@@ -216,7 +234,7 @@
       };
       cell(legs[0] ? nm(legs[0].venue) + " " + cents(legs[0].price) : "—", "", "Buy");
       cell(legs[1] ? nm(legs[1].venue) + " " + cents(legs[1].price) : "—", "", "Against");
-      cell(pct(r.gross_edge), r.gross_edge > 0 ? "pos" : "neg", "Gap");
+      cell(pct(L.net_edge), L.net_edge > 0 ? "pos" : "neg", "Return");
       cell(money(L.capital_in), "", "In");
       cell(money(L.worst_net), L.worst_net > 0 ? "pos" : "neg", "Keep");
       cell(L.risk_ratio ? Math.round(L.risk_ratio) + ":1" : "—",
