@@ -171,6 +171,13 @@
         <div class="ctrl"><label for="i-rf">Risk-free rate</label>
           <input id="i-rf" type="number" min="0" max="20" step="0.25" value="4" inputmode="decimal">
           <span class="hint">% &mdash; what cash pays</span></div>
+        <div class="ctrl"><label for="i-kind">Contract</label>
+          <select id="i-kind">
+            <option value="all">every kind</option>
+            <option value="moneyline">moneyline only</option>
+            <option value="total">over / under only</option>
+            <option value="futures">title futures only</option>
+          </select><span class="hint">what you are trading</span></div>
         <div class="ctrl"><label for="i-min">Hide below</label>
           <select id="i-min">
             <option value="all">show everything</option>
@@ -246,6 +253,8 @@
   const safeUrl = u => (typeof u === "string" && u.startsWith("https://")) ? u : null;
 
   let DATA = null;
+  const KIND_LABEL = { futures: "futures", total: "o/u", moneyline: "moneyline" };
+  const KIND_FULL = { futures: "title futures", total: "over / under", moneyline: "moneyline" };
 
   // ---- the model, mirroring model.py so the page can re-price live --------
   // Kept deliberately in step with model.py: a review found this port had
@@ -339,7 +348,7 @@
              itemises: $("#i-item").checked, offsets: true,
              loss_deduct_pct: (DATA && DATA.tax && DATA.tax.loss_deduct_pct) || 0.9 },
       rf: n("#i-rf", 4) / 100,
-      filter: $("#i-min").value
+      filter: $("#i-min").value, kind: $("#i-kind").value
     };
   }
 
@@ -504,6 +513,7 @@
     let shown = 0, live = 0, beats = 0, unsized = 0;
 
     (DATA.opportunities || []).forEach(row => {
+      if (inp.kind !== "all" && row.kind !== inp.kind) return;
       const quotes = Object.entries(row.sides)
         .map(([side, qs]) => qs.length ? { venue: qs[0].venue, side, ask: qs[0].ask, size: qs[0].size } : null)
         .filter(Boolean);
@@ -536,8 +546,11 @@
       t.appendChild(el("span", "tag " + tagcls, label));
       const when = row.days_to_settle < 2 ? Math.round(row.days_to_settle * 24) + "h"
         : Math.round(row.days_to_settle) + "d";
-      t.appendChild(el("span", "meta", row.league.toUpperCase() + " · " +
-        row.venues.map(v => DATA.venueName[v] || v).join(" vs ") + " · settles in " + when));
+      t.appendChild(el("span", "meta", row.league.toUpperCase() + " · "
+        + (KIND_FULL[row.kind] || row.kind) + " · "
+        + row.venues.map(v => DATA.venueName[v] || v).join(" vs ")
+        + " · settles in " + when
+        + (row.polls_clearing > 1 ? " · clearing for " + row.polls_clearing + " polls" : "")));
       s.appendChild(t);
 
       const cell = (k, v, cls, hide) => {
@@ -557,8 +570,11 @@
       host.appendChild(d);
     });
 
+    const byKind = {};
+    (DATA.opportunities || []).forEach(r => { byKind[r.kind] = (byKind[r.kind] || 0) + 1; });
+    const mix = Object.entries(byKind).map(([k, n]) => n + " " + (KIND_LABEL[k] || k)).join(", ");
     $("#arb-n").textContent = shown + " shown · " + live + " clear with measured depth · "
-      + unsized + " unsized · " + beats + " beat cash";
+      + unsized + " unsized · " + beats + " beat cash" + (mix ? " · priced: " + mix : "");
     if (!shown) host.appendChild(el("div", "empty",
       "Nothing meets that filter right now. That is the normal state of this board — "
       + "loosen the filter above to see what is close."));
@@ -692,7 +708,7 @@
       DATA.venueMap = {}; DATA.venueName = {};
       (d.venues || []).forEach(v => { DATA.venueMap[v.key] = v; DATA.venueName[v.key] = v.name; });
       renderVenues(); renderBoard(); renderFields(); renderRecord(); renderFoot(); rerender();
-      ["#i-bank", "#i-fed", "#i-state", "#i-rf", "#i-min", "#i-item"].forEach(s =>
+      ["#i-bank", "#i-fed", "#i-state", "#i-rf", "#i-min", "#i-kind", "#i-item"].forEach(s =>
         $(s).addEventListener("input", rerender));
     })
     .catch(e => {
