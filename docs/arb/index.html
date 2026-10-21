@@ -177,6 +177,7 @@
             <option value="all">every kind</option>
             <option value="moneyline">moneyline only</option>
             <option value="total">over / under only</option>
+            <option value="spread">point spreads only</option>
             <option value="futures">title futures only</option>
           </select><span class="hint">what you are trading</span></div>
         <div class="ctrl"><label for="i-min">Hide below</label>
@@ -254,8 +255,10 @@
   const safeUrl = u => (typeof u === "string" && u.startsWith("https://")) ? u : null;
 
   let DATA = null;
-  const KIND_LABEL = { futures: "futures", total: "o/u", moneyline: "moneyline" };
-  const KIND_FULL = { futures: "title futures", total: "over / under", moneyline: "moneyline" };
+  const KIND_LABEL = { futures: "futures", total: "o/u", moneyline: "moneyline",
+                       spread: "spread" };
+  const KIND_FULL = { futures: "title futures", total: "over / under",
+                      moneyline: "moneyline", spread: "point spread" };
 
   // ---- the model, mirroring model.py so the page can re-price live --------
   // Kept deliberately in step with model.py: a review found this port had
