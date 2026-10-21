@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cross-venue sports arbitrage</title>
+<meta name="description" content="Live prices for the same sports contract on Kalshi and Polymarket, with every fee and tax taken out before anything is called profit.">
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --line:#e1e0d9; --rule:#c3c2b7; --strong:#16171b; --wash:#f3f3f0;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --good:#006300; --bad:#c0392b; --warn:#9a6a00; --warnbg:#fdf4dd;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --line:#2c2c2a; --rule:#383835; --strong:#e8e7e2; --wash:#232321;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --line:#2c2c2a; --rule:#383835; --strong:#e8e7e2; --wash:#232321;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
+       line-height:1.5; font-variant-numeric:tabular-nums;}
+  h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button,input,select{font:inherit; color:inherit;}
+  button{cursor:pointer; border:none; background:none;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+  a{color:var(--s1);}
+  main{max-width:1120px; margin:0 auto; padding:30px clamp(16px,4vw,44px) 80px;}
+
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin-bottom:6px;}
+  .head h1{font-size:22px;}
+  .sub{color:var(--ink2); font-size:13.5px; margin-top:4px; max-width:70ch;}
+  .badge{font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+         padding:3px 8px; border-radius:999px; border:1px solid var(--rule); color:var(--ink2); white-space:nowrap;}
+  .badge.live{color:var(--good); border-color:currentColor;}
+  .badge.stale{color:var(--warn); border-color:currentColor;}
+
+  section{margin-top:34px;}
+  .sechead{display:flex; align-items:baseline; justify-content:space-between; gap:10px 16px; flex-wrap:wrap;
+           border-bottom:1px solid var(--rule); padding-bottom:7px; margin-bottom:14px;}
+  .sechead h2{font-size:15.5px;}
+  .sechead .n{font-size:12px; color:var(--muted);}
+  .note{font-size:12.5px; color:var(--ink2); margin:-6px 0 14px; max-width:78ch;}
+
+  /* controls */
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+  .ctrls{display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:12px 16px;}
+  .ctrl{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .ctrl label{font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted);}
+  .ctrl input,.ctrl select{background:var(--paper); border:1px solid var(--rule); border-radius:6px;
+                           padding:6px 8px; font-size:14px; width:100%; min-width:0;}
+  .ctrl .hint{font-size:11px; color:var(--muted);}
+  .chk{flex-direction:row; align-items:center; gap:8px;}
+  .chk input{width:auto;}
+  .chk label{text-transform:none; letter-spacing:0; font-size:12.5px; color:var(--ink2);}
+
+  /* tables */
+  .tw{overflow:auto; max-inline-size:100%; container-type:inline-size;
+      border:1px solid var(--line); border-radius:10px; background:var(--surface);}
+  table{border-collapse:separate; border-spacing:0; width:100%; font-size:13px;}
+  caption{text-align:left; padding:9px 13px 3px; font-size:11px; letter-spacing:.05em;
+          text-transform:uppercase; color:var(--muted);}
+  thead{position:sticky; inset-block-start:0; z-index:1; background:var(--wash);}
+  th,td{padding:7px 11px; text-align:right; white-space:nowrap; border-block-end:1px solid var(--line);}
+  th:first-child,td:first-child{text-align:left;}
+  thead th{font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); font-weight:600;}
+  tbody tr:last-child td,tbody tr:last-child th{border-block-end:none;}
+  tbody th{font-weight:600; background:var(--surface);}
+  .num{font-variant-numeric:tabular-nums;}
+  .pos{color:var(--good);} .neg{color:var(--bad);} .dim{color:var(--muted);}
+
+  /* opportunity rows */
+  .opp{border:1px solid var(--line); border-radius:10px; background:var(--surface); margin-bottom:9px; overflow:hidden;}
+  .opp[data-beats="yes"]{border-color:color-mix(in srgb, var(--good) 45%, var(--line));}
+  .opp>summary{list-style:none; cursor:pointer; padding:11px 14px; display:grid; gap:4px 14px;
+               grid-template-columns:minmax(0,1.5fr) repeat(5,minmax(70px,auto)) 20px; align-items:center;}
+  .opp>summary::-webkit-details-marker{display:none;}
+  .opp>summary:hover{background:var(--wash);}
+  .opp .ttl{font-weight:600; font-size:14px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0;}
+  .opp .meta{font-size:11.5px; color:var(--muted); font-weight:400;}
+  .cell{text-align:right;}
+  .cell .k{display:block; font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted);}
+  .cell .v{font-size:14px; font-variant-numeric:tabular-nums;}
+  .chev{justify-self:end; color:var(--muted); transition:transform .15s;}
+  .opp[open] .chev{transform:rotate(90deg);}
+  .opp .body .tw th,.opp .body .tw td{padding-inline:9px;}
+  .opp .body{padding:4px 14px 16px; border-block-start:1px solid var(--line); background:var(--paper);}
+  .grid2{display:grid; gap:14px; grid-template-columns:minmax(0,1fr) minmax(0,1fr); margin-top:12px;}
+  @media (max-width:760px){ .grid2{grid-template-columns:minmax(0,1fr);} }
+  .tag{font-size:10.5px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+       padding:2px 7px; border-radius:999px; border:1px solid var(--rule); color:var(--ink2);}
+  .tag.live{color:var(--good);} .tag.feeeaten{color:var(--warn);} .tag.taxeaten{color:var(--s2);}
+  .tag.dead{color:var(--muted);} .tag.unsized{color:var(--s2);}
+  .tag.belowcash{color:var(--muted);}
+  .opp[data-verdict="unsized"]{border-color:color-mix(in srgb, var(--s2) 35%, var(--line));}
+  .risk{margin-top:10px; padding:9px 12px; border-radius:8px; background:var(--warnbg);
+        border:1px solid color-mix(in srgb, var(--warn) 45%, var(--line)); font-size:12.5px;}
+  .verdictline{margin-top:12px; padding:9px 12px; border-radius:8px; background:var(--wash);
+               font-size:13px; border:1px solid var(--line);}
+  .verdictline b{font-weight:600;}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:10px; margin-bottom:4px;}
+  .kpi{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:11px 13px;}
+  .kpi .k{font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted);}
+  .kpi .v{font-size:21px; font-family:'Space Grotesk',sans-serif; font-weight:600; margin-top:2px;}
+  .kpi .s{font-size:11.5px; color:var(--ink2);}
+
+  .empty{padding:22px 14px; text-align:center; color:var(--muted); font-size:13px;
+         border:1px dashed var(--rule); border-radius:10px;}
+  .foot{margin-top:40px; padding-top:14px; border-top:1px solid var(--rule); font-size:12px; color:var(--muted); max-width:80ch;}
+  .foot p+p{margin-top:7px;}
+
+  @container (width < 430px){
+    .tw table, .tw thead, .tw tbody, .tw tr, .tw th, .tw td{display:block;}
+    .tw thead{display:none;}
+    .tw tbody tr{border-block-end:1px solid var(--rule); padding:5px 0;}
+    .tw tbody tr:last-child{border-block-end:none;}
+    .tw td,.tw th{border-block-end:none; text-align:left; white-space:normal; padding:3px 12px;}
+    .tw td:not(:empty)::before{content:attr(data-l) ": "; color:var(--muted); font-size:11px;}
+    .tw td:empty{display:none;}
+    .tw tbody th{background:transparent; padding-block-start:8px;}
+  }
+  @media (max-width:720px){
+    .opp>summary{grid-template-columns:minmax(0,1fr) minmax(74px,auto) 20px;}
+    .opp>summary .cell.hide-sm{display:none;}
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="head">
+    <div>
+      <h1>Cross-venue sports arbitrage</h1>
+      <p class="sub">The same contract, priced on two exchanges at once. Every number below is
+      after trading fees, settlement fees and tax &mdash; the headline figure is what you keep in the
+      <em>worst</em> outcome, not the best. Nothing here places a bet.</p>
+    </div>
+    <span class="badge" id="freshness">loading</span>
+  </div>
+
+  <section id="s-summary" style="margin-top:22px;">
+    <div class="kpis" id="kpis"></div>
+  </section>
+
+  <section id="s-inputs">
+    <div class="sechead"><h2>1 &middot; Your numbers</h2>
+      <span class="n">everything below recomputes as you type</span></div>
+    <p class="note">Tax is the part most arbitrage maths leaves out, and for a hedge it is decisive.
+      A hedge books a big win on one leg and an almost equal loss on the other; whether those two
+      net against each other depends entirely on how the venue is taxed.</p>
+    <div class="panel">
+      <div class="ctrls">
+        <div class="ctrl"><label for="i-bank">Bankroll per trade</label>
+          <input id="i-bank" type="number" min="10" step="50" value="1000" inputmode="decimal">
+          <span class="hint">split across both legs</span></div>
+        <div class="ctrl"><label for="i-fed">Federal rate</label>
+          <input id="i-fed" type="number" min="0" max="60" step="1" value="24" inputmode="decimal">
+          <span class="hint">% marginal</span></div>
+        <div class="ctrl"><label for="i-state">State rate</label>
+          <input id="i-state" type="number" min="0" max="20" step="0.5" value="5" inputmode="decimal">
+          <span class="hint">% &mdash; MA is 5</span></div>
+        <div class="ctrl"><label for="i-rf">Risk-free rate</label>
+          <input id="i-rf" type="number" min="0" max="20" step="0.25" value="4" inputmode="decimal">
+          <span class="hint">% &mdash; what cash pays</span></div>
+        <div class="ctrl"><label for="i-min">Hide below</label>
+          <select id="i-min">
+            <option value="all">show everything</option>
+            <option value="gross">positive gross edge</option>
+            <option value="net" selected>clears fees + tax</option>
+            <option value="cash">beats cash</option>
+          </select><span class="hint">filter the board</span></div>
+        <div class="ctrl chk"><input id="i-item" type="checkbox">
+          <label for="i-item">I itemise deductions</label></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-rates">
+    <div class="sechead"><h2>2 &middot; Rates and takes, per venue</h2>
+      <span class="n">what each venue charges before you are ahead</span></div>
+    <p class="note">Kalshi's fee carries a <b>P&times;(1&minus;P)</b> term, so it peaks at a coin flip and
+      collapses at the tails. That single fact decides where this strategy can work: a 50&cent; contract
+      costs about <b>1.75&cent; per contract</b> to enter, a 5&cent; or 95&cent; contract about
+      <b>0.33&cent;</b> &mdash; five times cheaper. The two columns point opposite ways because a hedge
+      fixes your payout (so cost per contract is what bites) while a one-way bet fixes your stake.</p>
+    <div id="venues"></div>
+  </section>
+
+  <section id="s-arb">
+    <div class="sechead"><h2>3 &middot; Biggest spreads &mdash; the arbitrage board</h2>
+      <span class="n" id="arb-n"></span></div>
+    <p class="note">Ranked by what survives. Open a row for the full ledger: every dollar in, every
+      fee, and what you are left with under each outcome.</p>
+    <div id="arb"></div>
+  </section>
+
+  <section id="s-board">
+    <div class="sechead"><h2>4 &middot; The liquid board</h2>
+      <span class="n">biggest markets trading on both venues right now</span></div>
+    <p class="note">Where the real money is, whether or not there is an edge. A market both venues
+      agree on and trade heavily is the one you can actually get size into.</p>
+    <div id="board"></div>
+  </section>
+
+  <section id="s-fields">
+    <div class="sechead"><h2>5 &middot; Championship fields</h2>
+      <span class="n">buy every team &mdash; does the field price under 100%?</span></div>
+    <p class="note">Add up every team's price to win the title. Under 100&percnt; and buying the whole
+      field is a guaranteed payout for less than it returns. Over 100&percnt; is the overround, which
+      is the exchange's edge over the room.</p>
+    <div id="fields"></div>
+  </section>
+
+  <section id="s-record">
+    <div class="sechead"><h2>6 &middot; The record so far</h2>
+      <span class="n">what the collector has actually seen</span></div>
+    <p class="note">This is the point of the exercise. Not "is arbitrage possible" but "how often,
+      at what size, and does it beat leaving the money in cash".</p>
+    <div id="record"></div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c;
+    if (txt != null) n.textContent = txt; return n; };
+  const money = v => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US",
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const pct = (v, d = 2) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
+  const cents = v => (v * 100).toFixed(1) + "¢";
+  const num = v => Math.round(v).toLocaleString("en-US");
+  // venue-supplied strings reach href; only ever allow https
+  const safeUrl = u => (typeof u === "string" && u.startsWith("https://")) ? u : null;
+
+  let DATA = null;
+
+  // ---- the model, mirroring model.py so the page can re-price live --------
+  // Kept deliberately in step with model.py: a review found this port had
+  // silently dropped the settlement fee and ignored derivative_offsets_income,
+  // so the public page could show a different number than the collector.
+  const CENT = 0.01;
+  function tradeFee(v, contracts, price) {
+    if (!v) return 0;
+    if (v.fee_model === "kalshi") {
+      const raw = (v.kalshi_multiplier || 1) * 0.07 * contracts * price * (1 - price);
+      // round before ceiling: 1.75c lands on 1.7500000000000002 in binary
+      // floating point and would otherwise bill an extra cent every time
+      return Math.ceil(Number((raw / CENT).toFixed(9))) * CENT;
+    }
+    if (v.fee_model === "bps") return contracts * price * (v.taker_bps || 0) / 1e4;
+    return 0;
+  }
+  function taxOn(legs, tax) {
+    let deriv = 0, win = 0, loss = 0;
+    for (const l of legs) {
+      if (l.cls === "derivative") deriv += l.pnl;
+      else if (l.pnl > 0) win += l.pnl;
+      else loss -= l.pnl;
+    }
+    const deductible = tax.itemises ? loss * tax.loss_deduct_pct : 0;
+    let taxable = Math.max(0, win - Math.min(deductible, win));
+    if (deriv > 0 || tax.offsets) taxable += deriv;
+    // A negative figure here is a deduction, not a cheque. Booking it as a
+    // refund credits tax back at the full marginal rate, with certainty, in
+    // the same year — which makes every losing outcome read better than it is.
+    return taxable <= 0 ? 0 : taxable * tax.rate;
+  }
+  function buildLedger(quotes, bankroll, tax, venues, days) {
+    const unit = quotes.reduce((s, q) => s + q.ask, 0);
+    if (!(unit > 0) || quotes.some(q => !(q.ask > 0 && q.ask < 1))) return null;
+    let contracts = bankroll / unit;
+    // null means the book was never measured; 0 means measured and empty.
+    // Treating both as "unconstrained" sized 12 rows at a full bankroll
+    // against a leg with no resting orders at all.
+    const known = quotes.every(q => q.size !== null && q.size !== undefined);
+    const sizes = quotes.filter(q => q.size !== null && q.size !== undefined).map(q => q.size);
+    if (sizes.length) contracts = Math.min(contracts, Math.min(...sizes));
+    if (!(contracts > 0)) return null;
+
+    const legs = quotes.map(q => {
+      const v = venues[q.venue];
+      const fee = tradeFee(v, contracts, q.ask);
+      return { venue: q.venue, side: q.side, price: q.ask, contracts, fee,
+               cls: (v && v.tax_class) || "derivative",
+               settle_bps: (v && v.settle_bps) || 0,
+               stake: contracts * q.ask, out: contracts * q.ask + fee };
+    });
+    const capital = legs.reduce((s, l) => s + l.out, 0);
+    const payout = contracts;
+    const outcomes = legs.map(w => {
+      const settle = payout * (w.settle_bps || 0) / 1e4;
+      const ls = legs.map(l => ({ venue: l.venue, cls: l.cls,
+        pnl: l === w ? payout - settle - l.out : -l.out }));
+      const pre = ls.reduce((s, o) => s + o.pnl, 0);
+      const t = taxOn(ls, tax);
+      return { side: w.side, venue: w.venue, payout, pre, tax: t, net: pre - t, legs: ls };
+    });
+
+    // The outcome a two-leg hedge cannot express: the venues do not settle
+    // the same way, both legs lose, and the whole stake goes with them.
+    const dl = legs.map(l => ({ venue: l.venue, cls: l.cls, pnl: -l.out }));
+    const dpre = dl.reduce((s, o) => s + o.pnl, 0);
+    const divergence = dpre - taxOn(dl, tax);
+
+    const nets = outcomes.map(o => o.net);
+    const worst = Math.min(...nets), best = Math.max(...nets);
+    const prefee = payout - legs.reduce((s, l) => s + l.stake, 0);
+    const gross = payout - capital;
+    const roi = capital ? worst / capital : 0;
+    const d = Math.max(days || 1, 1);
+    // simple, not compound: a position held to settlement is not redeployed
+    const ann = roi * 365 / d;
+    return { legs, outcomes, capital, payout, fees: legs.reduce((s, l) => s + l.fee, 0),
+      prefee, gross, worst, best, roi, ann: Math.min(ann, 99), days: d,
+      divergence, riskRatio: worst > 0 ? Math.abs(divergence) / worst : 0,
+      depthKnown: known,
+      verdict: !known ? "unsized" : worst > 0 ? "live" : gross > 0 ? "tax-eaten"
+               : prefee > 0 ? "fee-eaten" : "dead" };
+  }
+
+  function readInputs() {
+    const n = (id, d) => { const v = parseFloat($(id).value); return isFinite(v) ? v : d; };
+    return {
+      bankroll: Math.max(10, n("#i-bank", 1000)),
+      tax: { rate: (n("#i-fed", 24) + n("#i-state", 5)) / 100,
+             itemises: $("#i-item").checked, offsets: true,
+             loss_deduct_pct: (DATA && DATA.tax && DATA.tax.loss_deduct_pct) || 0.9 },
+      rf: n("#i-rf", 4) / 100,
+      filter: $("#i-min").value
+    };
+  }
+
+  // ---- renderers ---------------------------------------------------------
+  function table(cols, rows, caption) {
+    const wrap = el("div", "tw"); wrap.tabIndex = 0; wrap.setAttribute("role", "region");
+    if (caption) wrap.setAttribute("aria-label", caption);
+    const t = el("table");
+    if (caption) t.appendChild(el("caption", null, caption));
+    const thead = el("thead"), hr = el("tr");
+    cols.forEach(c => { const th = el("th", null, c.h); if (c.w) th.style.width = c.w; hr.appendChild(th); });
+    thead.appendChild(hr); t.appendChild(thead);
+    const tb = el("tbody");
+    rows.forEach(r => {
+      const tr = el("tr");
+      cols.forEach((c, i) => {
+        const cell = el(i === 0 ? "th" : "td");
+        if (i === 0) cell.scope = "row"; else cell.dataset.l = c.h;
+        const v = r[i];
+        if (v && v.nodeType) cell.appendChild(v);
+        else { cell.textContent = v == null ? "—" : v; }
+        if (r.cls && r.cls[i]) cell.classList.add(r.cls[i]);
+        tr.appendChild(cell);
+      });
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb); wrap.appendChild(t); return wrap;
+  }
+
+  function renderVenues() {
+    const host = $("#venues"); host.textContent = "";
+    (DATA.venues || []).forEach(v => {
+      const box = el("div", "panel"); box.style.marginBottom = "10px";
+      const h = el("div"); h.style.cssText = "display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;margin-bottom:3px;";
+      const nm = el("h3", null, v.name); nm.style.fontSize = "14.5px"; h.appendChild(nm);
+      h.appendChild(el("span", "tag", v.fee_model === "kalshi" ? "P×(1−P) fee"
+        : v.taker_bps ? v.taker_bps + " bps taker" : "no trading fee"));
+      h.appendChild(el("span", "tag" + (v.tax_class === "gambling" ? " feeeaten" : ""),
+        v.tax_class === "gambling" ? "taxed as gambling" : "legs net for tax"));
+      box.appendChild(h);
+      const note = el("p", null, v.notes); note.style.cssText = "font-size:12.5px;color:var(--ink2);margin-bottom:10px;max-width:78ch;";
+      box.appendChild(note);
+      if (v.fee_curve && v.fee_curve.length) {
+        const rows = v.fee_curve.map(r => {
+          const row = [cents(r.price), r.cents_per_contract.toFixed(3) + "¢",
+                       r.pct_of_payout.toFixed(3) + "%", r.pct_of_stake.toFixed(2) + "%"];
+          row.cls = [null, r.price > 0.35 && r.price < 0.65 ? "neg" : "pos", null, null];
+          return row;
+        });
+        box.appendChild(table(
+          [{ h: "Contract price" }, { h: "Fee / contract" }, { h: "% of payout" }, { h: "% of stake" }],
+          rows, v.name + " fee schedule"));
+      }
+      host.appendChild(box);
+    });
+  }
+
+  function ledgerBody(row, L, inp) {
+    const body = el("div", "body");
+    const g = el("div", "grid2");
+
+    // what goes out
+    // venue and the side it backs share one cell: seven columns did not fit
+    // the ledger's half of the grid and pushed "cash out" off the edge
+    const legRows = L.legs.map(l => {
+      const q = (row.sides[l.side] || []).find(x => x.venue === l.venue) || {};
+      const box = el("span");
+      const a = el("a"); const u = safeUrl(q.url);
+      if (u) { a.href = u; a.target = "_blank"; a.rel = "noopener noreferrer"; }
+      a.textContent = (DATA.venueName[l.venue] || l.venue);
+      box.appendChild(a);
+      const sub = el("span", null, l.side);
+      sub.style.cssText = "display:block;font-size:11.5px;color:var(--muted);font-weight:400;";
+      box.appendChild(sub);
+      const r = [box, cents(l.price), num(l.contracts), money(l.stake), money(l.fee), money(l.out)];
+      r.cls = [null, null, null, null, l.fee > 0 ? "neg" : "dim", null];
+      return r;
+    });
+    legRows.push((() => {
+      const r = [el("b", null, "Total in"), "", "", money(L.capital - L.fees), money(L.fees), money(L.capital)];
+      r.cls = [null, null, null, null, "neg", null]; return r;
+    })());
+    const left = el("div");
+    left.appendChild(table([{ h: "Venue / side" }, { h: "Price" }, { h: "Contracts" },
+      { h: "Stake" }, { h: "Fee" }, { h: "Cash out" }], legRows, "Money in, leg by leg"));
+    g.appendChild(left);
+
+    // what comes back
+    const outRows = L.outcomes.map(o => {
+      const r = [o.side, money(o.payout), money(o.pre), money(-o.tax), money(o.net)];
+      r.cls = [null, null, o.pre >= 0 ? "pos" : "neg", o.tax > 0 ? "neg" : "dim", o.net >= 0 ? "pos" : "neg"];
+      return r;
+    });
+    outRows.push((() => {
+      const r = ["Venues disagree", money(0), money(L.divergence), money(0), money(L.divergence)];
+      r.cls = ["neg", "dim", "neg", "dim", "neg"]; return r;
+    })());
+    const right = el("div");
+    right.appendChild(table([{ h: "If this wins" }, { h: "Payout" }, { h: "Pre-tax" },
+      { h: "Tax" }, { h: "Keep" }], outRows, "Money back, outcome by outcome"));
+    g.appendChild(right);
+    body.appendChild(g);
+
+    // the verdict, in words
+    const v = el("div", "verdictline");
+    const beats = L.verdict === "live" && L.ann > inp.rf;
+    let msg;
+    if (L.verdict === "live" && beats) {
+      msg = `Clears everything. ${money(L.capital)} in, ${money(L.worst)} kept in the worst case — ` +
+            `${pct(L.roi)} over ${Math.round(L.days)} days, ${pct(L.ann, 1)} a year, against ` +
+            `${pct(inp.rf, 1)} for leaving it in cash.`;
+    } else if (L.verdict === "live") {
+      msg = `Profitable but not worth the money being tied up: ${money(L.worst)} on ${money(L.capital)} ` +
+            `over ${Math.round(L.days)} days is ${pct(L.ann, 1)} a year, below the ${pct(inp.rf, 1)} ` +
+            `cash pays. The edge is real; the capital could do better elsewhere.`;
+    } else if (L.verdict === "tax-eaten") {
+      msg = `A real edge that tax takes: ${money(L.gross)} before tax becomes ${money(L.worst)} after. ` +
+            `One leg books a gross win and the other a loss that does not fully offset it.`;
+    } else if (L.verdict === "fee-eaten") {
+      msg = `The prices cross by ${money(L.prefee)}, and fees cost ${money(L.fees)}. ` +
+            `The spread is real and too small to trade.`;
+    } else {
+      msg = `No edge: the two sides cost ${cents(row.unit_cost)} for a dollar of payout.`;
+    }
+    v.innerHTML = "<b>" + (L.verdict === "unsized" ? "Unsized. "
+      : beats ? "Worth doing. " : L.verdict === "live" ? "Marginal. " : "Not tradable. ") + "</b>";
+    v.append(L.verdict === "unsized"
+      ? "One venue does not publish resting depth for this market, so there is no honest "
+        + "size for this trade. The figures above assume a fill that may not exist."
+      : msg);
+    body.appendChild(v);
+
+    // The exposure the two-outcome ledger above cannot show.
+    const risk = el("div", "risk");
+    risk.innerHTML = "<b>What actually loses the money.</b> ";
+    risk.append("Both rows above assume the two venues settle the same way. If they do not "
+      + "\u2014 a different season or scope than it looks, an oracle result that departs from the "
+      + "league's official one, a void and refund on one venue only, a delisting or a state "
+      + "injunction \u2014 both legs lose and " + money(-L.divergence) + " goes"
+      + (L.riskRatio ? ", to win " + money(L.worst) + ". That is " + Math.round(L.riskRatio)
+          + " to 1 against you." : ".")
+      + " This is an exposure, not a probability: nothing here can estimate how likely it is.");
+    body.appendChild(risk);
+
+    // settlement warning
+    const rules = Object.values(row.sides).flat().map(s => s.rules).filter(Boolean);
+    if (rules.length) {
+      const d = el("details"); d.style.marginTop = "10px";
+      const sm = el("summary", null, "Settlement wording on each venue");
+      sm.style.cssText = "cursor:pointer;font-size:12px;color:var(--muted);";
+      d.appendChild(sm);
+      rules.forEach(r => { const p = el("p", null, r);
+        p.style.cssText = "font-size:12px;color:var(--ink2);margin-top:7px;"; d.appendChild(p); });
+      body.appendChild(d);
+    }
+    return body;
+  }
+
+  function renderArb(inp) {
+    const host = $("#arb"); host.textContent = "";
+    const vmap = DATA.venueMap;
+    let shown = 0, live = 0, beats = 0, unsized = 0;
+
+    (DATA.opportunities || []).forEach(row => {
+      const quotes = Object.entries(row.sides)
+        .map(([side, qs]) => qs.length ? { venue: qs[0].venue, side, ask: qs[0].ask, size: qs[0].size } : null)
+        .filter(Boolean);
+      if (quotes.length !== 2) return;
+      const L = buildLedger(quotes, inp.bankroll, inp.tax, vmap, row.days_to_settle);
+      if (!L) return;
+      row._L = L;
+      if (L.verdict === "live") live++;
+      if (L.verdict === "unsized") unsized++;
+      if (L.verdict === "live" && L.ann > inp.rf) beats++;
+
+      if (inp.filter === "gross" && L.prefee <= 0) return;
+      if (inp.filter === "net" && L.verdict !== "live") return;
+      if (inp.filter === "cash" && !(L.verdict === "live" && L.ann > inp.rf)) return;
+      shown++;
+
+      const d = el("details", "opp"); d.dataset.verdict = L.verdict;
+      d.dataset.beats = (L.verdict === "live" && L.ann > inp.rf) ? "yes" : "no";
+      const s = el("summary");
+      const t = el("div", "ttl");
+      t.appendChild(el("span", null, row.label));
+      // One label, not two. A row that clears fees and tax but returns less
+      // than cash was being badged green "live" next to a counter saying
+      // nothing beat cash; the green is the part people read.
+      const beatsCash = L.verdict === "live" && L.ann > inp.rf;
+      const label = L.verdict !== "live" ? L.verdict
+        : beatsCash ? "tradable" : "below cash";
+      const tagcls = L.verdict !== "live" ? L.verdict.replace("-", "")
+        : beatsCash ? "live" : "belowcash";
+      t.appendChild(el("span", "tag " + tagcls, label));
+      const when = row.days_to_settle < 2 ? Math.round(row.days_to_settle * 24) + "h"
+        : Math.round(row.days_to_settle) + "d";
+      t.appendChild(el("span", "meta", row.league.toUpperCase() + " · " +
+        row.venues.map(v => DATA.venueName[v] || v).join(" vs ") + " · settles in " + when));
+      s.appendChild(t);
+
+      const cell = (k, v, cls, hide) => {
+        const c = el("div", "cell" + (hide ? " hide-sm" : ""));
+        c.appendChild(el("span", "k", k));
+        const n = el("span", "v " + (cls || ""), v); c.appendChild(n); return c;
+      };
+      s.appendChild(cell("Spread", pct(row.gross_edge), row.gross_edge > 0 ? "pos" : "neg", true));
+      s.appendChild(cell("At risk", money(-L.divergence), "neg", true));
+      s.appendChild(cell("Keep", money(L.worst), L.worst > 0 ? "pos" : "neg"));
+      s.appendChild(cell("Risk : win", L.riskRatio ? Math.round(L.riskRatio) + ":1" : "\u2014",
+        L.riskRatio > 50 ? "neg" : "", true));
+      s.appendChild(cell("A year", pct(L.ann, 1), L.ann > inp.rf ? "pos" : "neg", true));
+      s.appendChild(el("span", "chev", "›"));
+      d.appendChild(s);
+      d.appendChild(ledgerBody(row, L, inp));
+      host.appendChild(d);
+    });
+
+    $("#arb-n").textContent = shown + " shown · " + live + " clear with measured depth · "
+      + unsized + " unsized · " + beats + " beat cash";
+    if (!shown) host.appendChild(el("div", "empty",
+      "Nothing meets that filter right now. That is the normal state of this board — "
+      + "loosen the filter above to see what is close."));
+    return { live, beats, total: (DATA.opportunities || []).length };
+  }
+
+  function renderBoard() {
+    const host = $("#board"); host.textContent = "";
+    const rows = (DATA.board || []).slice(0, 18).map(b => {
+      const sides = Object.entries(b.sides).map(([c, p]) => c + " " + cents(p)).join("  /  ");
+      const r = [b.label, b.league.toUpperCase(), sides, cents(b.unit_cost),
+                 pct(b.gross_edge), num(b.liquidity), b.venues.length + " venues"];
+      r.cls = [null, "dim", null, b.unit_cost < 1 ? "pos" : "neg",
+               b.gross_edge > 0 ? "pos" : "neg", null, "dim"];
+      return r;
+    });
+    if (!rows.length) { host.appendChild(el("div", "empty", "No games on both venues right now.")); return; }
+    host.appendChild(table([{ h: "Game" }, { h: "League" }, { h: "Best price each side" },
+      { h: "Both sides cost" }, { h: "Spread" }, { h: "Volume" }, { h: "On" }], rows,
+      "Biggest markets quoted on both exchanges"));
+  }
+
+  function renderFields() {
+    const host = $("#fields"); host.textContent = "";
+    const rows = (DATA.fields || []).map(f => {
+      const a = el("a"); const u = safeUrl(f.url);
+      if (u) { a.href = u; a.target = "_blank"; a.rel = "noopener noreferrer"; }
+      a.textContent = f.label || f.event_key;
+      const r = [a, DATA.venueName[f.venue] || f.venue, f.teams_listed + " / " + f.teams_expected,
+                 (f.field_total * 100).toFixed(1) + "%", pct(f.overround),
+                 f.buy_all_edge > 0 ? "buy the field" : f.complete ? "no" : "incomplete field"];
+      r.cls = [null, "dim", null, null, f.overround < 0 ? "pos" : "neg",
+               f.buy_all_edge > 0 ? "pos" : "dim"];
+      return r;
+    });
+    if (!rows.length) { host.appendChild(el("div", "empty", "No complete championship fields right now.")); return; }
+    host.appendChild(table([{ h: "Championship" }, { h: "Venue" }, { h: "Teams" },
+      { h: "Field prices to" }, { h: "Overround" }, { h: "Dutch book?" }], rows,
+      "Sum of every team's price to win the title"));
+  }
+
+  function renderRecord(stats) {
+    const host = $("#record"); host.textContent = "";
+    const h = DATA.history || {};
+    const rows = [
+      ["Collector runs", num(h.runs || 0), "each one polls every venue"],
+      ["Pairs priced", num(h.pairs_scanned || 0), "same contract, two venues"],
+      ["Crossed on raw price", num(h.gross_positive || 0) + "  (" + (h.pct_gross || 0) + "%)",
+       "before any fee"],
+      ["Cleared fees and tax", num(h.net_positive || 0) + "  (" + (h.pct_net || 0) + "%)",
+       "what is actually left"]
+    ].map(r => { const x = [r[0], r[1], r[2]]; x.cls = [null, "num", "dim"]; return x; });
+    host.appendChild(table([{ h: "Measured" }, { h: "Count" }, { h: "Meaning" }], rows,
+      "Everything the collector has logged"));
+  }
+
+  function renderKpis(stats, inp) {
+    const host = $("#kpis"); host.textContent = "";
+    const h = DATA.history || {};
+    const items = [
+      ["Pairs priced now", num((DATA.opportunities || []).length), "same contract, both venues"],
+      ["Clear, with real depth", num(stats.live), "and a book you could hit"],
+      ["Beat cash", num(stats.beats), "better than " + pct(inp.rf, 1) + " risk free"],
+      ["Crossed, all time", (h.pct_gross || 0) + "%", "of pairs ever priced"],
+      ["Survived, all time", (h.pct_net || 0) + "%", "of pairs ever priced"]
+    ];
+    items.forEach(([k, v, s], i) => {
+      const b = el("div", "kpi");
+      b.appendChild(el("div", "k", k));
+      const val = el("div", "v", v);
+      if (i === 1 || i === 2) val.classList.add(parseInt(v.replace(/\D/g, ""), 10) > 0 ? "pos" : "dim");
+      b.appendChild(val); b.appendChild(el("div", "s", s));
+      host.appendChild(b);
+    });
+  }
+
+  function renderFoot() {
+    const f = $("#foot"); f.textContent = "";
+    const hl = DATA.health || {};
+    const when = DATA.updated ? new Date(DATA.updated) : null;
+    const ps = [
+      "Prices come straight from the Kalshi and Polymarket public APIs and are a snapshot, not a "
+      + "live feed — by the time you read a row it may be gone. Sportsbook prices are deliberately "
+      + "not published here: redistributing an odds aggregator's feed is against its terms.",
+      "Two sides are only ever paired when both venues' own identifiers agree on the league, the date "
+      + "and both teams, and when each venue's display label resolves back to the same team. Anything "
+      + "that cannot be verified is dropped rather than guessed, because a flipped side turns a hedge "
+      + "into two bets on the same outcome."
+      + (hl.dropped_unverified ? " Dropped on this run: " + hl.dropped_unverified + "." : ""),
+      "This is a research board. It does not place bets, it has no account anywhere, and a positive "
+      + "row is not advice. Check your own state's rules before trading event contracts, and remember "
+      + "the size shown is the resting book, which others are hitting too."
+    ];
+    ps.forEach(t => f.appendChild(el("p", null, t)));
+    const rc = DATA.rate_confidence || {};
+    if (Object.keys(rc).length) {
+      const d = el("details"); d.style.marginTop = "9px";
+      const sm = el("summary", null, "Which of these rates are actually verified");
+      sm.style.cssText = "cursor:pointer;color:var(--ink2);";
+      d.appendChild(sm);
+      const ul = el("ul"); ul.style.cssText = "margin:7px 0 0 18px;";
+      Object.entries(rc).forEach(([k, val]) => {
+        const li = el("li", null, k.replace(/_/g, " ") + " \u2014 " + val);
+        li.style.marginTop = "4px"; ul.appendChild(li);
+      });
+      d.appendChild(ul); f.appendChild(d);
+    }
+    if (when) {
+      const age = (Date.now() - when.getTime()) / 6e4;
+      const p = el("p", null, "Last collected " + when.toLocaleString() + " · "
+        + (age < 60 ? Math.round(age) + " minutes ago" : Math.round(age / 60) + " hours ago")
+        + (hl.venues_up ? " · " + hl.venues_up.length + " adapters answered" : ""));
+      f.appendChild(p);
+      const b = $("#freshness");
+      b.textContent = age < 90 ? "live" : "snapshot " + (age < 1440 ? Math.round(age / 60) + "h" : Math.round(age / 1440) + "d") + " old";
+      b.className = "badge " + (age < 90 ? "live" : "stale");
+    }
+  }
+
+  function rerender() {
+    if (!DATA) return;
+    const inp = readInputs();
+    const stats = renderArb(inp);
+    renderKpis(stats, inp);
+  }
+
+  fetch("index.json", { cache: "no-store" })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
+    .then(d => {
+      DATA = d;
+      DATA.venueMap = {}; DATA.venueName = {};
+      (d.venues || []).forEach(v => { DATA.venueMap[v.key] = v; DATA.venueName[v.key] = v.name; });
+      renderVenues(); renderBoard(); renderFields(); renderRecord(); renderFoot(); rerender();
+      ["#i-bank", "#i-fed", "#i-state", "#i-rf", "#i-min", "#i-item"].forEach(s =>
+        $(s).addEventListener("input", rerender));
+    })
+    .catch(e => {
+      $("#freshness").textContent = "no data";
+      $("#arb").appendChild(el("div", "empty",
+        "Could not load the price feed (" + e.message + "). The collector publishes index.json "
+        + "beside this page; if it has never run there is nothing to show yet."));
+    });
+})();
+</script>
+</body>
+</html>
