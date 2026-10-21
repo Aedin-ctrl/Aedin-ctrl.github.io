@@ -18,12 +18,10 @@
     --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
     --good:#006300; --bad:#c0392b; --warn:#9a6a00; --warnbg:#fdf4dd;
   }
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-    --paper:#0d0d0d; --surface:#161615; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
-    --line:#272725; --rule:#3a3a37; --wash:#1e1e1c;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
-    --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
-  }}
+  /* Always light. This page is read at a glance next to the rest of the site,
+     and the site is white — a dark panel in a light browser chrome reads as a
+     different product. */
+  :root{color-scheme:light;}
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
        line-height:1.5; font-variant-numeric:tabular-nums;}
@@ -248,16 +246,41 @@
       }
     }
 
+    // Which index is actually winning right now, so the comparison is against
+    // the best one on offer rather than a flattering pick.
+    const INDEX = [{k:'spy',n:'S&P 500'},{k:'qqq',n:'Nasdaq'},{k:'dia',n:'Dow'}];
+    const ranked = INDEX.map(i => ({...i, v: b[i.k+'_pct']}))
+                        .filter(i => i.v != null).sort((a,b2) => b2.v - a.v);
+    const best = ranked[0] || null;
+    const gapBest = best ? (b.live_pct||0) - best.v : null;
+
+    // Day-over-day change for every line.
+    const prev = hist.length >= 2 ? hist[hist.length-2] : null;
+    const today = hist.length ? hist[hist.length-1] : null;
+    const dayChg = k => (prev && today && prev[k]) ? today[k]/prev[k] - 1 : null;
+
+    // What a bad day actually costs: every stop hitting at once.
+    let atRisk = 0, satVal = 0, coreVal = 0;
+    for(const p of pos){
+      const val = p.value || 0;
+      if(p.kind === 'core'){ coreVal += val; continue; }
+      satVal += val;
+      if(p.stop && p.price && p.shares) atRisk += (p.price - p.stop) * p.shares;
+    }
+    const cashVal = Math.max(0, (d.equity||0) - coreVal - satVal);
+
     const cards = `<div class="cards">
       <div class="card"><div class="k">Account</div><div class="v">${money2(d.equity)}</div>
-        <div class="s ${cls(gain)}">${pct(gain)} from ${money(start)}</div></div>
-      <div class="card"><div class="k">vs S&amp;P 500</div>
-        <div class="v ${cls((b.live_pct??0)-(b.spy_pct??0))}">${b.spy_pct==null?'—':pct((b.live_pct||0)-(b.spy_pct||0))}</div>
-        <div class="s">S&amp;P ${pct(b.spy_pct)} · Nasdaq ${pct(b.qqq_pct)}</div></div>
-      <div class="card"><div class="k">Holdings</div><div class="v">${pos.length}</div>
-        <div class="s">${pend.length} queued for the open</div></div>
-      <div class="card"><div class="k">Worst drawdown</div><div class="v">${maxDD==null?'—':pct(maxDD)}</div>
-        <div class="s">backtest said &minus;19.4%</div></div>
+        <div class="s ${cls(gain)}">${pct(gain)} since it started</div></div>
+      <div class="card"><div class="k">Today</div>
+        <div class="v ${cls(dayChg('live'))}">${dayChg('live')==null?'—':pct(dayChg('live'))}</div>
+        <div class="s">${prev?`S&amp;P ${pct(dayChg('spy'))} · Nasdaq ${pct(dayChg('qqq'))}`:'needs two sessions'}</div></div>
+      <div class="card"><div class="k">vs best index</div>
+        <div class="v ${cls(gapBest)}">${gapBest==null?'—':pct(gapBest)}</div>
+        <div class="s">${best?`best right now is the ${esc(best.n)} at ${pct(best.v)}`:'—'}</div></div>
+      <div class="card"><div class="k">At risk</div>
+        <div class="v">${atRisk?('&minus;'+money(atRisk)):'—'}</div>
+        <div class="s">if every stop hit${atRisk&&d.equity?` · ${(atRisk/d.equity*100).toFixed(1)}% of the account`:''}</div></div>
     </div>`;
 
     const brd = r.breadth||0, gate = r.gate||0.5;
@@ -293,6 +316,49 @@
         </details>` : ''}</div>
     </div>`;
 
+    // ---- risk, in money rather than ratios -----------------------------
+    const expo = [
+      {n:'Index core', v:coreVal, c:'--s1'},
+      {n:'Stock picks', v:satVal, c:'--s3'},
+      {n:'Cash', v:cashVal, c:'--rule'},
+    ].filter(x => x.v > 0.5);
+    const expoTotal = expo.reduce((a,x)=>a+x.v,0) || 1;
+    const riskPanel = `<div class="panel"><h2>Risk</h2>
+      <div class="cap">What a bad day costs, and where the money is.</div>
+      <table><tbody>
+        <tr><td>Worst fall so far</td><td class="num"><b>${maxDD==null?'—':maxDD>-5e-5?'none yet':pct(maxDD)}</b></td></tr>
+        <tr><td>Most it can lose from here<span class="tag">if every stop hits</span></td>
+            <td class="num"><b>${atRisk?('&minus;'+money2(atRisk)):'—'}</b></td></tr>
+        <tr><td>Backtested worst fall<span class="tag">8 years</span></td><td class="num">&minus;19.4%</td></tr>
+        <tr><td>Stop-losses resting</td><td class="num">${pos.filter(p=>p.kind!=='core'&&p.stop).length} of ${pos.filter(p=>p.kind!=='core').length}</td></tr>
+      </tbody></table>
+      <div style="display:flex;height:9px;border-radius:5px;overflow:hidden;margin:12px 0 7px;gap:2px">
+        ${expo.map(x=>`<div style="width:${(x.v/expoTotal*100).toFixed(1)}%;background:var(${x.c})"></div>`).join('')}
+      </div>
+      <div class="legend">${expo.map(x=>`<span><i class="sw" style="background:var(${x.c})"></i>${x.n} ${money(x.v)}</span>`).join('')}</div>
+    </div>`;
+
+    // ---- the plain day-by-day ledger -----------------------------------
+    const rows = hist.slice(-12).reverse();
+    const dayPanel = `<div class="panel"><h2>Day by day</h2>
+      <div class="cap">How much each moved that session, and who won it.</div>
+      ${rows.length >= 2 ? `<table><thead><tr><th>Date</th><th class="num">This bot</th>
+        <th class="num">S&amp;P</th><th class="num hide-sm">Nasdaq</th><th>Winner</th></tr></thead><tbody>
+        ${rows.map((r,i)=>{
+          const p2 = rows[i+1]; if(!p2) return '';
+          const ch = k => (p2[k] ? r[k]/p2[k]-1 : null);
+          const me = ch('live');
+          const field = [{n:'This bot',v:me},{n:'S&P 500',v:ch('spy')},
+                         {n:'Nasdaq',v:ch('qqq')},{n:'Dow',v:ch('dia')}].filter(x=>x.v!=null);
+          const win = field.sort((a,b2)=>b2.v-a.v)[0];
+          return `<tr><td>${esc(r.date.slice(5))}</td>
+            <td class="num ${cls(me)}">${pct(me)}</td>
+            <td class="num ${cls(ch('spy'))}">${pct(ch('spy'))}</td>
+            <td class="num hide-sm ${cls(ch('qqq'))}">${pct(ch('qqq'))}</td>
+            <td>${win?esc(win.n):'—'}</td></tr>`;
+        }).join('')}</tbody></table>`
+        : '<p class="blank">Needs two closed sessions.</p>'}</div>`;
+
     const posPanel = `<div class="panel" style="margin-bottom:10px"><h2>Holdings</h2>
       <div class="cap">Satellite positions rest a stop with the broker.</div>
       ${pos.length ? `<table><thead><tr><th>Symbol</th><th class="num">Shares</th>
@@ -321,7 +387,8 @@
           <span>${esc(e.msg)}</span></div>`).join('') || '<p class="blank">Nothing yet.</p>'}</div>
     </div>` : '';
 
-    $('body').innerHTML = needs(d) + cards + strip + charts + posPanel + queue + watch;
+    const riskRow = `<div class="grid2">${riskPanel}${dayPanel}</div>`;
+    $('body').innerHTML = needs(d) + cards + strip + charts + riskRow + posPanel + queue + watch;
     if(spy.length>1) wire($('p-spy'), spy, spySeries, 'd', {W:520,L:46,R:54,money:true});
     if(eq.length>1)  wire($('p-eq'),  eq,  SERIES,    'date', {W:520,L:46,R:62,money:false});
   }
