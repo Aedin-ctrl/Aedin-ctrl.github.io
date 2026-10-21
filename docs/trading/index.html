@@ -11,13 +11,17 @@
   :root{
     --paper:#ffffff; --surface:#ffffff; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
     --line:#e6e6e2; --rule:#c9c8c2; --wash:#f7f7f5;
-    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    /* Five series, fixed order, never cycled. Validated for colour-vision
+       separation against both surfaces; light mode warns on contrast for three
+       of them, which is why every line is direct-labelled and a table view
+       exists. */
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4;
     --good:#006300; --bad:#c0392b; --warn:#9a6a00; --warnbg:#fdf4dd;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
     --paper:#0d0d0d; --surface:#161615; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
     --line:#272725; --rule:#3a3a37; --wash:#1e1e1c;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181;
     --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
   }}
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -120,9 +124,11 @@
   // Fixed order, never cycled. Validated for colour-vision separation in both
   // modes; every series is also direct-laballed so colour is never the only cue.
   const SERIES = [
-    { key:'live',   name:'Model D', css:'--s1' },
-    { key:'spy',    name:'SPY',     css:'--s2' },
-    { key:'modelc', name:'Model C', css:'--s3' },
+    { key:'live',   name:'This bot',  css:'--s1' },
+    { key:'spy',    name:'S&P 500',   css:'--s2' },
+    { key:'qqq',    name:'Nasdaq',    css:'--s3' },
+    { key:'dia',    name:'Dow',       css:'--s4' },
+    { key:'modelc', name:'Reckless',  css:'--s5' },
   ];
   let data = null;
 
@@ -141,14 +147,29 @@
     for(let t=0;t<=3;t++){ const v = lo+(hi-lo)*t/3, y = Y(v);
       g += `<line x1="${o.L}" x2="${o.W-o.R}" y1="${y}" y2="${y}" stroke="var(--line)"/>`
          + `<text x="${o.L-7}" y="${y+3.5}" text-anchor="end" font-size="10.5" fill="var(--muted)">${o.money?money(v):v.toFixed(0)+'%'}</text>`; }
+    // End-of-line labels, pushed apart so two series finishing at the same
+    // value do not print on top of each other. Without this the chart is fine
+    // most days and unreadable exactly when two things converge.
+    const ends = series.map(s => ({ s, v: rows[n-1][s.key] }))
+                       .filter(e => e.v != null)
+                       .map(e => ({ ...e, y: Y(e.v) }))
+                       .sort((a,b) => a.y - b.y);
+    const GAP = 11.5;
+    for(let i=1;i<ends.length;i++)
+      if(ends[i].y - ends[i-1].y < GAP) ends[i].y = ends[i-1].y + GAP;
+    const over = ends.length ? ends[ends.length-1].y - (o.H - o.B) : 0;
+    if(over > 0) for(const e of ends) e.y -= over;        // keep them in frame
+    const labelY = new Map(ends.map(e => [e.s.key, e.y]));
+
     const paths = series.map(s=>{
       const pts = rows.map((r,i)=> r[s.key]==null ? null : `${X(i).toFixed(1)},${Y(r[s.key]).toFixed(1)}`).filter(Boolean);
       if(pts.length<2) return '';
       const last = rows[n-1][s.key];
+      const ly = labelY.get(s.key);
       return `<polyline fill="none" stroke="var(${s.css})" stroke-width="2" stroke-linejoin="round"
                 stroke-linecap="round" ${s.dash?'stroke-dasharray="4 3"':''} points="${pts.join(' ')}"/>`
         + (last!=null ? `<circle cx="${X(n-1)}" cy="${Y(last)}" r="3" fill="var(${s.css})" stroke="var(--surface)" stroke-width="1.5"/>`
-          + `<text x="${o.W-o.R+6}" y="${Y(last)+3.5}" font-size="10.5" font-weight="600" fill="var(${s.css})">${s.name}</text>` : '');
+          + `<text x="${o.W-o.R+6}" y="${(ly??Y(last))+3.5}" font-size="10.5" font-weight="600" fill="var(${s.css})">${s.name}</text>` : '');
     }).join('');
     const xl = [0, n-1].map(i=>`<text x="${X(i)}" y="${o.H-5}" text-anchor="${i?'end':'start'}"
       font-size="10.5" fill="var(--muted)">${esc(rows[i][xkey])}</text>`).join('');
@@ -230,9 +251,9 @@
     const cards = `<div class="cards">
       <div class="card"><div class="k">Account</div><div class="v">${money2(d.equity)}</div>
         <div class="s ${cls(gain)}">${pct(gain)} from ${money(start)}</div></div>
-      <div class="card"><div class="k">vs SPY</div>
+      <div class="card"><div class="k">vs S&amp;P 500</div>
         <div class="v ${cls((b.live_pct??0)-(b.spy_pct??0))}">${b.spy_pct==null?'—':pct((b.live_pct||0)-(b.spy_pct||0))}</div>
-        <div class="s">index ${pct(b.spy_pct)}</div></div>
+        <div class="s">S&amp;P ${pct(b.spy_pct)} · Nasdaq ${pct(b.qqq_pct)}</div></div>
       <div class="card"><div class="k">Holdings</div><div class="v">${pos.length}</div>
         <div class="s">${pend.length} queued for the open</div></div>
       <div class="card"><div class="k">Worst drawdown</div><div class="v">${maxDD==null?'—':pct(maxDD)}</div>
@@ -247,17 +268,29 @@
       <span class="sep">·</span><span>as of ${esc(d.asof||'—')}</span></div>`;
 
     const spy = (d.spy_series||[]).map(p=>({d:p.d, px:p.c, sma:p.m}));
-    const spySeries = [{key:'px',name:'SPY',css:'--s1'},{key:'sma',name:'200-day',css:'--s2',dash:true}];
-    const eq = d.history || [];
+    const spySeries = [{key:'px',name:'S&P 500',css:'--s1'},{key:'sma',name:'200-day',css:'--s2',dash:true}];
+
+    // Plotted as percent from the same starting balance, so every line answers
+    // the same question: how much would $1 have become.
+    const eq = (d.history||[]).map(h=>{
+      const row = { date: h.date };
+      for(const s of SERIES) row[s.key] = h[s.key] == null ? null : (h[s.key]/start - 1) * 100;
+      return row;
+    });
 
     const charts = `<div class="grid2">
       <div class="panel" id="p-spy"><h2>Market trend</h2>
         <div class="cap">Above the 200-day it holds the index. Below it, cash.</div>
-        ${lines(spy, spySeries, 'd', {id:'spy', label:'SPY against its 200-day average'})}</div>
-      <div class="panel" id="p-eq"><h2>Equity</h2>
-        <div class="cap">Against buying the index, and against a reckless control.</div>
+        ${lines(spy, spySeries, 'd', {id:'spy', label:'S&P 500 against its 200-day average'})}</div>
+      <div class="panel" id="p-eq"><h2>How it competes</h2>
+        <div class="cap">Percent return since it started, same money, same days.</div>
         <div class="legend">${SERIES.map(s=>`<span><i class="sw" style="background:var(${s.css})"></i>${s.name}</span>`).join('')}</div>
-        ${lines(eq, SERIES, 'date', {id:'eq', blank:'Starts after two sessions close.', label:'Equity against benchmarks'})}</div>
+        ${lines(eq, SERIES, 'date', {id:'eq', money:false, R:62, blank:'Starts after two sessions close.', label:'Percent return against the major indices'})}
+        ${eq.length>1 ? `<details><summary>Show as a table</summary>
+          <table style="margin-top:7px"><thead><tr><th>Date</th>${SERIES.map(s=>`<th class="num">${s.name}</th>`).join('')}</tr></thead>
+          <tbody>${eq.slice(-14).reverse().map(h=>`<tr><td>${esc(h.date)}</td>${SERIES.map(s=>
+            `<td class="num ${cls(h[s.key]==null?null:h[s.key]/100)}">${h[s.key]==null?'—':(h[s.key]>=0?'+':'')+h[s.key].toFixed(2)+'%'}</td>`).join('')}</tr>`).join('')}</tbody></table>
+        </details>` : ''}</div>
     </div>`;
 
     const posPanel = `<div class="panel" style="margin-bottom:10px"><h2>Holdings</h2>
@@ -290,7 +323,7 @@
 
     $('body').innerHTML = needs(d) + cards + strip + charts + posPanel + queue + watch;
     if(spy.length>1) wire($('p-spy'), spy, spySeries, 'd', {W:520,L:46,R:54,money:true});
-    if(eq.length>1)  wire($('p-eq'),  eq,  SERIES,    'date', {W:520,L:46,R:54,money:true});
+    if(eq.length>1)  wire($('p-eq'),  eq,  SERIES,    'date', {W:520,L:46,R:62,money:false});
   }
 
   async function load(){
