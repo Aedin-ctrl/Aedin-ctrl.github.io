@@ -9,131 +9,87 @@
   @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
   @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
   :root{
-    --paper:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-    --line:#e1e0d9; --rule:#c3c2b7; --strong:#16171b; --wash:#f3f3f0;
+    --paper:#ffffff; --surface:#ffffff; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --line:#e6e6e2; --rule:#c9c8c2; --wash:#f7f7f5;
     --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
     --good:#006300; --bad:#c0392b; --warn:#9a6a00; --warnbg:#fdf4dd;
   }
   @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
-    --line:#2c2c2a; --rule:#383835; --strong:#e8e7e2; --wash:#232321;
+    --paper:#0d0d0d; --surface:#161615; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
+    --line:#272725; --rule:#3a3a37; --wash:#1e1e1c;
     --s1:#3987e5; --s2:#d95926; --s3:#199e70;
     --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
   }}
-  :root[data-theme="dark"]{
-    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
-    --line:#2c2c2a; --rule:#383835; --strong:#e8e7e2; --wash:#232321;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-    --good:#0ca30c; --bad:#e66767; --warn:#fab219; --warnbg:#2a2415;
-  }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
        line-height:1.5; font-variant-numeric:tabular-nums;}
-  h1,h2,h3{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  h1,h2{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em;}
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
   :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
-  main{max-width:1040px; margin:0 auto; padding:30px clamp(16px,4vw,44px) 72px;}
+  main{max-width:1060px; margin:0 auto; padding:28px clamp(16px,4vw,40px) 56px;}
 
-  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap; margin-bottom:20px;}
-  .head h1{font-size:22px;}
-  .head p{color:var(--ink2); font-size:13.5px; margin-top:3px;}
-  .badge{font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
-         border:1px solid var(--rule); border-radius:999px; padding:3px 9px; color:var(--ink2);}
-  .badge.paper{border-color:var(--s1); color:var(--s1);}
+  .head{display:flex; align-items:flex-end; justify-content:space-between; gap:10px 20px;
+        flex-wrap:wrap; margin-bottom:18px;}
+  .head h1{font-size:21px;}
+  .head p{color:var(--ink2); font-size:13px; margin-top:3px;}
+  .badge{font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+         border:1px solid var(--s1); color:var(--s1); border-radius:999px; padding:2px 8px;
+         vertical-align:3px;}
   .badge.live{border-color:var(--bad); color:var(--bad);}
-  .fresh{font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:10px;}
-  .fresh button{font-size:12.5px; border-bottom:1px solid var(--muted);}
+  .fresh{font-size:12px; color:var(--muted); display:flex; align-items:center; gap:10px;}
+  .fresh button{font-size:12px; color:var(--ink2); border-bottom:1px solid var(--rule);}
 
   .note{border:1px solid var(--warn); background:var(--warnbg); border-radius:10px;
-        padding:12px 15px; margin-bottom:16px; font-size:13.5px; color:var(--ink);}
-  .note b{font-family:'Space Grotesk',sans-serif;}
-  .note ul{margin:6px 0 0 18px;} .note li{margin:2px 0;}
+        padding:10px 14px; margin-bottom:14px; font-size:13px;}
+  .note ul{margin:4px 0 0 17px;}
 
-  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; margin-bottom:14px;}
-  .card{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:14px 16px;}
-  .card .k{font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
-  .card .v{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; margin-top:3px; letter-spacing:-0.02em;}
-  .card .s{font-size:12.5px; color:var(--ink2); margin-top:2px;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(168px,1fr)); gap:10px; margin-bottom:10px;}
+  .card{border:1px solid var(--line); border-radius:11px; padding:13px 15px; background:var(--surface);}
+  .card .k{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.07em;}
+  .card .v{font-family:'Space Grotesk',sans-serif; font-size:25px; font-weight:600;
+           margin-top:2px; letter-spacing:-0.02em;}
+  .card .s{font-size:12px; color:var(--ink2); margin-top:1px;}
   .up{color:var(--good);} .down{color:var(--bad);}
 
-  .panel{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:16px 18px; margin-bottom:14px;}
-  .panel h2{font-size:14px; margin-bottom:2px;}
-  .panel .sub{font-size:12.5px; color:var(--muted); margin-bottom:12px;}
-
-  .regime{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
-  .dot{width:10px; height:10px; border-radius:50%; background:var(--muted); display:inline-block; flex:none;}
+  .strip{display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+         border:1px solid var(--line); border-radius:11px; padding:12px 15px;
+         background:var(--surface); margin-bottom:10px; font-size:13px; color:var(--ink2);}
+  .dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none;}
   .dot.on{background:var(--good); box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 18%,transparent);}
   .dot.off{background:var(--bad); box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 18%,transparent);}
-  .regime .state{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;}
-  .regime .why{font-size:13px; color:var(--ink2);}
-  .meter{height:6px; background:var(--wash); border-radius:3px; margin-top:9px; position:relative; overflow:hidden;}
-  .meter i{display:block; height:100%; background:var(--s1); border-radius:3px;}
-  .meter u{position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); text-decoration:none;}
+  .strip b{font-family:'Space Grotesk',sans-serif; font-size:14.5px; color:var(--ink); font-weight:600;}
+  .strip .sep{color:var(--rule);}
 
-  table{width:100%; border-collapse:collapse; font-size:13.5px;}
-  th{text-align:left; font-weight:600; font-size:11.5px; color:var(--muted); text-transform:uppercase;
-     letter-spacing:.05em; padding:0 10px 7px 0; border-bottom:1px solid var(--line); white-space:nowrap;}
-  td{padding:8px 10px 8px 0; border-bottom:1px solid var(--line); vertical-align:middle;}
-  tr:last-child td{border-bottom:none;}
-  .num{text-align:right; padding-right:18px;} th.num{text-align:right; padding-right:18px;}
-  td:last-child,th:last-child{padding-right:0;}
-  .sym{font-family:'Space Grotesk',sans-serif; font-weight:600;}
-  .kind{font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);
-        border:1px solid var(--line); border-radius:4px; padding:1px 5px; margin-left:7px;}
-  .empty{color:var(--muted); font-size:13.5px; padding:6px 0;}
-
-  .waiting{font-size:13.5px; color:var(--ink2);}
-  .waiting p + p{margin-top:9px;}
-  .waiting b{color:var(--ink); font-weight:600;}
-  .waiting ul{list-style:none; margin-top:10px;}
-  .waiting li{display:flex; gap:8px; align-items:baseline; padding:6px 0;
-              border-bottom:1px solid var(--line);}
-  .waiting li:last-child{border-bottom:none;}
-  .waiting .swatch{position:relative; top:1px;}
-
-  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--ink2); margin-bottom:8px;}
-  .legend span{display:flex; align-items:center; gap:6px;}
-  .swatch{width:11px; height:11px; border-radius:3px; flex:none;}
-  .chartwrap{position:relative;}
+  .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:10px; margin-bottom:10px;}
+  .panel{border:1px solid var(--line); border-radius:11px; padding:14px 16px; background:var(--surface);}
+  .panel h2{font-size:13px; margin-bottom:1px;}
+  .panel .cap{font-size:11.5px; color:var(--muted); margin-bottom:10px;}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--ink2); margin-bottom:6px;}
+  .legend span{display:flex; align-items:center; gap:5px;}
+  .sw{width:10px; height:10px; border-radius:3px; flex:none;}
+  .wrap{position:relative;}
   .tip{position:absolute; pointer-events:none; background:var(--surface); border:1px solid var(--rule);
-       border-radius:8px; padding:8px 10px; font-size:12.5px; box-shadow:0 4px 14px rgba(0,0,0,.12);
-       opacity:0; transition:opacity .08s; min-width:140px; z-index:5;}
-  .tip b{font-family:'Space Grotesk',sans-serif; display:block; margin-bottom:4px; font-size:12px; color:var(--ink2);}
-  .tip div{display:flex; justify-content:space-between; gap:12px;}
+       border-radius:7px; padding:7px 9px; font-size:12px; box-shadow:0 3px 12px rgba(0,0,0,.1);
+       opacity:0; transition:opacity .08s; min-width:128px; z-index:5;}
+  .tip b{display:block; margin-bottom:3px; font-size:11.5px; color:var(--ink2);}
+  .tip div{display:flex; justify-content:space-between; gap:10px;}
+  .blank{font-size:12.5px; color:var(--muted); padding:28px 0; text-align:center;}
 
-  /* intro that tells a stranger what they are looking at */
-  .lede{border:1px solid var(--line); background:var(--surface); border-radius:12px;
-        padding:16px 18px; margin-bottom:14px; font-size:14.5px; color:var(--ink2);}
-  .lede b{color:var(--ink); font-weight:600;}
-  .lede p + p{margin-top:8px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; font-weight:600; font-size:11px; color:var(--muted); text-transform:uppercase;
+     letter-spacing:.05em; padding:0 14px 6px 0; border-bottom:1px solid var(--line); white-space:nowrap;}
+  td{padding:7px 14px 7px 0; border-bottom:1px solid var(--line);}
+  tr:last-child td{border-bottom:none;}
+  td:last-child,th:last-child{padding-right:0;}
+  .num{text-align:right;} th.num{text-align:right;}
+  .sym{font-family:'Space Grotesk',sans-serif; font-weight:600;}
+  .tag{font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted);
+       border:1px solid var(--line); border-radius:4px; padding:1px 4px; margin-left:6px;}
 
-  /* chart beside the write-up on a wide screen, stacked on a phone */
-  .split{display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
-         gap:14px; align-items:start; margin-bottom:14px;}
-  .split > .panel{margin-bottom:0;}
-  @media (max-width:880px){ .split{grid-template-columns:1fr;} }
-  .about p{font-size:13.5px; color:var(--ink2);}
-  .about p + p{margin-top:9px;}
-  .about strong{color:var(--ink); font-weight:600;}
-  .about .status{border-left:2px solid var(--s1); padding:2px 0 2px 11px; margin:11px 0;
-                 font-size:13.5px; color:var(--ink);}
-  .about .facts{list-style:none; margin:11px 0 0; font-size:13px; color:var(--ink2);}
-  .about .facts li{display:flex; justify-content:space-between; gap:10px;
-                   padding:5px 0; border-bottom:1px solid var(--line);}
-  .about .facts li:last-child{border-bottom:none;}
-  .about .facts b{color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums;}
-
-  .ev{font-size:13px; display:flex; gap:10px; padding:5px 0; border-bottom:1px solid var(--line);}
-  .ev:last-child{border-bottom:none;}
-  .ev time{color:var(--muted); font-size:12px; white-space:nowrap; flex:none; width:98px;}
-  .ev .tag{font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; border-radius:4px;
-           padding:1px 5px; flex:none; align-self:flex-start; margin-top:1px;}
-  .tag.buy{color:var(--s3); border:1px solid var(--s3);}
-  .tag.sell,.tag.closed{color:var(--s2); border:1px solid var(--s2);}
-  .tag.error{color:var(--bad); border:1px solid var(--bad);}
-  .tag.decide,.tag.stop,.tag.skip,.tag.execute{color:var(--muted); border:1px solid var(--line);}
-  details.table-view{margin-top:10px;} details.table-view summary{font-size:12.5px; color:var(--ink2); cursor:pointer;}
-  @media (max-width:640px){ .hide-sm{display:none;} main{padding-top:22px;} }
+  .log{font-size:12.5px; display:flex; gap:9px; padding:4px 0; color:var(--ink2);}
+  .log time{color:var(--muted); font-size:11.5px; white-space:nowrap; width:86px; flex:none;}
+  details summary{font-size:12px; color:var(--ink2); cursor:pointer; padding:2px 0;}
+  @media (max-width:620px){ .hide-sm{display:none;} }
 </style>
 </head>
 <body>
@@ -141,273 +97,205 @@
   <div class="head">
     <div>
       <h1>Trading bot <span class="badge" id="mode">—</span></h1>
-      <p>A stock-trading strategy running by itself on a Raspberry Pi, with fake money, in public.</p>
+      <p>An index core plus up to six trending stocks, traded automatically from a Raspberry Pi.</p>
     </div>
     <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
   </div>
-  <div id="body"><p class="empty">Loading…</p></div>
+  <div id="body"><p class="blank">Loading…</p></div>
 </main>
 
 <script>
-  // Same Worker as Devices and Trends. The Pi posts a snapshot after each run;
-  // the read key only exists inside the sealed secret panel, which opens this
-  // page as trading/#k=KEY.
-  // Opened from the sealed panel as trading/#k=KEY it reads the authenticated
-  // route. Opened plainly it falls back to /trading/public, which needs no key
-  // — so this page is world-readable. The Worker var TRADING_PUBLIC="off"
-  // turns that route off and re-gates the page.
   const API = 'https://pi-status.pizza-calc-api.workers.dev';
   const KEY = new URLSearchParams(location.hash.slice(1)).get('k') || '';
-  const REFRESH_MS = 10 * 60 * 1000;      // the Pi only reports every 15 min anyway
+  const REFRESH_MS = 10 * 60 * 1000;
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const money = n => n == null ? '—' : '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+  const money = n => n == null ? '—' : '$' + Number(n).toLocaleString(undefined,{maximumFractionDigits:0});
+  const money2 = n => n == null ? '—' : '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
   const pct = n => n == null ? '—' : (n >= 0 ? '+' : '') + (n*100).toFixed(1) + '%';
   const cls = n => n == null || Math.abs(n) < 5e-5 ? '' : n > 0 ? 'up' : 'down';
-  const ago = s => s < 60 ? `${Math.max(0,Math.round(s))}s ago` : s < 3600 ? `${Math.round(s/60)} min ago`
+  const ago = s => s < 60 ? 'just now' : s < 3600 ? `${Math.round(s/60)} min ago`
                   : s < 86400 ? `${Math.round(s/3600)} h ago` : `${Math.round(s/86400)} d ago`;
 
-  // Three series, fixed order, never cycled. Palette validated for CVD in both
-  // modes; every series is also direct-labelled so identity is never colour alone.
+  // Fixed order, never cycled. Validated for colour-vision separation in both
+  // modes; every series is also direct-laballed so colour is never the only cue.
   const SERIES = [
-    { key:'live',   name:'Model D',  css:'--s1' },
-    { key:'spy',    name:'SPY',      css:'--s2' },
-    { key:'modelc', name:'Model C',  css:'--s3' },
+    { key:'live',   name:'Model D', css:'--s1' },
+    { key:'spy',    name:'SPY',     css:'--s2' },
+    { key:'modelc', name:'Model C', css:'--s3' },
   ];
   let data = null;
 
-  function chart(history){
-    if(!history || history.length < 2) return `<div class="waiting">
-      <p><b>The curve starts once two sessions have closed.</b>
-      ${history && history.length === 1 ? 'One is recorded so far.' : 'None recorded yet.'}</p>
-      <p>Three lines will be plotted from the same starting balance, so they are directly
-      comparable:</p>
-      <ul>
-        <li><i class="swatch" style="background:var(--s1)"></i><b>Model D</b> — the strategy
-          actually placing orders.</li>
-        <li><i class="swatch" style="background:var(--s2)"></i><b>SPY</b> — buying the index on
-          day one and doing nothing. The line to beat.</li>
-        <li><i class="swatch" style="background:var(--s3)"></i><b>Model C</b> — the reckless
-          control. Watch its drawdowns, not its returns.</li>
-      </ul></div>`;
-    // Sized so that at this column's real width the labels render near 1:1
-    // rather than being shrunk to 7px by the viewBox scale.
-    const W = 640, H = 240, L = 48, R = 58, T = 12, B = 26;
-    const xs = history.map((_,i)=>i), n = history.length;
+  // ---- a line chart, built once and reused by both panels ----------------
+  function lines(rows, series, xkey, opts){
+    const o = Object.assign({ W:520, H:210, L:46, R:54, T:10, B:22, money:true }, opts||{});
+    const n = rows.length;
+    if(n < 2) return `<p class="blank">${esc(o.blank || 'Not enough data yet.')}</p>`;
     let lo = Infinity, hi = -Infinity;
-    for(const h of history) for(const s of SERIES){ const v = h[s.key]; if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); } }
-    const pad = (hi-lo)*0.08 || 1; lo-=pad; hi+=pad;
-    const X = i => L + (i/(n-1))*(W-L-R);
-    const Y = v => T + (1-(v-lo)/(hi-lo))*(H-T-B);
-    const ticks = 4, gl = [], yl = [];
-    for(let t=0;t<=ticks;t++){ const v = lo + (hi-lo)*t/ticks, y = Y(v);
-      gl.push(`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/>`);
-      yl.push(`<text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="var(--muted)">$${Math.round(v).toLocaleString()}</text>`); }
-    const paths = SERIES.map(s=>{
-      const pts = history.map((h,i)=> h[s.key]==null ? null : `${X(i).toFixed(1)},${Y(h[s.key]).toFixed(1)}`).filter(Boolean);
+    for(const r of rows) for(const s of series){ const v = r[s.key];
+      if(v != null){ lo = Math.min(lo,v); hi = Math.max(hi,v); } }
+    const pad = (hi-lo)*0.07 || 1; lo -= pad; hi += pad;
+    const X = i => o.L + (i/(n-1))*(o.W-o.L-o.R);
+    const Y = v => o.T + (1-(v-lo)/(hi-lo))*(o.H-o.T-o.B);
+    let g = '';
+    for(let t=0;t<=3;t++){ const v = lo+(hi-lo)*t/3, y = Y(v);
+      g += `<line x1="${o.L}" x2="${o.W-o.R}" y1="${y}" y2="${y}" stroke="var(--line)"/>`
+         + `<text x="${o.L-7}" y="${y+3.5}" text-anchor="end" font-size="10.5" fill="var(--muted)">${o.money?money(v):v.toFixed(0)+'%'}</text>`; }
+    const paths = series.map(s=>{
+      const pts = rows.map((r,i)=> r[s.key]==null ? null : `${X(i).toFixed(1)},${Y(r[s.key]).toFixed(1)}`).filter(Boolean);
       if(pts.length<2) return '';
-      const last = history[n-1][s.key];
-      return `<polyline fill="none" stroke="var(${s.css})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts.join(' ')}"/>`
-        + (last!=null ? `<circle cx="${X(n-1)}" cy="${Y(last)}" r="3.5" fill="var(${s.css})" stroke="var(--surface)" stroke-width="2"/>`
-          + `<text x="${W-R+7}" y="${Y(last)+4}" font-size="11.5" font-weight="600" fill="var(${s.css})">${s.name}</text>` : '');
+      const last = rows[n-1][s.key];
+      return `<polyline fill="none" stroke="var(${s.css})" stroke-width="2" stroke-linejoin="round"
+                stroke-linecap="round" ${s.dash?'stroke-dasharray="4 3"':''} points="${pts.join(' ')}"/>`
+        + (last!=null ? `<circle cx="${X(n-1)}" cy="${Y(last)}" r="3" fill="var(${s.css})" stroke="var(--surface)" stroke-width="1.5"/>`
+          + `<text x="${o.W-o.R+6}" y="${Y(last)+3.5}" font-size="10.5" font-weight="600" fill="var(${s.css})">${s.name}</text>` : '');
     }).join('');
-    const xl = [0, Math.floor((n-1)/2), n-1].map(i=>
-      `<text x="${X(i)}" y="${H-7}" text-anchor="${i===0?'start':i===n-1?'end':'middle'}" font-size="11" fill="var(--muted)">${history[i].date}</text>`).join('');
-    return `<div class="chartwrap">
-      <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Equity of Model D against SPY and Model C" id="svg">
-        ${gl.join('')}${yl.join('')}
-        <line x1="${L}" x2="${W-R}" y1="${H-B}" y2="${H-B}" stroke="var(--rule)" stroke-width="1"/>
-        <line class="cross" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="var(--rule)" stroke-width="1" opacity="0"/>
-        ${paths}${xl}
-        <rect x="${L}" y="${T}" width="${W-L-R}" height="${H-T-B}" fill="transparent" id="hit"/>
-      </svg><div class="tip" id="tip"></div></div>`;
+    const xl = [0, n-1].map(i=>`<text x="${X(i)}" y="${o.H-5}" text-anchor="${i?'end':'start'}"
+      font-size="10.5" fill="var(--muted)">${esc(rows[i][xkey])}</text>`).join('');
+    return `<div class="wrap"><svg viewBox="0 0 ${o.W} ${o.H}" width="100%" role="img"
+        aria-label="${esc(o.label||'')}" data-chart="${esc(o.id)}">
+      ${g}<line x1="${o.L}" x2="${o.W-o.R}" y1="${o.H-o.B}" y2="${o.H-o.B}" stroke="var(--rule)"/>
+      <line class="cx" x1="0" x2="0" y1="${o.T}" y2="${o.H-o.B}" stroke="var(--rule)" opacity="0"/>
+      ${paths}${xl}
+      <rect x="${o.L}" y="${o.T}" width="${o.W-o.L-o.R}" height="${o.H-o.T-o.B}" fill="transparent" class="hit"/>
+    </svg><div class="tip"></div></div>`;
   }
 
-  function wireChart(history){
-    const svg = $('svg'), hit = $('hit'), tip = $('tip'); if(!svg||!hit) return;
-    const cross = svg.querySelector('.cross');
-    const W=640,L=48,R=58,n=history.length;
+  function wire(root, rows, series, xkey, o){
+    const svg = root.querySelector('svg'); if(!svg) return;
+    const hit = svg.querySelector('.hit'), cx = svg.querySelector('.cx'),
+          tip = root.querySelector('.tip');
+    const n = rows.length;
     const move = e => {
       const r = svg.getBoundingClientRect();
-      const px = (e.touches? e.touches[0].clientX : e.clientX) - r.left;
-      const vx = px / r.width * W;
-      let i = Math.round((vx - L)/(W-L-R)*(n-1)); i = Math.max(0, Math.min(n-1, i));
-      const h = history[i], X = L + (i/(n-1))*(W-L-R);
-      cross.setAttribute('x1',X); cross.setAttribute('x2',X); cross.setAttribute('opacity','1');
-      tip.innerHTML = `<b>${esc(h.date)}</b>` + SERIES.map(s=>
-        `<div><span style="color:var(${s.css})">${s.name}</span><span>${h[s.key]==null?'—':money(h[s.key])}</span></div>`).join('');
+      const px = ((e.touches ? e.touches[0].clientX : e.clientX) - r.left) / r.width * o.W;
+      let i = Math.round((px - o.L)/(o.W-o.L-o.R)*(n-1)); i = Math.max(0, Math.min(n-1, i));
+      const X = o.L + (i/(n-1))*(o.W-o.L-o.R);
+      cx.setAttribute('x1',X); cx.setAttribute('x2',X); cx.setAttribute('opacity','1');
+      tip.innerHTML = `<b>${esc(rows[i][xkey])}</b>` + series.map(s=>
+        `<div><span style="color:var(${s.css})">${s.name}</span><span>${rows[i][s.key]==null?'—':(o.money?money2(rows[i][s.key]):rows[i][s.key].toFixed(1)+'%')}</span></div>`).join('');
       tip.style.opacity = 1;
-      const left = X / W * r.width;
-      tip.style.left = Math.min(Math.max(8, left + 12), r.width - 160) + 'px';
-      tip.style.top = '10px';
+      tip.style.left = Math.min(Math.max(6, X/o.W*r.width + 10), r.width - 140) + 'px';
+      tip.style.top = '6px';
     };
     hit.addEventListener('mousemove', move);
-    hit.addEventListener('touchmove', e=>{ move(e); e.preventDefault(); }, {passive:false});
-    svg.addEventListener('mouseleave', ()=>{ tip.style.opacity=0; cross.setAttribute('opacity','0'); });
+    hit.addEventListener('touchmove', e => { move(e); e.preventDefault(); }, {passive:false});
+    svg.addEventListener('mouseleave', () => { tip.style.opacity=0; cx.setAttribute('opacity','0'); });
+  }
+
+  // ---- momentum bars -----------------------------------------------------
+  function bars(items){
+    if(!items.length) return '<p class="blank">Nothing passing the screen.</p>';
+    const max = Math.max(...items.map(c=>c.ret126));
+    return `<table><tbody>${items.map(c=>{
+      const w = Math.max(2, c.ret126/max*100);
+      return `<tr><td class="sym" style="width:52px">${esc(c.t)}</td>
+        <td><div style="background:var(--s1);height:9px;border-radius:0 4px 4px 0;width:${w.toFixed(1)}%"></div></td>
+        <td class="num" style="width:62px">${pct(c.ret126)}</td></tr>`;}).join('')}</tbody></table>`;
   }
 
   function needs(d){
-    const out = [];
-    const h = d.health || {};
-    if(!d.equity && d.equity !== 0) out.push('No broker connection — add <code>ALPACA_API_KEY</code> and <code>ALPACA_SECRET_KEY</code> to <code>~/trading/.env</code> on the Pi.');
-    if(h.stale) out.push(`Price data is stale — the newest bar is ${esc(d.asof||'unknown')}.`);
+    const out = [], h = d.health || {};
+    if(d.equity == null) out.push('No broker connection.');
+    if(h.stale) out.push(`Price data is stale — newest bar ${esc(d.asof||'?')}.`);
     if(h.bars_failed > 20) out.push(`${h.bars_failed} of ${h.universe} symbols failed to download.`);
     const seen = new Set(out);
     for(const e of (d.events||[]).filter(e=>e.kind==='error')){
-      const m = esc(e.msg);
-      if(seen.has(m)) continue;
-      seen.add(m); out.push(m);
-      if(out.length >= 4) break;
+      const m = esc(e.msg); if(seen.has(m)) continue; seen.add(m); out.push(m);
+      if(out.length>=4) break;
     }
-    if(!out.length) return '';
-    return `<div class="note"><b>Needs attention</b><ul>${out.map(o=>`<li>${o}</li>`).join('')}</ul></div>`;
-  }
-
-  // How the test is actually going, written from the data rather than asserted.
-  function howItsGoing(d){
-    const h = d.history || [], b = d.benchmarks || {};
-    const n = h.length;
-    if(n === 0) return `<p class="status">No sessions recorded yet. The first orders go in at
-      the next market open, and the chart starts from there.</p>`;
-    const me = b.live_pct ?? 0, spy = b.spy_pct ?? 0, mc = b.modelc_pct ?? 0;
-    const vsSpy = me - spy;
-    const word = Math.abs(vsSpy) < 0.002 ? 'level with' : vsSpy > 0 ? 'ahead of' : 'behind';
-    const day = n === 1 ? 'One session in' : `${n} sessions in`;
-    return `<p class="status">${day}: <strong>${pct(me)}</strong>, which is
-      <strong>${word} SPY</strong> at ${pct(spy)}. The high-risk control is at ${pct(mc)}.
-      ${n < 20 ? 'Far too early to mean anything — a few weeks of this is still noise.' :
-                 'Judge it on drawdown as much as return.'}</p>`;
-  }
-
-  function aboutPanel(d){
-    const h = d.health || {};
-    return `<aside class="panel about">
-      <h2>What this is</h2>
-      <p class="sub" style="margin-bottom:10px">and how the test is going</p>
-
-      <p>I built a trading strategy, backtested it on eight years of data, and it now runs by
-      itself on a Raspberry Pi in my room against a <strong>paper account</strong> — real prices
-      and real order mechanics, <strong>fake money</strong>.</p>
-
-      <p>The point isn't to get rich. It's to find out whether a mechanical rule set beats just
-      buying an index fund, <strong>before</strong> real money is involved. The honest answer
-      from the backtest: <strong>it doesn't beat the index on return.</strong> It roughly matches
-      it while cutting the worst drawdown from -33.7% to -19.4%. Less pain, not more profit.</p>
-
-      ${howItsGoing(d)}
-
-      <p>It holds SPY as its core whenever the market is above its 200-day average, and puts at
-      most 30% into up to six trending stocks, each with a stop-loss that only ratchets upward.
-      When the market turns down it sells and waits in cash. <strong>Model C</strong> on the
-      chart is a deliberately reckless version kept as a control: it usually makes more money and
-      takes drawdowns that would make you quit.</p>
-
-      <p>Not a recommendation, and a backtest is not a prediction.</p>
-
-      <ul class="facts">
-        <li><span>Runs on</span><b>Raspberry Pi 4</b></li>
-        <li><span>Broker</span><b>Alpaca paper</b></li>
-        <li><span>Universe</span><b>${h.universe || '—'} S&amp;P stocks</b></li>
-        <li><span>Decides</span><b>at the close</b></li>
-        <li><span>Trades</span><b>at the next open</b></li>
-        <li><span>Sessions recorded</span><b>${(d.history||[]).length}</b></li>
-      </ul>
-    </aside>`;
+    return out.length ? `<div class="note"><b>Needs attention</b><ul>${out.map(o=>`<li>${o}</li>`).join('')}</ul></div>` : '';
   }
 
   function render(){
-    const d = data; if(!d){ $('body').innerHTML = '<p class="empty">No snapshot yet. The Pi posts one after its first run.</p>'; return; }
+    const d = data;
+    if(!d){ $('body').innerHTML = '<p class="blank">No snapshot yet.</p>'; return; }
     const b = d.benchmarks || {}, r = d.regime || {};
     $('mode').textContent = (d.mode||'').toUpperCase() || '—';
-    $('mode').className = 'badge ' + (d.mode === 'live' ? 'live' : 'paper');
-    const start = d.starting_equity || 0;
-    const gain = start ? d.equity/start - 1 : null;
+    $('mode').className = 'badge' + (d.mode === 'live' ? ' live' : '');
+    const start = d.starting_equity || 0, gain = start ? d.equity/start - 1 : null;
+    const pos = d.positions || [], pend = d.pending || [];
+
+    // Worst peak-to-trough the live account has actually seen. This is the
+    // number the whole strategy is built to keep small, so it gets a card.
+    let peak = null, maxDD = null;
+    const hist = (d.history||[]).filter(h => h.live != null);
+    if(hist.length >= 2){           // one session has no peak to fall from
+      for(const h of hist){
+        peak = peak == null ? h.live : Math.max(peak, h.live);
+        maxDD = Math.min(maxDD == null ? 0 : maxDD, h.live/peak - 1);
+      }
+    }
 
     const cards = `<div class="cards">
-      <div class="card"><div class="k">Account</div><div class="v">${money(d.equity)}</div>
+      <div class="card"><div class="k">Account</div><div class="v">${money2(d.equity)}</div>
         <div class="s ${cls(gain)}">${pct(gain)} from ${money(start)}</div></div>
       <div class="card"><div class="k">vs SPY</div>
         <div class="v ${cls((b.live_pct??0)-(b.spy_pct??0))}">${b.spy_pct==null?'—':pct((b.live_pct||0)-(b.spy_pct||0))}</div>
-        <div class="s">SPY ${pct(b.spy_pct)} · you ${pct(b.live_pct)}</div></div>
-      <div class="card"><div class="k">vs Model C</div>
-        <div class="v ${cls((b.live_pct??0)-(b.modelc_pct??0))}">${b.modelc_pct==null?'—':pct((b.live_pct||0)-(b.modelc_pct||0))}</div>
-        <div class="s">the high-risk control: ${pct(b.modelc_pct)}</div></div>
-      <div class="card"><div class="k">Positions</div><div class="v">${(d.positions||[]).length}</div>
-        <div class="s">${(d.pending||[]).length} queued for the open</div></div>
+        <div class="s">index ${pct(b.spy_pct)}</div></div>
+      <div class="card"><div class="k">Holdings</div><div class="v">${pos.length}</div>
+        <div class="s">${pend.length} queued for the open</div></div>
+      <div class="card"><div class="k">Worst drawdown</div><div class="v">${maxDD==null?'—':pct(maxDD)}</div>
+        <div class="s">backtest said &minus;19.4%</div></div>
     </div>`;
 
-    const brd = (r.breadth||0), gate = (r.gate||0.5);
-    const regime = `<div class="panel">
-      <div class="regime"><span class="dot ${r.core_on?'on':'off'}"></span>
-        <span class="state">${r.core_on?'Risk on':'Risk off — core in cash'}</span>
-        <span class="why">${esc(r.reason||'')}</span></div>
-      <div class="meter" title="market breadth vs the satellite gate">
-        <i style="width:${Math.min(100,brd*100).toFixed(1)}%"></i><u style="left:${(gate*100).toFixed(1)}%"></u></div>
-      <div class="s" style="font-size:12.5px;color:var(--muted);margin-top:6px">
-        Breadth ${(brd*100).toFixed(0)}% of the S&amp;P above its own 200-day · satellite gate ${(gate*100).toFixed(0)}% ·
-        SPY ${r.spy_close?Number(r.spy_close).toFixed(2):'—'} vs 200-day ${r.spy_sma200?Number(r.spy_sma200).toFixed(2):'—'}
-        · as of ${esc(d.asof||'—')}</div></div>`;
+    const brd = r.breadth||0, gate = r.gate||0.5;
+    const strip = `<div class="strip"><span class="dot ${r.core_on?'on':'off'}"></span>
+      <b>${r.core_on?'Risk on':'Risk off'}</b>
+      <span class="sep">·</span><span>SPY ${r.spy_close?Number(r.spy_close).toFixed(0):'—'} vs 200-day ${r.spy_sma200?Number(r.spy_sma200).toFixed(0):'—'}</span>
+      <span class="sep">·</span><span>breadth ${(brd*100).toFixed(0)}% (gate ${(gate*100).toFixed(0)}%)</span>
+      <span class="sep">·</span><span>as of ${esc(d.asof||'—')}</span></div>`;
 
-    const hist = d.history || [];
-    const chartPanel = `<div class="panel"><h2>Equity</h2>
-      <p class="sub">Model D is the only one trading. SPY and Model C are tracked, never traded — so you can see whether the complexity is earning its keep.</p>
-      ${hist.length > 1 ? `<div class="legend">${SERIES.map(s=>`<span><i class="swatch" style="background:var(${s.css})"></i>${s.name}</span>`).join('')}</div>` : ''}
-      ${chart(hist)}
-      <details class="table-view"><summary>Show as a table</summary>
-        <table style="margin-top:8px"><thead><tr><th>Date</th>${SERIES.map(s=>`<th class="num">${s.name}</th>`).join('')}</tr></thead>
-        <tbody>${hist.slice(-20).reverse().map(h=>`<tr><td>${esc(h.date)}</td>${SERIES.map(s=>`<td class="num">${h[s.key]==null?'—':money(h[s.key])}</td>`).join('')}</tr>`).join('')}</tbody></table>
-      </details></div>`;
+    const spy = (d.spy_series||[]).map(p=>({d:p.d, px:p.c, sma:p.m}));
+    const spySeries = [{key:'px',name:'SPY',css:'--s1'},{key:'sma',name:'200-day',css:'--s2',dash:true}];
+    const eq = d.history || [];
 
-    const pos = (d.positions||[]);
-    const posPanel = `<div class="panel"><h2>Holdings</h2>
-      <p class="sub">The core is never stopped out. Every satellite position rests a stop with the broker, so it can fill intraday.</p>
-      ${pos.length? `<table><thead><tr><th>Symbol</th><th class="num">Shares</th><th class="num">Entry</th>
-        <th class="num">Price</th><th class="num">Value</th><th class="num">P/L</th><th class="num hide-sm">Stop</th><th class="num hide-sm">Room</th></tr></thead><tbody>
-        ${pos.map(p=>{ const room = (p.stop && p.price) ? (p.price-p.stop)/p.price : null;
-          return `<tr><td><span class="sym">${esc(p.symbol)}</span><span class="kind">${esc(p.kind)}</span></td>
-          <td class="num">${p.shares??'—'}</td><td class="num">${p.entry?Number(p.entry).toFixed(2):'—'}</td>
-          <td class="num">${p.price?Number(p.price).toFixed(2):'—'}</td><td class="num">${p.value?money(p.value):'—'}</td>
-          <td class="num ${cls(p.pl_pct)}">${pct(p.pl_pct)}</td>
-          <td class="num hide-sm">${p.stop?Number(p.stop).toFixed(2):'—'}</td>
-          <td class="num hide-sm">${room==null?'—':(room*100).toFixed(1)+'%'}</td></tr>`; }).join('')}
-        </tbody></table>` : '<p class="empty">Nothing held.</p>'}</div>`;
+    const charts = `<div class="grid2">
+      <div class="panel" id="p-spy"><h2>Market trend</h2>
+        <div class="cap">Above the 200-day it holds the index. Below it, cash.</div>
+        ${lines(spy, spySeries, 'd', {id:'spy', label:'SPY against its 200-day average'})}</div>
+      <div class="panel" id="p-eq"><h2>Equity</h2>
+        <div class="cap">Against buying the index, and against a reckless control.</div>
+        <div class="legend">${SERIES.map(s=>`<span><i class="sw" style="background:var(${s.css})"></i>${s.name}</span>`).join('')}</div>
+        ${lines(eq, SERIES, 'date', {id:'eq', blank:'Starts after two sessions close.', label:'Equity against benchmarks'})}</div>
+    </div>`;
 
-    const pend = (d.pending||[]);
-    const pendPanel = `<div class="panel"><h2>Queued for the next open</h2>
-      <p class="sub">Decided from the ${esc(d.asof||'last')} close. These are placed as market orders when the bell rings.</p>
-      ${pend.length? `<table><thead><tr><th>Action</th><th>Symbol</th><th class="num">Shares</th><th>Why / stop</th></tr></thead><tbody>
-        ${pend.map(o=>`<tr><td>${o.side==='buy'?'Buy':'Sell'}</td><td class="sym">${esc(o.symbol)}</td>
-        <td class="num">${o.qty??'all'}</td><td style="color:var(--ink2)">${o.side==='buy'?('stop '+(o.stop?Number(o.stop).toFixed(2):'—')):esc(o.reason||'')}</td></tr>`).join('')}
-        </tbody></table>` : '<p class="empty">Nothing queued.</p>'}</div>`;
+    const posPanel = `<div class="panel" style="margin-bottom:10px"><h2>Holdings</h2>
+      <div class="cap">Satellite positions rest a stop with the broker.</div>
+      ${pos.length ? `<table><thead><tr><th>Symbol</th><th class="num">Shares</th>
+        <th class="num">Price</th><th class="num">Value</th><th class="num">P/L</th>
+        <th class="num hide-sm">Stop</th></tr></thead><tbody>
+        ${pos.map(p=>`<tr><td><span class="sym">${esc(p.symbol)}</span><span class="tag">${esc(p.kind)}</span></td>
+        <td class="num">${p.shares??'—'}</td><td class="num">${p.price?Number(p.price).toFixed(2):'—'}</td>
+        <td class="num">${p.value?money(p.value):'—'}</td>
+        <td class="num ${cls(p.pl_pct)}">${pct(p.pl_pct)}</td>
+        <td class="num hide-sm">${p.stop?Number(p.stop).toFixed(2):'—'}</td></tr>`).join('')}
+        </tbody></table>` : '<p class="blank">Nothing held.</p>'}</div>`;
+
+    const queue = pend.length ? `<div class="panel" style="margin-bottom:10px"><h2>Queued for the open</h2>
+      <div class="cap">Decided from the ${esc(d.asof||'last')} close.</div>
+      <table><thead><tr><th>Action</th><th>Symbol</th><th class="num">Shares</th><th class="num">Stop</th></tr></thead><tbody>
+      ${pend.map(o=>`<tr><td>${o.side==='buy'?'Buy':'Sell'}</td><td class="sym">${esc(o.symbol)}</td>
+      <td class="num">${o.qty??'all'}</td><td class="num">${o.stop?Number(o.stop).toFixed(2):'—'}</td></tr>`).join('')}
+      </tbody></table></div>` : '';
 
     const cand = (d.candidates||[]);
-    const candPanel = cand.length? `<div class="panel"><h2>Watching</h2>
-      <p class="sub">Top-ranked names passing the trend screen. Not all get bought — at this account size a position is capped, so expensive stocks can round to zero shares.</p>
-      <table><thead><tr><th>Symbol</th><th class="num">6-month</th><th class="num">Close</th></tr></thead><tbody>
-      ${cand.map(c=>`<tr><td class="sym">${esc(c.t)}</td><td class="num ${cls(c.ret126)}">${pct(c.ret126)}</td>
-      <td class="num">${Number(c.close).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>` : '';
+    const watch = cand.length ? `<div class="grid2">
+      <div class="panel"><h2>Momentum</h2><div class="cap">Six-month return of what passes the screen.</div>
+        ${bars(cand)}</div>
+      <div class="panel"><h2>Log</h2><div class="cap">Newest first.</div>
+        ${(d.events||[]).slice(0,7).map(e=>`<div class="log"><time>${esc((e.t||'').replace('T',' ').slice(5,16))}</time>
+          <span>${esc(e.msg)}</span></div>`).join('') || '<p class="blank">Nothing yet.</p>'}</div>
+    </div>` : '';
 
-    const ev = (d.events||[]);
-    const evPanel = `<div class="panel"><h2>Log</h2><p class="sub">Everything it has done, newest first.</p>
-      ${ev.length? ev.map(e=>`<div class="ev"><time>${esc((e.t||'').replace('T',' ').slice(5,16))}</time>
-        <span class="tag ${esc(e.kind)}">${esc(e.kind)}</span><span>${esc(e.msg)}</span></div>`).join('')
-        : '<p class="empty">Nothing yet.</p>'}</div>`;
-
-    const lede = `<div class="lede"><p><b>A trading strategy running on its own, with fake
-      money, in public.</b> It decides what to buy after the market closes and places the orders
-      at the next opening bell. Everything below updates by itself — what it holds, what it is
-      about to do, and whether it is beating simply buying the index.</p></div>`;
-
-    const split = `<div class="split">${chartPanel}${aboutPanel(d)}</div>`;
-
-    $('body').innerHTML = needs(d) + lede + cards + regime + split
-                        + posPanel + pendPanel + candPanel + evPanel;
-    if(hist.length>1) wireChart(hist);
+    $('body').innerHTML = needs(d) + cards + strip + charts + posPanel + queue + watch;
+    if(spy.length>1) wire($('p-spy'), spy, spySeries, 'd', {W:520,L:46,R:54,money:true});
+    if(eq.length>1)  wire($('p-eq'),  eq,  SERIES,    'date', {W:520,L:46,R:54,money:true});
   }
 
   async function load(){
-    const btn = $('refresh');
-    const was = btn.textContent; btn.textContent = 'Refreshing…'; btn.disabled = true;
+    const btn = $('refresh'), was = btn.textContent;
+    btn.textContent = 'Refreshing…'; btn.disabled = true;
     try{
       const r = KEY
         ? await fetch(API + '/trading?days=120', { headers:{ Authorization:'Bearer ' + KEY }, cache:'no-store' })
@@ -415,18 +303,16 @@
       if(!r.ok) throw new Error('HTTP ' + r.status);
       const j = await r.json();
       data = j.state;
-      const stamp = data && (j.state_updated ?? (typeof data.updated === 'number' ? data.updated
-                     : data.updated ? Date.parse(data.updated)/1000 : null));
-      $('fresh').textContent = stamp ? 'updated ' + ago(Date.now()/1000 - stamp) : '';
+      const t = j.state_updated ?? (data && (typeof data.updated === 'number' ? data.updated
+                 : data.updated ? Date.parse(data.updated)/1000 : null));
+      $('fresh').textContent = t ? ago(Date.now()/1000 - t) : '';
       render();
-    }catch(e){ $('body').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; }
+    }catch(e){ $('body').innerHTML = `<p class="blank">Could not load: ${esc(e.message)}</p>`; }
     finally{ btn.textContent = was; btn.disabled = false; }
   }
   $('refresh').addEventListener('click', load);
   load();
   setInterval(load, REFRESH_MS);
-  // Coming back to the tab should show current numbers, not whatever was on
-  // screen when it was last left.
   document.addEventListener('visibilitychange', () => { if(!document.hidden) load(); });
 </script>
 </body>
