@@ -121,8 +121,13 @@
   // Same Worker as Devices and Trends. The Pi posts a snapshot after each run;
   // the read key only exists inside the sealed secret panel, which opens this
   // page as trading/#k=KEY.
+  // Opened from the sealed panel as trading/#k=KEY it reads the authenticated
+  // route. Opened plainly it falls back to /trading/public, which needs no key
+  // — so this page is world-readable. The Worker var TRADING_PUBLIC="off"
+  // turns that route off and re-gates the page.
   const API = 'https://pi-status.pizza-calc-api.workers.dev';
   const KEY = new URLSearchParams(location.hash.slice(1)).get('k') || '';
+  const REFRESH_MS = 10 * 60 * 1000;      // the Pi only reports every 15 min anyway
   const $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = n => n == null ? '—' : '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -296,9 +301,12 @@
   }
 
   async function load(){
-    if(!KEY){ $('body').innerHTML = '<p class="empty">Open this from the secret panel.</p>'; return; }
+    const btn = $('refresh');
+    const was = btn.textContent; btn.textContent = 'Refreshing…'; btn.disabled = true;
     try{
-      const r = await fetch(API + '/trading?days=120', { headers:{ Authorization:'Bearer ' + KEY }, cache:'no-store' });
+      const r = KEY
+        ? await fetch(API + '/trading?days=120', { headers:{ Authorization:'Bearer ' + KEY }, cache:'no-store' })
+        : await fetch(API + '/trading/public?days=120', { cache:'no-store' });
       if(!r.ok) throw new Error('HTTP ' + r.status);
       const j = await r.json();
       data = j.state;
@@ -307,10 +315,14 @@
       $('fresh').textContent = stamp ? 'updated ' + ago(Date.now()/1000 - stamp) : '';
       render();
     }catch(e){ $('body').innerHTML = `<p class="empty">Could not load: ${esc(e.message)}</p>`; }
+    finally{ btn.textContent = was; btn.disabled = false; }
   }
   $('refresh').addEventListener('click', load);
   load();
-  setInterval(load, 60000);
+  setInterval(load, REFRESH_MS);
+  // Coming back to the tab should show current numbers, not whatever was on
+  // screen when it was last left.
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) load(); });
 </script>
 </body>
 </html>
