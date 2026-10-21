@@ -82,6 +82,15 @@
         border:1px solid var(--line); border-radius:4px; padding:1px 5px; margin-left:7px;}
   .empty{color:var(--muted); font-size:13.5px; padding:6px 0;}
 
+  .waiting{font-size:13.5px; color:var(--ink2);}
+  .waiting p + p{margin-top:9px;}
+  .waiting b{color:var(--ink); font-weight:600;}
+  .waiting ul{list-style:none; margin-top:10px;}
+  .waiting li{display:flex; gap:8px; align-items:baseline; padding:6px 0;
+              border-bottom:1px solid var(--line);}
+  .waiting li:last-child{border-bottom:none;}
+  .waiting .swatch{position:relative; top:1px;}
+
   .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--ink2); margin-bottom:8px;}
   .legend span{display:flex; align-items:center; gap:6px;}
   .swatch{width:11px; height:11px; border-radius:3px; flex:none;}
@@ -91,6 +100,28 @@
        opacity:0; transition:opacity .08s; min-width:140px; z-index:5;}
   .tip b{font-family:'Space Grotesk',sans-serif; display:block; margin-bottom:4px; font-size:12px; color:var(--ink2);}
   .tip div{display:flex; justify-content:space-between; gap:12px;}
+
+  /* intro that tells a stranger what they are looking at */
+  .lede{border:1px solid var(--line); background:var(--surface); border-radius:12px;
+        padding:16px 18px; margin-bottom:14px; font-size:14.5px; color:var(--ink2);}
+  .lede b{color:var(--ink); font-weight:600;}
+  .lede p + p{margin-top:8px;}
+
+  /* chart beside the write-up on a wide screen, stacked on a phone */
+  .split{display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+         gap:14px; align-items:start; margin-bottom:14px;}
+  .split > .panel{margin-bottom:0;}
+  @media (max-width:880px){ .split{grid-template-columns:1fr;} }
+  .about p{font-size:13.5px; color:var(--ink2);}
+  .about p + p{margin-top:9px;}
+  .about strong{color:var(--ink); font-weight:600;}
+  .about .status{border-left:2px solid var(--s1); padding:2px 0 2px 11px; margin:11px 0;
+                 font-size:13.5px; color:var(--ink);}
+  .about .facts{list-style:none; margin:11px 0 0; font-size:13px; color:var(--ink2);}
+  .about .facts li{display:flex; justify-content:space-between; gap:10px;
+                   padding:5px 0; border-bottom:1px solid var(--line);}
+  .about .facts li:last-child{border-bottom:none;}
+  .about .facts b{color:var(--ink); font-weight:600; font-variant-numeric:tabular-nums;}
 
   .ev{font-size:13px; display:flex; gap:10px; padding:5px 0; border-bottom:1px solid var(--line);}
   .ev:last-child{border-bottom:none;}
@@ -109,8 +140,8 @@
 <main>
   <div class="head">
     <div>
-      <h1>Trading <span class="badge" id="mode">—</span></h1>
-      <p>Model D on the Pi — core SPY plus a capped momentum satellite. Decides on the close, trades the next open.</p>
+      <h1>Trading bot <span class="badge" id="mode">—</span></h1>
+      <p>A stock-trading strategy running by itself on a Raspberry Pi, with fake money, in public.</p>
     </div>
     <div class="fresh"><span id="fresh"></span><button type="button" id="refresh">Refresh</button></div>
   </div>
@@ -146,8 +177,22 @@
   let data = null;
 
   function chart(history){
-    if(!history || history.length < 2) return '<p class="empty">The equity curve starts after the first session.</p>';
-    const W = 920, H = 230, L = 52, R = 64, T = 12, B = 26;
+    if(!history || history.length < 2) return `<div class="waiting">
+      <p><b>The curve starts once two sessions have closed.</b>
+      ${history && history.length === 1 ? 'One is recorded so far.' : 'None recorded yet.'}</p>
+      <p>Three lines will be plotted from the same starting balance, so they are directly
+      comparable:</p>
+      <ul>
+        <li><i class="swatch" style="background:var(--s1)"></i><b>Model D</b> — the strategy
+          actually placing orders.</li>
+        <li><i class="swatch" style="background:var(--s2)"></i><b>SPY</b> — buying the index on
+          day one and doing nothing. The line to beat.</li>
+        <li><i class="swatch" style="background:var(--s3)"></i><b>Model C</b> — the reckless
+          control. Watch its drawdowns, not its returns.</li>
+      </ul></div>`;
+    // Sized so that at this column's real width the labels render near 1:1
+    // rather than being shrunk to 7px by the viewBox scale.
+    const W = 640, H = 240, L = 48, R = 58, T = 12, B = 26;
     const xs = history.map((_,i)=>i), n = history.length;
     let lo = Infinity, hi = -Infinity;
     for(const h of history) for(const s of SERIES){ const v = h[s.key]; if(v!=null){ lo=Math.min(lo,v); hi=Math.max(hi,v); } }
@@ -181,7 +226,7 @@
   function wireChart(history){
     const svg = $('svg'), hit = $('hit'), tip = $('tip'); if(!svg||!hit) return;
     const cross = svg.querySelector('.cross');
-    const W=920,L=52,R=64,n=history.length;
+    const W=640,L=48,R=58,n=history.length;
     const move = e => {
       const r = svg.getBoundingClientRect();
       const px = (e.touches? e.touches[0].clientX : e.clientX) - r.left;
@@ -216,6 +261,58 @@
     }
     if(!out.length) return '';
     return `<div class="note"><b>Needs attention</b><ul>${out.map(o=>`<li>${o}</li>`).join('')}</ul></div>`;
+  }
+
+  // How the test is actually going, written from the data rather than asserted.
+  function howItsGoing(d){
+    const h = d.history || [], b = d.benchmarks || {};
+    const n = h.length;
+    if(n === 0) return `<p class="status">No sessions recorded yet. The first orders go in at
+      the next market open, and the chart starts from there.</p>`;
+    const me = b.live_pct ?? 0, spy = b.spy_pct ?? 0, mc = b.modelc_pct ?? 0;
+    const vsSpy = me - spy;
+    const word = Math.abs(vsSpy) < 0.002 ? 'level with' : vsSpy > 0 ? 'ahead of' : 'behind';
+    const day = n === 1 ? 'One session in' : `${n} sessions in`;
+    return `<p class="status">${day}: <strong>${pct(me)}</strong>, which is
+      <strong>${word} SPY</strong> at ${pct(spy)}. The high-risk control is at ${pct(mc)}.
+      ${n < 20 ? 'Far too early to mean anything — a few weeks of this is still noise.' :
+                 'Judge it on drawdown as much as return.'}</p>`;
+  }
+
+  function aboutPanel(d){
+    const h = d.health || {};
+    return `<aside class="panel about">
+      <h2>What this is</h2>
+      <p class="sub" style="margin-bottom:10px">and how the test is going</p>
+
+      <p>I built a trading strategy, backtested it on eight years of data, and it now runs by
+      itself on a Raspberry Pi in my room against a <strong>paper account</strong> — real prices
+      and real order mechanics, <strong>fake money</strong>.</p>
+
+      <p>The point isn't to get rich. It's to find out whether a mechanical rule set beats just
+      buying an index fund, <strong>before</strong> real money is involved. The honest answer
+      from the backtest: <strong>it doesn't beat the index on return.</strong> It roughly matches
+      it while cutting the worst drawdown from -33.7% to -19.4%. Less pain, not more profit.</p>
+
+      ${howItsGoing(d)}
+
+      <p>It holds SPY as its core whenever the market is above its 200-day average, and puts at
+      most 30% into up to six trending stocks, each with a stop-loss that only ratchets upward.
+      When the market turns down it sells and waits in cash. <strong>Model C</strong> on the
+      chart is a deliberately reckless version kept as a control: it usually makes more money and
+      takes drawdowns that would make you quit.</p>
+
+      <p>Not a recommendation, and a backtest is not a prediction.</p>
+
+      <ul class="facts">
+        <li><span>Runs on</span><b>Raspberry Pi 4</b></li>
+        <li><span>Broker</span><b>Alpaca paper</b></li>
+        <li><span>Universe</span><b>${h.universe || '—'} S&amp;P stocks</b></li>
+        <li><span>Decides</span><b>at the close</b></li>
+        <li><span>Trades</span><b>at the next open</b></li>
+        <li><span>Sessions recorded</span><b>${(d.history||[]).length}</b></li>
+      </ul>
+    </aside>`;
   }
 
   function render(){
@@ -254,7 +351,7 @@
     const hist = d.history || [];
     const chartPanel = `<div class="panel"><h2>Equity</h2>
       <p class="sub">Model D is the only one trading. SPY and Model C are tracked, never traded — so you can see whether the complexity is earning its keep.</p>
-      <div class="legend">${SERIES.map(s=>`<span><i class="swatch" style="background:var(${s.css})"></i>${s.name}</span>`).join('')}</div>
+      ${hist.length > 1 ? `<div class="legend">${SERIES.map(s=>`<span><i class="swatch" style="background:var(${s.css})"></i>${s.name}</span>`).join('')}</div>` : ''}
       ${chart(hist)}
       <details class="table-view"><summary>Show as a table</summary>
         <table style="margin-top:8px"><thead><tr><th>Date</th>${SERIES.map(s=>`<th class="num">${s.name}</th>`).join('')}</tr></thead>
@@ -296,7 +393,15 @@
         <span class="tag ${esc(e.kind)}">${esc(e.kind)}</span><span>${esc(e.msg)}</span></div>`).join('')
         : '<p class="empty">Nothing yet.</p>'}</div>`;
 
-    $('body').innerHTML = needs(d) + cards + regime + chartPanel + posPanel + pendPanel + candPanel + evPanel;
+    const lede = `<div class="lede"><p><b>A trading strategy running on its own, with fake
+      money, in public.</b> It decides what to buy after the market closes and places the orders
+      at the next opening bell. Everything below updates by itself — what it holds, what it is
+      about to do, and whether it is beating simply buying the index.</p></div>`;
+
+    const split = `<div class="split">${chartPanel}${aboutPanel(d)}</div>`;
+
+    $('body').innerHTML = needs(d) + lede + cards + regime + split
+                        + posPanel + pendPanel + candPanel + evPanel;
     if(hist.length>1) wireChart(hist);
   }
 
