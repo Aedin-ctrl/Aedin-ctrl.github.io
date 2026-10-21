@@ -1,130 +1,128 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
 <title>Cross-venue sports arbitrage</title>
 <meta name="description" content="The same sports contract priced on Kalshi and Polymarket at once, after fees and tax.">
 <style>
   @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
   @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+
+  /* Light only, deliberately: this is a board that gets glanced at next to a
+     venue's own screen, and it should look the same every time. */
   :root{
-    --paper:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
-    --line:#e1e0d9; --rule:#c3c2b7; --wash:#f3f3f0;
-    --good:#006300; --bad:#c0392b; --warn:#9a6a00;
-  }
-  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
-    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
-    --line:#2c2c2a; --rule:#383835; --wash:#232321;
-    --good:#0ca30c; --bad:#e66767; --warn:#fab219;
-  }}
-  :root[data-theme="dark"]{
-    --paper:#0d0d0d; --surface:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#898781;
-    --line:#2c2c2a; --rule:#383835; --wash:#232321;
-    --good:#0ca30c; --bad:#e66767; --warn:#fab219;
+    --paper:#faf9f6; --card:#ffffff; --ink:#15150f; --ink2:#55534c; --muted:#92908a;
+    --line:#e8e6de; --rule:#d6d3c8;
+    --good:#0a6b2e; --goodbg:#eef7f0; --bad:#b03f2c; --warn:#8a6000;
+    --accent:#15150f;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
+  html{background:var(--paper);}
   body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
-       line-height:1.5; font-variant-numeric:tabular-nums;}
-  h1,h2{font-family:'Space Grotesk',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em;}
-  a{color:inherit;}
-  main{max-width:960px; margin:0 auto; padding:30px clamp(16px,4vw,40px) 70px;}
+       line-height:1.5; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;}
+  h1,h2,.num{font-family:'Space Grotesk',system-ui,sans-serif; letter-spacing:-0.015em;}
+  h1,h2{font-weight:600;}
+  main{max-width:900px; margin:0 auto; padding:38px clamp(16px,5vw,32px) 80px;}
 
-  header{display:flex; align-items:flex-end; justify-content:space-between; gap:10px 20px; flex-wrap:wrap;}
-  h1{font-size:21px;}
-  .sub{color:var(--ink2); font-size:13.5px; margin-top:5px; max-width:66ch;}
-  .stamp{font-size:11.5px; color:var(--muted); white-space:nowrap;}
+  /* header */
+  .top{display:flex; align-items:baseline; justify-content:space-between; gap:8px 20px; flex-wrap:wrap;}
+  h1{font-size:22px;}
+  .stamp{font-size:11.5px; color:var(--muted);}
+  .lede{color:var(--ink2); font-size:14px; margin-top:7px; max-width:60ch;}
 
-  .verdict{margin:22px 0 24px; padding:14px 16px; border-radius:10px;
-           background:var(--surface); border:1px solid var(--line); font-size:14px;}
-  .verdict b{font-family:'Space Grotesk',sans-serif; font-size:17px;}
+  /* summary */
+  .summary{margin:24px 0 20px; padding:17px 19px; border-radius:12px; background:var(--card);
+           border:1px solid var(--line);}
+  .headline{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;
+            letter-spacing:-0.015em;}
+  .summary p{font-size:13.5px; color:var(--ink2); margin-top:7px; max-width:66ch;}
 
-  .when{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 13px;}
-  .when button{font:inherit; font-size:12.5px; cursor:pointer; padding:5px 12px;
-    border-radius:999px; border:1px solid var(--rule); background:var(--surface);
-    color:var(--ink2);}
-  .when button:hover{color:var(--ink);}
-  .when button.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
-  .when button:disabled{opacity:.4; cursor:default;}
-  .when button:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+  /* filters */
+  .pills{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px;}
+  .pills button{font:inherit; font-size:12.5px; cursor:pointer; padding:6px 14px;
+    border-radius:999px; border:1px solid var(--rule); background:var(--card); color:var(--ink2);
+    transition:background .12s, color .12s, border-color .12s;}
+  .pills button:hover:not(:disabled){border-color:var(--ink); color:var(--ink);}
+  .pills button[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .pills button:disabled{opacity:.42; cursor:default;}
+  .pills button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
 
-  .tw{overflow-x:auto; border:1px solid var(--line); border-radius:10px;
-      background:var(--surface); container-type:inline-size;}
-  table{border-collapse:separate; border-spacing:0; width:100%; font-size:13px;}
-  th,td{padding:9px 11px; text-align:right; white-space:nowrap; border-block-end:1px solid var(--line);}
-  th:first-child,td:first-child{text-align:left;}
-  thead{position:sticky; inset-block-start:0; background:var(--wash);}
-  thead th{font-size:10.5px; letter-spacing:.05em; text-transform:uppercase;
-           color:var(--muted); font-weight:600;}
-  tbody tr:last-child>*{border-block-end:none;}
-  tbody th{font-weight:600; text-align:left; background:var(--surface);}
-  .what{display:block; font-size:11px; color:var(--muted); font-weight:400;
-        white-space:normal;}
-  tbody th{max-width:19rem;}
-  .pos{color:var(--good);} .neg{color:var(--bad);} .dim{color:var(--muted);}
-  .warn{color:var(--warn);}
+  /* cards */
+  .cards{display:grid; gap:11px; grid-template-columns:repeat(auto-fill,minmax(392px,1fr));}
+  .bet{background:var(--card); border:1px solid var(--line); border-radius:12px;
+       padding:15px 17px 13px;}
+  .bet-top{display:flex; align-items:flex-start; justify-content:space-between; gap:14px;}
+  .name{font-weight:600; font-size:15px; line-height:1.3;}
+  .meta{font-size:11.5px; color:var(--muted); margin-top:3px;}
+  .ret{text-align:right; flex-shrink:0;}
+  .ret .n{font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:600;
+          color:var(--good); letter-spacing:-0.02em; display:block; line-height:1.1;}
+  .ret .l{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);}
 
-  h2{font-size:14.5px; margin:34px 0 9px;}
-  p.note{font-size:13px; color:var(--ink2); max-width:72ch;}
-  p.note+p.note{margin-top:9px;}
-  .empty{padding:26px 14px; text-align:center; color:var(--muted); font-size:13.5px;
-         border:1px dashed var(--rule); border-radius:10px;}
-  footer{margin-top:34px; padding-top:13px; border-top:1px solid var(--rule);
-         font-size:12px; color:var(--muted); max-width:76ch;}
+  .legs{margin:13px 0 0; border-top:1px solid var(--line); padding-top:11px;
+        display:grid; gap:5px;}
+  .leg{display:flex; align-items:baseline; justify-content:space-between; gap:10px; font-size:13px;}
+  .leg .side{color:var(--muted); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase;
+             min-width:4.4rem;}
+  .leg .venue{flex:1; color:var(--ink2);}
+  .leg .px{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px;}
+
+  .foot-row{margin-top:12px; padding-top:10px; border-top:1px solid var(--line);
+            display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+            font-size:12.5px; color:var(--ink2);}
+  .foot-row b{font-weight:600; color:var(--ink);}
+  .risk{color:var(--warn);}
+  .working{margin-top:6px; font-size:11.5px; color:var(--muted);}
+
+  .empty{padding:30px 18px; text-align:center; color:var(--muted); font-size:13.5px;
+         border:1px dashed var(--rule); border-radius:12px; background:var(--card);}
+
+  h2{font-size:14px; margin:38px 0 10px;}
+  .note{font-size:13px; color:var(--ink2); max-width:68ch;}
+  .note+.note{margin-top:10px;}
+  .note b{color:var(--ink);}
+  footer{margin-top:34px; padding-top:14px; border-top:1px solid var(--rule);
+         font-size:11.5px; color:var(--muted); max-width:72ch;}
   footer p+p{margin-top:6px;}
 
-  @container (width < 560px){
-    table,thead,tbody,tr,th,td{display:block;}
-    thead{display:none;}
-    tbody tr{border-block-end:1px solid var(--rule); padding:7px 0;}
-    tbody tr:last-child{border-block-end:none;}
-    td,th{border-block-end:none; text-align:left; white-space:normal; padding:3px 12px;}
-    td:not(:empty)::before{content:attr(data-l) ": "; color:var(--muted); font-size:11px;}
+  @media (max-width:520px){
+    .cards{grid-template-columns:1fr;}
+    .ret .n{font-size:20px;}
   }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <div>
-      <h1>Cross-venue sports arbitrage</h1>
-      <p class="sub">The same contract priced on Kalshi and Polymarket at once. Only bets that
-        still make money once fees and tax come out, ranked by what they actually return.</p>
-    </div>
+  <div class="top">
+    <h1>Cross-venue sports arbitrage</h1>
     <span class="stamp" id="stamp">loading</span>
-  </header>
+  </div>
+  <p class="lede">The same contract priced on Kalshi and Polymarket at once. Only bets that still
+    make money once fees and tax come out.</p>
 
-  <div class="verdict" id="verdict"></div>
+  <div class="summary" id="summary"></div>
 
-  <nav class="when" id="when" aria-label="Filter by when the bet closes">
-    <button data-when="all" class="on">Best overall</button>
-    <button data-when="today">Closing today</button>
-    <button data-when="week">This week</button>
-    <button data-when="month">This month</button>
-  </nav>
+  <nav class="pills" id="pills" aria-label="Filter by when the bet closes"></nav>
 
   <div id="board"></div>
 
-  <h2>What the columns mean</h2>
-  <p class="note"><b>Return</b> is what the bet actually pays, after everything. Under each bet is
-    the arithmetic behind it: the <b>gap</b> between the two venues' prices, less fees, less tax.
-    <b>In</b> is what you put up across both venues and <b>keep</b> is what comes back, whichever
-    way the event lands.</p>
-  <p class="note">A positive gap is not enough on its own, which is why the board does not list
-    one. Kalshi's fee is largest in the middle of the price range, so a 1&percnt; gap on a
-    30&cent; contract loses money &mdash; the fee there is 1.47&percnt; of the payout and no amount
-    of size fixes it. Only the tails are cheap enough for a thin gap to survive, which is why
-    nearly everything here is a longshot.</p>
-  <p class="note"><b>Risk&nbsp;:&nbsp;win</b> is the part most arbitrage maths leaves out. The two legs
-    only cancel if both venues settle the same way. If they do not &mdash; a different season or
-    scope than it looks, an oracle result that departs from the league's official one, a void on
-    one venue only, a delisting &mdash; both legs lose and the <em>entire</em> stake in the
-    &ldquo;in&rdquo; column goes, to win what is in &ldquo;keep&rdquo;. That ratio is the number
-    worth looking at. It is an exposure, not a probability: nothing here can estimate how likely
+  <h2>Reading a card</h2>
+  <p class="note">The big number is what the bet <b>returns after everything</b>. Underneath each
+    card is its working: the <b>gap</b> between the two venues, less fees, less tax.</p>
+  <p class="note">A positive gap is not enough on its own. Kalshi's fee is
+    <b>0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price)</b> per contract, biggest in the middle of the
+    range &mdash; 1.75&cent; at a coin flip against 0.33&cent; at 5&cent; or 95&cent;. So a 1&percnt;
+    gap on a 30&cent; contract loses money whatever size you trade, because the fee there is
+    1.47&percnt; of the payout. Only the tails are cheap enough for a thin gap to survive, which is
+    why nearly every bet here is a longshot.</p>
+  <p class="note"><b>Risk</b> is the ratio most arbitrage maths leaves out. The two legs only cancel
+    if both venues settle the same way. If they do not &mdash; a different season or scope than it
+    looks, an oracle result that departs from the league's official one, a void on one venue only,
+    a delisting &mdash; both legs lose and the entire stake goes, to win the few dollars in
+    &ldquo;keep&rdquo;. It is an exposure, not a probability: nothing here can estimate how likely
     it is.</p>
-  <p class="note">The fee is <b>0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price)</b> per contract on Kalshi:
-    1.75&cent; at a coin flip, 0.33&cent; at 5&cent; or 95&cent;. Polymarket is modelled at no trading
-    fee. Tax assumes both legs are exchange contracts that net against each other.</p>
 
   <footer id="foot"></footer>
 </main>
@@ -137,139 +135,165 @@
     if (x != null) n.textContent = x; return n; };
   const money = v => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US",
     { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const money0 = v => "$" + Math.round(v).toLocaleString("en-US");
   const pct = (v, d = 2) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
   const cents = v => (v * 100).toFixed(1) + "¢";
-  // Deadlines are shown as real times, not "253d". Anything closing today
-  // gets a clock, anything this week gets a weekday, the rest get a date.
+
   const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  function deadline(iso, bucket) {
-    if (!iso) return "\u2014";
+  function closes(iso, bucket) {
+    if (!iso) return "";
     const d = new Date(iso);
     const hm = d.toLocaleTimeString("en-US",
       { hour: "numeric", minute: "2-digit" }).replace(" ", "").toLowerCase();
-    if (bucket === "today") return hm;
-    if (bucket === "week") return DOW[d.getDay()] + " " + hm;
+    if (bucket === "today") return "closes " + hm + " today";
+    if (bucket === "week") return "closes " + DOW[d.getDay()] + " " + hm;
     const y = d.getFullYear() !== new Date().getFullYear() ? " " + d.getFullYear() : "";
-    return d.getDate() + " " + MON[d.getMonth()] + y;
+    return "closes " + d.getDate() + " " + MON[d.getMonth()] + y;
   }
 
-  // No inputs, and no model: the page renders what the collector computed and
-  // nothing else. The arithmetic lives in one place, which is also why there
-  // is nothing here that could drift away from it.
   const WITHIN = { today: ["today"], week: ["today", "week"],
                    month: ["today", "week", "month"] };
+  const TABS = [["all", "Best overall"], ["today", "Closing today"],
+                ["week", "This week"], ["month", "This month"]];
+
+  function card(r, venueName) {
+    const L = r.ledger;
+    const legs = L.legs || [];
+    const c = el("div", "bet");
+
+    const top = el("div", "bet-top");
+    const who = el("div");
+    who.appendChild(el("div", "name", r.label));
+    who.appendChild(el("div", "meta",
+      r.league.toUpperCase() + " · " + closes(r.deadline, r.bucket)
+      + (r.polls_clearing > 1 ? " · up " + r.polls_clearing + " polls" : "")));
+    top.appendChild(who);
+    const ret = el("div", "ret");
+    ret.appendChild(el("span", "n", pct(L.net_edge)));
+    ret.appendChild(el("span", "l", "return"));
+    top.appendChild(ret);
+    c.appendChild(top);
+
+    const box = el("div", "legs");
+    ["Buy", "Against"].forEach((label, i) => {
+      const lg = legs[i];
+      if (!lg) return;
+      const row = el("div", "leg");
+      row.appendChild(el("span", "side", label));
+      row.appendChild(el("span", "venue", (venueName[lg.venue] || lg.venue)
+        + " — " + lg.side));
+      row.appendChild(el("span", "px", cents(lg.price)));
+      box.appendChild(row);
+    });
+    c.appendChild(box);
+
+    const f = el("div", "foot-row");
+    const left = el("span");
+    left.innerHTML = money0(L.capital_in) + " in → keep <b>" + money(L.worst_net) + "</b>";
+    f.appendChild(left);
+    if (L.risk_ratio) f.appendChild(el("span", "risk", Math.round(L.risk_ratio) + " : 1 risk"));
+    c.appendChild(f);
+
+    const taxOut = (L.outcomes || []).filter(o => !o.divergence);
+    const taxPct = taxOut.length && L.payout_total
+      ? taxOut.reduce((a, o) => a + o.tax, 0) / taxOut.length / L.payout_total : 0;
+    c.appendChild(el("div", "working",
+      pct(r.gross_edge) + " gap − " + (L.fee_pct_of_payout * 100).toFixed(2)
+      + "% fee − " + (taxPct * 100).toFixed(2) + "% tax"));
+    return c;
+  }
 
   function render(d, when) {
     const all = d.opportunities || [];
-    const rows = when && when !== "all"
-      ? all.filter(r => (WITHIN[when] || []).includes(r.bucket)) : all;
-    const floor = d.min_publish_edge || 0.01;
+    const rows = (when && when !== "all"
+      ? all.filter(r => (WITHIN[when] || []).includes(r.bucket)) : all)
+      .slice().sort((a, b) => b.ledger.net_edge - a.ledger.net_edge);
 
-    const live = rows.filter(r => r.ledger.verdict === "live");
-    const beats = rows.filter(r => r.ledger.beats_cash);
-    const best = rows.reduce((a, r) => (!a || r.gross_edge > a.gross_edge) ? r : a, null);
+    const s = $("#summary"); s.textContent = "";
+    const rec = d.recent || {};
+    const crossed = Object.values(rec.crossed || {}).reduce((a, b) => a + b, 0);
 
-    const v = $("#verdict");
-    v.textContent = "";
     if (!rows.length) {
-      v.innerHTML = "<b>Nothing clears fees and tax"
-        + (when && when !== "all" ? " in that window" : " right now") + ".</b> ";
-      v.append("That is the usual state of this board.");
+      s.appendChild(el("div", "headline", when && when !== "all"
+        ? "Nothing clears in that window." : "Nothing clears fees and tax right now."));
+      s.appendChild(el("p", null, crossed
+        ? "In the last " + (rec.hours || 24) + " hours " + crossed + " different contracts did "
+          + "disagree across the two venues — the gaps just were not wide enough to beat the "
+          + "fee. That is the usual state of this board."
+        : "That is the usual state of this board."));
     } else {
-      const top = rows.reduce((a, r) =>
-        (!a || r.ledger.net_edge > a.ledger.net_edge) ? r : a, null);
-      v.innerHTML = "<b>" + rows.length + " bet" + (rows.length === 1 ? "" : "s")
-        + " that clear fees and tax";
-      const tail = ", best " + pct(top.ledger.net_edge) + " on " + top.label + ". "
-        + (beats.length
-            ? beats.length + " of them beat leaving the money in cash."
-            : "None of them beats leaving the money in cash — the ones that clear fees and "
-              + "tax are long-dated title futures returning about 1% a year, and they risk the "
-              + "whole stake against a few dollars of profit.");
-      v.innerHTML += "</b>";
-      v.append(tail);
+      const top = rows[0];
+      s.appendChild(el("div", "headline", rows.length + " bet" + (rows.length === 1 ? "" : "s")
+        + " clear fees and tax, best " + pct(top.ledger.net_edge) + "."));
+      const beats = rows.filter(r => r.ledger.beats_cash).length;
+      s.appendChild(el("p", null, beats
+        ? beats + " of them beat leaving the money in cash."
+        : "None beats leaving the money in cash. They are long-dated title futures returning "
+          + "about 1% a year, and each risks its whole stake to win a few dollars."));
     }
 
-    const host = $("#board");
-    host.textContent = "";
+    const host = $("#board"); host.textContent = "";
     if (!rows.length) {
       host.appendChild(el("div", "empty",
-        "Nothing meets the threshold. The collector keeps logging the near-misses."));
+        "No bet on the board. The collector keeps logging the near-misses."));
       return;
     }
-
-    const cols = ["Bet", "Buy", "Against", "Return", "In", "Keep", "Risk : win", "Closes"];
-    const tw = el("div", "tw"); tw.tabIndex = 0; tw.setAttribute("role", "region");
-    tw.setAttribute("aria-label", "Cross-venue price gaps of 1% or wider");
-    const t = el("table"), thead = el("thead"), hr = el("tr");
-    cols.forEach(c => hr.appendChild(el("th", null, c)));
-    thead.appendChild(hr); t.appendChild(thead);
-
-    const tb = el("tbody");
-    rows.slice().sort((a, b) => b.ledger.net_edge - a.ledger.net_edge).forEach(r => {
-      const L = r.ledger;
-      const legs = L.legs || [];
-      const nm = k => (d.venueName && d.venueName[k]) || k;
-      const tr = el("tr");
-
-      const th = el("th"); th.scope = "row";
-      th.appendChild(document.createTextNode(r.label));
-      // gap minus fees minus tax is the return, shown so a row explains
-      // itself: a 1% gap on a 30c contract loses money, because Kalshi's fee
-      // at 30c is 1.47% of payout, and that was not visible before.
-      const taxOut = (L.outcomes || []).filter(o => !o.divergence);
-      const taxPct = taxOut.length && L.payout_total
-        ? taxOut.reduce((a, o) => a + o.tax, 0) / taxOut.length / L.payout_total : 0;
-      th.appendChild(el("span", "what",
-        r.league.toUpperCase() + " · " + pct(r.gross_edge) + " gap \u2212 "
-        + (L.fee_pct_of_payout * 100).toFixed(2) + "% fee \u2212 "
-        + (taxPct * 100).toFixed(2) + "% tax"
-        + (r.polls_clearing > 1 ? " · " + r.polls_clearing + " polls" : "")));
-      tr.appendChild(th);
-
-      const cell = (txt, cls, label) => {
-        const td = el("td", cls, txt); td.dataset.l = label; tr.appendChild(td);
-      };
-      cell(legs[0] ? nm(legs[0].venue) + " " + cents(legs[0].price) : "—", "", "Buy");
-      cell(legs[1] ? nm(legs[1].venue) + " " + cents(legs[1].price) : "—", "", "Against");
-      cell(pct(L.net_edge), L.net_edge > 0 ? "pos" : "neg", "Return");
-      cell(money(L.capital_in), "", "In");
-      cell(money(L.worst_net), L.worst_net > 0 ? "pos" : "neg", "Keep");
-      cell(L.risk_ratio ? Math.round(L.risk_ratio) + ":1" : "—",
-           L.risk_ratio > 50 ? "warn" : "", "Risk : win");
-      cell(deadline(r.deadline, r.bucket), "dim", "Closes");
-      tb.appendChild(tr);
-    });
-    t.appendChild(tb); tw.appendChild(t); host.appendChild(tw);
+    const grid = el("div", "cards");
+    rows.forEach(r => grid.appendChild(card(r, d.venueName)));
+    host.appendChild(grid);
   }
 
-  function stamp(d) {
+  function pills(d) {
+    const nav = $("#pills"); nav.textContent = "";
+    const counts = {};
+    (d.opportunities || []).forEach(r => { counts[r.bucket] = (counts[r.bucket] || 0) + 1; });
+    const btns = TABS.map(([key, label]) => {
+      const b = el("button", null, label
+        + (key === "all" ? "" : " (" + (WITHIN[key] || []).reduce(
+            (a, k) => a + (counts[k] || 0), 0) + ")"));
+      b.type = "button";
+      b.setAttribute("aria-pressed", key === "all" ? "true" : "false");
+      if (key !== "all" && (WITHIN[key] || []).reduce((a, k) => a + (counts[k] || 0), 0) === 0) {
+        b.disabled = true;
+      }
+      b.addEventListener("click", () => {
+        btns.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+        render(d, key);
+      });
+      nav.appendChild(b);
+      return b;
+    });
+  }
+
+  function foot(d) {
     const f = $("#foot");
-    const when = d.updated ? new Date(d.updated) : null;
     const h = d.history || {};
+    const rec = d.recent || {};
     const lines = [
       "Prices come from the Kalshi and Polymarket public APIs and are a snapshot, not a live "
-      + "feed — a row may be gone by the time you read it. Two contracts are only ever paired "
-      + "when both venues' own identifiers agree on the league, the date, the teams and the "
-      + "line, and when each venue's label resolves back to the same side. Anything that cannot "
-      + "be verified is dropped rather than guessed.",
-      "This is a research board. It places no bets, holds no account anywhere, and a row on it "
+      + "feed. Two contracts are only ever paired when both venues' own identifiers agree on the "
+      + "league, the date, the teams and the line, and when each venue's label resolves back to "
+      + "the same side. Anything that cannot be verified is dropped rather than guessed.",
+      "This is a research board. It places no bets, holds no account anywhere, and a card on it "
       + "is not advice."
     ];
     if (h.runs) {
-      lines.push("Measured so far: " + h.runs.toLocaleString() + " polls, "
+      let s = "Measured so far: " + h.runs.toLocaleString() + " polls, "
         + (h.pairs_scanned || 0).toLocaleString() + " contract-pairs priced, "
         + (h.pct_gross || 0).toFixed(1) + "% crossed on raw price and "
-        + (h.pct_net || 0).toFixed(1) + "% survived fees and tax."
-        + (h.episodes && h.episodes.longest_minutes != null
-            ? " The longest a gap stayed open was " + h.episodes.longest_minutes + " minutes."
-            : ""));
+        + (h.pct_net || 0).toFixed(1) + "% survived fees and tax.";
+      const c = rec.crossed || {};
+      if (Object.keys(c).length) {
+        s += " In the last " + (rec.hours || 24) + " hours: "
+          + Object.entries(c).map(([k, n]) => n + " " + k).join(", ") + " crossed.";
+      }
+      lines.push(s);
     }
     lines.forEach(x => f.appendChild(el("p", null, x)));
-    if (when) {
-      const mins = (Date.now() - when.getTime()) / 6e4;
+    if (d.updated) {
+      const mins = (Date.now() - new Date(d.updated).getTime()) / 6e4;
       $("#stamp").textContent = "updated " + (mins < 90 ? Math.round(mins) + " min"
         : Math.round(mins / 60) + " h") + " ago";
     }
@@ -280,26 +304,12 @@
     .then(d => {
       d.venueName = {};
       (d.venues || []).forEach(v => { d.venueName[v.key] = v.name; });
-      const btns = [...document.querySelectorAll("#when button")];
-      const counts = {};
-      (d.opportunities || []).forEach(r => { counts[r.bucket] = (counts[r.bucket] || 0) + 1; });
-      btns.forEach(b => {
-        const w = b.dataset.when;
-        if (w !== "all") {
-          const n = (WITHIN[w] || []).reduce((a, k) => a + (counts[k] || 0), 0);
-          b.textContent += " (" + n + ")";
-          b.disabled = n === 0;
-        }
-        b.addEventListener("click", () => {
-          btns.forEach(x => x.classList.toggle("on", x === b));
-          render(d, w);
-        });
-      });
-      render(d, "all"); stamp(d);
+      pills(d); render(d, "all"); foot(d);
     })
     .catch(e => {
       $("#stamp").textContent = "no data";
-      $("#verdict").textContent = "Could not load the price feed (" + e.message + ").";
+      $("#summary").appendChild(el("div", "headline", "Could not load the price feed."));
+      $("#summary").appendChild(el("p", null, e.message));
     });
 })();
 </script>
