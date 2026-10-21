@@ -309,14 +309,17 @@
       return { venue: q.venue, side: q.side, price: q.ask, contracts, fee,
                cls: (v && v.tax_class) || "derivative",
                settle_bps: (v && v.settle_bps) || 0,
+               ramp: (v && v.withdraw_flat) || 0,
                stake: contracts * q.ask, out: contracts * q.ask + fee };
     });
-    const capital = legs.reduce((s, l) => s + l.out, 0);
+    // getting money onto a venue and off again, charged once per leg
+    const ramp = legs.reduce((s, l) => s + l.ramp, 0);
+    const capital = legs.reduce((s, l) => s + l.out, 0) + ramp;
     const payout = contracts;
     const outcomes = legs.map(w => {
       const settle = payout * (w.settle_bps || 0) / 1e4;
       const ls = legs.map(l => ({ venue: l.venue, cls: l.cls,
-        pnl: l === w ? payout - settle - l.out : -l.out }));
+        pnl: l === w ? payout - settle - (l.out + l.ramp) : -(l.out + l.ramp) }));
       const pre = ls.reduce((s, o) => s + o.pnl, 0);
       const t = taxOn(ls, tax);
       return { side: w.side, venue: w.venue, payout, pre, tax: t, net: pre - t, legs: ls };
@@ -324,7 +327,7 @@
 
     // The outcome a two-leg hedge cannot express: the venues do not settle
     // the same way, both legs lose, and the whole stake goes with them.
-    const dl = legs.map(l => ({ venue: l.venue, cls: l.cls, pnl: -l.out }));
+    const dl = legs.map(l => ({ venue: l.venue, cls: l.cls, pnl: -(l.out + l.ramp) }));
     const dpre = dl.reduce((s, o) => s + o.pnl, 0);
     const divergence = dpre - taxOn(dl, tax);
 
@@ -336,8 +339,9 @@
     const d = Math.max(days || 1, 1);
     // simple, not compound: a position held to settlement is not redeployed
     const ann = roi * 365 / d;
-    return { legs, outcomes, capital, payout, fees: legs.reduce((s, l) => s + l.fee, 0),
+    return { legs, outcomes, capital, payout,
       prefee, gross, worst, best, roi, ann: Math.min(ann, 99), days: d,
+      fees: legs.reduce((s, l) => s + l.fee, 0) + ramp,
       divergence, riskRatio: worst > 0 ? Math.abs(divergence) / worst : 0,
       depthKnown: known,
       // a cent of profit on five dollars is a rounding artefact, not a trade
