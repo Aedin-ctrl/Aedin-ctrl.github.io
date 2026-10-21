@@ -101,6 +101,7 @@
   .tag.live{color:var(--good);} .tag.feeeaten{color:var(--warn);} .tag.taxeaten{color:var(--s2);}
   .tag.dead{color:var(--muted);} .tag.unsized{color:var(--s2);}
   .tag.belowcash{color:var(--muted);} .tag.nosize{color:var(--bad);}
+  .tag.toosmall{color:var(--muted);}
   .opp[data-verdict="unsized"]{border-color:color-mix(in srgb, var(--s2) 35%, var(--line));}
   .risk{margin-top:10px; padding:9px 12px; border-radius:8px; background:var(--warnbg);
         border:1px solid color-mix(in srgb, var(--warn) 45%, var(--line)); font-size:12.5px;}
@@ -336,7 +337,10 @@
       prefee, gross, worst, best, roi, ann: Math.min(ann, 99), days: d,
       divergence, riskRatio: worst > 0 ? Math.abs(divergence) / worst : 0,
       depthKnown: known,
-      verdict: !known ? "unsized" : worst > 0 ? "live" : gross > 0 ? "tax-eaten"
+      // a cent of profit on five dollars is a rounding artefact, not a trade
+      verdict: !known ? "unsized"
+               : (worst > 0 && worst < (tax.minProfit ?? 1)) ? "too-small"
+               : worst > 0 ? "live" : gross > 0 ? "tax-eaten"
                : prefee > 0 ? "fee-eaten" : "dead" };
   }
 
@@ -346,6 +350,7 @@
       bankroll: Math.max(10, n("#i-bank", 1000)),
       tax: { rate: (n("#i-fed", 24) + n("#i-state", 5)) / 100,
              itemises: $("#i-item").checked, offsets: true,
+             minProfit: (DATA && DATA.min_profit) || 1,
              loss_deduct_pct: (DATA && DATA.tax && DATA.tax.loss_deduct_pct) || 0.9 },
       rf: n("#i-rf", 4) / 100,
       filter: $("#i-min").value, kind: $("#i-kind").value
@@ -478,6 +483,10 @@
     v.append(L.verdict === "unsized"
       ? "One venue does not publish resting depth for this market, so there is no honest "
         + "size for this trade. The figures above assume a fill that may not exist."
+      : L.verdict === "too-small"
+      ? "It clears, but only just: " + money(L.worst) + " is below the threshold where "
+        + "this board calls something a trade. The percentage looks fine because the "
+        + "capital is tiny \u2014 the book ran out before the money did."
       : L.verdict === "no-size"
       ? "The quoted prices cross, but walking both order books there is no quantity at "
         + "which this actually clears \u2014 the second contract costs more than the first, "
@@ -668,6 +677,33 @@
     ].map(r => { const x = [r[0], r[1], r[2]]; x.cls = [null, "num", "dim"]; return x; });
     host.appendChild(table([{ h: "Measured" }, { h: "Count" }, { h: "Meaning" }], rows,
       "Everything the collector has logged"));
+
+    // How long an edge stands, which the per-poll counts cannot show:
+    // six sightings could be one edge lasting half an hour or six flickers.
+    const ep = h.episodes || {};
+    if (ep.total) {
+      const head = el("p", null,
+        ep.total + " separate edges tracked \u00B7 " + ep.open + " still open"
+        + (ep.median_minutes != null
+            ? " \u00B7 the ones that closed lasted " + ep.median_minutes
+              + " minutes at the median, " + ep.longest_minutes + " at the longest"
+            : " \u00B7 none has closed yet, so there is no lifetime to report"));
+      head.style.cssText = "font-size:12.5px;color:var(--ink2);margin:14px 0 9px;";
+      host.appendChild(head);
+      if ((ep.recent || []).length) {
+        const rs = ep.recent.map(e => {
+          const r = [e.label, KIND_LABEL[e.kind] || e.kind, num(e.polls),
+                     e.minutes + " min", money(e.peak_net),
+                     e.open ? "open" : "closed"];
+          r.cls = [null, "dim", null, null, e.peak_net > 0 ? "pos" : "neg",
+                   e.open ? "pos" : "dim"];
+          return r;
+        });
+        host.appendChild(table([{ h: "Edge" }, { h: "Kind" }, { h: "Polls" },
+          { h: "Stood for" }, { h: "Best it reached" }, { h: "Now" }], rs,
+          "Every edge the collector has watched, and how long it lasted"));
+      }
+    }
   }
 
   function renderKpis(stats, inp) {
