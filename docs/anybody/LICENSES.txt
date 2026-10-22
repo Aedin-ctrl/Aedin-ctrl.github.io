@@ -1,0 +1,27 @@
+Anybody — third-party software and model notices
+
+MediaPipe Tasks Vision (@mediapipe/tasks-vision 1.1.1)
+  https://github.com/google-ai-edge/mediapipe — Apache License 2.0
+  Copyright Google LLC. Full text: https://www.apache.org/licenses/LICENSE-2.0
+  Vendored files: vision_bundle.mjs, wasm/vision_wasm_internal.{js,wasm}
+
+MediaPipe Holistic Landmarker model bundle (holistic_landmarker.task, float16, rev 1)
+  https://storage.googleapis.com/mediapipe-models/holistic_landmarker/holistic_landmarker/float16/1/holistic_landmarker.task
+  Published by Google as part of MediaPipe Solutions. The MediaPipe framework and
+  its sample code are Apache-2.0. Google does not publish separate redistribution
+  terms for the .task model bundles themselves; see google-ai-edge/mediapipe
+  issue #6306, which asks for exactly that and was unanswered at the time of
+  writing. The bundle is vendored here unmodified, served from the same origin as
+  the page, and attributed above.
+
+Model provenance
+  The Holistic Landmarker composes BlazePose GHUM (body), MediaPipe Hands, and
+  MediaPipe Face Mesh. Training data provenance is Google's and is not published
+  per-model.
+
+  Note on what is NOT used here: this project deliberately does not ship any model
+  trained on COCO-WholeBody. Those annotations are licensed by SenseTime Research
+  for research and non-commercial use only, which would silently attach a
+  restriction to anyone integrating this library.
+
+Anybody itself is MIT licensed — see LICENSE.

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <!-- Privacy is an enforced property here, not a promise in a README.
+       connect-src 'self' blocks MediaPipe's usage-stats POST to
+       odml.pa.googleapis.com, and there is no other network call after the model
+       loads. Camera frames and pose data never leave the page. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; style-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Anybody — full-body tracking test harness</title>
+  <meta name="description" content="A test harness for full-body pose tracking that does not assume the subject is standing up.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg fill='none' stroke='%235fd0a0' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='6' cy='16' r='3'/%3E%3Cpath d='M10 16h9'/%3E%3Cpath d='M14 16l4-5'/%3E%3Cpath d='M19 16l5-4M19 16l5 4'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="src/harness/style.css">
+  <script type="module" src="src/harness/main.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Anybody</h1>
+    <span class="sub">full-body tracking that doesn&rsquo;t assume you&rsquo;re standing up</span>
+    <span class="spacer"></span>
+    <span class="sub" id="status">Loading&hellip;</span>
+  </header>
+
+  <main>
+    <div>
+      <div class="empty" id="empty">
+        Point it at a camera, or load a video of someone on the floor.<br>
+        Everything runs in this tab &mdash; no frame is uploaded anywhere.
+      </div>
+
+      <div class="stage" id="stage" hidden>
+        <!-- The frame sizes itself to the video's rendered box, so the overlay
+             canvas at inset:0 lines up with the pixels the model actually saw.
+             Letterboxing the video inside a fixed stage would silently offset
+             every landmark. -->
+        <div class="frame" id="frame">
+          <video id="feed" playsinline muted controls></video>
+          <canvas id="overlay"></canvas>
+        </div>
+      </div>
+
+      <div class="bar">
+        <button id="useCamera">Use camera</button>
+        <label class="file">Load video&hellip;<input id="file" type="file" accept="video/*"></label>
+        <span class="gap"></span>
+        <button id="t-skeleton">Skeleton</button>
+        <button id="t-points">Points</button>
+        <button id="t-box">Box</button>
+        <button id="t-face">Face mesh</button>
+        <button id="t-feed">Video</button>
+      </div>
+
+      <div class="bar">
+        <label for="orientation" class="sub">Orientation</label>
+        <select id="orientation">
+          <option value="auto" selected>auto (search 0/90/180/270)</option>
+          <option value="none">none (never rotate)</option>
+          <option value="0">pin 0&deg;</option>
+          <option value="90">pin 90&deg;</option>
+          <option value="180">pin 180&deg;</option>
+          <option value="270">pin 270&deg;</option>
+        </select>
+        <button id="reset">Clear lock</button>
+        <span class="gap"></span>
+        <label for="minScore" class="sub">Min confidence</label>
+        <input id="minScore" type="range" min="0" max="0.95" step="0.05" value="0.3">
+        <output id="minScoreOut" class="sub">0.30</output>
+      </div>
+
+      <div class="bar">
+        <button id="rec" aria-pressed="false">&#9679; Record</button>
+        <button id="saveJson" disabled>Save JSON</button>
+        <button id="saveCsv" disabled>Save CSV</button>
+        <span class="sub" id="recInfo"></span>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <section>
+        <h2>This frame</h2>
+        <dl class="stats" id="stats"></dl>
+        <div class="rot" id="rot"></div>
+        <p class="note">
+          Rotation scores come from the torso and limb joints only, so a model
+          that is confident about a face but lost the legs scores low &mdash;
+          which is the case worth catching.
+        </p>
+      </section>
+
+      <section>
+        <h2>Landmarks</h2>
+        <table id="table">
+          <thead>
+            <tr><th>name</th><th>#</th><th>x</th><th>y</th><th>conf</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <p class="note">
+          Hover the canvas to highlight a point here. The 478 face-mesh points are
+          drawn but not listed. <strong>Confidence is model-specific</strong> and
+          is not comparable with another model&rsquo;s.
+        </p>
+      </section>
+
+      <section>
+        <h2>Reading this honestly</h2>
+        <p class="note">
+          These are coordinates, not clinical measurements. Markerless pose error
+          on good joints is around 10&deg; against lab motion capture, which is
+          the same size as the change a clinician would act on. Use it to see
+          movement, not to score it.
+        </p>
+      </section>
+    </aside>
+  </main>
+
+  <footer>
+    Runs entirely on your device &middot;
+    <a href="LICENSES.txt">Third-party notices</a> &middot;
+    <a href="README.md">Read me</a>
+  </footer>
+</body>
+</html>
