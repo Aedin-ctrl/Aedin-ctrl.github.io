@@ -683,8 +683,7 @@
         <button class="tab-btn" data-tab="news">news</button>
         <button class="tab-btn" data-tab="contact">contact</button>
         <button class="tab-btn" data-tab="links">links</button>
-        <!-- Shown only while the projects tab (or one of these two) is open. -->
-        <button class="tab-btn" data-tab="trading" data-market hidden>trading</button>
+        <!-- Shown only while the projects tab (or arb itself) is open. -->
         <button class="tab-btn" data-tab="arb" data-market hidden>arb</button>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
@@ -1350,7 +1349,6 @@
     '/contact': { type:'panel', panel:'contact' },
     '/links': { type:'panel', panel:'links' },
     '/news': { type:'iframe', src:'news/', title:'News' },
-    '/trading': { type:'iframe', src:'trading/', title:'Trading bot' },
     '/arb': { type:'iframe', src:'arb/', title:'Cross-venue sports arbitrage' },
     '/projects/cal-tracker': { type:'iframe', src:'cal/', title:'Cal Tracker' },
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io', title:'Hallway Marathon event site' },
@@ -1438,10 +1436,10 @@
     syncMarketTabs(tab);
   }
 
-  // trading and arb sit behind projects: they appear when projects is open, stay
-  // while one of them is open so it can be clicked, and go away on any other tab.
+  // arb sits behind projects: it appears when projects is open, stays while it
+  // is itself open so it can be clicked, and goes away on any other tab.
   const marketTabs = [...document.querySelectorAll('.tab-btn[data-market]')];
-  const MARKET_HOSTS = new Set(['projects', 'trading', 'arb']);
+  const MARKET_HOSTS = new Set(['projects', 'arb']);
   function syncMarketTabs(tab){
     const show = MARKET_HOSTS.has(tab);
     marketTabs.forEach(b => { b.hidden = !show; });
