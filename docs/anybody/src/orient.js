@@ -16,6 +16,15 @@
 // Caching is only an optimisation. `recheckEvery` bounds how long a confidently
 // wrong lock can survive, which is the one way brute force could still latch.
 //
+// MEASURED CAVEAT -- the passes are not as independent as this design assumes.
+// MediaPipe's HolisticLandmarker carries state between detect() calls even in
+// IMAGE mode. On fixtures/prone90.jpg the same image yields 33 landmarks from a
+// fresh landmarker and ZERO immediately after a different image was processed.
+// So each rotation in a search is influenced by the one before it, and the four
+// scores are not strictly comparable. In practice the signal that matters is
+// coarse -- detection either works or returns nothing at all -- which survives
+// the contamination. Finer comparisons between rotations do not; see README.
+//
 // Note what rotation does and does not buy you: it is an IN-PLANE transform. It
 // addresses a model trained on upright bodies. It does nothing for foreshortening,
 // self-occlusion, or out-of-plane rotation, which are different problems.

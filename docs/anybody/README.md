@@ -115,7 +115,9 @@ from the hip midpoint in a proper orthogonal frame.
 
 ### The `runningMode` caveat
 
-Defaults to `IMAGE`, which runs the detector on every frame independently.
+Defaults to `IMAGE`, which runs the detector on every frame — though not as
+independently as the name suggests; see "MediaPipe IMAGE mode is not stateless"
+below.
 `VIDEO` is faster — it tracks a region of interest forward and only re-runs the
 detector on track loss — but that means **a frame the detector would fail on
 alone gets rescued by its predecessor**, which hides exactly the failures this
@@ -176,14 +178,64 @@ intentional version bump. The model URL is pinned to revision `1`, not `latest`,
 because a silent upstream reweight would change every number this reports with
 nothing in the diff to show it.
 
-### Status
+---
 
-Version 0.1. The pipeline is tested end to end; **detection quality on real
-non-upright footage has not been measured yet.** The failure literature cited
-above is about OpenPose, YOLO26 and a bench-press study — not about this model.
-Whether the rotation search is worth its cost here is an open question, and the
-harness exists to answer it. If it turns out MediaPipe handles floor work fine on
-its own, that's a good result and should be written down.
+## What has actually been measured
+
+Version 0.1. Measured on `fixtures/`, which is four images — small, so treat
+these as findings that justify more testing, not as settled numbers.
+
+### The rotation search earns its keep, decisively
+
+On `prone90.jpg` (a person lying on the floor, shot in portrait):
+
+| orientation | result |
+|---|---|
+| `none` / pinned 0° / pinned 180° | **nothing. 0 landmarks.** |
+| pinned 90° / pinned 270° | body + both hands, 75 landmarks |
+
+The difference is not degraded accuracy, it is total detection failure versus
+working. An earlier draft of this README was about to conclude the opposite from
+the upright yoga fixture alone, where all four rotations perform identically. One
+more fixture overturned it.
+
+### Confidence does not tell you when the pose is wrong
+
+On `prone.jpg`, detected directly, the hip-knee-ankle chain lands in empty floor
+several body-widths from her actual legs. The same person detected via
+`prone90.jpg` and un-rotated lands correctly. Mean disagreement between the two
+is **0.139 of the frame, with a worst joint at 0.728**.
+
+Both report a confidence of **~0.80**.
+
+So the search can catch "the model found nothing", and cannot catch "the model
+found something confidently wrong". If you need the second, you need a check this
+library does not have — bilateral bone-length symmetry was tried and did not
+separate the two cases.
+
+### MediaPipe IMAGE mode is not stateless
+
+This one is worth knowing about whatever you build on. The same image, through
+the same landmarker, gives different answers depending on what was processed
+immediately before it:
+
+| call history | landmarks found on `prone90.jpg` |
+|---|---|
+| fresh landmarker | 33 |
+| the same image twice | 33, identical |
+| **straight after a different image** | **0** |
+| after a four-rotation search | 33 |
+
+Google's docs present IMAGE mode as per-image. It is not. The practical
+consequences: results are reproducible only for a fixed call order, and the four
+passes of a rotation search influence each other, so their scores are not
+strictly comparable. The coarse signal — found something versus found nothing —
+survives this. Fine-grained comparison between rotations does not.
+
+### Still not measured
+
+Real video of real rehab movement, with a moving subject, motion blur, clothing,
+and a camera that is not a studio. Everything above is still images.
 
 ## Licence
 
