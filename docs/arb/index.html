@@ -75,6 +75,7 @@
   .foot-row b{font-weight:600; color:var(--ink);}
   .risk{color:var(--warn);}
   .working{margin-top:6px; font-size:11.5px; color:var(--muted);}
+  .thin{margin-top:7px; font-size:11.5px; color:var(--warn);}
 
   .empty{padding:30px 18px; text-align:center; color:var(--muted); font-size:13.5px;
          border:1px dashed var(--rule); border-radius:12px; background:var(--card);}
@@ -107,6 +108,23 @@
   <nav class="pills" id="pills" aria-label="Filter by when the bet closes"></nav>
 
   <div id="board"></div>
+
+  <h2>Before you act on one of these</h2>
+  <p class="note"><b>Once both legs are filled you are safe</b> — exactly one pays out, so the
+    total is fixed and later price moves cannot touch it. That only holds if you hold to
+    settlement, which for most rows here is mid-2027; selling early means selling at whatever
+    the market is then.</p>
+  <p class="note"><b>Between the two fills you are not safe</b>, and that is where the money is
+    actually lost. There is no atomic order across two venues: you place one, then the other.
+    Both quote in whole cents, so a single tick is 1&percnt; of the payout — <b>larger than most
+    of the edges on this board</b>. If the second venue moves one cent while you are getting
+    there, you either hold one naked leg, which is an outright bet on a team, or you complete at
+    a worse price and lose more than the arbitrage was worth.</p>
+  <p class="note">These rows are also short-lived: measured over the collector's whole log,
+    <b>53&percnt; of them are gone within one poll</b> and the median lifetime is under a minute.
+    A card that has been standing for several polls is a far better prospect than one first seen
+    this poll, and each card says which it is. None of this is priced into the figures above —
+    they assume both legs fill at the quoted price, instantly.</p>
 
   <h2>Reading a card</h2>
   <p class="note">The big number is what the bet <b>returns after everything</b>. Underneath each
@@ -199,6 +217,16 @@
     const taxOut = (L.outcomes || []).filter(o => !o.divergence);
     const taxPct = taxOut.length && L.payout_total
       ? taxOut.reduce((a, o) => a + o.tax, 0) / taxOut.length / L.payout_total : 0;
+    // One tick is a whole cent on both venues. An edge thinner than that
+    // cannot survive either leg moving once while the other is being placed.
+    // Flagged per card only when it is notably worse than a tick: at this
+    // board's typical edge the warning is true of everything, so it belongs
+    // in the summary rather than repeated fifteen times.
+    if (L.net_edge > 0 && 0.01 / L.net_edge >= 2) {
+      c.appendChild(el("div", "thin",
+        "A 1\u00A2 move on either leg is " + Math.round(0.01 / L.net_edge)
+        + "\u00D7 this edge."));
+    }
     c.appendChild(el("div", "working",
       pct(r.gross_edge) + " gap − " + (L.fee_pct_of_payout * 100).toFixed(2)
       + "% fee − " + (taxPct * 100).toFixed(2) + "% tax"));
@@ -228,10 +256,17 @@
       s.appendChild(el("div", "headline", rows.length + " bet" + (rows.length === 1 ? "" : "s")
         + " clear fees and tax, best " + pct(top.ledger.net_edge) + "."));
       const beats = rows.filter(r => r.ledger.beats_cash).length;
-      s.appendChild(el("p", null, beats
-        ? beats + " of them beat leaving the money in cash."
-        : "None beats leaving the money in cash. They are long-dated title futures returning "
-          + "about 1% a year, and each risks its whole stake to win a few dollars."));
+      const thin = rows.filter(r => r.ledger.net_edge < 0.01).length;
+      let msg = beats
+        ? beats + " of them beat leaving the money in cash. "
+        : "None beats leaving the money in cash, and each risks its whole stake to win a few "
+          + "dollars. ";
+      if (thin) {
+        msg += (thin === rows.length ? "Every one" : thin + " of them")
+          + " is thinner than a single price tick: both venues quote in whole cents, so one "
+          + "cent of movement on either leg while you place the other wipes out the trade.";
+      }
+      s.appendChild(el("p", null, msg));
     }
 
     const host = $("#board"); host.textContent = "";
