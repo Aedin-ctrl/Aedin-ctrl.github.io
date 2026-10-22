@@ -683,8 +683,9 @@
         <button class="tab-btn" data-tab="news">news</button>
         <button class="tab-btn" data-tab="contact">contact</button>
         <button class="tab-btn" data-tab="links">links</button>
-        <button class="tab-btn" data-tab="trading">trading</button>
-        <button class="tab-btn" data-tab="arb">arb</button>
+        <!-- Shown only while the projects tab (or one of these two) is open. -->
+        <button class="tab-btn" data-tab="trading" data-market hidden>trading</button>
+        <button class="tab-btn" data-tab="arb" data-market hidden>arb</button>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
           <button class="tab-btn" data-tab="secret_projects" data-route="/secret_projects">secret projects</button>
@@ -1434,6 +1435,16 @@
   function highlightTab(path){
     const tab = path === '/' ? 'general' : path.startsWith('/secret_projects/devices') ? 'devices' : path.split('/')[1];
     buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    syncMarketTabs(tab);
+  }
+
+  // trading and arb sit behind projects: they appear when projects is open, stay
+  // while one of them is open so it can be clicked, and go away on any other tab.
+  const marketTabs = [...document.querySelectorAll('.tab-btn[data-market]')];
+  const MARKET_HOSTS = new Set(['projects', 'trading', 'arb']);
+  function syncMarketTabs(tab){
+    const show = MARKET_HOSTS.has(tab);
+    marketTabs.forEach(b => { b.hidden = !show; });
   }
 
   function showPanel(id){
@@ -1862,6 +1873,7 @@
     addressInput.value = displayValue(currentPath);
     browserEl.classList.remove('minimized');
     buttons.forEach(b => b.classList.remove('active'));
+    syncMarketTabs('shared');
     showPanel('shared-project');
     return true;
   }
