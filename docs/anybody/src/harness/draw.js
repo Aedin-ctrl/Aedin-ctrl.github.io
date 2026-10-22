@@ -10,18 +10,44 @@ import { BODY_EDGES, HAND_EDGES, sideOf } from '../schema.js';
 
 const EDGES = { body: BODY_EDGES, leftHand: HAND_EDGES, rightHand: HAND_EDGES };
 
-/** Read the CSS custom properties so the overlay follows the page theme. */
-export function readTheme(el = document.documentElement) {
-  const s = getComputedStyle(el);
-  const v = (n, f) => (s.getPropertyValue(n) || f).trim();
-  return {
+/**
+ * Read the theme colours as something canvas can actually use.
+ *
+ * getComputedStyle().getPropertyValue('--x') returns the custom property's
+ * *unresolved* token. For a token defined with light-dark() that is the literal
+ * string "light-dark(#5a5a62, #b0b0ba)", which every canvas colour parser
+ * rejects — and createLinearGradient().addColorStop() throws on it, taking the
+ * whole frame down with it.
+ *
+ * So resolve each one through a probe element's `color`, which the engine
+ * computes down to an rgb() triple regardless of how it was written.
+ */
+export function readTheme(root = document.documentElement) {
+  const probe = document.createElement('span');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.position = 'absolute';
+  probe.style.opacity = '0';
+  probe.style.pointerEvents = 'none';
+  (document.body ?? root).append(probe);
+
+  const v = (name, fallback) => {
+    probe.style.color = fallback;
+    probe.style.color = `var(${name}, ${fallback})`;
+    const c = getComputedStyle(probe).color;
+    // An unparseable value leaves `color` at the fallback we set first.
+    return c && c !== 'rgba(0, 0, 0, 0)' ? c : fallback;
+  };
+
+  const theme = {
     left: v('--left', '#e8903a'),
     right: v('--right', '#3aa0e8'),
-    centre: v('--centre', '#888'),
+    centre: v('--centre', '#888888'),
     accent: v('--accent', '#5fd0a0'),
-    ink: v('--ink', '#eee'),
+    ink: v('--ink', '#eeeeee'),
     panel: v('--panel', '#1c1c20'),
   };
+  probe.remove();
+  return theme;
 }
 
 const colourFor = (p, theme) => {
@@ -88,10 +114,14 @@ export function drawResult(ctx, result, opts) {
         if (ca === cb) {
           ctx.strokeStyle = ca;
         } else {
-          const g = ctx.createLinearGradient(X(pa), Y(pa), X(pb), Y(pb));
-          g.addColorStop(0, ca);
-          g.addColorStop(1, cb);
-          ctx.strokeStyle = g;
+          try {
+            const g = ctx.createLinearGradient(X(pa), Y(pa), X(pb), Y(pb));
+            g.addColorStop(0, ca);
+            g.addColorStop(1, cb);
+            ctx.strokeStyle = g;
+          } catch {
+            ctx.strokeStyle = ca; // a colour we cannot parse is not worth a dead frame
+          }
         }
         ctx.beginPath();
         ctx.moveTo(X(pa), Y(pa));

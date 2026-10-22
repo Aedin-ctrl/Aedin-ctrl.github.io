@@ -73,16 +73,16 @@ export async function createTracker({
       const t0 = performance.now();
       let inferenceMs = 0;
       let passes = 0;
-      let lastFound = {};
-      let lastWorld = null;
+      // Keyed by rotation, because a search runs the backend four times and the
+      // answer we keep belongs to the winner — not to whichever ran last.
+      const perRotation = new Map();
 
       const run = async (deg) => {
         const a = performance.now();
-        const { points, found, world } = impl.run(source, deg, timestampMs + passes);
+        const { points, world } = impl.run(source, deg, timestampMs + passes);
         inferenceMs += performance.now() - a;
         passes++;
-        lastFound = found;
-        lastWorld = world;
+        perRotation.set(deg, { world });
         return points;
       };
 
@@ -98,10 +98,11 @@ export async function createTracker({
 
       const out = emptyResult({ modelId: impl.id, modelRevision: impl.revision });
       out.points = points;
-      for (const [part, ok] of Object.entries(lastFound)) {
-        if (ok) out.parts[part] = points.filter((p) => p.part === part);
-      }
-      out.world = lastWorld;
+      // Parts are derived from the points themselves, so the two can never
+      // disagree about what was found. Points arrive in landmark order within a
+      // part, so the array index is the landmark index.
+      for (const p of points) (out.parts[p.part] ??= []).push(p);
+      out.world = perRotation.get(picked.rotation)?.world ?? null;
       out.box = boxOf(points);
       out.orientation = {
         applied: picked.rotation,
