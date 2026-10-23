@@ -110,18 +110,29 @@
   .paper svg{display:block; width:clamp(70px,10vw,120px); height:24px;}
   .paper .warn{color:var(--bad); font-weight:600;}
   .paper .sim{color:var(--muted); white-space:nowrap;}
+
+  /* Real money in each venue, and 24h of it. */
+  .money{border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px;}
+  .money[hidden]{display:none;}
+  .money .nums{display:flex; align-items:baseline; gap:clamp(14px,4vw,34px); flex-wrap:wrap;}
+  .money .big{font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:600;
+              letter-spacing:-0.02em; line-height:1;}
+  .money .lab{font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+              color:var(--muted); display:block; margin-bottom:3px;}
+  .money .v{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
+  .money .up{color:var(--good);} .money .down{color:var(--bad);}
+  .money .k{color:#2d5d8a;} .money .p{color:#8a5a2d;}
+  .money svg{display:block; width:100%; height:80px; margin-top:12px;}
+  .money .key{display:flex; gap:16px; font-size:11px; color:var(--muted); margin-top:5px;}
+  .money .key i{display:inline-block; width:14px; height:2px; vertical-align:middle;
+                margin-right:5px; border-radius:2px;}
+  .money .none{font-size:12.5px; color:var(--muted);}
+  .age{font-size:11.5px; color:var(--muted); margin-top:9px;}
 </style>
 </head>
 <body>
 <aside class="paper" id="paper" hidden></aside>
 <main>
-  <div class="top">
-    <h1>Cross-venue sports arbitrage</h1>
-    <span class="stamp" id="stamp">loading</span>
-  </div>
-  <p class="lede">The same contract priced on Kalshi and Polymarket at once. Only bets that still
-    make money once fees and tax come out.</p>
-
   <div class="summary" id="summary"></div>
 
   <nav class="pills" id="pills" aria-label="Filter by when the bet closes"></nav>
@@ -259,6 +270,7 @@
       .slice().sort((a, b) => b.ledger.net_edge - a.ledger.net_edge);
 
     const s = $("#summary"); s.textContent = "";
+    const money = el("div", "money"); money.id = "money"; s.appendChild(money);
     const rec = d.recent || {};
     const crossed = Object.values(rec.crossed || {}).reduce((a, b) => a + b, 0);
 
@@ -348,13 +360,89 @@
     lines.forEach(x => f.appendChild(el("p", null, x)));
     if (d.updated) {
       const mins = (Date.now() - new Date(d.updated).getTime()) / 6e4;
-      $("#stamp").textContent = "updated " + (mins < 90 ? Math.round(mins) + " min"
-        : Math.round(mins / 60) + " h") + " ago";
+      f.appendChild(el("p", "age", "board updated "
+        + (mins < 90 ? Math.round(mins) + " min" : Math.round(mins / 60) + " h") + " ago"));
     }
   }
 
   // Paper account card. Carried in the feed by the collector; absent when
   // no paper run exists, and then nothing is drawn.
+  // Real money in each venue, with 24h of history. Served separately from
+  // the board because it is tracked on its own cadence, and absent
+  // entirely until an account is actually connected.
+  function renderMoney(b) {
+    const box = document.getElementById("money");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!b || b.total === undefined || b.total === null) {
+      box.appendChild(el("div", "none",
+        "No account connected yet \u2014 showing the board only."));
+      return;
+    }
+    const up = (b.change_24h || 0) >= 0;
+    const nums = el("div", "nums");
+    const mk = (label, val, cls) => {
+      const d = el("div");
+      d.appendChild(el("span", "lab", label));
+      d.appendChild(el("span", cls || "v",
+        val === null || val === undefined ? "\u2014" : "$" + val.toFixed(2)));
+      return d;
+    };
+    const tot = el("div");
+    tot.appendChild(el("span", "lab", "total across both"));
+    tot.appendChild(el("span", "big", "$" + b.total.toFixed(2)));
+    nums.appendChild(tot);
+    nums.appendChild(mk("kalshi", b.kalshi, "v k"));
+    nums.appendChild(mk("polymarket", b.polymarket, "v p"));
+    const ch = el("div");
+    ch.appendChild(el("span", "lab", "24 hours"));
+    ch.appendChild(el("span", "v " + (up ? "up" : "down"),
+      (up ? "+" : "\u2212") + "$" + Math.abs(b.change_24h || 0).toFixed(2)));
+    nums.appendChild(ch);
+    box.appendChild(nums);
+
+    const c = b.curve || [];
+    if (c.length < 2) return;
+    const W = 700, H = 80, PAD = 2;
+    const vals = [];
+    c.forEach(r => ["total", "kalshi", "polymarket"].forEach(k => {
+      if (r[k] !== null && r[k] !== undefined) vals.push(r[k]);
+    }));
+    const lo = Math.min(...vals), hi = Math.max(...vals), span = (hi - lo) || 1;
+    const x = i => (i * W) / (c.length - 1);
+    const y = v => PAD + (H - 2 * PAD) * (1 - (v - lo) / span);
+    const line = (k) => {
+      let d = "", pen = false;
+      c.forEach((r, i) => {
+        const v = r[k];
+        if (v === null || v === undefined) { pen = false; return; }
+        d += (pen ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1) + " ";
+        pen = true;
+      });
+      return d.trim();
+    };
+    const svg = ['<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">'];
+    [["polymarket", "#8a5a2d", 1.4], ["kalshi", "#2d5d8a", 1.4],
+     ["total", "var(--ink)", 2]].forEach(([k, col, w]) => {
+      const d = line(k);
+      if (d) svg.push('<path d="' + d + '" fill="none" stroke="' + col +
+                      '" stroke-width="' + w + '" stroke-linejoin="round"/>');
+    });
+    svg.push("</svg>");
+    box.insertAdjacentHTML("beforeend", svg.join(""));
+    box.insertAdjacentHTML("beforeend",
+      '<div class="key"><span><i style="background:var(--ink)"></i>total</span>' +
+      '<span><i style="background:#2d5d8a"></i>kalshi</span>' +
+      '<span><i style="background:#8a5a2d"></i>polymarket</span></div>');
+  }
+
+  function refreshMoney() {
+    fetch(LIVE + "/balances.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(renderMoney)
+      .catch(() => renderMoney(null));
+  }
+
   function paperCard(d) {
     const p = d.paper, box = $("#paper");
     if (!p || !box) return;
@@ -427,11 +515,11 @@
       d.venueName = {};
       (d.venues || []).forEach(v => { d.venueName[v.key] = v.name; });
       pills(d); render(d, "all"); foot(d); paperCard(d);
-      refreshPaper();
+      refreshPaper(); refreshMoney();
       setInterval(refreshPaper, 20000);
+      setInterval(refreshMoney, 60000);
     })
     .catch(e => {
-      $("#stamp").textContent = "no data";
       $("#summary").appendChild(el("div", "headline", "Could not load the price feed."));
       $("#summary").appendChild(el("p", null, e.message));
     });
