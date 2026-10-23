@@ -365,8 +365,11 @@
     box.innerHTML = "";
     const pair = el("div", "pair");
     pair.appendChild(el("span", "tag", "paper account"));
+    const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
     pair.appendChild(el("span", "big " + (up ? "up" : "down"),
-                        sign + "$" + Math.abs(p.pnl).toFixed(2)));
+                        sign + Math.abs(pctMove).toFixed(2) + "%"));
+    pair.appendChild(el("span", up ? "up" : "down",
+                        "(" + sign + "$" + Math.abs(p.pnl).toFixed(2) + ")"));
     box.appendChild(pair);
     box.appendChild(el("span", null,
       "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
@@ -392,7 +395,7 @@
       box.appendChild(el("span", null,
         (age < 90 ? age + "s" : Math.round(age / 60) + " min") + " ago \u00b7 every 60s"));
     }
-    box.appendChild(el("span", "sim", "simulated"));
+    box.appendChild(el("span", "sim", "simulated \u00b7 no order ever placed"));
   }
 
   function renderMoney(b) {
@@ -401,7 +404,8 @@
     box.innerHTML = "";
     if (!b || b.total === undefined || b.total === null) {
       box.appendChild(el("div", "none",
-        "No balance data yet \u2014 showing the board only."));
+        "No account connected \u2014 add a Polymarket address or Kalshi key "
+        + "to show real balances here."));
       return;
     }
     const up = (b.change_24h || 0) >= 0;
