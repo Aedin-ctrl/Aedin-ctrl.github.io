@@ -349,65 +349,41 @@
     const p = d.paper, box = $("#paper");
     if (!p || !box) return;
     box.hidden = false;
-    const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
-    const pts = (p.curve || []).map(r => r[1]);
-    // One settled trade is a dot, not a line: start from the stake so the
-    // bar never implies a trend it does not have.
-    if (pts.length < 2) pts.unshift(p.staked);
-    const lo = Math.min(...pts, p.staked), hi = Math.max(...pts, p.staked);
-    const span = (hi - lo) || 1, W = 190, H = 26;
-    const xy = pts.map((v, i) => [i * W / (pts.length - 1),
-                                  H - ((v - lo) / span) * H]);
-    const path = xy.map((c, i) => (i ? "L" : "M") + c[0].toFixed(1) + " " + c[1].toFixed(1)).join(" ");
-    const zeroY = H - ((p.staked - lo) / span) * H;
-    const col = up ? "var(--good)" : "var(--bad)";
-
     box.innerHTML = "";
+    const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
+    const cash = p.cash || {};
+    const atRisk = Math.max(0, p.equity - ((cash.kalshi || 0) + (cash.polymarket || 0)));
+    const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
+
     const pair = el("div", "pair");
     pair.appendChild(el("span", "tag", "paper account"));
-    const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
     pair.appendChild(el("span", "big " + (up ? "up" : "down"),
                         sign + Math.abs(pctMove).toFixed(2) + "%"));
     pair.appendChild(el("span", up ? "up" : "down",
                         "(" + sign + "$" + Math.abs(p.pnl).toFixed(2) + ")"));
     box.appendChild(pair);
+
     box.appendChild(el("span", null,
       "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
-    // Per-venue, because one wallet starving is what actually stops the
-    // account trading -- the total hides it completely.
-    const cash = p.cash || {};
-    if (cash.kalshi !== undefined || cash.polymarket !== undefined) {
-      const k = cash.kalshi, pm = cash.polymarket;
-      const locked = p.equity - ((k || 0) + (pm || 0));
-      box.appendChild(el("span", null,
-        "kalshi $" + (k === undefined ? "\u2014" : k.toFixed(2))
-        + " \u00b7 poly $" + (pm === undefined ? "\u2014" : pm.toFixed(2))
-        + (locked > 0.005 ? " \u00b7 in play $" + locked.toFixed(2) : "")));
-    }
-    box.insertAdjacentHTML("beforeend",
-      '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
-      '<line x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + W + '" y2="' + zeroY.toFixed(1) +
-      '" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 3"/>' +
-      '<path d="' + path + '" fill="none" stroke="' + col +
-      '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>');
+    // Per venue, because one wallet starving is what stops the account
+    // trading and the total hides it completely.
+    box.appendChild(el("span", null,
+      "kalshi $" + (cash.kalshi === undefined ? "\u2014" : cash.kalshi.toFixed(2))
+      + " \u00b7 poly $" + (cash.polymarket === undefined ? "\u2014" : cash.polymarket.toFixed(2))));
+    box.appendChild(el("span", atRisk > 0.005 ? "v" : null,
+      "$" + atRisk.toFixed(2) + " bet right now"));
     box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
-    const srcs = Object.entries(p.by_source || {});
-    if (srcs.length > 1) {
-      box.appendChild(el("span", null, srcs
-        .map(([k, v]) => k + " " + (v.pnl >= 0 ? "+" : "\u2212") + "$" + Math.abs(v.pnl).toFixed(2))
-        .join(" \u00b7 ")));
-    }
-    // The number this whole exercise exists to find: both legs lost, so the
-    // two venues disagreed and the entire stake went.
+    // The number this whole exercise exists to find: both legs lost, so
+    // the two venues disagreed and the entire stake went.
     box.appendChild(el("span", p.diverged ? "warn" : null,
       p.diverged ? p.diverged + " settled differently" : "0 disagreements"));
     if (p.as_of) {
       const age = Math.max(0, Math.round((Date.now() - new Date(p.as_of).getTime()) / 1000));
       box.appendChild(el("span", null,
-        (age < 90 ? age + "s" : Math.round(age / 60) + " min") + " ago \u00b7 every 60s"));
+        (age < 90 ? age + "s" : Math.round(age / 60) + " min") + " ago"));
     }
-    box.appendChild(el("span", "sim", "simulated \u00b7 no order ever placed"));
   }
+
 
   function renderMoney(b) {
     const box = document.getElementById("money");
