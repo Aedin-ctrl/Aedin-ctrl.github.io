@@ -107,10 +107,9 @@
               letter-spacing:-0.02em; line-height:1;}
   .paper .up{color:var(--good);} .paper .down{color:var(--bad);}
   .paper .pair{display:flex; align-items:baseline; gap:8px;}
-  .paper svg{display:block; width:clamp(90px,16vw,190px); height:26px;}
+  .paper svg{display:block; width:clamp(70px,10vw,120px); height:24px;}
   .paper .warn{color:var(--bad); font-weight:600;}
-  .paper .sim{margin-left:auto; color:var(--muted); white-space:nowrap;}
-  @media (max-width:640px){ .paper .sim{margin-left:0;} }
+  .paper .sim{color:var(--muted); white-space:nowrap;}
 </style>
 </head>
 <body>
@@ -388,23 +387,48 @@
       '<path d="' + path + '" fill="none" stroke="' + col +
       '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>');
     box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
-    const src = Object.entries(p.by_source || {})
-      .map(([k, v]) => k + " " + (v.pnl >= 0 ? "+" : "\u2212") + "$" + Math.abs(v.pnl).toFixed(2))
-      .join(" \u00b7 ");
-    if (src) box.appendChild(el("span", null, src));
+    const srcs = Object.entries(p.by_source || {});
+    if (srcs.length > 1) {
+      box.appendChild(el("span", null, srcs
+        .map(([k, v]) => k + " " + (v.pnl >= 0 ? "+" : "\u2212") + "$" + Math.abs(v.pnl).toFixed(2))
+        .join(" \u00b7 ")));
+    }
     // The number this whole exercise exists to find: both legs lost, so the
     // two venues disagreed and the entire stake went.
     box.appendChild(el("span", p.diverged ? "warn" : null,
-      p.diverged ? p.diverged + " settled differently" : "no venue disagreements"));
-    box.appendChild(el("span", "sim", "simulated \u00b7 nothing is placed"));
+      p.diverged ? p.diverged + " settled differently" : "0 disagreements"));
+    if (p.as_of) {
+      const age = Math.max(0, Math.round((Date.now() - new Date(p.as_of).getTime()) / 1000));
+      box.appendChild(el("span", null,
+        (age < 90 ? age + "s" : Math.round(age / 60) + " min") + " ago \u00b7 every 60s"));
+    }
+    box.appendChild(el("span", "sim", "simulated"));
   }
 
-  fetch("index.json", { cache: "no-store" })
+  // The board's own feed moves every five minutes; the paper account is
+  // republished every minute by the trader itself, so the bar reads that
+  // directly and refreshes on its own without re-pulling the whole board.
+  const LIVE = "https://arb.aedinlai.com";
+  function refreshPaper() {
+    fetch(LIVE + "/paper.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(p => { if (p) paperCard({ paper: p }); })
+      .catch(() => {});
+  }
+
+  // The Pi serves the feed directly, which is minutes fresher than waiting
+  // for a commit to rebuild on Pages. The committed snapshot stays as the
+  // fallback for when the Pi is unreachable.
+  fetch(LIVE + "/index.json", { cache: "no-store" })
+    .then(r => r.ok ? r : Promise.reject(new Error("live " + r.status)))
+    .catch(() => fetch("index.json", { cache: "no-store" }))
     .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
     .then(d => {
       d.venueName = {};
       (d.venues || []).forEach(v => { d.venueName[v.key] = v.name; });
       pills(d); render(d, "all"); foot(d); paperCard(d);
+      refreshPaper();
+      setInterval(refreshPaper, 20000);
     })
     .catch(e => {
       $("#stamp").textContent = "no data";
