@@ -29,6 +29,9 @@
   --left: #e8903a;
   --right: #3aa0e8;
   --centre: light-dark(#5a5a62, #b0b0ba);
+  /* The runner-up pose. Deliberately a hue used nowhere else, so it can never
+     be mistaken for a left or right limb. */
+  --ghost: #b06cf0;
 
   color-scheme: light dark;
   accent-color: var(--accent);
@@ -179,6 +182,7 @@ tbody tr td.dot::before {
 .note strong { color: var(--muted); font-weight: 600; }
 
 .warn { color: var(--warn); }
+.faint { color: var(--faint); }
 
 footer {
   padding: 16px; border-top: 1px solid var(--line);

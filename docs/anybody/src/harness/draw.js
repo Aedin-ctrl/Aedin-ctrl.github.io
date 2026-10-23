@@ -43,6 +43,8 @@ export function readTheme(root = document.documentElement) {
     right: v('--right', '#3aa0e8'),
     centre: v('--centre', '#888888'),
     accent: v('--accent', '#5fd0a0'),
+    warn: v('--warn', '#ffb267'),
+    ghost: v('--ghost', '#b06cf0'),
     ink: v('--ink', '#eeeeee'),
     panel: v('--panel', '#1c1c20'),
   };
@@ -94,6 +96,31 @@ export function drawResult(ctx, result, opts) {
       ctx.fillRect(X(p) - 0.5, Y(p) - 0.5, 1.2, 1.2);
     }
     ctx.globalAlpha = 1;
+  }
+
+  // --- the runner-up rotation, drawn as a ghost.
+  // The model cannot tell you when it is confidently wrong, and nor can this
+  // harness. What it CAN do is show you the other pose the model was equally
+  // happy with. When the ghost sits on the subject the two agree and there is
+  // nothing to worry about; when it sprawls across empty floor, you can see at
+  // a glance that the confidence number is meaningless on this frame.
+  if (show.ghost && result.rival?.body?.length) {
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    ctx.strokeStyle = theme.ghost;
+    ctx.lineWidth = 1.8;
+    ctx.setLineDash([4, 3]);
+    const g = result.rival.body;
+    for (const [a, b] of BODY_EDGES) {
+      const pa = g[a];
+      const pb = g[b];
+      if (!pa || !pb || pa.score < minScore || pb.score < minScore) continue;
+      ctx.beginPath();
+      ctx.moveTo(X(pa), Y(pa));
+      ctx.lineTo(X(pb), Y(pb));
+      ctx.stroke();
+    }
+    ctx.restore();
   }
 
   // --- skeleton

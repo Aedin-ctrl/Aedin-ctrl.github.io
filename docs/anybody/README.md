@@ -65,11 +65,11 @@ for (const p of result.parts.body ?? []) {
 | option | default | meaning |
 |---|---|---|
 | `orientation` | `'auto'` | `'auto'` searches the four quarter turns. `'none'` never rotates. A literal `0`/`90`/`180`/`270` pins one. |
-| `parts` | all four | `'body'`, `'leftHand'`, `'rightHand'`, `'face'` |
+| `parts` | body + both hands | `'body'`, `'leftHand'`, `'rightHand'`, `'face'`. The face **mesh** is off by default: 478 of 553 points, the least useful for movement and the most identifying |
 | `runningMode` | `'IMAGE'` | `'VIDEO'` is faster but see the caveat below |
-| `keepAbove` | `0.5` | a cached rotation is trusted while it scores above this |
-| `margin` | `0.08` | a challenger rotation must beat the incumbent by this to switch |
-| `recheckEvery` | `150` | forced full search, so a confidently wrong lock cannot persist |
+| `keepAbove` | `0.5` | a cached rotation is kept while it scores above this. Note this means "still finding something", not "still right" |
+| `recheckEvery` | `150` | forced full search, bounding how long one rotation is kept unexamined |
+| `cooldown` | `15` | frames to wait after a search that changed nothing, so low confidence cannot pin the frame rate at its worst value |
 
 **If you know how the camera is mounted, pin the rotation.** It is faster and
 more reliable than any amount of inference.
@@ -84,6 +84,8 @@ more reliable than any amount of inference.
   parts: { body: [...], leftHand: [...] },   // only what was actually found
   points: [ { part, index, name, x, y, z, score, present } ],
   world: [ { index, name, x, y, z } ] | null, // metres from the hip midpoint
+  agreement: { disagreement, rotation, score } | null,  // see "a second opinion"
+  rival: { rotation, score, points, body } | null,      // the runner-up pose
   box: { x, y, w, h } | null,
   orientation: { applied, score, searched, scores },
   timings: { totalMs, inferenceMs, passes },
@@ -186,10 +188,21 @@ never think to look.
 ```sh
 npm install
 npm run vendor      # copy the runtime, download the model, verify hashes
-npm test            # unit tests
+npm test            # unit tests (50)
+npm run test:e2e    # browser test: starts its own server, needs Chrome
+npm run test:all    # both
 npm run serve       # http://localhost:5173
-node tests/e2e.mjs  # browser smoke test (needs Chrome)
 ```
+
+`npm run test:e2e` loads a clip with a person in it and asserts landmarks, table
+rows and non-blank canvas pixels, because the two worst bugs this project has
+shipped both rendered an empty page while every unit test stayed green. It is
+part of `scripts/deploy-site.sh`, which also re-verifies the SHA-256 of the
+**copied** vendor files rather than only the source tree.
+
+`tests/measure/` holds the pages that produced the numbers in "What has actually
+been measured" — open them in a browser with a real GPU, since headless Chrome
+falls back to a software rasteriser and roughly doubles the frame times.
 
 `vendor/HASHES.json` pins every vendored file by SHA-256. `npm run vendor` fails
 if anything changed underneath you; `npm run vendor -- --update` re-pins after an
@@ -217,6 +230,30 @@ The difference is not degraded accuracy, it is total detection failure versus
 working. An earlier draft of this README was about to conclude the opposite from
 the upright yoga fixture alone, where all four rotations perform identically. One
 more fixture overturned it.
+
+### What to do about it: a second opinion you can see
+
+Since no number distinguishes a correct pose from a confidently wrong one, the
+library stops pretending and shows you the disagreement instead.
+
+When a rotation search runs and more than one rotation returns a body, the
+result carries the runner-up:
+
+```js
+result.agreement  // { disagreement, rotation, score } — or null
+result.rival      // the runner-up pose, in source coordinates
+```
+
+`disagreement` is the mean distance between the two poses over the torso and
+limb joints, in frame widths. On the prone fixture it is **0.139** while both
+poses report confidence around 0.80. It is a warning, not a selector: tested as
+a selector it picks the wrong one.
+
+The harness draws the runner-up as a violet dashed skeleton (the **2nd opinion**
+toggle). Sitting on the subject means the two agree. Sprawled across empty floor
+means the model holds two incompatible confident opinions and the confidence
+number is meaningless on that frame. **That visual check is the only one that
+works, which makes the overlay part of the product rather than a demo.**
 
 ### Confidence does not tell you when the pose is wrong
 
@@ -255,6 +292,17 @@ survives this. Fine-grained comparison between rotations does not.
 
 Real video of real rehab movement, with a moving subject, motion blur, clothing,
 and a camera that is not a studio. Everything above is still images.
+
+## Status and stability
+
+**v0.1, one person, no deprecation policy.** The public API may change. There
+are three independent version numbers and they move for different reasons:
+`SCHEMA_VERSION` (the shape of a result), `formatVersion` (the layout of an
+exported file) and `modelRevision` (the vendored model). If you parse the CSV,
+pin the first two.
+
+There is no published package. To depend on this, vendor `src/` and `vendor/`
+and pin by git SHA.
 
 ## Licence
 

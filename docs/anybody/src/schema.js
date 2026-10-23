@@ -112,6 +112,8 @@ export function emptyResult({ modelId, modelRevision }) {
     parts: {},
     points: [],
     world: null,
+    agreement: null,
+    rival: null,
     box: null,
     orientation: { applied: 0, score: 0, searched: false, scores: null },
     timings: { totalMs: 0, inferenceMs: 0, passes: 0 },

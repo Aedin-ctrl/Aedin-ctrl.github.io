@@ -19,7 +19,7 @@ const ui = {
   reset: $('reset'), frame: $('frame'), stopCam: $('stopCam'),
 };
 
-const show = { skeleton: true, points: true, box: true, face: false, feed: true };
+const show = { skeleton: true, points: true, box: true, face: false, feed: true, ghost: true };
 const state = {
   tracker: null, result: null, hover: null, running: false, busy: false,
   minScore: 0.3, frames: 0, fpsAt: 0, fps: 0, visible: true, lastTableAt: 0, rows: null,
@@ -175,7 +175,11 @@ function updateStats() {
     row('inference', `${r.timings.inferenceMs.toFixed(1)} ms`),
     row('passes', r.timings.passes),
     row('rotation', `${r.orientation.applied}°${r.orientation.searched ? ' (searched)' : ''}`),
-    row('rot. score', r.orientation.score.toFixed(3)),
+    // Deliberately NOT called confidence or quality. It is the model's mean
+    // reported visibility, which is measured not to distinguish a correct pose
+    // from a confidently wrong one.
+    row('landmarks in frame', r.orientation.score.toFixed(3)),
+    row('2nd opinion', agreementRow(r)),
     row('parts', found.length ? found.join(', ') : '<span class="warn">none found</span>'),
     row('points', r.points.length),
     row('model', `${r.modelId}`),
@@ -189,6 +193,18 @@ function updateStats() {
       `<div class="${Number(deg) === r.orientation.applied ? 'win' : ''}">${deg}°<span class="v">${s.toFixed(2)}</span></div>`
     ).join('');
   }
+}
+
+/**
+ * How far the runner-up rotation's pose sits from the chosen one, in frame
+ * widths. There is no threshold here that means "wrong" — it is shown so a
+ * person can look, which is the only check that works.
+ */
+function agreementRow(r) {
+  if (!r.agreement || r.agreement.disagreement == null) return '<span class="faint">—</span>';
+  const d = r.agreement.disagreement;
+  const cls = d > 0.08 ? ' class="warn"' : '';
+  return `<span${cls}>${d.toFixed(3)} apart at ${r.agreement.rotation}°</span>`;
 }
 
 /** Build the table once per layout, then only write cell text. */
@@ -280,7 +296,7 @@ ui.stopCam.addEventListener('click', () => {
   say('Camera stopped.');
 });
 $('file').addEventListener('change', (e) => { if (e.target.files[0]) useFile(e.target.files[0]); });
-['skeleton', 'points', 'box', 'face', 'feed'].forEach((k) => bindToggle(`t-${k}`, k));
+['skeleton', 'points', 'box', 'face', 'feed', 'ghost'].forEach((k) => bindToggle(`t-${k}`, k));
 
 ui.orientation.addEventListener('change', async () => {
   const v = ui.orientation.value;
@@ -335,7 +351,10 @@ ui.frame.addEventListener('pointerleave', () => { state.hover = null; queueRende
 
 // Pause the whole pipeline when the stage is not being rendered.
 ui.stage.addEventListener('contentvisibilityautostatechange', (e) => {
-  state.visible = !e.skipped;
+  // Never pause mid-recording. Scrolling down to read the landmark table would
+  // otherwise punch a silent hole in the file you are about to export, and the
+  // gaps would land wherever the operator happened to look away.
+  state.visible = !e.skipped || recorder.recording;
 });
 document.addEventListener('visibilitychange', () => {
   state.visible = document.visibilityState === 'visible';

@@ -114,8 +114,9 @@ export class OrientationSearch {
   #current = 0;
   #score = 0;
   #sinceSearch = Infinity;
+  #cooling = 0;
 
-  constructor({ mode = 'auto', keepAbove = 0.5, margin = 0.08, recheckEvery = 150 } = {}) {
+  constructor({ mode = 'auto', keepAbove = 0.5, recheckEvery = 150, cooldown = 15 } = {}) {
     if (mode !== 'auto' && mode !== 'none' && !ROTATIONS.includes(mode)) {
       throw new Error(`orientation must be 'auto', 'none', or one of ${ROTATIONS.join('/')}`);
     }
@@ -124,8 +125,13 @@ export class OrientationSearch {
     // measured wrong detection scores 0.80, well above the 0.5 default. So this
     // keeps a rotation that is FINDING something, not one that is RIGHT.
     this.keepAbove = keepAbove;
-    this.margin = margin;         // a challenger must beat the cached one by this much
     this.recheckEvery = recheckEvery; // forced full search, so a wrong lock cannot persist
+    // A search that changes nothing used to be free to run again on the very
+    // next frame: low confidence -> four passes -> subject moved and blurred ->
+    // low confidence again. On the out-of-distribution subjects this library is
+    // for, that pins the frame rate at the worst value indefinitely. Back off
+    // after a search that didn't help.
+    this.cooldown = cooldown;
     if (mode !== 'auto' && mode !== 'none') this.#current = mode;
   }
 
@@ -161,6 +167,12 @@ export class OrientationSearch {
         return { rotation: this.#current, points, score: s, searched: false, scores: null };
       }
       tried = { rotation: this.#current, points, score: s };
+      // Still in the backoff window from a search that didn't change anything.
+      if (this.#cooling > 0) {
+        this.#cooling--;
+        this.#score = s;
+        return { rotation: this.#current, points, score: s, searched: false, scores: null };
+      }
     }
 
     // Full search. The cached rotation has already been run above unless this
@@ -176,26 +188,30 @@ export class OrientationSearch {
     }
     const scores = Object.fromEntries(results.map((r) => [r.rotation, r.score]));
 
-    let best = results[0];
-    for (const r of results) if (r.score > best.score) best = r;
+    const ranked = [...results].sort((a, b) => b.score - a.score);
+    const best = ranked[0];
 
-    // Hysteresis: only switch if the challenger is clearly better, so a frame of
-    // noise does not flip the skeleton. `recheckEvery` is what stops this from
-    // becoming a latch.
-    const incumbent = results.find((r) => r.rotation === this.#current);
-    if (incumbent && best.rotation !== this.#current && best.score < incumbent.score + this.margin) {
-      best = incumbent;
-    }
-
+    // No hysteresis any more. It arbitrated between scores this module already
+    // documents as not strictly comparable, i.e. it was arbitration over noise.
+    const changed = best.rotation !== this.#current;
+    this.#cooling = changed ? 0 : this.cooldown;
     this.#current = best.rotation;
     this.#score = best.score;
     this.#sinceSearch = 0;
-    return { ...best, searched: true, scores };
+
+    // Hand back every candidate that actually found a body. Comparing those
+    // candidates geometrically is the only thing measured to differ between a
+    // correct and an incorrect detection. The scores do not.
+    return {
+      ...best, searched: true, scores,
+      candidates: ranked.filter((r) => r.points.some((p) => p.part === 'body')),
+    };
   }
 
   reset() {
     this.#current = this.mode === 'auto' || this.mode === 'none' ? 0 : this.mode;
     this.#score = 0;
     this.#sinceSearch = Infinity;
+    this.#cooling = 0;
   }
 }

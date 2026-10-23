@@ -19,6 +19,33 @@ const BACKENDS = {
   mediapipe: createMediaPipeBackend,
 };
 
+/** Joints used to compare two candidate poses: torso and limbs, not the head. */
+const CORE = [11, 12, 23, 24, 13, 14, 15, 16, 25, 26, 27, 28];
+
+/**
+ * Mean distance between two candidate body poses over the core joints, both
+ * already mapped into source coordinates. Normalised units, so 0.1 is a tenth
+ * of the frame.
+ *
+ * This is the one quantity measured to differ between a correct and an
+ * incorrect detection: on the prone fixture the two candidates disagreed by
+ * 0.139 while reporting confidences of 0.80 and 0.81. It cannot say WHICH is
+ * right — tested, it picks wrong — but a large value means the model has two
+ * confident and incompatible opinions, which is worth showing a human.
+ */
+export function disagreement(a, b) {
+  let sum = 0;
+  let n = 0;
+  for (const i of CORE) {
+    const pa = a[i];
+    const pb = b[i];
+    if (!pa || !pb) continue;
+    sum += Math.hypot(pa.x - pb.x, pa.y - pb.y);
+    n++;
+  }
+  return n ? sum / n : null;
+}
+
 /** Axis-aligned bounds of the body points, in normalised source coordinates. */
 export function boxOf(points, { part = 'body', minScore = 0.3 } = {}) {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -46,10 +73,14 @@ export function boxOf(points, { part = 'body', minScore = 0.3 } = {}) {
 export async function createTracker({
   backend = 'mediapipe',
   orientation = 'auto',
-  parts = ['body', 'leftHand', 'rightHand', 'face'],
+  // The face MESH is off by default: 478 of 553 points, the least useful part
+  // of a movement recording, the most identifying, and it costs an allocation
+  // and a loop over every one of them on every frame. Ask for 'face' if you
+  // want it.
+  parts = ['body', 'leftHand', 'rightHand'],
   keepAbove = 0.5,
-  margin = 0.08,
   recheckEvery = 150,
+  cooldown = 15,
   ...backendOptions
 } = {}) {
   // A function may be passed directly. That is how the tests drive the real
@@ -65,7 +96,7 @@ export async function createTracker({
   }
 
   const impl = await make({ parts, ...backendOptions });
-  const search = new OrientationSearch({ mode: orientation, keepAbove, margin, recheckEvery });
+  const search = new OrientationSearch({ mode: orientation, keepAbove, recheckEvery, cooldown });
 
   return {
     backend: impl.id,
@@ -105,6 +136,22 @@ export async function createTracker({
             return { ...p, x, y };
           });
 
+      // Map each rival candidate into source coordinates too, so they can be
+      // compared with the winner and drawn as a ghost.
+      const toSource = (pts, rot) => (rot === 0 ? pts : pts.map((p) => {
+        const { x, y } = unrotatePoint(p.x, p.y, rot);
+        return { ...p, x, y };
+      }));
+      let rival = null;
+      if (picked.candidates?.length > 1) {
+        const r = picked.candidates.find((c) => c.rotation !== picked.rotation);
+        if (r) {
+          const pts = toSource(r.points, r.rotation);
+          rival = { rotation: r.rotation, score: r.score, points: pts,
+                    body: pts.filter((p) => p.part === 'body') };
+        }
+      }
+
       const out = emptyResult({ modelId: impl.id, modelRevision: impl.revision });
       out.points = points;
       // Parts are derived from the points themselves, so the two can never
@@ -119,6 +166,16 @@ export async function createTracker({
         searched: picked.searched,
         scores: picked.scores,
       };
+      // How much the runner-up rotation disagrees with the winner. Present only
+      // on frames where a search actually ran and at least two rotations found
+      // a body. null otherwise -- it is NOT a confidence, and there is no
+      // threshold here that means "wrong".
+      out.agreement = rival && out.parts.body
+        ? { disagreement: disagreement(out.parts.body, rival.body),
+            rotation: rival.rotation, score: rival.score }
+        : null;
+      out.rival = rival;
+
       out.timings = { totalMs: performance.now() - t0, inferenceMs, passes };
       return out;
     },

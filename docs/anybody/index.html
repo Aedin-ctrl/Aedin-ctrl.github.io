@@ -56,6 +56,7 @@
         <button id="t-points">Points</button>
         <button id="t-box">Box</button>
         <button id="t-face">Face mesh</button>
+        <button id="t-ghost">2nd opinion</button>
         <button id="t-feed">Video</button>
       </div>
 
@@ -90,9 +91,16 @@
         <dl class="stats" id="stats"></dl>
         <div class="rot" id="rot"></div>
         <p class="note">
-          Rotation scores come from the torso and limb joints only, so a model
-          that is confident about a face but lost the legs scores low &mdash;
-          which is the case worth catching.
+          <strong>&ldquo;Landmarks in frame&rdquo; is not accuracy.</strong> It is
+          the model&rsquo;s own mean visibility, and a detection whose legs are
+          drawn across empty floor scores about the same as a correct one. The
+          model cannot tell you when it is confidently wrong.
+        </p>
+        <p class="note">
+          <strong>2nd opinion</strong> (violet, dashed) draws the pose the model produced at the
+          runner-up rotation, dashed. Sitting on the subject means the two agree.
+          Sprawled across the floor means the model has two incompatible
+          opinions and the number above is meaningless on this frame.
         </p>
       </section>
 
