@@ -67,9 +67,25 @@ export function confidenceOf(lm) {
   return 1;
 }
 
+/**
+ * The pose model always emits all 33 body landmarks, extrapolating the ones it
+ * cannot see — so a head-and-shoulders webcam shot still returns knees and
+ * ankles, placed somewhere below the bottom of the picture. Those are guesses,
+ * not measurements, and writing them into an export as though they were
+ * measured is the kind of thing a downstream consumer would never catch.
+ *
+ * `present` marks the difference: a landmark is present when the model says it
+ * is visible AND it lies inside the frame. Everything is still returned — the
+ * coordinates are sometimes useful — but absent landmarks are not drawn and are
+ * written to the export as blanks.
+ */
+const PRESENCE_FLOOR = 0.2;
+const inFrame = (lm) => lm.x >= -0.02 && lm.x <= 1.02 && lm.y >= -0.02 && lm.y <= 1.02;
+
 function pushPart(out, part, landmarks, names) {
   if (!landmarks?.length) return false;
   landmarks.forEach((lm, i) => {
+    const score = confidenceOf(lm);
     out.push(makePoint({
       part,
       index: i,
@@ -77,8 +93,8 @@ function pushPart(out, part, landmarks, names) {
       x: lm.x,
       y: lm.y,
       z: lm.z,
-      score: confidenceOf(lm),
-      present: true,
+      score,
+      present: score >= PRESENCE_FLOOR && inFrame(lm),
     }));
   });
   return true;

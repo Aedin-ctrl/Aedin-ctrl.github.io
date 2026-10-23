@@ -288,6 +288,52 @@ passes of a rotation search influence each other, so their scores are not
 strictly comparable. The coarse signal — found something versus found nothing —
 survives this. Fine-grained comparison between rotations does not.
 
+### Partial framing works, and why it needed a fix
+
+You do not need the whole body in shot. Measured on crops of the upright
+fixture, after the fix below:
+
+| framing | score | body landmarks marked absent |
+|---|---|---|
+| whole body | 0.999 | 0 / 33 |
+| cut below the knees | 0.991 | 8 / 33 |
+| cut at the hips | 0.987 | 10 / 33 |
+| head and shoulders (webcam) | 0.989 | 13 / 33 |
+
+Two things had to change to make that true.
+
+**Scoring no longer averages over joints that are simply out of shot.** The
+model always emits all 33 body landmarks, extrapolating the ones it cannot see,
+so on a webcam crop the hips report 0.006 and the legs 0.05. A flat mean over
+the twelve core joints sank under `keepAbove` on *every frame*, firing a
+four-pass rotation search forever for a subject that was being tracked
+perfectly. Scoring the best half asks "is there a body here the model
+understands", which is the actual question.
+
+**`present` now distinguishes measured from guessed.** A landmark is present
+when the model reports it visible *and* it falls inside the frame. Absent ones
+are still returned — the coordinates are occasionally useful — but they are not
+drawn, not counted in the bounding box, and written to the export as blanks. A
+knee the model placed below the bottom of the picture is a guess, and a
+downstream consumer has no way to tell that from a measurement once it is a
+number in a CSV.
+
+### Why hand tracking feels so much more solid than body tracking
+
+Worth knowing, because it is not a quality gap, it is a structural one.
+
+The hand model is a dedicated detector for a small, self-contained object, and
+when it does not find a hand it reports **nothing**. The pose model fits a whole
+articulated body prior (GHUM) and **always returns all 33 landmarks**, filling
+in whatever it cannot see. So a hand is either tracked or absent, while a body
+is always "tracked" — sometimes with half of it invented.
+
+On top of that, BlazePose's detector derives the whole-body region of interest
+from the hip-to-shoulder axis, and its paper says training was limited to images
+where the whole person is visible or where hips and shoulders could be
+confidently annotated. Framings that cut the hips are outside what it was
+trained on; a hand never has that problem.
+
 ### Still not measured
 
 Real video of real rehab movement, with a moving subject, motion blur, clothing,

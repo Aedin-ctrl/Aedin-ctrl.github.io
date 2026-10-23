@@ -50,7 +50,7 @@ export function disagreement(a, b) {
 export function boxOf(points, { part = 'body', minScore = 0.3 } = {}) {
   let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
   for (const p of points) {
-    if (p.part !== part || p.score < minScore) continue;
+    if (p.part !== part || p.present === false || p.score < minScore) continue;
     if (p.x < x0) x0 = p.x;
     if (p.y < y0) y0 = p.y;
     if (p.x > x1) x1 = p.x;

@@ -94,7 +94,9 @@ export class Recorder {
     let o = base;
     for (const col of columns) {
       const p = result.parts[col.part]?.[col.index];
-      if (p) {
+      // A landmark the model guessed outside the frame is written as blank: it
+      // was not measured, and a consumer cannot tell the difference afterwards.
+      if (p && p.present !== false) {
         this.#frame[o] = p.x; this.#frame[o + 1] = p.y;
         this.#frame[o + 2] = p.z ?? 0; this.#frame[o + 3] = p.score;
       } else {

@@ -90,17 +90,35 @@ export function rotatedSize(w, h, deg) {
  */
 const CORE = [11, 12, 23, 24, 13, 14, 15, 16, 25, 26, 27, 28];
 
+/** How many of the core joints must look good for this to count as a body. */
+const QUORUM = 6;
+
 export function scoreBody(points) {
   if (!points?.length) return 0;
   const body = points.filter((p) => p.part === 'body');
   if (!body.length) return 0;
-  let sum = 0;
-  let n = 0;
+
+  const seen = [];
   for (const i of CORE) {
     const p = body[i];
-    if (p && Number.isFinite(p.score)) { sum += p.score; n++; }
+    if (p && Number.isFinite(p.score)) seen.push(p.score);
   }
-  return n ? sum / n : 0;
+  if (!seen.length) return 0;
+
+  // Mean of the BEST half, not of all twelve.
+  //
+  // A flat mean collapses whenever part of the body is simply out of frame: on
+  // a head-and-shoulders webcam crop the hips report 0.006 and the legs 0.05,
+  // which dragged the score under `keepAbove` on every single frame and fired a
+  // four-pass rotation search forever, for a subject that was being tracked
+  // perfectly well. Scoring the best half asks "is there a body here that the
+  // model understands", which is the actual question, and is unbothered by the
+  // half of it that is outside the picture.
+  seen.sort((a, b) => b - a);
+  const take = Math.min(QUORUM, seen.length);
+  let sum = 0;
+  for (let i = 0; i < take; i++) sum += seen[i];
+  return sum / take;
 }
 
 /**

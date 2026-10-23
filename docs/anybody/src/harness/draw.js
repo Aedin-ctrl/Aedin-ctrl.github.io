@@ -92,7 +92,7 @@ export function drawResult(ctx, result, opts) {
     ctx.fillStyle = theme.centre;
     ctx.globalAlpha = 0.5;
     for (const p of result.parts.face) {
-      if (p.score < minScore) continue;
+      if (p.present === false || p.score < minScore) continue;
       ctx.fillRect(X(p) - 0.5, Y(p) - 0.5, 1.2, 1.2);
     }
     ctx.globalAlpha = 1;
@@ -133,7 +133,8 @@ export function drawResult(ctx, result, opts) {
       for (const [a, b] of edges) {
         const pa = pts[a];
         const pb = pts[b];
-        if (!pa || !pb || pa.score < minScore || pb.score < minScore) continue;
+        if (!pa || !pb || pa.present === false || pb.present === false) continue;
+        if (pa.score < minScore || pb.score < minScore) continue;
         // An edge is drawn in its own side's colour; a cross-body edge (shoulder
         // to shoulder, hip to hip) gets a gradient so neither side claims it.
         const ca = colourFor(pa, theme);
@@ -162,7 +163,7 @@ export function drawResult(ctx, result, opts) {
   if (show.points) {
     for (const p of result.points) {
       if (p.part === 'face') continue;
-      if (p.score < minScore) continue;
+      if (p.present === false || p.score < minScore) continue;
       const r = 2.2 + 2.2 * Math.min(1, Math.max(0, p.score));
       ctx.fillStyle = colourFor(p, theme);
       ctx.beginPath();
@@ -218,7 +219,7 @@ export function pick(result, px, py, w, h, { minScore = 0.3, within = 18, includ
   let bestD = within * within;
   for (const p of result.points) {
     if (!includeFace && p.part === 'face') continue;
-    if (p.score < minScore) continue;
+    if (p.present === false || p.score < minScore) continue;
     const dx = p.x * w - px;
     const dy = p.y * h - py;
     const d = dx * dx + dy * dy;
