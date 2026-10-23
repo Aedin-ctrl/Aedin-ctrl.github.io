@@ -373,6 +373,17 @@
     box.appendChild(pair);
     box.appendChild(el("span", null,
       "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
+    // Per-venue, because one wallet starving is what actually stops the
+    // account trading -- the total hides it completely.
+    const cash = p.cash || {};
+    if (cash.kalshi !== undefined || cash.polymarket !== undefined) {
+      const k = cash.kalshi, pm = cash.polymarket;
+      const locked = p.equity - ((k || 0) + (pm || 0));
+      box.appendChild(el("span", null,
+        "kalshi $" + (k === undefined ? "\u2014" : k.toFixed(2))
+        + " \u00b7 poly $" + (pm === undefined ? "\u2014" : pm.toFixed(2))
+        + (locked > 0.005 ? " \u00b7 in play $" + locked.toFixed(2) : "")));
+    }
     box.insertAdjacentHTML("beforeend",
       '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
       '<line x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + W + '" y2="' + zeroY.toFixed(1) +
