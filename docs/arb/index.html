@@ -93,27 +93,28 @@
     .ret .n{font-size:20px;}
   }
 
-  /* Paper account, bottom right. Not real money, and it says so -- the
-     whole point of the number is to be told the truth by it. */
-  .paper{position:fixed; right:14px; bottom:14px; z-index:20; width:188px;
-         background:var(--card); border:1px solid var(--line); border-radius:11px;
-         padding:10px 12px 9px; box-shadow:0 2px 14px rgba(0,0,0,.07);
-         font-size:11.5px; color:var(--ink2);}
+  /* Paper account, across the top. Not real money, and it says so --
+     the whole point of the number is to be told the truth by it. */
+  .paper{position:sticky; top:0; z-index:30; background:var(--card);
+         border-bottom:1px solid var(--rule);
+         display:flex; align-items:center; gap:clamp(12px,3vw,26px);
+         flex-wrap:wrap; padding:9px clamp(16px,5vw,32px);
+         font-size:12px; color:var(--ink2);}
   .paper[hidden]{display:none;}
-  .paper .ttl{display:flex; justify-content:space-between; align-items:baseline;
-              gap:10px; font-size:10px; letter-spacing:.07em; text-transform:uppercase;
+  .paper .tag{font-size:10px; letter-spacing:.08em; text-transform:uppercase;
               color:var(--muted); white-space:nowrap;}
-  .paper .big{font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600;
-              letter-spacing:-0.02em; margin-top:2px; line-height:1.15;}
+  .paper .big{font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600;
+              letter-spacing:-0.02em; line-height:1;}
   .paper .up{color:var(--good);} .paper .down{color:var(--bad);}
-  .paper .sub{margin-top:1px; font-size:11px; color:var(--muted);}
-  .paper svg{display:block; width:100%; height:34px; margin:7px 0 4px; overflow:visible;}
+  .paper .pair{display:flex; align-items:baseline; gap:8px;}
+  .paper svg{display:block; width:clamp(90px,16vw,190px); height:26px;}
   .paper .warn{color:var(--bad); font-weight:600;}
-  @media (max-width:640px){ .paper{position:static; width:auto; margin:18px 0 0;
-                                   box-shadow:none;} }
+  .paper .sim{margin-left:auto; color:var(--muted); white-space:nowrap;}
+  @media (max-width:640px){ .paper .sim{margin-left:0;} }
 </style>
 </head>
 <body>
+<aside class="paper" id="paper" hidden></aside>
 <main>
   <div class="top">
     <h1>Cross-venue sports arbitrage</h1>
@@ -162,7 +163,6 @@
     it is.</p>
 
   <footer id="foot"></footer>
-<aside class="paper" id="paper" hidden></aside>
 </main>
 
 <script>
@@ -361,44 +361,42 @@
     if (!p || !box) return;
     box.hidden = false;
     const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
-    const money = sign + "$" + Math.abs(p.pnl).toFixed(2);
     const pts = (p.curve || []).map(r => r[1]);
-    // One settled trade is a dot, not a line: draw a flat baseline so the
-    // card never implies a trend it does not have.
+    // One settled trade is a dot, not a line: start from the stake so the
+    // bar never implies a trend it does not have.
     if (pts.length < 2) pts.unshift(p.staked);
     const lo = Math.min(...pts, p.staked), hi = Math.max(...pts, p.staked);
-    const span = (hi - lo) || 1, W = 164, H = 34;
-    const xy = pts.map((v, i) => [
-      (pts.length === 1 ? W : i * W / (pts.length - 1)),
-      H - ((v - lo) / span) * H
-    ]);
+    const span = (hi - lo) || 1, W = 190, H = 26;
+    const xy = pts.map((v, i) => [i * W / (pts.length - 1),
+                                  H - ((v - lo) / span) * H]);
     const path = xy.map((c, i) => (i ? "L" : "M") + c[0].toFixed(1) + " " + c[1].toFixed(1)).join(" ");
     const zeroY = H - ((p.staked - lo) / span) * H;
     const col = up ? "var(--good)" : "var(--bad)";
+
     box.innerHTML = "";
-    const head = el("div", "ttl");
-    head.appendChild(el("span", null, "paper account"));
-    head.appendChild(el("span", null, p.settled + " settled"));
-    box.appendChild(head);
-    const big = el("div", "big " + (up ? "up" : "down"), money);
-    box.appendChild(big);
-    box.appendChild(el("div", "sub",
-      "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2) + " \u00b7 " + p.open + " open"));
+    const pair = el("div", "pair");
+    pair.appendChild(el("span", "tag", "paper account"));
+    pair.appendChild(el("span", "big " + (up ? "up" : "down"),
+                        sign + "$" + Math.abs(p.pnl).toFixed(2)));
+    box.appendChild(pair);
+    box.appendChild(el("span", null,
+      "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
     box.insertAdjacentHTML("beforeend",
       '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' +
       '<line x1="0" y1="' + zeroY.toFixed(1) + '" x2="' + W + '" y2="' + zeroY.toFixed(1) +
       '" stroke="var(--rule)" stroke-width="1" stroke-dasharray="2 3"/>' +
       '<path d="' + path + '" fill="none" stroke="' + col +
       '" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>');
+    box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
     const src = Object.entries(p.by_source || {})
       .map(([k, v]) => k + " " + (v.pnl >= 0 ? "+" : "\u2212") + "$" + Math.abs(v.pnl).toFixed(2))
       .join(" \u00b7 ");
-    if (src) box.appendChild(el("div", "sub", src));
+    if (src) box.appendChild(el("span", null, src));
     // The number this whole exercise exists to find: both legs lost, so the
     // two venues disagreed and the entire stake went.
-    box.appendChild(el("div", "sub" + (p.diverged ? " warn" : ""),
+    box.appendChild(el("span", p.diverged ? "warn" : null,
       p.diverged ? p.diverged + " settled differently" : "no venue disagreements"));
-    box.appendChild(el("div", "sub", "simulated \u00b7 nothing is placed"));
+    box.appendChild(el("span", "sim", "simulated \u00b7 nothing is placed"));
   }
 
   fetch("index.json", { cache: "no-store" })
