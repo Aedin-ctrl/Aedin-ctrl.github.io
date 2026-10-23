@@ -7,7 +7,7 @@
 // Every result says which model produced it and which parts it actually
 // contains. Nothing is zero-filled to make a schema look complete.
 
-import { emptyResult, SCHEMA_VERSION } from './schema.js';
+import { emptyResult, SCHEMA_VERSION, PARTS } from './schema.js';
 import { OrientationSearch, unrotatePoint, scoreBody } from './orient.js';
 import { createMediaPipeBackend } from './backends/mediapipe.js';
 
@@ -52,8 +52,17 @@ export async function createTracker({
   recheckEvery = 150,
   ...backendOptions
 } = {}) {
-  const make = BACKENDS[backend];
+  // A function may be passed directly. That is how the tests drive the real
+  // estimate() in node with a fake backend — the previous regression test
+  // reimplemented estimate() and so could not have caught a regression in it.
+  const make = typeof backend === 'function' ? backend : BACKENDS[backend];
   if (!make) throw new Error(`unknown backend: ${backend}. Known: ${Object.keys(BACKENDS).join(', ')}`);
+
+  // Unknown options are a silent no-op otherwise, which is the worst outcome
+  // for a library whose value is tuning keepAbove / margin / recheckEvery.
+  for (const part of parts) {
+    if (!PARTS.includes(part)) throw new Error(`unknown part: ${part}. Known: ${PARTS.join(', ')}`);
+  }
 
   const impl = await make({ parts, ...backendOptions });
   const search = new OrientationSearch({ mode: orientation, keepAbove, margin, recheckEvery });

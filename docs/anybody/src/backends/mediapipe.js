@@ -17,6 +17,7 @@
 // the fast path and accept that caveat.
 
 import { BODY_NAMES, HAND_NAMES, makePoint } from '../schema.js';
+import { unrotateWorld } from '../orient.js';
 
 const DEFAULT_ASSET_PATH = './vendor/mediapipe';
 
@@ -50,13 +51,19 @@ export function sourceSize(source) {
 }
 
 /**
- * MediaPipe reports a landmark's `visibility` (is it in frame) and sometimes
- * `presence`. Hands and face carry neither, so they fall back to 1 — they are
- * only reported at all when the model found them.
+ * MediaPipe reports a landmark's `visibility` (roughly: is it inside the frame)
+ * and sometimes `presence`. Hands and face carry neither, so they fall back to
+ * 1 — they are only reported at all when the model found them.
+ *
+ * Note the `>= 0` rather than `> 0`: a landmark the model declares *invisible*
+ * reports visibility 0, and treating that as "no value, fall through" handed it
+ * maximum confidence — the exact inversion of what it means.
+ *
+ * This number is NOT a measure of whether the pose is correct. See README.
  */
-function confidenceOf(lm) {
-  if (Number.isFinite(lm.visibility) && lm.visibility > 0) return lm.visibility;
-  if (Number.isFinite(lm.presence) && lm.presence > 0) return lm.presence;
+export function confidenceOf(lm) {
+  if (Number.isFinite(lm.visibility) && lm.visibility >= 0) return lm.visibility;
+  if (Number.isFinite(lm.presence) && lm.presence >= 0) return lm.presence;
   return 1;
 }
 
@@ -133,24 +140,31 @@ export async function createMediaPipeBackend({
         ? landmarker.detectForVideo(image, timestampMs)
         : landmarker.detect(image);
 
+      // Parts are derived downstream from the points themselves, so there is no
+      // separate "found" map to fall out of sync with them.
       const points = [];
-      const found = {};
-      if (want.has('body')) found.body = pushPart(points, 'body', res.poseLandmarks?.[0], BODY_NAMES);
-      if (want.has('leftHand')) found.leftHand = pushPart(points, 'leftHand', res.leftHandLandmarks?.[0], HAND_NAMES);
-      if (want.has('rightHand')) found.rightHand = pushPart(points, 'rightHand', res.rightHandLandmarks?.[0], HAND_NAMES);
-      if (want.has('face')) found.face = pushPart(points, 'face', res.faceLandmarks?.[0], null);
+      if (want.has('body')) pushPart(points, 'body', res.poseLandmarks?.[0], BODY_NAMES);
+      if (want.has('leftHand')) pushPart(points, 'leftHand', res.leftHandLandmarks?.[0], HAND_NAMES);
+      if (want.has('rightHand')) pushPart(points, 'rightHand', res.rightHandLandmarks?.[0], HAND_NAMES);
+      if (want.has('face')) pushPart(points, 'face', res.faceLandmarks?.[0], null);
 
-      // World landmarks are metres from the hip midpoint and are the only output
+      // World landmarks are metres from the hip midpoint, and are the only output
       // worth computing an angle from — the normalised z has no consistent scale
-      // and is not orthogonal to the image plane. Reported unrotated, since the
-      // frame they are expressed in is not the image frame.
+      // and is not orthogonal to the image plane.
+      //
+      // They are camera-aligned, so feeding the model a rotated image returns a
+      // skeleton rotated about the optical axis by the same amount. Bone-to-bone
+      // angles survive that; anything measured against an external axis (trunk
+      // to vertical, knee valgus) would jump 90 degrees the instant the rotation
+      // lock changed. So un-rotate them back into the source camera frame here.
       const world = res.poseWorldLandmarks?.[0]
-        ? res.poseWorldLandmarks[0].map((lm, i) => ({
-            index: i, name: BODY_NAMES[i], x: lm.x, y: lm.y, z: lm.z,
-          }))
+        ? res.poseWorldLandmarks[0].map((lm, i) => {
+            const { x, y } = unrotateWorld(lm.x, lm.y, deg);
+            return { index: i, name: BODY_NAMES[i], x, y, z: lm.z };
+          })
         : null;
 
-      return { points, found, world };
+      return { points, world };
     },
 
     close() { landmarker.close?.(); },

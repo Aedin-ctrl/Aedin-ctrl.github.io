@@ -6,9 +6,13 @@
 // minute session becomes a gigabyte of garbage-collected heap. Columnar keeps it
 // flat, bounded, and cheap to serialise.
 //
-// The face mesh is excluded by default: it is 478 of the 553 points, it is the
-// least useful part of a movement recording, and it is the part most obviously
-// identifying.
+// The face MESH is excluded by default: 478 of the 553 points, the least useful
+// part of a movement recording. Note this does NOT make the export
+// de-identifying: body landmarks 0-10 are nose, eyes, ears and mouth corners,
+// and hand geometry is itself a biometric. Say so to anyone who records a
+// person with this.
+
+import { partInfo } from '../schema.js';
 
 const VALUES = 4; // x, y, z, score
 
@@ -20,6 +24,7 @@ export class Recorder {
   #meta = [];
   #layout = null;
   #chunkFrames = 64;
+  #provenance = null;
 
   constructor({ maxFrames = 36_000, parts = ['body', 'leftHand', 'rightHand'] } = {}) {
     this.maxFrames = maxFrames; // ~20 min at 30 fps; refuses to grow past this
@@ -34,27 +39,45 @@ export class Recorder {
   get bytes() { return this.#chunks.length * this.#chunkFrames * (this.#layout?.stride ?? 0) * 4; }
 
   start(result) {
+    // Provenance is captured HERE, from the frame that began the recording.
+    // Reading it at save time meant the file described whatever happened to be
+    // on screen when you pressed the button, and threw outright if that was null.
+    this.#provenance = {
+      schemaVersion: result?.schemaVersion ?? null,
+      modelId: result?.modelId ?? null,
+      modelRevision: result?.modelRevision ?? null,
+      startedAt: new Date().toISOString(),
+    };
     this.#chunks = [];
     this.#frame = null;
     this.#used = 0;
     this.#frames = 0;
     this.#meta = [];
     this.droppedForLimit = 0;
-    this.#layout = this.#layoutFor(result);
+    this.#layout = this.#layoutFor();
     this.recording = true;
     return this.#layout;
   }
 
   stop() { this.recording = false; return this.#frames; }
 
-  /** Fix the column order from the first frame; later frames must match it. */
-  #layoutFor(result) {
-    const parts = this.parts.filter((p) => result.parts[p]);
+  /**
+   * Columns come from the parts this recorder was CONFIGURED for, not from
+   * whichever parts happened to be present in frame one. Deriving them from the
+   * first frame silently dropped any part that appeared later — and "arms at
+   * your sides, hands not yet found" is the normal opening of exactly the
+   * supine work this tool is for, so a whole hand could vanish from a recording
+   * with nothing in the file to say it had.
+   */
+  #layoutFor() {
     const columns = [];
-    for (const part of parts) {
-      for (const p of result.parts[part]) columns.push({ part, index: p.index, name: p.name });
+    for (const part of this.parts) {
+      const { names, count } = partInfo(part);
+      for (let i = 0; i < count; i++) {
+        columns.push({ part, index: i, name: names ? names[i] : `${part}_${i}` });
+      }
     }
-    return { parts, columns, stride: columns.length * VALUES };
+    return { parts: [...this.parts], columns, stride: columns.length * VALUES };
   }
 
   push(result, timestampMs) {
@@ -104,13 +127,14 @@ export class Recorder {
   }
 
   /** Provenance travels with the data; a bare coordinate dump is unreadable later. */
-  #header(source) {
+  #header() {
+    const p = this.#provenance ?? {};
     return {
       format: 'anybody-pose',
       formatVersion: 1,
-      schemaVersion: source.schemaVersion,
-      model: { id: source.modelId, revision: source.modelRevision },
-      recordedAt: new Date().toISOString(),
+      schemaVersion: p.schemaVersion,
+      model: { id: p.modelId, revision: p.modelRevision },
+      recordedAt: p.startedAt,
       frameCount: this.#frames,
       parts: this.#layout.parts,
       columns: this.#layout.columns,
@@ -120,7 +144,7 @@ export class Recorder {
     };
   }
 
-  toJSON(source) {
+  toJSON() {
     const { stride, columns } = this.#layout;
     const frames = [];
     this.#each((f, chunk, base) => {
@@ -133,18 +157,18 @@ export class Recorder {
       }
       frames.push({ ...this.#meta[f], p: pts });
     });
-    return JSON.stringify({ ...this.#header(source), frames }, null, 0);
+    return JSON.stringify({ ...this.#header(), frames }, null, 0);
   }
 
   /** One row per frame, one column group per landmark. Opens in any spreadsheet. */
-  toCSV(source) {
+  toCSV() {
     const { columns } = this.#layout;
     const head = ['frame', 'time_ms', 'rotation_deg', 'rotation_score', 'searched', 'total_ms', 'passes'];
     for (const c of columns) {
       head.push(`${c.part}.${c.name}.x`, `${c.part}.${c.name}.y`, `${c.part}.${c.name}.z`, `${c.part}.${c.name}.score`);
     }
     const lines = [
-      `# anybody-pose v1  model=${source.modelId}@${source.modelRevision}  schema=${source.schemaVersion}`,
+      `# anybody-pose v1  model=${this.#provenance?.modelId}@${this.#provenance?.modelRevision}  schema=${this.#provenance?.schemaVersion}`,
       '# coordinates normalised to the source frame, origin top-left; blank = part absent that frame',
       head.join(','),
     ];
@@ -160,15 +184,22 @@ export class Recorder {
       }
       lines.push(row.join(','));
     });
-    return lines.join('\n');
+    return lines; // array of rows: hand straight to Blob, never concatenated
   }
 }
 
 const round = (n, d = 5) => (Number.isNaN(n) ? null : Math.round(n * 10 ** d) / 10 ** d);
 
-/** Hand a Blob to the user as a file. Revoked on the next task, not immediately. */
-export function download(filename, text, type) {
-  const blob = new Blob([text], { type });
+/**
+ * Hand a Blob to the user as a file.
+ *
+ * `body` may be an array of strings. Blob joins them itself, so a long CSV never
+ * becomes one giant JS string first — building and holding that concatenation
+ * was the peak-memory step of the whole export.
+ */
+export function download(filename, body, type) {
+  const parts = Array.isArray(body) ? body.flatMap((l, i) => (i ? ['\n', l] : [l])) : [body];
+  const blob = new Blob(parts, { type });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;

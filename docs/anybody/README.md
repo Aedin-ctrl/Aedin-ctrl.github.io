@@ -147,18 +147,37 @@ not to score it.
 ## Privacy
 
 Everything runs in the tab. The harness ships a CSP with `connect-src 'self'`,
-which blocks MediaPipe's usage-stats POST, and there is no other network request
-after the model loads. Nothing is persisted unless you press Record, and the
-export never contains video.
+which blocks MediaPipe's usage-stats POST, and nothing in `src/` makes any other
+network request after the model loads. Nothing is persisted unless you press
+Record.
 
 The model and runtime are self-hosted rather than fetched from a CDN. A runtime
 fetch from a third party would beacon the viewer's IP, user agent and referring
-URL at the moment someone steps in front of the camera, which is not a reasonable
-thing to do in a clinical setting.
+URL at the moment someone steps in front of the camera, which is not a
+reasonable thing to do in a clinical setting.
 
-If you embed this, note that **camera permission is granted per-origin and
-persists**. Host it somewhere that doesn't share an origin with anything
-sensitive.
+### What that does and does not buy you
+
+Be precise about this, because the gap is where someone non-technical would
+never think to look.
+
+- **CSP is per-document.** A same-origin parent page that frames this one can
+  reach into it and read the video element directly. The in-page guarantee is
+  only as strong as the origin it is served on. **The demo at
+  aedinlai.com/anybody/ is itself framed by a same-origin parent that has no
+  CSP** — so treat that deployment as a demo, not as the privacy posture.
+  If you are recording real people, serve this from its own origin.
+- **Camera permission is granted per-origin and persists**, so it is shared with
+  everything else on that origin.
+- `connect-src` stops accidental telemetry. It does not stop exfiltration by
+  navigation, so it is not a defence against a hostile vendored bundle.
+- **The export is not de-identified.** It excludes the face *mesh* and contains
+  no video, but body landmarks 0–10 are nose, eyes, ears and mouth corners, and
+  hand geometry is itself a biometric. A joint-kinematics file is re-identifying.
+  Do not put a person's name in the filename.
+- Hashes in `vendor/HASHES.json` are a **build- and deploy-time** control, not a
+  runtime one: `npm run vendor` verifies the source tree and `deploy-site.sh`
+  re-verifies the copied files, but the browser itself checks nothing.
 
 ---
 

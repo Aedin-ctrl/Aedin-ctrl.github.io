@@ -56,6 +56,25 @@ export function unrotatePoint(x, y, deg) {
   }
 }
 
+/**
+ * Un-rotate a camera-aligned WORLD landmark back into the source camera frame.
+ *
+ * World landmarks are metres from the hip midpoint in a frame aligned with the
+ * camera, so rotating the input image rotates the whole skeleton about the
+ * optical axis. Image +x is right and image +y is down, so a 90-degree
+ * clockwise image rotation sends source-right to rotated-down; inverting that
+ * is a rotation of the XY pair. Z (toward the camera) is unaffected.
+ */
+export function unrotateWorld(x, y, deg) {
+  switch (((deg % 360) + 360) % 360) {
+    case 0: return { x, y };
+    case 90: return { x: -y, y: x };
+    case 180: return { x: -x, y: -y };
+    case 270: return { x: y, y: -x };
+    default: throw new Error(`rotation must be a multiple of 90, got ${deg}`);
+  }
+}
+
 /** Pixel dimensions after rotating a `w`x`h` image by `deg`. */
 export function rotatedSize(w, h, deg) {
   const d = ((deg % 360) + 360) % 360;
@@ -95,14 +114,16 @@ export class OrientationSearch {
   #current = 0;
   #score = 0;
   #sinceSearch = Infinity;
-  #lastScores = null;
 
   constructor({ mode = 'auto', keepAbove = 0.5, margin = 0.08, recheckEvery = 150 } = {}) {
     if (mode !== 'auto' && mode !== 'none' && !ROTATIONS.includes(mode)) {
       throw new Error(`orientation must be 'auto', 'none', or one of ${ROTATIONS.join('/')}`);
     }
     this.mode = mode;
-    this.keepAbove = keepAbove;   // cached rotation is trusted while it scores above this
+    // NOTE: `keepAbove` gates on a score that cannot detect a wrong pose -- a
+    // measured wrong detection scores 0.80, well above the 0.5 default. So this
+    // keeps a rotation that is FINDING something, not one that is RIGHT.
+    this.keepAbove = keepAbove;
     this.margin = margin;         // a challenger must beat the cached one by this much
     this.recheckEvery = recheckEvery; // forced full search, so a wrong lock cannot persist
     if (mode !== 'auto' && mode !== 'none') this.#current = mode;
@@ -131,6 +152,7 @@ export class OrientationSearch {
     // searches, not one more than it.
     this.#sinceSearch++;
     const forced = this.#sinceSearch >= this.recheckEvery;
+    let tried = null;
     if (!forced) {
       const points = await run(this.#current);
       const s = score(points);
@@ -138,12 +160,17 @@ export class OrientationSearch {
         this.#score = s;
         return { rotation: this.#current, points, score: s, searched: false, scores: null };
       }
+      tried = { rotation: this.#current, points, score: s };
     }
 
-    // Full search. Stateless: every rotation is re-evaluated from scratch, so a
-    // previous wrong answer carries no weight beyond `margin`.
+    // Full search. The cached rotation has already been run above unless this
+    // search was forced, so re-running it here cost a whole extra inference pass
+    // -- a "four-way" search was really five -- and under MediaPipe's hidden
+    // state the duplicate could even disagree with itself. Reuse it instead.
     const results = [];
+    if (!forced && tried) results.push(tried);
     for (const deg of ROTATIONS) {
+      if (results.some((r) => r.rotation === deg)) continue;
       const points = await run(deg);
       results.push({ rotation: deg, points, score: score(points) });
     }
@@ -163,7 +190,6 @@ export class OrientationSearch {
     this.#current = best.rotation;
     this.#score = best.score;
     this.#sinceSearch = 0;
-    this.#lastScores = scores;
     return { ...best, searched: true, scores };
   }
 
@@ -171,6 +197,5 @@ export class OrientationSearch {
     this.#current = this.mode === 'auto' || this.mode === 'none' ? 0 : this.mode;
     this.#score = 0;
     this.#sinceSearch = Infinity;
-    this.#lastScores = null;
   }
 }

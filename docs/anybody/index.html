@@ -4,10 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <!-- Privacy is an enforced property here, not a promise in a README.
-       connect-src 'self' blocks MediaPipe's usage-stats POST to
-       odml.pa.googleapis.com, and there is no other network call after the model
-       loads. Camera frames and pose data never leave the page. -->
+  <!-- connect-src 'self' blocks MediaPipe's usage-stats POST to
+       odml.pa.googleapis.com, and nothing in src/ makes any other network call
+       after the model loads.
+
+       Two honest limits on that. (1) CSP is per-DOCUMENT: a same-origin parent
+       page that frames this one can reach straight into it, so this guarantee
+       is only as strong as the origin it is served from. (2) connect-src covers
+       fetch/XHR/WebSocket/beacon, not exfiltration by navigation. It stops
+       accidental telemetry; it is not a defence against a hostile bundle. -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'self' data: blob:; media-src 'self' blob: mediastream:; style-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Anybody — full-body tracking test harness</title>
@@ -44,6 +49,7 @@
 
       <div class="bar">
         <button id="useCamera">Use camera</button>
+        <button id="stopCam" hidden>Stop camera</button>
         <label class="file">Load video&hellip;<input id="file" type="file" accept="video/*"></label>
         <span class="gap"></span>
         <button id="t-skeleton">Skeleton</button>

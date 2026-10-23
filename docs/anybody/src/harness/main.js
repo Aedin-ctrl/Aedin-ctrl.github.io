@@ -16,7 +16,7 @@ const ui = {
   stats: $('stats'), rot: $('rot'),
   orientation: $('orientation'), minScore: $('minScore'), minScoreOut: $('minScoreOut'),
   rec: $('rec'), saveJson: $('saveJson'), saveCsv: $('saveCsv'), recInfo: $('recInfo'),
-  reset: $('reset'), frame: $('frame'),
+  reset: $('reset'), frame: $('frame'), stopCam: $('stopCam'),
 };
 
 const show = { skeleton: true, points: true, box: true, face: false, feed: true };
@@ -36,13 +36,25 @@ function say(msg, kind = '') {
 
 // --- source ----------------------------------------------------------------
 
+/** Release the camera hardware. The indicator light going out is the UI. */
+function releaseCamera() {
+  const st = ui.video.srcObject;
+  if (st) { st.getTracks().forEach((t) => t.stop()); ui.video.srcObject = null; }
+  if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+  ui.stopCam.hidden = true;
+}
+
+let objectUrl = null;
+
 async function useCamera() {
   stop();
+  releaseCamera();
   try {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false,
     });
     ui.video.srcObject = stream;
+    ui.stopCam.hidden = false;
     ui.video.loop = false;
     ui.video.muted = true;
     await ui.video.play();
@@ -54,11 +66,9 @@ async function useCamera() {
 
 function useFile(file) {
   stop();
-  if (ui.video.srcObject) {
-    ui.video.srcObject.getTracks().forEach((t) => t.stop());
-    ui.video.srcObject = null;
-  }
-  ui.video.src = URL.createObjectURL(file);
+  releaseCamera();
+  objectUrl = URL.createObjectURL(file);
+  ui.video.src = objectUrl;
   ui.video.loop = true;
   ui.video.muted = true;
   ui.video.controls = true;
@@ -67,7 +77,9 @@ function useFile(file) {
 
 function stop() {
   state.running = false;
-  state.result = null;
+  // Deliberately NOT clearing state.result: a finished recording still needs a
+  // frame to describe it, and nulling it here silently destroyed the session
+  // the moment you switched source, with Save still enabled and then throwing.
   if (recorder.recording) toggleRecord();
 }
 
@@ -119,6 +131,9 @@ async function loop() {
     } finally {
       state.busy = false;
     }
+    // stop() may have fired while this frame was in flight; without this the
+    // old loop keeps scheduling itself alongside the new one.
+    if (!state.running) return;
     if (recorder.recording) {
       recorder.push(state.result, ui.video.currentTime * 1000);
       updateRecInfo();
@@ -259,15 +274,26 @@ function bindToggle(id, key) {
 }
 
 $('useCamera').addEventListener('click', useCamera);
+ui.stopCam.addEventListener('click', () => {
+  stop();
+  releaseCamera();
+  say('Camera stopped.');
+});
 $('file').addEventListener('change', (e) => { if (e.target.files[0]) useFile(e.target.files[0]); });
 ['skeleton', 'points', 'box', 'face', 'feed'].forEach((k) => bindToggle(`t-${k}`, k));
 
 ui.orientation.addEventListener('change', async () => {
   const v = ui.orientation.value;
   const mode = v === 'auto' || v === 'none' ? v : Number(v);
-  if (state.tracker) { state.tracker.close(); state.tracker = null; }
+  const wasRunning = state.running;
+  state.running = false;
+  // Wait for any in-flight detect() to return before closing the landmarker
+  // underneath it.
+  while (state.busy) await new Promise((r) => setTimeout(r, 10));
+  state.tracker?.close();
   state.tracker = await createTracker({ orientation: mode });
   say(`Orientation: ${v}`);
+  if (wasRunning) { state.running = true; loop(); }
 });
 
 ui.minScore.addEventListener('input', () => {
@@ -283,19 +309,27 @@ ui.reset.addEventListener('click', () => {
 
 ui.rec.addEventListener('click', toggleRecord);
 ui.saveJson.addEventListener('click', () =>
-  download(`anybody_${stamp()}.json`, recorder.toJSON(state.result), 'application/json'));
+  download(`anybody_${stamp()}.json`, recorder.toJSON(), 'application/json'));
 ui.saveCsv.addEventListener('click', () =>
-  download(`anybody_${stamp()}.csv`, recorder.toCSV(state.result), 'text/csv'));
+  download(`anybody_${stamp()}.csv`, recorder.toCSV(), 'text/csv'));
 
 // --- hover -----------------------------------------------------------------
 
+// Coalesced into a frame: a 1000 Hz mouse would otherwise force a full redraw
+// and a synchronous layout per event.
+let hoverQueued = false;
+const queueRender = () => {
+  if (hoverQueued) return;
+  hoverQueued = true;
+  requestAnimationFrame(() => { hoverQueued = false; render(); });
+};
 ui.frame.addEventListener('pointermove', (e) => {
   const rect = ui.canvas.getBoundingClientRect();
   state.hover = pick(state.result, e.clientX - rect.left, e.clientY - rect.top,
     rect.width, rect.height, { minScore: state.minScore });
-  render();
+  queueRender();
 });
-ui.frame.addEventListener('pointerleave', () => { state.hover = null; render(); });
+ui.frame.addEventListener('pointerleave', () => { state.hover = null; queueRender(); });
 
 // --- lifecycle -------------------------------------------------------------
 
@@ -311,7 +345,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
   theme = readTheme();
   render();
 });
-addEventListener('resize', render);
+addEventListener('resize', queueRender);
 
 updateRecInfo();
 say('Choose a camera or a video file to begin.');
