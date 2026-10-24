@@ -131,6 +131,33 @@
                 margin-right:5px; border-radius:2px;}
   .money .none{font-size:12.5px; color:var(--muted);}
   .age{font-size:11.5px; color:var(--muted); margin-top:9px;}
+
+  /* System panel. The page exists to be read away from the machine, so
+     the things that decide whether this is worth funding -- how much data
+     exists, what the curve says, whether the collectors are even alive --
+     belong here and not only over ssh. */
+  .sys{margin-top:34px; border-top:1px solid var(--rule); padding-top:20px;}
+  .sys h2{margin:0 0 4px;}
+  .sys .grid{display:grid; gap:14px; margin-top:14px;
+             grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
+  .sys .box{border:1px solid var(--rule); border-radius:10px; padding:13px 15px;
+            background:var(--card);}
+  .sys .box h3{margin:0 0 8px; font-size:11px; letter-spacing:.09em;
+               text-transform:uppercase; color:var(--muted); font-weight:600;}
+  .sys .big{font-family:'Space Grotesk',sans-serif; font-size:23px;
+            font-weight:600; letter-spacing:-0.02em; line-height:1.1;}
+  .sys .sub{font-size:12px; color:var(--ink2); margin-top:3px;}
+  .sys table{width:100%; border-collapse:collapse; font-size:12.5px;
+             margin-top:4px;}
+  .sys td,.sys th{padding:3px 6px 3px 0; text-align:right;}
+  .sys th{color:var(--muted); font-weight:600; font-size:11px;}
+  .sys td:first-child,.sys th:first-child{text-align:left;}
+  .sys .ok{color:var(--good);} .sys .bad{color:var(--bad);}
+  .sys .dot{display:inline-block; width:7px; height:7px; border-radius:50%;
+            margin-right:6px; vertical-align:middle;}
+  .sys .verdict{border-left:3px solid var(--bad); padding-left:13px;
+                margin-top:16px;}
+  .sys .verdict li{font-size:13px; color:var(--ink2); margin:5px 0;}
 </style>
 </head>
 <body>
@@ -184,6 +211,8 @@
     that reason, not because the price is wrong. Real settlements so far: <b>98.6&percnt;
     agreement</b> &mdash; but that rests on a handful of disagreements, so treat it as thin
     evidence rather than a rate.</p>
+
+  <section class="sys" id="sys" hidden></section>
 
   <footer id="foot"></footer>
 </main>
@@ -508,6 +537,102 @@
       .catch(() => {});
   }
 
+  function sysCard(d) {
+    const box = $("#sys");
+    if (!d || !box) return;
+    box.hidden = false;
+    const esc = t => String(t).replace(/[<>&]/g, c =>
+      ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
+    const alive = d.alive || {};
+    const names = Object.keys(alive);
+    const up = names.filter(n => alive[n]).length;
+    const sm = d.sampler || {};
+    const st = d.settlement || {};
+    const pa = d.paper || {};
+    const c20 = ((sm.curves || {}).qty20 || {}).curve || [];
+
+    let h = "<h2>System</h2><p class=\"lede\">What is running, how much has "
+          + "been measured, and what it says so far.</p><div class=\"grid\">";
+
+    h += "<div class=\"box\"><h3>Collectors</h3><div class=\"big\">"
+       + up + " / " + names.length + "</div><div class=\"sub\">";
+    h += names.map(n => '<span class="dot" style="background:'
+       + (alive[n] ? "var(--good)" : "var(--bad)") + '"></span>'
+       + esc(n.replace(".py", ""))).join("<br>");
+    h += "</div></div>";
+
+    h += "<div class=\"box\"><h3>Second-by-second sample</h3><div class=\"big\">"
+       + (sm.rows ? sm.rows.toLocaleString() : "0") + "</div>"
+       + "<div class=\"sub\">quotes over " + (sm.hours || 0) + " h"
+       + (sm.newest_age_s != null
+          ? " &middot; newest " + Math.round(sm.newest_age_s) + "s ago" : "")
+       + "</div></div>";
+
+    h += "<div class=\"box\"><h3>Settlement agreement</h3><div class=\"big\">"
+       + (st.agreement_pct != null ? st.agreement_pct + "%" : "--") + "</div>"
+       + "<div class=\"sub\">" + (st.agreed || 0) + " / " + (st.windows || 0)
+       + " windows &middot; " + (st.disagreed || 0) + " disagreed<br>"
+       + "95% lower bound " + (st.wilson_lower_pct != null
+            ? st.wilson_lower_pct + "%" : "--") + "</div></div>";
+
+    const eq = pa.equity, start = 209.0088;
+    const dpnl = eq != null ? eq - start : null;
+    h += "<div class=\"box\"><h3>Paper account (real books)</h3>"
+       + "<div class=\"big " + (dpnl >= 0 ? "ok" : "bad") + "\">"
+       + (eq != null ? "$" + eq.toFixed(2) : "--") + "</div>"
+       + "<div class=\"sub\">from $209.01 &middot; "
+       + (dpnl != null ? (dpnl >= 0 ? "+" : "") + "$" + dpnl.toFixed(2) : "--")
+       + "<br>" + (pa.settled || 0) + " settled, " + (pa.open || 0) + " open"
+       + " &middot; " + (pa.divergences || 0) + " divergences</div></div>";
+    h += "</div>";
+
+    if (c20.length) {
+      h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
+         + "text-transform:uppercase;color:var(--muted)\">"
+         + "How much survives a safety margin (20+ contracts both sides)</h3>";
+      h += "<table><tr><th>margin / leg</th><th>samples</th><th>tradeable</th>"
+         + "<th>rate</th><th>median</th><th>best</th></tr>";
+      c20.forEach(r => {
+        h += "<tr><td>" + r.safety_c.toFixed(2) + "c</td><td>"
+           + r.n.toLocaleString() + "</td><td>" + r.tradeable + "</td><td>"
+           + r.rate_pct.toFixed(3) + "%</td><td>" + r.median_c.toFixed(2)
+           + "c</td><td class=\"" + (r.best_c > 0 ? "ok" : "bad") + "\">"
+           + r.best_c.toFixed(2) + "c</td></tr>";
+      });
+      h += "</table>";
+    }
+
+    const wy = pa.why_no_trade || [];
+    if (wy.length) {
+      h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
+         + "text-transform:uppercase;color:var(--muted)\">"
+         + "Why the paper account did not trade</h3><table>";
+      wy.forEach(r => {
+        h += "<tr><td>" + esc(r.reason) + "</td><td>" + r.n + "</td></tr>";
+      });
+      h += "</table>";
+    }
+
+    const v = d.verdict || {};
+    if (v.headline) {
+      h += "<div class=\"verdict\"><b>" + esc(v.headline) + "</b><ul>";
+      (v.points || []).forEach(p => { h += "<li>" + esc(p) + "</li>"; });
+      h += "</ul></div>";
+    }
+    if (d.as_of) {
+      const age = Math.max(0, Math.round((Date.now() - new Date(d.as_of)) / 1000));
+      h += "<div class=\"age\">system panel " + age + "s old</div>";
+    }
+    box.innerHTML = h;
+  }
+
+  function refreshSys() {
+    fetch(LIVE + "/status.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) sysCard(d); })
+      .catch(() => {});
+  }
+
   function refreshMoney() {
     fetch(LIVE + "/balances.json", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
@@ -528,9 +653,10 @@
       d.venueName = {};
       (d.venues || []).forEach(v => { d.venueName[v.key] = v.name; });
       pills(d); render(d, "all"); foot(d); paperCard(d);
-      refreshPaper(); refreshMoney();
+      refreshPaper(); refreshMoney(); refreshSys();
       setInterval(refreshPaper, 20000);
       setInterval(refreshMoney, 60000);
+      setInterval(refreshSys, 30000);
     })
     .catch(e => {
       $("#summary").appendChild(el("div", "headline", "Could not load the price feed."));
