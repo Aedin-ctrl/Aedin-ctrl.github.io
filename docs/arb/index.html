@@ -385,7 +385,7 @@
     const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
 
     const pair = el("div", "pair");
-    pair.appendChild(el("span", "tag", "paper account"));
+    pair.appendChild(el("span", "tag", "paper account \u00b7 not real money"));
     pair.appendChild(el("span", "big " + (up ? "up" : "down"),
                         sign + Math.abs(pctMove).toFixed(2) + "%"));
     pair.appendChild(el("span", up ? "up" : "down",
@@ -396,9 +396,16 @@
       "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
     // Per venue, because one wallet starving is what stops the account
     // trading and the total hides it completely.
+    // "kalshi $26.86" next to a real KALSHI $99.00 further down the page
+    // reads as a balance that has gone wrong. Say "sim" on the number
+    // itself, not only in the heading, and name the venue this track
+    // actually trades -- global Polymarket, which the real accounts
+    // cannot reach.
     box.appendChild(el("span", null,
-      "kalshi $" + (cash.kalshi === undefined ? "\u2014" : cash.kalshi.toFixed(2))
-      + " \u00b7 poly $" + (cash.polymarket === undefined ? "\u2014" : cash.polymarket.toFixed(2))));
+      "sim wallets \u00b7 kalshi $"
+      + (cash.kalshi === undefined ? "\u2014" : cash.kalshi.toFixed(2))
+      + " \u00b7 poly(global) $"
+      + (cash.polymarket === undefined ? "\u2014" : cash.polymarket.toFixed(2))));
     box.appendChild(el("span", atRisk > 0.005 ? "v" : null,
       "$" + atRisk.toFixed(2) + " bet right now"));
     box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
@@ -406,6 +413,12 @@
     // the two venues disagreed and the entire stake went.
     box.appendChild(el("span", p.diverged ? "warn" : null,
       p.diverged ? p.diverged + " settled differently" : "0 disagreements"));
+    // This track pairs Kalshi with GLOBAL Polymarket, which settles on a
+    // Chainlink TWAP against the start price while Kalshi uses a CF
+    // Benchmarks 60s average. Different contract, and not one the real
+    // accounts can buy -- so this P&L does not forecast them.
+    box.appendChild(el("span", "warn",
+      "global-poly pair \u2014 not what the real accounts trade"));
     if (p.as_of) {
       const age = Math.max(0, Math.round((Date.now() - new Date(p.as_of).getTime()) / 1000));
       box.appendChild(el("span", null,
