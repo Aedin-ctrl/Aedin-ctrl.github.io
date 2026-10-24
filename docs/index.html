@@ -560,6 +560,7 @@
   .link-item:last-child{border-bottom:1px solid var(--line);}
   .link-title{font-size:14px; color:var(--ink); font-family:'Space Grotesk', sans-serif; font-weight:500; display:block;}
   .link-desc{color:var(--muted); font-size:12.5px; line-height:1.6; margin-top:5px; max-width:460px;}
+  .link-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
 
   .penguin-wrap{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -1219,10 +1220,15 @@
             <li class="link-item">
               <div>
                 <span class="link-title">Anybody</span>
-                <p class="link-desc">Full-body tracking you can put in your own project. Test harness, source and notes.</p>
+                <p class="link-desc">Full-body tracking you can put in your own project. Test harness, source and notes.
+                  The download is the whole thing, models included &mdash; 14&nbsp;MB zip, runs with no network.</p>
               </div>
-              <button type="button" class="btn-outline" data-path="/projects/anybody"
-                 aria-label="Open Anybody">Open</button>
+              <div class="link-actions">
+                <button type="button" class="btn-outline" data-path="/projects/anybody"
+                   aria-label="Open Anybody">Open</button>
+                <a class="btn-outline" href="/downloads/anybody.zip" download
+                   aria-label="Download Anybody as a zip">Download</a>
+              </div>
             </li>
             <li class="link-item">
               <div>
