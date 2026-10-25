@@ -83,6 +83,72 @@
   .empty{padding:30px 18px; text-align:center; color:var(--muted); font-size:13.5px;
          border:1px dashed var(--rule); border-radius:12px; background:var(--card);}
 
+  /* THE VENUE BOARD. One column per venue; adding a third venue is
+     adding a third entry to the feed, not a layout change. */
+  .venues{display:grid; gap:13px; align-items:start;
+          grid-template-columns:repeat(var(--vcols,2),minmax(0,1fr));}
+  .vcol{min-width:0;}
+  .vhead{display:flex; align-items:baseline; justify-content:space-between;
+         gap:10px; padding:0 2px 8px; border-bottom:1px solid var(--rule);
+         margin-bottom:10px;}
+  .vhead .vname{font-family:'Space Grotesk',sans-serif; font-weight:600;
+                font-size:14px; letter-spacing:.01em;}
+  .vhead .vcash{font-size:11.5px; color:var(--muted);
+                font-variant-numeric:tabular-nums;}
+  .mkt{background:var(--card); border:1px solid var(--line); border-radius:11px;
+       padding:11px 13px 10px; margin-bottom:9px;}
+  .mkt+.mkt{margin-top:0;}
+  .mkt .mtop{display:flex; align-items:flex-start; justify-content:space-between;
+             gap:10px;}
+  .mkt .mname{font-size:13px; font-weight:600; color:var(--ink); line-height:1.3;}
+  .mkt .mline{font-size:11.5px; color:var(--ink2); margin-top:3px;
+              font-variant-numeric:tabular-nums;}
+  .mkt .clock{font-family:'Space Grotesk',sans-serif; font-size:15px;
+              font-weight:600; font-variant-numeric:tabular-nums;
+              white-space:nowrap;}
+  .mkt .clock.soon{color:var(--bad);}
+  .mkt .clockl{display:block; font-size:9.5px; letter-spacing:.07em;
+               text-transform:uppercase; color:var(--muted); font-weight:500;
+               text-align:right; margin-top:1px;}
+  .sides{display:flex; gap:7px; margin-top:9px;}
+  .sd{flex:1; min-width:0; border:1px solid var(--rule); border-radius:8px;
+      padding:6px 8px;}
+  .sd .sn{font-size:10px; letter-spacing:.06em; text-transform:uppercase;
+          color:var(--muted);}
+  .sd .sp{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+          font-variant-numeric:tabular-nums;}
+  .sd .ss{font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
+  /* Is real money on this market right now? */
+  .held{display:flex; align-items:center; gap:7px; margin-top:9px;
+        padding-top:8px; border-top:1px solid var(--rule); font-size:12px;}
+  .held .mk{display:inline-flex; align-items:center; justify-content:center;
+            width:17px; height:17px; border-radius:50%; font-size:11px;
+            font-weight:700; flex:none;}
+  .held.on .mk{background:var(--good); color:#fff;}
+  .held.off .mk{background:var(--rule); color:var(--muted);}
+  .held.on{color:var(--ink);}
+  .held.off{color:var(--muted);}
+  .held b{font-variant-numeric:tabular-nums;}
+
+  /* What should be bet on -- every pairing, including the ones that do
+     not clear, because "nothing clears" is the finding. */
+  .sig{border:1px solid var(--line); border-radius:11px; background:var(--card);
+       padding:11px 13px; margin-bottom:18px;}
+  .sig h3{font-size:12px; margin:0 0 8px; letter-spacing:.02em;}
+  .sigrow{display:flex; align-items:baseline; gap:10px; font-size:12.5px;
+          padding:4px 0; border-top:1px solid var(--rule);
+          font-variant-numeric:tabular-nums;}
+  .sigrow:first-of-type{border-top:0;}
+  .sigrow .c{font-weight:600; text-transform:uppercase; font-size:11px;
+             width:38px; flex:none;}
+  .sigrow .sh{flex:1; min-width:0; color:var(--ink2);
+              overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sigrow .nv{font-family:'Space Grotesk',sans-serif; font-weight:600;
+              width:66px; text-align:right; flex:none;}
+  .sigrow .nv.neg{color:var(--bad);} .sigrow .nv.pos{color:var(--good);}
+  .sigrow .sz{width:74px; text-align:right; flex:none; color:var(--muted);
+              font-size:11px;}
+
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
   .note+.note{margin-top:10px;}
@@ -91,9 +157,15 @@
          font-size:11.5px; color:var(--muted); max-width:72ch;}
   footer p+p{margin-top:6px;}
 
+  @media (max-width:720px){
+    /* Columns stop being columns on a phone: they stack, each still
+       labelled with its venue, which is the thing that matters. */
+    .venues{grid-template-columns:1fr; gap:22px;}
+  }
   @media (max-width:520px){
     .cards{grid-template-columns:1fr;}
     .ret .n{font-size:20px;}
+    .sigrow .sz{display:none;}
   }
 
   /* Paper account, across the top. Not real money, and it says so --
@@ -174,52 +246,47 @@
 <main>
   <div class="summary" id="summary"></div>
 
-  <nav class="pills" id="pills" aria-label="Filter by whether the pairing clears"></nav>
+  <div class="sig" id="signals" hidden></div>
 
   <div id="board"></div>
 
-  <h2>Before you act on one of these</h2>
-  <p class="note"><b>Filling both legs does not make you safe here.</b> On a true hedge exactly
-    one leg pays and the total is fixed. These pairings are not that: they pay $1 when the two
-    venues agree, and <b>$2 or $0</b> when they do not. The downside is real and it is why the
-    movement filter exists. Settlement is at most fifteen minutes away, so there is no holding
-    period to speak of.</p>
-  <p class="note"><b>Between the two fills you are not safe</b>, and that is where the money is
-    actually lost. There is no atomic order across two venues: you place one, then the other.
-    Both quote in whole cents, so a single tick is 1&percnt; of the payout — <b>larger than most
-    of the edges on this board</b>. If the second venue moves one cent while you are getting
-    there, you either hold one naked leg — an outright directional bet on the coin — or you
-    complete at a worse price and lose more than the gap was worth.</p>
-  <p class="note">These rows are short-lived by construction — each window lives fifteen
-    minutes and Kalshi lists one at a time. More to the point, <b>about four in five candidates
-    lose their edge when both legs are re-read together</b> a few seconds later. Measured drift
-    on the re-read averages −0.13&cent;, so it is not a one-way leak; it is that the cheapest
-    quote in a scan is the most likely to be the stale one. None of this is priced into the
-    figures above — they assume both legs fill at the quoted price, instantly.</p>
-
-  <h2>Reading a card</h2>
-  <p class="note"><b>This is not an arbitrage.</b> Kalshi and Polymarket both run
-    &ldquo;will it go up&rdquo; markets on the same 15-minute clock, but they resolve
-    <b>different questions</b>. Kalshi compares the average of the last 60 seconds to the average
-    of the 60 seconds before the open. Polymarket compares a time-weighted average of the
-    <em>whole</em> window to the price at the open. A coin that sits flat for 14 minutes and
-    spikes in the last one is <b>up on Kalshi and down on Polymarket</b>.</p>
+  <h2>Reading the board</h2>
+  <p class="note">One column per venue. Each card is a live 15-minute window on that venue, in
+    that venue's own wording, with that venue's own line, the time left on the clock, and what
+    each side costs right now. Both columns are priced from the same streamed order books the
+    trader decides on. <b>The check or cross on a card is real money</b> &mdash; whether an actual
+    position is open on that exact market, read from the venue's own portfolio endpoint, with the
+    amount.</p>
+  <p class="note"><b>Kalshi and Polymarket US are the same contract.</b> Both settle on the same
+    CF Benchmarks index, by the same rule: the simple average of the sixty seconds before the
+    close against the simple average of the sixty seconds before the open. Over 356 settled
+    windows the two venues published <b>the same strike to the cent</b> on BTC, ETH and SOL.
+    (This is not true of <em>global</em> Polymarket, which uses a Chainlink time-weighted average
+    against the opening price. That is a different contract, and it is not what this board shows.)</p>
   <p class="note">So buying the cheap side on each venue pays <b>$1 when the two agree</b>, and
-    <b>$2 or $0</b> on the two kinds of disagreement. Over 34,326 windows those two kinds came out
-    nearly balanced (6.08&percnt; against 5.26&percnt;), which is why the <b>price gap between the
-    venues</b> is the thing worth having rather than a premium for taking a risk. The big number on
-    each card is that gap after fees, per contract.</p>
-  <p class="note">A positive gap is not enough on its own. Kalshi's fee is
-    <b>0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price)</b> per contract, biggest in the middle of the
-    range &mdash; 1.75&cent; at a coin flip against 0.33&cent; at 5&cent; or 95&cent;. The board
-    has measured edges of a fifth of a cent to nine cents a contract, so the fee is routinely
-    larger than the edge, and a pairing only clears when it is priced well away from the middle.</p>
-  <p class="note"><b>Disagreement is the risk, and it is predictable.</b> It collapses as the
-    window moves: 40.9&percnt; of windows that moved under 1bp disagreed, against 0.4&percnt; of
-    those that moved more than 40bp. Pairings on a window that has barely moved are held back for
-    that reason, not because the price is wrong. Real settlements so far: <b>98.6&percnt;
-    agreement</b> &mdash; but that rests on a handful of disagreements, so treat it as thin
-    evidence rather than a rate.</p>
+    <b>$2 or $0</b> when they disagree. Measured over 1,256 settled windows they agreed
+    <b>98.25&percnt;</b> of the time &mdash; 22 disagreements, each of which is a total loss or a
+    double. That residual is the real risk, and it does not shrink with the fee.</p>
+
+  <h2>Why the number next to each pairing is negative</h2>
+  <p class="note"><b>The price on a card is the top of the book</b> &mdash; what the first contract
+    costs. Twenty contracts cost more, because the ladder has to be walked, and Polymarket US is
+    thin at the touch: a median of 67 contracts against Kalshi's 328. The pairing figures are
+    quoted at the size actually shown, which is why a card can look cheap while nothing clears.</p>
+  <p class="note"><b>The fee is quadratic.</b> Kalshi charges
+    0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price) per contract and
+    Polymarket US 0.0695 of the same shape, so the round trip is 3.8&cent; at a coin flip and
+    0.34&cent; out at 3&cent;. The cheap corner looks like the place to trade. It is not: across
+    81,164 samples the two venues' mid prices differ by <b>0.00&cent; in every price band</b>.
+    With no fee charged at all there is no gap. The whole measured loss <em>is</em> the fee.</p>
+  <p class="note">Three more things close that corner independently. The maker rebate is
+    &theta;&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price) &mdash; the same
+    quadratic as the fee, so it collapses with it. Polymarket US quotes on a flat 1&cent; tick
+    while Kalshi quotes to 0.1&cent; in the tails, so in the band where the round trip falls to
+    0.34&cent; <b>the tick is larger than the fee</b> and a sub-cent edge could not be priced.
+    And Massachusetts does not adopt the federal wagering-loss rule, so a hedged pair is taxed on
+    its gross winnings &mdash; roughly 2.5&cent; on a 3&cent; edge, and that does not shrink in
+    the cheap corner either.</p>
 
   <section class="sys" id="sys" hidden></section>
 
@@ -271,139 +338,173 @@
     "no edge": "the two legs cost more than the $1 they pay",
   };
 
-  function card(r, venueName) {
-    const c = el("div", "bet");
-    const live = r.verdict === "opened" || r.verdict === "tradeable";
+  // ---------------------------------------------------------------- board
+  // One column per venue. Each card is a live window on that venue: the
+  // venue's own wording, its own line, the time left, both sides priced
+  // off the same streamed book the trader decides on, and whether real
+  // money is on it.
+  function clock(secs) {
+    if (secs === null || secs === undefined) return ["--", false];
+    const t = Math.max(0, Math.round(secs));
+    const m = Math.floor(t / 60), ss = t % 60;
+    return [m + ":" + String(ss).padStart(2, "0"), t <= 60];
+  }
 
-    const top = el("div", "bet-top");
+  function marketCard(m) {
+    const c = el("div", "mkt");
+    c.dataset.close = m.close || "";
+
+    const top = el("div", "mtop");
     const who = el("div");
-    who.appendChild(el("div", "name", r.label));
-    who.appendChild(el("div", "meta",
-      "pairing " + r.variant
-      + (r.contracts ? " · " + r.contracts + " contracts" : "")
-      + (r.move_bp !== null ? " · moved " + r.move_bp.toFixed(1) + "bp" : "")));
+    who.appendChild(el("div", "mname", m.title || m.coin.toUpperCase()));
+    if (m.line) who.appendChild(el("div", "mline", m.line));
     top.appendChild(who);
-    const ret = el("div", "ret");
-    if (r.net_per_contract !== null) {
-      const big = el("span", "n",
-        (r.net_per_contract >= 0 ? "+" : "") + (r.net_per_contract * 100).toFixed(2) + "\u00A2");
-      if (r.net_per_contract < 0) big.classList.add("neg");
-      ret.appendChild(big);
-      ret.appendChild(el("span", "l", "per contract"));
-    } else {
-      ret.appendChild(el("span", "n", "\u2014"));
-      ret.appendChild(el("span", "l", "not sized"));
-    }
-    top.appendChild(ret);
+
+    const right = el("div");
+    const [txt, soon] = clock(m.secs_left);
+    const cl = el("div", "clock" + (soon ? " soon" : ""), txt);
+    cl.dataset.clock = "1";
+    right.appendChild(cl);
+    right.appendChild(el("span", "clockl", "left"));
+    top.appendChild(right);
     c.appendChild(top);
 
-    const box = el("div", "legs");
-    (r.legs || []).forEach(lg => {
-      const row = el("div", "leg");
-      row.appendChild(el("span", "side", "Buy"));
-      row.appendChild(el("span", "venue",
-        (venueName[lg.venue] || lg.venue) + " \u2014 " + lg.side));
-      row.appendChild(el("span", "px", cents(lg.price)));
-      box.appendChild(row);
+    const sides = el("div", "sides");
+    (m.sides || []).forEach(sd => {
+      const b = el("div", "sd");
+      b.appendChild(el("div", "sn", sd.name));
+      b.appendChild(el("div", "sp", sd.px === null || sd.px === undefined
+        ? "\u2014" : (sd.px * 100).toFixed(1) + "\u00A2"));
+      // Sizes under a contract are real and are the whole story on a thin
+      // book -- rounding 0.02 to "0" printed a price next to no size at all.
+      b.appendChild(el("div", "ss", sd.size
+        ? (sd.size < 10 ? (Math.round(sd.size * 100) / 100)
+                        : Math.round(sd.size).toLocaleString())
+          + " at this price" : "no size"));
+      sides.appendChild(b);
     });
-    c.appendChild(box);
+    c.appendChild(sides);
 
-    const f = el("div", "foot-row");
-    const left = el("span");
-    left.innerHTML = cents(r.unit_cost) + " in \u2192 pays <b>$1.00</b> when the two venues agree";
-    f.appendChild(left);
-    if (r.net_total !== null) {
-      f.appendChild(el("span", "risk",
-        (r.net_total >= 0 ? "+" : "") + money(r.net_total) + " total"));
+    // The real-money marker. A check and the amount when a position is
+    // open on this exact market, a cross when there is none. This reads
+    // the venue's own portfolio endpoint; nothing here places anything.
+    const h = m.position;
+    const row = el("div", "held " + (h ? "on" : "off"));
+    row.appendChild(el("span", "mk", h ? "\u2713" : "\u2715"));
+    if (h) {
+      const sp = el("span");
+      sp.innerHTML = "betting <b>" + money(h.cost) + "</b> \u2014 "
+        + Math.round(h.qty).toLocaleString() + " contracts "
+        + (h.side === "yes" || h.side === "long" ? "on up" : "on down");
+      row.appendChild(sp);
+    } else {
+      row.appendChild(el("span", null, "no real money on this one"));
     }
-    c.appendChild(f);
-
-    if (!live) {
-      c.appendChild(el("div", "thin", VERDICT_NOTE[r.verdict] || r.verdict));
-    }
-    c.appendChild(el("div", "working",
-      r.verdict + (r.fees !== null ? " \u00B7 " + money(r.fees) + " fees" : "")));
+    c.appendChild(row);
     return c;
   }
 
-  function render(d, when) {
-    const all = d.pairings || [];
-    const rows = (when && when !== "all"
-      ? all.filter(r => (WITHIN[when] || []).includes(r.verdict)) : all).slice();
-
-    const s = $("#summary"); s.textContent = "";
-    const money = el("div", "money"); money.id = "money"; s.appendChild(money);
-    // The summary box is the money box. The board below speaks for
-    // itself -- every card already carries its own fee, tax and risk
-    // line, so a prose headline only restates them less precisely.
-
-    const host = $("#board"); host.textContent = "";
-    if (!rows.length) {
-      host.appendChild(el("div", "empty",
-        "Nothing in this view right now. Kalshi lists one 15-minute window at "
-        + "a time, so there is a short gap between them."));
-      return;
-    }
-    const grid = el("div", "cards");
-    rows.forEach(r => grid.appendChild(card(r, d.venueName)));
-    host.appendChild(grid);
-  }
-
-  function pills(d) {
-    const nav = $("#pills"); nav.textContent = "";
-    const counts = {};
-    (d.pairings || []).forEach(r => { counts[r.verdict] = (counts[r.verdict] || 0) + 1; });
-    const btns = TABS.map(([key, label]) => {
-      const b = el("button", null, label
-        + (key === "all" ? "" : " (" + (WITHIN[key] || []).reduce(
-            (a, k) => a + (counts[k] || 0), 0) + ")"));
-      b.type = "button";
-      b.setAttribute("aria-pressed", key === "all" ? "true" : "false");
-      if (key !== "all" && (WITHIN[key] || []).reduce((a, k) => a + (counts[k] || 0), 0) === 0) {
-        b.disabled = true;
-      }
-      b.addEventListener("click", () => {
-        btns.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
-        render(d, key);
-      });
-      nav.appendChild(b);
-      return b;
+  function signalStrip(d) {
+    const box = $("#signals");
+    const rows = d.signals || [];
+    if (!rows.length) { box.hidden = true; return; }
+    box.hidden = false;
+    box.textContent = "";
+    const clears = rows.filter(r => r.clears).length;
+    box.appendChild(el("h3", null, clears
+      ? clears + " of " + rows.length + " pairings clear the floor right now"
+      : "What to bet on: nothing. " + rows.length
+        + " pairings priced, none clears the floor."));
+    rows.slice(0, 8).forEach(r => {
+      const row = el("div", "sigrow");
+      row.appendChild(el("span", "c", r.coin));
+      row.appendChild(el("span", "sh", r.shape + " \u00B7 costs "
+        + (r.unit * 100).toFixed(1) + "\u00A2 to win $1"));
+      const nv = el("span", "nv " + (r.net >= 0 ? "pos" : "neg"),
+        (r.net >= 0 ? "+" : "\u2212") + Math.abs(r.net * 100).toFixed(2) + "\u00A2");
+      row.appendChild(nv);
+      row.appendChild(el("span", "sz", r.size
+        ? (r.size < 10 ? (Math.round(r.size * 100) / 100)
+                       : Math.round(r.size).toLocaleString()) + " deep"
+        : "no size"));
+      box.appendChild(row);
     });
   }
 
+  function render(d) {
+    // Do NOT rebuild #summary here. It holds the real-balances card, which
+    // refreshes on its own 60s clock; recreating it on every 5s board pass
+    // blanked it for eleven passes out of twelve.
+    if (!$("#money")) {
+      const mny = el("div", "money"); mny.id = "money";
+      $("#summary").appendChild(mny);
+    }
+
+    signalStrip(d);
+
+    const host = $("#board"); host.textContent = "";
+    const venues = (d.venues || []).filter(v => (v.markets || []).length);
+    if (!venues.length) {
+      host.appendChild(el("div", "empty",
+        "No window is open on either venue right now. Kalshi lists one "
+        + "15-minute market at a time, so there is a short gap between them."));
+      return;
+    }
+    const grid = el("div", "venues");
+    grid.style.setProperty("--vcols", String(venues.length));
+    venues.forEach(v => {
+      const col = el("div", "vcol");
+      const hd = el("div", "vhead");
+      hd.appendChild(el("span", "vname", v.name));
+      hd.appendChild(el("span", "vcash", v.wallet === null || v.wallet === undefined
+        ? "balance unknown" : money(v.wallet) + " in the account"));
+      col.appendChild(hd);
+      (v.markets || []).forEach(m => col.appendChild(marketCard(m)));
+      grid.appendChild(col);
+    });
+    host.appendChild(grid);
+  }
+
+  // The clocks tick locally between feed passes, so the time left is
+  // right to the second instead of right to the last poll.
+  setInterval(() => {
+    document.querySelectorAll(".mkt").forEach(c => {
+      const iso = c.dataset.close;
+      if (!iso) return;
+      const node = c.querySelector("[data-clock]");
+      if (!node) return;
+      const [txt, soon] = clock((new Date(iso).getTime() - Date.now()) / 1000);
+      node.textContent = txt;
+      node.classList.toggle("soon", soon);
+    });
+  }, 1000);
+
   function foot(d) {
     const f = $("#foot");
-    const h = d.history || {};
-    const rec = d.recent || {};
+    f.textContent = "";
     const lines = [
-      "Prices come from the Kalshi and Polymarket public APIs and are a snapshot, not a live "
-      + "feed. The Polymarket side is priced and sized from the live order book, never from the "
-      + "cached summary quote \u2014 that was measured twenty cents stale and invented edges that "
-      + "nobody was offering. A book that did not answer is treated as unknown, not unlimited, "
-      + "and may not size anything.",
-      "Prices on a card are from the scan. Before the paper trader commits it re-reads both legs "
-      + "together, and about four in five candidates lose their edge on that re-read \u2014 so a "
-      + "\u201Ctradeable\u201D card is what the gate would do at these prices, not a fill.",
-      "This is a research board. It places no bets, holds no account anywhere, and a card on it "
-      + "is not advice."
+      "Both columns are priced from live WebSocket order books \u2014 the same books the "
+      + "paper trader decides on, so the page and the decision cannot disagree. Neither side "
+      + "uses a venue's cached summary quote; Polymarket's was measured twenty cents stale and "
+      + "invented edges nobody was offering. A book that does not answer shows no size rather "
+      + "than unlimited size.",
+      "A price on a card is the top of the book \u2014 what the FIRST contract costs. Twenty "
+      + "contracts cost more, because the ladder has to be walked. The pairing figures above "
+      + "are quoted at the size actually shown, which is why a card can look cheap while "
+      + "nothing clears.",
+      "The check and cross mark whether real money is on that exact market, read from each "
+      + "venue's own portfolio endpoint. The paper account below is separate, and it skips any "
+      + "window that already has a real bet on it so the two never compete for the same money.",
+      "This is a research board. It places no orders, and a card on it is not advice."
     ];
-    if (h.runs) {
-      let s = "Measured so far: " + h.runs.toLocaleString() + " polls, "
-        + (h.pairs_scanned || 0).toLocaleString() + " contract-pairs priced, "
-        + (h.pct_gross || 0).toFixed(1) + "% crossed on raw price and "
-        + (h.pct_net || 0).toFixed(1) + "% survived fees and tax.";
-      const c = rec.crossed || {};
-      if (Object.keys(c).length) {
-        s += " In the last " + (rec.hours || 24) + " hours: "
-          + Object.entries(c).map(([k, n]) => n + " " + k).join(", ") + " crossed.";
-      }
-      lines.push(s);
-    }
     lines.forEach(x => f.appendChild(el("p", null, x)));
-    if (d.updated) {
-      const mins = (Date.now() - new Date(d.updated).getTime()) / 6e4;
+    if (d.as_of) {
+      const secs = (Date.now() - new Date(d.as_of).getTime()) / 1000;
       f.appendChild(el("p", "age", "board updated "
-        + (mins < 90 ? Math.round(mins) + " min" : Math.round(mins / 60) + " h") + " ago"));
+        + (secs < 90 ? Math.round(secs) + "s" : Math.round(secs / 60) + " min") + " ago"
+        + (d.real_as_of ? " \u00B7 positions checked "
+            + Math.round((Date.now() - new Date(d.real_as_of).getTime()) / 1000)
+            + "s ago" : "")));
     }
   }
 
@@ -833,23 +934,27 @@
   // The Pi serves the feed directly, which is minutes fresher than waiting
   // for a commit to rebuild on Pages. The committed snapshot stays as the
   // fallback for when the Pi is unreachable.
-  fetch(LIVE + "/index.json", { cache: "no-store" })
-    .then(r => r.ok ? r : Promise.reject(new Error("live " + r.status)))
-    .catch(() => fetch("index.json", { cache: "no-store" }))
-    .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
-    .then(d => {
-      d.venueName = {};
-      (d.venues || []).forEach(v => { d.venueName[v.key] = v.name; });
-      pills(d); render(d, "all"); foot(d); paperCard(d);
-      refreshPaper(); refreshMoney(); refreshSys();
-      setInterval(refreshPaper, 20000);
-      setInterval(refreshMoney, 60000);
-      setInterval(refreshSys, 30000);
-    })
-    .catch(e => {
-      $("#summary").appendChild(el("div", "headline", "Could not load the price feed."));
-      $("#summary").appendChild(el("p", null, e.message));
-    });
+  // The venue board. Written by the scanner that already holds both
+  // streams, so it is the same data the trader acted on, not a re-poll.
+  function refreshBoard(first) {
+    return fetch(LIVE + "/live.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
+      .then(d => { render(d); foot(d); })
+      .catch(e => {
+        if (!first) return;
+        $("#summary").appendChild(el("div", "headline",
+          "Could not load the venue board."));
+        $("#summary").appendChild(el("p", null, e.message));
+      });
+  }
+
+  refreshBoard(true).then(() => {
+    refreshPaper(); refreshMoney(); refreshSys();
+    setInterval(refreshBoard, 5000);
+    setInterval(refreshPaper, 20000);
+    setInterval(refreshMoney, 60000);
+    setInterval(refreshSys, 30000);
+  });
 })();
 </script>
 </body>
