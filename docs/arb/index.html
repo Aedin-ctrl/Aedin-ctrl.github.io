@@ -203,24 +203,44 @@
   .hstats .k{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
              color:var(--muted); display:block; margin-top:3px;}
 
-  /* one cell per half hour, oldest on the left */
+  /* The contribution grid: hours across, days down. One cell is one
+     hour. Day is a single row; Week is seven, which is the whole point
+     of laying it out this way rather than as one long strip. */
   .htl{padding:15px clamp(15px,4vw,22px) 14px; border-bottom:1px solid var(--rule);}
+  .htl .head{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
   .htl .cap{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
-            color:var(--muted); margin-bottom:8px;}
-  .htl .strip{display:flex; gap:2px;}
-  .htl .strip.dense{gap:1px;}
-  .htl .cell{flex:1 1 0; min-width:3px; height:26px; border-radius:2px;
-             background:var(--line);}
-  .htl .strip.dense .cell{min-width:2px; border-radius:1px;}
-  .htl .cell.near{background:#dcbd6b;}
-  .htl .cell.trade{background:var(--good);}
-  .htl .cell.loss{background:var(--bad);}
-  .htl .ends{display:flex; justify-content:space-between; margin-top:7px;
-             font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
-  .htl .key{display:flex; gap:14px; margin-top:10px; font-size:10.5px;
+            color:var(--muted);}
+  .htl .modes{display:flex; gap:5px; margin-left:auto;}
+  .htl .modes button{font:inherit; font-size:10.5px; cursor:pointer;
+            padding:3px 11px; border-radius:999px; border:1px solid var(--rule);
+            background:var(--card); color:var(--ink2); white-space:nowrap;}
+  .htl .modes button:hover{border-color:var(--ink); color:var(--ink);}
+  .htl .modes button[aria-pressed="true"]{background:var(--accent); color:#fff;
+            border-color:var(--accent);}
+  .htl .modes button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .grid{display:grid; gap:2px; align-items:center;}
+  .grid .lab{font-size:9px; color:var(--muted); text-align:right;
+             padding-right:6px; white-space:nowrap; overflow:hidden;}
+  .grid .lab.today{color:var(--ink2); font-weight:600;}
+  .grid .tick{font-size:8.5px; color:var(--muted); text-align:left;
+              letter-spacing:-.01em;}
+  .cell{height:15px; border-radius:2px; background:var(--line);}
+  .grid.day .cell{height:28px; border-radius:3px;}
+  /* An hour before the account existed, or one that has not happened
+     yet, is not the same as an hour it watched and passed on. */
+  .cell.before,.cell.future{background:transparent;
+             box-shadow:inset 0 0 0 1px var(--line);}
+  .cell.future{opacity:.5;}
+  .cell.near{background:#dcbd6b;}
+  .cell.trade{background:var(--good);}
+  .cell.loss{background:var(--bad);}
+
+  .htl .key{display:flex; gap:13px; margin-top:11px; font-size:10.5px;
             color:var(--muted); flex-wrap:wrap;}
   .htl .key i{display:inline-block; width:8px; height:8px; border-radius:2px;
               margin-right:5px; background:var(--line);}
+  .htl .key .none i{background:transparent; box-shadow:inset 0 0 0 1px var(--line);}
   .htl .key .near i{background:#dcbd6b;}
   .htl .key .trade i{background:var(--good);}
 
@@ -876,10 +896,12 @@
   // information for being repeated. One cell each, and one line per run.
   let PAPER = null;
 
-  const SLOT_MIN  = 30;   // bucket size; the label and the walk derive from it
-  const MIN_SLOTS = 12;   // always reach back at least six hours
-  const MAX_CELLS = 96;   // two days, after which the strip stops growing
-  const MAX_EV    = 5;    // near-misses shown per half hour before "+N more"
+  const SLOT_MIN  = 60;   // bucket size; the label and the walk derive from it
+  const MIN_SLOTS = 12;   // always reach back at least twelve hours
+  const MAX_LOG   = 240;  // ten days of hours in the log, at most
+  const MAX_EV    = 5;    // near-misses shown per hour before "+N more"
+  const HOUR      = 3600000;
+  let STRIP_MODE  = "day";   // "day" (24 cells) or "week" (7 x 24)
 
   const pad2 = n => String(n).padStart(2, "0");
 
@@ -1077,8 +1099,7 @@
     let keys = [];
     for (let k = +slotStart(from), last = +slotStart(now);
          k <= last; k += SLOT_MIN * 60000) keys.push(k);
-    const clipped = keys.length > MAX_CELLS;
-    if (clipped) keys = keys.slice(-MAX_CELLS);
+    if (keys.length > MAX_LOG) keys = keys.slice(-MAX_LOG);
 
     // ---- the four figures
     const taken  = (P.settled || 0) + (P.open || 0);
@@ -1098,43 +1119,81 @@
     fig(String(passed), "passed",   passed ? "near" : "z");
     fig(money(real),    "realised", real > 0 ? "up" : real < 0 ? "down" : "z");
 
-    // ---- the strip
+    // ---- the grid
     const near = P.passed_total != null ? P.passed_total : misses.length;
-    tl.appendChild(el("div", "cap",
-      (clipped ? "the last two days · " : "")
-      + "one cell per half hour, oldest first"
+    const head = el("div", "head");
+    head.appendChild(el("span", "cap", "one cell per hour"
       + (near ? " · " + near + " came close" : "")));
-    const strip = el("div", "strip" + (keys.length > 40 ? " dense" : ""));
-    keys.forEach(k => {
-      const s = slots.get(k);
-      const c = el("div", "cell");
-      let what = "watched, nothing";
-      if (s && s.t.length) {
-        const pl = s.t.reduce((a, x) => a + (x.pnl || 0), 0);
-        c.className = "cell " + (pl < 0 ? "loss" : "trade");
-        what = s.t.length + " taken";
-      } else if (s && s.m.length) {
-        c.className = "cell near";
-        what = s.m.length + " came close";
-      }
-      c.title = slotLabel(k) + " — " + what;
-      strip.appendChild(c);
+    const modes = el("span", "modes");
+    [["day", "Day"], ["week", "Week"]].forEach(([m, txt]) => {
+      const b = el("button", null, txt);
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(STRIP_MODE === m));
+      b.addEventListener("click", () => { STRIP_MODE = m; renderHistory(); });
+      modes.appendChild(b);
     });
-    tl.appendChild(strip);
+    head.appendChild(modes);
+    tl.appendChild(head);
 
-    const ends = el("div", "ends");
-    ends.appendChild(el("span", null, edgeLabel(keys[0])));
-    ends.appendChild(el("span", null, "now"));
-    tl.appendChild(ends);
+    const days = STRIP_MODE === "week" ? 7 : 1;
+    const midnight = new Date(now);
+    midnight.setHours(0, 0, 0, 0);
+    const sinceMs = since ? +since : null;
+
+    const grid = el("div", "grid " + STRIP_MODE);
+    grid.style.gridTemplateColumns = "57px repeat(24,1fr)";
+
+    // hour ruler, labelled every three hours so it stays legible narrow
+    grid.appendChild(el("span"));
+    for (let h = 0; h < 24; h++) {
+      grid.appendChild(el("span", "tick", h % 3 === 0
+        ? (h % 12 === 0 ? 12 : h % 12) + (h < 12 ? "a" : "p") : ""));
+    }
+
+    for (let d = days - 1; d >= 0; d--) {
+      const day0 = new Date(midnight);
+      day0.setDate(day0.getDate() - d);
+      const isToday = d === 0;
+      grid.appendChild(el("span", "lab" + (isToday ? " today" : ""),
+        isToday ? "Today"
+          : day0.toLocaleDateString(undefined, { weekday: "short" })
+            + " " + (day0.getMonth() + 1) + "/" + day0.getDate()));
+      for (let h = 0; h < 24; h++) {
+        const cellAt = new Date(day0);
+        cellAt.setHours(h, 0, 0, 0);
+        const k = +cellAt;
+        const sl = slots.get(k);
+        const c = el("div", "cell");
+        let what = "watched, nothing";
+        if (sl && sl.t.length) {
+          const pl = sl.t.reduce((a, x) => a + (x.pnl || 0), 0);
+          c.className = "cell " + (pl < 0 ? "loss" : "trade");
+          what = sl.t.length + " taken";
+        } else if (sl && sl.m.length) {
+          c.className = "cell near";
+          what = sl.m.length + " came close";
+        } else if (k > +now) {
+          c.className = "cell future";
+          what = "not yet";
+        } else if (sinceMs && k + HOUR <= sinceMs) {
+          c.className = "cell before";
+          what = "before this account started";
+        }
+        c.title = slotLabel(k) + " — " + what;
+        grid.appendChild(c);
+      }
+    }
+    tl.appendChild(grid);
 
     const key = el("div", "key");
-    [["", "watched, nothing"], ["near", "came close, passed"],
-     ["trade", "position taken"]].forEach(([cls, txt]) => {
-      const sp = el("span", cls || null);
-      sp.appendChild(el("i"));
-      sp.appendChild(document.createTextNode(txt));
-      key.appendChild(sp);
-    });
+    [["none", "not watched"], ["", "watched, nothing"],
+     ["near", "came close, passed"], ["trade", "position taken"]]
+      .forEach(([cls, txt]) => {
+        const sp = el("span", cls || null);
+        sp.appendChild(el("i"));
+        sp.appendChild(document.createTextNode(txt));
+        key.appendChild(sp);
+      });
     tl.appendChild(key);
 
     const bestBox = $("#histbest");
@@ -1166,7 +1225,7 @@
       const g = el("div", "gap");
       g.appendChild(el("span", "gt", run.length === 1 ? slotLabel(oldK)
         : edgeLabel(oldK) + "–" + edgeLabel(newK + SLOT_MIN * 60000)));
-      g.appendChild(el("span", null, run.length + " half hour"
+      g.appendChild(el("span", null, run.length + " hour"
         + (run.length === 1 ? "" : "s") + " · nothing cleared the floor"));
       body.appendChild(g);
       run = [];
@@ -1191,7 +1250,7 @@
       ms.slice(0, MAX_EV).forEach(m => sl.appendChild(missRow(m)));
       if (ms.length > MAX_EV) {
         sl.appendChild(el("div", "more",
-          "+ " + (ms.length - MAX_EV) + " more passed in this half hour"));
+          "+ " + (ms.length - MAX_EV) + " more passed in this hour"));
       }
       body.appendChild(sl);
     });
