@@ -786,19 +786,40 @@
 
   function pad(n) { return String(n).padStart(2, "0"); }
 
+  // Half-hour slots. SLOT_MIN is the only thing to change if the bucket
+  // size ever moves again -- the key, the label and the walk all derive
+  // from it rather than assuming an hour.
+  const SLOT_MIN = 30;
+
+  function slotStart(d) {
+    const x = new Date(d);
+    x.setMinutes(Math.floor(x.getMinutes() / SLOT_MIN) * SLOT_MIN, 0, 0);
+    return x;
+  }
+
   function hourKey(d) {
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate())
-      + " " + pad(d.getHours());
+    const x = slotStart(d);
+    return x.getFullYear() + "-" + pad(x.getMonth() + 1) + "-" + pad(x.getDate())
+      + " " + pad(x.getHours()) + ":" + pad(x.getMinutes());
+  }
+
+  function clock12(d) {
+    const h = d.getHours();
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return { t: h12 + ":" + pad(d.getMinutes()), m: h < 12 ? "am" : "pm" };
   }
 
   function hourLabel(d) {
-    const h = d.getHours();
-    const ampm = h < 12 ? "am" : "pm";
-    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const a = slotStart(d);
+    const b = new Date(a.getTime() + SLOT_MIN * 60000);
+    const ca = clock12(a), cb = clock12(b);
     const today = new Date();
-    const same = d.toDateString() === today.toDateString();
-    return (same ? "" : (d.getMonth() + 1) + "/" + d.getDate() + "  ")
-      + h12 + ampm + "\u2013" + ((h12 % 12) + 1) + (h === 11 ? "pm" : h === 23 ? "am" : ampm);
+    const datePart = a.toDateString() === today.toDateString()
+      ? "" : (a.getMonth() + 1) + "/" + a.getDate() + "  ";
+    // Only repeat am/pm on the first time when the slot crosses noon or
+    // midnight, so the common case stays short: "2:00\u20132:30am".
+    return datePart + ca.t + (ca.m === cb.m ? "" : ca.m)
+      + "\u2013" + cb.t + cb.m;
   }
 
   function tradeRow(t) {
@@ -850,21 +871,27 @@
 
     // Walk every hour from the first thing this account ever saw to now,
     // so the gaps are visible rather than collapsed away.
+    // Always cover at least the last few hours, even with nothing booked.
+    // A panel showing one empty slot says "no trades"; a panel showing
+    // twelve says "it has been watching for six hours and taken none",
+    // which is the thing actually worth knowing.
+    const MIN_SLOTS = 12;
     const first = PAPER && PAPER.first_seen ? new Date(PAPER.first_seen)
       : (trades.length ? new Date(trades[trades.length - 1].opened) : new Date());
-    const start = new Date(first); start.setMinutes(0, 0, 0);
-    const now = new Date();
+    const floorBy = new Date(Date.now() - MIN_SLOTS * SLOT_MIN * 60000);
+    const start = slotStart(first < floorBy ? first : floorBy);
     const hours = [];
-    for (let d = new Date(now); d >= start; d.setHours(d.getHours() - 1)) {
+    for (let d = slotStart(new Date()); d >= start;
+         d = new Date(d.getTime() - SLOT_MIN * 60000)) {
       hours.push(new Date(d));
-      if (hours.length > 240) break;          // ten days is plenty
+      if (hours.length > 480) break;          // ten days of half-hours
     }
 
     const taken = trades.length;
     lede.textContent = taken
       ? taken + " position" + (taken === 1 ? "" : "s") + " taken, newest first. "
-        + "Hours with no trades are shown too, so you can see it was looking."
-      : "No positions taken yet. Every hour below is an hour it watched and "
+        + "Half-hours with no trades are shown too, so you can see it was looking."
+      : "No positions taken yet. Every half-hour below is one it watched and "
         + "found nothing that cleared the floor.";
 
     hours.forEach(d => {
