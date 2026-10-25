@@ -443,11 +443,12 @@
     signalStrip(d);
 
     const host = $("#board"); host.textContent = "";
-    const venues = (d.venues || []).filter(v => (v.markets || []).length);
+    // Every venue keeps its column even with nothing open on it. Dropping
+    // the empty one re-flows the board to a single column and makes it
+    // look as though the venue is gone, when it is only between windows.
+    const venues = d.venues || [];
     if (!venues.length) {
-      host.appendChild(el("div", "empty",
-        "No window is open on either venue right now. Kalshi lists one "
-        + "15-minute market at a time, so there is a short gap between them."));
+      host.appendChild(el("div", "empty", "No venues in the feed."));
       return;
     }
     const grid = el("div", "venues");
@@ -459,7 +460,14 @@
       hd.appendChild(el("span", "vcash", v.wallet === null || v.wallet === undefined
         ? "balance unknown" : money(v.wallet) + " in the account"));
       col.appendChild(hd);
-      (v.markets || []).forEach(m => col.appendChild(marketCard(m)));
+      const ms = v.markets || [];
+      if (!ms.length) {
+        col.appendChild(el("div", "empty",
+          "Between windows. These are 15-minute markets and each venue "
+          + "lists the next one a moment after the last one closes."));
+      } else {
+        ms.forEach(m => col.appendChild(marketCard(m)));
+      }
       grid.appendChild(col);
     });
     host.appendChild(grid);
