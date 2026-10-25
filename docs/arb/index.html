@@ -157,6 +157,43 @@
                 border-top:1px solid var(--rule); white-space:nowrap;}
   table.band th:first-child,table.band td:first-child{text-align:left;}
 
+  /* Trade history, opened from the corner of the bar. */
+  .histbtn{margin-left:auto; font:inherit; font-size:11px; cursor:pointer;
+           padding:5px 12px; border:1px solid var(--line); border-radius:999px;
+           background:transparent; color:var(--ink2); white-space:nowrap;}
+  .histbtn:hover{border-color:var(--ink); color:var(--ink);}
+  .histbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .hist{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.45);
+        display:flex; justify-content:flex-end;}
+  .hist[hidden]{display:none;}
+  .hist .panel{background:var(--bg); width:min(560px,100%); height:100%;
+               overflow-y:auto; padding:20px clamp(16px,4vw,26px) 40px;
+               border-left:1px solid var(--rule);}
+  .hist h3{font-size:14px; margin:0;}
+  .hist .close{position:absolute; top:14px; right:16px; font:inherit;
+               font-size:20px; line-height:1; background:none; cursor:pointer;
+               border:0; color:var(--muted); padding:4px 8px;}
+  .hist .close:hover{color:var(--ink);}
+  .hist .lede{font-size:12px; color:var(--muted); margin:6px 0 18px;}
+  .hour{border-top:1px solid var(--rule); padding:9px 0 4px;}
+  .hour .hh{font-size:11px; letter-spacing:.07em; text-transform:uppercase;
+            color:var(--muted); display:flex; justify-content:space-between;}
+  .hour.empty .hh{opacity:.55;}
+  .hour .none{font-size:12px; color:var(--muted); padding:3px 0 5px;
+               font-style:italic;}
+  .trd{border:1px solid var(--line); border-radius:9px; padding:9px 11px;
+       margin:7px 0; background:var(--card);}
+  .trd .th{display:flex; justify-content:space-between; align-items:baseline;
+           gap:10px; font-size:12.5px;}
+  .trd .co{font-weight:600; text-transform:uppercase;}
+  .trd .pl{font-family:'Space Grotesk',sans-serif; font-weight:600;
+           font-variant-numeric:tabular-nums;}
+  .trd .pl.up{color:var(--good);} .trd .pl.down{color:var(--bad);}
+  .trd .lg{display:flex; justify-content:space-between; font-size:11.5px;
+           color:var(--ink2); padding:3px 0 0; font-variant-numeric:tabular-nums;}
+  .trd .warn{font-size:11px; color:var(--bad); margin-top:5px;}
+  .trd .open{font-size:11px; color:var(--muted); margin-top:5px;}
+
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
   .note+.note{margin-top:10px;}
@@ -178,7 +215,17 @@
 
   /* Paper account, across the top. Not real money, and it says so --
      the whole point of the number is to be told the truth by it. */
+  /* The bar starts pinned at the top and slides out of the way when you
+     scroll down, coming back the moment you scroll up -- so it is there
+     when wanted and not eating the screen while reading the board. */
   .paper{position:sticky; top:0; z-index:30; background:var(--card);
+         transition:transform .22s ease, opacity .22s ease;}
+  .paper.tucked{transform:translateY(-105%); opacity:0; pointer-events:none;}
+  @media (prefers-reduced-motion:reduce){
+    .paper{transition:none;}
+    .paper.tucked{transform:none; opacity:1; pointer-events:auto;}
+  }
+  .paper{
          border-bottom:1px solid var(--rule);
          display:flex; align-items:center; gap:clamp(12px,3vw,26px);
          flex-wrap:wrap; padding:9px clamp(16px,5vw,32px);
@@ -251,6 +298,14 @@
 </head>
 <body>
 <aside class="paper" id="paper" hidden></aside>
+<div class="hist" id="hist" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Trade history">
+    <button class="close" id="histclose" aria-label="Close">&times;</button>
+    <h3>Trade history</h3>
+    <p class="lede" id="histlede"></p>
+    <div id="histbody"></div>
+  </div>
+</div>
 <main>
   <div class="summary" id="summary"></div>
 
@@ -561,6 +616,16 @@
     if (!p || !box) return;
     box.hidden = false;
     box.innerHTML = "";
+    // The history button is appended at the end, after everything the
+    // card builds -- margin-left:auto pushes it into the corner.
+    const addHistBtn = () => {
+      const b = el("button", "histbtn",
+        "Trade history" + (p.settled + p.open ? " (" + (p.settled + p.open) + ")" : ""));
+      b.type = "button";
+      b.addEventListener("click", openHistory);
+      box.appendChild(b);
+    };
+    setTimeout(addHistBtn, 0);
     const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
     const cash = p.cash || {};
     const atRisk = Math.max(0, p.equity - ((cash.kalshi || 0) + (cash.polymarket || 0)));
@@ -712,10 +777,145 @@
       '<span><i style="background:#8a5a2d"></i>polymarket</span></div>');
   }
 
+  // ------------------------------------------------------- trade history
+  // Grouped by hour, every hour shown even when empty. An empty hour is
+  // the point: it says the thing is alive and looking, and chose not to
+  // trade. A list that only showed fills would be indistinguishable from
+  // a list that stopped running.
+  let PAPER = null;
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function hourKey(d) {
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate())
+      + " " + pad(d.getHours());
+  }
+
+  function hourLabel(d) {
+    const h = d.getHours();
+    const ampm = h < 12 ? "am" : "pm";
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    const today = new Date();
+    const same = d.toDateString() === today.toDateString();
+    return (same ? "" : (d.getMonth() + 1) + "/" + d.getDate() + "  ")
+      + h12 + ampm + "\u2013" + ((h12 % 12) + 1) + (h === 11 ? "pm" : h === 23 ? "am" : ampm);
+  }
+
+  function tradeRow(t) {
+    const box = el("div", "trd");
+    const top = el("div", "th");
+    const left = el("span");
+    left.innerHTML = '<span class="co">' + t.coin + "</span> \u00B7 "
+      + (t.qty || 0) + " contracts";
+    top.appendChild(left);
+    if (t.pnl === null || t.pnl === undefined) {
+      top.appendChild(el("span", "pl", "open"));
+    } else {
+      const pl = el("span", "pl " + (t.pnl >= 0 ? "up" : "down"),
+        (t.pnl >= 0 ? "+" : "\u2212") + money(Math.abs(t.pnl)));
+      top.appendChild(pl);
+    }
+    box.appendChild(top);
+
+    (t.legs || []).forEach(lg => {
+      const row = el("div", "lg");
+      row.appendChild(el("span", null,
+        (lg.venue === "kalshi" ? "Kalshi" : "Polymarket US") + " \u2014 " + lg.side));
+      row.appendChild(el("span", null,
+        lg.qty + " @ " + (lg.px * 100).toFixed(1) + "\u00A2"));
+      box.appendChild(row);
+    });
+
+    if (t.naked) {
+      box.appendChild(el("div", "warn",
+        "ONE LEG ONLY \u2014 this was a directional bet, not a hedge"));
+    }
+    if (t.state !== "settled") {
+      box.appendChild(el("div", "open", "still open \u00B7 cost " + money(t.cost)));
+    }
+    return box;
+  }
+
+  function renderHistory() {
+    const body = $("#histbody"), lede = $("#histlede");
+    const trades = (PAPER && PAPER.trades) || [];
+    body.textContent = "";
+
+    const byHour = {};
+    trades.forEach(t => {
+      const d = new Date(t.opened);
+      if (isNaN(d)) return;
+      (byHour[hourKey(d)] = byHour[hourKey(d)] || []).push(t);
+    });
+
+    // Walk every hour from the first thing this account ever saw to now,
+    // so the gaps are visible rather than collapsed away.
+    const first = PAPER && PAPER.first_seen ? new Date(PAPER.first_seen)
+      : (trades.length ? new Date(trades[trades.length - 1].opened) : new Date());
+    const start = new Date(first); start.setMinutes(0, 0, 0);
+    const now = new Date();
+    const hours = [];
+    for (let d = new Date(now); d >= start; d.setHours(d.getHours() - 1)) {
+      hours.push(new Date(d));
+      if (hours.length > 240) break;          // ten days is plenty
+    }
+
+    const taken = trades.length;
+    lede.textContent = taken
+      ? taken + " position" + (taken === 1 ? "" : "s") + " taken, newest first. "
+        + "Hours with no trades are shown too, so you can see it was looking."
+      : "No positions taken yet. Every hour below is an hour it watched and "
+        + "found nothing that cleared the floor.";
+
+    hours.forEach(d => {
+      const list = byHour[hourKey(d)] || [];
+      const h = el("div", "hour" + (list.length ? "" : " empty"));
+      const hh = el("div", "hh");
+      hh.appendChild(el("span", null, hourLabel(d)));
+      hh.appendChild(el("span", null,
+        list.length ? list.length + " taken" : "no trades taken"));
+      h.appendChild(hh);
+      if (!list.length) {
+        h.appendChild(el("div", "none", "watched, nothing cleared the floor"));
+      } else {
+        list.sort((a, b) => new Date(b.opened) - new Date(a.opened));
+        list.forEach(t => h.appendChild(tradeRow(t)));
+      }
+      body.appendChild(h);
+    });
+  }
+
+  function openHistory() { $("#hist").hidden = false; renderHistory(); }
+  function closeHistory() { $("#hist").hidden = true; }
+  $("#histclose").addEventListener("click", closeHistory);
+  $("#hist").addEventListener("click", e => {
+    if (e.target === $("#hist")) closeHistory();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeHistory();
+  });
+
+  // The bar tucks away on scroll down and comes back on scroll up.
+  (() => {
+    let lastY = 0;
+    window.addEventListener("scroll", () => {
+      const bar = $("#paper");
+      if (!bar || bar.hidden) return;
+      const y = window.scrollY;
+      bar.classList.toggle("tucked", y > 90 && y > lastY);
+      lastY = y;
+    }, { passive: true });
+  })();
+
   function refreshPaper() {
     fetch(LIVE + "/paper.json", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
-      .then(p => { if (p) paperCard({ paper: p }); })
+      .then(p => {
+        if (!p) return;
+        PAPER = p;
+        paperCard({ paper: p });
+        if (!$("#hist").hidden) renderHistory();
+      })
       .catch(() => {});
   }
 
