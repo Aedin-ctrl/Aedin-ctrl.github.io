@@ -439,10 +439,27 @@
     (This is not true of <em>global</em> Polymarket, which uses a Chainlink time-weighted average
     against the opening price. That is a different contract, and it is not what this board shows.)</p>
   <p class="note">So buying the cheap side on each venue pays <b>$1 when the two agree</b>, and
-    <b>$2 or $0</b> when they disagree. Over <b>384 settled windows on these two contracts</b>
-    they agreed <b>383 times &mdash; 99.74&percnt;</b>. The single disagreement was XRP. That
-    residual is the real risk and it does not shrink with the fee, but one event is one event:
-    the true rate could plausibly be several times higher.</p>
+    <b>$2 or $0</b> when they disagree. Over <b>640 settled windows</b> they disagreed
+    <b>3 times</b> &mdash; and <b>every one of the three was XRP</b>. On BTC, ETH and SOL the
+    count is <b>0 disagreements in 480 windows</b>.</p>
+  <p class="note"><b>XRP is not the same contract on the two venues, and that is why.</b> Each
+    venue publishes its own strike, and they match in <b>100&percnt;</b> of windows on BTC, ETH
+    and SOL but only <b>14&percnt;</b> on XRP &mdash; it trades near $1.30, where Kalshi's four
+    decimals and Polymarket's five genuinely differ in the last place. Live at the time of
+    writing: Kalshi <code>1.2995</code> against Polymarket <code>1.29947</code>. A pair struck
+    at two different numbers is not a hedge, and the page had been hiding it: Polymarket's card
+    rounds the display to &ldquo;Price to beat $1.30&rdquo;.</p>
+  <p class="note">The sting is that the fee was <em>steering</em> the search there. Kalshi
+    charges <code>ceil(0.07&middot;C&middot;p&middot;(1&minus;p))</code>, which is cheapest at
+    extreme prices &mdash; exactly where XRP sits. <b>The cheapest-looking trades on the board
+    were the only ones that could settle against you.</b> Cards whose two columns are struck at
+    different numbers now say so, the paper trader skips them, and the pairing list can never
+    mark one as clearing.</p>
+  <p class="note"><b>Correction.</b> This page previously said 383 of 384 windows agreed and
+    called the one disagreement an unexplained residual that &ldquo;does not shrink with the
+    fee&rdquo;. With 640 windows the rate is similar but the <em>shape</em> was wrong: it is not
+    a residual spread across the book, it is one coin whose two contracts are struck at
+    different numbers. That is avoidable rather than irreducible.</p>
   <p class="note"><b>Correction.</b> This page previously said 98.25&percnt; over 1,256 windows.
     That figure was measured on <em>global</em> Polymarket &mdash; a different contract, on a
     venue these accounts cannot reach, and its sample even included coins Polymarket US does not
