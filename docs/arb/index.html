@@ -147,8 +147,17 @@
   .sys .big{font-family:'Space Grotesk',sans-serif; font-size:23px;
             font-weight:600; letter-spacing:-0.02em; line-height:1.1;}
   .sys .sub{font-size:12px; color:var(--ink2); margin-top:3px;}
+  /* Seven columns of numbers do not fit a phone. Let each table scroll
+     sideways inside its own box rather than pushing the whole page out
+     of the viewport, which is what a wide table does by default. */
+  .sys .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;
+               max-width:100%;}
   .sys table{width:100%; border-collapse:collapse; font-size:12.5px;
              margin-top:4px;}
+  @media (max-width:520px){
+    .sys table{font-size:11.5px; min-width:360px;}
+    .sys td,.sys th{padding:3px 5px 3px 0;}
+  }
   .sys td,.sys th{padding:3px 6px 3px 0; text-align:right;}
   .sys th{color:var(--muted); font-weight:600; font-size:11px;}
   .sys td:first-child,.sys th:first-child{text-align:left;}
@@ -637,7 +646,7 @@
       h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
          + "text-transform:uppercase;color:var(--muted)\">"
          + "How much survives a safety margin (20+ contracts both sides)</h3>";
-      h += "<table><tr><th>margin / leg</th><th>samples</th><th>tradeable</th>"
+      h += "<div class=\"scroll\"><table><tr><th>margin / leg</th><th>samples</th><th>tradeable</th>"
          + "<th>rate</th><th>median</th><th>best</th></tr>";
       c20.forEach(r => {
         h += "<tr><td>" + r.safety_c.toFixed(2) + "c</td><td>"
@@ -646,7 +655,7 @@
            + "c</td><td class=\"" + (r.best_c > 0 ? "ok" : "bad") + "\">"
            + r.best_c.toFixed(2) + "c</td></tr>";
       });
-      h += "</table>";
+      h += "</table></div>";
     }
 
     if (pa.settled != null) {
@@ -674,7 +683,7 @@
     if (bd.length) {
       h += sec("The gap by price band &mdash; the fee is quadratic, so a "
              + "pooled median hides the corners");
-      h += "<table><tr><th>min(p, 1&minus;p)</th><th>samples</th>"
+      h += "<div class=\"scroll\"><table><tr><th>min(p, 1&minus;p)</th><th>samples</th>"
          + "<th>fee / contract</th><th>median net</th>"
          + "<th>20+ both sides</th><th>venues disagree</th></tr>";
       bd.forEach(r => {
@@ -683,7 +692,7 @@
            + r.net_c.toFixed(2) + "c</td><td>" + r.deep_pct.toFixed(0)
            + "%</td><td><b>" + r.disagree_c.toFixed(2) + "c</b></td></tr>";
       });
-      h += "</table><p class=\"note\">The last column is the mid-to-mid "
+      h += "</table></div><p class=\"note\">The last column is the mid-to-mid "
          + "difference with no fee charged at all &mdash; what the two "
          + "venues actually disagree about. It is 0.00c in every band, so "
          + "the median net <i>is</i> the fee and nothing else. The cheap "
@@ -695,7 +704,7 @@
     const mk = d.maker || [];
     if (mk.length) {
       h += sec("Resting the Polymarket leg instead of taking it");
-      h += "<table><tr><th>min(p, 1&minus;p)</th><th>fills</th>"
+      h += "<div class=\"scroll\"><table><tr><th>min(p, 1&minus;p)</th><th>fills</th>"
          + "<th>hedge slip</th><th>net if instant</th><th>net as rested</th>"
          + "<th>rebate t1 / t4</th></tr>";
       mk.forEach(r => {
@@ -706,7 +715,7 @@
            + r.rebate_t1_c.toFixed(3) + "c / " + r.rebate_t4_c.toFixed(3)
            + "c</td></tr>";
       });
-      h += "</table><p class=\"note\">The rebate is real and large: it "
+      h += "</table></div><p class=\"note\">The rebate is real and large: it "
          + "turns the deep band from &minus;4.94c taker-to-taker into "
          + "&minus;1.66c. Then the Kalshi hedge slips a full tick while the "
          + "resting order waits to be chosen, and it ends at &minus;2.66c. "
@@ -718,10 +727,41 @@
          + "bound.</p>";
     }
 
+    const sg = d.strikegap || null;
+    if (sg && (sg.coins || []).length) {
+      h += sec("Do the two venues even use the same strike?");
+      h += "<div class=\"scroll\"><table><tr><th>coin</th><th>windows</th><th>strike gap</th>"
+         + "<th>median margin</th><th>closest</th>"
+         + "<th>landed between</th><th>implied split rate</th></tr>";
+      sg.coins.forEach(r => {
+        const live = r.gap_pct > 0;
+        h += "<tr><td>" + esc(r.coin) + "</td><td>" + r.n + "</td><td class=\""
+           + (live ? "bad" : "ok") + "\">" + r.gap_pct.toFixed(5)
+           + "%</td><td>" + r.median_margin_pct.toFixed(4) + "%</td><td>"
+           + r.closest_pct.toFixed(4) + "%</td><td>" + r.between
+           + "</td><td class=\"" + (live ? "bad" : "ok") + "\">"
+           + (live ? r.split_rate_pct.toFixed(2) + "%"
+                   : "0 \u2014 identical") + "</td></tr>";
+      });
+      h += "</table></div><p class=\"note\">Settlement agreeing " + sg.windows
+         + "/" + sg.windows + " times only means something if some window "
+         + "came close. These are the margins. <b>And one real divergence "
+         + "channel turned up here:</b> Kalshi and Polymarket US publish the "
+         + "same strike to the last digit on btc, eth and sol \u2014 but not "
+         + "on xrp, where Kalshi rounds the reference to 4 decimals and "
+         + "Polymarket US carries 5. A settlement landing strictly between "
+         + "the two resolves <i>opposite ways</i>, and a hedge then loses "
+         + "the <b>whole stake</b>, not a few cents of fee. "
+         + sg.between + " of " + sg.windows + " windows landed there; the "
+         + "density of near misses puts it near 1.2% on xrp and exactly zero "
+         + "on the other three. Break-even on a 3c edge needs it under ~3%."
+         + "</p>";
+    }
+
     const tx = d.taxes || null;
     if (tx && (tx.rows || []).length) {
       h += sec("What the tax characterization does to a hedged pair");
-      h += "<table><tr><th>unit cost</th><th>gross edge</th>"
+      h += "<div class=\"scroll\"><table><tr><th>unit cost</th><th>gross edge</th>"
          + "<th>gross winnings</th><th>capital / 1256</th>"
          + "<th>federal wagering</th><th>+ Massachusetts</th></tr>";
       tx.rows.forEach(r => {
@@ -734,7 +774,7 @@
            + (r.fed_ma_c >= 0 ? "+" : "") + r.fed_ma_c.toFixed(2)
            + "c</td></tr>";
       });
-      h += "</table><p class=\"note\">A hedged pair books one winner and "
+      h += "</table></div><p class=\"note\">A hedged pair books one winner and "
          + "one loser. Net gain 3c; gross winnings on the winning ticket "
          + "~51c. Massachusetts does not adopt IRC 165(d) &mdash; losses are "
          + "deductible only against a Massachusetts-licensed gaming "
@@ -753,11 +793,12 @@
     if (wy.length) {
       h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
          + "text-transform:uppercase;color:var(--muted)\">"
-         + "Why the paper account did not trade</h3><table>";
+         + "Why the paper account did not trade</h3>"
+         + "<div class=\"scroll\"><table>";
       wy.forEach(r => {
         h += "<tr><td>" + esc(r.reason) + "</td><td>" + r.n + "</td></tr>";
       });
-      h += "</table>";
+      h += "</table></div>";
     }
 
     const v = d.verdict || {};
