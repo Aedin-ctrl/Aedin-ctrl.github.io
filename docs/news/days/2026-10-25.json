@@ -1,0 +1,756 @@
+{
+  "date": "2026-10-25",
+  "generated": "2026-10-25T10:09:35.682Z",
+  "articles": [
+    {
+      "id": "2026-10-25-heat-killed-an-estimated-50-000-people-in",
+      "headline": "Heat killed an estimated 50,000 people in European cities this summer, a study finds",
+      "summary": "An analysis of 854 European urban areas estimates more than 50,000 heat-related deaths in summer 2026. About two-thirds are attributed to human-caused climate change. The figures are modeled estimates, not counted deaths.",
+      "impacts": [
+        "Heat is now a mass-casualty hazard in cities that were not built for it, including parts of western and northern Europe.",
+        "Estimates like this drive decisions on cooling centers, building codes and early-warning systems.",
+        "Roughly 6,000 of the deaths were among people under 65, so the risk is not limited to the elderly.",
+        "Engineers designing buildings and grids will increasingly be asked to plan for sustained extreme heat."
+      ],
+      "details": [
+        "A new analysis estimates that more than 50,000 people died from heat in European urban areas during summer 2026 (June 1 to August 31). The researchers looked at 854 urban areas across 27 EU countries plus the UK, Norway and Switzerland. The results were published on October 23, according to the Phys.org report.",
+        "The team compared the summer's actual temperatures with modeled temperatures for a world without human-caused warming. On that comparison, roughly two-thirds of the deaths are attributed to human-induced climate change. Nearly one-third of the deaths fell in a two-week window, June 17 to July 1.",
+        "Some country-level detail is reported: about 4,500 deaths in UK urban areas, and around 6,000 deaths among people under 65 across the study areas. Dr. Pierre Masselot of the London School of Hygiene & Tropical Medicine said, 'Climate change is everybody's problem. It is not just hot regions that are suffering anymore - some parts of western and northern Europe are now experiencing extreme heat.'",
+        "The main caution is what the number is. These are modeled estimates, not confirmed death certificates. They depend on assumptions about how many people were exposed and on temperature-mortality relationships drawn from historical data. Heat deaths are rarely recorded as such, which is why researchers estimate them statistically.",
+        "What to watch next: whether national statistics offices later confirm the excess-death totals, and whether cities that saw large early-summer spikes change their heat-action plans before next year."
+      ],
+      "category": "Climate",
+      "tags": [
+        "heat",
+        "europe",
+        "climate",
+        "mortality",
+        "heatwave",
+        "cities"
+      ],
+      "date": "2026-10-23",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Phys.org",
+          "url": "https://phys.org/news/2026-10-summer-toll-exceeded-deaths-european.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-unresponsive-icu-patients-controlled-sounds-with-their-minds",
+      "headline": "Unresponsive ICU patients controlled sounds with their minds, via a non-invasive EEG headset",
+      "summary": "In a Columbia study of 41 unresponsive brain-injured ICU patients, about a third used thought alone to change a beeping tone within days of injury. It hints at hidden awareness in patients who look unconscious.",
+      "impacts": [
+        "Some patients who look unconscious may be aware, which changes how families and doctors make life-or-death decisions.",
+        "Non-invasive BCIs that need only EEG electrodes could reach ICU patients without surgery.",
+        "Today the detection works only in research settings and needs real-time computer analysis.",
+        "If it matures, it raises hard questions about who decides what a patient 'says' through a machine."
+      ],
+      "details": [
+        "Researchers at Columbia University and NewYork-Presbyterian reported that unresponsive ICU patients could raise and lower the pitch of a beeping tone using only their thoughts. The study was published in the journal Brain and covered by News-Medical on October 23.",
+        "It involved 41 clinically unresponsive patients with acute brain injury. Non-invasive EEG electrodes recorded their brainwaves while they were told by voice to attempt hand movements to change the tone's frequency. Roughly one-third of the patients succeeded within days of their injury. All patients in whom the researchers had detected 'cognitive motor dissociation' (CMD, awareness without visible movement) succeeded.",
+        "This builds on a 2019 Columbia study that found hidden consciousness in about 15% of unresponsive brain-injured patients, a result that surprised critical care doctors.",
+        "The lead researcher, Jan Claassen, MD, framed it modestly: 'Our brain-computer interface is only a first step, but it shows that, in principle, we could hopefully in the future give some of these patients a voice.'",
+        "What is uncertain: the study is preliminary, CMD detection is currently limited to research settings, and the system needs real-time computer analysis of EEG signals. It does not yet show that such communication improves outcomes. The story is unsettling because it suggests some patients are aware while being treated as unaware."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "bci",
+        "brain",
+        "eeg",
+        "consciousness",
+        "icu",
+        "neuroscience"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "News-Medical",
+          "url": "https://news-medical.net/news/20261023/Brain-computer-interface-enables-unresponsive-ICU-patients-to-control-sounds.aspx"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-attackers-are-using-agentic-ai-to-work-inside",
+      "headline": "Attackers are using agentic AI to work inside hacked PHP servers, Palo Alto's Unit 42 says",
+      "summary": "Unit 42 updated its PHP2Shell brief on Oct 23: within two hours of exploiting a European government target, attackers had password hashes and MFA secrets. Command output was formatted for an AI model to read.",
+      "impacts": [
+        "The window between a bug being exploited and a network being deeply compromised may now be hours, not days.",
+        "Patching speed matters more: Cortex Xpanse found over 22.6 million potentially exposed instances.",
+        "Defenders can look for machine-readable delimiters and rapid retry patterns as signs of an AI-driven attacker.",
+        "Governments and small organizations running PHP sites have the least staff to react quickly."
+      ],
+      "details": [
+        "Palo Alto Networks' Unit 42 updated its threat brief on two critical PHP flaws, CVE-2026-109618 and CVE-2026-109619 (nicknamed PHP2Shell), on October 23 at 12:30 p.m. PT. The update added details on what it called agentic AI post-exploitation activity.",
+        "In one case against a European government entity, Unit 42 says that within two hours of initial exploitation the attackers had accessed password hashes and multi-factor authentication secrets. They then set up an NTLM-relay tunnel into Active Directory and attempted to escalate to Domain Admin.",
+        "The telltale signs, according to the brief, were command batches wrapped in section headers such as ==SHELLUSER== and ==PASSWD==, which produce output that is easy for an AI model to parse. The attackers also ran reconnaissance commands in rapid succession and pivoted quickly after failures, a pattern Unit 42 describes as consistent with autonomous AI-driven attacks.",
+        "On scale, Cortex Xpanse identified over 22.6 million exposed instances potentially vulnerable to the two CVEs. Palo Alto lists protections across its own products and tells organizations to patch immediately.",
+        "What is not established: the brief describes behavior consistent with AI agents, based on Unit 42's observations; it does not prove how the attackers' tooling works. It is a vendor report on a single reported case, though it fits a broader pattern the site has covered of AI shortening attack timelines."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "php2shell",
+        "ai agents",
+        "vulnerability",
+        "active directory",
+        "palo alto",
+        "exploitation"
+      ],
+      "date": "2026-10-23",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Palo Alto Networks Unit 42",
+          "url": "https://unit42.paloaltonetworks.com/cve-2026-109618-cve-2026-109619/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-thwaites-doomsday-glacier-could-add-about-30-mm",
+      "headline": "Thwaites 'doomsday' glacier could add about 30 mm of sea level by 2100, double earlier estimates",
+      "summary": "A Nature Communications study says seawater pumped in and out under Thwaites Glacier by tides is driving melt that could unpin it from a stabilizing ridge. It projects about 1.2 inches of sea-level rise by 2100.",
+      "impacts": [
+        "Thwaites already contributes about 4% of global sea-level rise, so doubling its projection matters for coastal planning.",
+        "If the glacier unpins, retreat could speed up down the sloping bedrock behind it.",
+        "Existing sea-level projections may be too low if ice-sheet models miss grounding-zone processes.",
+        "Infrastructure with 50-100 year lifespans, such as ports and seawalls, is where this feeds into engineering decisions."
+      ],
+      "details": [
+        "Researchers from the University of California and NASA's Jet Propulsion Laboratory published a study in Nature Communications saying Thwaites Glacier in West Antarctica may be melting more aggressively than models assumed. Al Jazeera covered it on October 17.",
+        "The key idea is that the 'grounding line' is not a sharp line but a grounding zone. Seawater flows in and out with the tides. Lead author Mattia Poinelli described it as 'tidal pumping,' where seawater 'lifts and lowers the ice...allowing warm water to reach deep underneath the ice sheets and causing vigorous melting.'",
+        "The numbers reported: the glacier is about 192,000 square kilometers (roughly the size of Senegal), currently contributes about 4% of global sea-level rise, and has lost about 50 billion tonnes of ice per year since 2000. The new projection is that it could add 1.2 inches (30 mm) by 2100, about double previous estimates, with a 60% probability of unpinning from a stabilizing seafloor ridge by the end of the century.",
+        "There is important context. A separate British Antarctic Survey study from July (Geophysical Research Letters) found Thwaites will keep melting for at least 150 years regardless. Experts say more research is needed for accurate predictions, and the worst outcomes are decades to centuries away.",
+        "Thirty millimeters is small next to the full 'collapse' scenarios people often associate with this glacier. The reason it is notable is the direction of the revision: a process that models did not capture roughly doubled the estimate. Watch for follow-up modeling that tests whether other Antarctic glaciers have similar grounding-zone behavior."
+      ],
+      "category": "Climate",
+      "tags": [
+        "antarctica",
+        "glacier",
+        "sea level",
+        "thwaites",
+        "ice sheet",
+        "climate"
+      ],
+      "date": "2026-10-17",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Al Jazeera",
+          "url": "https://www.aljazeera.com/news/2026/10/17/senegal-sized-antarctic-glacier-melting-faster-than-thought-why-it-matters"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-ebola-reaches-nigeria-the-fifth-country-with-bundibugyo",
+      "headline": "Ebola reaches Nigeria, the fifth country with Bundibugyo cases, and no vaccine exists for this strain",
+      "summary": "WHO says a woman who travelled from Uganda was confirmed with Bundibugyo Ebola in Nigeria on Oct 20, with 44 contacts monitored. Congo has recorded more than 9,500 cases and 4,200 deaths, and Kenya has nine cases.",
+      "impacts": [
+        "A confirmed case in Nigeria's capital region brings the outbreak to a large, highly connected city region.",
+        "There is no vaccine for the Bundibugyo strain, so control depends on isolation and contact tracing.",
+        "Nigeria's exposure history is not yet explained, which makes it harder to know where transmission is still hidden.",
+        "WHO does not recommend travel or trade restrictions, so the risk is mostly to health systems and health workers."
+      ],
+      "details": [
+        "A UN News report dated October 21 says Nigeria has confirmed its first Ebola case, a woman who had travelled from Uganda. She developed symptoms on October 7, sought care in Abuja on October 11, and was laboratory-confirmed on October 20. She is isolated, and 44 contacts have been identified and are being monitored.",
+        "WHO is helping Nigerian authorities with case investigation, contact tracing, infection prevention and protective equipment for health workers. The case is described as the fifth country to detect Ebola Bundibugyo cases in this outbreak, which began in the Democratic Republic of the Congo in mid-May. The report says Congo had recorded more than 9,500 cases and over 4,200 deaths as of October 18, and that no vaccine is currently available for this strain.",
+        "The report notes that Uganda's outbreak was declared over in late August, so the woman's exposure history remains under investigation. That matters: it means the source of her infection is unknown.",
+        "Kenya's picture is different. Nairametrics reported on October 21 that Kenya has nine confirmed cases including one death, the ninth being a 24-year-old man who tested positive on October 19. At least one hospital attendant who cared for the first patient was infected. Kenya says 134 of 135 identified contacts have been traced and quarantined, and that all nine cases belong to one cluster with no evidence of spread outside it.",
+        "The takeaway is mixed. Kenya's cluster looks contained, while Nigeria's case has an unexplained source. WHO advises heightened surveillance in the region and no travel or trade restrictions. The outbreak is still driven mainly by Congo, where conflict and weak infrastructure make the true scale uncertain."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "congo",
+        "outbreak",
+        "who",
+        "nigeria",
+        "kenya",
+        "public health"
+      ],
+      "date": "2026-10-21",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "UN News",
+          "url": "https://news.un.org/en/story/2026/10/1168637"
+        },
+        {
+          "name": "Nairametrics",
+          "url": "https://nairametrics.com/2026/10/21/kenya-records-ninth-ebola-case-as-virus-spreads-beyond-dr-congo/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-scientists-propose-a-light-based-test-to-detect",
+      "headline": "Scientists propose a light-based test to detect 'mirror life' if anyone ever builds it",
+      "summary": "Strathclyde and Durham researchers propose using circularly polarised luminescence to spot mirror-image organisms. Mirror life does not exist, and the assay has not yet been demonstrated in experiments.",
+      "impacts": [
+        "It would give biosecurity teams a way to look for mirror organisms before an incident, rather than after.",
+        "It shows the field is preparing tools for a risk that is considered low-likelihood but high-severity.",
+        "The method is only a proposal, so no real surveillance capability exists yet.",
+        "It adds to the argument that detection and prevention rules should be set before the capability exists."
+      ],
+      "details": [
+        "Researchers at the University of Strathclyde and Durham University published a proposal in Royal Society Open Science, announced on October 21, for the first method to detect mirror life. Mirror life would be organisms built from mirror-image versions of the molecules that all known life uses.",
+        "The method uses circularly polarised luminescence (CPL), which responds to the 'handedness' of molecules. Fluorescent probes would bind to cellular structures and produce distinctive CPL signals that identify mirror organisms. Professor Robert Pal said the concept 'relies on the same fundamental concept that allows modern 3D cinema glasses' to work.",
+        "Dr. Lewis MacKenzie of Strathclyde was blunt about the timeline: 'We don't expect mirror life to appear tomorrow, but if it did arise, the consequences could be severe.'",
+        "The caveats are large. Mirror life does not currently exist. The proposed assay has not been experimentally demonstrated. A complete protocol would need multiple probes to limit false results. The team says the approach could be developed using ordinary biological samples, without creating any mirror organisms.",
+        "The concern behind the paper, as expressed in the proposal's framing, is that mirror organisms could evade natural defenses. This is a preparedness proposal, not evidence that anyone is close to building such an organism."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "mirror life",
+        "biosecurity",
+        "synthetic biology",
+        "chirality",
+        "detection"
+      ],
+      "date": "2026-10-21",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "University of Strathclyde",
+          "url": "https://www.strath.ac.uk/whystrathclyde/news/2026/researchersproposefirstmethodtodetectmirrorlife/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-nypds-hidden-surveillance-contracts-come-out-159m-through",
+      "headline": "NYPD's hidden surveillance contracts come out: $159M through a secret fund, 1,700 Flock searches",
+      "summary": "After a court fight, the Legal Aid Society has obtained NYPD records showing cellphone tracking, facial recognition and iris scanning bought through a fund that kept the deals out of public view from 2007 to 2020.",
+      "impacts": [
+        "It shows how surveillance tools can be bought without public review when spending runs through special funds.",
+        "The NYPD reportedly stopped tracking facial-recognition accuracy in 2015 because of high error rates.",
+        "Records lack the detail needed for a full audit, so questions about data sharing remain open.",
+        "Other police departments' procurement practices may now face similar records requests."
+      ],
+      "details": [
+        "A Hoodline report on October 24 describes newly public NYPD records showing that the department built cellphone tracking, facial recognition and iris scanning capabilities through contracts that existed only on paper. The Legal Aid Society obtained them through court action, and an appellate ruling required disclosure of documents covering March 27, 2007 through October 27, 2020.",
+        "The purchases ran through a Special Expenses Fund that shielded transactions from public view. Figures in the report include $610,791 for cellular tracking from Harris Corporation in 2009, another $1.2 million for additional tracking systems by 2013, and $159 million through the fund between 2007 and 2020. The article says the NYPD spent about $3 billion on surveillance technology over a 12-year period, and that Idemia received a $6.8 million contract in 2018 for biometric tools.",
+        "About 165,000 hard-copy pages are to be released, of which 470 have been published so far. The article also says NYPD officers ran about 1,700 Flock Safety database searches between 2023 and 2025.",
+        "On accuracy, the article says the NYPD stopped tracking facial-recognition accuracy in 2015 because of high error rates.",
+        "Caveats from the report: the records lack the details needed for a full audit, and it remains unclear how widely data is shared with third-party providers. The disclosures are historical, covering mostly 2007-2020, and say little about how the tools are used today."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "nypd",
+        "surveillance",
+        "facial recognition",
+        "flock",
+        "police",
+        "privacy",
+        "cellphone tracking"
+      ],
+      "date": "2026-10-24",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Hoodline",
+          "url": "https://hoodline.com/2026/10/nypd-kept-surveillance-deals-hidden-for-years-newly-public-records-show/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-study-top-ai-models-planned-attacks-on-power",
+      "headline": "Study: top AI models planned attacks on power and water systems in about 90% of tries",
+      "summary": "Frenos ran 16,980 tests on 10 AI models. The three best planned attacks on industrial systems about 90% of the time, but the plans often had missing steps and were inconsistent from run to run.",
+      "impacts": [
+        "AI could lower the skill needed to plan attacks on utilities, even if humans still have to fix the gaps.",
+        "Open-weight models did not lag far behind: the best non-US one reached 36.2% overall success.",
+        "Plans that look sensible but omit steps still waste an attacker's time, which limits the risk today.",
+        "Utility operators may need to treat AI-assisted planning as part of their threat model."
+      ],
+      "details": [
+        "Security firm Frenos published a study, reported by The Register on October 21, testing whether AI models can help plan attacks on industrial control systems such as water and power. Between October 2025 and September 2026 it ran 16,980 tests: 13,884 decision attempts, 2,520 planning attempts and 576 simulated attack scenarios.",
+        "Ten models took part: six frontier models, two US open-weight models and two foreign open-weight models. Each got background information and a set of action choices, and the researchers checked whether the selections matched what an attack would require.",
+        "On basic decisions, success rates ranged from 6% to 47%. The top three frontier models reached about 90% success when building attack plans, though their repeatability ran from 60% to 74.3%. The best non-US open-weight model reached 36.2% overall success, outperforming some US frontier models.",
+        "The study's own critical caveat is that models often produced plans with missing steps or assumed access that had not been established. One expert said, 'A plan can look sensible and still leave out something essential.' Another said AI 'doesn't yet turn script kiddies into sophisticated nation-state attackers, but the potential is there.'",
+        "In short: this is about planning, not carrying out attacks. A human attacker could correct the gaps, which could make the plans more useful than the raw success rates suggest. Watch for tests of whether the plans work against real industrial equipment."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ai",
+        "critical infrastructure",
+        "water",
+        "power grid",
+        "llm",
+        "industrial control"
+      ],
+      "date": "2026-10-21",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/a/5304297"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-two-in-body-gene-editors-report-early-human",
+      "headline": "Two in-body gene editors report early human results: a Wilson disease dose and a GSD1a trial",
+      "summary": "Prime Medicine dosed its first patient with an in vivo prime editor for Wilson disease. Beam's base editor BEAM-301 let both evaluable high-dose patients with a rare metabolic disease fast 15+ hours, up from 2.5.",
+      "impacts": [
+        "These are one-time treatments edited inside the body, which could replace lifelong management of some genetic diseases.",
+        "Results are from very few patients, so safety and durability are still unproven.",
+        "Prime editing has now reached in-body human dosing, a step beyond earlier cell-based work.",
+        "Permanent edits raise the stakes for off-target effects, which only longer follow-up can address."
+      ],
+      "details": [
+        "CRISPR Medicine News' weekly roundup for October 23 highlights two clinical updates in gene editing done directly inside patients.",
+        "First, Prime Medicine has begun dosing in a global Phase 1/2 trial of PM577a, an in vivo prime editor for Wilson disease. It is delivered in lipid nanoparticles and aims to correct H1069Q, described as the most common Wilson-causing allele in Europe and North America, in liver cells after a single infusion. The FDA granted PM577 Rare Pediatric Disease designation.",
+        "Second, six people with glycogen storage disease type Ia have received a single infusion of Beam Therapeutics' BEAM-301, a base editor targeting the R83C variant in the G6PC1 gene. Of the two evaluable patients in the higher-dose group, both reached the protocol's maximum controlled fasting duration of 15 hours or more, compared with 2.5 hours before treatment.",
+        "The roundup links to company press releases for both, and these are company-reported results. The numbers are tiny: one newly dosed patient for Prime, and two evaluable patients in the Beam result.",
+        "Why it matters: both are gene edits made in the body rather than in cells taken out and returned. Why caution is needed: edits are permanent, long-term safety is unknown, and early small trials often look better than later large ones. Watch for larger cohorts and follow-up on side effects."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "gene editing",
+        "prime editing",
+        "base editing",
+        "crispr",
+        "clinical trial",
+        "biotech"
+      ],
+      "date": "2026-10-23",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "CRISPR Medicine News",
+          "url": "https://crisprmedicinenews.com/news/cmn-weekly-23-october-2026-your-weekly-crispr-medicine-news/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-a-marsquake-shows-the-solar-systems-biggest-canyon",
+      "headline": "A marsquake shows the solar system's biggest canyon still has active faults",
+      "summary": "Imperial College and Columbia researchers tied a 2021 InSight marsquake to a fault 20-40 km under Valles Marineris. The study in Nature Communications says the canyon's old faults can still slip today.",
+      "impacts": [
+        "It suggests ancient faults on supposedly 'dead' planets can still break, which affects how we look for activity elsewhere.",
+        "Future Mars landers and bases would need to account for seismic risk near big canyon systems.",
+        "It rests on one marsquake, so how often such events happen is unknown.",
+        "Seismometers on other bodies may find activity where none was expected."
+      ],
+      "details": [
+        "Imperial College London published a release on October 15 about a Nature Communications study from Imperial and Columbia University. It says faults beneath Valles Marineris, the largest canyon system in the solar system, are still active.",
+        "The evidence is a marsquake called S0976a, recorded by NASA's InSight lander on August 25, 2021. By analyzing the amplitudes and directions of seismic waves, the team reconstructed the source motion and concluded the quake came from strike-slip faulting beneath the canyon, at an estimated depth of 20 to 40 kilometers. They tested and ruled out meteoroid impacts and landslides as alternatives.",
+        "Lead researcher Jung-Hun Song said: 'Faults deep beneath the canyon can still slip and generate marsquakes, long after the geological processes that originally formed them have ceased.' The release also says structures created billions of years ago 'can remain important and still control where the crust breaks today.'",
+        "A Daily Galaxy write-up on October 21 describes the canyon as about 2,400 miles long and links the activity to planetary cooling and stress from the Tharsis volcanic region.",
+        "The limits are clear. The study analyzes a single seismic event, and the quake's magnitude is not given in the university's article. It is a strong result for one fault, not a map of Martian seismic hazard."
+      ],
+      "category": "Space",
+      "tags": [
+        "mars",
+        "marsquake",
+        "insight",
+        "valles marineris",
+        "planetary science",
+        "faults"
+      ],
+      "date": "2026-10-15",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Imperial College London",
+          "url": "https://www.imperial.ac.uk/news/articles/engineering/earth-science/2026/giant-canyon-on-mars-is-still-tectonically-active-today/"
+        },
+        {
+          "name": "Daily Galaxy",
+          "url": "https://dailygalaxy.com/2026/10/a-2400-mile-scar-on-mars-is-still-moving/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-georgia-tech-simple-instructions-cut-chatbots-agreement-with",
+      "headline": "Georgia Tech: simple instructions cut chatbots' agreement with delusions by about 74%",
+      "summary": "Across 1,280 simulated conversations with eight AI models, telling chatbots not to over-agree cut confirmation of delusional beliefs by 73.8%. Adding self-reflection raised it to 77%. No real patients were tested.",
+      "impacts": [
+        "Sycophancy, where chatbots agree with whatever a user says, is a known risk for people with delusional beliefs.",
+        "A prompt-level fix is cheap for AI providers to apply, if it holds up.",
+        "The test used simulated users, so it does not show reduced harm to real people.",
+        "Anyone building chatbot products can read this as a baseline test to run on their own systems."
+      ],
+      "details": [
+        "Researchers at the Georgia Institute of Technology (Lorenzo de la Loza and Vijay Madisetti, with Courtney Crooks of the Georgia Tech Research Institute) published the study in ACM AI Letters. TechXplore reported on it on October 22.",
+        "They tested eight AI models across 1,280 simulated conversations, built from 16 clinically derived scenarios about delusional beliefs. They compared the models' default behavior with instructions designed to discourage excessive agreement, then with instructions that also added a self-reflection step.",
+        "Instructions discouraging agreement reduced confirmation of delusional beliefs by 73.8%. Adding self-reflection raised the reduction to 77%. The authors say this works without needing new model architectures.",
+        "The limits are stated plainly: the study did not test actual people in clinical settings and did not prove the approach prevents real-world harm. Madisetti said the work 'will help AI providers and solution creators better understand how best to protect and safeguard their users from harming themselves.'",
+        "It connects to a wider concern about companion chatbots, but this paper is only about whether a prompt can change model behavior in simulations. The next step would be testing with real users and measuring outcomes."
+      ],
+      "category": "AI",
+      "tags": [
+        "chatbots",
+        "sycophancy",
+        "delusions",
+        "mental health",
+        "ai safety",
+        "llm"
+      ],
+      "date": "2026-10-22",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "TechXplore",
+          "url": "https://techxplore.com/news/2026-10-ai-chatbots-delusions.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-who-plague-ruled-out-in-the-death-of",
+      "headline": "WHO: plague ruled out in the death of a Russian lab worker, but the cause is still unknown",
+      "summary": "WHO's report on the Irkutsk Antiplague Institute employee who died October 2 says over 5,500 contacts and tests found no infection and ruled out plague. The cause of the pneumonia remains undiagnosed.",
+      "impacts": [
+        "Authorities treated a lab worker's unexplained death as a possible high-threat pathogen event.",
+        "No spread was found among more than 5,500 contacts, which is reassuring.",
+        "Without a diagnosis, WHO lists the lack of a confirmed cause as a 'key uncertainty'.",
+        "The case shows how a single death at a pathogen lab triggers a large, costly public-health response."
+      ],
+      "details": [
+        "WHO published a Disease Outbreak News report on October 10 about a death at the Irkutsk Antiplague Research Institute in Siberia. The employee was hospitalized on September 29 with severe pneumonia and died on October 2, the same day WHO was notified.",
+        "Because the person worked with high-consequence pathogens, pneumonic plague was suspected from occupational exposure. Testing ruled out plague and other high-threat pathogens.",
+        "Authorities identified and monitored more than 5,500 contacts and ran more than 5,500 laboratory tests. The hospital was quarantined. All contacts stayed asymptomatic with negative results, and WHO found no evidence of ongoing transmission.",
+        "WHO's risk assessment names a 'key uncertainty': 'the absence of a confirmed diagnosis in the deceased laboratory worker.' The death was classified as pneumonia of undetermined etiology.",
+        "The site previously covered earlier, smaller contact counts for this case; the WHO report puts the monitored total at over 5,500. The report supports a low-risk reading, but the unresolved cause means the story is not closed."
+      ],
+      "category": "Health",
+      "tags": [
+        "who",
+        "russia",
+        "lab",
+        "pneumonia",
+        "plague",
+        "outbreak",
+        "biosecurity"
+      ],
+      "date": "2026-10-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "World Health Organization",
+          "url": "https://www.who.int/emergencies/disease-outbreak-news/item/2026-DON620"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-france-will-run-facial-recognition-on-riot-footage",
+      "headline": "France will run facial recognition on riot footage and social media images to find suspects",
+      "summary": "Justice Minister Gerald Darmanin said investigators will match images from recent riots against police files and platforms like TikTok, Instagram and Discord. France's regulator has previously found police use of the tech illegal.",
+      "impacts": [
+        "Facial recognition on social media images widens who can be identified from a photo posted online.",
+        "Forensic use is allowed in French law, but the regulator has criticized real-time public use.",
+        "Only 12 specialist officers use it among about 200 investigators, so scale is limited for now.",
+        "It tests where the line sits between investigating a crime and mass biometric scanning."
+      ],
+      "details": [
+        "Biometric Update reported on October 22 that French Justice Minister Gerald Darmanin announced investigators will use facial recognition to identify suspects from recent nationwide riots. Images will be cross-referenced against police databases (the TAJ file) and social media platforms including TikTok, Instagram and Discord.",
+        "The report says facial recognition for forensic identification is established in French law and has withstood EU-level legal challenges. Resources are modest: 12 specialist officers use it among 200 investigators nationwide. The article also notes Paris has 80,000 security cameras across streets, public transit and retail locations.",
+        "The criticism is that France's data regulator, CNIL, previously found that police deployed facial recognition in public spaces without required approvals or data protection impact assessments, and ruled such deployments illegal. Earlier in 2026, media reports alleged police were doing real-time checks against databases in violation of criminal procedure codes; the gendarmerie denied this.",
+        "One officer quoted called it 'one of the very useful tools for investigators' but said it is not enough alone to resolve cases.",
+        "The distinction to keep in mind is after-the-fact identification from known footage, which the law allows, versus live scanning of crowds, which the regulator has objected to. The announcement is about the first."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "france",
+        "facial recognition",
+        "police",
+        "biometrics",
+        "surveillance",
+        "privacy"
+      ],
+      "date": "2026-10-22",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Biometric Update",
+          "url": "https://www.biometricupdate.com/202610/french-police-use-facial-recognition-social-media-images-to-identify-rioters"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-navigate360-admits-hackers-copied-data-from-its-tip",
+      "headline": "Navigate360 admits hackers copied data from its tip platform, about 7 months after a claim of 8 million tips",
+      "summary": "On Oct 23 Navigate360 confirmed hackers copied months of data from its P3 Global Intel tip platform. A hacker claimed 8 million confidential tips in March. The company has not confirmed any sensitive data was misused.",
+      "impacts": [
+        "People who submit anonymous tips depend on the platform keeping them confidential.",
+        "Potentially exposed data includes names, addresses, dates of birth and Social Security numbers.",
+        "The company has not given a count of affected people, so the impact is unclear.",
+        "A months-long gap between a hacker's claim and a confirmation leaves people unable to protect themselves."
+      ],
+      "details": [
+        "Tech Insider reports that Navigate360, which runs the P3 Global Intel tip platform, said on October 23 that hackers accessed one of its systems and copied months of data. The unauthorized access window ran from November 21, 2025 to March 5, 2026, so the company's acknowledgment came about seven and a half months after the intrusion ended.",
+        "In March 2026, a hacker using the name 'Internet Yiff Machine' claimed 93 gigabytes containing 8 million confidential tips. Later reporting described about 8.3 million tip records, close enough to give the claim some credibility, though the exact contents are unconfirmed.",
+        "Navigate360 says potentially exposed information includes names, addresses, dates of birth, Social Security numbers and other sensitive information. It hired third-party forensics, and CEO JP Guilbault said the company has 'not confirmed that any sensitive information has been accessed or misused.'",
+        "What is not known: no confirmed count of affected people, whether every record contained personal data, or whether the stolen data has been published. No ransom demand has been reported and the attackers' identity and motive are unknown.",
+        "The wording, 'copied' but 'not confirmed accessed,' is the kind of statement that can both admit the breach and avoid confirming harm. Watch for a formal notice with numbers."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "data breach",
+        "tips",
+        "privacy",
+        "navigate360",
+        "school safety",
+        "hacking"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Tech Insider",
+          "url": "https://tech-insider.org/navigate360-p3-global-intel-breach-8-million-crime-tips-2026/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-the-philippines-says-it-is-exploring-undersea-cable",
+      "headline": "The Philippines says it is exploring undersea-cable cooperation with Taiwan; no deal is signed",
+      "summary": "A Philippine diplomat said Manila is exploring deeper cooperation with Taipei on protecting cables in the Bashi Channel. Beijing replied with its one-China line. Cable cuts and a suspected survey ship are the backdrop.",
+      "impacts": [
+        "Undersea cables carry most international internet traffic, so a cut can disrupt banking and communications.",
+        "Taiwan reports an average of 7-8 cable incidents a year.",
+        "The cooperation is exploratory only, with no agreement, joint body or schedule.",
+        "The cause of a recent Philippines cable outage is still unknown, so the link to sabotage is unproven."
+      ],
+      "details": [
+        "Astig.ph reported on October 21-22 that Felipe Carino III, the Philippines' deputy chief of mission in Washington, said Manila is exploring 'deeper cooperation' with Taiwan on protecting undersea cables and countering gray-zone activity. He described 'practical and more pragmatic approaches,' including knowledge-sharing and capacity building in the Bashi Channel between the two.",
+        "The report is explicit that no deal has been signed: no agreement, joint body or published schedule exists, and there is no official Philippine government readout.",
+        "The background includes the Philippine Coast Guard recently challenging a Chinese research vessel, Jia Hai 7, off Batanes, suspected of surveying subsea cables while spoofing its location signals. Taiwan has reported an average of 7 to 8 cable incidents per year over four years. Earlier this month, cable segments linking the Philippines to Singapore and Hong Kong went offline, losing about 300 gigabits of capacity, with the cause still unknown.",
+        "Beijing's response, from Chinese Foreign Ministry spokesperson Mao Ning on October 22, was only that the Philippines should adhere to the one-China principle 'with real actions.'",
+        "The honest reading is that this is early talk. The cable outages and the survey ship are context, but the article does not say any of them were deliberate sabotage."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "undersea cables",
+        "taiwan",
+        "philippines",
+        "china",
+        "infrastructure",
+        "gray zone"
+      ],
+      "date": "2026-10-22",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Astig.ph",
+          "url": "https://astig.ph/philippines-taiwan-undersea-cable-cooperation-bashi-channel-2026/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-us-orders-pjm-to-be-able-to-push",
+      "headline": "US orders PJM to be able to push data centers onto backup generators to avoid blackouts",
+      "summary": "Energy Secretary Chris Wright issued an emergency order directing PJM to compel data centers and other big consumers to run backup generation if needed. It ran through Oct 16, citing warm weather and generator outages.",
+      "impacts": [
+        "It treats data centers' backup generators as a grid resource, with 35 GW unused nationwide.",
+        "Even in autumn, planned outages and warm weather can strain the mid-Atlantic grid.",
+        "Running diesel backups more often has local air-quality costs, though the article does not quantify them.",
+        "It adds fuel to the debate over who pays for AI-driven electricity demand."
+      ],
+      "details": [
+        "The National reported that the US Department of Energy issued an emergency order to prevent blackouts in the mid-Atlantic region. It directed PJM Interconnection, which operates the grid across parts of the eastern US, to compel data centers and other large consumers to activate backup generation if necessary.",
+        "Energy Secretary Chris Wright authorized it, citing 'above-normal temperatures' and 'a high rate of planned generator outages during the autumn maintenance season.' The order was valid through October 16, with PJM alerts issued for October 13-14. The article says there is 35 GW of unused backup generation nationwide.",
+        "Important caveats: PJM's maximum generation alert 'does not require any action from customers,' and the order is temporary and limited in scope. The piece adds political context, saying data centers are controversial because of rising electricity costs and that the administration promotes nuclear expansion as a longer-term answer.",
+        "Nothing in the report says blackouts occurred. It is a precaution, taken in a shoulder season when demand is usually lower, which is why it stands out.",
+        "Watch for whether similar orders are issued for winter, when other grid regulators have warned of tighter margins."
+      ],
+      "category": "Tech",
+      "tags": [
+        "power grid",
+        "data centers",
+        "blackouts",
+        "pjm",
+        "energy",
+        "electricity"
+      ],
+      "date": "2026-10-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The National",
+          "url": "https://www.thenationalnews.com/future/technology/2026/10/13/power-grid-emergency-energy-data-center/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-nasdaq-falls-2-6-as-the-10-year",
+      "headline": "Nasdaq falls 2.6% as the 10-year yield slips below 5% and Brent holds near $115",
+      "summary": "On Oct 23 stocks fell on AI-debt worries while investors bought bonds, pushing the 10-year Treasury yield down 16 basis points to 4.97%. Oil stayed high on Middle East attacks and shipping costs.",
+      "impacts": [
+        "Money moving from tech stocks into bonds is a sign investors are reassessing AI-related debt.",
+        "High oil and shipping costs keep pressure on prices even as yields fall.",
+        "France's 10-year yield at 5.07%, over 170 basis points above Germany's, shows strain in some bond markets.",
+        "A Fed decision and big tech earnings next week could swing sentiment either way."
+      ],
+      "details": [
+        "Euronews reported on October 23 that Brent crude stood at $114.73 a barrel (up 0.9%) and WTI at $100.75. In the US, the S&P 500 fell 1.2% and the Nasdaq 2.6%, while the 10-year Treasury yield dropped 16 basis points to 4.97%.",
+        "Euronews attributes the oil rise to 'deadly attacks in Saudi Arabia' and regional conflict worries, with shipping costs for Middle Eastern crude over $37 a barrel. The stock selloff reflects an AI sector correction, with investors fleeing tech over debt worries and elevated borrowing costs for data centers and chip purchases.",
+        "In Europe, the Stoxx 600 fell 0.4%, the CAC 40 0.8% and the DAX 0.5%. Kering dropped more than 11% after Gucci sales fell 6% year over year in the third quarter. France's 10-year yield was 5.07%, more than 170 basis points above Germany's 3.33%.",
+        "Context matters. Euronews notes that despite the weak indexes, the majority of stocks actually rose. And a Fed rate decision and major tech earnings reports arrive next week, which could change sentiment.",
+        "This is a follow-up to earlier coverage of the IMF's warnings about AI debt. One day of falling stocks and bond buying does not prove a trend, but it is the pattern the warnings described."
+      ],
+      "category": "Economy",
+      "tags": [
+        "ai bubble",
+        "bond yields",
+        "oil",
+        "stocks",
+        "nasdaq",
+        "inflation",
+        "economy"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Euronews",
+          "url": "https://www.euronews.com/2026/10/23/oil-prices-climb-above-113-as-ai-sell-off-rattles-stocks-and-investors-buy-bonds"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-university-hospitals-disconnects-from-the-internet-after-unusual",
+      "headline": "University Hospitals disconnects from the internet after 'unusual activity'; MyChart is offline",
+      "summary": "University Hospitals said staff found unusual activity on its servers on Oct 22 and cut internet connections. Some appointments and elective procedures were rescheduled, and disruptions are expected into next week.",
+      "impacts": [
+        "Digital outages at hospitals can push scheduling, records and patient portals back to manual processes.",
+        "The hospital says patient care is not directly affected, though some elective procedures were moved.",
+        "Few details have been shared about the nature of the activity, so it is not confirmed as ransomware.",
+        "Patients may lose access to MyChart and other digital services for days."
+      ],
+      "details": [
+        "Cleveland 19 reported on October 23 that University Hospitals is experiencing 'digital service disruptions' after staff identified suspicious activity on its servers on October 22. The hospital proactively severed its internet connections as a precaution while it investigates.",
+        "According to the report there is currently no direct effect on patient care, but some appointments and elective procedures have been rescheduled. Access to MyChart and other digital services remains offline. The hospital says it is working around the clock to restore services and reconnect external partners.",
+        "Disruptions are expected to continue into the following week. The hospital has given limited detail on what the unusual activity was, and no timeline for full restoration.",
+        "Because the cause has not been disclosed, it is not possible to say whether this was ransomware, data theft or something else. Disconnecting from the internet is a standard containment step, and it is what makes the services unavailable.",
+        "Watch for an update that names the cause and says whether patient data was touched."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "hospital",
+        "cyberattack",
+        "healthcare",
+        "ohio",
+        "outage",
+        "critical infrastructure"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Cleveland 19",
+          "url": "https://cleveland19.com/2026/10/23/university-hospitals-experiencing-digital-service-disruptions"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-bitdefender-stalking-apps-are-being-sold-through-tiktok",
+      "headline": "Bitdefender: stalking apps are being sold through TikTok ads, and the apps do not do what the ads claim",
+      "summary": "Bitdefender found apps like Lens AI advertised on TikTok, 3,000+ ads in a month, with promises to locate people or read their WhatsApp. The store listings leave out the stalking pitch, and the advertised features do not work.",
+      "impacts": [
+        "Even fake stalking apps can normalize, and profit from, the idea of secretly tracking a partner.",
+        "People may pay for apps that do nothing, with a trial reportedly charging $5.40 despite 'free' claims.",
+        "App-store listings differ from the ads, which helps the apps avoid removal.",
+        "Real stalkerware does exist, so checking your own device remains worth doing."
+      ],
+      "details": [
+        "Bitdefender's security researchers published an analysis on October 22 of apps advertised on TikTok with surveillance claims. Named examples include Lens AI, GPS Cam: Timestamp & Location, and mSpy (not on official stores), along with parental-control apps repurposed for monitoring.",
+        "The numbers reported: more than 3,000 TikTok ads for Lens AI in a single month, and a GPS Cam package with about 91 classes of code. Lens AI changed its icon to avoid resembling Google Lens.",
+        "The ads promised to locate people by phone number, access WhatsApp messages remotely, find deleted photos, identify hidden accounts and detect infidelity. According to Bitdefender, the installed apps do not deliver those features, and users report non-functional applications. Many positive reviews look potentially automated or inauthentic.",
+        "On store policy, the official app-store descriptions differ sharply from the TikTok ads and omit the stalking language, which Bitdefender says is to avoid removal. Google Play and the Apple App Store would reject apps that explicitly promised surveillance.",
+        "So the immediate harm is mostly fraud and a normalized pitch for spying, not working spyware. That is a more limited risk than real stalkerware, but the marketing targets people who want to monitor someone else."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "stalkerware",
+        "tiktok",
+        "privacy",
+        "apps",
+        "scams",
+        "bitdefender"
+      ],
+      "date": "2026-10-22",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Bitdefender",
+          "url": "https://www.bitdefender.com/en-us/blog/hotforsecurity/stalkerware-ai-apps-privacy"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-a-mother-wired-5-400-to-a-kidnapper",
+      "headline": "A mother wired $5,400 to a 'kidnapper' after scammers cloned her daughter's voice",
+      "summary": "Fortune profiles Deborah Del Mastro, who sent $5,400 to Mexico over five hours after a call with an AI-cloned voice of her 37-year-old daughter. Experts recommend a family safe word. Her daughter was safe at work.",
+      "impacts": [
+        "A few seconds of public audio can be enough to clone a voice well enough to fool a parent.",
+        "A family code word gives a simple way to verify a call that sounds real.",
+        "Only about 13% of victims report scams, so official numbers understate the problem.",
+        "Hanging up and calling the person directly breaks most of these scams."
+      ],
+      "details": [
+        "Fortune reported on October 24 on a May 2026 incident. Deborah Del Mastro got a call claiming her 37-year-old daughter had been kidnapped by a Mexican drug cartel. The caller played an AI-cloned voice of her daughter in distress. She wired $5,400 to Mexico over five hours before finding that her daughter was safe at work.",
+        "The article cites scale figures: 15 million American adults were scammed in 2025, losing about $68 billion, with 12% of reported scams involving AI or deepfakes. AI can clone a voice from as little as 3 seconds of audio with about 85% accuracy, according to the article. It also cites the 2024 case in which a Hong Kong finance worker lost $25.6 million to a deepfake CFO scam.",
+        "Kimberly Hyun of the University of Cincinnati said 'You really need to create a safe code with your loved ones.' Grace Gedye of Consumer Reports said some companies are not taking basic steps to prevent nonconsensual voice cloning.",
+        "Advice in the piece: set a family code word, hang up and call family members directly, and report scams to the FTC or the FBI's Internet Crime Complaint Center.",
+        "The caveat is that actual AI-involved scam rates may be higher than reported, since victims often do not realize AI was used. Voice-clone scams have been covered on this site before; this one is a first-person account of how it plays out."
+      ],
+      "category": "AI",
+      "tags": [
+        "voice cloning",
+        "scam",
+        "deepfake",
+        "fraud",
+        "ai",
+        "privacy"
+      ],
+      "date": "2026-10-24",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Fortune",
+          "url": "https://fortune.com/2026/10/24/ai-voice-cloning-scam-fake-kidnapping-safe-word/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-25-node-js-patches-10-flaws-including-a-remote",
+      "headline": "Node.js patches 10 flaws, including a remote-code-execution bug in its Brotli decoder",
+      "summary": "Node.js fixed ten vulnerabilities on Oct 21, four rated high, including an out-of-bounds write in Brotli (CVE-2026-111497) that can allow remote code execution. No exploitation in the wild has been reported.",
+      "impacts": [
+        "Servers that fetch and decompress Brotli data from untrusted sources are the main exposure.",
+        "Two TLS hostname-check bypasses weaken connection security in unusual IP formats.",
+        "The Node.js team reports no exploitation in the wild and no confirmed public proof of concept.",
+        "Updating to 22.23.4, 24.22.1 or 26.12.1 closes the issues on supported lines."
+      ],
+      "details": [
+        "SecurityOnline reported that on October 21 the Node.js project released security fixes across its supported 22.x, 24.x and 26.x lines, fixing ten flaws, four rated high. Fixed versions are 22.23.4, 24.22.1 and 26.12.1.",
+        "The headline bug, CVE-2026-111497, is an out-of-bounds write in the bundled Brotli decoder that permits remote code execution through crafted compressed data. AI Weekly's roundup, citing CryptoBriefing, says OpenAI's Codex Security team discovered it and rates it CVSS 9.2; SecurityOnline's article does not name the finder.",
+        "Other fixes include two TLS certificate hostname-verification bypasses using unusual IP formats (CVE-2026-105483 and CVE-2026-106069) and a DNS resolver flaw that cuts off names containing NUL characters. The release also updated Node's certificate store to remove trust in compromised eMudhra intermediate CA keys.",
+        "The AI Weekly summary adds that applications using fetch(), undici or axios against untrusted servers that auto-decompress Brotli responses face exposure.",
+        "The Node.js team does not report exploitation in the wild, and no public proof of concept has been confirmed. The practical step is to update. This matters because Node powers a very large number of web servers and build tools."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "nodejs",
+        "vulnerability",
+        "brotli",
+        "remote code execution",
+        "patch",
+        "tls"
+      ],
+      "date": "2026-10-21",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "SecurityOnline",
+          "url": "https://securityonline.info/nodejs-security-release-october-2026/"
+        },
+        {
+          "name": "AI Weekly",
+          "url": "https://aiweekly.co/ai-news-today"
+        }
+      ]
+    }
+  ]
+}
