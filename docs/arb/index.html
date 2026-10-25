@@ -77,6 +77,12 @@
             font-size:12.5px; color:var(--ink2);}
   .foot-row b{font-weight:600; color:var(--ink);}
   .risk{color:var(--warn);}
+  /* Two columns on the same coin that are struck at different numbers are
+     not two sides of one trade, and nothing on the board said so. */
+  .mismatch{margin-top:9px; padding:7px 9px; border-radius:7px;
+            background:#fbf4e4; border:1px solid #e6d6a8;
+            font-size:11.5px; color:var(--warn); line-height:1.45;}
+  .mismatch b{color:#6d4d00; font-weight:600;}
   .working{margin-top:6px; font-size:11.5px; color:var(--muted);}
   .thin{margin-top:7px; font-size:11.5px; color:var(--warn);}
 
@@ -546,7 +552,7 @@
     return [m + ":" + String(ss).padStart(2, "0"), t <= 60];
   }
 
-  function marketCard(m) {
+  function marketCard(m, clash) {
     const c = el("div", "mkt");
     c.dataset.close = m.close || "";
 
@@ -580,6 +586,18 @@
       sides.appendChild(b);
     });
     c.appendChild(sides);
+
+    if (clash && clash.length) {
+      const w = el("div", "mismatch");
+      w.appendChild(el("b", null, "Not hedgeable against the other column. "));
+      w.appendChild(document.createTextNode(
+        "Each venue is struck at a different number \u2014 "
+        + clash.map(x => x.venue + " " + x.val).join(", ")
+        + " \u2014 so these are not two sides of one trade. If the settlement "
+        + "lands between them the pair pays $2 or $0 instead of $1. The paper "
+        + "trader skips this coin for that reason."));
+      c.appendChild(w);
+    }
 
     // The real-money marker. A check and the amount when a position is
     // open on this exact market, a cross when there is none. This reads
@@ -647,6 +665,31 @@
       host.appendChild(el("div", "empty", "No venues in the feed."));
       return;
     }
+    // WHICH COINS ARE STRUCK AT THE SAME NUMBER ON EVERY VENUE?
+    //
+    // line_val is each venue's own strike. A pair whose strikes differ is
+    // not a hedge -- it pays $2 or $0 instead of $1 whenever the
+    // settlement lands between them. Of 640 settled windows three
+    // resolved differently across the two venues and all three were XRP,
+    // which trades near $1.30 where Kalshi's four decimals and
+    // Polymarket's five genuinely disagree. Computed from the feed rather
+    // than hardcoded, so a coin that starts agreeing clears itself.
+    const strikes = {};
+    venues.forEach(v => (v.markets || []).forEach(m => {
+      if (m.line_val === null || m.line_val === undefined) return;
+      const k = (m.coin || "") + "|" + (m.window || "");
+      (strikes[k] = strikes[k] || []).push({ venue: v.name, val: m.line_val });
+    }));
+    const mismatched = {};
+    Object.keys(strikes).forEach(k => {
+      const seen = strikes[k];
+      if (seen.length < 2) return;
+      const lo = Math.min.apply(null, seen.map(x => x.val));
+      const hi = Math.max.apply(null, seen.map(x => x.val));
+      // Relative, so it reads the same on a $80,000 coin and a $1.30 one.
+      if ((hi - lo) / Math.max(Math.abs(hi), 1e-9) > 1e-9) mismatched[k] = seen;
+    });
+
     const grid = el("div", "venues");
     grid.style.setProperty("--vcols", String(venues.length));
     venues.forEach(v => {
@@ -662,7 +705,8 @@
           "Between windows. These are 15-minute markets and each venue "
           + "lists the next one a moment after the last one closes."));
       } else {
-        ms.forEach(m => col.appendChild(marketCard(m)));
+        ms.forEach(m => col.appendChild(marketCard(m,
+          mismatched[(m.coin || "") + "|" + (m.window || "")])));
       }
       grid.appendChild(col);
     });
