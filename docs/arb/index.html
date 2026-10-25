@@ -149,6 +149,14 @@
   .sigrow .sz{width:74px; text-align:right; flex:none; color:var(--muted);
               font-size:11px;}
 
+  table.band{border-collapse:collapse; font-size:12.5px; margin:10px 0 4px;
+             font-variant-numeric:tabular-nums;}
+  table.band th{text-align:right; padding:3px 11px 3px 0; color:var(--muted);
+                font-weight:600; font-size:11px; white-space:nowrap;}
+  table.band td{text-align:right; padding:3px 11px 3px 0;
+                border-top:1px solid var(--rule); white-space:nowrap;}
+  table.band th:first-child,table.band td:first-child{text-align:left;}
+
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
   .note+.note{margin-top:10px;}
@@ -264,9 +272,14 @@
     (This is not true of <em>global</em> Polymarket, which uses a Chainlink time-weighted average
     against the opening price. That is a different contract, and it is not what this board shows.)</p>
   <p class="note">So buying the cheap side on each venue pays <b>$1 when the two agree</b>, and
-    <b>$2 or $0</b> when they disagree. Measured over 1,256 settled windows they agreed
-    <b>98.25&percnt;</b> of the time &mdash; 22 disagreements, each of which is a total loss or a
-    double. That residual is the real risk, and it does not shrink with the fee.</p>
+    <b>$2 or $0</b> when they disagree. Over <b>384 settled windows on these two contracts</b>
+    they agreed <b>383 times &mdash; 99.74&percnt;</b>. The single disagreement was XRP. That
+    residual is the real risk and it does not shrink with the fee, but one event is one event:
+    the true rate could plausibly be several times higher.</p>
+  <p class="note"><b>Correction.</b> This page previously said 98.25&percnt; over 1,256 windows.
+    That figure was measured on <em>global</em> Polymarket &mdash; a different contract, on a
+    venue these accounts cannot reach, and its sample even included coins Polymarket US does not
+    list. It was the wrong number for the thing being traded.</p>
 
   <h2>Why the number next to each pairing is negative</h2>
   <p class="note"><b>The price on a card is the top of the book</b> &mdash; what the first contract
@@ -276,17 +289,39 @@
   <p class="note"><b>The fee is quadratic.</b> Kalshi charges
     0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price) per contract and
     Polymarket US 0.0695 of the same shape, so the round trip is 3.8&cent; at a coin flip and
-    0.34&cent; out at 3&cent;. The cheap corner looks like the place to trade. It is not: across
-    81,164 samples the two venues' mid prices differ by <b>0.00&cent; in every price band</b>.
-    With no fee charged at all there is no gap. The whole measured loss <em>is</em> the fee.</p>
-  <p class="note">Three more things close that corner independently. The maker rebate is
-    &theta;&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price) &mdash; the same
-    quadratic as the fee, so it collapses with it. Polymarket US quotes on a flat 1&cent; tick
-    while Kalshi quotes to 0.1&cent; in the tails, so in the band where the round trip falls to
-    0.34&cent; <b>the tick is larger than the fee</b> and a sub-cent edge could not be priced.
-    And Massachusetts does not adopt the federal wagering-loss rule, so a hedged pair is taxed on
-    its gross winnings &mdash; roughly 2.5&cent; on a 3&cent; edge, and that does not shrink in
-    the cheap corner either.</p>
+    0.30&cent; out at 3&cent;. But the fee turns out <b>not</b> to be what stops this.</p>
+  <p class="note"><b>The two venues disagree constantly.</b> Over 81,000 samples, the gap between
+    their mid prices, with no fee charged at all:</p>
+  <table class="band"><thead><tr><th>price band</th><th>median gap</th><th>p90</th><th>p99</th>
+    <th>round&nbsp;trip</th><th>gap&nbsp;&gt;&nbsp;fee</th></tr></thead><tbody>
+    <tr><td>0.00&ndash;0.03</td><td>0.35&cent;</td><td>0.85&cent;</td><td>2.55&cent;</td><td>0.30&cent;</td><td><b>53.8&percnt;</b></td></tr>
+    <tr><td>0.03&ndash;0.07</td><td>0.35&cent;</td><td>1.00&cent;</td><td>9.45&cent;</td><td>0.74&cent;</td><td>18.5&percnt;</td></tr>
+    <tr><td>0.07&ndash;0.15</td><td>0.30&cent;</td><td>1.05&cent;</td><td>6.00&cent;</td><td>1.53&cent;</td><td>6.3&percnt;</td></tr>
+    <tr><td>0.15&ndash;0.30</td><td>0.50&cent;</td><td>2.00&cent;</td><td>8.00&cent;</td><td>2.74&cent;</td><td>3.9&percnt;</td></tr>
+    <tr><td>0.30&ndash;0.50</td><td>0.50&cent;</td><td>2.00&cent;</td><td>10.00&cent;</td><td>3.76&cent;</td><td>3.7&percnt;</td></tr>
+  </tbody></table>
+  <p class="note"><b>Correction.</b> This page previously said the venues' mids differ by
+    &ldquo;0.00&cent; in every band&rdquo; and that the whole loss <em>was</em> the fee. That was
+    an artifact. The sampler writes both pairings off the same two mid prices, and the two are
+    exact negatives of each other, so pooling them forced the median to zero <em>by
+    construction</em> &mdash; it would have printed 0.00&cent; if the venues had disagreed by a
+    nickel all day. 81,000 samples bought nothing; eight would have said the same.</p>
+  <p class="note"><b>What actually stops it is the spread, not the fee.</b> In the cheapest band
+    the round trip costs 0.30&cent; but the two bid&ndash;ask spreads cost about 0.55&cent;
+    &mdash; and both venues sit at exactly one tick, the narrowest price either can quote. You
+    cannot cross two spreads to collect a gap whose median is 0.35&cent;. Taker-to-taker in that
+    band is <b>&minus;0.99&cent;</b> per contract, and that number is a real measurement rather
+    than an artifact. Polymarket US quotes on a flat 1&cent; grid while Kalshi quotes to
+    0.1&cent; in the tails, so the coarser grid alone is wider than the fee it is supposed to
+    beat.</p>
+  <p class="note">Two things remain genuinely open rather than closed. The <b>maker route</b> was
+    reported here as closed; that measurement has been withdrawn &mdash; its fill proxy counted a
+    fill whenever the price ticked down, so it selected the adverse half of the sample and then
+    measured how adverse it was. Running it on the rows where the price ticked <em>up</em> gives
+    the exact mirror image, which means the test had no power at all. And Massachusetts does not
+    adopt the federal wagering-loss rule, so a hedged pair may be taxed on its gross winnings
+    &mdash; roughly 2.5&cent; against a 3&cent; edge &mdash; though whether these are instead
+    §1256 contracts, which would void that entirely, is unresolved.</p>
 
   <section class="sys" id="sys" hidden></section>
 
