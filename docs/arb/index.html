@@ -157,42 +157,105 @@
                 border-top:1px solid var(--rule); white-space:nowrap;}
   table.band th:first-child,table.band td:first-child{text-align:left;}
 
-  /* Trade history, opened from the corner of the bar. */
+  /* ------------------------------------------------------------ history
+     This strategy is meant to trade rarely, so the panel is mostly empty
+     time, and empty time was being drawn as one box per half hour -- a
+     wall of identical cards that said nothing. It is now three things:
+     four figures, a strip where every half hour is one cell, and a log
+     that collapses the quiet runs and only expands what happened. */
   .histbtn{margin-left:auto; font:inherit; font-size:11px; cursor:pointer;
            padding:5px 12px; border:1px solid var(--line); border-radius:999px;
            background:transparent; color:var(--ink2); white-space:nowrap;}
   .histbtn:hover{border-color:var(--ink); color:var(--ink);}
   .histbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-  .hist{position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.45);
+
+  .hist{position:fixed; inset:0; z-index:60; background:rgba(21,21,15,.34);
         display:flex; justify-content:flex-end;}
   .hist[hidden]{display:none;}
-  .hist .panel{background:var(--bg); width:min(560px,100%); height:100%;
-               overflow-y:auto; padding:20px clamp(16px,4vw,26px) 40px;
-               border-left:1px solid var(--rule);}
-  .hist h3{font-size:14px; margin:0;}
-  .hist .close{position:absolute; top:14px; right:16px; font:inherit;
-               font-size:20px; line-height:1; background:none; cursor:pointer;
-               border:0; color:var(--muted); padding:4px 8px;}
-  .hist .close:hover{color:var(--ink);}
-  .hist .lede{font-size:12px; color:var(--muted); margin:6px 0 18px;}
-  .hour{border-top:1px solid var(--rule); padding:9px 0 4px;}
-  .hour .hh{font-size:11px; letter-spacing:.07em; text-transform:uppercase;
-            color:var(--muted); display:flex; justify-content:space-between;}
-  .hour.empty .hh{opacity:.55;}
-  .hour .none{font-size:12px; color:var(--muted); padding:3px 0 5px;
-               font-style:italic;}
-  .trd{border:1px solid var(--line); border-radius:9px; padding:9px 11px;
-       margin:7px 0; background:var(--card);}
+  /* --bg was never a token on this page, so the panel was transparent and
+     the board showed straight through the history. */
+  .hist .panel{background:var(--paper); width:min(520px,100%); height:100%;
+               overflow-y:auto; border-left:1px solid var(--rule);
+               box-shadow:-18px 0 44px rgba(21,21,15,.10);}
+
+  .hhead{position:sticky; top:0; z-index:2; background:var(--paper);
+         border-bottom:1px solid var(--rule);
+         padding:17px clamp(15px,4vw,22px) 13px;}
+  .hhead h3{font-family:'Space Grotesk',sans-serif; font-size:15px;
+            font-weight:600; letter-spacing:-0.015em; margin:0;}
+  .hhead .close{position:absolute; top:11px; right:11px; font:inherit;
+                font-size:17px; line-height:1; background:none; cursor:pointer;
+                border:0; color:var(--muted); padding:5px 9px; border-radius:7px;}
+  .hhead .close:hover{color:var(--ink); background:var(--line);}
+  .hhead .close:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+  .hhead .lede{font-size:12.5px; color:var(--ink2); margin:5px 0 0; max-width:48ch;}
+
+  .hstats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+          background:var(--line); border-bottom:1px solid var(--rule);}
+  .hstats div{background:var(--paper); padding:12px 6px 11px; text-align:center;}
+  .hstats .n{font-family:'Space Grotesk',sans-serif; font-size:19px;
+             font-weight:600; letter-spacing:-0.02em; display:block; line-height:1.15;}
+  .hstats .n.z{color:var(--muted);}
+  .hstats .n.up{color:var(--good);} .hstats .n.down{color:var(--bad);}
+  .hstats .k{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
+             color:var(--muted); display:block; margin-top:3px;}
+
+  /* one cell per half hour, oldest on the left */
+  .htl{padding:15px clamp(15px,4vw,22px) 14px; border-bottom:1px solid var(--rule);}
+  .htl .cap{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
+            color:var(--muted); margin-bottom:8px;}
+  .htl .strip{display:flex; gap:2px;}
+  .htl .strip.dense{gap:1px;}
+  .htl .cell{flex:1 1 0; min-width:3px; height:26px; border-radius:2px;
+             background:var(--line);}
+  .htl .strip.dense .cell{min-width:2px; border-radius:1px;}
+  .htl .cell.near{background:#dcbd6b;}
+  .htl .cell.trade{background:var(--good);}
+  .htl .cell.loss{background:var(--bad);}
+  .htl .ends{display:flex; justify-content:space-between; margin-top:7px;
+             font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
+  .htl .key{display:flex; gap:14px; margin-top:10px; font-size:10.5px;
+            color:var(--muted); flex-wrap:wrap;}
+  .htl .key i{display:inline-block; width:8px; height:8px; border-radius:2px;
+              margin-right:5px; background:var(--line);}
+  .htl .key .near i{background:#dcbd6b;}
+  .htl .key .trade i{background:var(--good);}
+
+  .hbody{padding:2px clamp(15px,4vw,22px) 44px;}
+  /* A run of quiet half hours collapses to one line. Thirteen boxes
+     saying "nothing" is not thirteen times the information. */
+  .gap{display:flex; justify-content:space-between; align-items:baseline;
+       gap:12px; padding:10px 0; border-bottom:1px solid var(--line);
+       font-size:12px; color:var(--muted);}
+  .gap .gt{font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .slot{padding:13px 0 5px; border-bottom:1px solid var(--line);}
+  .slot .sh{display:flex; justify-content:space-between; align-items:baseline;
+            font-size:10.5px; letter-spacing:.07em; text-transform:uppercase;
+            color:var(--muted); margin-bottom:6px;}
+  .slot .sh b{color:var(--ink2); font-weight:600;}
+
+  .ev{display:flex; gap:9px; align-items:baseline; padding:6px 0; font-size:12.5px;}
+  .ev .co{font-weight:600; text-transform:uppercase; font-size:10.5px;
+          letter-spacing:.04em; min-width:2.3rem; color:var(--ink);}
+  .ev .nt{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px;
+          font-variant-numeric:tabular-nums; min-width:3.3rem; text-align:right;
+          color:var(--warn);}
+  .ev .rs{color:var(--ink2); flex:1; min-width:0;}
+  .ev .tm{color:var(--muted); font-size:10.5px; font-variant-numeric:tabular-nums;}
+  .more{font-size:11.5px; color:var(--muted); padding:3px 0 2px;}
+
+  .trd{border:1px solid var(--line); border-radius:10px; padding:11px 13px;
+       margin:8px 0; background:var(--card);}
   .trd .th{display:flex; justify-content:space-between; align-items:baseline;
-           gap:10px; font-size:12.5px;}
+           gap:10px; font-size:13px;}
   .trd .co{font-weight:600; text-transform:uppercase;}
   .trd .pl{font-family:'Space Grotesk',sans-serif; font-weight:600;
            font-variant-numeric:tabular-nums;}
   .trd .pl.up{color:var(--good);} .trd .pl.down{color:var(--bad);}
   .trd .lg{display:flex; justify-content:space-between; font-size:11.5px;
-           color:var(--ink2); padding:3px 0 0; font-variant-numeric:tabular-nums;}
-  .trd .warn{font-size:11px; color:var(--bad); margin-top:5px;}
-  .trd .open{font-size:11px; color:var(--muted); margin-top:5px;}
+           color:var(--ink2); padding:4px 0 0; font-variant-numeric:tabular-nums;}
+  .trd .warn{font-size:11px; color:var(--bad); margin-top:6px;}
+  .trd .open{font-size:11px; color:var(--muted); margin-top:6px;}
 
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
@@ -300,10 +363,14 @@
 <aside class="paper" id="paper" hidden></aside>
 <div class="hist" id="hist" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-label="Trade history">
-    <button class="close" id="histclose" aria-label="Close">&times;</button>
-    <h3>Trade history</h3>
-    <p class="lede" id="histlede"></p>
-    <div id="histbody"></div>
+    <div class="hhead">
+      <button class="close" id="histclose" aria-label="Close">&times;</button>
+      <h3>Trade history</h3>
+      <p class="lede" id="histlede"></p>
+    </div>
+    <div class="hstats" id="histstats"></div>
+    <div class="htl" id="histtl"></div>
+    <div class="hbody" id="histbody"></div>
   </div>
 </div>
 <main>
@@ -777,139 +844,278 @@
       '<span><i style="background:#8a5a2d"></i>polymarket</span></div>');
   }
 
-  // ------------------------------------------------------- trade history
-  // Grouped by hour, every hour shown even when empty. An empty hour is
-  // the point: it says the thing is alive and looking, and chose not to
-  // trade. A list that only showed fills would be indistinguishable from
-  // a list that stopped running.
+  // --------------------------------------------------------- history
+  // Three parts, ordered by how fast each answers "is this thing doing
+  // anything": four figures, a strip with one cell per half hour, then a
+  // log that collapses the quiet runs and expands only what happened.
+  //
+  // The point of showing empty time at all is that a strategy meant to
+  // trade twice a day looks identical to a dead process if you only list
+  // fills. But the first version drew one card per empty half hour, so
+  // an ordinary night was thirteen stacked boxes all reading "watched,
+  // nothing cleared the floor" -- the same sentence is not more
+  // information for being repeated. One cell each, and one line per run.
   let PAPER = null;
 
-  function pad(n) { return String(n).padStart(2, "0"); }
+  const SLOT_MIN  = 30;   // bucket size; the label and the walk derive from it
+  const MIN_SLOTS = 12;   // always reach back at least six hours
+  const MAX_CELLS = 96;   // two days, after which the strip stops growing
+  const MAX_EV    = 5;    // near-misses shown per half hour before "+N more"
 
-  // Half-hour slots. SLOT_MIN is the only thing to change if the bucket
-  // size ever moves again -- the key, the label and the walk all derive
-  // from it rather than assuming an hour.
-  const SLOT_MIN = 30;
+  const pad2 = n => String(n).padStart(2, "0");
 
   function slotStart(d) {
     const x = new Date(d);
     x.setMinutes(Math.floor(x.getMinutes() / SLOT_MIN) * SLOT_MIN, 0, 0);
     return x;
   }
-
-  function hourKey(d) {
-    const x = slotStart(d);
-    return x.getFullYear() + "-" + pad(x.getMonth() + 1) + "-" + pad(x.getDate())
-      + " " + pad(x.getHours()) + ":" + pad(x.getMinutes());
-  }
+  const slotKey = d => +slotStart(d);
 
   function clock12(d) {
-    const h = d.getHours();
-    const h12 = h % 12 === 0 ? 12 : h % 12;
-    return { t: h12 + ":" + pad(d.getMinutes()), m: h < 12 ? "am" : "pm" };
+    const h = d.getHours(), h12 = h % 12 === 0 ? 12 : h % 12;
+    return { t: h12 + ":" + pad2(d.getMinutes()), m: h < 12 ? "am" : "pm" };
+  }
+  const shortTime = d => { const c = clock12(d); return c.t + c.m; };
+
+  function datePrefix(d) {
+    return d.toDateString() === new Date().toDateString()
+      ? "" : (d.getMonth() + 1) + "/" + d.getDate() + " ";
+  }
+  const edgeLabel = ms => { const d = new Date(ms); return datePrefix(d) + shortTime(d); };
+
+  // "2:00-2:30am" -- am/pm repeated only when the slot crosses noon.
+  function slotLabel(ms) {
+    const a = new Date(ms), b = new Date(ms + SLOT_MIN * 60000);
+    const ca = clock12(a), cb = clock12(b);
+    return datePrefix(a) + ca.t + (ca.m === cb.m ? "" : ca.m)
+      + "–" + cb.t + cb.m;
   }
 
-  function hourLabel(d) {
-    const a = slotStart(d);
-    const b = new Date(a.getTime() + SLOT_MIN * 60000);
-    const ca = clock12(a), cb = clock12(b);
-    const today = new Date();
-    const datePart = a.toDateString() === today.toDateString()
-      ? "" : (a.getMonth() + 1) + "/" + a.getDate() + "  ";
-    // Only repeat am/pm on the first time when the slot crosses noon or
-    // midnight, so the common case stays short: "2:00\u20132:30am".
-    return datePart + ca.t + (ca.m === cb.m ? "" : ca.m)
-      + "\u2013" + cb.t + cb.m;
+  function spanWords(mins) {
+    const h = Math.floor(mins / 60), m = Math.round(mins % 60);
+    if (h >= 24) {
+      const d = Math.floor(h / 24);
+      return h % 24 ? d + "d " + (h % 24) + "h" : d + " days";
+    }
+    if (h && m) return h + "h " + m + "m";
+    if (h) return h + "h";
+    return m + "m";
+  }
+
+  // The stored reason is a whole sentence written for a log file. The
+  // full text stays as the row's tooltip; this is what fits on a line.
+  const WHY = [
+    [/settlement window/i,   "inside the settlement minute"],
+    [/earlier than/i,        "too early in the window"],
+    [/already holding/i,     "already in this window"],
+    [/wallet cannot cover/i, "not enough cash for the leg"],
+    [/contract floor/i,      "too few contracts to clear the fee"],
+    [/queue haircut/i,       "no real size behind the quote"],
+    [/safety margin/i,       "the safety margin ate it"],
+    [/walking the ladder/i,  "ladder depth ate it"],
+    [/below the floor/i,     "under the floor at size"],
+    [/ONLY kalshi/i,         "only Kalshi would have filled"],
+    [/ONLY pm us/i,          "only Polymarket would have filled"],
+    [/both legs missed/i,    "both legs moved first"],
+    [/unreadable/i,          "a book went unreadable"],
+    [/quote was/i,           "the quote went stale"]
+  ];
+  function whyShort(r) {
+    for (const w of WHY) if (w[0].test(r || "")) return w[1];
+    return (r || "passed").split("--")[0].trim();
+  }
+
+  function missRow(m) {
+    const row = el("div", "ev");
+    row.title = m.reason || "";
+    row.appendChild(el("span", "co", m.coin || ""));
+    row.appendChild(el("span", "nt", m.net == null ? ""
+      : (m.net >= 0 ? "+" : "−")
+        + Math.abs(m.net * 100).toFixed(2) + "¢"));
+    row.appendChild(el("span", "rs", whyShort(m.reason)));
+    row.appendChild(el("span", "tm", shortTime(m._d)));
+    return row;
   }
 
   function tradeRow(t) {
     const box = el("div", "trd");
     const top = el("div", "th");
     const left = el("span");
-    left.innerHTML = '<span class="co">' + t.coin + "</span> \u00B7 "
-      + (t.qty || 0) + " contracts";
+    left.appendChild(el("span", "co", t.coin || ""));
+    left.appendChild(document.createTextNode(
+      " · " + (t.qty || 0) + " contracts"));
     top.appendChild(left);
     if (t.pnl === null || t.pnl === undefined) {
       top.appendChild(el("span", "pl", "open"));
     } else {
-      const pl = el("span", "pl " + (t.pnl >= 0 ? "up" : "down"),
-        (t.pnl >= 0 ? "+" : "\u2212") + money(Math.abs(t.pnl)));
-      top.appendChild(pl);
+      top.appendChild(el("span", "pl " + (t.pnl >= 0 ? "up" : "down"),
+        (t.pnl >= 0 ? "+" : "−") + money(Math.abs(t.pnl)).replace("$", "$")));
     }
     box.appendChild(top);
 
     (t.legs || []).forEach(lg => {
       const row = el("div", "lg");
       row.appendChild(el("span", null,
-        (lg.venue === "kalshi" ? "Kalshi" : "Polymarket US") + " \u2014 " + lg.side));
+        (lg.venue === "kalshi" ? "Kalshi" : "Polymarket US") + " — " + lg.side));
       row.appendChild(el("span", null,
-        lg.qty + " @ " + (lg.px * 100).toFixed(1) + "\u00A2"));
+        lg.qty + " @ " + (lg.px * 100).toFixed(1) + "¢"));
       box.appendChild(row);
     });
 
     if (t.naked) {
       box.appendChild(el("div", "warn",
-        "ONE LEG ONLY \u2014 this was a directional bet, not a hedge"));
+        "ONE LEG ONLY — a directional bet, not a hedge"));
     }
     if (t.state !== "settled") {
-      box.appendChild(el("div", "open", "still open \u00B7 cost " + money(t.cost)));
+      box.appendChild(el("div", "open", "still open · cost " + money(t.cost)));
     }
     return box;
   }
 
   function renderHistory() {
+    const P = PAPER || {};
+    const trades = P.trades || [], misses = P.misses || [];
     const body = $("#histbody"), lede = $("#histlede");
-    const trades = (PAPER && PAPER.trades) || [];
-    body.textContent = "";
+    const stats = $("#histstats"), tl = $("#histtl");
+    body.textContent = ""; stats.textContent = ""; tl.textContent = "";
 
-    const byHour = {};
-    trades.forEach(t => {
-      const d = new Date(t.opened);
-      if (isNaN(d)) return;
-      (byHour[hourKey(d)] = byHour[hourKey(d)] || []).push(t);
-    });
+    // ---- bucket every event into its half hour
+    const slots = new Map();
+    const bucket = k => {
+      if (!slots.has(k)) slots.set(k, { t: [], m: [] });
+      return slots.get(k);
+    };
+    let oldest = null;
+    const note = (iso, kind, o) => {
+      const d = new Date(iso);
+      if (isNaN(d)) return;           // rows written before misses carried a date
+      o._d = d;
+      bucket(slotKey(d))[kind].push(o);
+      if (!oldest || d < oldest) oldest = d;
+    };
+    trades.forEach(t => note(t.opened, "t", t));
+    misses.forEach(m => note(m.ts, "m", m));
 
-    // Walk every hour from the first thing this account ever saw to now,
-    // so the gaps are visible rather than collapsed away.
-    // Always cover at least the last few hours, even with nothing booked.
-    // A panel showing one empty slot says "no trades"; a panel showing
-    // twelve says "it has been watching for six hours and taken none",
-    // which is the thing actually worth knowing.
-    const MIN_SLOTS = 12;
-    const first = PAPER && PAPER.first_seen ? new Date(PAPER.first_seen)
-      : (trades.length ? new Date(trades[trades.length - 1].opened) : new Date());
-    const floorBy = new Date(Date.now() - MIN_SLOTS * SLOT_MIN * 60000);
-    const start = slotStart(first < floorBy ? first : floorBy);
-    const hours = [];
-    for (let d = slotStart(new Date()); d >= start;
-         d = new Date(d.getTime() - SLOT_MIN * 60000)) {
-      hours.push(new Date(d));
-      if (hours.length > 480) break;          // ten days of half-hours
-    }
+    // ---- how far back this reaches
+    const now = new Date();
+    const sinceRaw = P.since ? new Date(P.since) : null;
+    const since = sinceRaw && !isNaN(sinceRaw) ? sinceRaw : null;
+    const floorBy = new Date(+now - MIN_SLOTS * SLOT_MIN * 60000);
+    let from = since || oldest || floorBy;
+    if (oldest && oldest < from) from = oldest;
+    if (from > floorBy) from = floorBy;
 
-    const taken = trades.length;
-    lede.textContent = taken
-      ? taken + " position" + (taken === 1 ? "" : "s") + " taken, newest first. "
-        + "Half-hours with no trades are shown too, so you can see it was looking."
-      : "No positions taken yet. Every half-hour below is one it watched and "
-        + "found nothing that cleared the floor.";
+    let keys = [];
+    for (let k = +slotStart(from), last = +slotStart(now);
+         k <= last; k += SLOT_MIN * 60000) keys.push(k);
+    const clipped = keys.length > MAX_CELLS;
+    if (clipped) keys = keys.slice(-MAX_CELLS);
 
-    hours.forEach(d => {
-      const list = byHour[hourKey(d)] || [];
-      const h = el("div", "hour" + (list.length ? "" : " empty"));
-      const hh = el("div", "hh");
-      hh.appendChild(el("span", null, hourLabel(d)));
-      hh.appendChild(el("span", null,
-        list.length ? list.length + " taken" : "no trades taken"));
-      h.appendChild(hh);
-      if (!list.length) {
-        h.appendChild(el("div", "none", "watched, nothing cleared the floor"));
-      } else {
-        list.sort((a, b) => new Date(b.opened) - new Date(a.opened));
-        list.forEach(t => h.appendChild(tradeRow(t)));
+    // ---- the four figures
+    const taken  = (P.settled || 0) + (P.open || 0);
+    const naked  = (P.naked_settled || 0) + (P.naked_open || 0);
+    const hedged = Math.max(0, taken - naked);
+    const real   = P.realised || 0;
+    const fig = (v, k, cls) => {
+      const d = el("div");
+      d.appendChild(el("span", "n" + (cls ? " " + cls : ""), v));
+      d.appendChild(el("span", "k", k));
+      stats.appendChild(d);
+    };
+    fig(String(taken),  "taken",    taken  ? "" : "z");
+    fig(String(hedged), "hedged",   hedged ? "" : "z");
+    fig(String(naked),  "naked",    naked  ? "down" : "z");
+    fig(money(real),    "realised", real > 0 ? "up" : real < 0 ? "down" : "z");
+
+    // ---- the strip
+    const near = misses.length;
+    tl.appendChild(el("div", "cap",
+      (clipped ? "the last two days · " : "")
+      + "one cell per half hour, oldest first"
+      + (near ? " · " + near + " came close" : "")));
+    const strip = el("div", "strip" + (keys.length > 40 ? " dense" : ""));
+    keys.forEach(k => {
+      const s = slots.get(k);
+      const c = el("div", "cell");
+      let what = "watched, nothing";
+      if (s && s.t.length) {
+        const pl = s.t.reduce((a, x) => a + (x.pnl || 0), 0);
+        c.className = "cell " + (pl < 0 ? "loss" : "trade");
+        what = s.t.length + " taken";
+      } else if (s && s.m.length) {
+        c.className = "cell near";
+        what = s.m.length + " came close";
       }
-      body.appendChild(h);
+      c.title = slotLabel(k) + " — " + what;
+      strip.appendChild(c);
     });
+    tl.appendChild(strip);
+
+    const ends = el("div", "ends");
+    ends.appendChild(el("span", null, edgeLabel(keys[0])));
+    ends.appendChild(el("span", null, "now"));
+    tl.appendChild(ends);
+
+    const key = el("div", "key");
+    [["", "watched, nothing"], ["near", "came close, passed"],
+     ["trade", "position taken"]].forEach(([cls, txt]) => {
+      const sp = el("span", cls || null);
+      sp.appendChild(el("i"));
+      sp.appendChild(document.createTextNode(txt));
+      key.appendChild(sp);
+    });
+    tl.appendChild(key);
+
+    // ---- the line that says what all of that means
+    const watchedMin = Math.max(0, (now - (since || oldest || new Date(keys[0]))) / 60000);
+    lede.textContent = taken
+      ? taken + " position" + (taken === 1 ? "" : "s") + " in "
+        + spanWords(watchedMin) + " of watching, newest first."
+      : near
+        ? "Nothing taken in " + spanWords(watchedMin) + ". " + near + " pairing"
+          + (near === 1 ? "" : "s") + " cleared the floor and " + (near === 1
+            ? "was" : "were") + " still passed — each one is listed with why."
+        : "Nothing taken in " + spanWords(watchedMin) + ", and nothing has even "
+          + "cleared the floor to be considered.";
+
+    // ---- the log, newest first, quiet runs collapsed to one line
+    let run = [];
+    const flushRun = () => {
+      if (!run.length) return;
+      const oldK = run[run.length - 1], newK = run[0];
+      const g = el("div", "gap");
+      g.appendChild(el("span", "gt", run.length === 1 ? slotLabel(oldK)
+        : edgeLabel(oldK) + "–" + edgeLabel(newK + SLOT_MIN * 60000)));
+      g.appendChild(el("span", null, run.length + " half hour"
+        + (run.length === 1 ? "" : "s") + " · nothing cleared the floor"));
+      body.appendChild(g);
+      run = [];
+    };
+
+    keys.slice().reverse().forEach(k => {
+      const s = slots.get(k);
+      if (!s || (!s.t.length && !s.m.length)) { run.push(k); return; }
+      flushRun();
+      const sl = el("div", "slot");
+      const sh = el("div", "sh");
+      const lab = el("span");
+      lab.appendChild(el("b", null, slotLabel(k)));
+      sh.appendChild(lab);
+      sh.appendChild(el("span", null,
+        (s.t.length ? s.t.length + " taken" : "")
+        + (s.t.length && s.m.length ? " · " : "")
+        + (s.m.length ? s.m.length + " passed" : "")));
+      sl.appendChild(sh);
+      s.t.sort((a, b) => b._d - a._d).forEach(t => sl.appendChild(tradeRow(t)));
+      const ms = s.m.sort((a, b) => b._d - a._d);
+      ms.slice(0, MAX_EV).forEach(m => sl.appendChild(missRow(m)));
+      if (ms.length > MAX_EV) {
+        sl.appendChild(el("div", "more",
+          "+ " + (ms.length - MAX_EV) + " more passed in this half hour"));
+      }
+      body.appendChild(sl);
+    });
+    flushRun();
   }
 
   function openHistory() { $("#hist").hidden = false; renderHistory(); }
