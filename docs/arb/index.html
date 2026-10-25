@@ -190,13 +190,16 @@
   .hhead .close:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
   .hhead .lede{font-size:12.5px; color:var(--ink2); margin:5px 0 0; max-width:48ch;}
 
-  .hstats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
-          background:var(--line); border-bottom:1px solid var(--rule);}
-  .hstats div{background:var(--paper); padding:12px 6px 11px; text-align:center;}
-  .hstats .n{font-family:'Space Grotesk',sans-serif; font-size:19px;
+  /* Five figures have to stay on one row at phone width, or the last one
+     sits alone against a grey gap. */
+  .hstats{display:grid; grid-template-columns:repeat(auto-fit,minmax(70px,1fr));
+          gap:1px; background:var(--line); border-bottom:1px solid var(--rule);}
+  .hstats div{background:var(--paper); padding:12px 3px 11px; text-align:center;}
+  .hstats .n{font-family:'Space Grotesk',sans-serif; font-size:clamp(15px,4.2vw,19px);
              font-weight:600; letter-spacing:-0.02em; display:block; line-height:1.15;}
   .hstats .n.z{color:var(--muted);}
   .hstats .n.up{color:var(--good);} .hstats .n.down{color:var(--bad);}
+  .hstats .n.near{color:var(--warn);}
   .hstats .k{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
              color:var(--muted); display:block; margin-top:3px;}
 
@@ -221,6 +224,11 @@
   .htl .key .near i{background:#dcbd6b;}
   .htl .key .trade i{background:var(--good);}
 
+  .best{margin:14px clamp(15px,4vw,22px) 0; padding:12px 14px;
+        border:1px solid #e6d6a8; border-radius:10px; background:#fbf6e8;}
+  .best .cap{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
+             color:var(--warn); margin-bottom:6px;}
+
   .hbody{padding:2px clamp(15px,4vw,22px) 44px;}
   /* A run of quiet half hours collapses to one line. Thirteen boxes
      saying "nothing" is not thirteen times the information. */
@@ -234,20 +242,30 @@
             color:var(--muted); margin-bottom:6px;}
   .slot .sh b{color:var(--ink2); font-weight:600;}
 
-  .ev{display:flex; gap:9px; align-items:baseline; padding:6px 0; font-size:12.5px;}
-  .ev .co{font-weight:600; text-transform:uppercase; font-size:10.5px;
-          letter-spacing:.04em; min-width:2.3rem; color:var(--ink);}
-  .ev .nt{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:12.5px;
-          font-variant-numeric:tabular-nums; min-width:3.3rem; text-align:right;
-          color:var(--warn);}
-  .ev .rs{color:var(--ink2); flex:1; min-width:0;}
-  .ev .tm{color:var(--muted); font-size:10.5px; font-variant-numeric:tabular-nums;}
+  .ev{padding:8px 0 7px;}
+  .ev + .ev{border-top:1px dotted var(--line);}
+  .ev .r1{display:flex; justify-content:space-between; align-items:baseline;
+          gap:10px; font-size:12.5px;}
+  .ev .co{font-weight:600; text-transform:uppercase; font-size:11px;
+          letter-spacing:.04em; color:var(--ink);}
+  .ev .inc{color:var(--muted); font-size:11px; margin-left:6px;}
+  .ev .nt{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
+          font-variant-numeric:tabular-nums; color:var(--warn);}
+  .ev .tm{color:var(--muted); font-size:10.5px; font-variant-numeric:tabular-nums;
+          margin-left:8px;}
+  /* Both venues on one line, in feed order, so adding a third venue is a
+     longer line rather than a new layout. */
+  .ev .odds{font-size:12px; color:var(--ink2); margin-top:3px;
+            font-variant-numeric:tabular-nums;}
+  .ev .odds b{font-weight:600; color:var(--ink);}
+  .ev .rs{font-size:11.5px; color:var(--muted); margin-top:3px;}
   .more{font-size:11.5px; color:var(--muted); padding:3px 0 2px;}
 
   .trd{border:1px solid var(--line); border-radius:10px; padding:11px 13px;
        margin:8px 0; background:var(--card);}
   .trd .th{display:flex; justify-content:space-between; align-items:baseline;
            gap:10px; font-size:13px;}
+  .trd .inc{color:var(--muted); font-size:11px; margin-left:6px;}
   .trd .co{font-weight:600; text-transform:uppercase;}
   .trd .pl{font-family:'Space Grotesk',sans-serif; font-weight:600;
            font-variant-numeric:tabular-nums;}
@@ -370,6 +388,7 @@
     </div>
     <div class="hstats" id="histstats"></div>
     <div class="htl" id="histtl"></div>
+    <div id="histbest"></div>
     <div class="hbody" id="histbody"></div>
   </div>
 </div>
@@ -925,16 +944,62 @@
     return (r || "passed").split("--")[0].trim();
   }
 
+  // "15m", "1h", "1d" -- derived from the window the feed carries, not a
+  // list of known horizons, so a market of any length prints correctly.
+  function increment(open, close) {
+    const a = new Date(open), b = new Date(close);
+    if (!open || !close || isNaN(a) || isNaN(b)) return "";
+    const m = Math.round((b - a) / 60000);
+    if (m <= 0) return "";
+    if (m % 1440 === 0) return (m / 1440) + "d";
+    if (m % 60 === 0) return (m / 60) + "h";
+    return m + "m";
+  }
+  const centsTxt = v => (v >= 0 ? "+" : "\u2212")
+    + Math.abs(v * 100).toFixed(2) + "\u00A2";
+
+  // One venue per segment, in the order the feed lists them. A third
+  // venue makes this line longer; it does not make it a different line.
+  function oddsLine(legs, key) {
+    const line = el("div", "odds");
+    const usable = (legs || []).filter(l => l[key || "px"] != null);
+    usable.forEach((l, i) => {
+      if (i) line.appendChild(document.createTextNode("   \u00B7   "));
+      line.appendChild(document.createTextNode(
+        (l.name || l.venue || "") + " " + (l.label || l.side || "") + " "));
+      line.appendChild(el("b", null, (l.px * 100).toFixed(1) + "\u00A2"));
+    });
+    return usable.length ? line : null;
+  }
+
   function missRow(m) {
     const row = el("div", "ev");
     row.title = m.reason || "";
-    row.appendChild(el("span", "co", m.coin || ""));
-    row.appendChild(el("span", "nt", m.net == null ? ""
-      : (m.net >= 0 ? "+" : "−")
-        + Math.abs(m.net * 100).toFixed(2) + "¢"));
-    row.appendChild(el("span", "rs", whyShort(m.reason)));
-    row.appendChild(el("span", "tm", shortTime(m._d)));
+    const r1 = el("div", "r1");
+    const left = el("span");
+    left.appendChild(el("span", "co", m.coin || ""));
+    const inc = increment(m.open, m.close);
+    if (inc) left.appendChild(el("span", "inc", inc));
+    r1.appendChild(left);
+    const right = el("span");
+    if (m.net != null) right.appendChild(el("span", "nt", centsTxt(m.net)));
+    right.appendChild(el("span", "tm", shortTime(m._d)));
+    r1.appendChild(right);
+    row.appendChild(r1);
+    const odds = oddsLine(m.legs);
+    if (odds) row.appendChild(odds);
+    row.appendChild(el("div", "rs", whyShort(m.reason)));
     return row;
+  }
+
+  // The single best thing it turned down, called out above the log.
+  function bestCard(m) {
+    const box = el("div", "best");
+    box.appendChild(el("div", "cap", "closest it came"));
+    const row = missRow(m);
+    row.style.padding = "0";
+    box.appendChild(row);
+    return box;
   }
 
   function tradeRow(t) {
@@ -942,6 +1007,8 @@
     const top = el("div", "th");
     const left = el("span");
     left.appendChild(el("span", "co", t.coin || ""));
+    const inc = increment(t.open, t.close);
+    if (inc) left.appendChild(el("span", "inc", inc));
     left.appendChild(document.createTextNode(
       " · " + (t.qty || 0) + " contracts"));
     top.appendChild(left);
@@ -955,8 +1022,10 @@
 
     (t.legs || []).forEach(lg => {
       const row = el("div", "lg");
+      // The feed names the venue and says the side in words, so this
+      // works unchanged the day a third venue appears in the list.
       row.appendChild(el("span", null,
-        (lg.venue === "kalshi" ? "Kalshi" : "Polymarket US") + " — " + lg.side));
+        (lg.name || lg.venue || "") + " — " + (lg.label || lg.side || "")));
       row.appendChild(el("span", null,
         lg.qty + " @ " + (lg.px * 100).toFixed(1) + "¢"));
       box.appendChild(row);
@@ -1022,13 +1091,15 @@
       d.appendChild(el("span", "k", k));
       stats.appendChild(d);
     };
+    const passed = P.passed_total != null ? P.passed_total : misses.length;
     fig(String(taken),  "taken",    taken  ? "" : "z");
     fig(String(hedged), "hedged",   hedged ? "" : "z");
     fig(String(naked),  "naked",    naked  ? "down" : "z");
+    fig(String(passed), "passed",   passed ? "near" : "z");
     fig(money(real),    "realised", real > 0 ? "up" : real < 0 ? "down" : "z");
 
     // ---- the strip
-    const near = misses.length;
+    const near = P.passed_total != null ? P.passed_total : misses.length;
     tl.appendChild(el("div", "cap",
       (clipped ? "the last two days · " : "")
       + "one cell per half hour, oldest first"
@@ -1066,15 +1137,24 @@
     });
     tl.appendChild(key);
 
+    const bestBox = $("#histbest");
+    bestBox.textContent = "";
+    if (P.best_pass && P.best_pass.net != null) {
+      const b = Object.assign({}, P.best_pass);
+      b._d = new Date(b.ts);
+      if (!isNaN(b._d)) bestBox.appendChild(bestCard(b));
+    }
+
     // ---- the line that says what all of that means
     const watchedMin = Math.max(0, (now - (since || oldest || new Date(keys[0]))) / 60000);
     lede.textContent = taken
       ? taken + " position" + (taken === 1 ? "" : "s") + " in "
         + spanWords(watchedMin) + " of watching, newest first."
       : near
-        ? "Nothing taken in " + spanWords(watchedMin) + ". " + near + " pairing"
-          + (near === 1 ? "" : "s") + " cleared the floor and " + (near === 1
-            ? "was" : "were") + " still passed — each one is listed with why."
+        ? "Nothing taken in " + spanWords(watchedMin) + ". " + near
+          + " full trade" + (near === 1 ? "" : "s") + " cleared the floor and "
+          + (near === 1 ? "was" : "were") + " still passed — each one is "
+          + "below with both sides’ odds and why it was turned down."
         : "Nothing taken in " + spanWords(watchedMin) + ", and nothing has even "
           + "cleared the floor to be considered.";
 
