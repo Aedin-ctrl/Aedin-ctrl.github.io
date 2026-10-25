@@ -77,6 +77,8 @@
             font-size:12.5px; color:var(--ink2);}
   .foot-row b{font-weight:600; color:var(--ink);}
   .risk{color:var(--warn);}
+  .bstale{display:block; font-size:10px; color:var(--warn); margin-top:2px;
+          letter-spacing:.02em;}
   /* Two columns on the same coin that are struck at different numbers are
      not two sides of one trade, and nothing on the board said so. */
   .mismatch{margin-top:9px; padding:7px 9px; border-radius:7px;
@@ -882,11 +884,38 @@
     }
     const up = (b.change_24h || 0) >= 0;
     const nums = el("div", "nums");
-    const mk = (label, val, cls) => {
+    // A VENUE'S FIGURE CAN BE STALE WHILE THE PAGE LOOKS FRESH.
+    //
+    // A balance row is only recorded when that venue's read succeeds, and
+    // the series carries the last known value forward -- so when Kalshi
+    // returns 429 and Polymarket does not, the timestamp advances on
+    // Polymarket's read while the Kalshi figure beside it is minutes old.
+    // Every line in the balance log is a 429, about 12 misses in 552
+    // polls, leaving 10 to 15 minute gaps. A number you would size a
+    // trade against should not be able to go quietly stale.
+    const seenAt = b.venue_as_of || {};
+    const ageOf = key => {
+      const ts = seenAt[key];
+      if (!ts) return null;
+      const secs = (Date.now() - new Date(ts).getTime()) / 1000;
+      return isFinite(secs) ? secs : null;
+    };
+    const mk = (label, val, cls, key) => {
       const d = el("div");
       d.appendChild(el("span", "lab", label));
       d.appendChild(el("span", cls || "v",
         val === null || val === undefined ? "\u2014" : "$" + val.toFixed(2)));
+      const age = key ? ageOf(key) : null;
+      if (age !== null && age > 600) {
+        const m = Math.round(age / 60);
+        const w = el("span", "bstale",
+          m >= 60 ? "last read " + Math.round(m / 60) + "h ago"
+                  : "last read " + m + "m ago");
+        w.title = "This venue's balance endpoint has not answered since "
+          + new Date(seenAt[key]).toLocaleTimeString()
+          + ". The figure shown is the last one it gave.";
+        d.appendChild(w);
+      }
       return d;
     };
     const tot = el("div");
@@ -894,8 +923,8 @@
       b.real ? "total across both" : "total across both \u00b7 simulated"));
     tot.appendChild(el("span", "big", "$" + b.total.toFixed(2)));
     nums.appendChild(tot);
-    nums.appendChild(mk("kalshi", b.kalshi, "v k"));
-    nums.appendChild(mk("polymarket", b.polymarket, "v p"));
+    nums.appendChild(mk("kalshi", b.kalshi, "v k", "kalshi"));
+    nums.appendChild(mk("polymarket", b.polymarket, "v p", "polymarket"));
     const ch = el("div");
     if (b.change_24h === null || b.change_24h === undefined) {
       // Not enough history yet to call anything a 24-hour change.
