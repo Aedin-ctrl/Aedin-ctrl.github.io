@@ -17,6 +17,9 @@
     --line:#e8e6de; --rule:#d6d3c8;
     --good:#0a6b2e; --goodbg:#eef7f0; --bad:#b03f2c; --warn:#8a6000;
     --accent:#15150f;
+    /* Live/ongoing. Deliberately the only blue on the page, because its
+       whole job is to be findable at a glance among settled rows. */
+    --live:#1b58b8; --livebg:#eef3fc; --liveline:#bed2f0;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{background:var(--paper);}
@@ -302,6 +305,29 @@
            color:var(--ink2); padding:4px 0 0; font-variant-numeric:tabular-nums;}
   .trd .warn{font-size:11px; color:var(--bad); margin-top:6px;}
   .trd .open{font-size:11px; color:var(--muted); margin-top:6px;}
+
+  /* ---- a position that is still running -------------------------------
+     An open trade used to render as a normal card with the word "open"
+     where the P&L goes, which is indistinguishable at a glance from a
+     settled trade that broke even. These are the only rows on the page
+     where something is still at stake, so they get the blue. */
+  .trd.live{border-color:var(--liveline); background:var(--livebg);
+            box-shadow:inset 3px 0 0 var(--live);}
+  .trd.live .pl{color:var(--live);}
+  .trd .live-line{font-size:11px; color:var(--live); margin-top:6px;
+                  font-weight:600; display:flex; align-items:center; gap:6px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--live);
+       flex:0 0 auto; animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.25;}}
+  @media (prefers-reduced-motion:reduce){ .dot{animation:none;} }
+
+  .livebox{border:1px solid var(--liveline); background:var(--livebg);
+           border-radius:12px; padding:12px 14px; margin:0 0 14px;}
+  .livebox h3{font-size:12px; letter-spacing:.06em; text-transform:uppercase;
+              color:var(--live); margin:0 0 8px; display:flex;
+              align-items:center; gap:7px;}
+  .livebox .trd{background:var(--card);}
+  .livebox .none{font-size:12px; color:var(--ink2);}
 
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
@@ -1147,9 +1173,77 @@
       box.appendChild(el("div", "warn",
         "ONE LEG ONLY — a directional bet, not a hedge"));
     }
-    if (t.state !== "settled") {
-      box.appendChild(el("div", "open", "still open · cost " + money(t.cost)));
+    if (t.kind && t.kind !== "exact") {
+      box.appendChild(el("div", "warn",
+        "BASIS PAIR — the two venues settle on different indices, "
+        + "so this can pay $2 or $0, not $1"));
     }
+    if (t.state !== "settled") {
+      // A live row says what is at stake and when it resolves. "still
+      // open" alone reads the same whether the window closes in ten
+      // seconds or ten minutes.
+      box.classList.add("live");
+      const line = el("div", "live-line");
+      line.appendChild(el("span", "dot"));
+      const txt = el("span");
+      // Computed from the window's close time, not from a number baked
+      // in at feed-write: the feed refreshes every 30s, so a server-side
+      // countdown would sit still for 29 of them.
+      txt.dataset.close = t.close || "";
+      txt.dataset.cost = String(t.cost || 0);
+      tickLive(txt);
+      line.appendChild(txt);
+      box.appendChild(line);
+    }
+    return box;
+  }
+
+  // Seconds -> "4m 10s". Used only for live positions, where the number
+  // is small and the point is that it is moving.
+  function countdown(s) {
+    s = Math.max(0, Math.round(s));
+    const m = Math.floor(s / 60);
+    return m ? m + "m " + String(s % 60).padStart(2, "0") + "s" : s + "s";
+  }
+
+  function tickLive(node) {
+    const close = Date.parse(node.dataset.close || "");
+    const cost = money(parseFloat(node.dataset.cost || "0"));
+    if (isNaN(close)) { node.textContent = "LIVE · " + cost + " at stake"; return; }
+    const left = (close - Date.now()) / 1000;
+    node.textContent = "LIVE · " + cost + " at stake · "
+      + (left > 0 ? "settles in " + countdown(left)
+                  : "window closed, waiting on both venues to resolve");
+  }
+
+  // One timer for every live row on the page. Cheap, and it keeps the
+  // countdown honest between the 30-second feed refreshes.
+  setInterval(() => {
+    document.querySelectorAll(".live-line span[data-close]").forEach(tickLive);
+  }, 1000);
+
+  // The live positions, lifted out of the timeline and put at the top.
+  // Buried among settled rows they were effectively invisible, which is
+  // the opposite of what an open position needs to be.
+  function renderLive(trades) {
+    const open = (trades || []).filter(t => t.state !== "settled");
+    const box = el("div", "livebox");
+    const h = el("h3");
+    if (open.length) h.appendChild(el("span", "dot"));
+    h.appendChild(document.createTextNode(
+      open.length ? "Live now · " + open.length
+                    + (open.length === 1 ? " position" : " positions")
+                  : "Live now"));
+    box.appendChild(h);
+    if (!open.length) {
+      box.appendChild(el("div", "none",
+        "Nothing open. Positions appear here the moment both legs fill, "
+        + "and stay until the window settles."));
+      return box;
+    }
+    let risk = 0;
+    open.forEach(t => { risk += (t.cost || 0); box.appendChild(tradeRow(t)); });
+    box.appendChild(el("div", "none", "Total at stake: " + money(risk)));
     return box;
   }
 
@@ -1159,6 +1253,10 @@
     const body = $("#histbody"), lede = $("#histlede");
     const stats = $("#histstats"), tl = $("#histtl");
     body.textContent = ""; stats.textContent = ""; tl.textContent = "";
+
+    // Live positions first, above the timeline. They are the only rows
+    // where money is still moving, so they do not get buried in it.
+    body.appendChild(renderLive(trades));
 
     // ---- bucket every event into its half hour
     const slots = new Map();
