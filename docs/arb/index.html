@@ -823,7 +823,17 @@
     setTimeout(addHistBtn, 0);
     const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
     const cash = p.cash || {};
-    const atRisk = Math.max(0, p.equity - ((cash.kalshi || 0) + (cash.polymarket || 0)));
+    // Use the number the feed publishes. This used to be inferred as
+    // equity minus the two wallets the page knew about -- so the moment a
+    // third venue existed, its idle cash had nowhere to go and was
+    // reported as money on the table: $100 sitting unused in Gemini read
+    // as "$100.00 bet right now" with nothing open at all. Derive a
+    // quantity from the thing that measures it, not from what is left
+    // over after subtracting the parts you happen to know.
+    const atRisk = p.at_risk !== undefined
+      ? p.at_risk
+      : Math.max(0, p.equity - Object.values(p.wallets || cash)
+                                     .reduce((a, b) => a + (b || 0), 0));
     const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
 
     // A headline percentage that mixes hedged pairs with naked legs is
@@ -850,11 +860,18 @@
     // itself, not only in the heading, and name the venue this track
     // actually trades -- global Polymarket, which the real accounts
     // cannot reach.
-    box.appendChild(el("span", null,
-      "sim wallets \u00b7 kalshi $"
-      + (cash.kalshi === undefined ? "\u2014" : cash.kalshi.toFixed(2))
-      + " \u00b7 poly(US) $"
-      + (cash.polymarket === undefined ? "\u2014" : cash.polymarket.toFixed(2))));
+    // Every wallet the feed reports, not the two this card was written
+    // for. A venue whose balance is not shown cannot be seen to be
+    // starving, and a starving wallet is what stops the account trading.
+    const SHORTV = { kalshi: "kalshi", polymarket_us: "poly(US)",
+                     gemini: "gemini" };
+    const wal = p.wallets
+      || { kalshi: cash.kalshi, polymarket_us: cash.polymarket };
+    box.appendChild(el("span", null, "sim wallets \u00b7 "
+      + Object.keys(wal).sort().map(k =>
+          (SHORTV[k] || k) + " $"
+          + (wal[k] === undefined || wal[k] === null
+               ? "\u2014" : Number(wal[k]).toFixed(2))).join(" \u00b7 ")));
     box.appendChild(el("span", atRisk > 0.005 ? "v" : null,
       "$" + atRisk.toFixed(2) + " bet right now"));
     box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
