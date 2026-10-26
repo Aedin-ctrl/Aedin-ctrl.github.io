@@ -419,7 +419,7 @@
               color:var(--muted); display:block; margin-bottom:3px;}
   .money .v{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
   .money .up{color:var(--good);} .money .down{color:var(--bad);}
-  .money .k{color:#2d5d8a;} .money .p{color:#8a5a2d;}
+  .money .k{color:#2d5d8a;} .money .p{color:#8a5a2d;} .money .g{color:#2d7a5a;}
   .money svg{display:block; width:100%; height:80px; margin-top:12px;}
   .money .key{display:flex; gap:16px; font-size:11px; color:var(--muted); margin-top:5px;}
   .money .key i{display:inline-block; width:14px; height:2px; vertical-align:middle;
@@ -998,20 +998,44 @@
       }
       return d;
     };
+    // EVERY VENUE THE FEED REPORTS, NOT THE TWO THIS CARD WAS WRITTEN FOR.
+    //
+    // `total` has always summed every venue in the record while this card
+    // drew a row for Kalshi and Polymarket only. The moment a third venue
+    // started reporting, the total would have moved with nothing on the
+    // page accounting for the difference -- and the account whose balance
+    // is invisible is exactly the one that cannot be seen to be empty.
+    const VCLASS = { kalshi: "v k", polymarket: "v p", polymarket_us: "v p",
+                     gemini: "v g" };
+    const vmap = (b.venues && Object.keys(b.venues).length)
+      ? b.venues
+      : { kalshi: b.kalshi, polymarket: b.polymarket };
+    const vkeys = Object.keys(vmap).sort();
     const tot = el("div");
     tot.appendChild(el("span", "lab",
-      b.real ? "total across both" : "total across both \u00b7 simulated"));
+      "total across " + vkeys.length + (b.real ? "" : " \u00b7 simulated")));
     tot.appendChild(el("span", "big", "$" + b.total.toFixed(2)));
     nums.appendChild(tot);
-    nums.appendChild(mk("kalshi", b.kalshi, "v k", "kalshi"));
-    nums.appendChild(mk("polymarket", b.polymarket, "v p", "polymarket"));
+    vkeys.forEach(k => {
+      const v = vmap[k];
+      nums.appendChild(mk(k, (v === undefined ? null : v),
+                          VCLASS[k] || "v", k));
+    });
     const ch = el("div");
     if (b.change_24h === null || b.change_24h === undefined) {
       // Not enough history yet to call anything a 24-hour change.
       ch.appendChild(el("span", "lab", "history"));
       ch.appendChild(el("span", "v", (b.span_hours || 0).toFixed(1) + "h"));
     } else {
-      ch.appendChild(el("span", "lab", "24 hours"));
+      // A change measured over fewer venues than the card shows is not
+      // the account's change, and must not be read as one. The recorder
+      // only differences venues present at both ends of the window --
+      // say so here when that is a subset.
+      const cv = b.change_venues || [];
+      ch.appendChild(el("span", "lab",
+        (cv.length && cv.length < vkeys.length)
+          ? "24 hours \u00b7 " + cv.join(" + ") + " only"
+          : "24 hours"));
       ch.appendChild(el("span", "v " + (up ? "up" : "down"),
         (up ? "+" : "\u2212") + "$" + Math.abs(b.change_24h).toFixed(2)));
     }
@@ -1021,17 +1045,26 @@
     const c = b.curve || [];
     if (c.length < 2) return;
     const W = 700, H = 80, PAD = 2;
+    // EVERY VENUE GETS A LINE. The total was drawn against two named
+    // series, so a third venue's money moved the heavy line with nothing
+    // underneath it to account for the step.
+    const vseries = vkeys.slice();
     const vals = [];
-    c.forEach(r => ["total", "kalshi", "polymarket"].forEach(k => {
-      if (r[k] !== null && r[k] !== undefined) vals.push(r[k]);
-    }));
+    c.forEach(r => {
+      if (r.total !== null && r.total !== undefined) vals.push(r.total);
+      const vm = r.venues || r;
+      vseries.forEach(k => {
+        const v = vm[k];
+        if (v !== null && v !== undefined) vals.push(v);
+      });
+    });
     const lo = Math.min(...vals), hi = Math.max(...vals), span = (hi - lo) || 1;
     const x = i => (i * W) / (c.length - 1);
     const y = v => PAD + (H - 2 * PAD) * (1 - (v - lo) / span);
     const line = (k) => {
       let d = "", pen = false;
       c.forEach((r, i) => {
-        const v = r[k];
+        const v = (k === "total") ? r.total : ((r.venues || r)[k]);
         if (v === null || v === undefined) { pen = false; return; }
         d += (pen ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1) + " ";
         pen = true;
@@ -1039,8 +1072,12 @@
       return d.trim();
     };
     const svg = ['<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">'];
-    [["polymarket", "#8a5a2d", 1.4], ["kalshi", "#2d5d8a", 1.4],
-     ["total", "var(--ink)", 2]].forEach(([k, col, w]) => {
+    const VCOL = { kalshi: "#2d5d8a", polymarket: "#8a5a2d",
+                   polymarket_us: "#8a5a2d", gemini: "#2d7a5a" };
+    const PALETTE = ["#7a2d5a", "#5a2d7a", "#7a6a2d", "#2d6a7a"];
+    const colOf = k => VCOL[k] || PALETTE[vseries.indexOf(k) % PALETTE.length];
+    vseries.map(k => [k, colOf(k), 1.4])
+           .concat([["total", "var(--ink)", 2]]).forEach(([k, col, w]) => {
       const d = line(k);
       if (d) svg.push('<path d="' + d + '" fill="none" stroke="' + col +
                       '" stroke-width="' + w + '" stroke-linejoin="round"/>');
@@ -1048,9 +1085,11 @@
     svg.push("</svg>");
     box.insertAdjacentHTML("beforeend", svg.join(""));
     box.insertAdjacentHTML("beforeend",
-      '<div class="key"><span><i style="background:var(--ink)"></i>total</span>' +
-      '<span><i style="background:#2d5d8a"></i>kalshi</span>' +
-      '<span><i style="background:#8a5a2d"></i>polymarket</span></div>');
+      '<div class="key"><span><i style="background:var(--ink)"></i>total</span>'
+      + vseries.map(k =>
+          '<span><i style="background:' + colOf(k) + '"></i>'
+          + k.replace(/_/g, " ") + '</span>').join("")
+      + '</div>');
   }
 
   // --------------------------------------------------------- history
