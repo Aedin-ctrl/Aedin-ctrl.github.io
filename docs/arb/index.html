@@ -99,6 +99,7 @@
   .venues{display:grid; gap:9px; align-items:start;
           grid-template-columns:repeat(var(--vcols,2),minmax(0,1fr));}
   .vcol{min-width:0;}
+  .vhead{margin-bottom:0;}
   .vhead{display:flex; align-items:baseline; justify-content:space-between;
          gap:10px; padding:0 2px 8px; border-bottom:1px solid var(--rule);
          margin-bottom:10px;}
@@ -114,8 +115,12 @@
      its slot and says so -- dropping it would slide the bands below it up
      and stop the columns lining up, which is the whole point of a grid. */
   .dband{font-size:9px; letter-spacing:.09em; text-transform:uppercase;
-         color:var(--muted); font-weight:600; margin:9px 0 4px; padding:0 2px;}
-  .dband:first-child{margin-top:0;}
+         color:var(--muted); font-weight:600; margin:10px 0 2px; padding:0 2px;
+         border-top:1px solid var(--rule); padding-top:7px;}
+  /* The cell is the venue's slot within one band row. align-self:start
+     keeps a one-card cell from stretching to the height of a four-card
+     one; the ROW still starts level, which is the point. */
+  .bcell{min-width:0; align-self:start;}
   .dna{border:1px dashed var(--rule); border-radius:9px; padding:6px 9px;
        margin-bottom:6px; font-size:11px; color:var(--muted);}
   .mkt+.mkt{margin-top:0;}
@@ -685,7 +690,15 @@
     // Every venue keeps its column even with nothing open on it. Dropping
     // the empty one re-flows the board to a single column and makes it
     // look as though the venue is gone, when it is only between windows.
-    const venues = d.venues || [];
+    // LEFT TO RIGHT: Polymarket US, Gemini, Kalshi. Fixed here rather
+    // than taken from the feed, so the columns stay put when the writer
+    // reorders them or a venue drops out for a scan and comes back.
+    // Anything not named keeps its feed order, after the named ones.
+    const VORDER = ["Polymarket US", "Gemini", "Kalshi"];
+    const venues = (d.venues || []).slice().sort((x, y) => {
+      const i = VORDER.indexOf(x.name), j = VORDER.indexOf(y.name);
+      return (i < 0 ? 99 : i) - (j < 0 ? 99 : j);
+    });
     if (!venues.length) {
       host.appendChild(el("div", "empty", "No venues in the feed."));
       return;
@@ -730,36 +743,54 @@
       (v.bands || []).forEach(b => { supported[v.name][b] = true; });
     });
 
+    // BAND-MAJOR, NOT COLUMN-MAJOR.
+    //
+    // Each venue used to own a column and lay its own bands out inside
+    // it, so the columns flowed independently: Polymarket's four
+    // 5-minute cards pushed its 15-minute band far below Kalshi's, and
+    // the rows stopped lining up the moment two venues had different
+    // card counts. The band is now the grid ROW -- a full-width label,
+    // then one cell per venue -- so every band starts at the same height
+    // in all three columns no matter how much is in each cell.
     const grid = el("div", "venues");
     grid.style.setProperty("--vcols", String(venues.length));
+
     venues.forEach(v => {
-      const col = el("div", "vcol");
       const hd = el("div", "vhead");
       hd.appendChild(el("span", "vname", v.name));
       hd.appendChild(el("span", "vcash", v.wallet === null || v.wallet === undefined
         ? "balance unknown" : money(v.wallet) + " in the account"));
-      col.appendChild(hd);
-      const ms = v.markets || [];
-      // Every band keeps its slot on every venue, so the 15-minute row is
-      // at the same height in all three columns and "this venue does not
-      // list that length" is visible rather than inferred from a gap.
-      const byBand = {};
-      ms.forEach(m => (byBand[bandOf(m)] = byBand[bandOf(m)] || []).push(m));
-      BANDS.forEach(x => {
-        col.appendChild(el("div", "dband", x.label));
-        const got = byBand[x.key] || [];
+      grid.appendChild(hd);
+    });
+
+    const byVenue = venues.map(v => {
+      const by = {};
+      (v.markets || []).forEach(m => (by[bandOf(m)] = by[bandOf(m)] || []).push(m));
+      return by;
+    });
+
+    BANDS.forEach(x => {
+      const lab = el("div", "dband", x.label);
+      lab.style.gridColumn = "1 / -1";
+      grid.appendChild(lab);
+      venues.forEach((v, i) => {
+        const cell = el("div", "bcell");
+        const got = (byVenue[i][x.key] || []).slice();
         if (!got.length) {
-          col.appendChild(el("div", "dna",
+          // An empty band means one of two different things and they must
+          // not read alike: the venue lists this length and is between
+          // windows, or it does not offer it at all.
+          cell.appendChild(el("div", "dna",
             supported[v.name] && supported[v.name][x.key]
               ? "between windows"
               : "n/a \u2014 not listed here"));
-          return;
+        } else {
+          got.sort((a, b) => new Date(a.close || 0) - new Date(b.close || 0));
+          got.forEach(m => cell.appendChild(marketCard(m,
+            mismatched[(m.coin || "") + "|" + (m.window || "")])));
         }
-        got.sort((a, b) => new Date(a.close || 0) - new Date(b.close || 0));
-        got.forEach(m => col.appendChild(marketCard(m,
-          mismatched[(m.coin || "") + "|" + (m.window || "")])));
+        grid.appendChild(cell);
       });
-      grid.appendChild(col);
     });
     host.appendChild(grid);
   }
