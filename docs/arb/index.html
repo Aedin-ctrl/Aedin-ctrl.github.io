@@ -96,7 +96,7 @@
 
   /* THE VENUE BOARD. One column per venue; adding a third venue is
      adding a third entry to the feed, not a layout change. */
-  .venues{display:grid; gap:13px; align-items:start;
+  .venues{display:grid; gap:9px; align-items:start;
           grid-template-columns:repeat(var(--vcols,2),minmax(0,1fr));}
   .vcol{min-width:0;}
   .vhead{display:flex; align-items:baseline; justify-content:space-between;
@@ -106,27 +106,37 @@
                 font-size:14px; letter-spacing:.01em;}
   .vhead .vcash{font-size:11.5px; color:var(--muted);
                 font-variant-numeric:tabular-nums;}
-  .mkt{background:var(--card); border:1px solid var(--line); border-radius:11px;
-       padding:11px 13px 10px; margin-bottom:9px;}
+  .mkt{background:var(--card); border:1px solid var(--line); border-radius:9px;
+       padding:7px 9px 6px; margin-bottom:6px;}
+  /* Duration bands. Cards are grouped shortest-first so the thing closing
+     soonest is at the top of every column and the same band sits at the
+     same height across all three venues. A band with nothing in it keeps
+     its slot and says so -- dropping it would slide the bands below it up
+     and stop the columns lining up, which is the whole point of a grid. */
+  .dband{font-size:9px; letter-spacing:.09em; text-transform:uppercase;
+         color:var(--muted); font-weight:600; margin:9px 0 4px; padding:0 2px;}
+  .dband:first-child{margin-top:0;}
+  .dna{border:1px dashed var(--rule); border-radius:9px; padding:6px 9px;
+       margin-bottom:6px; font-size:11px; color:var(--muted);}
   .mkt+.mkt{margin-top:0;}
   .mkt .mtop{display:flex; align-items:flex-start; justify-content:space-between;
              gap:10px;}
-  .mkt .mname{font-size:13px; font-weight:600; color:var(--ink); line-height:1.3;}
-  .mkt .mline{font-size:11.5px; color:var(--ink2); margin-top:3px;
+  .mkt .mname{font-size:12px; font-weight:600; color:var(--ink); line-height:1.3;}
+  .mkt .mline{font-size:10.5px; color:var(--ink2); margin-top:2px;
               font-variant-numeric:tabular-nums;}
-  .mkt .clock{font-family:'Space Grotesk',sans-serif; font-size:15px;
+  .mkt .clock{font-family:'Space Grotesk',sans-serif; font-size:13px;
               font-weight:600; font-variant-numeric:tabular-nums;
               white-space:nowrap;}
   .mkt .clock.soon{color:var(--bad);}
   .mkt .clockl{display:block; font-size:9.5px; letter-spacing:.07em;
                text-transform:uppercase; color:var(--muted); font-weight:500;
                text-align:right; margin-top:1px;}
-  .sides{display:flex; gap:7px; margin-top:9px;}
-  .sd{flex:1; min-width:0; border:1px solid var(--rule); border-radius:8px;
-      padding:6px 8px;}
+  .sides{display:flex; gap:5px; margin-top:6px;}
+  .sd{flex:1; min-width:0; border:1px solid var(--rule); border-radius:7px;
+      padding:4px 6px;}
   .sd .sn{font-size:10px; letter-spacing:.06em; text-transform:uppercase;
           color:var(--muted);}
-  .sd .sp{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+  .sd .sp{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
           font-variant-numeric:tabular-nums;}
   .sd .ss{font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
   /* Is real money on this market right now? */
@@ -474,88 +484,6 @@
 
   <div id="board"></div>
 
-  <h2>Reading the board</h2>
-  <p class="note">One column per venue. Each card is a live 15-minute window on that venue, in
-    that venue's own wording, with that venue's own line, the time left on the clock, and what
-    each side costs right now. Both columns are priced from the same streamed order books the
-    trader decides on. <b>The check or cross on a card is real money</b> &mdash; whether an actual
-    position is open on that exact market, read from the venue's own portfolio endpoint, with the
-    amount.</p>
-  <p class="note"><b>Kalshi and Polymarket US are the same contract.</b> Both settle on the same
-    CF Benchmarks index, by the same rule: the simple average of the sixty seconds before the
-    close against the simple average of the sixty seconds before the open. Over 356 settled
-    windows the two venues published <b>the same strike to the cent</b> on BTC, ETH and SOL.
-    (This is not true of <em>global</em> Polymarket, which uses a Chainlink time-weighted average
-    against the opening price. That is a different contract, and it is not what this board shows.)</p>
-  <p class="note">So buying the cheap side on each venue pays <b>$1 when the two agree</b>, and
-    <b>$2 or $0</b> when they disagree. Over <b>640 settled windows</b> they disagreed
-    <b>3 times</b> &mdash; and <b>every one of the three was XRP</b>. On BTC, ETH and SOL the
-    count is <b>0 disagreements in 480 windows</b>.</p>
-  <p class="note"><b>XRP is not the same contract on the two venues, and that is why.</b> Each
-    venue publishes its own strike, and they match in <b>100&percnt;</b> of windows on BTC, ETH
-    and SOL but only <b>14&percnt;</b> on XRP &mdash; it trades near $1.30, where Kalshi's four
-    decimals and Polymarket's five genuinely differ in the last place. Live at the time of
-    writing: Kalshi <code>1.2995</code> against Polymarket <code>1.29947</code>. A pair struck
-    at two different numbers is not a hedge, and the page had been hiding it: Polymarket's card
-    rounds the display to &ldquo;Price to beat $1.30&rdquo;.</p>
-  <p class="note">The sting is that the fee was <em>steering</em> the search there. Kalshi
-    charges <code>ceil(0.07&middot;C&middot;p&middot;(1&minus;p))</code>, which is cheapest at
-    extreme prices &mdash; exactly where XRP sits. <b>The cheapest-looking trades on the board
-    were the only ones that could settle against you.</b> Cards whose two columns are struck at
-    different numbers now say so, the paper trader skips them, and the pairing list can never
-    mark one as clearing.</p>
-  <p class="note"><b>Correction.</b> This page previously said 383 of 384 windows agreed and
-    called the one disagreement an unexplained residual that &ldquo;does not shrink with the
-    fee&rdquo;. With 640 windows the rate is similar but the <em>shape</em> was wrong: it is not
-    a residual spread across the book, it is one coin whose two contracts are struck at
-    different numbers. That is avoidable rather than irreducible.</p>
-  <p class="note"><b>Correction.</b> This page previously said 98.25&percnt; over 1,256 windows.
-    That figure was measured on <em>global</em> Polymarket &mdash; a different contract, on a
-    venue these accounts cannot reach, and its sample even included coins Polymarket US does not
-    list. It was the wrong number for the thing being traded.</p>
-
-  <h2>Why the number next to each pairing is negative</h2>
-  <p class="note"><b>The price on a card is the top of the book</b> &mdash; what the first contract
-    costs. Twenty contracts cost more, because the ladder has to be walked, and Polymarket US is
-    thin at the touch: a median of 67 contracts against Kalshi's 328. The pairing figures are
-    quoted at the size actually shown, which is why a card can look cheap while nothing clears.</p>
-  <p class="note"><b>The fee is quadratic.</b> Kalshi charges
-    0.07&nbsp;&times;&nbsp;price&nbsp;&times;&nbsp;(1&nbsp;&minus;&nbsp;price) per contract and
-    Polymarket US 0.0695 of the same shape, so the round trip is 3.8&cent; at a coin flip and
-    0.30&cent; out at 3&cent;. But the fee turns out <b>not</b> to be what stops this.</p>
-  <p class="note"><b>The two venues disagree constantly.</b> Over 81,000 samples, the gap between
-    their mid prices, with no fee charged at all:</p>
-  <table class="band"><thead><tr><th>price band</th><th>median gap</th><th>p90</th><th>p99</th>
-    <th>round&nbsp;trip</th><th>gap&nbsp;&gt;&nbsp;fee</th></tr></thead><tbody>
-    <tr><td>0.00&ndash;0.03</td><td>0.35&cent;</td><td>0.85&cent;</td><td>2.55&cent;</td><td>0.30&cent;</td><td><b>53.8&percnt;</b></td></tr>
-    <tr><td>0.03&ndash;0.07</td><td>0.35&cent;</td><td>1.00&cent;</td><td>9.45&cent;</td><td>0.74&cent;</td><td>18.5&percnt;</td></tr>
-    <tr><td>0.07&ndash;0.15</td><td>0.30&cent;</td><td>1.05&cent;</td><td>6.00&cent;</td><td>1.53&cent;</td><td>6.3&percnt;</td></tr>
-    <tr><td>0.15&ndash;0.30</td><td>0.50&cent;</td><td>2.00&cent;</td><td>8.00&cent;</td><td>2.74&cent;</td><td>3.9&percnt;</td></tr>
-    <tr><td>0.30&ndash;0.50</td><td>0.50&cent;</td><td>2.00&cent;</td><td>10.00&cent;</td><td>3.76&cent;</td><td>3.7&percnt;</td></tr>
-  </tbody></table>
-  <p class="note"><b>Correction.</b> This page previously said the venues' mids differ by
-    &ldquo;0.00&cent; in every band&rdquo; and that the whole loss <em>was</em> the fee. That was
-    an artifact. The sampler writes both pairings off the same two mid prices, and the two are
-    exact negatives of each other, so pooling them forced the median to zero <em>by
-    construction</em> &mdash; it would have printed 0.00&cent; if the venues had disagreed by a
-    nickel all day. 81,000 samples bought nothing; eight would have said the same.</p>
-  <p class="note"><b>What actually stops it is the spread, not the fee.</b> In the cheapest band
-    the round trip costs 0.30&cent; but the two bid&ndash;ask spreads cost about 0.55&cent;
-    &mdash; and both venues sit at exactly one tick, the narrowest price either can quote. You
-    cannot cross two spreads to collect a gap whose median is 0.35&cent;. Taker-to-taker in that
-    band is <b>&minus;0.99&cent;</b> per contract, and that number is a real measurement rather
-    than an artifact. Polymarket US quotes on a flat 1&cent; grid while Kalshi quotes to
-    0.1&cent; in the tails, so the coarser grid alone is wider than the fee it is supposed to
-    beat.</p>
-  <p class="note">Two things remain genuinely open rather than closed. The <b>maker route</b> was
-    reported here as closed; that measurement has been withdrawn &mdash; its fill proxy counted a
-    fill whenever the price ticked down, so it selected the adverse half of the sample and then
-    measured how adverse it was. Running it on the rows where the price ticked <em>up</em> gives
-    the exact mirror image, which means the test had no power at all. And Massachusetts does not
-    adopt the federal wagering-loss rule, so a hedged pair may be taxed on its gross winnings
-    &mdash; roughly 2.5&cent; against a 3&cent; edge &mdash; though whether these are instead
-    §1256 contracts, which would void that entirely, is unresolved.</p>
-
   <section class="sys" id="sys" hidden></section>
 
   <footer id="foot"></footer>
@@ -616,6 +544,37 @@
     const t = Math.max(0, Math.round(secs));
     const m = Math.floor(t / 60), ss = t % 60;
     return [m + ":" + String(ss).padStart(2, "0"), t <= 60];
+  }
+
+  // DURATION BANDS, SHORTEST FIRST.
+  //
+  // Derived from the market's own open/close rather than from a field in
+  // the feed, so a venue that starts listing a new length appears without
+  // the writer having to be taught about it. The thresholds are generous
+  // because venues round their timestamps: anything up to 7 minutes is a
+  // 5-minute window, up to 20 a 15-minute one, up to 90 an hour.
+  const BANDS = [
+    { key: "5m",  label: "5 minute",  max: 7 },
+    { key: "15m", label: "15 minute", max: 20 },
+    { key: "1h",  label: "hourly",    max: 90 },
+    { key: "1d",  label: "daily",     max: Infinity },
+  ];
+
+  function bandOf(m) {
+    // The feed already labels most cards with a horizon; trust it first.
+    // Deriving from open/close is the fallback, and it has to BE a
+    // fallback because not every card carries an open -- a Polymarket
+    // card has close and window but no open, and silently bucketing all
+    // of those as 15-minute would have put the 5-minute ones in the
+    // wrong band while looking entirely correct.
+    const h = (m.horizon || "").toLowerCase();
+    if (h && BANDS.some(x => x.key === h)) return h;
+    const a = m.open ? new Date(m.open).getTime() : NaN;
+    const b = m.close ? new Date(m.close).getTime() : NaN;
+    if (!isFinite(a) || !isFinite(b) || b <= a) return "15m";
+    const mins = (b - a) / 60000;
+    for (const x of BANDS) if (mins <= x.max) return x.key;
+    return "1d";
   }
 
   function marketCard(m, clash) {
@@ -756,6 +715,21 @@
       if ((hi - lo) / Math.max(Math.abs(hi), 1e-9) > 1e-9) mismatched[k] = seen;
     });
 
+    // WHICH LENGTHS DOES EACH VENUE ACTUALLY LIST?
+    //
+    // An empty band means one of two different things and they should not
+    // read alike: the venue lists that length and is simply between
+    // windows, or the venue does not offer it at all. Kalshi lists no
+    // 5-minute crypto; Gemini and Polymarket US both do. Taken from what
+    // the feed has carried rather than hardcoded, so the page stops
+    // claiming "n/a" the moment a venue starts listing something.
+    const supported = {};
+    venues.forEach(v => {
+      supported[v.name] = supported[v.name] || {};
+      (v.markets || []).forEach(m => { supported[v.name][bandOf(m)] = true; });
+      (v.bands || []).forEach(b => { supported[v.name][b] = true; });
+    });
+
     const grid = el("div", "venues");
     grid.style.setProperty("--vcols", String(venues.length));
     venues.forEach(v => {
@@ -766,14 +740,25 @@
         ? "balance unknown" : money(v.wallet) + " in the account"));
       col.appendChild(hd);
       const ms = v.markets || [];
-      if (!ms.length) {
-        col.appendChild(el("div", "empty",
-          "Between windows. These are 15-minute markets and each venue "
-          + "lists the next one a moment after the last one closes."));
-      } else {
-        ms.forEach(m => col.appendChild(marketCard(m,
+      // Every band keeps its slot on every venue, so the 15-minute row is
+      // at the same height in all three columns and "this venue does not
+      // list that length" is visible rather than inferred from a gap.
+      const byBand = {};
+      ms.forEach(m => (byBand[bandOf(m)] = byBand[bandOf(m)] || []).push(m));
+      BANDS.forEach(x => {
+        col.appendChild(el("div", "dband", x.label));
+        const got = byBand[x.key] || [];
+        if (!got.length) {
+          col.appendChild(el("div", "dna",
+            supported[v.name] && supported[v.name][x.key]
+              ? "between windows"
+              : "n/a \u2014 not listed here"));
+          return;
+        }
+        got.sort((a, b) => new Date(a.close || 0) - new Date(b.close || 0));
+        got.forEach(m => col.appendChild(marketCard(m,
           mismatched[(m.coin || "") + "|" + (m.window || "")])));
-      }
+      });
       grid.appendChild(col);
     });
     host.appendChild(grid);
