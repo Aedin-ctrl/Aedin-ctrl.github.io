@@ -329,6 +329,24 @@
   .livebox .trd{background:var(--card);}
   .livebox .none{font-size:12px; color:var(--ink2);}
 
+  /* The hour grid, folded away. It is the largest block in the panel and
+     answers "when was it busy", which is not the question the panel is
+     opened to ask. */
+  .hfold{margin:4px 0 2px;}
+  .hfold>summary{cursor:pointer; font-size:11.5px; color:var(--ink2);
+                 padding:5px 0; list-style:none; user-select:none;}
+  .hfold>summary::-webkit-details-marker{display:none;}
+  .hfold>summary::before{content:"\25B8 "; color:var(--muted);}
+  .hfold[open]>summary::before{content:"\25BE ";}
+  .hfold>summary:hover{color:var(--ink);}
+  .hfold>summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* Which two markets a row is between. */
+  .vp{font-size:10.5px; color:var(--ink2); background:var(--line);
+      border-radius:4px; padding:1px 5px; margin-left:7px;
+      white-space:nowrap; font-weight:500;}
+  .vp.basis{background:#fdf1ec; color:var(--bad);}
+
   h2{font-size:14px; margin:38px 0 10px;}
   .note{font-size:13px; color:var(--ink2); max-width:68ch;}
   .note+.note{margin-top:10px;}
@@ -441,8 +459,11 @@
       <p class="lede" id="histlede"></p>
     </div>
     <div class="hstats" id="histstats"></div>
-    <div class="htl" id="histtl"></div>
     <div id="histbest"></div>
+    <details class="hfold">
+      <summary>Activity by hour</summary>
+      <div class="htl" id="histtl"></div>
+    </details>
     <div class="hbody" id="histbody"></div>
   </div>
 </div>
@@ -1032,7 +1053,11 @@
   const SLOT_MIN  = 60;   // bucket size; the label and the walk derive from it
   const MIN_SLOTS = 12;   // always reach back at least twelve hours
   const MAX_LOG   = 240;  // ten days of hours in the log, at most
-  const MAX_EV    = 5;    // near-misses shown per hour before "+N more"
+  const MAX_EV    = 2;    // near-misses shown per hour before "+N more".
+                          // Was 5. Every one of these says a
+                          // version of the same thing, so the
+                          // log was mostly restatement; the
+                          // count and the best one carry it.
   const HOUR      = 3600000;
   let STRIP_MODE  = "day";   // "day" (24 cells) or "week" (7 x 24)
 
@@ -1115,6 +1140,24 @@
 
   // One venue per segment, in the order the feed lists them. A third
   // venue makes this line longer; it does not make it a different line.
+  // Which two markets this row is between. The odds line already names
+  // them, but it sits below the fold of a dense row and reads as prices,
+  // not as "who". With three venues the pair is the first thing worth
+  // knowing about any row.
+  const VSHORT = { "Kalshi": "Kalshi", "Polymarket US": "Poly", "Gemini": "Gemini" };
+  function venuePair(legs, kind) {
+    const ns = (legs || []).map(l => VSHORT[l.name] || l.name || l.venue)
+                           .filter(Boolean);
+    if (ns.length < 2) return null;
+    const sp = el("span", "vp" + (kind && kind !== "exact" ? " basis" : ""));
+    sp.textContent = ns[0] + " \u2194 " + ns[1];
+    if (kind && kind !== "exact") {
+      sp.title = "Different settlement indices \u2014 this pair can pay "
+               + "$2 or $0, not $1";
+    }
+    return sp;
+  }
+
   function oddsLine(legs, key) {
     const line = el("div", "odds");
     const usable = (legs || []).filter(l => l[key || "px"] != null);
@@ -1135,6 +1178,8 @@
     left.appendChild(el("span", "co", m.coin || ""));
     const inc = increment(m.open, m.close);
     if (inc) left.appendChild(el("span", "inc", inc));
+    const vpm = venuePair(m.legs, m.kind);
+    if (vpm) left.appendChild(vpm);
     r1.appendChild(left);
     const right = el("span");
     if (m.net != null) right.appendChild(el("span", "nt", centsTxt(m.net)));
@@ -1164,6 +1209,8 @@
     left.appendChild(el("span", "co", t.coin || ""));
     const inc = increment(t.open, t.close);
     if (inc) left.appendChild(el("span", "inc", inc));
+    const vpt = venuePair(t.legs, t.kind);
+    if (vpt) left.appendChild(vpt);
     left.appendChild(document.createTextNode(
       " · " + (t.qty || 0) + " contracts"));
     top.appendChild(left);
