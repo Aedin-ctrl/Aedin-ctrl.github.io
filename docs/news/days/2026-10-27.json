@@ -1,0 +1,761 @@
+{
+  "date": "2026-10-27",
+  "generated": "2026-10-27T10:06:24.592Z",
+  "articles": [
+    {
+      "id": "2026-10-27-serbias-vu-i-concedes-after-two-years-of",
+      "headline": "Serbia's Vučić concedes after two years of documented spyware use on his critics",
+      "summary": "Aleksandar Vučić conceded his prime ministerial race on Sunday. Researchers had documented spyware infections on dozens of Serbian opposition figures, protesters, prosecutors and journalists, and the report does not claim the spyware decided the vote.",
+      "impacts": [
+        "Phone-hacking tools sold to governments can be aimed at students, prosecutors and reporters, not just criminals.",
+        "Apple threat notifications were an early warning for at least one targeted prosecutor.",
+        "The result suggests surveillance campaigns do not always protect an incumbent from losing."
+      ],
+      "details": [
+        "Serbian leader Aleksandar Vučić conceded defeat in his prime ministerial race on Sunday, according to The Record. He has dominated Serbian politics since 2014. The outlet ties the result to a long record of digital surveillance of his opponents, though it presents the link as an inference, not a proven cause.",
+        "Over the past two years, digital forensics researchers have found evidence suggesting spyware infections on dozens of Serbian opposition leaders, protesters, prosecutors and journalists. Amnesty International investigators say the government used Cellebrite extraction software, and then installed spyware, during what they described as bogus interrogations and arrests.",
+        "The reporting names several targets. Citizen Lab found the Pegasus zero-click spyware on the phone of University of Belgrade Rector Vladan Đokić earlier in 2026. He had refused to help the government crack down on student protesters, and authorities seized his office computers in March. Prosecutor Rade Bajić, who looked into alleged dealings between Vučić and Jared Kushner over a possible Trump Tower project in Belgrade, was also targeted with Pegasus and received several Apple threat notifications.",
+        "The SHARE Foundation has documented at least 15 people targeted with mercenary spyware in 2026. Foundation researcher Andrijana Ristić said the surveillance moved on to protesters as a new election cycle approached, adding that the stakes were very high for the government. Two investigative journalists were also targeted with Pegasus in March 2025, per Amnesty.",
+        "Cellebrite said in February 2025 that it had cut ties with the Serbian government after Amnesty documented systematic use against civilians. Amnesty later found the software still in use weeks afterwards. Serbia's Foreign Ministry did not immediately comment on the allegations.",
+        "What is established and what is not: the spyware findings come from forensic researchers and human-rights groups, and the article says the evidence 'suggests' infections. It does not say the surveillance changed the election outcome, and no one has shown how many voters knew about it. What to watch next: whether the incoming government investigates who bought and used the tools, and whether vendors face consequences."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "serbia",
+        "pegasus",
+        "spyware",
+        "citizen lab",
+        "cellebrite",
+        "election",
+        "amnesty"
+      ],
+      "date": "2026-10-26",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/serbia-election-spyware-vucic"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-ukraine-disputes-musks-starlink-misuse-claim-as-military",
+      "headline": "Ukraine disputes Musk's Starlink misuse claim as military connectivity returns",
+      "summary": "Starlink and Starshield service for Ukraine's military is restored after nearly two weeks of disruption. Elon Musk says Kyiv broke the terms of service with drone strikes; Ukrainian officials say the civilian terminals could not have done that.",
+      "impacts": [
+        "Frontline communications for a country at war depended on one private company's settings.",
+        "Disruption was tied to a drop in drone interception, per the Institute for the Study of War.",
+        "Who decides speed caps and access on satellite links is unresolved and political."
+      ],
+      "details": [
+        "Ukraine's military connectivity was restored after nearly two weeks of disruption, The Record reports. Defense Minister Yevhen Khmara said on Saturday that Starlink and Starshield service was fully back, with monitoring systems showing stable links on equipment moving faster than 400 kilometers per hour. President Zelensky said connectivity had returned to the levels needed for military operations, citing the fight against jet-powered Shahed drones.",
+        "Elon Musk accused Ukraine's military on X of violating Starlink's terms of service and using it for offensive drone strikes. He said commercial Starlink works differently from Starshield, the military-focused system controlled by the US government.",
+        "Ukrainian officials rejected the claim on technical grounds. Defense ministry adviser Serhii Sternenko said civilian Starlink could not be used for drone missions because a February registration system requires all terminals on moving platforms to connect only to Starshield. Presidential adviser Serhii Beskrestnov said commercial terminals in Ukraine were limited to 70 to 90 kilometers per hour and did not work on Russian territory, which rules out medium- or long-range strikes with civilian equipment.",
+        "The effects were real. The mid-October restrictions forced Ukrainian troops to cancel some combat missions and complicated drone and reconnaissance work. The Institute for the Study of War said Ukraine's interception rate against Russian jet-powered attack drones fell from 77% to about 74% between October 14 and 24.",
+        "The political backdrop is tense. The Wall Street Journal reported that President Trump ordered Musk to lift the restrictions on October 21 after becoming frustrated with a 160-kilometer-per-hour speed cap. Trump later denied discussing it with Musk but said he might step in if problems continued. Zelensky said in an interview that he felt personally betrayed by Trump, amid disagreements over Ukrainian strikes on Russian oil infrastructure.",
+        "What is not known: The Record says it is unclear who imposed the speed restrictions, and whether technical faults or deliberate policy caused the outage. The three-point drop in interception rate is a short-window figure from one think tank and does not by itself prove battlefield consequences. What to watch: whether any formal arrangement emerges for who controls military satellite access."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "starlink",
+        "starshield",
+        "ukraine",
+        "musk",
+        "drones",
+        "satellites",
+        "shahed"
+      ],
+      "date": "2026-10-26",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/ukraine-disputes-musk-claims-of-starlink-misuse"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-korean-police-ex-pentester-used-the-artex-ai",
+      "headline": "Korean police: ex-pentester used the ARTEX AI framework to steal 8.2 million records",
+      "summary": "Seoul police arrested seven suspects over breaches of more than 90 organizations. They say the leader's attacks scaled up after he adopted the autonomous ARTEX pentesting tool, in what they call Korea's first arrest tied to AI-aided mass data theft.",
+      "impacts": [
+        "Tools built for defenders can lower the skill needed to breach hospitals and schools at scale.",
+        "Smaller organizations like golf courses and schools were hit alongside big companies.",
+        "Police say AI cuts the barrier for aspiring criminals, so more attackers may appear."
+      ],
+      "details": [
+        "South Korean authorities have arrested seven suspects in a cybercrime operation that targeted more than 90 organizations and stole 8.2 million data records, BleepingComputer reports. The gang's leader is a 32-year-old self-taught hacker who worked at a cybersecurity company between 2019 and 2022. The attacks began in September 2025.",
+        "Victims included educational institutions, hospitals, large corporations and golf courses. In 38 incidents the attackers demanded ransom of about 360 million won (roughly $270,000) each, threatening to leak the data otherwise.",
+        "The key change came in late August 2026, when the gang began using ARTEX, an autonomous AI penetration-testing framework. Police say that shift let them expand the operation. Before that they had used conventional hacking tools.",
+        "The timeline: police opened the case after a victim complained in June 2026 and traced the suspects through server logs recovered from breached organizations. The leader was arrested on October 15, formally detained two days later, and referred to prosecutors on October 23. Six other suspects are under investigation but not detained.",
+        "The Seoul Metropolitan Police said AI has lowered the barrier to entry for aspiring cybercriminals, producing large-scale incidents once possible only for skilled actors. They described it as Korea's first arrest tied to large-scale hacking and personal-data theft that exploited generative AI. The police also used an in-house AI tool to analyze the evidence.",
+        "What is uncertain: the article reports police statements, and it does not give an independent measure of how much faster or larger the attacks became because of ARTEX. Investigators are still checking whether the stolen data has shown up on darknet markets. BleepingComputer notes earlier attacks on South Korean banks that also involved ARTEX and Claude agents. What to watch: charges, and whether the framework's developers face any pressure."
+      ],
+      "category": "AI",
+      "tags": [
+        "artex",
+        "ai hacking",
+        "south korea",
+        "ransom",
+        "pentest",
+        "data theft",
+        "police"
+      ],
+      "date": "2026-10-26",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/former-pentester-used-artex-ai-to-steal-82-million-data-records/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-bundibugyo-ebola-kenyas-second-death-and-a-nigerian",
+      "headline": "Bundibugyo Ebola: Kenya's second death, and a Nigerian patient airlifted to Switzerland",
+      "summary": "Kenya confirmed a second Ebola death on October 26. Nigeria's one patient, a Ugandan woman with no DRC exposure, was flown to Switzerland. The DRC outbreak stands at 9,964 cases and 4,841 deaths, and investigators are looking at Entebbe airport.",
+      "impacts": [
+        "A strain with no licensed vaccine is now in at least two more countries through air travel links.",
+        "A case with no known DRC exposure means transmission chains may be missed.",
+        "ECDC rates the risk to EU residents as low with proper precautions."
+      ],
+      "details": [
+        "Kenya confirmed its second Bundibugyo Ebola death on October 26, CIDRAP reports: a 65-year-old woman, a close relative of the country's first patient. She developed symptoms about 10 days before she died while quarantined at an infectious disease unit in Nairobi. Seven confirmed patients remain isolated, and Kenya reported no new cases.",
+        "All of Kenya's infections trace to an index patient who arrived on October 3 via Uganda and the Democratic Republic of Congo and died on October 5. Officials identified 135 contacts and quarantined 118. The first group completed the 21-day quarantine over the weekend and was released.",
+        "Nigeria's only patient, a 42-year-old Ugandan woman, was airlifted to Switzerland in stable condition, said coordinating minister Muhammad Ali Pate. He described her as clinically much improved, but officials stressed she is still infectious. Her asymptomatic Swiss spouse travelled with her. Nigeria is monitoring 52 contacts.",
+        "Africa CDC director Jean Kaseya said his team will investigate how Nigeria's case arose, because travel records show she had no DRC exposure. Both Kenya's and Nigeria's index patients passed through Uganda's Entebbe International Airport on October 3, which suggests, but does not prove, that transmission happened there.",
+        "In the DRC the outbreak has reached 9,964 cases and 4,841 deaths, a case-fatality rate near 48%. A nurse was killed and a health worker attacked outside a clinic. A new three-way trial is testing Merck's Ervebo, which targets the Zaire strain, alongside experimental alternatives. Regeneron extended its supply agreement with BARDA for Inmazeb, an antibody cocktail that cut Zaire-strain Ebola mortality by about 55% against active controls in trials.",
+        "What is uncertain: how the Nigerian patient was infected, and whether other undetected chains exist. The ECDC assessed infection likelihood for EU/EEA residents in affected areas as low. What to watch next: the Entebbe investigation, contact-tracing results in Kenya and Nigeria, and early signals from the vaccine trial."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "bundibugyo",
+        "kenya",
+        "nigeria",
+        "drc",
+        "outbreak",
+        "vaccine"
+      ],
+      "date": "2026-10-26",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/ebola/kenya-reports-2nd-ebola-death-nigeria-races-understand-transmission-index-patient"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-cisa-confirms-php2shell-flaws-are-exploited-about-3",
+      "headline": "CISA confirms PHP2Shell flaws are exploited; about 3.8 million PHP hosts have open ports",
+      "summary": "CISA added two critical PHP remote-code-execution bugs to its exploited list on October 26 and gave federal agencies until October 30. Amazon says attacks began four days before patches. A third bug has no patch.",
+      "impacts": [
+        "PHP runs about 70% of websites, so many small sites could be exposed if not patched.",
+        "Attackers started before patches existed, leaving defenders no head start.",
+        "A third remote-code bug has no fix, only a narrow set of risky configurations."
+      ],
+      "details": [
+        "The US Cybersecurity and Infrastructure Security Agency confirmed on October 26 that two critical PHP flaws, CVE-2026-109618 and CVE-2026-109619, are being exploited in real attacks, BleepingComputer reports. Together they are called PHP2Shell. CISA added them to its Known Exploited Vulnerabilities catalog and ordered federal civilian agencies to patch by October 30.",
+        "The bugs let an unprivileged attacker run code on unpatched systems, though through what CISA calls high-complexity attacks. The PHP security team shipped emergency patches on October 21, 2026.",
+        "Details leaked before the patches arrived, and proof-of-concept exploits circulated, although at first none worked. Cloudflare and Amazon later detected widespread exploitation attempts. Amazon Threat Intelligence concluded attackers began targeting the flaws four days before the patches were released.",
+        "By the weekend of October 24-25, a Perplexity detection team confirmed in-the-wild exploitation against Apache mod_php installations running PHP 8.4.26. Its honeypots recorded evidence of remote code execution.",
+        "The scale is large. PHP powers roughly 70% of websites. VirusTotal estimates about 5.1 million PHP hosts are exposed online, and around 3.8 million have at least one port open to attack. Those are exposure estimates, not a count of vulnerable or compromised servers.",
+        "A third remote-code bug, CVE-2026-115560, has no patch. The PHP team says it is exploitable only under specific combinations of configuration and application code. What to watch: whether a fix arrives, whether the number of confirmed compromises rises, and how fast hosting providers push updates."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "php",
+        "php2shell",
+        "cisa",
+        "kev",
+        "remote code execution",
+        "exploited",
+        "web servers"
+      ],
+      "date": "2026-10-26",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/cisa-confirms-php2shell-vulnerabilities-now-exploited-in-attacks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-a-personalized-mrna-cancer-vaccine-cut-recurrence-or",
+      "headline": "A personalized mRNA cancer vaccine cut recurrence or death by 42% in a Phase 3 trial",
+      "summary": "At the ESMO congress, Merck and Moderna's intismeran autogene plus Keytruda reduced the risk of recurrence or death by 42% versus Keytruda alone. STAT calls it the first neoantigen mRNA therapy to hit its primary Phase 3 endpoint.",
+      "impacts": [
+        "Individualized vaccines could become a standard add-on after surgery for some cancers.",
+        "Each dose needs sequencing and custom manufacturing, which could limit access.",
+        "Insurers may resist paying for prevention that pays off for a later insurer."
+      ],
+      "details": [
+        "At the European Society for Medical Oncology congress this month, researchers reported that intismeran autogene lowered the risk of recurrence or death by 42% compared with pembrolizumab (Keytruda) alone, STAT News reports. It is described as the first neoantigen and mRNA therapy to meet its primary endpoint in a Phase 3 oncology trial.",
+        "The vaccine is made by Merck and Moderna. Each dose is designed for one patient's tumor mutations, which marks a break from one-size-fits-all drugs. The trial compared the vaccine plus existing immunotherapy against immunotherapy alone. The STAT piece focuses mainly on melanoma and says other cancers were studied.",
+        "The piece is an opinion-style analysis of what comes next, and it lists four obstacles to getting the vaccines to patients. First, regulatory pathways were not designed for individualized therapies, which pushes narrow indications and higher costs. Second, delivery is fragmented across tumor sampling, sequencing, neoantigen selection, manufacturing and administration, with no single party accountable.",
+        "Third, payers have weak incentives: insurers see prevention as less urgent than treating active disease, and plans with high member turnover may not want to fund treatment whose benefit goes to a competitor. Fourth, clinical guidelines update slowly and were built for fixed products.",
+        "The authors propose public-private partnerships like the National Cancer Institute's Therapeutic Cancer Vaccines Initiative, AI to cut cost and time, outcomes-based contracts and faster guideline frameworks for platform technologies.",
+        "What remains uncertain: which cancers the approach will work in, which technologies work best, optimal dosing and patient selection, and how long responses last. The 42% figure is a relative risk reduction as reported by STAT, and I did not find absolute numbers in the pages I opened. What to watch next: regulatory filings and whether the benefit holds in other tumor types."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "mrna",
+        "cancer vaccine",
+        "moderna",
+        "merck",
+        "melanoma",
+        "esmo",
+        "immunotherapy"
+      ],
+      "date": "2026-10-27",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "STAT News",
+          "url": "https://www.statnews.com/2026/10/27/cancer-vaccines-intismeran-autogene-esmo-results-delivery-access/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-ledger-says-implants-in-resold-crypto-wallets-sent",
+      "headline": "Ledger says implants in resold crypto wallets sent recovery phrases over LTE",
+      "summary": "Ledger disclosed on October 13 that hidden hardware in devices sold by Southeast Asian reseller CryptoBilis captured 24-word recovery phrases and transmitted them via an eSIM. Tampered units may still pass authenticity checks.",
+      "impacts": [
+        "A hardware wallet bought from a reseller can be compromised before you open the box.",
+        "Authenticity checks passed because the implants left the Secure Element intact.",
+        "Crypto stolen this way cannot be recovered by changing a password."
+      ],
+      "details": [
+        "On October 13, 2026, hardware-wallet maker Ledger disclosed that devices sold through Southeast Asian reseller CryptoBilis contained hidden hardware implants designed to capture users' recovery phrases, The Record reports.",
+        "According to Ledger's security research team, the implants could read data shown on the wallet's screen. During setup they picked up the 24-word recovery phrase and sent it over an LTE connection using an embedded eSIM. Unknown attackers then used the phrases to drain funds. The theft Ledger describes occurred on October 9.",
+        "A key complication: the implants left the Secure Element, the chip meant to protect keys, intact. Ledger therefore warned that tampered devices may still pass its authenticity checks, so normal verification may not tell a compromised wallet from a genuine one.",
+        "Ledger told CryptoBilis customers with unused devices not to activate them and to contact support. Anyone who had already set one up was told to move assets promptly to a new signer with a new recovery phrase, and not to enter or restore a recovery phrase on any device bought from CryptoBilis. CryptoBilis paused all sales and shipments of Ledger devices and said it is cooperating.",
+        "How big is it? Ledger says confirmed thefts have largely been reported in Southeast Asia and involve only CryptoBilis devices, and it believes the number of affected devices is limited. But it has not confirmed total losses, has not publicly named the affected models, and says it is reviewing reports of implants in other signers and locations.",
+        "What is uncertain: the scale of losses, the models involved and who built the implants. What to watch next: whether Ledger confirms devices from other resellers, and what it publishes about how to check a unit physically."
+      ],
+      "category": "Tech",
+      "tags": [
+        "ledger",
+        "crypto",
+        "hardware wallet",
+        "supply chain",
+        "implant",
+        "recovery phrase",
+        "esim"
+      ],
+      "date": "2026-10-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/ledger-cryptocurrency-wallet-implant-theft"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-arctic-winter-sea-ice-could-vanish-about-a",
+      "headline": "Arctic winter sea ice could vanish about a million square kilometers sooner than models say",
+      "summary": "A Cambridge-led Nature Geoscience study weighted 27 climate models using 6,000-year-old sediment records. It finds Arctic winter ice may disappear about one million square kilometers faster than earlier projections.",
+      "impacts": [
+        "Faster winter ice loss changes weather patterns, including colder winters and more snow in parts of Europe and North America.",
+        "More snowfall over southeastern Greenland could destabilize its ice sheet.",
+        "Heavier Mediterranean rain could worsen southern European flooding."
+      ],
+      "details": [
+        "Researchers from the University of Cambridge and Mexico's Centro de Investigación en Matemáticas report that Arctic winter sea ice could disappear about one million square kilometers faster than earlier climate models predicted. The study appears in Nature Geoscience, according to ScienceDaily.",
+        "The method uses chemical markers called IP25, made by sea-ice algae, taken from Arctic Ocean sediments from the mid-Holocene, about 6,000 years ago. The team applied Bayesian weighting to 27 climate models, giving more weight to models that matched the historical evidence. Lead researcher Crystal Fu said applying the weights to historical simulations eliminated a positive bias. The approach cut uncertainty in some projections by as much as 85%.",
+        "Winter ice gets less attention than summer ice, but it affects heat and moisture exchange between ocean and atmosphere. Losing it correlates with colder winters and heavier snowfall across the UK, northern Europe and North America.",
+        "The observed record is already stark. March 2025 and March 2026 each recorded the lowest annual maximum winter extent since modern monitoring began.",
+        "Reweighting the precipitation projections also pointed to possible underestimates of future snowfall over southeastern Greenland and of rainfall across the Mediterranean region. The article says more Greenland snowfall could destabilize the ice sheet and that more Mediterranean rain could raise flood risk in southern Europe; these are stated implications of the model weighting, not observed events.",
+        "What is uncertain: the result rests on statistical weighting of model output and on a proxy record from one past climate state. Fu notes the physics is the same whether warming comes from orbital changes or human activity. What to watch: follow-up work testing the weighting on other model sets and regions."
+      ],
+      "category": "Climate",
+      "tags": [
+        "arctic",
+        "sea ice",
+        "climate models",
+        "nature geoscience",
+        "greenland",
+        "cambridge",
+        "paleoclimate"
+      ],
+      "date": "2026-10-26",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://sciencedaily.com/releases/2026/10/261022081259.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-facewatch-generated-297-433-shopper-alerts-in-six",
+      "headline": "Facewatch generated 297,433 shopper alerts in six months, with no UK opt-out and no specific law",
+      "summary": "Facewatch's facial recognition, used by 125+ UK retailers, raised 297,433 alerts from January to June 2026. Three people were wrongly ejected after human review errors; Big Brother Watch holds a victims' summit at Parliament on October 27.",
+      "impacts": [
+        "Shoppers in participating stores are scanned with no opt-out, and UK law has no specific commercial facial recognition framework.",
+        "The 99.98% accuracy claim covers the algorithm, not the human review where the reported errors happened.",
+        "Wrongly flagged people must file data requests, possibly submitting ID to Facewatch itself."
+      ],
+      "details": [
+        "Facewatch runs facial recognition across more than 125 UK retailers, including Sainsbury's and B&M, according to a Tech Times report. Between January and June 2026 its system generated 297,433 alerts across participating stores. UK law has no specific framework governing commercial facial recognition, and shoppers have no opt-out. This follows our earlier coverage of Facewatch in Sainsbury's stores; the new reporting is the alert volume and the push for rules.",
+        "In July 2026 Facewatch added police-alert capability, notifying law enforcement within four seconds when what it calls high-risk repeat offenders enter a store.",
+        "On accuracy, Facewatch advertises 99.98%. The article points out that this figure covers only algorithmic matching, not the human review stages where errors actually happened. It documents three wrongful ejections of people misidentified as suspected shoplifters: Byron Long (November 2025), Warren Rajah (February 2026) and Matt Arnold (August 2026). Each involved human error at the review stage, not algorithmic failure. Arnold called it a terrifying glimpse of the future.",
+        "Facewatch says it hopes the government will set standards that keep out less-scrupulous operators. Critics quoted in the article read that as market protection, since Facewatch already holds ISO/IEC 42001 certification and acts as legal data controller across its retailer network, and licensing rules could be hard for new rivals to meet.",
+        "Opposition is growing. Big Brother Watch's petition for a ban has passed 42,000 signatures, and the group is holding a summit at Parliament on October 27, 2026 where wrongly flagged people will testify. The article contrasts the EU AI Act, which restricts real-time biometric identification in public spaces, with the post-Brexit UK, which declined equivalent protections.",
+        "What is unknown: the Home Office has completed a public consultation on private-sector facial recognition, but its conclusions are unpublished. The 297,433 figure counts alerts, not confirmed offenders, and the article does not say how many were wrong. What to watch next: the consultation outcome and whether Parliament moves toward licensing or a ban."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "facewatch",
+        "facial recognition",
+        "uk",
+        "retail",
+        "big brother watch",
+        "biometrics",
+        "privacy"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Tech Times",
+          "url": "https://www.techtimes.com/articles/329431/20261023/facewatch-scanned-uk-shoppers-300000-times-now-it-wants-rules-that-could-lock-out-rivals.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-http2shell-a-brotli-decoder-bug-reaches-node-js",
+      "headline": "HTTP2Shell: a Brotli decoder bug reaches Node.js, Python libraries and .NET",
+      "summary": "A buffer overflow in Google's Brotli decompression library, CVE-2026-111497, can crash programs, leak memory or allow remote code execution. Public exploit code exists; no in-the-wild attacks were documented. Patching the system library alone is not enough.",
+      "impacts": [
+        "A bug in a compression library shows up inside many apps, so one patch may not cover them all.",
+        "Software that bundles its own Brotli copy stays exposed after system updates.",
+        "Malicious compressed web responses, not just requests, can be an attack path."
+      ],
+      "details": [
+        "A critical buffer overflow in Brotli, Google's open-source compression library, is tracked as CVE-2026-111497 and goes by HTTP2Shell, Node2Shell and Broccoli2Shell, BleepingComputer reports. Researchers first found it in Node.js, then realized it was in the underlying decoder. This follows earlier coverage here of the Node.js patch release; the story now covers the library itself and its wider reach.",
+        "The flaw occurs when the decoder treats an invalid block switch as a request for more input. It then writes beyond an eight-byte internal buffer and corrupts adjacent memory. The article lists three escalating outcomes: process crashes, exposure of sensitive memory, and remote code execution. Imperva said exploiting the flaw can lead to RCE, and Microsoft's emergency .NET update warned of privilege escalation.",
+        "Affected Brotli versions are 1.0.3 through 1.0.9, 1.1.0 and 1.2.0. Dependent software includes Node.js, Python HTTP libraries (urllib3, requests, httpx, aiohttp), Microsoft .NET and anything else using a vulnerable build.",
+        "The timeline: fixes landed in the upstream repository in February 2026, stable patches rolled out on October 21, the announcement came October 22 and fixed PyPI packages were available October 23. Patched versions include Brotli 1.0.10, 1.1.1 and 1.2.1; Node.js 22.23.4, 24.22.1 and 26.12.1; and Python Brotli 1.2.1.",
+        "Public proof-of-concept exploits have been released, but no active exploitation in the wild had been documented when BleepingComputer wrote. The article stresses that updating the system Brotli library gives incomplete protection: applications that ship their own copy remain vulnerable, and blocking inbound compressed requests does not stop attacks through compressed HTTP responses.",
+        "Organizations that cannot patch quickly can remove Brotli support from Python applications or filter compressed requests at a proxy. What to watch: whether exploitation appears now that PoC code is public, and how many bundled copies linger unpatched."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "brotli",
+        "http2shell",
+        "node.js",
+        "python",
+        "dotnet",
+        "cve",
+        "remote code execution"
+      ],
+      "date": "2026-10-26",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/critical-http2shell-brotli-vulnerability-triggers-emergency-patches/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-first-known-human-case-of-livestock-linked-shamonda",
+      "headline": "First known human case of livestock-linked Shamonda virus found in France",
+      "summary": "An immunocompromised man who died in early October at a Lyon hospital is the first documented human Shamonda virus case. Experts say public risk is very low; the midge species involved is unknown.",
+      "impacts": [
+        "It shows an animal-only virus can occasionally infect a person with a weakened immune system.",
+        "There is no antiviral or vaccine for Shamonda virus.",
+        "Experts say the risk to healthy people appears very low."
+      ],
+      "details": [
+        "A man in France has become the first documented human case of Shamonda virus, a livestock-related orthobunyavirus, CIDRAP reports. He died in early October at a hospital in Lyon. He had a severely weakened immune system, which is thought to have made him susceptible.",
+        "He developed neurological complications that are believed to be connected to the infection. French and European authorities are still investigating how he got it and whether the virus contributed to his death.",
+        "Until now the virus was considered not transmissible to humans. It circulates in cattle, sheep, goats, horses and alpacas, and in animals it can cause fever, diarrhea, appetite loss, lower milk production, stillbirths and congenital abnormalities. No antiviral treatment or vaccine exists.",
+        "Biting midges of the genus Culicoides normally spread it between animals. The species involved in the human case has not been identified. The midges are typically active from spring through fall and become less active as temperatures drop.",
+        "Experts stress the public risk is very low. Tom Solomon of the University of Liverpool said the virus has circulated in animals for many years without a recognized human infection, so spillover is extremely unusual. The European Centre for Disease Prevention and Control pointed to the unknown midge species, seasonal activity and the lack of earlier human cases as protective factors.",
+        "What is uncertain: whether the virus caused the neurological illness or death, and how the man was infected. It is one case in a patient with a compromised immune system. What to watch: any additional cases, and findings on which midges can carry the virus to humans."
+      ],
+      "category": "Health",
+      "tags": [
+        "shamonda",
+        "virus",
+        "france",
+        "midges",
+        "zoonotic",
+        "livestock",
+        "ecdc"
+      ],
+      "date": "2026-10-26",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/misc-emerging-topics/first-ever-human-case-livestock-related-shamonda-virus-identified-france"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-university-of-copenhagen-breach-exposes-national-id-numbers",
+      "headline": "University of Copenhagen breach exposes national ID numbers of about 545,000 people",
+      "summary": "Hackers got into one of the university's test environments. Names, Danish CPR numbers, phones, emails and PIN codes were exposed for 525,000 people, and later PINs for another 20,000.",
+      "impacts": [
+        "Test environments holding real personal data can become the weak point.",
+        "National ID numbers plus contact details make phishing and impersonation easier.",
+        "The university restricted campus access and issued new access codes."
+      ],
+      "details": [
+        "Hackers breached a test environment at the University of Copenhagen and exposed personal information on 525,000 people, BleepingComputer reports. The university detected the intrusion last Tuesday and disclosed it on Friday. An update said another 20,000 staff and students had their PIN codes compromised, for roughly 545,000 people in total.",
+        "The exposed data includes full names, Danish national identity (CPR) numbers, phone numbers, email addresses and PIN access codes. For scale, the university has about 36,800 students and 10,700 employees across six faculties and more than 200 research centers, so the exposed number is far larger than the current community.",
+        "The university says it has contained the breach and blocked the attackers. It says there is currently no indication that systems supporting daily operations were accessed. It restricted physical access to critical campus locations, reopened them gradually and distributed new access codes.",
+        "It reported the incident to the Danish Data Protection Agency and said the breach falls under the EU's GDPR. It promised updates as the investigation continues.",
+        "The risk, according to the article, is phishing and social engineering using the exposed details. The university advised those affected to be cautious about unsolicited messages and to verify any requests for information independently.",
+        "What is uncertain: who the attackers are, how they got into the test environment, and why it held production-scale personal data; the article does not say. What to watch next: findings from the data protection agency and any sign the data is being sold or used."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "university of copenhagen",
+        "data breach",
+        "denmark",
+        "cpr",
+        "gdpr",
+        "phishing",
+        "test environment"
+      ],
+      "date": "2026-10-26",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/university-of-copenhagen-data-breach-exposes-data-of-525-000-people/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-a-pennsylvania-doctor-cured-a-calfs-rare-disease",
+      "headline": "A Pennsylvania doctor cured a calf's rare disease with gene therapy; no human has received it",
+      "summary": "Dr. Kevin Strauss developed a gene therapy for maple syrup urine disease and treated a calf named Petunia, now a healthy 1,500-pound heifer after five years. No human patient has had it yet, even in a trial.",
+      "impacts": [
+        "Rare-disease treatments can work in animals yet stall for lack of a commercial sponsor.",
+        "Communities with a high disease burden are trying to build their own drug development.",
+        "The same disorder that took Petunia's brother is common among Pennsylvania Mennonites."
+      ],
+      "details": [
+        "STAT News describes how Dr. Kevin Strauss, a physician in Lancaster, Pennsylvania, developed a gene therapy for maple syrup urine disease (MSUD) and tested it on a cow named Petunia. She survived and grew into a healthy 1,500-pound heifer over five years. Yet no human patient has received the treatment, not even in a clinical trial.",
+        "MSUD is a life-threatening metabolic disorder that is unusually common in the Mennonite community of Pennsylvania Dutch country. Petunia's brother Louie had the condition and died hours after birth. Her team kept her alive through two sleepless nights, moving her from the barn to a veterinary hospital, where she received gene therapy delivered by a virus carrying corrective genetic material.",
+        "Strauss draws on two decades of treating MSUD patients in the region. The article frames the project as an effort by a rural doctor and a Mennonite network to get around the usual biopharma pipeline, because drug companies have not built a treatment for such a small patient population.",
+        "A limit on what I can report: the STAT article was only partly available to me, and the page I opened did not explain why a human trial has not started or which regulatory, financial or logistical hurdles stand in the way. The headline summary says patients are waiting after the community grew tired of waiting for biopharma.",
+        "What is established: one animal was treated and has done well for five years. What is not shown: that the therapy is safe or effective in people, since one cow is not evidence of either. What to watch next: whether a human trial is announced, who funds it, and how regulators handle a community-built rare-disease program."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "gene therapy",
+        "msud",
+        "rare disease",
+        "mennonite",
+        "pennsylvania",
+        "clinical trial",
+        "aav"
+      ],
+      "date": "2026-10-27",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "STAT News",
+          "url": "https://www.statnews.com/2026/10/27/gene-therapy-cow-rare-disease-amish-mennonite-patients-waiting/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-judge-rules-opm-broke-the-privacy-act-by",
+      "headline": "Judge rules OPM broke the Privacy Act by giving DOGE agents sweeping data access",
+      "summary": "Federal Judge Denise Cote granted summary judgment finding the Office of Personnel Management violated privacy protections twice by giving DOGE agents database access. The remedy phase is still pending.",
+      "impacts": [
+        "Federal employee records were opened to a score of outside agents on an expedited basis.",
+        "The court found no support for the claim that a modernization agenda drove the access.",
+        "What the government must do to fix it is not yet decided."
+      ],
+      "details": [
+        "Judge Denise Cote of the US District Court for the Southern District of New York granted summary judgment finding that the Office of Personnel Management violated privacy protections twice by granting DOGE agents access to its databases, according to State of Surveillance's October 21 daily briefing.",
+        "In the ruling the judge wrote that the record provides no support for a finding that a modernization agenda prompted OPM to grant sweeping and expedited access to a score of DOGE agents. That undercuts the justification that was offered for the access.",
+        "The remedy phase has not yet happened. The briefing does not say what relief the plaintiffs seek, how many records were reached, or what the government plans to do next, and I did not open the opinion itself, so those details are unknown to me.",
+        "The same briefing carried other surveillance items: Mozilla blocked eight eMudhra intermediate certificates whose private keys had been exposed within three hours and shipped Firefox 158.0.1; DHS ordered civilian agencies to remove DeepSeek and anything built on it; and the UK cancelled its compulsory digital ID card while keeping underlying systems such as GOV.UK One Login.",
+        "Context for readers: the Privacy Act limits how federal agencies share personal records. A violation finding on summary judgment means the judge decided no trial was needed on the facts, which is a stronger result than a preliminary order.",
+        "What is uncertain: the scope of the remedy and any appeal. What to watch next: the remedy ruling, whether data must be deleted or access restricted, and whether the government appeals."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "opm",
+        "doge",
+        "privacy act",
+        "federal employees",
+        "court ruling",
+        "personnel data",
+        "government data"
+      ],
+      "date": "2026-10-21",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "State of Surveillance",
+          "url": "https://stateofsurveillance.org/news/daily-surveillance-briefing-october-21-2026"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-engie-confirms-customer-data-stolen-via-a-compromised",
+      "headline": "ENGIE confirms customer data stolen via a compromised partner marketing platform",
+      "summary": "French energy company ENGIE says attackers stole French customers' names, contact details and energy contract data through a partner tool used for prospecting. Internal IT systems were not compromised, and banking data was not taken.",
+      "impacts": [
+        "A breach at a partner's marketing tool exposed a large company's customers without touching its own systems.",
+        "Contract numbers and customer IDs with contact details help scammers pose as the utility.",
+        "The company has not said how many people are affected."
+      ],
+      "details": [
+        "ENGIE confirmed that attackers stole customer data after compromising a marketing platform used by business partners, BleepingComputer reports. The company said its internal IT systems were not compromised. ENGIE operates in 30 countries, has more than 90,000 employees and reported €71.9 billion in annual revenue.",
+        "The incident is limited to French customers. The stolen data includes names, addresses, email addresses, phone numbers, energy contract details, customer IDs and contract numbers. Banking data was not compromised.",
+        "According to ENGIE, the attackers gained unusual access to a partner tool used for customer prospecting and marketing. The company cut off the access, notified the authorities and affected customers, and gave fraud-prevention guidance.",
+        "ENGIE did not disclose the total number of affected customers, the attack timeline or who the attackers are. No ransomware group has claimed responsibility.",
+        "For context, BleepingComputer notes that a year earlier the Scattered LAPSUS$ Hunters group claimed to have breached a Salesforce instance belonging to Engie Records, ENGIE's North American retail energy subsidiary, though details there remain limited. The article does not say the two incidents are connected, and nothing in it links them.",
+        "The pattern to watch is third-party exposure: the data leaked from a partner's tool, so ENGIE's own security did not fail in the usual sense. ENGIE says the investigation is ongoing and that only contact and contract information was reachable through the compromised platform. What to watch next: a customer count, any regulator notice and whether a group claims the theft."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "engie",
+        "data breach",
+        "france",
+        "energy",
+        "third-party",
+        "marketing platform",
+        "customer data"
+      ],
+      "date": "2026-10-27",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/energy-giant-engie-discloses-data-breach-affecting-customers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-2026-nobel-in-medicine-goes-to-optogenetics-the",
+      "headline": "2026 Nobel in Medicine goes to optogenetics, the technique for switching neurons with light",
+      "summary": "Karl Deisseroth, Peter Hegemann and Georg Nagel won the Nobel Prize in Physiology or Medicine for light-gated ion channels. The method lets scientists turn chosen neurons on with light, including reactivating a mouse's fear memory.",
+      "impacts": [
+        "Light-controlled neurons turned memories into something researchers can switch on in mice.",
+        "Early trials are using it to partly restore vision in retinal degeneration.",
+        "Parkinson's and epilepsy applications are being investigated, not proven."
+      ],
+      "details": [
+        "The 2026 Nobel Prize in Physiology or Medicine went to Karl Deisseroth of Stanford, Peter Hegemann of Humboldt University Berlin and Georg Nagel of the University of Würzburg for work on light-gated ion channels and optogenetics, ScienceDaily reports.",
+        "The discovery began with Chlamydomonas, a single-celled alga. Hegemann and Nagel identified channelrhodopsin, a protein that detects light. When light hits its retinaldehyde part, the protein changes shape and opens an ion channel, letting charged particles cross the cell membrane. This is how the alga steers toward light.",
+        "The key idea was putting that protein into nerve cells. Scientists deliver the channelrhodopsin gene using modified, non-pathogenic viruses. Once expressed, the targeted neurons respond to light delivered through optical fibers. That lets researchers activate specific populations of neurons and watch what the animal does.",
+        "The article highlights a landmark 2012 MIT study in which researchers tagged fear-memory neurons in mice. Days later, reactivating those cells with light triggered fear responses, showing a memory could be reactivated on demand.",
+        "Clinical use is early. Trials are introducing light-sensitive proteins into surviving retinal cells when photoreceptors degrade, which partly restores vision. Researchers are also investigating applications in Parkinson's disease and epilepsy.",
+        "Keep it in proportion: the memory work was in mice, and the human applications listed are trials and investigations, not approved treatments. The prize also stresses how an apparently esoteric question, how algae swim toward light, produced a major research tool. What to watch next: results from retinal trials and any move toward brain applications in people."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "optogenetics",
+        "nobel prize",
+        "neurons",
+        "brain",
+        "channelrhodopsin",
+        "deisseroth",
+        "vision"
+      ],
+      "date": "2026-10-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://sciencedaily.com/releases/2026/10/261018205037.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-webb-finds-three-feeding-supermassive-black-holes-in",
+      "headline": "Webb finds three feeding supermassive black holes in one galaxy 12.5 billion light-years away",
+      "summary": "Max Planck researchers report the first evidence of three active black holes in one distant galaxy. Two sit about 620 light-years apart and are expected to merge within several hundred million years.",
+      "impacts": [
+        "It suggests multi-black-hole systems may be common in the early universe and are still undiscovered.",
+        "The middle-mass black hole feeds faster than standard models predict.",
+        "Mergers like this produce gravitational waves."
+      ],
+      "details": [
+        "Astronomers led by Hannah Übler at the Max Planck Institute for Extraterrestrial Physics have identified three actively feeding supermassive black holes in the galaxy J0148-4214, ScienceDaily reports. The galaxy is 12.5 billion light-years away, seen as it was when the universe was about 1.2 billion years old.",
+        "The black holes differ greatly in mass: roughly 80 million solar masses for the largest, 600,000 for the smallest and 2 million for the third. The 600,000 solar-mass object is accumulating matter at an exceptionally high rate, above what standard models predict. The host galaxy has about 1.3 billion solar masses of stars, so the black holes make up a notable share of it.",
+        "Two of the black holes orbit just 620 light-years apart and are expected to merge within several hundred million years. The third lies about 5,500 light-years from the galaxy's center.",
+        "The team used integral field spectroscopy with the James Webb Space Telescope's NIRSpec instrument. They did not image the black holes directly; they analyzed hydrogen gas emission to spot the signatures of matter moving at extreme speeds. Spectro-astrometry, a technique that tracks tiny positional shifts, helped separate the closely spaced central pair. Übler called it the first evidence of three active black holes in a single galaxy in the distant universe.",
+        "The finding supports ideas that galaxy collisions help black holes merge and grow in the young universe. The third black hole could be a leftover from an earlier merger, possibly kicked out by gravitational-wave recoil, or it might slowly drift toward the center.",
+        "What is uncertain: the origin of the third black hole is unresolved, and the merger timing is a projection. The authors suggest many more multiple-black-hole systems await discovery. What to watch: follow-up Webb observations and similar systems."
+      ],
+      "category": "Space",
+      "tags": [
+        "black holes",
+        "webb",
+        "early universe",
+        "galaxy",
+        "max planck",
+        "mergers",
+        "astronomy"
+      ],
+      "date": "2026-10-25",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://sciencedaily.com/releases/2026/10/261024222000.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-ai-spotted-pancreatic-cancer-on-ct-scans-about",
+      "headline": "AI spotted pancreatic cancer on CT scans about 475 days before diagnosis, beating radiologists",
+      "summary": "A BMJ Group study of the REDMOD system found pancreatic cancer on earlier CT scans an average of 475 days before diagnosis. Its sensitivity was 73% versus 39% for radiologists, but it still needs prospective testing.",
+      "impacts": [
+        "Pancreatic cancer is usually found late; earlier detection could change survival odds.",
+        "The model flags texture patterns that radiologists cannot see by eye.",
+        "At 81% specificity, false alarms would still need handling in a real program."
+      ],
+      "details": [
+        "Researchers have built an AI framework called REDMOD that identifies pancreatic cancer on CT scans an average of 475 days before clinical diagnosis, ScienceDaily reports. It analyzes subtle texture patterns in the scans that radiologists cannot see.",
+        "The study, published by the BMJ Group, compared earlier CT scans from 219 patients who were later diagnosed with pancreatic ductal adenocarcinoma against scans from 1,243 cancer-free controls. Patients were 34 to 88 years old, and about 64% of cancers developed in the head of the pancreas.",
+        "Overall sensitivity was 73% for the AI versus 39% for radiologists. For scans taken two or more years before diagnosis, it was 68% versus 23%. Specificity was 81%, meaning it correctly cleared 81% of cancer-free scans, and accuracy reached 87.5% on a public NIH dataset. Results matched in 90 to 92% of cases when the same patients' scans were analyzed months apart.",
+        "The stakes: the authors note that raising the share of localized cases from 10% to 50% would more than double survival rates.",
+        "They also list limits. The study population had limited ethnic diversity, and the system needs prospective testing, especially in high-risk patients such as those with unexplained weight loss or a recent diabetes diagnosis. Researchers say clinical validation is needed before routine use.",
+        "The scary reading to resist is that AI will soon screen everyone; this was a retrospective comparison on selected scans. What to watch: prospective trials and how the false-positive rate behaves in ordinary populations."
+      ],
+      "category": "Health",
+      "tags": [
+        "pancreatic cancer",
+        "ai",
+        "ct scan",
+        "early detection",
+        "radiology",
+        "bmj",
+        "redmod"
+      ],
+      "date": "2026-10-26",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://sciencedaily.com/releases/2026/10/261024222031.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-solid-state-transformers-could-ease-the-five-year",
+      "headline": "Solid-state transformers could ease the five-year wait for grid equipment feeding AI",
+      "summary": "Conventional high-voltage transformers can take five years to get. A 1-megawatt solid-state prototype tested in August reached about 98% efficiency at roughly one-tenth the size, but only at around 15,000 volts so far.",
+      "impacts": [
+        "Transformer shortages are a real bottleneck for utilities, generators and data centers.",
+        "Early use is aimed at data centers, where voltages are lower.",
+        "Scaling to transmission voltages is still a major engineering challenge."
+      ],
+      "details": [
+        "MIT Technology Review reports that transformer supply is a critical bottleneck. Wait times for conventional high-voltage transformers now stretch to five years, which supply-chain analyst Benjamin Boucher calls one of the biggest bottlenecks for utilities, generation developers and even data centers. The devices need specialized labor that is hard to scale, and demand is rising from electric vehicles, data centers and renewables.",
+        "Solid-state transformers redesign the device around semiconductors, usually silicon carbide. They convert incoming AC to DC, then to high-frequency AC through semiconductor switches, use a smaller magnetic component to change voltage, and convert back. N.C. State's Srdjan Lukic says they have roughly one-tenth the size at the same capacity.",
+        "In August 2026 the New York Power Authority and the Electric Power Research Institute tested a one-megawatt unit built in Lukic's lab, described as the first test at that capacity under realistic utility conditions. It reached about 98% efficiency, losing 2% of input energy, versus roughly 96% for a conventional transformer paired with a rectifier. Lukic says that could cut power losses from conventional equipment in half.",
+        "The limits are significant. The prototype ran at about 15,000 volts. Industrial data centers typically need higher voltages, and transmission lines run at hundreds of thousands of volts. Scaling to long-distance transmission is the industry's ultimate goal but needs substantial engineering work.",
+        "Companies are targeting data centers first. Heron Power, which raised $140 million in February, is building a $100 million California factory expected to start production in 2027 and reach 40 gigawatts of annual capacity by 2029.",
+        "Why it matters for risk: without enough transformer capacity, expanding the grid faces severe constraints, which ties to earlier stories here on power limits for AI data centers. What is uncertain: whether the technology can scale in cost and voltage, and whether factories deliver on schedule. What to watch next: further utility pilots and production start dates."
+      ],
+      "category": "Tech",
+      "tags": [
+        "transformers",
+        "power grid",
+        "data centers",
+        "solid-state",
+        "silicon carbide",
+        "ai power",
+        "supply chain"
+      ],
+      "date": "2026-10-27",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/10/27/1147684/solid-state-transformers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-openai-launches-gpt-6-1-terra-agents-3x",
+      "headline": "OpenAI launches GPT-6.1 Terra: agents 3x faster, half the price, 50.3% on Terminal-Bench 4.0",
+      "summary": "OpenAI says GPT-6.1 Terra completes computer-use tasks over three times faster than GPT-6 Astra at $1 per million input tokens and $5 per million output. The benchmarks are the company's own, and it still recommends bigger models for hard coding.",
+      "impacts": [
+        "Cheaper, faster agents make automating computer work affordable for more employers.",
+        "Cheaper agent runs also lower the cost of misuse; defenders will see more automated attempts.",
+        "Vendor benchmarks are not independent verification."
+      ],
+      "details": [
+        "OpenAI released GPT-6.1 Terra on October 26, BleepingComputer reports. It is aimed at computer use, visual reasoning, coding and workplace automation such as filling forms, editing video and reading technical drawings.",
+        "Pricing is $1 per million input tokens and $5 per million output tokens, about half the price of earlier models. OpenAI says Terra finishes tasks more than three times faster than GPT-6 Astra and GPT-6.1 Sol, and costs one-tenth as much per token as Astra while matching its performance.",
+        "Reported figures: the error rate at low reasoning effort fell from 53.6% to 16.7%, and the Terminal-Bench 4.0 coding score rose to 50.3% from 21.5%. OpenAI also says the model hallucinates less, with error rates down 18 percentage points at maximum effort to 4.3%, close to more advanced models.",
+        "It is available now to Plus, Pro, Enterprise and Edu users through ChatGPT Work and Codex, and through the API as gpt-6.1-terra.",
+        "What to be careful about: BleepingComputer notes there is no independent verification of the benchmarks, and the article does not detail limitations. OpenAI itself still recommends more advanced models for complex coding tasks, which suggests Terra has boundaries.",
+        "Why it is on this page: this week's other stories include an arrested hacker who used an autonomous AI pentesting framework to scale attacks. Cheaper and faster agents are not shown to cause crime by themselves, but they change the economics for both builders and attackers. What to watch next: independent evaluations and any misuse reports tied to the new model."
+      ],
+      "category": "AI",
+      "tags": [
+        "openai",
+        "gpt-6.1",
+        "ai agents",
+        "pricing",
+        "coding",
+        "benchmarks",
+        "computer use"
+      ],
+      "date": "2026-10-26",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/artificial-intelligence/openai-launches-gpt-61-terra-with-3x-faster-ai-agents-50-percent-lower-pricing/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-27-chernobyl-fallout-particles-stayed-intact-for-40-years",
+      "headline": "Chernobyl fallout particles stayed intact for 40 years, but researchers urge caution",
+      "summary": "Synchrotron X-ray analysis of six Chernobyl particles found some stable and still trapping radioactive material. The team says six particles from two sites cannot show how contamination behaves everywhere, and outliers will release more later.",
+      "impacts": [
+        "How long radioactive particles hold their contents affects long-term contamination estimates.",
+        "Stability in some particles does not make the Exclusion Zone safe.",
+        "Persistent outliers may release radionuclides later."
+      ],
+      "details": [
+        "Researchers from Helmholtz-Zentrum Dresden-Rossendorf and Leibniz University Hannover examined radioactive particles from the Chernobyl disaster, expecting heavy deterioration after 40 years, ScienceDaily reports. Instead they found that some particles remained surprisingly stable and still trap radioactive substances inside.",
+        "They studied six particles recovered from contaminated Ukrainian soil. Using synchrotron X-ray diffraction at the Rossendorf Beamline in Grenoble, they rotated each particle in a beam about 100 micrometers wide and collected data from 2,000 angles to map its internal crystal structure. The samples were so radioactive that they needed multi-layer containment for transport.",
+        "Lead researcher Tobias Weissenborn described three types: particles chemically similar to uranium dioxide fuel; particles encased in or fused with zirconium from the fuel cladding; and particles formed when the graphite moderator burned, creating fragile uranium oxides such as U3O8.",
+        "The team is explicit about the limits. Every particle has a different structure, and the study covers only six particles from two locations, so it cannot describe the whole contaminated zone. Even if particles generally decay uniformly, Weissenborn said, there will always be outliers, more persistent particles, that release radionuclides later.",
+        "The findings do not argue for loosening restrictions on the Chernobyl Exclusion Zone, and the researchers caution against reading stability as evidence that contamination becomes harmless.",
+        "Further experiments on highly radioactive transuranic phases are under way to understand how nuclear materials change over time. What is uncertain: how representative the six particles are. What to watch: results from the transuranic work and larger sample sets."
+      ],
+      "category": "Climate",
+      "tags": [
+        "chernobyl",
+        "radioactive",
+        "nuclear",
+        "fallout",
+        "synchrotron",
+        "ukraine",
+        "contamination"
+      ],
+      "date": "2026-10-22",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://sciencedaily.com/releases/2026/10/261021231241.htm"
+        }
+      ]
+    }
+  ]
+}
