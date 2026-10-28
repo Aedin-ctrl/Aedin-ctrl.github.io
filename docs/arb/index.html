@@ -43,6 +43,29 @@
   .summary p{font-size:13.5px; color:var(--ink2); margin-top:7px; max-width:66ch;}
 
   /* filters */
+  /* The real-money bar. Deliberately not styled like the rest of the
+     board: the board reports a simulation and this reports spent money,
+     and the two must not be mistakable for one another at a glance. */
+  .realbar{display:flex; align-items:center; gap:10px; margin-bottom:16px;
+           padding:9px 14px; border-radius:999px; text-decoration:none;
+           font-size:13px; font-weight:600; letter-spacing:.01em;
+           border:1px solid var(--line); color:var(--ink);
+           background:var(--card, transparent);}
+  .realbar .dot{width:8px; height:8px; border-radius:50%;
+                background:var(--muted); flex:none;}
+  .realbar .sub{font-weight:400; color:var(--muted); font-size:12px;}
+  .realbar[data-state="done"]{border-color:var(--ok, #2d7); color:var(--ok, #2d7);}
+  .realbar[data-state="done"] .dot{background:var(--ok, #2d7);}
+  .realbar[data-state="attention"]{border-color:var(--warn, #e85);
+                                   color:var(--warn, #e85);}
+  .realbar[data-state="attention"] .dot{background:var(--warn, #e85);}
+  .realbar[data-state="idle"]{opacity:.72;}
+  @media (prefers-reduced-motion: no-preference){
+    .realbar[data-state="done"] .dot,
+    .realbar[data-state="attention"] .dot{animation:rbp 2.4s ease-in-out infinite;}
+  }
+  @keyframes rbp{0%,100%{opacity:1;} 50%{opacity:.35;}}
+
   .pills{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px;}
   .pills button{font:inherit; font-size:12.5px; cursor:pointer; padding:6px 14px;
     border-radius:999px; border:1px solid var(--rule); background:var(--card); color:var(--ink2);
@@ -506,6 +529,13 @@
   </div>
 </div>
 <main>
+  <!-- REAL MONEY, not the paper account. Everything else on this page is
+       simulated or observed; this one line is the record of orders that
+       were actually sent to a venue, published by tradefeed.py from the
+       order journal. It is first because it is the only thing here that
+       can cost anything. -->
+  <a class="realbar" id="realbar" href="#" hidden></a>
+
   <div class="summary" id="summary"></div>
 
   <div class="sig" id="signals" hidden></div>
@@ -2058,6 +2088,36 @@
     box.innerHTML = h;
   }
 
+  // THE REAL-MONEY BAR.
+  //
+  // trades.json counts TRADES (money moved), not attempts. An order that
+  // was sent and filled nothing is in the record and is not a trade, and
+  // a bar that counted it as one would be announcing activity that never
+  // happened -- on the one line of this page about real money.
+  function refreshReal() {
+    fetch(LIVE + "/trades.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const el = document.getElementById("realbar");
+        if (!el || !d) { if (el) el.hidden = true; return; }
+        const state = d.needs_attention ? "attention"
+                    : d.trades_done ? "done" : "idle";
+        el.dataset.state = state;
+        const sub = d.trades_done
+          ? `${d.attempts} order${d.attempts === 1 ? "" : "s"} sent`
+          : "real money armed, nothing filled yet";
+        el.innerHTML = '<span class="dot"></span><span></span>'
+                     + '<span class="sub"></span>';
+        // textContent, not innerHTML: the headline is built from a file
+        // on the Pi and there is no reason for this page to interpret it
+        // as markup.
+        el.children[1].textContent = d.headline || "";
+        el.children[2].textContent = sub;
+        el.hidden = false;
+      })
+      .catch(() => {});
+  }
+
   function refreshSys() {
     fetch(LIVE + "/status.json", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
@@ -2103,11 +2163,15 @@
   }
 
   refreshBoard(true).then(() => {
-    refreshPaper(); refreshMoney(); refreshSys();
+    refreshPaper(); refreshMoney(); refreshSys(); refreshReal();
     setInterval(refreshBoard, 5000);
     setInterval(refreshPaper, 20000);
     setInterval(refreshMoney, 60000);
     setInterval(refreshSys, 30000);
+    // 15s: this is the line someone checks from a phone to find out
+    // whether a trade landed, so it should not be the stalest thing on
+    // the page. tradefeed.py rewrites the file every 20s.
+    setInterval(refreshReal, 15000);
   });
 })();
 </script>
