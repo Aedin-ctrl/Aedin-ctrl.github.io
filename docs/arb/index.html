@@ -66,6 +66,47 @@
   }
   @keyframes rbp{0%,100%{opacity:1;} 50%{opacity:.35;}}
 
+  /* THE LIVE RUN PANEL.
+     The real-money bar above answers "what has happened". This answers
+     "what is happening", which between trades is the only question with
+     an answer -- and on the measured evidence, between trades is almost
+     all of the time. A run that died looks exactly like a run that is
+     watching unless something says so. */
+  .runp{border:1px solid var(--line); border-radius:14px; background:var(--card);
+        padding:14px 16px; margin-bottom:16px;}
+  .runp .top{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
+  .runp .dot{width:9px; height:9px; border-radius:50%; background:var(--muted);
+             flex:none;}
+  .runp .st{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+            letter-spacing:-0.01em;}
+  .runp .when{color:var(--muted); font-size:12px; margin-left:auto;}
+  .runp .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr));
+              gap:10px 14px; margin-top:12px;}
+  .runp .k{color:var(--muted); font-size:11px; text-transform:uppercase;
+           letter-spacing:.06em;}
+  .runp .v{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;
+           margin-top:2px;}
+  .runp .v small{font-weight:400; font-size:11.5px; color:var(--muted);}
+  .runp .note{color:var(--ink2); font-size:12.5px; margin-top:11px;
+              padding-top:11px; border-top:1px solid var(--line);}
+  .runp .att{margin-top:10px; font-size:12.5px; color:var(--ink2);}
+  .runp .att div{padding:3px 0; border-top:1px dotted var(--line);}
+  .runp .att div:first-child{border-top:0;}
+  .runp[data-state="watching"] .dot{background:var(--live);}
+  .runp[data-state="watching"]{border-color:var(--liveline);}
+  .runp[data-state="stalled"] .dot,
+  .runp[data-state="attention"] .dot{background:var(--bad);}
+  .runp[data-state="stalled"],
+  .runp[data-state="attention"]{border-color:var(--bad);}
+  .runp[data-state="stalled"] .st,
+  .runp[data-state="attention"] .st{color:var(--bad);}
+  .runp[data-state="stopped"] .dot{background:var(--warn);}
+  .runp[data-state="stopped"]{border-color:var(--warn);}
+  .runp[data-state="idle"],.runp[data-state="finished"]{opacity:.8;}
+  @media (prefers-reduced-motion: no-preference){
+    .runp[data-state="watching"] .dot{animation:rbp 2.4s ease-in-out infinite;}
+  }
+
   .pills{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px;}
   .pills button{font:inherit; font-size:12.5px; cursor:pointer; padding:6px 14px;
     border-radius:999px; border:1px solid var(--rule); background:var(--card); color:var(--ink2);
@@ -535,6 +576,13 @@
        order journal. It is first because it is the only thing here that
        can cost anything. -->
   <a class="realbar" id="realbar" href="#" hidden></a>
+
+  <!-- LIVE RUN STATE, from runfeed.py on the Pi. Separate from the bar
+       above on purpose: that one is the record of money that moved,
+       this one is whether anything is running right now. Between
+       trades the record is silent, and silence is the expected state,
+       so without this a dead run and a patient one look identical. -->
+  <section class="runp" id="runp" hidden></section>
 
   <div class="summary" id="summary"></div>
 
@@ -2118,6 +2166,116 @@
       .catch(() => {});
   }
 
+  // THE LIVE RUN.
+  //
+  // Everything from the feed goes in with textContent, never innerHTML:
+  // the strings are built on the Pi and there is no reason for this page
+  // to interpret any of them as markup.
+  function refreshRun() {
+    fetch(LIVE + "/run.json", { cache: "no-store" })
+      .then(r => r.ok ? r.json() : null)
+      .then(d => {
+        const box = document.getElementById("runp");
+        if (!box || !d) { if (box) box.hidden = true; return; }
+        const attention = d.trades && d.trades.needs_attention;
+        box.dataset.state = attention ? "attention" : (d.state || "idle");
+
+        const cell = (k, v, sub) => {
+          const c = document.createElement("div");
+          const kk = document.createElement("div");
+          kk.className = "k"; kk.textContent = k;
+          const vv = document.createElement("div");
+          vv.className = "v"; vv.textContent = v;
+          if (sub) { const sm = document.createElement("small");
+                     sm.textContent = " " + sub; vv.appendChild(sm); }
+          c.appendChild(kk); c.appendChild(vv);
+          return c;
+        };
+        const money = n => (n === null || n === undefined || isNaN(n))
+          ? "--" : "$" + Number(n).toFixed(2);
+
+        box.textContent = "";
+        const top = document.createElement("div");
+        top.className = "top";
+        const dot = document.createElement("span"); dot.className = "dot";
+        const st = document.createElement("span"); st.className = "st";
+        st.textContent = d.headline || d.state || "";
+        const when = document.createElement("span"); when.className = "when";
+        const age = d.generated
+          ? Math.max(0, Math.round((Date.now() - new Date(d.generated)) / 1000))
+          : null;
+        when.textContent = age === null ? "" : age + "s ago";
+        top.appendChild(dot); top.appendChild(st); top.appendChild(when);
+        box.appendChild(top);
+
+        const g = document.createElement("div"); g.className = "grid";
+        g.appendChild(cell("orders",
+          (d.orders_used === null || d.orders_used === undefined ? "--" : d.orders_used)
+          + " / " + (d.orders_cap || "--"), "sent today"));
+        g.appendChild(cell("time left",
+          d.minutes_left === null || d.minutes_left === undefined
+            ? "--" : Math.max(0, Math.round(d.minutes_left)) + "m",
+          d.expires ? "ends " + d.expires : ""));
+        const b = d.last_beat || {};
+        g.appendChild(cell("best now",
+          b.raw_c === undefined || b.raw_c === null
+            ? "--" : b.raw_c.toFixed(2) + "c",
+          "floor " + (d.floor_c === null || d.floor_c === undefined
+            ? "--" : "+" + d.floor_c.toFixed(2) + "c")));
+        const tr = d.trades || {};
+        g.appendChild(cell("realised",
+          tr.realised === null || tr.realised === undefined
+            ? "--" : (tr.realised >= 0 ? "+" : "") + "$" + Math.abs(tr.realised).toFixed(4),
+          "all time"));
+        const sp = d.spendable || {};
+        g.appendChild(cell("kalshi", money(sp.kalshi), "crypto shard"));
+        g.appendChild(cell("polymarket", money(sp.polymarket_us), ""));
+        g.appendChild(cell("gemini", money(sp.gemini), ""));
+        box.appendChild(g);
+
+        // Recent attempts. An order that filled nothing is still worth
+        // showing: it is the difference between "watching" and "trying
+        // and missing", and those two look the same in the trade record.
+        const att = (d.attempts || []).slice(-4).reverse();
+        if (att.length) {
+          const a = document.createElement("div"); a.className = "att";
+          att.forEach(x => {
+            const row = document.createElement("div");
+            const legs = (x.legs || []).map(l =>
+              l.venue + " " + l.http + (l.filled ? " filled " + l.filled : " filled 0")
+            ).join("  |  ");
+            row.textContent = "attempt " + x.n + " -- "
+              + (x.outcome || "in flight") + (legs ? "  (" + legs + ")" : "");
+            a.appendChild(row);
+          });
+          box.appendChild(a);
+        }
+
+        const note = document.createElement("div"); note.className = "note";
+        if (attention) {
+          note.textContent = "A position needs looking at. Check the "
+            + "venue accounts before starting anything else.";
+        } else if (d.state === "stalled") {
+          note.textContent = "The process is up but has not printed for a "
+            + "while. That is not the same as watching -- check the log.";
+        } else if (d.state === "stopped") {
+          note.textContent = "The kill switch is set. Remove it before the "
+            + "next run: rm ~/sportsarb/STOP";
+        } else if (d.state === "idle") {
+          note.textContent = "Nothing is running. Nothing can be sent.";
+        } else if (d.state === "finished") {
+          note.textContent = "The run ended: " + (d.ended || "");
+        } else {
+          note.textContent = "Watching both books. It only sends when a "
+            + "pair clears the floor, so sending nothing is the normal "
+            + "state. Stop it with: touch ~/sportsarb/STOP";
+        }
+        box.appendChild(note);
+        box.hidden = false;
+      })
+      .catch(() => {});
+  }
+
   function refreshSys() {
     fetch(LIVE + "/status.json", { cache: "no-store" })
       .then(r => r.ok ? r.json() : null)
@@ -2163,7 +2321,7 @@
   }
 
   refreshBoard(true).then(() => {
-    refreshPaper(); refreshMoney(); refreshSys(); refreshReal();
+    refreshPaper(); refreshMoney(); refreshSys(); refreshReal(); refreshRun();
     setInterval(refreshBoard, 5000);
     setInterval(refreshPaper, 20000);
     setInterval(refreshMoney, 60000);
@@ -2172,6 +2330,9 @@
     // whether a trade landed, so it should not be the stalest thing on
     // the page. tradefeed.py rewrites the file every 20s.
     setInterval(refreshReal, 15000);
+    // 10s: this is the line that says whether anything is running at
+    // all, and runfeed.py rewrites the file every 15s.
+    setInterval(refreshRun, 10000);
   });
 })();
 </script>
