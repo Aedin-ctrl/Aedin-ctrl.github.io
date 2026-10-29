@@ -1,0 +1,719 @@
+{
+  "date": "2026-10-29",
+  "generated": "2026-10-29T15:06:11.322Z",
+  "articles": [
+    {
+      "id": "2026-10-29-lumen-volt-typhoons-silent-train-relay-network-backed",
+      "headline": "Lumen: Volt Typhoon's 'Silent Train' relay network backed four zero-day campaigns",
+      "summary": "Lumen's Black Lotus Labs says China-linked Volt Typhoon built a relay network from hijacked routers and IoT devices and used it in four zero-day campaigns against management systems. It tracked the network for about three years.",
+      "impacts": [
+        "Management tools like SD-WAN controllers can open a path into every customer behind them.",
+        "Traffic routed through hijacked home and office devices can look like ordinary local activity.",
+        "Utilities, telecoms and emergency services were among the named target sectors.",
+        "Internet-facing admin pages on routers and appliances are the weak point defenders are told to close."
+      ],
+      "details": [
+        "Black Lotus Labs, the threat research arm of Lumen, published research on a covert access network it calls Silent Train. It attributes the network to Volt Typhoon, a state-sponsored Chinese group active since at least 2021 that focuses on critical infrastructure such as communications, energy, transportation and water. BleepingComputer and The Hacker News both reported the findings on October 28.",
+        "Silent Train is a chain of relays. Operators route traffic through rented servers outside the US, then through compromised small-office, home-office and IoT devices abroad, and finally through compromised devices inside the US that act as exit points. The researchers say at least 27 classes of device were used, from consumer routers to enterprise firewalls. They name Intelbras modems as overseas relays and Netgear Orbi devices as US hops. Sessions were short, from minutes to several hours, and the tooling was removed afterward. By early 2025 the network had become hybrid, keeping some enterprise devices for one to three months.",
+        "The report links the network to four confirmed zero-day campaigns, meaning flaws exploited before a patch existed: CVE-2024-39717 in Versa Director, CVE-2025-8875 and CVE-2025-8876 in N-able N-central, CVE-2026-20127 in Cisco Catalyst SD-WAN, and CVE-2026-16812 in VeloCloud Orchestrator. A suspected fifth zero-day in Quest KACE, patched in October 2025, is described only as likely, with more than 30 victims.",
+        "The target list is broad: telecommunications, government, defense contractors, satellite providers, universities, IT firms and managed service providers, utilities, rail, aviation and emergency services. In the US, the researchers saw the most activity in Hawaii, California and Texas. They describe hundreds of victims but do not name specific organizations.",
+        "What is proven and what is assessed differ. The exploited flaws and device types are findings from the researchers' telemetry. The attribution to Volt Typhoon, the victim counts, the idea that the network was held back for high-value targets, and the Indo-Pacific motive are the researchers' own assessments, not independently verified. Both articles describe the network as disrupted, but neither says it is fully dismantled.",
+        "Black Lotus Labs advises restricting internet exposure of administrative interfaces, patching quickly, centralizing logs with longer retention, and watching for unusual admin activity. The point is that the control layer of a network is the high-value target, not the individual device."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "volt typhoon",
+        "china",
+        "zero-day",
+        "critical infrastructure",
+        "espionage",
+        "cisco"
+      ],
+      "date": "2026-10-28",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/volt-typhoon-hides-zero-day-attacks-using-silent-train-framework/"
+        },
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/volt-typhoon-used-covert-silent-train.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-a-hacker-says-they-leaked-data-on-40",
+      "headline": "A hacker says they leaked data on 40,000 DHS staff, including CBP and ICE agents",
+      "summary": "TechCrunch reports that records on more than 40,000 Homeland Security employees and contractors were published after an undisclosed breach. The hacker claims it came from DHS's Okta login system; Okta says it has no evidence of compromise.",
+      "impacts": [
+        "Names, cell numbers and office locations of federal agents are now public and cannot be pulled back.",
+        "The group memberships show which surveillance tools staff are set up to use.",
+        "Federal workers could face doxxing, harassment or phishing built on real contact details.",
+        "Unclear whether the hole is closed, so more data could follow."
+      ],
+      "details": [
+        "TechCrunch reported on October 28 that personal data on more than 40,000 Department of Homeland Security employees and contractors was published online after a breach earlier this year that DHS had not publicly disclosed. The data includes names, job titles and work contact details such as email addresses, cell numbers and office locations.",
+        "By TechCrunch's count, roughly 21,000 records relate to Customs and Border Protection, about 10,000 to ICE and its Homeland Security Investigations unit, and just under 1,000 to CISA, the cyber agency. Thousands more cover headquarters and other components such as USCIS and the Federal Protective Service. The total is about one-fifth of DHS's workforce of roughly 220,000. Timestamps suggest the records were taken around mid-August.",
+        "TechCrunch says it verified part of the data by matching names of known employees against an offline copy of the database. The data was given to journalist maia arson crimew and then posted to DDoSecrets, a leak-publishing group.",
+        "The dataset also includes Active Directory group memberships, which show who has access to what. About 4,500 users appear in a group named for the Headspace meditation app, and dozens of groups reference Penlink, a location-tracking vendor. One group lists more than 200 CBP users of Mobile Fortify, a facial-recognition app. Headspace told TechCrunch it has provided no services to DHS or ICE since a 2023 contract ended; Penlink did not respond.",
+        "How it happened is unverified. A hacker calling themselves 'Department of Peace' claims the data came from DHS's Okta single sign-on system and wrote, 'They have our information, so it's only fair that we have theirs.' The hacker did not answer TechCrunch's questions. Okta said it has 'no evidence our data or systems were compromised.' DHS said it is 'aware of a potential breach' and working to address it. It is unclear whether the underlying weakness has been fixed.",
+        "TechCrunch places it in a run of US government breaches this year, including reported thefts of FBI agents' records and Pentagon personnel data, and notes it is DHS's second breach this year after the same hacker claimed contract data in March."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "dhs",
+        "data breach",
+        "ice",
+        "cbp",
+        "facial recognition",
+        "okta",
+        "leak"
+      ],
+      "date": "2026-10-28",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/28/hacker-stole-personnel-data-about-thousands-of-homeland-security-employees-including-cbp-and-ice-agents/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-googles-gemini-4-carbon-claims-a-firm-lead",
+      "headline": "Google's Gemini 4 Carbon claims a 'firm lead' on finding and exploiting bugs",
+      "summary": "Google says its new Gemini 4 Carbon scores 88.2% finding bugs, 54.8% exploiting them and 71.0% patching them on three security benchmarks. Access is limited to cyber defenders, and the numbers are Google's own.",
+      "impacts": [
+        "Frontier labs are now competing on offensive security skill, not only defense.",
+        "Restricted access means outsiders cannot yet check the results.",
+        "Faster bug-finding shortens the time defenders have between disclosure and exploitation.",
+        "Several labs saying their models hit cyber risk thresholds in the same week points to a trend."
+      ],
+      "details": [
+        "The Hacker News reported on October 29 that Google unveiled Gemini 4 Carbon, a frontier model it pitches for cybersecurity and long tasks. Google DeepMind's Koray Kavukcuoglu said it takes a 'firm lead' on three benchmarks: SEC-bench Pro at 88.2% for finding vulnerabilities, ExploitGym at 54.8% for exploitation, and CWE-bench at 71.0% for patching.",
+        "Those figures come from Google. The article does not explain how the benchmarks are built or scored, and there is no third-party replication. Google also says the model is 'reportedly' twice as likely to write secure code as Gemini 4 Argon, which launched less than a week earlier, that it resisted every indirect prompt-injection attempt it was tested against, and that it asks for human input on ambiguous tasks instead of guessing. Those claims come without supporting data in the article.",
+        "On the Artificial Analysis Intelligence Index, a general-purpose ranking rather than a security test, Carbon scored 59, ahead of Claude Opus 5.5 at 58, GPT-6 Astra at 57 and GPT-6.1 Sol at 55. The article does not say how that index was run.",
+        "Access is restricted. Like Argon, Carbon starts with a subset of cyber defenders, with wider access planned for trusted partners through Google's Fairwind Program. Google says it takes part in the US government's voluntary pre-release model testing.",
+        "The release lands in a busy week. OpenAI shipped GPT-6.1 Terra and says it 'meets the Critical threshold in cybersecurity' under its Preparedness Framework, a claim the article repeats without independent verification. Anthropic recently disclosed that an unreleased internal model found serious flaws, including a one-click Chrome remote code execution bug and a Safari exploit chain; the article says Google, Apple and Microsoft have fixed them.",
+        "What to watch: whether independent testers get access and reproduce the scores, and whether defenders gain more from these tools than attackers do."
+      ],
+      "category": "AI",
+      "tags": [
+        "gemini",
+        "google",
+        "ai hacking",
+        "exploit",
+        "vulnerability",
+        "benchmark",
+        "openai"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/googles-gemini-4-carbon-leads.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-rubin-data-yields-2026-ed138-a-candidate-sixth",
+      "headline": "Rubin data yields 2026 ED138, a candidate sixth dwarf planet; its finder suspected a bug",
+      "summary": "A search program run on Vera Rubin Observatory data flagged a distant object about 46 au out, estimated at 600 to 1,500 km across. It is a candidate, not a confirmed dwarf planet.",
+      "impacts": [
+        "Rubin's survey is expected to turn up many more distant bodies, reshaping the map of the outer Solar System.",
+        "Large objects hiding near the Milky Way's plane show how much of the sky earlier surveys missed.",
+        "A wide size range means the object's classification is not yet settled."
+      ],
+      "details": [
+        "The Register reported on October 29 that a strong candidate for the Solar System's sixth known dwarf planet, 2026 ED138, was found in data from the Vera C. Rubin Observatory in Chile. The observatory is run by the US National Science Foundation and Department of Energy, and its 3200-megapixel LSST Camera came online in June 2026.",
+        "The find came from search code written by Matthew Holman of the Center for Astrophysics, Harvard & Smithsonian, and colleague Kevin Napier, run on data taken before the full survey began. On October 13 it flagged an object that was bright and distant, which suggested it might be unusually large. Holman said his first reaction was 'excited disbelief' and that he checked whether he or the code had made an error. Other astronomers then searched older records and found about ten years of relevant observations.",
+        "The Minor Planet Center reviewed the work and announced the object. Its orbit sits at roughly 46 astronomical units from the Sun, beyond Pluto's average of 40. Estimates put its diameter between 600 and 1,500 km. At the low end it would be the smallest dwarf planet yet; at the high end it would be smaller than Pluto, Eris and Haumea but bigger than Makemake and Ceres.",
+        "It was hard to spot because it lies near the plane of the Milky Way, where it blends into billions of stars. Rubin's repeated survey of the southern sky and its algorithms for tracking moving objects made the detection possible.",
+        "The caveats matter. This is a candidate, the size range is wide because the brightness depends on how reflective it is, and certification depends on further review under the International Astronomical Union's definition of a dwarf planet."
+      ],
+      "category": "Space",
+      "tags": [
+        "dwarf planet",
+        "rubin observatory",
+        "solar system",
+        "astronomy",
+        "kuiper belt"
+      ],
+      "date": "2026-10-29",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/science/2026/10/29/boffins-software-found-a-possible-dwarf-planet-a-result-so-rare-he-thought-it-must-be-a-bug/5306204"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-microsoft-offers-voluntary-buyouts-to-about-60-000",
+      "headline": "Microsoft offers voluntary buyouts to about 60,000 employees as it retools for AI",
+      "summary": "Microsoft confirmed it is offering a 'Voluntary Exit Offer' to roughly 60,000 employees in the US, Canada, India and the UK. How many will accept is unknown.",
+      "impacts": [
+        "A company with about 223,000 staff is inviting more than a quarter of them to leave.",
+        "Buyouts are voluntary, but they signal what roles the company expects to need less of.",
+        "Other large employers may copy the approach as they shift spending toward AI."
+      ],
+      "details": [
+        "TechCrunch reported on October 26 that Microsoft confirmed it is offering voluntary buyouts to around 60,000 employees. Business Insider reported it first, and Bloomberg reported that divisions including Xbox, Windows, Copilot and Finance are taking part.",
+        "Employees at vice-president level and below on select teams in the US, Canada, India and the UK are eligible. Some groups are excluded, including data center staff and sales and marketing. Per the report, terms resemble Microsoft's standard severance.",
+        "Chief people officer Amy Coleman wrote in a note to staff, also posted on Microsoft's blog, that the offer 'gives eligible employees who may be considering a future outside the company a new choice.' She also said 'The Voluntary Exit Offer is new for us,' and that the company will learn from it.",
+        "For scale, Microsoft's headcount was about 223,000 at the end of June. Earlier this year it offered buyouts to retirement-age employees, and Bloomberg reported that more than 30% of roughly 8,750 eligible workers accepted.",
+        "Caveats: 60,000 is an approximate figure, the participating divisions and exclusions come from Bloomberg and Business Insider rather than Microsoft, and the acceptance rate is unknown. Microsoft says there is 'no one-size-fits-all approach,' so the effect will differ by team."
+      ],
+      "category": "Economy",
+      "tags": [
+        "microsoft",
+        "layoffs",
+        "jobs",
+        "ai",
+        "workforce",
+        "buyouts"
+      ],
+      "date": "2026-10-26",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/26/microsoft-offers-buyouts-to-around-60000-employees-reports-say/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-a-retrovirus-family-silenced-a-brain-gene-in",
+      "headline": "A retrovirus family silenced a brain gene in chimps but is absent in humans, a study finds",
+      "summary": "Lund University researchers report that PTERV1 retrovirus insertions, found in chimpanzees but not humans, switch off the gene LINC00662, which is active in human brain development. The work used lab-grown brain organoids.",
+      "impacts": [
+        "It offers a concrete, testable mechanism for part of why human and chimp brains diverged.",
+        "Suggests that long-dead infections may have shaped brain evolution.",
+        "Organoid results do not show what happens in living brains."
+      ],
+      "details": [
+        "404 Media's October 24 newsletter pointed to a Science Advances paper titled 'Retroviral insertions contributed to the divergence of human and chimpanzee brains,' by Patricia Gerdes, Ofelia Karlsson, Raquel Garza, Diahann Atacho and colleagues, led by researchers at Lund University.",
+        "The human brain is roughly three times the size of a chimpanzee's, with more cortical neurons and denser connections, but the genetic causes are poorly understood. The team identified a family of endogenous retroviruses, called PTERV1, that is common in chimpanzees but absent from the human genome.",
+        "Chimpanzee-specific PTERV1 insertions on chromosome 19 silence a gene called LINC00662. That gene is active during human brain development, where it influences how neurons mature and grow. Its silencing in chimps therefore points to a possible difference in neural development. PTERV1 elements also appear in bonobos and gorillas, which suggests the infections happened in an ancestor of the African apes roughly 5 to 7 million years ago.",
+        "The team used brain organoids, small clusters of neurons grown from stem cells, from both humans and chimpanzees. Organoids model some aspects of early development but not the whole brain.",
+        "The authors say humans lack PTERV1 either because human and chimp ancestors did not share a habitat at the time, or because the human ancestor's germline cells resisted infection. Both remain hypotheses. The study identifies a mechanism in lab tissue; it does not directly show how the insertions changed brain size or cognition in living animals, and retroviruses are far from the only factor."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "evolution",
+        "retrovirus",
+        "organoids",
+        "chimpanzee",
+        "genetics"
+      ],
+      "date": "2026-10-24",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/an-ancient-virus-explains-why-the-human-brain-is-special/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-attackers-hit-61-github-repos-in-under-an",
+      "headline": "Attackers hit 61 GitHub repos in under an hour by hiding commands in issues",
+      "summary": "Radware found at least 83 malicious posts aimed at 61 projects including Trivy, MLflow and Brave. The goal looks like stealing CI/CD secrets; researchers could confirm the command ran in only two cases.",
+      "impacts": [
+        "No repository access was needed, since anyone can open an issue or comment.",
+        "Automated workflows that paste outside text into shell commands become a way in.",
+        "Stolen build tokens could be used to tamper with software that downstream users trust."
+      ],
+      "details": [
+        "The Register reported on October 29 that Radware researchers Gabi Nakibly and Zvika Babo found at least 83 malicious attacks against 61 public GitHub repositories. Targets included Google LangExtract, Trivy, the Brave browser, MLflow, Podman, discord.js, Cilium, Homebrew Cask and PX4-Autopilot, some with tens of thousands of stars. They found it while studying prompt injection on GitHub.",
+        "The campaign was fast: 77 of the malicious items were posted within a 43-minute window on September 1, and the other six within the next two minutes. The researchers believe one person ran it using 74 GitHub accounts, many with real development histories, which suggests the accounts were compromised.",
+        "The method is simple. The attacker posts an issue, pull request or comment with commands hidden in HTML comments, which do not show on the rendered page. If a repository's automation reacts to that event, it can run within a second. If the workflow pastes the text into a shell command unsafely, the hidden command runs, collects environment variables and tries to send them to a server the attacker controls.",
+        "The limits matter. As of October 13 the team had verified 83 items across 61 repositories, and found logs showing the command actually ran in the automation environment in two cases. They could not tell whether the attacker gained write access, changed source code or compromised downstream software. They disclosed to maintainers, and most affected repositories were closed or fixed, though they could not confirm all.",
+        "Radware recommends least-privilege workflow permissions, separating externally triggered workflows from jobs that hold secrets, treating all external content as untrusted, and limiting which secrets workflows can see."
+      ],
+      "category": "Tech",
+      "tags": [
+        "github",
+        "supply chain",
+        "ci/cd",
+        "prompt injection",
+        "credentials",
+        "open source"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/29/attackers-turn-github-issues-into-supply-chain-campaign-against-61-public-repos-in-less-than-an-hour/5306153"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-senators-press-meta-on-whether-smart-glasses-footage",
+      "headline": "Senators press Meta on whether smart-glasses footage of bystanders trains its AI",
+      "summary": "In a letter, the two senators cite Meta's own disclosures that imagery from the glasses' AI features may be retained and used for training, sometimes with human reviewers. 404 Media reports no Meta response yet.",
+      "impacts": [
+        "People filmed by the glasses never agreed to have their image used for AI training.",
+        "Reports describe stalking and harassment after videos were posted with personal details.",
+        "Users have modded glasses to disable the recording light, undermining the main privacy safeguard."
+      ],
+      "details": [
+        "404 Media reported on October 29 that Senators Ron Wyden of Oregon and Edward Markey of Massachusetts sent Meta a letter demanding answers on the privacy risks of its smart glasses. It cites 404 Media's October 2025 investigation, which found men using Meta's Ray-Ban glasses to film massage parlor workers while soliciting sex, with videos posted to Instagram accounts that had hundreds of thousands of followers.",
+        "The senators argue Meta's own disclosures indicate that imagery processed by the glasses' visual AI features may be retained and used for AI training, sometimes with human reviewers. They write that 'using intimate imagery for AI development is itself an invasion of privacy.' They ask what safeguards exist against nonconsensual capture, whether Meta evaluated the glasses' potential to enable voyeurism, what imagery it uses for training, and whether people can have biometric data deleted.",
+        "The letter sits on a pile of other reports: an August 2026 study of influencers filming strangers, a January BBC report on a woman stalked after her number was posted with a video of her, a lawsuit by more than 70 people alleging intimate images reached contractors labeling AI data, and March reporting by Swedish journalists that Kenyan data labelers viewed uncensored footage. Per the BBC, Meta ended that contract less than two months later. In August Meta also filed a patent for facial recognition and highlight-reel features.",
+        "What is established: the letter, the 2025 investigation, the contract termination and the patent filing. The harms described rest largely on reports, lawsuits and the senators' own assertions; the lawsuit claims are allegations with no ruling reported. 404 Media's article does not include a Meta response."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "meta",
+        "smart glasses",
+        "privacy",
+        "facial recognition",
+        "ai training",
+        "senators"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/senators-wyden-markey-letter-to-meta-smart-glasses/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-artemis-i-mannequins-radiation-near-the-moon-spreads",
+      "headline": "Artemis I mannequins: radiation near the Moon spreads evenly, unlike on the space station",
+      "summary": "Polish researchers analyzed crystal detectors flown around the Moon in 2022 and report an even dose across the mannequins. Near-Moon doses are higher than in low Earth orbit, but by less than many expect. The authors call the results preliminary.",
+      "impacts": [
+        "Crews heading past Earth's magnetic shield face galactic cosmic rays with no Van Allen belt filtering.",
+        "Small wearable crystal detectors could let astronauts carry personal dose trackers.",
+        "Real crew dose, not mannequin dose, is still the open question for longer missions."
+      ],
+      "details": [
+        "ScienceDaily reported on October 28 on a paper in Radiation Measurements (2026, vol. 198) from the Henryk Niewodniczanski Institute of Nuclear Physics in Cracow, by P. Bilski, A. Kilian, M. Sankowska, T. Horwacik and T. Berger. It analyzes detectors flown on NASA's uncrewed Artemis I mission around the Moon in late 2022.",
+        "Two human-shaped mannequins in the Orion capsule carried more than 10,000 small crystals that recorded radiation. The Cracow institute supplied several dozen experimental fluorescent lithium fluoride detectors and nearly 600 conventional thermoluminescent ones. Particles create color centers in the crystals; blue light then makes them glow red, and a microscope reveals particle tracks without chemical etching.",
+        "Corrected for background glow, the new detectors agreed with conventional track detectors to within 15% across their overlapping energy range, and also recorded tracks below the older devices' threshold.",
+        "Near the Moon, dose was spread almost uniformly through the mannequins. On the International Space Station an earlier experiment showed uneven dose, because low-energy protons trapped in the Van Allen belts deposited energy at shallow depths. Total dose near the Moon is higher than in low Earth orbit, mainly from galactic cosmic rays, but the difference is smaller than many would expect.",
+        "The authors call the measurements preliminary. Cosmic radiation arrives from all directions with many particle types and energies, which makes track interpretation hard, and the team needed complex calibration software. The article gives no absolute dose values, and mannequins are not people."
+      ],
+      "category": "Space",
+      "tags": [
+        "artemis",
+        "radiation",
+        "moon",
+        "astronauts",
+        "cosmic rays",
+        "nasa"
+      ],
+      "date": "2026-10-28",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261027063659.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-cisco-patches-an-exploited-zero-day-that-crashes",
+      "headline": "Cisco patches an exploited zero-day that crashes ASA and FTD firewalls",
+      "summary": "Cisco fixed CVE-2026-76418, a flaw an unauthenticated attacker can use to make firewalls with SSL VPN enabled reload. Cisco says it is being exploited but has not said by whom.",
+      "impacts": [
+        "A crashed perimeter firewall can cut off remote workers and branch offices.",
+        "Cisco has had repeated exploited flaws in this product line this year.",
+        "Cisco published no indicators of compromise, so defenders cannot easily check for past attacks."
+      ],
+      "details": [
+        "BleepingComputer reported on October 29 that Cisco released updates for CVE-2026-76418, a high-severity denial-of-service flaw in Adaptive Security Appliance and Firepower Threat Defense software. An unauthenticated remote attacker can trigger it with a crafted request while connecting to the SSL remote access VPN, causing the device to reload.",
+        "It affects devices with the 'webvpn' keyword configured and SSL VPN enabled on at least one interface. Cisco attributes it to 'logic errors when secondary authentication is configured on a tunnel group.' Its product security team learned of active exploitation in October 2026.",
+        "Cisco has not published indicators of compromise or said who is targeted or behind the attacks, and offers no workaround, though administrators who cannot patch right away can disable secondary authentication on the default or any custom tunnel group. Shadowserver counts more than 51,000 Cisco ASA SSL VPN devices exposed online, without saying how many are patched or are honeypots.",
+        "BleepingComputer notes a pattern: two ASA and FTD zero-days tied to the ArcaneDoor campaign in 2025, another exploited denial-of-service zero-day (CVE-2026-20349) in August 2026, and an exploited Secure Email Gateway zero-day earlier this month. Since November 2021 CISA has listed 101 Cisco flaws as exploited, seven also used by ransomware groups.",
+        "This flaw crashes devices rather than giving access, so the direct harm is outage. Whether it is being used as a stepping stone to something else is not stated."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "cisco",
+        "zero-day",
+        "firewall",
+        "vpn",
+        "exploited",
+        "cisa"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/cisco-warns-of-firewall-zero-day-exploited-to-crash-ssl-vpn-devices/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-crowdstrike-warp-panda-used-a-vmware-esx-zero",
+      "headline": "CrowdStrike: Warp Panda used a VMware ESX zero-day to hide from audit logs at law firms",
+      "summary": "CISA added CVE-2026-41709 to its exploited-flaws list after CrowdStrike said Warp Panda used it in early 2026 against the US legal sector. The bug is rated low severity, yet it lets an admin act without being logged.",
+      "impacts": [
+        "A low severity score can hide a flaw that is valuable to a stealthy attacker.",
+        "Law firms hold client secrets that make them espionage targets.",
+        "Stolen session tokens and rogue MFA devices can keep access alive after a password reset."
+      ],
+      "details": [
+        "The Hacker News reported on October 29 that CISA added Broadcom VMware ESX flaw CVE-2026-41709 to its Known Exploited Vulnerabilities catalog on October 28, after CrowdStrike disclosed that a China-nexus actor it calls Warp Panda used it against the US legal sector.",
+        "The flaw is rated CVSS 2.7 and is an insufficient-logging bug: an attacker with admin access can perform certain operations without them being recorded. Broadcom disclosed it in a July 2026 advisory and shipped fixes. CrowdStrike's 2026 Legal Threat Landscape Report says Warp Panda exploited it as a zero-day in early 2026 to reduce audit trail visibility.",
+        "CrowdStrike says the group typically enters through internet-facing edge devices, then moves into VMware vCenter to deploy malware such as BRICKSTORM and SharpStorm. In some intrusions it stole session tokens to reach Microsoft 365 without setting off credential alerts, and in at least one case registered a new MFA device on a compromised account, which would preserve access after a password reset. The group has a history of zero-days in Citrix NetScaler and Ivanti Connect Secure.",
+        "Separately, Mandiant earlier in October attributed a BeyondTrust Remote Support zero-day (CVE-2026-102764, CVSS 9.3) to the same group, according to the article. Federal civilian agencies have until November 11 to apply the fixes.",
+        "Caveats: the article relies on CrowdStrike's report and gives no independent technical analysis, and the Mandiant link is reported secondhand."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "vmware",
+        "china",
+        "zero-day",
+        "crowdstrike",
+        "espionage",
+        "cisa",
+        "mfa"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/china-linked-hackers-exploited-vmware.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-belgiums-tax-agency-confirms-a-cyberattack-and-pulls",
+      "headline": "Belgium's tax agency confirms a cyberattack and pulls its tax portal offline",
+      "summary": "FOD Financiën says it stopped the attack within hours and sees no sign of a data breach, but MyMinfin, Tax-on-web and Biztax are down and will return only in an isolated environment. An October 31 deadline moves to November 16.",
+      "impacts": [
+        "Taxpayers lost access to the main government tax portal during filing season.",
+        "Restoring services in an isolated environment means a slow recovery.",
+        "The 'no data compromised' statement is early and could change."
+      ],
+      "details": [
+        "The Register reported on October 29 that Belgium's finance and tax agency, FOD Financiën, confirmed a cyberattack on Wednesday, October 28, and took several digital services offline. Its main online portal MyMinfin was temporarily unavailable, as were Tax-on-web and Biztax. Other applications remain available in full or part.",
+        "Spokesperson Francis Adyns said the attack was stopped within hours and could not be expanded enough to take over applications or reach data. Potentially infected elements were isolated, and the agency says there is currently no indication of a data breach, though it is still investigating.",
+        "Adyns said the affected services must be restored in an isolated environment, which will take considerable time so that new risks are ruled out. The October 31 deadline for certain filings, including sole traders and people with income from foreign companies, has been extended to November 16.",
+        "The article does not identify the type of attack, the attackers or the full scope. Those are official statements, not independently verified, and the investigation is at an early stage, so the no-breach position could change."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "belgium",
+        "tax",
+        "cyberattack",
+        "government",
+        "outage"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/29/belgiums-tax-agency-confirms-cyberattack-pulls-services-offline/5306409"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-discord-will-make-messages-from-63-000-public",
+      "headline": "Discord will make messages from 63,000 public servers searchable on the web, on by default",
+      "summary": "From November 16, Discoverable Servers get public web pages, and from mid-December eligible messages can be indexed by search engines. Posted content cannot be pulled back once public.",
+      "impacts": [
+        "Casual chat in large public servers becomes findable by anyone, with no Discord account.",
+        "Opting out of the default means acting before the dates, and only future messages are covered.",
+        "Search-indexed chat can resurface years later and be scraped for AI training."
+      ],
+      "details": [
+        "BleepingComputer reported on October 28 that Discord will let search engines index discussions in Discoverable Servers, which are publicly listed communities with at least 1,000 members. Discord says about 63,000 such servers exist. Private servers, DMs and smaller servers are excluded.",
+        "The rollout has two stages. On November 16 every Discoverable Server gets a public Server Web Page with automatically generated summaries of active conversations from that date on, and admins who have not made a page get one anyway. The only way to avoid one is to switch the server to private before then. In mid-December, every eligible message on those servers appears on the page and may be indexed, gradually, and messages posted before release are excluded.",
+        "Admins can exclude channels or turn off sharing under Server Settings, and members can control whether their own messages appear under User Settings, but that setting covers only future messages, and content that has already become public cannot be retracted. Content is included by default, except in the EU, UK, Canada, Brazil, Australia and South Korea, where members must opt in. Under-18s are excluded.",
+        "Discord piloted the feature in the NBA 2K, Rust and Dead by Daylight communities and says it wants useful information to reach the wider internet. The main concern raised is the default-on setting, since many users may share content without choosing to."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "discord",
+        "privacy",
+        "search engines",
+        "default settings",
+        "social media"
+      ],
+      "date": "2026-10-28",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/discord-to-let-search-engines-index-public-server-messages/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-telegram-for-android-flaw-ran-code-when-you",
+      "headline": "Telegram for Android flaw ran code when you answered a call; fixed in September",
+      "summary": "NebuSec says every Android release from 8.6.2 through 12.10.3 had a memory bug in call-status handling. Version 12.10.4 fixes it. No in-the-wild use is reported.",
+      "impacts": [
+        "Answering a call from a stranger was the only action required.",
+        "Users who have not updated since September remain exposed.",
+        "AI-assisted code scanning is finding years-old bugs in widely used apps."
+      ],
+      "details": [
+        "The Hacker News reported on October 29 that security startup NebuSec disclosed a bug in Telegram for Android that let an attacker run code on a victim's phone when the victim answered a voice call. The attacker needed only a standard Telegram account.",
+        "Every Android release from 8.6.2 through 12.10.3, shipped between March 2022 and September 2026, is affected. Telegram fixed it in 12.10.4, released in late September. It had no CVE identifier as of October 29.",
+        "The bug is in code that reads 'MediaState' messages, which report microphone, camera and video rotation status during calls. The article's review of the published 12.10.3 source found that when a rotation value was present, the code read the video state field even if the message lacked it, reading memory it should not.",
+        "NebuSec confirmed the issue on ARM64 phones and shows a video of a victim's phone dropping to the home screen with a 'HACKED BY NEBUSEC' logo. The video does not state the app or Android version, and no technical write-up was published. NebuSec has no evidence it affects iOS, desktop or group calls, and the article does not report any real attacks. NebuSec says its AI-based code security product found the flaw."
+      ],
+      "category": "Tech",
+      "tags": [
+        "telegram",
+        "android",
+        "vulnerability",
+        "remote code execution",
+        "messaging",
+        "ai hacking"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/telegram-android-flaw-lets-attackers.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-a-scan-of-7-25-million-gitee-repos",
+      "headline": "A scan of 7.25 million Gitee repos found 26,400 still-working cloud and AI keys",
+      "summary": "Independent researcher Ben Zimmermann tested the secrets he found and says 26,400 still worked, including 9,473 Alibaba Cloud key pairs and 1,348 OpenAI keys. He had not confirmed that any were revoked.",
+      "impacts": [
+        "A leaked key gives whoever finds it the owner's cloud and AI access and bill.",
+        "Deleting a key from code or rewriting history does not revoke it.",
+        "AI service keys are now a common prize alongside cloud credentials."
+      ],
+      "details": [
+        "The Hacker News reported that Zimmermann scanned 7.25 million public repositories on Gitee, a Chinese code-hosting service, and reported results on October 28. He found 26,400 unique credentials that still worked when tested against the issuing services.",
+        "The largest group was 9,473 Alibaba Cloud AccessKey pairs. Others included 3,805 YouTube API keys, 3,170 DeepSeek keys, 1,489 Zhipu BigModel keys and 1,348 OpenAI keys, with smaller numbers for GitHub, AWS, Google Cloud and Gemini. One was an active organization-admin key for an unnamed enterprise AI platform. By commit date, 12,242 came from 2025.",
+        "He used two scanners, TruffleHog and MongoDB's Kingfisher, and checked full commit histories, so keys deleted from current code still counted. The tools overlapped on only 1,001 findings, which suggests either alone misses a lot.",
+        "He told the vendors with the most exposed keys but did not contact the developers, had not confirmed revocations, and did not say whether anyone else used the keys. Gitee's 3.64 working credentials per 1,000 repos is higher than earlier TruffleHog-only scans of GitLab (3.11) and Bitbucket (2.39), though the article calls the comparison imperfect."
+      ],
+      "category": "Tech",
+      "tags": [
+        "credentials",
+        "api keys",
+        "gitee",
+        "cloud",
+        "secrets",
+        "deepseek",
+        "openai"
+      ],
+      "date": "2026-10-28",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/26400-valid-cloud-and-ai-credentials.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-sonys-so-net-isp-says-2-59-million",
+      "headline": "Sony's So-net ISP says 2.59 million customer records were accessed",
+      "summary": "Sony Network Communications confirmed unauthorized access to its member database on October 19. Names, phone numbers, emails and birthdates were exposed; Sony says no payment data was.",
+      "impacts": [
+        "Names, birthdates and phone numbers are enough to build convincing phishing.",
+        "Docomo customers were affected through a contract with Sony's unit, showing supply-chain spread.",
+        "Japan has had a run of large breaches, prompting emergency government meetings."
+      ],
+      "details": [
+        "BleepingComputer reported that Sony Network Communications, a Sony Group subsidiary that runs an ISP in Japan, confirmed a breach affecting about 2.5 million customer records. The intrusion happened October 19 and was detected four days later, after which Sony shut down the compromised servers and blocked external communication. It announced the incident October 27.",
+        "The count is 2,585,481 records with full names, phone numbers, emails, user IDs, dates of birth, gender and Internet connection IDs. That breaks down to 2,141,986 So-net entries and 443,495 plala records, which belong to NTT Docomo customers of its Docomo Hikari service. Separately, 54,401 email addresses from several mail services were exposed with passwords, and Sony advises changing them. Sony says no banking, payment card or other account details were exposed.",
+        "Docomo says the incident affects all current Hikari clients and those who canceled in the previous six months, and warned of phishing emails and fake sites impersonating its d POINT Club and a Universal Studios Japan ticket giveaway.",
+        "Sony reported the case to Japan's Personal Information Protection Commission and is still investigating cause and scope. As of October 27 neither company had confirmed misuse. The article lists other recent Japanese incidents, including GMO Internet Group and KDDI (12 million customers), and says the government held urgent meetings on October 27."
+      ],
+      "category": "Tech",
+      "tags": [
+        "sony",
+        "data breach",
+        "japan",
+        "docomo",
+        "phishing",
+        "isp"
+      ],
+      "date": "2026-10-27",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/sony-isp-subsidiary-data-breach-exposes-25-million-customer-records/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-leaked-audio-flocks-ceo-tells-police-chiefs-protests",
+      "headline": "Leaked audio: Flock's CEO tells police chiefs protests against it are not real",
+      "summary": "404 Media says Flock CEO Garrett Langley told a private police conference that anti-Flock social media was driven by paid Russian bots, without evidence. Reporters note the theory he repeated is disputed.",
+      "impacts": [
+        "A surveillance vendor's leadership is dismissing public opposition to officials who buy its products.",
+        "Claims of bot-driven backlash can be used to wave away real local objections.",
+        "Council members hearing from residents may be told the pushback is manufactured."
+      ],
+      "details": [
+        "404 Media's Joseph Cox and Jason Koebler reported on October 26 on leaked audio of Garrett Langley, CEO of automatic license plate reader company Flock, speaking to police chiefs at a private conference. The page shows only a preview, so this covers the visible part.",
+        "According to the audio, Langley said anti-Flock protests around the country are not real. He claimed, without evidence, that social media opposition is driven mostly by Russian bots, and said, 'Somebody was paying for [the social media posts and] stopped paying for it.' He said chatter about Flock was down about 95 percent from July, and dropped 50 percent in one week, tying that to a Ukrainian drone strike on a Russian data center.",
+        "404 Media says the theory that Ukrainian strikes on Russian data centers sharply cut bot activity has been disproven, linking an earlier piece. Langley also reportedly said his wife told him never to apologize and that he would prefer not to give interviews again.",
+        "Related items on the page: an October 21 document reportedly telling police to expect 'emotional confrontations' at Flock city council meetings, Sen. Ron Wyden's October 9 request for a privacy review of a license plate program, and an October 8 video of a Flock search a judge ruled unconstitutional.",
+        "The remarks are the CEO's, reported from a leak; 404 Media's full article is paywalled."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "flock",
+        "license plate",
+        "police",
+        "surveillance",
+        "protest",
+        "bots"
+      ],
+      "date": "2026-10-26",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/in-leaked-audio-flock-ceo-tells-cops-backlash-to-the-company-isnt-real/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-under-42-minutes-of-bright-daylight-a-day",
+      "headline": "Under 42 minutes of bright daylight a day is tied to higher dementia risk",
+      "summary": "A wrist-sensor cohort study in General Psychiatry found average daytime light above 1,000 lux went with 16% lower dementia risk. It shows an association, not that daylight prevents dementia.",
+      "impacts": [
+        "Light exposure is a cheap, measurable habit that could be added to prevention research.",
+        "Sensor-measured light is more reliable than self-report.",
+        "People who are already ill may go outside less, so cause and effect could run backward."
+      ],
+      "details": [
+        "ScienceDaily posted on October 29 a Wiley press release on a prospective cohort study led by Hongliang Feng of Guangzhou Medical University, published in General Psychiatry (2026; 39(3)). First author is Nana Zheng.",
+        "It followed 87,577 adults who wore wrist devices with accelerometers measuring light day and night, for a median of 8.1 years, during which 741 developed dementia.",
+        "Adults with average daytime light above 1,000 lux, roughly an overcast day outdoors, had a 16% lower dementia risk. Longer time at 5,000 lux or more went with further reductions. Getting less than 0.7 hours, about 42 minutes, of bright daytime light a day predicted dementia more strongly than six established risk factors, which the page does not name. No significant link appeared for nighttime light.",
+        "The authors say the findings show an association, not that more daylight directly prevents dementia. The page does not detail how lifestyle and health differences were handled, and the 42-minute figure comes without a full explanation. Treat it as a signal for further study."
+      ],
+      "category": "Health",
+      "tags": [
+        "dementia",
+        "sunlight",
+        "brain",
+        "alzheimers",
+        "study",
+        "prevention"
+      ],
+      "date": "2026-10-29",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261028232707.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-lilly-says-retatrutide-cut-weight-20-9-in",
+      "headline": "Lilly says retatrutide cut weight 20.9% in a diabetes head-to-head with Ozempic's 9.4%",
+      "summary": "In Lilly's trial, the highest dose of its investigational triple-hormone drug lowered A1c 2.2 points and weight 20.9% at 80 weeks, versus 1.8 points and 9.4% for Ozempic. Those figures come from people who stayed on treatment.",
+      "impacts": [
+        "A bigger weight drop in diabetes would raise the bar for current drugs.",
+        "Treatment-only analyses can overstate results versus everyone enrolled.",
+        "Safety data was not visible in the report, which matters for a drug people may take for years."
+      ],
+      "details": [
+        "STAT reported on October 28 that Eli Lilly says its drug retatrutide beat Novo Nordisk's Ozempic in a large head-to-head diabetes study. The article is paywalled, so only the opening is available here.",
+        "At the highest dose, retatrutide lowered A1c, a measure of average blood sugar, by 2.2 percentage points after 80 weeks, versus 1.8 for Ozempic. Participants on that dose lost 20.9% of body weight; those on Ozempic lost 9.4%. STAT notes people with diabetes usually lose less weight on these drugs, which makes the retatrutide figure notable.",
+        "The caveats are significant. The numbers come from analyses of participants who stayed on treatment, not everyone enrolled, which can overstate effects. Retatrutide is investigational and not approved. The visible text gives no side-effect rates, trial size, other doses or statistics, and these are results announced by the company, not a peer-reviewed paper."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "retatrutide",
+        "glp-1",
+        "diabetes",
+        "lilly",
+        "weight loss",
+        "clinical trial"
+      ],
+      "date": "2026-10-28",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/10/28/retatrutide-vs-ozempic-lilly-diabetes-study/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-hhs-will-let-pharmacies-compound-six-peptides-before",
+      "headline": "HHS will let pharmacies compound six peptides before the FDA decides",
+      "summary": "HHS released a temporary 'enforcement discretion' policy that it will not act against state-licensed pharmacies, federal facilities or physicians that compound six named peptides. The FDA has not finished its own review.",
+      "impacts": [
+        "Compounded peptides are made outside the full FDA approval process.",
+        "The policy covers products popular in wellness circles, where evidence of benefit is limited.",
+        "The temporary status leaves rules for patients and pharmacies unsettled."
+      ],
+      "details": [
+        "STAT reported on October 28 that HHS released a policy temporarily allowing compounding pharmacies to make some peptide products. The article is STAT+ only and just the opening text was visible.",
+        "Under 'enforcement discretion,' HHS will not take action against state-licensed pharmacies, federal facilities and licensed physicians compounding six specific peptides listed in an appendix. The policy was published in the Federal Register. The article notes an FDA advisory committee backed them, with a July 2026 vote recommending compounding pharmacies be cleared for six substances.",
+        "STAT frames this as widening access to 'experimental wellness therapies' embraced by the Make America Healthy Again movement, and its headline says there is little evidence of safety or effectiveness. The FDA is still weighing whether to allow peptide compounding, so HHS acts ahead of the agency's own decision. The visible text does not name the peptides or detail FDA scientists' specific objections."
+      ],
+      "category": "Health",
+      "tags": [
+        "peptides",
+        "hhs",
+        "fda",
+        "compounding",
+        "maha",
+        "regulation"
+      ],
+      "date": "2026-10-28",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/10/28/hhs-enforcement-discretion-policy-allows-peptide-compounding/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-29-a-weak-brain-wave-signal-may-tie-together",
+      "headline": "A weak brain-wave signal may tie together schizophrenia's symptoms, a small study finds",
+      "summary": "McGill-led researchers using MEG found slower, weaker beta-band activity in 25 people with schizophrenia versus 25 controls, tied to timing errors and disorganized speech. The authors call it early and modest in size.",
+      "impacts": [
+        "A single measurable signal could help spot young people at risk of psychosis.",
+        "It might point to a target for future treatments.",
+        "With 50 participants, the result needs replication before it is relied on."
+      ],
+      "details": [
+        "ScienceDaily reported on a Science Advances study (2026, vol. 12, issue 43) titled 'Neurophysiological dynamics related to perception, action, and language in schizophrenia.' Lead author is Hsi (Tiana) Wei and senior author Lena Palaniyappan, with teams from McGill University, the Université de Montréal and the Douglas Research Centre.",
+        "They used magnetoencephalography, which detects the tiny magnetic fields of neural activity, to measure beta-band rhythms linked to coordinating perception and movement. Participants judged the timing of visual and auditory information, and their speech was analyzed for disorganization.",
+        "Of 50 participants, 25 had schizophrenia and 25 were healthy controls. Those with schizophrenia showed weaker and slower beta activity. Within that group, the most pronounced abnormalities went with worse timing judgments, more disorganized speech and more severe symptoms. These features are usually studied separately, so a shared link to one signal hints at a common process, which the authors suggest involves how the brain builds and updates its model of the environment.",
+        "The authors describe the work as early and modest in size. The speech and severity links need testing in larger independent samples, and the press summary reports no effect sizes or statistical methods, so strength cannot be judged from it."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "schizophrenia",
+        "brain",
+        "meg",
+        "psychosis",
+        "neuroscience",
+        "biomarker"
+      ],
+      "date": "2026-10-29",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261028232659.htm"
+        }
+      ]
+    }
+  ]
+}
