@@ -1,2340 +1,293 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light">
-<title>Cross-venue short-window board</title>
-<meta name="description" content="Kalshi and Polymarket 15-minute crypto windows priced side by side, after fees.">
+<meta name="color-scheme" content="light dark">
+<title>Calibration Board</title>
+<meta name="description" content="What prediction markets were priced at, against what actually happened.">
 <style>
-  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
-  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
-
-  /* Light only, deliberately: this is a board that gets glanced at next to a
-     venue's own screen, and it should look the same every time. */
   :root{
-    --paper:#faf9f6; --card:#ffffff; --ink:#15150f; --ink2:#55534c; --muted:#92908a;
-    --line:#e8e6de; --rule:#d6d3c8;
-    --good:#0a6b2e; --goodbg:#eef7f0; --bad:#b03f2c; --warn:#8a6000;
-    --accent:#15150f;
-    /* Live/ongoing. Deliberately the only blue on the page, because its
-       whole job is to be findable at a glance among settled rows. */
-    --live:#1b58b8; --livebg:#eef3fc; --liveline:#bed2f0;
+    color-scheme: light;
+    --paper:#f7f6f3; --surface-1:#fcfcfb; --line:#e4e2db; --rule:#c3c2b7;
+    --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --good:#0ca30c; --warning:#fab219; --critical:#d03b3b;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html{background:var(--paper);}
-  body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--paper);
-       line-height:1.5; font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased;}
-  h1,h2,.num{font-family:'Space Grotesk',system-ui,sans-serif; letter-spacing:-0.015em;}
-  h1,h2{font-weight:600;}
-  main{max-width:900px; margin:0 auto; padding:38px clamp(16px,5vw,32px) 80px;}
-
-  /* header */
-  .top{display:flex; align-items:baseline; justify-content:space-between; gap:8px 20px; flex-wrap:wrap;}
-  h1{font-size:22px;}
-  .stamp{font-size:11.5px; color:var(--muted);}
-  .lede{color:var(--ink2); font-size:14px; margin-top:7px; max-width:60ch;}
-
-  /* summary */
-  .summary{margin:24px 0 20px; padding:17px 19px; border-radius:12px; background:var(--card);
-           border:1px solid var(--line);}
-  .headline{font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;
-            letter-spacing:-0.015em;}
-  .summary p{font-size:13.5px; color:var(--ink2); margin-top:7px; max-width:66ch;}
-
-  /* filters */
-  /* The real-money bar. Deliberately not styled like the rest of the
-     board: the board reports a simulation and this reports spent money,
-     and the two must not be mistakable for one another at a glance. */
-  .realbar{display:flex; align-items:center; gap:10px; margin-bottom:16px;
-           padding:9px 14px; border-radius:999px; text-decoration:none;
-           font-size:13px; font-weight:600; letter-spacing:.01em;
-           border:1px solid var(--line); color:var(--ink);
-           background:var(--card, transparent);}
-  .realbar .dot{width:8px; height:8px; border-radius:50%;
-                background:var(--muted); flex:none;}
-  .realbar .sub{font-weight:400; color:var(--muted); font-size:12px;}
-  .realbar[data-state="done"]{border-color:var(--ok, #2d7); color:var(--ok, #2d7);}
-  .realbar[data-state="done"] .dot{background:var(--ok, #2d7);}
-  .realbar[data-state="attention"]{border-color:var(--warn, #e85);
-                                   color:var(--warn, #e85);}
-  .realbar[data-state="attention"] .dot{background:var(--warn, #e85);}
-  .realbar[data-state="idle"]{opacity:.72;}
-  @media (prefers-reduced-motion: no-preference){
-    .realbar[data-state="done"] .dot,
-    .realbar[data-state="attention"] .dot{animation:rbp 2.4s ease-in-out infinite;}
+  @media (prefers-color-scheme: dark){
+    :root:where(:not([data-theme="light"])){
+      color-scheme: dark;
+      --paper:#141413; --surface-1:#1a1a19; --line:#2f2f2c; --rule:#383835;
+      --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#898781;
+      --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    }
   }
-  @keyframes rbp{0%,100%{opacity:1;} 50%{opacity:.35;}}
-
-  /* THE LIVE RUN PANEL.
-     The real-money bar above answers "what has happened". This answers
-     "what is happening", which between trades is the only question with
-     an answer -- and on the measured evidence, between trades is almost
-     all of the time. A run that died looks exactly like a run that is
-     watching unless something says so. */
-  .runp{border:1px solid var(--line); border-radius:14px; background:var(--card);
-        padding:14px 16px; margin-bottom:16px;}
-  .runp .top{display:flex; align-items:center; gap:9px; flex-wrap:wrap;}
-  .runp .dot{width:9px; height:9px; border-radius:50%; background:var(--muted);
-             flex:none;}
-  .runp .st{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
-            letter-spacing:-0.01em;}
-  .runp .when{color:var(--muted); font-size:12px; margin-left:auto;}
-  .runp .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr));
-              gap:10px 14px; margin-top:12px;}
-  .runp .k{color:var(--muted); font-size:11px; text-transform:uppercase;
-           letter-spacing:.06em;}
-  .runp .v{font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;
-           margin-top:2px;}
-  .runp .v small{font-weight:400; font-size:11.5px; color:var(--muted);}
-  .runp .note{color:var(--ink2); font-size:12.5px; margin-top:11px;
-              padding-top:11px; border-top:1px solid var(--line);}
-  .runp .att{margin-top:10px; font-size:12.5px; color:var(--ink2);}
-  .runp .att div{padding:3px 0; border-top:1px dotted var(--line);}
-  .runp .att div:first-child{border-top:0;}
-  .runp[data-state="watching"] .dot{background:var(--live);}
-  .runp[data-state="watching"]{border-color:var(--liveline);}
-  .runp[data-state="stalled"] .dot,
-  .runp[data-state="attention"] .dot{background:var(--bad);}
-  .runp[data-state="stalled"],
-  .runp[data-state="attention"]{border-color:var(--bad);}
-  .runp[data-state="stalled"] .st,
-  .runp[data-state="attention"] .st{color:var(--bad);}
-  .runp[data-state="stopped"] .dot{background:var(--warn);}
-  .runp[data-state="stopped"]{border-color:var(--warn);}
-  .runp[data-state="idle"],.runp[data-state="finished"]{opacity:.8;}
-  @media (prefers-reduced-motion: no-preference){
-    .runp[data-state="watching"] .dot{animation:rbp 2.4s ease-in-out infinite;}
+  :root[data-theme="dark"]{
+    color-scheme: dark;
+    --paper:#141413; --surface-1:#1a1a19; --line:#2f2f2c; --rule:#383835;
+    --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#898781;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
   }
-
-  .pills{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:18px;}
-  .pills button{font:inherit; font-size:12.5px; cursor:pointer; padding:6px 14px;
-    border-radius:999px; border:1px solid var(--rule); background:var(--card); color:var(--ink2);
-    transition:background .12s, color .12s, border-color .12s;}
-  .pills button:hover:not(:disabled){border-color:var(--ink); color:var(--ink);}
-  .pills button[aria-pressed="true"]{background:var(--accent); color:#fff; border-color:var(--accent);}
-  .pills button:disabled{opacity:.42; cursor:default;}
-  .pills button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-
-  /* cards */
-  .cards{display:grid; gap:11px; grid-template-columns:repeat(auto-fill,minmax(392px,1fr));}
-  .bet{background:var(--card); border:1px solid var(--line); border-radius:12px;
-       padding:15px 17px 13px;}
-  .bet-top{display:flex; align-items:flex-start; justify-content:space-between; gap:14px;}
-  .name{font-weight:600; font-size:15px; line-height:1.3;}
-  .meta{font-size:11.5px; color:var(--muted); margin-top:3px;}
-  .ret{text-align:right; flex-shrink:0;}
-  .ret .n{font-family:'Space Grotesk',sans-serif; font-size:23px; font-weight:600;
-          color:var(--good); letter-spacing:-0.02em; display:block; line-height:1.1;}
-  /* The board publishes every pairing now, including the ones that cost more
-     than they pay, so the big number has to carry its own sign. */
-  .ret .n.neg{color:var(--muted);}
-  .ret .l{font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);}
-
-  .legs{margin:13px 0 0; border-top:1px solid var(--line); padding-top:11px;
-        display:grid; gap:5px;}
-  .leg{display:flex; align-items:baseline; justify-content:space-between; gap:10px; font-size:13px;}
-  .leg .side{color:var(--muted); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase;
-             min-width:4.4rem;}
-  .leg .venue{flex:1; color:var(--ink2);}
-  .leg .px{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px;}
-
-  .foot-row{margin-top:12px; padding-top:10px; border-top:1px solid var(--line);
-            display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-            font-size:12.5px; color:var(--ink2);}
-  .foot-row b{font-weight:600; color:var(--ink);}
-  .risk{color:var(--warn);}
-  .bstale{display:block; font-size:10px; color:var(--warn); margin-top:2px;
-          letter-spacing:.02em;}
-  /* Two columns on the same coin that are struck at different numbers are
-     not two sides of one trade, and nothing on the board said so. */
-  .mismatch{margin-top:9px; padding:7px 9px; border-radius:7px;
-            background:#fbf4e4; border:1px solid #e6d6a8;
-            font-size:11.5px; color:var(--warn); line-height:1.45;}
-  .mismatch b{color:#6d4d00; font-weight:600;}
-  .working{margin-top:6px; font-size:11.5px; color:var(--muted);}
-  .thin{margin-top:7px; font-size:11.5px; color:var(--warn);}
-
-  .empty{padding:30px 18px; text-align:center; color:var(--muted); font-size:13.5px;
-         border:1px dashed var(--rule); border-radius:12px; background:var(--card);}
-
-  /* THE VENUE BOARD. One column per venue; adding a third venue is
-     adding a third entry to the feed, not a layout change. */
-  .venues{display:grid; gap:9px; align-items:start;
-          grid-template-columns:repeat(var(--vcols,2),minmax(0,1fr));}
-  .vcol{min-width:0;}
-  .vhead{margin-bottom:0;}
-  .vhead{display:flex; align-items:baseline; justify-content:space-between;
-         gap:10px; padding:0 2px 8px; border-bottom:1px solid var(--rule);
-         margin-bottom:10px;}
-  .vhead .vname{font-family:'Space Grotesk',sans-serif; font-weight:600;
-                font-size:14px; letter-spacing:.01em;}
-  .vhead .vcash{font-size:11.5px; color:var(--muted);
-                font-variant-numeric:tabular-nums;}
-  .mkt{background:var(--card); border:1px solid var(--line); border-radius:9px;
-       padding:7px 9px 6px; margin-bottom:6px;}
-  /* Duration bands. Cards are grouped shortest-first so the thing closing
-     soonest is at the top of every column and the same band sits at the
-     same height across all three venues. A band with nothing in it keeps
-     its slot and says so -- dropping it would slide the bands below it up
-     and stop the columns lining up, which is the whole point of a grid. */
-  .dband{font-size:9px; letter-spacing:.09em; text-transform:uppercase;
-         color:var(--muted); font-weight:600; margin:10px 0 2px; padding:0 2px;
-         border-top:1px solid var(--rule); padding-top:7px;}
-  /* The cell is the venue's slot within one band row. align-self:start
-     keeps a one-card cell from stretching to the height of a four-card
-     one; the ROW still starts level, which is the point. */
-  .bcell{min-width:0; align-self:start;}
-  .dna{border:1px dashed var(--rule); border-radius:9px; padding:6px 9px;
-       margin-bottom:6px; font-size:11px; color:var(--muted);}
-  .mkt+.mkt{margin-top:0;}
-  .mkt .mtop{display:flex; align-items:flex-start; justify-content:space-between;
-             gap:10px;}
-  .mkt .mname{font-size:12px; font-weight:600; color:var(--ink); line-height:1.3;}
-  .mkt .mline{font-size:10.5px; color:var(--ink2); margin-top:2px;
-              font-variant-numeric:tabular-nums;}
-  .mkt .clock{font-family:'Space Grotesk',sans-serif; font-size:13px;
-              font-weight:600; font-variant-numeric:tabular-nums;
-              white-space:nowrap;}
-  .mkt .clock.soon{color:var(--bad);}
-  .mkt .clockl{display:block; font-size:9.5px; letter-spacing:.07em;
-               text-transform:uppercase; color:var(--muted); font-weight:500;
-               text-align:right; margin-top:1px;}
-  .sides{display:flex; gap:5px; margin-top:6px;}
-  .sd{flex:1; min-width:0; border:1px solid var(--rule); border-radius:7px;
-      padding:4px 6px;}
-  .sd .sn{font-size:10px; letter-spacing:.06em; text-transform:uppercase;
-          color:var(--muted);}
-  .sd .sp{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
-          font-variant-numeric:tabular-nums;}
-  .sd .ss{font-size:10.5px; color:var(--muted); font-variant-numeric:tabular-nums;}
-  /* Is real money on this market right now? */
-  .held{display:flex; align-items:center; gap:7px; margin-top:9px;
-        padding-top:8px; border-top:1px solid var(--rule); font-size:12px;}
-  .held .mk{display:inline-flex; align-items:center; justify-content:center;
-            width:17px; height:17px; border-radius:50%; font-size:11px;
-            font-weight:700; flex:none;}
-  .held.on .mk{background:var(--good); color:#fff;}
-  .held.off .mk{background:var(--rule); color:var(--muted);}
-  .held.on{color:var(--ink);}
-  .held.off{color:var(--muted);}
-  .held b{font-variant-numeric:tabular-nums;}
-
-  /* What should be bet on -- every pairing, including the ones that do
-     not clear, because "nothing clears" is the finding. */
-  .sig{border:1px solid var(--line); border-radius:11px; background:var(--card);
-       padding:11px 13px; margin-bottom:18px;}
-  .sig h3{font-size:12px; margin:0 0 8px; letter-spacing:.02em;}
-  .sigrow{display:flex; align-items:baseline; gap:10px; font-size:12.5px;
-          padding:4px 0; border-top:1px solid var(--rule);
-          font-variant-numeric:tabular-nums;}
-  .sigrow:first-of-type{border-top:0;}
-  .sigrow .c{font-weight:600; text-transform:uppercase; font-size:11px;
-             width:38px; flex:none;}
-  .sigrow .sh{flex:1; min-width:0; color:var(--ink2);
-              overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .sigrow .nv{font-family:'Space Grotesk',sans-serif; font-weight:600;
-              width:66px; text-align:right; flex:none;}
-  .sigrow .nv.neg{color:var(--bad);} .sigrow .nv.pos{color:var(--good);}
-  .sigrow .sz{width:74px; text-align:right; flex:none; color:var(--muted);
-              font-size:11px;}
-
-  table.band{border-collapse:collapse; font-size:12.5px; margin:10px 0 4px;
-             font-variant-numeric:tabular-nums;}
-  table.band th{text-align:right; padding:3px 11px 3px 0; color:var(--muted);
-                font-weight:600; font-size:11px; white-space:nowrap;}
-  table.band td{text-align:right; padding:3px 11px 3px 0;
-                border-top:1px solid var(--rule); white-space:nowrap;}
-  table.band th:first-child,table.band td:first-child{text-align:left;}
-
-  /* ------------------------------------------------------------ history
-     This strategy is meant to trade rarely, so the panel is mostly empty
-     time, and empty time was being drawn as one box per half hour -- a
-     wall of identical cards that said nothing. It is now three things:
-     four figures, a strip where every half hour is one cell, and a log
-     that collapses the quiet runs and only expands what happened. */
-  .histbtn{margin-left:auto; font:inherit; font-size:11px; cursor:pointer;
-           padding:5px 12px; border:1px solid var(--line); border-radius:999px;
-           background:transparent; color:var(--ink2); white-space:nowrap;}
-  .histbtn:hover{border-color:var(--ink); color:var(--ink);}
-  .histbtn:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-
-  .hist{position:fixed; inset:0; z-index:60; background:rgba(21,21,15,.34);
-        display:flex; justify-content:flex-end;}
-  .hist[hidden]{display:none;}
-  /* --bg was never a token on this page, so the panel was transparent and
-     the board showed straight through the history. */
-  .hist .panel{background:var(--paper); width:min(520px,100%); height:100%;
-               overflow-y:auto; border-left:1px solid var(--rule);
-               box-shadow:-18px 0 44px rgba(21,21,15,.10);}
-
-  .hhead{position:sticky; top:0; z-index:2; background:var(--paper);
-         border-bottom:1px solid var(--rule);
-         padding:17px clamp(15px,4vw,22px) 13px;}
-  .hhead h3{font-family:'Space Grotesk',sans-serif; font-size:15px;
-            font-weight:600; letter-spacing:-0.015em; margin:0;}
-  .hhead .close{position:absolute; top:11px; right:11px; font:inherit;
-                font-size:17px; line-height:1; background:none; cursor:pointer;
-                border:0; color:var(--muted); padding:5px 9px; border-radius:7px;}
-  .hhead .close:hover{color:var(--ink); background:var(--line);}
-  .hhead .close:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-  .hhead .lede{font-size:12.5px; color:var(--ink2); margin:5px 0 0; max-width:48ch;}
-
-  /* Five figures have to stay on one row at phone width, or the last one
-     sits alone against a grey gap. */
-  .hstats{display:grid; grid-template-columns:repeat(auto-fit,minmax(70px,1fr));
-          gap:1px; background:var(--line); border-bottom:1px solid var(--rule);}
-  .hstats div{background:var(--paper); padding:12px 3px 11px; text-align:center;}
-  .hstats .n{font-family:'Space Grotesk',sans-serif; font-size:clamp(15px,4.2vw,19px);
-             font-weight:600; letter-spacing:-0.02em; display:block; line-height:1.15;}
-  .hstats .n.z{color:var(--muted);}
-  .hstats .n.up{color:var(--good);} .hstats .n.down{color:var(--bad);}
-  .hstats .n.near{color:var(--warn);}
-  .hstats .k{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
-             color:var(--muted); display:block; margin-top:3px;}
-
-  /* The contribution grid: hours across, days down. One cell is one
-     hour. Day is a single row; Week is seven, which is the whole point
-     of laying it out this way rather than as one long strip. */
-  .htl{padding:15px clamp(15px,4vw,22px) 14px; border-bottom:1px solid var(--rule);}
-  .htl .head{display:flex; align-items:center; gap:10px; margin-bottom:9px;}
-  .htl .cap{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
-            color:var(--muted);}
-  .htl .modes{display:flex; gap:5px; margin-left:auto;}
-  .htl .modes button{font:inherit; font-size:10.5px; cursor:pointer;
-            padding:3px 11px; border-radius:999px; border:1px solid var(--rule);
-            background:var(--card); color:var(--ink2); white-space:nowrap;}
-  .htl .modes button:hover{border-color:var(--ink); color:var(--ink);}
-  .htl .modes button[aria-pressed="true"]{background:var(--accent); color:#fff;
-            border-color:var(--accent);}
-  .htl .modes button:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-
-  .grid{display:grid; gap:2px; align-items:center;}
-  .grid .lab{font-size:9px; color:var(--muted); text-align:right;
-             padding-right:6px; white-space:nowrap; overflow:hidden;}
-  .grid .lab.today{color:var(--ink2); font-weight:600;}
-  .grid .tick{font-size:8.5px; color:var(--muted); text-align:left;
-              letter-spacing:-.01em;}
-  .cell{height:15px; border-radius:2px; background:var(--line);}
-  .grid.day .cell{height:28px; border-radius:3px;}
-  /* An hour before the account existed, or one that has not happened
-     yet, is not the same as an hour it watched and passed on. */
-  .cell.before,.cell.future{background:transparent;
-             box-shadow:inset 0 0 0 1px var(--line);}
-  .cell.future{opacity:.5;}
-  .cell.near{background:#dcbd6b;}
-  .cell.trade{background:var(--good);}
-  .cell.loss{background:var(--bad);}
-
-  .htl .key{display:flex; gap:13px; margin-top:11px; font-size:10.5px;
-            color:var(--muted); flex-wrap:wrap;}
-  .htl .key i{display:inline-block; width:8px; height:8px; border-radius:2px;
-              margin-right:5px; background:var(--line);}
-  .htl .key .none i{background:transparent; box-shadow:inset 0 0 0 1px var(--line);}
-  .htl .key .near i{background:#dcbd6b;}
-  .htl .key .trade i{background:var(--good);}
-
-  .best{margin:14px clamp(15px,4vw,22px) 0; padding:12px 14px;
-        border:1px solid #e6d6a8; border-radius:10px; background:#fbf6e8;}
-  .best .cap{font-size:9.5px; letter-spacing:.07em; text-transform:uppercase;
-             color:var(--warn); margin-bottom:6px;}
-
-  .hbody{padding:2px clamp(15px,4vw,22px) 44px;}
-  /* A run of quiet half hours collapses to one line. Thirteen boxes
-     saying "nothing" is not thirteen times the information. */
-  .gap{display:flex; justify-content:space-between; align-items:baseline;
-       gap:12px; padding:10px 0; border-bottom:1px solid var(--line);
-       font-size:12px; color:var(--muted);}
-  .gap .gt{font-variant-numeric:tabular-nums; white-space:nowrap;}
-  .slot{padding:13px 0 5px; border-bottom:1px solid var(--line);}
-  .slot .sh{display:flex; justify-content:space-between; align-items:baseline;
-            font-size:10.5px; letter-spacing:.07em; text-transform:uppercase;
-            color:var(--muted); margin-bottom:6px;}
-  .slot .sh b{color:var(--ink2); font-weight:600;}
-
-  .ev{padding:8px 0 7px;}
-  .ev + .ev{border-top:1px dotted var(--line);}
-  .ev .r1{display:flex; justify-content:space-between; align-items:baseline;
-          gap:10px; font-size:12.5px;}
-  .ev .co{font-weight:600; text-transform:uppercase; font-size:11px;
-          letter-spacing:.04em; color:var(--ink);}
-  .ev .inc{color:var(--muted); font-size:11px; margin-left:6px;}
-  .ev .nt{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:13px;
-          font-variant-numeric:tabular-nums; color:var(--warn);}
-  .ev .tm{color:var(--muted); font-size:10.5px; font-variant-numeric:tabular-nums;
-          margin-left:8px;}
-  /* Both venues on one line, in feed order, so adding a third venue is a
-     longer line rather than a new layout. */
-  .ev .odds{font-size:12px; color:var(--ink2); margin-top:3px;
-            font-variant-numeric:tabular-nums;}
-  .ev .odds b{font-weight:600; color:var(--ink);}
-  .ev .rs{font-size:11.5px; color:var(--muted); margin-top:3px;}
-  .more{font-size:11.5px; color:var(--muted); padding:3px 0 2px;}
-
-  .trd{border:1px solid var(--line); border-radius:10px; padding:11px 13px;
-       margin:8px 0; background:var(--card);}
-  .trd .th{display:flex; justify-content:space-between; align-items:baseline;
-           gap:10px; font-size:13px;}
-  .trd .inc{color:var(--muted); font-size:11px; margin-left:6px;}
-  .trd .co{font-weight:600; text-transform:uppercase;}
-  .trd .pl{font-family:'Space Grotesk',sans-serif; font-weight:600;
-           font-variant-numeric:tabular-nums;}
-  .trd .pl.up{color:var(--good);} .trd .pl.down{color:var(--bad);}
-  .trd .lg{display:flex; justify-content:space-between; font-size:11.5px;
-           color:var(--ink2); padding:4px 0 0; font-variant-numeric:tabular-nums;}
-  .trd .warn{font-size:11px; color:var(--bad); margin-top:6px;}
-  .trd .open{font-size:11px; color:var(--muted); margin-top:6px;}
-
-  /* ---- a position that is still running -------------------------------
-     An open trade used to render as a normal card with the word "open"
-     where the P&L goes, which is indistinguishable at a glance from a
-     settled trade that broke even. These are the only rows on the page
-     where something is still at stake, so they get the blue. */
-  .trd.live{border-color:var(--liveline); background:var(--livebg);
-            box-shadow:inset 3px 0 0 var(--live);}
-  .trd.live .pl{color:var(--live);}
-  .trd .live-line{font-size:11px; color:var(--live); margin-top:6px;
-                  font-weight:600; display:flex; align-items:center; gap:6px;}
-  .dot{width:7px; height:7px; border-radius:50%; background:var(--live);
-       flex:0 0 auto; animation:pulse 1.6s ease-in-out infinite;}
-  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.25;}}
-  @media (prefers-reduced-motion:reduce){ .dot{animation:none;} }
-
-  .livebox{border:1px solid var(--liveline); background:var(--livebg);
-           border-radius:12px; padding:12px 14px; margin:0 0 14px;}
-  .livebox h3{font-size:12px; letter-spacing:.06em; text-transform:uppercase;
-              color:var(--live); margin:0 0 8px; display:flex;
-              align-items:center; gap:7px;}
-  .livebox .trd{background:var(--card);}
-  .livebox .none{font-size:12px; color:var(--ink2);}
-
-  /* The hour grid, folded away. It is the largest block in the panel and
-     answers "when was it busy", which is not the question the panel is
-     opened to ask. */
-  .hfold{margin:4px 0 2px;}
-  .hfold>summary{cursor:pointer; font-size:11.5px; color:var(--ink2);
-                 padding:5px 0; list-style:none; user-select:none;}
-  .hfold>summary::-webkit-details-marker{display:none;}
-  .hfold>summary::before{content:"\25B8 "; color:var(--muted);}
-  .hfold[open]>summary::before{content:"\25BE ";}
-  .hfold>summary:hover{color:var(--ink);}
-  .hfold>summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
-
-  /* Which two markets a row is between. */
-  .vp{font-size:10.5px; color:var(--ink2); background:var(--line);
-      border-radius:4px; padding:1px 5px; margin-left:7px;
-      white-space:nowrap; font-weight:500;}
-  .vp.basis{background:#fdf1ec; color:var(--bad);}
-
-  h2{font-size:14px; margin:38px 0 10px;}
-  .note{font-size:13px; color:var(--ink2); max-width:68ch;}
-  .note+.note{margin-top:10px;}
-  .note b{color:var(--ink);}
-  footer{margin-top:34px; padding-top:14px; border-top:1px solid var(--rule);
-         font-size:11.5px; color:var(--muted); max-width:72ch;}
-  footer p+p{margin-top:6px;}
-
-  @media (max-width:720px){
-    /* Columns stop being columns on a phone: they stack, each still
-       labelled with its venue, which is the thing that matters. */
-    .venues{grid-template-columns:1fr; gap:22px;}
-  }
-  @media (max-width:520px){
-    .cards{grid-template-columns:1fr;}
-    .ret .n{font-size:20px;}
-    .sigrow .sz{display:none;}
-  }
-
-  /* Paper account, across the top. Not real money, and it says so --
-     the whole point of the number is to be told the truth by it. */
-  /* The bar starts pinned at the top and slides out of the way when you
-     scroll down, coming back the moment you scroll up -- so it is there
-     when wanted and not eating the screen while reading the board. */
-  .paper{position:sticky; top:0; z-index:30; background:var(--card);
-         transition:transform .22s ease, opacity .22s ease;}
-  .paper.tucked{transform:translateY(-105%); opacity:0; pointer-events:none;}
-  @media (prefers-reduced-motion:reduce){
-    .paper{transition:none;}
-    .paper.tucked{transform:none; opacity:1; pointer-events:auto;}
-  }
-  .paper{
-         border-bottom:1px solid var(--rule);
-         display:flex; align-items:center; gap:clamp(12px,3vw,26px);
-         flex-wrap:wrap; padding:9px clamp(16px,5vw,32px);
-         font-size:12px; color:var(--ink2);}
-  .paper[hidden]{display:none;}
-  .paper .tag{font-size:10px; letter-spacing:.08em; text-transform:uppercase;
-              color:var(--muted); white-space:nowrap;}
-  .paper .big{font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:600;
-              letter-spacing:-0.02em; line-height:1;}
-  .paper .up{color:var(--good);} .paper .down{color:var(--bad);}
-  .paper .pair{display:flex; align-items:baseline; gap:8px;}
-  .paper svg{display:block; width:clamp(70px,10vw,120px); height:24px;}
-  .paper .warn{color:var(--bad); font-weight:600;}
-  .paper .sim{color:var(--muted); white-space:nowrap;}
-
-  /* Real money in each venue, and 24h of it. */
-  .money{}
-  .money[hidden]{display:none;}
-  .money .nums{display:flex; align-items:baseline; gap:clamp(14px,4vw,34px); flex-wrap:wrap;}
-  .money .big{font-family:'Space Grotesk',sans-serif; font-size:27px; font-weight:600;
-              letter-spacing:-0.02em; line-height:1;}
-  .money .lab{font-size:10px; letter-spacing:.08em; text-transform:uppercase;
-              color:var(--muted); display:block; margin-bottom:3px;}
-  .money .v{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
-  .money .up{color:var(--good);} .money .down{color:var(--bad);}
-  /* One colour per venue, shared by the figure and its line in the chart
-     below. Red/blue/purple are far enough apart to stay distinct where the
-     curves overlap, which they do constantly -- all three accounts sit
-     within $11 of each other. */
-  .money .k{color:#0288d1;} .money .p{color:#d32f2f;} .money .g{color:#7b1fa2;}
-  /* Two frames side by side, stacking on a narrow screen. The SVG keeps
-     its aspect ratio so the axis text scales with the frame instead of
-     being stretched -- the old rule pinned every chart to 80px tall and
-     distorted anything with words in it. */
-  .money .charts{display:grid; grid-template-columns:1fr 1fr;
-    gap:clamp(14px,3vw,26px); margin-top:16px;}
-  @media (max-width:760px){ .money .charts{grid-template-columns:1fr;} }
-  .money figure{margin:0; position:relative;}
-  .money figcaption{font-size:10px; letter-spacing:.08em; text-transform:uppercase;
-    color:var(--muted); margin-bottom:5px;}
-  .money .chart svg{display:block; width:100%; height:auto; overflow:visible;}
-  .money .ckey{display:flex; gap:13px; margin-top:7px; font-size:10.5px;
-    color:var(--ink2); flex-wrap:wrap;}
-  .money .ckey i{display:inline-block; width:9px; height:9px; border-radius:2px;
-    margin-right:5px; vertical-align:-1px;}
-  .money .tip{position:absolute; pointer-events:none; opacity:0;
-    transition:opacity .09s; background:var(--card); border:1px solid var(--rule);
-    border-radius:6px; padding:6px 9px; font-size:11px; line-height:1.5;
-    white-space:nowrap; box-shadow:0 2px 10px rgba(0,0,0,.10); z-index:5;}
-  .money .tip b{font-family:'Space Grotesk',sans-serif;}
-  .money .key{display:flex; gap:16px; font-size:11px; color:var(--muted); margin-top:5px;}
-  .money .key i{display:inline-block; width:14px; height:2px; vertical-align:middle;
-                margin-right:5px; border-radius:2px;}
-  .money .none{font-size:12.5px; color:var(--muted);}
-  .age{font-size:11.5px; color:var(--muted); margin-top:9px;}
-
-  /* System panel. The page exists to be read away from the machine, so
-     the things that decide whether this is worth funding -- how much data
-     exists, what the curve says, whether the collectors are even alive --
-     belong here and not only over ssh. */
-  .sys{margin-top:34px; border-top:1px solid var(--rule); padding-top:20px;}
-  .sys h2{margin:0 0 4px;}
-  .sys .grid{display:grid; gap:14px; margin-top:14px;
-             grid-template-columns:repeat(auto-fit,minmax(230px,1fr));}
-  .sys .box{border:1px solid var(--rule); border-radius:10px; padding:13px 15px;
-            background:var(--card);}
-  .sys .box h3{margin:0 0 8px; font-size:11px; letter-spacing:.09em;
-               text-transform:uppercase; color:var(--muted); font-weight:600;}
-  .sys .big{font-family:'Space Grotesk',sans-serif; font-size:23px;
-            font-weight:600; letter-spacing:-0.02em; line-height:1.1;}
-  .sys .sub{font-size:12px; color:var(--ink2); margin-top:3px;}
-  /* Seven columns of numbers do not fit a phone. Let each table scroll
-     sideways inside its own box rather than pushing the whole page out
-     of the viewport, which is what a wide table does by default. */
-  .sys .scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;
-               max-width:100%;}
-  .sys table{width:100%; border-collapse:collapse; font-size:12.5px;
-             margin-top:4px;}
-  @media (max-width:520px){
-    .sys table{font-size:11.5px; min-width:360px;}
-    .sys td,.sys th{padding:3px 5px 3px 0;}
-  }
-  .sys td,.sys th{padding:3px 6px 3px 0; text-align:right;}
-  .sys th{color:var(--muted); font-weight:600; font-size:11px;}
-  .sys td:first-child,.sys th:first-child{text-align:left;}
-  .sys .ok{color:var(--good);} .sys .bad{color:var(--bad);}
-  .sys .dot{display:inline-block; width:7px; height:7px; border-radius:50%;
-            margin-right:6px; vertical-align:middle;}
-  .sys .verdict{border-left:3px solid var(--bad); padding-left:13px;
-                margin-top:16px;}
-  .sys .verdict li{font-size:13px; color:var(--ink2); margin:5px 0;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper)}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       background:var(--paper); color:var(--text-primary); line-height:1.55;
+       font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased}
+  main{max-width:960px;margin:0 auto;padding:40px 16px 96px}
+  h1{font-size:clamp(26px,4.4vw,36px);font-weight:650;letter-spacing:-.02em}
+  h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:0 0 4px}
+  .sub{color:var(--text-secondary);max-width:62ch;margin-top:10px}
+  section{background:var(--surface-1);border:1px solid var(--line);
+          border-radius:14px;padding:22px;margin-top:22px}
+  .shead{margin-bottom:16px}
+  .shead p{color:var(--text-secondary);font-size:13.5px;max-width:70ch;margin-top:3px}
+  .tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}
+  .tile{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
+  .tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted)}
+  .tile .v{font-size:23px;font-weight:650;margin-top:3px;letter-spacing:-.02em}
+  .tile .n{font-size:12px;color:var(--text-secondary);margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
+  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+     color:var(--text-muted);font-weight:600}
+  tbody tr:last-child td{border-bottom:none}
+  .pos{color:var(--good)} .neg{color:var(--critical)}
+  .wrap{overflow-x:auto}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+        border:1px solid var(--line);border-radius:999px;padding:2px 9px;
+        color:var(--text-secondary)}
+  .dot{width:8px;height:8px;border-radius:50%}
+  .legend{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 2px}
+  .note{font-size:12.5px;color:var(--text-secondary);margin-top:12px;
+        border-left:2px solid var(--rule);padding-left:11px}
+  .warn{border-left-color:var(--warning)}
+  .empty{color:var(--text-secondary);font-size:14px;padding:26px 0;text-align:center}
+  svg{display:block;max-width:100%;height:auto}
+  .tip{position:fixed;pointer-events:none;background:var(--surface-1);
+       border:1px solid var(--rule);border-radius:8px;padding:8px 10px;
+       font-size:12.5px;box-shadow:0 6px 22px rgba(0,0,0,.14);opacity:0;
+       transition:opacity .1s;z-index:20;max-width:230px}
+  footer{margin-top:30px;font-size:12px;color:var(--text-muted)}
+  a{color:var(--s1)}
 </style>
 </head>
 <body>
-<aside class="paper" id="paper" hidden></aside>
-<div class="hist" id="hist" hidden>
-  <div class="panel" role="dialog" aria-modal="true" aria-label="Trade history">
-    <div class="hhead">
-      <button class="close" id="histclose" aria-label="Close">&times;</button>
-      <h3>Trade history</h3>
-      <p class="lede" id="histlede"></p>
-    </div>
-    <div class="hstats" id="histstats"></div>
-    <div id="histbest"></div>
-    <details class="hfold">
-      <summary>Activity by hour</summary>
-      <div class="htl" id="histtl"></div>
-    </details>
-    <div class="hbody" id="histbody"></div>
-  </div>
-</div>
 <main>
-  <!-- REAL MONEY, not the paper account. Everything else on this page is
-       simulated or observed; this one line is the record of orders that
-       were actually sent to a venue, published by tradefeed.py from the
-       order journal. It is first because it is the only thing here that
-       can cost anything. -->
-  <a class="realbar" id="realbar" href="#" hidden></a>
+  <h1>Calibration Board</h1>
+  <p class="sub">What prediction markets were <em>priced</em> at, against what
+  actually <em>happened</em>. Every figure uses the price you could have
+  transacted at &mdash; the ask to buy, the bid to sell, never the midpoint
+  &mdash; and only quotes with real depth behind them.</p>
 
-  <!-- LIVE RUN STATE, from runfeed.py on the Pi. Separate from the bar
-       above on purpose: that one is the record of money that moved,
-       this one is whether anything is running right now. Between
-       trades the record is silent, and silence is the expected state,
-       so without this a dead run and a patient one look identical. -->
-  <section class="runp" id="runp" hidden></section>
+  <section>
+    <div class="shead"><h2>What has been collected</h2>
+    <p>The collector runs on the Pi and keeps running with every laptop in the
+    house shut. It records the order book for open markets, then records how
+    each one settled.</p></div>
+    <div class="tiles" id="tiles"></div>
+    <div id="cats"></div>
+  </section>
 
-  <div class="summary" id="summary"></div>
+  <section>
+    <div class="shead"><h2>Is the price right?</h2>
+    <p>Each point is a band of prices. The diagonal is a perfectly calibrated
+    market. A point <strong>above</strong> the line happened more often than it
+    was priced for; <strong>below</strong>, less often. Bars are 95% confidence
+    intervals &mdash; where they cross the line, the market is not measurably
+    wrong.</p></div>
+    <div id="chartwrap"></div>
+  </section>
 
-  <div class="sig" id="signals" hidden></div>
+  <section>
+    <div class="shead"><h2>Could you have traded it?</h2>
+    <p>Gross is the mispricing. Net is after the Kalshi fee at a realistic order
+    size &mdash; the fee ceiling is charged per <em>order</em>, so size matters
+    a great deal. A row only counts as an edge if its confidence interval clears
+    the price <em>and</em> net is positive.</p></div>
+    <div id="tables"></div>
+    <div class="note warn" id="caveat"></div>
+  </section>
 
-  <div id="board"></div>
-
-  <section class="sys" id="sys" hidden></section>
-
-  <footer id="foot"></footer>
+  <footer>
+    Source <a href="https://arb.aedinlai.com/calib.json">calib.json</a>,
+    rebuilt every 5 minutes. Read-only: the collector holds no trading
+    credentials and cannot place an order.
+    <span id="gen"></span>
+  </footer>
 </main>
+<div class="tip" id="tip"></div>
 
 <script>
-(() => {
-  "use strict";
-  const $ = s => document.querySelector(s);
-  const el = (t, c, x) => { const n = document.createElement(t); if (c) n.className = c;
-    if (x != null) n.textContent = x; return n; };
-  const money = v => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US",
-    { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const money0 = v => "$" + Math.round(v).toLocaleString("en-US");
-  const pct = (v, d = 2) => (v >= 0 ? "+" : "−") + Math.abs(v * 100).toFixed(d) + "%";
-  const cents = v => (v * 100).toFixed(1) + "¢";
+const FEED = "https://arb.aedinlai.com/calib.json";
+const $ = s => document.querySelector(s);
+const pc = x => (100*x).toFixed(1) + "c";
+const sgn = x => (x>0?"+":"") + (100*x).toFixed(1) + "c";
 
-  const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-               "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  function closes(iso, bucket) {
-    if (!iso) return "";
-    const d = new Date(iso);
-    const hm = d.toLocaleTimeString("en-US",
-      { hour: "numeric", minute: "2-digit" }).replace(" ", "").toLowerCase();
-    if (bucket === "today") return "closes " + hm + " today";
-    if (bucket === "week") return "closes " + DOW[d.getDay()] + " " + hm;
-    const y = d.getFullYear() !== new Date().getFullYear() ? " " + d.getFullYear() : "";
-    return "closes " + d.getDate() + " " + MON[d.getMonth()] + y;
+function tile(k, v, n){
+  return `<div class="tile"><div class="k">${k}</div>
+          <div class="v">${v}</div>${n?`<div class="n">${n}</div>`:""}</div>`;
+}
+
+function renderTiles(d){
+  const t = d.totals || {};
+  const days = (t.days||[]).length;
+  $("#tiles").innerHTML =
+      tile("Snapshots", (t.snapshots||0).toLocaleString(), "order books recorded")
+    + tile("Settled", (t.settled||0).toLocaleString(), "markets with a result")
+    + tile("Usable", (t.observations||0).toLocaleString(), "priced AND settled")
+    + tile("Days", days || "—", days ? `${t.days[0]} → ${t.days[days-1]}` : "accumulating");
+
+  const bc = t.by_category_settled || {};
+  const keys = Object.keys(bc).sort((a,b)=>bc[b]-bc[a]);
+  if(keys.length){
+    $("#cats").innerHTML = `<div class="legend" style="margin-top:14px">` +
+      keys.map(k=>`<span class="chip">${k} · ${bc[k].toLocaleString()} settled</span>`).join("") +
+      `</div>`;
   }
+}
 
-  // The board shows the 15-minute crypto pairings, not sports. Sports
-  // collection was retired 2026-10-23: Polymarket US carries no crypto, so
-  // the sports board was costing 363 MB and a pass every five minutes for a
-  // market this account does not trade.
-  const WITHIN = { live: ["opened", "tradeable"],
-                   near: ["too thin", "too quiet", "too small"],
-                   none: ["no edge", "depth unknown"] };
-  const TABS = [["all", "Everything"], ["live", "Tradeable"],
-                ["near", "Near miss"], ["none", "No edge"]];
-  const VERDICT_NOTE = {
-    "opened": "the paper trader took this one",
-    "tradeable": "clears the floor at these prices",
-    "too thin": "real edge, under the profit floor",
-    "too quiet": "the window has barely moved — the two rulebooks disagree most when it is flat",
-    "too small": "size rounds to nothing",
-    "depth unknown": "a book did not answer, so it may not size a position",
-    "no edge": "the two legs cost more than the $1 they pay",
-  };
-
-  // ---------------------------------------------------------------- board
-  // One column per venue. Each card is a live window on that venue: the
-  // venue's own wording, its own line, the time left, both sides priced
-  // off the same streamed book the trader decides on, and whether real
-  // money is on it.
-  function clock(secs) {
-    if (secs === null || secs === undefined) return ["--", false];
-    const t = Math.max(0, Math.round(secs));
-    const m = Math.floor(t / 60), ss = t % 60;
-    return [m + ":" + String(ss).padStart(2, "0"), t <= 60];
+/* CALIBRATION CURVE. Predicted on x, actual on y, a 45-degree reference
+   line, and a 95% interval on each point. The reference line is the whole
+   point of the form: deviation from it IS the finding, so it is drawn
+   first and in ink rather than as a series. */
+function renderChart(d){
+  const all = (d.tables && d.tables.all) || null;
+  const pts = [];
+  if(all){
+    (all.buy||[]).forEach(c => pts.push({...c, side:"buy"}));
+    (all.sell||[]).forEach(c => pts.push({...c, side:"sell"}));
   }
-
-  // DURATION BANDS, SHORTEST FIRST.
-  //
-  // Derived from the market's own open/close rather than from a field in
-  // the feed, so a venue that starts listing a new length appears without
-  // the writer having to be taught about it. The thresholds are generous
-  // because venues round their timestamps: anything up to 7 minutes is a
-  // 5-minute window, up to 20 a 15-minute one, up to 90 an hour.
-  const BANDS = [
-    { key: "5m",  label: "5 minute",  max: 7 },
-    { key: "15m", label: "15 minute", max: 20 },
-    { key: "1h",  label: "hourly",    max: 90 },
-    { key: "1d",  label: "daily",     max: Infinity },
-  ];
-
-  function bandOf(m) {
-    // The feed already labels most cards with a horizon; trust it first.
-    // Deriving from open/close is the fallback, and it has to BE a
-    // fallback because not every card carries an open -- a Polymarket
-    // card has close and window but no open, and silently bucketing all
-    // of those as 15-minute would have put the 5-minute ones in the
-    // wrong band while looking entirely correct.
-    const h = (m.horizon || "").toLowerCase();
-    if (h && BANDS.some(x => x.key === h)) return h;
-    const a = m.open ? new Date(m.open).getTime() : NaN;
-    const b = m.close ? new Date(m.close).getTime() : NaN;
-    if (!isFinite(a) || !isFinite(b) || b <= a) return "15m";
-    const mins = (b - a) / 60000;
-    for (const x of BANDS) if (mins <= x.max) return x.key;
-    return "1d";
+  if(!pts.length){
+    $("#chartwrap").innerHTML =
+      `<div class="empty">No market has both a recorded price and a result yet.<br>
+       The first 15-minute crypto windows land within the hour; game markets
+       enter the 24-hour window as they approach.</div>`;
+    return;
   }
-
-  function marketCard(m, clash) {
-    const c = el("div", "mkt");
-    c.dataset.close = m.close || "";
-
-    const top = el("div", "mtop");
-    const who = el("div");
-    who.appendChild(el("div", "mname", m.title || m.coin.toUpperCase()));
-    if (m.line) who.appendChild(el("div", "mline", m.line));
-    top.appendChild(who);
-
-    const right = el("div");
-    const [txt, soon] = clock(m.secs_left);
-    const cl = el("div", "clock" + (soon ? " soon" : ""), txt);
-    cl.dataset.clock = "1";
-    right.appendChild(cl);
-    right.appendChild(el("span", "clockl", "left"));
-    top.appendChild(right);
-    c.appendChild(top);
-
-    const sides = el("div", "sides");
-    (m.sides || []).forEach(sd => {
-      const b = el("div", "sd");
-      b.appendChild(el("div", "sn", sd.name));
-      b.appendChild(el("div", "sp", sd.px === null || sd.px === undefined
-        ? "\u2014" : (sd.px * 100).toFixed(1) + "\u00A2"));
-      // Sizes under a contract are real and are the whole story on a thin
-      // book -- rounding 0.02 to "0" printed a price next to no size at all.
-      b.appendChild(el("div", "ss", sd.size
-        ? (sd.size < 10 ? (Math.round(sd.size * 100) / 100)
-                        : Math.round(sd.size).toLocaleString())
-          + " at this price" : "no size"));
-      sides.appendChild(b);
-    });
-    c.appendChild(sides);
-
-    if (clash && clash.length) {
-      const w = el("div", "mismatch");
-      w.appendChild(el("b", null, "Not hedgeable against the other column. "));
-      w.appendChild(document.createTextNode(
-        "Each venue is struck at a different number \u2014 "
-        + clash.map(x => x.venue + " " + x.val).join(", ")
-        + " \u2014 so these are not two sides of one trade. If the settlement "
-        + "lands between them the pair pays $2 or $0 instead of $1. The paper "
-        + "trader skips this coin for that reason."));
-      c.appendChild(w);
-    }
-
-    // The real-money marker. A check and the amount when a position is
-    // open on this exact market, a cross when there is none. This reads
-    // the venue's own portfolio endpoint; nothing here places anything.
-    const h = m.position;
-    const row = el("div", "held " + (h ? "on" : "off"));
-    row.appendChild(el("span", "mk", h ? "\u2713" : "\u2715"));
-    if (h) {
-      const sp = el("span");
-      sp.innerHTML = "betting <b>" + money(h.cost) + "</b> \u2014 "
-        + Math.round(h.qty).toLocaleString() + " contracts "
-        + (h.side === "yes" || h.side === "long" ? "on up" : "on down");
-      row.appendChild(sp);
-    } else {
-      row.appendChild(el("span", null, "no real money on this one"));
-    }
-    c.appendChild(row);
-    return c;
+  const W=680,H=440,P={t:14,r:16,b:44,l:52};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const X=v=>P.l+v*iw, Y=v=>P.t+(1-v)*ih;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img"
+          aria-label="Calibration curve: priced probability against realised frequency">`;
+  // grid + axes
+  for(let i=0;i<=5;i++){
+    const v=i/5;
+    s+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}"
+         stroke="var(--line)" stroke-width="1"/>`;
+    s+=`<text x="${P.l-9}" y="${Y(v)+4}" text-anchor="end" font-size="11"
+         fill="var(--text-muted)">${v.toFixed(1)}</text>`;
+    s+=`<text x="${X(v)}" y="${H-P.b+18}" text-anchor="middle" font-size="11"
+         fill="var(--text-muted)">${v.toFixed(1)}</text>`;
   }
-
-  function signalStrip(d) {
-    const box = $("#signals");
-    const rows = d.signals || [];
-    if (!rows.length) { box.hidden = true; return; }
-    box.hidden = false;
-    box.textContent = "";
-    const clears = rows.filter(r => r.clears).length;
-    box.appendChild(el("h3", null, clears
-      ? clears + " of " + rows.length + " pairings clear the floor right now"
-      : "What to bet on: nothing. " + rows.length
-        + " pairings priced, none clears the floor."));
-    rows.slice(0, 8).forEach(r => {
-      const row = el("div", "sigrow");
-      row.appendChild(el("span", "c", r.coin));
-      row.appendChild(el("span", "sh", r.shape + " \u00B7 costs "
-        + (r.unit * 100).toFixed(1) + "\u00A2 to win $1"));
-      const nv = el("span", "nv " + (r.net >= 0 ? "pos" : "neg"),
-        (r.net >= 0 ? "+" : "\u2212") + Math.abs(r.net * 100).toFixed(2) + "\u00A2");
-      row.appendChild(nv);
-      row.appendChild(el("span", "sz", r.size
-        ? (r.size < 10 ? (Math.round(r.size * 100) / 100)
-                       : Math.round(r.size).toLocaleString()) + " deep"
-        : "no size"));
-      box.appendChild(row);
-    });
-  }
-
-  function render(d) {
-    // Do NOT rebuild #summary here. It holds the real-balances card, which
-    // refreshes on its own 60s clock; recreating it on every 5s board pass
-    // blanked it for eleven passes out of twelve.
-    if (!$("#money")) {
-      const mny = el("div", "money"); mny.id = "money";
-      $("#summary").appendChild(mny);
-    }
-
-    signalStrip(d);
-
-    const host = $("#board"); host.textContent = "";
-    // Every venue keeps its column even with nothing open on it. Dropping
-    // the empty one re-flows the board to a single column and makes it
-    // look as though the venue is gone, when it is only between windows.
-    // LEFT TO RIGHT: Polymarket US, Gemini, Kalshi. Fixed here rather
-    // than taken from the feed, so the columns stay put when the writer
-    // reorders them or a venue drops out for a scan and comes back.
-    // Anything not named keeps its feed order, after the named ones.
-    const VORDER = ["Polymarket US", "Gemini", "Kalshi"];
-    const venues = (d.venues || []).slice().sort((x, y) => {
-      const i = VORDER.indexOf(x.name), j = VORDER.indexOf(y.name);
-      return (i < 0 ? 99 : i) - (j < 0 ? 99 : j);
-    });
-    if (!venues.length) {
-      host.appendChild(el("div", "empty", "No venues in the feed."));
-      return;
-    }
-    // WHICH COINS ARE STRUCK AT THE SAME NUMBER ON EVERY VENUE?
-    //
-    // line_val is each venue's own strike. A pair whose strikes differ is
-    // not a hedge -- it pays $2 or $0 instead of $1 whenever the
-    // settlement lands between them. Of 640 settled windows three
-    // resolved differently across the two venues and all three were XRP,
-    // which trades near $1.30 where Kalshi's four decimals and
-    // Polymarket's five genuinely disagree. Computed from the feed rather
-    // than hardcoded, so a coin that starts agreeing clears itself.
-    const strikes = {};
-    venues.forEach(v => (v.markets || []).forEach(m => {
-      if (m.line_val === null || m.line_val === undefined) return;
-      const k = (m.coin || "") + "|" + (m.window || "");
-      (strikes[k] = strikes[k] || []).push({ venue: v.name, val: m.line_val });
-    }));
-    const mismatched = {};
-    Object.keys(strikes).forEach(k => {
-      const seen = strikes[k];
-      if (seen.length < 2) return;
-      const lo = Math.min.apply(null, seen.map(x => x.val));
-      const hi = Math.max.apply(null, seen.map(x => x.val));
-      // Relative, so it reads the same on a $80,000 coin and a $1.30 one.
-      if ((hi - lo) / Math.max(Math.abs(hi), 1e-9) > 1e-9) mismatched[k] = seen;
-    });
-
-    // WHICH LENGTHS DOES EACH VENUE ACTUALLY LIST?
-    //
-    // An empty band means one of two different things and they should not
-    // read alike: the venue lists that length and is simply between
-    // windows, or the venue does not offer it at all. Kalshi lists no
-    // 5-minute crypto; Gemini and Polymarket US both do. Taken from what
-    // the feed has carried rather than hardcoded, so the page stops
-    // claiming "n/a" the moment a venue starts listing something.
-    const supported = {};
-    venues.forEach(v => {
-      supported[v.name] = supported[v.name] || {};
-      (v.markets || []).forEach(m => { supported[v.name][bandOf(m)] = true; });
-      (v.bands || []).forEach(b => { supported[v.name][b] = true; });
-    });
-
-    // BAND-MAJOR, NOT COLUMN-MAJOR.
-    //
-    // Each venue used to own a column and lay its own bands out inside
-    // it, so the columns flowed independently: Polymarket's four
-    // 5-minute cards pushed its 15-minute band far below Kalshi's, and
-    // the rows stopped lining up the moment two venues had different
-    // card counts. The band is now the grid ROW -- a full-width label,
-    // then one cell per venue -- so every band starts at the same height
-    // in all three columns no matter how much is in each cell.
-    const grid = el("div", "venues");
-    grid.style.setProperty("--vcols", String(venues.length));
-
-    venues.forEach(v => {
-      const hd = el("div", "vhead");
-      hd.appendChild(el("span", "vname", v.name));
-      hd.appendChild(el("span", "vcash", v.wallet === null || v.wallet === undefined
-        ? "balance unknown" : money(v.wallet) + " in the account"));
-      grid.appendChild(hd);
-    });
-
-    const byVenue = venues.map(v => {
-      const by = {};
-      (v.markets || []).forEach(m => (by[bandOf(m)] = by[bandOf(m)] || []).push(m));
-      return by;
-    });
-
-    BANDS.forEach(x => {
-      const lab = el("div", "dband", x.label);
-      lab.style.gridColumn = "1 / -1";
-      grid.appendChild(lab);
-      venues.forEach((v, i) => {
-        const cell = el("div", "bcell");
-        const got = (byVenue[i][x.key] || []).slice();
-        if (!got.length) {
-          // An empty band means one of two different things and they must
-          // not read alike: the venue lists this length and is between
-          // windows, or it does not offer it at all.
-          cell.appendChild(el("div", "dna",
-            supported[v.name] && supported[v.name][x.key]
-              ? "between windows"
-              : "n/a \u2014 not listed here"));
-        } else {
-          got.sort((a, b) => new Date(a.close || 0) - new Date(b.close || 0));
-          got.forEach(m => cell.appendChild(marketCard(m,
-            mismatched[(m.coin || "") + "|" + (m.window || "")])));
-        }
-        grid.appendChild(cell);
-      });
-    });
-    host.appendChild(grid);
-  }
-
-  // The clocks tick locally between feed passes, so the time left is
-  // right to the second instead of right to the last poll.
-  setInterval(() => {
-    document.querySelectorAll(".mkt").forEach(c => {
-      const iso = c.dataset.close;
-      if (!iso) return;
-      const node = c.querySelector("[data-clock]");
-      if (!node) return;
-      const [txt, soon] = clock((new Date(iso).getTime() - Date.now()) / 1000);
-      node.textContent = txt;
-      node.classList.toggle("soon", soon);
-    });
-  }, 1000);
-
-  function foot(d) {
-    const f = $("#foot");
-    f.textContent = "";
-    const lines = [
-      "Both columns are priced from live WebSocket order books \u2014 the same books the "
-      + "paper trader decides on, so the page and the decision cannot disagree. Neither side "
-      + "uses a venue's cached summary quote; Polymarket's was measured twenty cents stale and "
-      + "invented edges nobody was offering. A book that does not answer shows no size rather "
-      + "than unlimited size.",
-      "A price on a card is the top of the book \u2014 what the FIRST contract costs. Twenty "
-      + "contracts cost more, because the ladder has to be walked. The pairing figures above "
-      + "are quoted at the size actually shown, which is why a card can look cheap while "
-      + "nothing clears.",
-      "The check and cross mark whether real money is on that exact market, read from each "
-      + "venue's own portfolio endpoint. The paper account below is separate, and it skips any "
-      + "window that already has a real bet on it so the two never compete for the same money.",
-      "This is a research board. It places no orders, and a card on it is not advice."
-    ];
-    lines.forEach(x => f.appendChild(el("p", null, x)));
-    if (d.as_of) {
-      const secs = (Date.now() - new Date(d.as_of).getTime()) / 1000;
-      f.appendChild(el("p", "age", "board updated "
-        + (secs < 90 ? Math.round(secs) + "s" : Math.round(secs / 60) + " min") + " ago"
-        + (d.real_as_of ? " \u00B7 positions checked "
-            + Math.round((Date.now() - new Date(d.real_as_of).getTime()) / 1000)
-            + "s ago" : "")));
-    }
-  }
-
-  // Paper account card. Carried in the feed by the collector; absent when
-  // no paper run exists, and then nothing is drawn.
-  // Real money in each venue, with 24h of history. Served separately from
-  // the board because it is tracked on its own cadence, and absent
-  // entirely until an account is actually connected.
-  function paperCard(d) {
-    const p = d.paper, box = $("#paper");
-    if (!p || !box) return;
-    box.hidden = false;
-    box.innerHTML = "";
-    // The history button is appended at the end, after everything the
-    // card builds -- margin-left:auto pushes it into the corner.
-    const addHistBtn = () => {
-      const b = el("button", "histbtn",
-        "Trade history" + (p.settled + p.open ? " (" + (p.settled + p.open) + ")" : ""));
-      b.type = "button";
-      b.addEventListener("click", openHistory);
-      box.appendChild(b);
-    };
-    setTimeout(addHistBtn, 0);
-    const up = p.pnl >= 0, sign = up ? "+" : "\u2212";
-    const cash = p.cash || {};
-    // Use the number the feed publishes. This used to be inferred as
-    // equity minus the two wallets the page knew about -- so the moment a
-    // third venue existed, its idle cash had nowhere to go and was
-    // reported as money on the table: $100 sitting unused in Gemini read
-    // as "$100.00 bet right now" with nothing open at all. Derive a
-    // quantity from the thing that measures it, not from what is left
-    // over after subtracting the parts you happen to know.
-    const atRisk = p.at_risk !== undefined
-      ? p.at_risk
-      : Math.max(0, p.equity - Object.values(p.wallets || cash)
-                                     .reduce((a, b) => a + (b || 0), 0));
-    const pctMove = p.staked ? (p.pnl / p.staked) * 100 : 0;
-
-    // A headline percentage that mixes hedged pairs with naked legs is
-    // not a result. Lead with whichever one the money actually came
-    // from, and say so.
-    const nkPnl = p.naked_pnl || 0;
-    const hdPnl = p.hedged_pnl != null ? p.hedged_pnl : (p.pnl || 0) - nkPnl;
-    const nakedRules = Math.abs(nkPnl) > Math.abs(hdPnl) && nkPnl !== 0;
-
-    const pair = el("div", "pair");
-    pair.appendChild(el("span", "tag", "paper account \u00b7 not real money"));
-    pair.appendChild(el("span", "big " + (up ? "up" : "down"),
-                        sign + Math.abs(pctMove).toFixed(2) + "%"));
-    pair.appendChild(el("span", up ? "up" : "down",
-                        "(" + sign + "$" + Math.abs(p.pnl).toFixed(2) + ")"));
-    box.appendChild(pair);
-
-    box.appendChild(el("span", null,
-      "$" + p.equity.toFixed(2) + " of $" + p.staked.toFixed(2)));
-    // Per venue, because one wallet starving is what stops the account
-    // trading and the total hides it completely.
-    // "kalshi $26.86" next to a real KALSHI $99.00 further down the page
-    // reads as a balance that has gone wrong. Say "sim" on the number
-    // itself, not only in the heading, and name the venue this track
-    // actually trades -- global Polymarket, which the real accounts
-    // cannot reach.
-    // Every wallet the feed reports, not the two this card was written
-    // for. A venue whose balance is not shown cannot be seen to be
-    // starving, and a starving wallet is what stops the account trading.
-    const SHORTV = { kalshi: "kalshi", polymarket_us: "poly(US)",
-                     gemini: "gemini" };
-    const wal = p.wallets
-      || { kalshi: cash.kalshi, polymarket_us: cash.polymarket };
-    box.appendChild(el("span", null, "sim wallets \u00b7 "
-      + Object.keys(wal).sort().map(k =>
-          (SHORTV[k] || k) + " $"
-          + (wal[k] === undefined || wal[k] === null
-               ? "\u2014" : Number(wal[k]).toFixed(2))).join(" \u00b7 ")));
-    box.appendChild(el("span", atRisk > 0.005 ? "v" : null,
-      "$" + atRisk.toFixed(2) + " bet right now"));
-    box.appendChild(el("span", null, p.settled + " settled \u00b7 " + p.open + " open"));
-    // The number this whole exercise exists to find: both legs lost, so
-    // the two venues disagreed and the entire stake went.
-    box.appendChild(el("span", p.diverged ? "warn" : null,
-      p.diverged ? p.diverged + " settled differently" : "0 disagreements"));
-    // The split, every time. One leg filling and the other missing is a
-    // real position a real account would be stuck with -- and because it
-    // is a coin flip on the full stake it swamps a 3c edge in both
-    // directions. The old harness deleted these and called the account
-    // perfectly hedged.
-    box.appendChild(el("span", null,
-      (p.hedged_settled != null ? p.hedged_settled : "\u2014")
-      + " hedged (" + (hdPnl >= 0 ? "+" : "\u2212") + "$"
-      + Math.abs(hdPnl).toFixed(2) + ") \u00b7 "
-      + (p.naked_settled || 0) + " naked ("
-      + (nkPnl >= 0 ? "+" : "\u2212") + "$" + Math.abs(nkPnl).toFixed(2)
-      + ")"));
-    if (nakedRules) {
-      box.appendChild(el("span", "warn",
-        "this P&L is naked legs, not the strategy \u2014 one order "
-        + "filled, the other missed"));
-    }
-    if (p.naked_open) {
-      box.appendChild(el("span", "warn",
-        p.naked_open + " unhedged position"
-        + (p.naked_open === 1 ? "" : "s") + " live right now"));
-    }
-    // Both legs are now the real pair -- Kalshi KX*15M against
-    // Polymarket US 15m, the same CF Benchmarks index on both sides. The
-    // old global-Polymarket track that used to feed this card settled on
-    // a Chainlink TWAP and was a different contract entirely.
-    box.appendChild(el("span", null,
-      "real pair \u00b7 both legs on the CF Benchmarks index"));
-    if (p.as_of) {
-      const age = Math.max(0, Math.round((Date.now() - new Date(p.as_of).getTime()) / 1000));
-      box.appendChild(el("span", null,
-        (age < 90 ? age + "s" : Math.round(age / 60) + " min") + " ago"));
-    }
-  }
-
-
-  function renderMoney(b) {
-    const box = document.getElementById("money");
-    if (!box) return;
-    box.innerHTML = "";
-    if (!b || b.total === undefined || b.total === null) {
-      box.appendChild(el("div", "none",
-        "No account connected \u2014 add a Polymarket address or Kalshi key "
-        + "to show real balances here."));
-      return;
-    }
-    const up = (b.change_24h || 0) >= 0;
-    const nums = el("div", "nums");
-    // A VENUE'S FIGURE CAN BE STALE WHILE THE PAGE LOOKS FRESH.
-    //
-    // A balance row is only recorded when that venue's read succeeds, and
-    // the series carries the last known value forward -- so when Kalshi
-    // returns 429 and Polymarket does not, the timestamp advances on
-    // Polymarket's read while the Kalshi figure beside it is minutes old.
-    // Every line in the balance log is a 429, about 12 misses in 552
-    // polls, leaving 10 to 15 minute gaps. A number you would size a
-    // trade against should not be able to go quietly stale.
-    const seenAt = b.venue_as_of || {};
-    const ageOf = key => {
-      const ts = seenAt[key];
-      if (!ts) return null;
-      const secs = (Date.now() - new Date(ts).getTime()) / 1000;
-      return isFinite(secs) ? secs : null;
-    };
-    const mk = (label, val, cls, key) => {
-      const d = el("div");
-      d.appendChild(el("span", "lab", label));
-      d.appendChild(el("span", cls || "v",
-        val === null || val === undefined ? "\u2014" : "$" + val.toFixed(2)));
-      const age = key ? ageOf(key) : null;
-      if (age !== null && age > 600) {
-        const m = Math.round(age / 60);
-        const w = el("span", "bstale",
-          m >= 60 ? "last read " + Math.round(m / 60) + "h ago"
-                  : "last read " + m + "m ago");
-        w.title = "This venue's balance endpoint has not answered since "
-          + new Date(seenAt[key]).toLocaleTimeString()
-          + ". The figure shown is the last one it gave.";
-        d.appendChild(w);
-      }
-      return d;
-    };
-    // EVERY VENUE THE FEED REPORTS, NOT THE TWO THIS CARD WAS WRITTEN FOR.
-    //
-    // `total` has always summed every venue in the record while this card
-    // drew a row for Kalshi and Polymarket only. The moment a third venue
-    // started reporting, the total would have moved with nothing on the
-    // page accounting for the difference -- and the account whose balance
-    // is invisible is exactly the one that cannot be seen to be empty.
-    const VCLASS = { kalshi: "v k", polymarket: "v p", polymarket_us: "v p",
-                     gemini: "v g" };
-    const vmap = (b.venues && Object.keys(b.venues).length)
-      ? b.venues
-      : { kalshi: b.kalshi, polymarket: b.polymarket };
-    const vkeys = Object.keys(vmap).sort();
-    const tot = el("div");
-    tot.appendChild(el("span", "lab",
-      "total across " + vkeys.length + (b.real ? "" : " \u00b7 simulated")));
-    tot.appendChild(el("span", "big", "$" + b.total.toFixed(2)));
-    nums.appendChild(tot);
-    vkeys.forEach(k => {
-      const v = vmap[k];
-      nums.appendChild(mk(k, (v === undefined ? null : v),
-                          VCLASS[k] || "v", k));
-    });
-    const ch = el("div");
-    if (b.change_24h === null || b.change_24h === undefined) {
-      // Not enough history yet to call anything a 24-hour change.
-      ch.appendChild(el("span", "lab", "history"));
-      ch.appendChild(el("span", "v", (b.span_hours || 0).toFixed(1) + "h"));
-    } else {
-      // A change measured over fewer venues than the card shows is not
-      // the account's change, and must not be read as one. The recorder
-      // only differences venues present at both ends of the window --
-      // say so here when that is a subset.
-      const cv = b.change_venues || [];
-      ch.appendChild(el("span", "lab",
-        (cv.length && cv.length < vkeys.length)
-          ? "24 hours \u00b7 " + cv.join(" + ") + " only"
-          : "24 hours"));
-      ch.appendChild(el("span", "v " + (up ? "up" : "down"),
-        (up ? "+" : "\u2212") + "$" + Math.abs(b.change_24h).toFixed(2)));
-    }
-    nums.appendChild(ch);
-    box.appendChild(nums);
-
-    // ------------------------------------------------------------- charts
-    // TWO FRAMES, NOT ONE AXIS WITH TWO SCALES.
-    //
-    // Each account sits near $100 and their sum near $309. On one axis the
-    // three account lines are crushed into the bottom third while the total
-    // rides clear above them; a second y-axis would be worse still, because
-    // two scales on one frame let any shape be made to resemble any other.
-    // Separate frames, each with its own honest scale, is the standard
-    // answer to two measures of different magnitude.
-    const c = b.curve || [];
-    if (c.length < 2) return;
-    const vseries = vkeys.slice();
-
-    // Validated with the palette checker against this page's surface:
-    // worst adjacent pair is purple/blue at dE 14.7 under deuteranopia and
-    // 25.1 for normal vision, both above the floor. The obvious
-    // red/blue/purple (#c62828/#1b58b8/#6d3fb0) FAILED at dE 1.6 deutan --
-    // two of the three lines were the same line to a red-green colourblind
-    // reader, and only 11.2 apart for everyone else.
-    const VCOL = { kalshi: "#0288d1", polymarket: "#d32f2f",
-                   polymarket_us: "#d32f2f", gemini: "#7b1fa2" };
-    const PALETTE = ["#00695c", "#8a6000", "#c2185b", "#455a64"];
-    const colOf = k => VCOL[k] || PALETTE[vseries.indexOf(k) % PALETTE.length];
-    const totalCol = up ? "#0a6b2e" : "#c2691a";
-
-    const ts = c.map(r => new Date(r.ts).getTime());
-    const t0 = ts[0], t1 = ts[ts.length - 1];
-    const valAt = (r, k) => (k === "total" ? r.total : (r.venues || r)[k]);
-
-    // Round tick values, so the axis reads $100 / $105 rather than
-    // $99.0133. A flat series gets a small band around itself instead of a
-    // zero-height scale -- every account here is perfectly flat, and a
-    // degenerate domain would put the line on the frame edge or divide by 0.
-    function niceTicks(lo, hi, want) {
-      if (!(hi > lo)) {
-        const pad = Math.max(0.5, Math.abs(hi || 1) * 0.01);
-        lo -= pad; hi += pad;
-      }
-      const raw = (hi - lo) / Math.max(1, want);
-      const mag = Math.pow(10, Math.floor(Math.log10(raw)));
-      const n = raw / mag;
-      const step = (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * mag;
-      const out = [];
-      for (let v = Math.floor(lo / step) * step;
-           v <= Math.ceil(hi / step) * step + step * 1e-9; v += step) {
-        out.push(Math.round(v * 1e6) / 1e6);
-      }
-      return out;
-    }
-    const money = (v, step) => "$" + (step >= 1 ? Math.round(v)
-                                                : v.toFixed(2));
-    // "3p", "11a", "12a" -- the hour, which is what you actually read off a
-    // time axis, with a single character to place it in the day.
-    const hourLabel = (ms) => {
-      const d = new Date(ms), h = d.getHours();
-      return (h % 12 === 0 ? 12 : h % 12) + (h < 12 ? "a" : "p");
-    };
-
-    // What one chart will be handed: the card's width, halved and minus
-    // the gap when the two sit side by side.
-    const cardW = Math.max(240, box.clientWidth || 700);
-    const twoUp = window.matchMedia("(min-width: 761px)").matches;
-    const gap = Math.min(26, Math.max(14, cardW * 0.03));
-    const frameW = Math.round(twoUp ? (cardW - gap) / 2 : cardW);
-
-    function chart(keys, colFor, opts) {
-      // THE VIEWBOX IS THE SIZE IT WILL ACTUALLY RENDER AT.
-      //
-      // A fixed viewBox cannot win at every width: 520 units inside a
-      // 385px frame scaled every label by 0.74, so 10.5-unit type landed
-      // on screen at 7.8px -- the whole reason the old chart read as low
-      // quality -- and a box tuned for the desktop pair then shrank to
-      // 8.6px when the grid stacked on a phone. Measure the frame and
-      // draw at that size, so the scale is 1 and 11 means 11.
-      const W = frameW, H = 206, L = 48, R = 12, T = 14, B = 30;
-      const pw = W - L - R, ph = H - T - B;
-      let lo = Infinity, hi = -Infinity;
-      c.forEach(r => keys.forEach(k => {
-        const v = valAt(r, k);
-        if (v !== null && v !== undefined) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
-      }));
-      if (!isFinite(lo)) return null;
-      const yt = niceTicks(lo, hi, 4);
-      const yStep = yt.length > 1 ? yt[1] - yt[0] : 1;
-      const ylo = yt[0], yhi = yt[yt.length - 1];
-      const X = ms => L + pw * ((ms - t0) / ((t1 - t0) || 1));
-      const Y = v => T + ph * (1 - (v - ylo) / ((yhi - ylo) || 1));
-
-      const s = ['<svg viewBox="0 0 ' + W + ' ' + H + '" role="img">'];
-      // Horizontal grid only: vertical rules add ink without adding a
-      // reading you could not already take off the x labels.
-      yt.forEach(v => {
-        s.push('<line x1="' + L + '" y1="' + Y(v).toFixed(1) + '" x2="' +
-               (W - R) + '" y2="' + Y(v).toFixed(1) +
-               '" stroke="var(--line)" stroke-width="1"/>');
-        s.push('<text x="' + (L - 7) + '" y="' + (Y(v) + 4).toFixed(1) +
-               '" text-anchor="end" font-size="11" fill="var(--muted)">' +
-               money(v, yStep) + '</text>');
-      });
-      // Time ticks on round hours, spaced so the labels never collide.
-      const spanH = (t1 - t0) / 3.6e6;
-      const stepH = spanH <= 3 ? 1 : spanH <= 8 ? 2 : spanH <= 18 ? 3
-                  : spanH <= 30 ? 4 : 12;
-      const d0 = new Date(t0);
-      d0.setMinutes(0, 0, 0);
-      for (let m = d0.getTime(); m <= t1; m += stepH * 3.6e6) {
-        if (m < t0) continue;
-        s.push('<line x1="' + X(m).toFixed(1) + '" y1="' + (T + ph) +
-               '" x2="' + X(m).toFixed(1) + '" y2="' + (T + ph + 4) +
-               '" stroke="var(--rule)" stroke-width="1"/>');
-        s.push('<text x="' + X(m).toFixed(1) + '" y="' + (T + ph + 16) +
-               '" text-anchor="middle" font-size="11" fill="var(--muted)">' +
-               hourLabel(m) + '</text>');
-      }
-      s.push('<line x1="' + L + '" y1="' + (T + ph) + '" x2="' + (W - R) +
-             '" y2="' + (T + ph) + '" stroke="var(--rule)" stroke-width="1"/>');
-
-      keys.forEach(k => {
-        // Break the path wherever a venue has no reading, instead of
-        // drawing a straight line across the gap as though it were data.
-        let d = "", pen = false;
-        c.forEach((r, i) => {
-          const v = valAt(r, k);
-          if (v === null || v === undefined) { pen = false; return; }
-          d += (pen ? "L" : "M") + X(ts[i]).toFixed(1) + " " + Y(v).toFixed(1) + " ";
-          pen = true;
-        });
-        if (d) s.push('<path d="' + d.trim() + '" fill="none" stroke="' +
-                      colFor(k) + '" stroke-width="2" stroke-linejoin="round" ' +
-                      'stroke-linecap="round"/>');
-      });
-      if (opts && opts.mark !== undefined && opts.mark >= 0 && opts.mark < ts.length) {
-        const mx = X(ts[opts.mark]).toFixed(1);
-        s.push('<line x1="' + mx + '" y1="' + T + '" x2="' + mx + '" y2="' +
-               (T + ph) + '" stroke="var(--muted)" stroke-width="1" ' +
-               'stroke-dasharray="3 3"/>');
-        s.push('<text x="' + (+mx + 5) + '" y="' + (T + 11) +
-               '" font-size="10" fill="var(--muted)">' + opts.markLabel + '</text>');
-      }
-      s.push('</svg>');
-      return { svg: s.join(""), X: X, Y: Y, W: W, H: H, L: L, R: R, T: T, ph: ph };
-    }
-
-    // The combined line steps up when an ACCOUNT ARRIVES, not when money is
-    // made: this record starts with Polymarket alone and gains Kalshi and
-    // then Gemini, so the sum climbs $110 -> $309 without a trade. Mark
-    // where the set of reporting accounts last changed, so the step is
-    // read as bookkeeping rather than profit.
-    const sigOf = r => Object.keys(r.venues || {})
-      .filter(k => r.venues[k] !== null && r.venues[k] !== undefined).sort().join(",");
-    const finalSig = sigOf(c[c.length - 1]);
-    let markIdx = -1;
-    for (let i = c.length - 1; i > 0; i--) {
-      if (sigOf(c[i]) !== finalSig) { markIdx = i + 1; break; }
-    }
-
-    const wrap = el("div", "charts");
-    const figs = [
-      { cap: "each account", keys: vseries, colFor: colOf, legend: true, opts: null },
-      { cap: "combined", keys: ["total"], colFor: () => totalCol, legend: false,
-        opts: { mark: markIdx, markLabel: "all " + vseries.length + " reporting" } }
-    ];
-    figs.forEach(f => {
-      const made = chart(f.keys, f.colFor, f.opts);
-      if (!made) return;
-      const fig = el("figure");
-      fig.appendChild(el("figcaption", null, f.cap));
-      const plot = el("div", "chart");
-      plot.innerHTML = made.svg;
-      fig.appendChild(plot);
-      const tip = el("div", "tip");
-      fig.appendChild(tip);
-      if (f.legend && f.keys.length > 1) {
-        const key = el("div", "ckey");
-        f.keys.forEach(k => {
-          const sp = el("span");
-          sp.innerHTML = '<i style="background:' + f.colFor(k) + '"></i>';
-          sp.appendChild(document.createTextNode(k.replace(/_/g, " ")));
-          key.appendChild(sp);
-        });
-        fig.appendChild(key);
-      }
-      // Crosshair and readout. A line chart that cannot be queried makes
-      // you estimate values off the grid, which is the thing the grid is
-      // an approximation of.
-      const svgEl = plot.querySelector("svg");
-      const nsv = "http://www.w3.org/2000/svg";
-      const cross = document.createElementNS(nsv, "line");
-      cross.setAttribute("stroke", "var(--rule)");
-      cross.setAttribute("stroke-width", "1");
-      cross.setAttribute("y1", made.T);
-      cross.setAttribute("y2", made.T + made.ph);
-      cross.setAttribute("opacity", "0");
-      svgEl.appendChild(cross);
-      const dots = f.keys.map(k => {
-        const ci = document.createElementNS(nsv, "circle");
-        ci.setAttribute("r", "4");
-        ci.setAttribute("fill", f.colFor(k));
-        ci.setAttribute("stroke", "var(--card)");
-        ci.setAttribute("stroke-width", "2");
-        ci.setAttribute("opacity", "0");
-        svgEl.appendChild(ci);
-        return ci;
-      });
-      const hide = () => {
-        cross.setAttribute("opacity", "0");
-        dots.forEach(d => d.setAttribute("opacity", "0"));
-        tip.style.opacity = "0";
-      };
-      plot.addEventListener("pointerleave", hide);
-      plot.addEventListener("pointermove", ev => {
-        const r = svgEl.getBoundingClientRect();
-        const ux = (ev.clientX - r.left) / r.width * made.W;
-        if (ux < made.L - 4 || ux > made.W - made.R + 4) { hide(); return; }
-        let best = 0, bd = Infinity;
-        for (let i = 0; i < ts.length; i++) {
-          const d = Math.abs(made.X(ts[i]) - ux);
-          if (d < bd) { bd = d; best = i; }
-        }
-        const row = c[best];
-        cross.setAttribute("x1", made.X(ts[best]));
-        cross.setAttribute("x2", made.X(ts[best]));
-        cross.setAttribute("opacity", "1");
-        const lines = ['<b>' + new Date(ts[best]).toLocaleTimeString([],
-          { hour: "numeric", minute: "2-digit" }) + '</b>'];
-        f.keys.forEach((k, i) => {
-          const v = valAt(row, k);
-          if (v === null || v === undefined) { dots[i].setAttribute("opacity", "0"); return; }
-          dots[i].setAttribute("cx", made.X(ts[best]));
-          dots[i].setAttribute("cy", made.Y(v));
-          dots[i].setAttribute("opacity", "1");
-          lines.push('<i style="display:inline-block;width:8px;height:8px;' +
-            'border-radius:2px;background:' + f.colFor(k) + ';margin-right:5px"></i>' +
-            (k === "total" ? "combined" : k.replace(/_/g, " ")) +
-            ' &nbsp;<b>$' + v.toFixed(2) + '</b>');
-        });
-        tip.innerHTML = lines.join("<br>");
-        tip.style.opacity = "1";
-        const px = made.X(ts[best]) / made.W * r.width;
-        tip.style.left = Math.min(Math.max(px + 12, 0),
-                                  Math.max(0, r.width - tip.offsetWidth - 4)) + "px";
-        tip.style.top = "22px";
-      });
-      wrap.appendChild(fig);
-    });
-    box.appendChild(wrap);
-  }
-
-  // --------------------------------------------------------- history
-  // Three parts, ordered by how fast each answers "is this thing doing
-  // anything": four figures, a strip with one cell per half hour, then a
-  // log that collapses the quiet runs and expands only what happened.
-  //
-  // The point of showing empty time at all is that a strategy meant to
-  // trade twice a day looks identical to a dead process if you only list
-  // fills. But the first version drew one card per empty half hour, so
-  // an ordinary night was thirteen stacked boxes all reading "watched,
-  // nothing cleared the floor" -- the same sentence is not more
-  // information for being repeated. One cell each, and one line per run.
-  let PAPER = null;
-
-  const SLOT_MIN  = 60;   // bucket size; the label and the walk derive from it
-  const MIN_SLOTS = 12;   // always reach back at least twelve hours
-  const MAX_LOG   = 240;  // ten days of hours in the log, at most
-  const MAX_EV    = 2;    // near-misses shown per hour before "+N more".
-                          // Was 5. Every one of these says a
-                          // version of the same thing, so the
-                          // log was mostly restatement; the
-                          // count and the best one carry it.
-  const HOUR      = 3600000;
-  let STRIP_MODE  = "day";   // "day" (24 cells) or "week" (7 x 24)
-
-  const pad2 = n => String(n).padStart(2, "0");
-
-  function slotStart(d) {
-    const x = new Date(d);
-    x.setMinutes(Math.floor(x.getMinutes() / SLOT_MIN) * SLOT_MIN, 0, 0);
-    return x;
-  }
-  const slotKey = d => +slotStart(d);
-
-  function clock12(d) {
-    const h = d.getHours(), h12 = h % 12 === 0 ? 12 : h % 12;
-    return { t: h12 + ":" + pad2(d.getMinutes()), m: h < 12 ? "am" : "pm" };
-  }
-  const shortTime = d => { const c = clock12(d); return c.t + c.m; };
-
-  function datePrefix(d) {
-    return d.toDateString() === new Date().toDateString()
-      ? "" : (d.getMonth() + 1) + "/" + d.getDate() + " ";
-  }
-  const edgeLabel = ms => { const d = new Date(ms); return datePrefix(d) + shortTime(d); };
-
-  // "2:00-2:30am" -- am/pm repeated only when the slot crosses noon.
-  function slotLabel(ms) {
-    const a = new Date(ms), b = new Date(ms + SLOT_MIN * 60000);
-    const ca = clock12(a), cb = clock12(b);
-    return datePrefix(a) + ca.t + (ca.m === cb.m ? "" : ca.m)
-      + "–" + cb.t + cb.m;
-  }
-
-  function spanWords(mins) {
-    const h = Math.floor(mins / 60), m = Math.round(mins % 60);
-    if (h >= 24) {
-      const d = Math.floor(h / 24);
-      return h % 24 ? d + "d " + (h % 24) + "h" : d + " days";
-    }
-    if (h && m) return h + "h " + m + "m";
-    if (h) return h + "h";
-    return m + "m";
-  }
-
-  // The stored reason is a whole sentence written for a log file. The
-  // full text stays as the row's tooltip; this is what fits on a line.
-  const WHY = [
-    [/settlement window/i,   "inside the settlement minute"],
-    [/earlier than/i,        "too early in the window"],
-    [/already holding/i,     "already in this window"],
-    [/wallet cannot cover/i, "not enough cash for the leg"],
-    [/contract floor/i,      "too few contracts to clear the fee"],
-    [/queue haircut/i,       "no real size behind the quote"],
-    [/safety margin/i,       "the safety margin ate it"],
-    [/walking the ladder/i,  "ladder depth ate it"],
-    [/below the floor/i,     "under the floor at size"],
-    [/ONLY kalshi/i,         "only Kalshi would have filled"],
-    [/ONLY pm us/i,          "only Polymarket would have filled"],
-    [/both legs missed/i,    "both legs moved first"],
-    [/unreadable/i,          "a book went unreadable"],
-    [/quote was/i,           "the quote went stale"]
-  ];
-  function whyShort(r) {
-    for (const w of WHY) if (w[0].test(r || "")) return w[1];
-    return (r || "passed").split("--")[0].trim();
-  }
-
-  // "15m", "1h", "1d" -- derived from the window the feed carries, not a
-  // list of known horizons, so a market of any length prints correctly.
-  function increment(open, close) {
-    const a = new Date(open), b = new Date(close);
-    if (!open || !close || isNaN(a) || isNaN(b)) return "";
-    const m = Math.round((b - a) / 60000);
-    if (m <= 0) return "";
-    if (m % 1440 === 0) return (m / 1440) + "d";
-    if (m % 60 === 0) return (m / 60) + "h";
-    return m + "m";
-  }
-  const centsTxt = v => (v >= 0 ? "+" : "\u2212")
-    + Math.abs(v * 100).toFixed(2) + "\u00A2";
-
-  // One venue per segment, in the order the feed lists them. A third
-  // venue makes this line longer; it does not make it a different line.
-  // Which two markets this row is between. The odds line already names
-  // them, but it sits below the fold of a dense row and reads as prices,
-  // not as "who". With three venues the pair is the first thing worth
-  // knowing about any row.
-  const VSHORT = { "Kalshi": "Kalshi", "Polymarket US": "Poly", "Gemini": "Gemini" };
-  function venuePair(legs, kind) {
-    const ns = (legs || []).map(l => VSHORT[l.name] || l.name || l.venue)
-                           .filter(Boolean);
-    if (ns.length < 2) return null;
-    const sp = el("span", "vp" + (kind && kind !== "exact" ? " basis" : ""));
-    sp.textContent = ns[0] + " \u2194 " + ns[1];
-    if (kind && kind !== "exact") {
-      sp.title = "Different settlement indices \u2014 this pair can pay "
-               + "$2 or $0, not $1";
-    }
-    return sp;
-  }
-
-  function oddsLine(legs, key) {
-    const line = el("div", "odds");
-    const usable = (legs || []).filter(l => l[key || "px"] != null);
-    usable.forEach((l, i) => {
-      if (i) line.appendChild(document.createTextNode("   \u00B7   "));
-      line.appendChild(document.createTextNode(
-        (l.name || l.venue || "") + " " + (l.label || l.side || "") + " "));
-      line.appendChild(el("b", null, (l.px * 100).toFixed(1) + "\u00A2"));
-    });
-    return usable.length ? line : null;
-  }
-
-  function missRow(m) {
-    const row = el("div", "ev");
-    row.title = m.reason || "";
-    const r1 = el("div", "r1");
-    const left = el("span");
-    left.appendChild(el("span", "co", m.coin || ""));
-    const inc = increment(m.open, m.close);
-    if (inc) left.appendChild(el("span", "inc", inc));
-    const vpm = venuePair(m.legs, m.kind);
-    if (vpm) left.appendChild(vpm);
-    r1.appendChild(left);
-    const right = el("span");
-    if (m.net != null) right.appendChild(el("span", "nt", centsTxt(m.net)));
-    right.appendChild(el("span", "tm", shortTime(m._d)));
-    r1.appendChild(right);
-    row.appendChild(r1);
-    const odds = oddsLine(m.legs);
-    if (odds) row.appendChild(odds);
-    row.appendChild(el("div", "rs", whyShort(m.reason)));
-    return row;
-  }
-
-  // The single best thing it turned down, called out above the log.
-  function bestCard(m) {
-    const box = el("div", "best");
-    box.appendChild(el("div", "cap", "closest it came"));
-    const row = missRow(m);
-    row.style.padding = "0";
-    box.appendChild(row);
-    return box;
-  }
-
-  function tradeRow(t) {
-    const box = el("div", "trd");
-    const top = el("div", "th");
-    const left = el("span");
-    left.appendChild(el("span", "co", t.coin || ""));
-    const inc = increment(t.open, t.close);
-    if (inc) left.appendChild(el("span", "inc", inc));
-    const vpt = venuePair(t.legs, t.kind);
-    if (vpt) left.appendChild(vpt);
-    left.appendChild(document.createTextNode(
-      " · " + (t.qty || 0) + " contracts"));
-    top.appendChild(left);
-    if (t.pnl === null || t.pnl === undefined) {
-      top.appendChild(el("span", "pl", "open"));
-    } else {
-      top.appendChild(el("span", "pl " + (t.pnl >= 0 ? "up" : "down"),
-        (t.pnl >= 0 ? "+" : "−") + money(Math.abs(t.pnl)).replace("$", "$")));
-    }
-    box.appendChild(top);
-
-    (t.legs || []).forEach(lg => {
-      const row = el("div", "lg");
-      // The feed names the venue and says the side in words, so this
-      // works unchanged the day a third venue appears in the list.
-      row.appendChild(el("span", null,
-        (lg.name || lg.venue || "") + " — " + (lg.label || lg.side || "")));
-      row.appendChild(el("span", null,
-        lg.qty + " @ " + (lg.px * 100).toFixed(1) + "¢"));
-      box.appendChild(row);
-    });
-
-    if (t.naked) {
-      box.appendChild(el("div", "warn",
-        "ONE LEG ONLY — a directional bet, not a hedge"));
-    }
-    if (t.kind && t.kind !== "exact") {
-      box.appendChild(el("div", "warn",
-        "BASIS PAIR — the two venues settle on different indices, "
-        + "so this can pay $2 or $0, not $1"));
-    }
-    if (t.state !== "settled") {
-      // A live row says what is at stake and when it resolves. "still
-      // open" alone reads the same whether the window closes in ten
-      // seconds or ten minutes.
-      box.classList.add("live");
-      const line = el("div", "live-line");
-      line.appendChild(el("span", "dot"));
-      const txt = el("span");
-      // Computed from the window's close time, not from a number baked
-      // in at feed-write: the feed refreshes every 30s, so a server-side
-      // countdown would sit still for 29 of them.
-      txt.dataset.close = t.close || "";
-      txt.dataset.cost = String(t.cost || 0);
-      tickLive(txt);
-      line.appendChild(txt);
-      box.appendChild(line);
-    }
-    return box;
-  }
-
-  // Seconds -> "4m 10s". Used only for live positions, where the number
-  // is small and the point is that it is moving.
-  function countdown(s) {
-    s = Math.max(0, Math.round(s));
-    const m = Math.floor(s / 60);
-    return m ? m + "m " + String(s % 60).padStart(2, "0") + "s" : s + "s";
-  }
-
-  function tickLive(node) {
-    const close = Date.parse(node.dataset.close || "");
-    const cost = money(parseFloat(node.dataset.cost || "0"));
-    if (isNaN(close)) { node.textContent = "LIVE · " + cost + " at stake"; return; }
-    const left = (close - Date.now()) / 1000;
-    node.textContent = "LIVE · " + cost + " at stake · "
-      + (left > 0 ? "settles in " + countdown(left)
-                  : "window closed, waiting on both venues to resolve");
-  }
-
-  // One timer for every live row on the page. Cheap, and it keeps the
-  // countdown honest between the 30-second feed refreshes.
-  setInterval(() => {
-    document.querySelectorAll(".live-line span[data-close]").forEach(tickLive);
-  }, 1000);
-
-  // The live positions, lifted out of the timeline and put at the top.
-  // Buried among settled rows they were effectively invisible, which is
-  // the opposite of what an open position needs to be.
-  function renderLive(trades) {
-    const open = (trades || []).filter(t => t.state !== "settled");
-    const box = el("div", "livebox");
-    const h = el("h3");
-    if (open.length) h.appendChild(el("span", "dot"));
-    h.appendChild(document.createTextNode(
-      open.length ? "Live now · " + open.length
-                    + (open.length === 1 ? " position" : " positions")
-                  : "Live now"));
-    box.appendChild(h);
-    if (!open.length) {
-      box.appendChild(el("div", "none",
-        "Nothing open. Positions appear here the moment both legs fill, "
-        + "and stay until the window settles."));
-      return box;
-    }
-    let risk = 0;
-    open.forEach(t => { risk += (t.cost || 0); box.appendChild(tradeRow(t)); });
-    box.appendChild(el("div", "none", "Total at stake: " + money(risk)));
-    return box;
-  }
-
-  function renderHistory() {
-    const P = PAPER || {};
-    const trades = P.trades || [], misses = P.misses || [];
-    const body = $("#histbody"), lede = $("#histlede");
-    const stats = $("#histstats"), tl = $("#histtl");
-    body.textContent = ""; stats.textContent = ""; tl.textContent = "";
-
-    // Live positions first, above the timeline. They are the only rows
-    // where money is still moving, so they do not get buried in it.
-    body.appendChild(renderLive(trades));
-
-    // ---- bucket every event into its half hour
-    const slots = new Map();
-    const bucket = k => {
-      if (!slots.has(k)) slots.set(k, { t: [], m: [] });
-      return slots.get(k);
-    };
-    let oldest = null;
-    const note = (iso, kind, o) => {
-      const d = new Date(iso);
-      if (isNaN(d)) return;           // rows written before misses carried a date
-      o._d = d;
-      bucket(slotKey(d))[kind].push(o);
-      if (!oldest || d < oldest) oldest = d;
-    };
-    trades.forEach(t => note(t.opened, "t", t));
-    misses.forEach(m => note(m.ts, "m", m));
-
-    // ---- how far back this reaches
-    const now = new Date();
-    const sinceRaw = P.since ? new Date(P.since) : null;
-    const since = sinceRaw && !isNaN(sinceRaw) ? sinceRaw : null;
-    const floorBy = new Date(+now - MIN_SLOTS * SLOT_MIN * 60000);
-    let from = since || oldest || floorBy;
-    if (oldest && oldest < from) from = oldest;
-    if (from > floorBy) from = floorBy;
-
-    let keys = [];
-    for (let k = +slotStart(from), last = +slotStart(now);
-         k <= last; k += SLOT_MIN * 60000) keys.push(k);
-    if (keys.length > MAX_LOG) keys = keys.slice(-MAX_LOG);
-
-    // ---- the four figures
-    const taken  = (P.settled || 0) + (P.open || 0);
-    const naked  = (P.naked_settled || 0) + (P.naked_open || 0);
-    const hedged = Math.max(0, taken - naked);
-    const real   = P.realised || 0;
-    const fig = (v, k, cls) => {
-      const d = el("div");
-      d.appendChild(el("span", "n" + (cls ? " " + cls : ""), v));
-      d.appendChild(el("span", "k", k));
-      stats.appendChild(d);
-    };
-    const passed = P.passed_total != null ? P.passed_total : misses.length;
-    fig(String(taken),  "taken",    taken  ? "" : "z");
-    fig(String(hedged), "hedged",   hedged ? "" : "z");
-    fig(String(naked),  "naked",    naked  ? "down" : "z");
-    fig(String(passed), "passed",   passed ? "near" : "z");
-    fig(money(real),    "realised", real > 0 ? "up" : real < 0 ? "down" : "z");
-
-    // ---- the grid
-    const near = P.passed_total != null ? P.passed_total : misses.length;
-    const head = el("div", "head");
-    head.appendChild(el("span", "cap", "one cell per hour"
-      + (near ? " · " + near + " came close" : "")));
-    const modes = el("span", "modes");
-    [["day", "Day"], ["week", "Week"]].forEach(([m, txt]) => {
-      const b = el("button", null, txt);
-      b.type = "button";
-      b.setAttribute("aria-pressed", String(STRIP_MODE === m));
-      b.addEventListener("click", () => { STRIP_MODE = m; renderHistory(); });
-      modes.appendChild(b);
-    });
-    head.appendChild(modes);
-    tl.appendChild(head);
-
-    const days = STRIP_MODE === "week" ? 7 : 1;
-    const midnight = new Date(now);
-    midnight.setHours(0, 0, 0, 0);
-    const sinceMs = since ? +since : null;
-
-    const grid = el("div", "grid " + STRIP_MODE);
-    grid.style.gridTemplateColumns = "57px repeat(24,1fr)";
-
-    // hour ruler, labelled every three hours so it stays legible narrow
-    grid.appendChild(el("span"));
-    for (let h = 0; h < 24; h++) {
-      grid.appendChild(el("span", "tick", h % 3 === 0
-        ? (h % 12 === 0 ? 12 : h % 12) + (h < 12 ? "a" : "p") : ""));
-    }
-
-    for (let d = days - 1; d >= 0; d--) {
-      const day0 = new Date(midnight);
-      day0.setDate(day0.getDate() - d);
-      const isToday = d === 0;
-      grid.appendChild(el("span", "lab" + (isToday ? " today" : ""),
-        isToday ? "Today"
-          : day0.toLocaleDateString(undefined, { weekday: "short" })
-            + " " + (day0.getMonth() + 1) + "/" + day0.getDate()));
-      for (let h = 0; h < 24; h++) {
-        const cellAt = new Date(day0);
-        cellAt.setHours(h, 0, 0, 0);
-        const k = +cellAt;
-        const sl = slots.get(k);
-        const c = el("div", "cell");
-        let what = "watched, nothing";
-        if (sl && sl.t.length) {
-          const pl = sl.t.reduce((a, x) => a + (x.pnl || 0), 0);
-          c.className = "cell " + (pl < 0 ? "loss" : "trade");
-          what = sl.t.length + " taken";
-        } else if (sl && sl.m.length) {
-          c.className = "cell near";
-          what = sl.m.length + " came close";
-        } else if (k > +now) {
-          c.className = "cell future";
-          what = "not yet";
-        } else if (sinceMs && k + HOUR <= sinceMs) {
-          c.className = "cell before";
-          what = "before this account started";
-        }
-        c.title = slotLabel(k) + " — " + what;
-        grid.appendChild(c);
-      }
-    }
-    tl.appendChild(grid);
-
-    const key = el("div", "key");
-    [["none", "not watched"], ["", "watched, nothing"],
-     ["near", "came close, passed"], ["trade", "position taken"]]
-      .forEach(([cls, txt]) => {
-        const sp = el("span", cls || null);
-        sp.appendChild(el("i"));
-        sp.appendChild(document.createTextNode(txt));
-        key.appendChild(sp);
-      });
-    tl.appendChild(key);
-
-    const bestBox = $("#histbest");
-    bestBox.textContent = "";
-    if (P.best_pass && P.best_pass.net != null) {
-      const b = Object.assign({}, P.best_pass);
-      b._d = new Date(b.ts);
-      if (!isNaN(b._d)) bestBox.appendChild(bestCard(b));
-    }
-
-    // ---- the line that says what all of that means
-    const watchedMin = Math.max(0, (now - (since || oldest || new Date(keys[0]))) / 60000);
-    lede.textContent = taken
-      ? taken + " position" + (taken === 1 ? "" : "s") + " in "
-        + spanWords(watchedMin) + " of watching, newest first."
-      : near
-        ? "Nothing taken in " + spanWords(watchedMin) + ". " + near
-          + " full trade" + (near === 1 ? "" : "s") + " cleared the floor and "
-          + (near === 1 ? "was" : "were") + " still passed — each one is "
-          + "below with both sides’ odds and why it was turned down."
-        : "Nothing taken in " + spanWords(watchedMin) + ", and nothing has even "
-          + "cleared the floor to be considered.";
-
-    // ---- the log, newest first, quiet runs collapsed to one line
-    let run = [];
-    const flushRun = () => {
-      if (!run.length) return;
-      const oldK = run[run.length - 1], newK = run[0];
-      const g = el("div", "gap");
-      g.appendChild(el("span", "gt", run.length === 1 ? slotLabel(oldK)
-        : edgeLabel(oldK) + "–" + edgeLabel(newK + SLOT_MIN * 60000)));
-      g.appendChild(el("span", null, run.length + " hour"
-        + (run.length === 1 ? "" : "s") + " · nothing cleared the floor"));
-      body.appendChild(g);
-      run = [];
-    };
-
-    keys.slice().reverse().forEach(k => {
-      const s = slots.get(k);
-      if (!s || (!s.t.length && !s.m.length)) { run.push(k); return; }
-      flushRun();
-      const sl = el("div", "slot");
-      const sh = el("div", "sh");
-      const lab = el("span");
-      lab.appendChild(el("b", null, slotLabel(k)));
-      sh.appendChild(lab);
-      sh.appendChild(el("span", null,
-        (s.t.length ? s.t.length + " taken" : "")
-        + (s.t.length && s.m.length ? " · " : "")
-        + (s.m.length ? s.m.length + " passed" : "")));
-      sl.appendChild(sh);
-      s.t.sort((a, b) => b._d - a._d).forEach(t => sl.appendChild(tradeRow(t)));
-      const ms = s.m.sort((a, b) => b._d - a._d);
-      ms.slice(0, MAX_EV).forEach(m => sl.appendChild(missRow(m)));
-      if (ms.length > MAX_EV) {
-        sl.appendChild(el("div", "more",
-          "+ " + (ms.length - MAX_EV) + " more passed in this hour"));
-      }
-      body.appendChild(sl);
-    });
-    flushRun();
-  }
-
-  function openHistory() { $("#hist").hidden = false; renderHistory(); }
-  function closeHistory() { $("#hist").hidden = true; }
-  $("#histclose").addEventListener("click", closeHistory);
-  $("#hist").addEventListener("click", e => {
-    if (e.target === $("#hist")) closeHistory();
+  // the reference line: a perfectly priced market
+  s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}"
+       stroke="var(--rule)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  s+=`<text x="${X(0.80)}" y="${Y(0.80)-9}" font-size="11.5"
+       fill="var(--text-muted)" transform="rotate(-45 ${X(0.80)} ${Y(0.80)-9})">
+       priced correctly</text>`;
+  // intervals first, marks on top
+  pts.forEach(c=>{
+    const col = c.side==="buy" ? "var(--s1)" : "var(--s2)";
+    s+=`<line x1="${X(c.price)}" y1="${Y(c.ci[0])}" x2="${X(c.price)}"
+         y2="${Y(c.ci[1])}" stroke="${col}" stroke-width="2"
+         stroke-linecap="round" opacity=".45"/>`;
   });
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") closeHistory();
+  pts.forEach((c,i)=>{
+    const col = c.side==="buy" ? "var(--s1)" : "var(--s2)";
+    const r = Math.max(5, Math.min(11, 4+Math.sqrt(c.n)/3));
+    s+=`<circle cx="${X(c.price)}" cy="${Y(c.actual)}" r="${r}" fill="${col}"
+         stroke="var(--surface-1)" stroke-width="2" data-i="${i}"
+         style="cursor:pointer"/>`;
   });
+  s+=`<text x="${P.l+iw/2}" y="${H-6}" text-anchor="middle" font-size="12"
+       fill="var(--text-secondary)">priced probability</text>`;
+  s+=`<text transform="rotate(-90 14 ${P.t+ih/2})" x="14" y="${P.t+ih/2}"
+       text-anchor="middle" font-size="12"
+       fill="var(--text-secondary)">realised frequency</text>`;
+  s+=`</svg>`;
+  $("#chartwrap").innerHTML =
+    `<div class="legend">
+       <span class="chip"><span class="dot" style="background:var(--s1)"></span>buy side (the ask)</span>
+       <span class="chip"><span class="dot" style="background:var(--s2)"></span>sell side (the bid)</span>
+       <span class="chip">point size = sample</span>
+     </div>` + s;
 
-  // The bar tucks away on scroll down and comes back on scroll up.
-  (() => {
-    let lastY = 0;
-    window.addEventListener("scroll", () => {
-      const bar = $("#paper");
-      if (!bar || bar.hidden) return;
-      const y = window.scrollY;
-      bar.classList.toggle("tucked", y > 90 && y > lastY);
-      lastY = y;
-    }, { passive: true });
-  })();
-
-  function refreshPaper() {
-    fetch(LIVE + "/paper.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(p => {
-        if (!p) return;
-        PAPER = p;
-        paperCard({ paper: p });
-        if (!$("#hist").hidden) renderHistory();
-      })
-      .catch(() => {});
-  }
-
-  function sysCard(d) {
-    const box = $("#sys");
-    if (!d || !box) return;
-    box.hidden = false;
-    const esc = t => String(t).replace(/[<>&]/g, c =>
-      ({ "<": "&lt;", ">": "&gt;", "&": "&amp;" }[c]));
-    const alive = d.alive || {};
-    const names = Object.keys(alive);
-    const up = names.filter(n => alive[n]).length;
-    const sm = d.sampler || {};
-    const st = d.settlement || {};
-    const pa = d.paper || {};
-    const c20 = ((sm.curves || {}).qty20 || {}).curve || [];
-
-    const sec = t => "<h3 style=\"margin-top:22px;font-size:12px;"
-      + "letter-spacing:.08em;text-transform:uppercase;color:var(--muted)\">"
-      + t + "</h3>";
-
-    let h = "<h2>System</h2><p class=\"lede\">What is running, how much has "
-          + "been measured, and what it says so far.</p><div class=\"grid\">";
-
-    h += "<div class=\"box\"><h3>Collectors</h3><div class=\"big\">"
-       + up + " / " + names.length + "</div><div class=\"sub\">";
-    h += names.map(n => '<span class="dot" style="background:'
-       + (alive[n] ? "var(--good)" : "var(--bad)") + '"></span>'
-       + esc(n.replace(".py", ""))).join("<br>");
-    h += "</div></div>";
-
-    h += "<div class=\"box\"><h3>Second-by-second sample</h3><div class=\"big\">"
-       + (sm.rows ? sm.rows.toLocaleString() : "0") + "</div>"
-       + "<div class=\"sub\">quotes over " + (sm.hours || 0) + " h"
-       + (sm.newest_age_s != null
-          ? " &middot; newest " + Math.round(sm.newest_age_s) + "s ago" : "")
-       + "</div></div>";
-
-    h += "<div class=\"box\"><h3>Settlement agreement</h3><div class=\"big\">"
-       + (st.agreement_pct != null ? st.agreement_pct + "%" : "--") + "</div>"
-       + "<div class=\"sub\">" + (st.agreed || 0) + " / " + (st.windows || 0)
-       + " windows &middot; " + (st.disagreed || 0) + " disagreed<br>"
-       + "95% lower bound " + (st.wilson_lower_pct != null
-            ? st.wilson_lower_pct + "%" : "--") + "</div></div>";
-
-    const eq = pa.equity, start = 209.0088;
-    const dpnl = eq != null ? eq - start : null;
-    h += "<div class=\"box\"><h3>Paper account (real books)</h3>"
-       + "<div class=\"big " + (dpnl >= 0 ? "ok" : "bad") + "\">"
-       + (eq != null ? "$" + eq.toFixed(2) : "--") + "</div>"
-       + "<div class=\"sub\">from $209.01 &middot; "
-       + (dpnl != null ? (dpnl >= 0 ? "+" : "") + "$" + dpnl.toFixed(2) : "--")
-       + "<br>" + (pa.settled || 0) + " settled, " + (pa.open || 0) + " open"
-       + " &middot; " + (pa.divergences || 0) + " divergences"
-       + "<br><span class=\"" + ((pa.naked_settled || pa.naked_open)
-            ? "bad" : "") + "\">naked (one leg only): "
-       + (pa.naked_settled || 0) + " settled"
-       + (pa.naked_pnl ? " " + (pa.naked_pnl >= 0 ? "+" : "")
-            + "$" + pa.naked_pnl.toFixed(2) : "")
-       + ", " + (pa.naked_open || 0) + " open</span></div></div>";
-
-    // Split the P&L. A naked leg is an unhedged coin flip that happened
-    // because one order filled and the other did not -- it is not the
-    // strategy working, and a headline number that mixes the two reads
-    // as if it were. This is the exact thing the old harness hid by
-    // recording one-legged fills as "no trade".
-    const hedgedPnl = (pa.realised || 0) - (pa.naked_pnl || 0);
-    const hedgedN = (pa.settled || 0) - (pa.naked_settled || 0);
-    h += "</div>";
-
-    if (c20.length) {
-      h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
-         + "text-transform:uppercase;color:var(--muted)\">"
-         + "How much survives a safety margin (20+ contracts both sides)</h3>";
-      h += "<div class=\"scroll\"><table><tr><th>margin / leg</th><th>samples</th><th>tradeable</th>"
-         + "<th>rate</th><th>median</th><th>best</th></tr>";
-      c20.forEach(r => {
-        h += "<tr><td>" + r.safety_c.toFixed(2) + "c</td><td>"
-           + r.n.toLocaleString() + "</td><td>" + r.tradeable + "</td><td>"
-           + r.rate_pct.toFixed(3) + "%</td><td>" + r.median_c.toFixed(2)
-           + "c</td><td class=\"" + (r.best_c > 0 ? "ok" : "bad") + "\">"
-           + r.best_c.toFixed(2) + "c</td></tr>";
-      });
-      h += "</table></div>";
-    }
-
-    if (pa.settled != null) {
-      h += "<p class=\"note\" style=\"margin-top:14px\"><b>Where that "
-         + "money came from.</b> " + hedgedN + " hedged pair"
-         + (hedgedN === 1 ? "" : "s") + " settled for "
-         + (hedgedPnl >= 0 ? "+" : "") + "$" + hedgedPnl.toFixed(2) + ", and "
-         + (pa.naked_settled || 0) + " <i>naked</i> leg"
-         + ((pa.naked_settled || 0) === 1 ? "" : "s")
-         + " &mdash; one order filled, the other missed &mdash; settled for "
-         + ((pa.naked_pnl || 0) >= 0 ? "+" : "") + "$"
-         + (pa.naked_pnl || 0).toFixed(2) + ". "
-         + (Math.abs(pa.naked_pnl || 0) > Math.abs(hedgedPnl)
-            ? "<b class=\"bad\">The naked legs dominate this number, so it "
-              + "is not a result &mdash; it is unhedged coin flips that "
-              + "happened to land this way.</b> "
-            : "")
-         + "An earlier version of this account recorded one-legged fills as "
-         + "\u201cno trade\u201d and deleted them, which is why it once "
-         + "reported itself perfectly hedged. A sent order cannot be "
-         + "un-sent.</p>";
-    }
-
-    const bd = d.bands || [];
-    if (bd.length) {
-      h += sec("The gap by price band &mdash; the fee is quadratic, so a "
-             + "pooled median hides the corners");
-      h += "<div class=\"scroll\"><table><tr><th>min(p, 1&minus;p)</th><th>samples</th>"
-         + "<th>fee / contract</th><th>median net</th>"
-         + "<th>20+ both sides</th><th>venues disagree</th></tr>";
-      bd.forEach(r => {
-        h += "<tr><td>" + esc(r.band) + "</td><td>" + r.n.toLocaleString()
-           + "</td><td>" + r.fee_c.toFixed(2) + "c</td><td class=\"bad\">"
-           + r.net_c.toFixed(2) + "c</td><td>" + r.deep_pct.toFixed(0)
-           + "%</td><td><b>" + r.disagree_c.toFixed(2) + "c</b></td></tr>";
-      });
-      h += "</table></div><p class=\"note\">The last column is the mid-to-mid "
-         + "difference with no fee charged at all &mdash; what the two "
-         + "venues actually disagree about. It is 0.00c in every band, so "
-         + "the median net <i>is</i> the fee and nothing else. The cheap "
-         + "corner is real (the round trip falls about ten-fold) and it is "
-         + "not a liquidity mirage (two thirds still show 20+ contracts a "
-         + "side) &mdash; the venues simply agree there too.</p>";
-    }
-
-    const mk = d.maker || [];
-    if (mk.length) {
-      h += sec("Resting the Polymarket leg instead of taking it");
-      h += "<div class=\"scroll\"><table><tr><th>min(p, 1&minus;p)</th><th>fills</th>"
-         + "<th>hedge slip</th><th>net if instant</th><th>net as rested</th>"
-         + "<th>rebate t1 / t4</th></tr>";
-      mk.forEach(r => {
-        h += "<tr><td>" + esc(r.band) + "</td><td>" + r.fills.toLocaleString()
-           + "</td><td class=\"bad\">+" + r.slip_c.toFixed(2) + "c</td><td>"
-           + r.instant_c.toFixed(2) + "c</td><td class=\"bad\">"
-           + r.rested_c.toFixed(2) + "c</td><td>"
-           + r.rebate_t1_c.toFixed(3) + "c / " + r.rebate_t4_c.toFixed(3)
-           + "c</td></tr>";
-      });
-      h += "</table></div><p class=\"note\">The rebate is real and large: it "
-         + "turns the deep band from &minus;4.94c taker-to-taker into "
-         + "&minus;1.66c. Then the Kalshi hedge slips a full tick while the "
-         + "resting order waits to be chosen, and it ends at &minus;2.66c. "
-         + "The rebate is &theta;&middot;p&middot;(1&minus;p) &mdash; the "
-         + "same quadratic as the fee &mdash; so at the extremes the best "
-         + "tier pays 0.03c against 0.25c of adverse selection. It is worth "
-         + "least exactly where it would have mattered. Measured at a 1s "
-         + "cadence against a ~125ms real hedge, so this is the pessimistic "
-         + "bound.</p>";
-    }
-
-    const sg = d.strikegap || null;
-    if (sg && (sg.coins || []).length) {
-      h += sec("Do the two venues even use the same strike?");
-      h += "<div class=\"scroll\"><table><tr><th>coin</th><th>windows</th><th>strike gap</th>"
-         + "<th>median margin</th><th>closest</th>"
-         + "<th>landed between</th><th>implied split rate</th></tr>";
-      sg.coins.forEach(r => {
-        const live = r.gap_pct > 0;
-        h += "<tr><td>" + esc(r.coin) + "</td><td>" + r.n + "</td><td class=\""
-           + (live ? "bad" : "ok") + "\">" + r.gap_pct.toFixed(5)
-           + "%</td><td>" + r.median_margin_pct.toFixed(4) + "%</td><td>"
-           + r.closest_pct.toFixed(4) + "%</td><td>" + r.between
-           + "</td><td class=\"" + (live ? "bad" : "ok") + "\">"
-           + (live ? r.split_rate_pct.toFixed(2) + "%"
-                   : "0 \u2014 identical") + "</td></tr>";
-      });
-      h += "</table></div><p class=\"note\">Settlement agreeing " + sg.windows
-         + "/" + sg.windows + " times only means something if some window "
-         + "came close. These are the margins. <b>And one real divergence "
-         + "channel turned up here:</b> Kalshi and Polymarket US publish the "
-         + "same strike to the last digit on btc, eth and sol \u2014 but not "
-         + "on xrp, where Kalshi rounds the reference to 4 decimals and "
-         + "Polymarket US carries 5. A settlement landing strictly between "
-         + "the two resolves <i>opposite ways</i>, and a hedge then loses "
-         + "the <b>whole stake</b>, not a few cents of fee. "
-         + sg.between + " of " + sg.windows + " windows landed there; the "
-         + "density of near misses puts it near 1.2% on xrp and exactly zero "
-         + "on the other three. Break-even on a 3c edge needs it under ~3%."
-         + "</p>";
-    }
-
-    const tx = d.taxes || null;
-    if (tx && (tx.rows || []).length) {
-      h += sec("What the tax characterization does to a hedged pair");
-      h += "<div class=\"scroll\"><table><tr><th>unit cost</th><th>gross edge</th>"
-         + "<th>gross winnings</th><th>capital / 1256</th>"
-         + "<th>federal wagering</th><th>+ Massachusetts</th></tr>";
-      tx.rows.forEach(r => {
-        h += "<tr><td>" + r.unit.toFixed(4) + "</td><td>"
-           + r.edge_c.toFixed(2) + "c</td><td>" + r.gross_win_c.toFixed(2)
-           + "c</td><td class=\"ok\">+" + r.capital_c.toFixed(2)
-           + "c</td><td class=\"" + (r.fed_wager_c >= 0 ? "ok" : "bad")
-           + "\">" + (r.fed_wager_c >= 0 ? "+" : "") + r.fed_wager_c.toFixed(2)
-           + "c</td><td class=\"" + (r.fed_ma_c >= 0 ? "ok" : "bad") + "\">"
-           + (r.fed_ma_c >= 0 ? "+" : "") + r.fed_ma_c.toFixed(2)
-           + "c</td></tr>";
-      });
-      h += "</table></div><p class=\"note\">A hedged pair books one winner and "
-         + "one loser. Net gain 3c; gross winnings on the winning ticket "
-         + "~51c. Massachusetts does not adopt IRC 165(d) &mdash; losses are "
-         + "deductible only against a Massachusetts-licensed gaming "
-         + "establishment, which neither venue is &mdash; so it taxes the "
-         + "gross at 5%: 2.5c against a 3c edge, about 86% before the IRS is "
-         + "involved. And it does not shrink in the cheap corner, where the "
-         + "fee is 0.39c. Federal assumes " + tx.fed_pct + "% marginal with "
-         + "the 2026 OBBBA 90% loss haircut. <b>Unsettled:</b> if capital or "
-         + "1256 treatment holds, only the first column applies. There is no "
-         + "IRS guidance on event contracts and the published guides "
-         + "contradict each other. Not tax advice &mdash; a question for a "
-         + "CPA, and worth asking before any money moves.</p>";
-    }
-
-    const wy = pa.why_no_trade || [];
-    if (wy.length) {
-      h += "<h3 style=\"margin-top:22px;font-size:12px;letter-spacing:.08em;"
-         + "text-transform:uppercase;color:var(--muted)\">"
-         + "Why the paper account did not trade</h3>"
-         + "<div class=\"scroll\"><table>";
-      wy.forEach(r => {
-        h += "<tr><td>" + esc(r.reason) + "</td><td>" + r.n + "</td></tr>";
-      });
-      h += "</table></div>";
-    }
-
-    const v = d.verdict || {};
-    if (v.headline) {
-      h += "<div class=\"verdict\"><b>" + esc(v.headline) + "</b><ul>";
-      (v.points || []).forEach(p => { h += "<li>" + esc(p) + "</li>"; });
-      h += "</ul></div>";
-    }
-    if (d.as_of) {
-      const age = Math.max(0, Math.round((Date.now() - new Date(d.as_of)) / 1000));
-      h += "<div class=\"age\">system panel " + age + "s old</div>";
-    }
-    box.innerHTML = h;
-  }
-
-  // THE REAL-MONEY BAR.
-  //
-  // trades.json counts TRADES (money moved), not attempts. An order that
-  // was sent and filled nothing is in the record and is not a trade, and
-  // a bar that counted it as one would be announcing activity that never
-  // happened -- on the one line of this page about real money.
-  function refreshReal() {
-    fetch(LIVE + "/trades.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        const el = document.getElementById("realbar");
-        if (!el || !d) { if (el) el.hidden = true; return; }
-        const state = d.needs_attention ? "attention"
-                    : d.trades_done ? "done" : "idle";
-        el.dataset.state = state;
-        const sub = d.trades_done
-          ? `${d.attempts} order${d.attempts === 1 ? "" : "s"} sent`
-          : "real money armed, nothing filled yet";
-        el.innerHTML = '<span class="dot"></span><span></span>'
-                     + '<span class="sub"></span>';
-        // textContent, not innerHTML: the headline is built from a file
-        // on the Pi and there is no reason for this page to interpret it
-        // as markup.
-        el.children[1].textContent = d.headline || "";
-        el.children[2].textContent = sub;
-        el.hidden = false;
-      })
-      .catch(() => {});
-  }
-
-  // THE LIVE RUN.
-  //
-  // Everything from the feed goes in with textContent, never innerHTML:
-  // the strings are built on the Pi and there is no reason for this page
-  // to interpret any of them as markup.
-  function refreshRun() {
-    fetch(LIVE + "/run.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => {
-        const box = document.getElementById("runp");
-        if (!box || !d) { if (box) box.hidden = true; return; }
-        const attention = d.trades && d.trades.needs_attention;
-        box.dataset.state = attention ? "attention" : (d.state || "idle");
-
-        const cell = (k, v, sub) => {
-          const c = document.createElement("div");
-          const kk = document.createElement("div");
-          kk.className = "k"; kk.textContent = k;
-          const vv = document.createElement("div");
-          vv.className = "v"; vv.textContent = v;
-          if (sub) { const sm = document.createElement("small");
-                     sm.textContent = " " + sub; vv.appendChild(sm); }
-          c.appendChild(kk); c.appendChild(vv);
-          return c;
-        };
-        const money = n => (n === null || n === undefined || isNaN(n))
-          ? "--" : "$" + Number(n).toFixed(2);
-
-        box.textContent = "";
-        const top = document.createElement("div");
-        top.className = "top";
-        const dot = document.createElement("span"); dot.className = "dot";
-        const st = document.createElement("span"); st.className = "st";
-        st.textContent = d.headline || d.state || "";
-        const when = document.createElement("span"); when.className = "when";
-        const age = d.generated
-          ? Math.max(0, Math.round((Date.now() - new Date(d.generated)) / 1000))
-          : null;
-        when.textContent = age === null ? "" : age + "s ago";
-        top.appendChild(dot); top.appendChild(st); top.appendChild(when);
-        box.appendChild(top);
-
-        const g = document.createElement("div"); g.className = "grid";
-        g.appendChild(cell("orders",
-          (d.orders_used === null || d.orders_used === undefined ? "--" : d.orders_used)
-          + " / " + (d.orders_cap || "--"), "sent today"));
-        g.appendChild(cell("time left",
-          d.minutes_left === null || d.minutes_left === undefined
-            ? "--" : Math.max(0, Math.round(d.minutes_left)) + "m",
-          d.expires ? "ends " + d.expires : ""));
-        const b = d.last_beat || {};
-        g.appendChild(cell("best now",
-          b.raw_c === undefined || b.raw_c === null
-            ? "--" : b.raw_c.toFixed(2) + "c",
-          "floor " + (d.floor_c === null || d.floor_c === undefined
-            ? "--" : "+" + d.floor_c.toFixed(2) + "c")));
-        const tr = d.trades || {};
-        g.appendChild(cell("realised",
-          tr.realised === null || tr.realised === undefined
-            ? "--" : (tr.realised >= 0 ? "+" : "") + "$" + Math.abs(tr.realised).toFixed(4),
-          "all time"));
-        const sp = d.spendable || {};
-        g.appendChild(cell("kalshi", money(sp.kalshi), "crypto shard"));
-        g.appendChild(cell("polymarket", money(sp.polymarket_us), ""));
-        g.appendChild(cell("gemini", money(sp.gemini), ""));
-        box.appendChild(g);
-
-        // Recent attempts. An order that filled nothing is still worth
-        // showing: it is the difference between "watching" and "trying
-        // and missing", and those two look the same in the trade record.
-        const att = (d.attempts || []).slice(-4).reverse();
-        if (att.length) {
-          const a = document.createElement("div"); a.className = "att";
-          att.forEach(x => {
-            const row = document.createElement("div");
-            const legs = (x.legs || []).map(l =>
-              l.venue + " " + l.http + (l.filled ? " filled " + l.filled : " filled 0")
-            ).join("  |  ");
-            row.textContent = "attempt " + x.n + " -- "
-              + (x.outcome || "in flight") + (legs ? "  (" + legs + ")" : "");
-            a.appendChild(row);
-          });
-          box.appendChild(a);
-        }
-
-        const note = document.createElement("div"); note.className = "note";
-        if (attention) {
-          note.textContent = "A position needs looking at. Check the "
-            + "venue accounts before starting anything else.";
-        } else if (d.state === "stalled") {
-          note.textContent = "The process is up but has not printed for a "
-            + "while. That is not the same as watching -- check the log.";
-        } else if (d.state === "stopped") {
-          note.textContent = "The kill switch is set. Remove it before the "
-            + "next run: rm ~/sportsarb/STOP";
-        } else if (d.state === "idle") {
-          note.textContent = "Nothing is running. Nothing can be sent.";
-        } else if (d.state === "finished") {
-          note.textContent = "The run ended: " + (d.ended || "");
-        } else {
-          note.textContent = "Watching both books. It only sends when a "
-            + "pair clears the floor, so sending nothing is the normal "
-            + "state. Stop it with: touch ~/sportsarb/STOP";
-        }
-        box.appendChild(note);
-        box.hidden = false;
-      })
-      .catch(() => {});
-  }
-
-  function refreshSys() {
-    fetch(LIVE + "/status.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) sysCard(d); })
-      .catch(() => {});
-  }
-
-  // The charts are drawn at the pixel width they will occupy, so a resize
-  // (or a rotate, or the grid collapsing to one column) has to redraw them
-  // rather than stretch what is there. Keep the last payload for that.
-  let LAST_MONEY = null;
-  function refreshMoney() {
-    fetch(LIVE + "/balances.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : null)
-      .then(b => { LAST_MONEY = b; renderMoney(b); })
-      .catch(() => renderMoney(null));
-  }
-  let moneyResizeT = null;
-  window.addEventListener("resize", () => {
-    clearTimeout(moneyResizeT);
-    moneyResizeT = setTimeout(() => {
-      if (LAST_MONEY) renderMoney(LAST_MONEY);
-    }, 140);
+  const tip=$("#tip");
+  $("#chartwrap").querySelectorAll("circle[data-i]").forEach(el=>{
+    el.addEventListener("mouseenter", e=>{
+      const c=pts[+el.dataset.i];
+      tip.innerHTML = `<strong>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</strong>
+        &middot; ${c.side}<br>priced ${c.price.toFixed(3)},
+        happened ${c.actual.toFixed(3)}<br>
+        n=${c.n} &middot; 95% [${c.ci[0].toFixed(3)}, ${c.ci[1].toFixed(3)}]<br>
+        net ${sgn(c.net)}`;
+      tip.style.opacity=1;
+    });
+    el.addEventListener("mousemove", e=>{
+      tip.style.left=Math.min(e.clientX+14, innerWidth-244)+"px";
+      tip.style.top=(e.clientY+14)+"px";
+    });
+    el.addEventListener("mouseleave", ()=>tip.style.opacity=0);
   });
+}
 
-  const LIVE = "https://arb.aedinlai.com";
+function rows(cells, side){
+  if(!cells.length) return `<tr><td colspan="7" style="color:var(--text-muted)">
+     not enough samples yet</td></tr>`;
+  return cells.map(c=>{
+    const h=c.halves||[];
+    const oos = h.filter(x=>x&&x.holds).length;
+    return `<tr>
+      <td>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</td>
+      <td>${c.n}</td>
+      <td>${c.price.toFixed(3)}</td>
+      <td>${c.actual.toFixed(3)}</td>
+      <td class="${c.gross>0?'pos':'neg'}">${sgn(c.gross)}</td>
+      <td>${pc(c.fee)}</td>
+      <td class="${c.net>0?'pos':'neg'}"><strong>${sgn(c.net)}</strong>
+        ${c.significant?`<span class="chip" style="margin-left:6px">${oos}/2 halves</span>`:""}</td>
+    </tr>`;
+  }).join("");
+}
 
-  // The Pi serves the feed directly, which is minutes fresher than waiting
-  // for a commit to rebuild on Pages. The committed snapshot stays as the
-  // fallback for when the Pi is unreachable.
-  // The venue board. Written by the scanner that already holds both
-  // streams, so it is the same data the trader acted on, not a re-poll.
-  function refreshBoard(first) {
-    return fetch(LIVE + "/live.json", { cache: "no-store" })
-      .then(r => r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)))
-      .then(d => { render(d); foot(d); })
-      .catch(e => {
-        if (!first) return;
-        $("#summary").appendChild(el("div", "headline",
-          "Could not load the venue board."));
-        $("#summary").appendChild(el("p", null, e.message));
-      });
-  }
-
-  refreshBoard(true).then(() => {
-    refreshPaper(); refreshMoney(); refreshSys(); refreshReal(); refreshRun();
-    setInterval(refreshBoard, 5000);
-    setInterval(refreshPaper, 20000);
-    setInterval(refreshMoney, 60000);
-    setInterval(refreshSys, 30000);
-    // 15s: this is the line someone checks from a phone to find out
-    // whether a trade landed, so it should not be the stalest thing on
-    // the page. tradefeed.py rewrites the file every 20s.
-    setInterval(refreshReal, 15000);
-    // 10s: this is the line that says whether anything is running at
-    // all, and runfeed.py rewrites the file every 15s.
-    setInterval(refreshRun, 10000);
+function renderTables(d){
+  const t=d.tables||{};
+  const names=Object.keys(t).sort((a,b)=>(a==="all"?-1:b==="all"?1:t[b].n-t[a].n));
+  let out="";
+  names.forEach(name=>{
+    const g=t[name];
+    out+=`<h2 style="margin:20px 0 2px;font-size:14px">
+            ${name==="all"?"All categories":name}
+            <span style="color:var(--text-muted);font-weight:400"> · ${g.n.toLocaleString()} markets</span>
+          </h2>`;
+    [["Buying at the ask",g.buy,"buy"],["Selling at the bid",g.sell,"sell"]].forEach(([lab,cells,side])=>{
+      out+=`<div class="wrap"><table>
+        <thead><tr><th>${lab}</th><th>n</th><th>priced</th><th>happened</th>
+        <th>gross</th><th>fee</th><th>net</th></tr></thead>
+        <tbody>${rows(cells||[],side)}</tbody></table></div>`;
+    });
   });
-})();
+  $("#tables").innerHTML=out;
+
+  const n=d.comparisons||0, fp=d.expected_false_positives||0;
+  $("#caveat").innerHTML = n
+    ? `<strong>${n} comparisons</strong> are made in this report. At 95%
+       confidence you should expect about <strong>${fp}</strong> of them to look
+       significant by chance alone. One lone significant band is not a finding;
+       a band that holds in <em>both</em> halves of the data, over many days,
+       might be. Order size ${d.params.order_size}, minimum depth
+       ${d.params.min_depth} contracts, priced ${d.params.target_s}s before close.`
+    : `Nothing to caveat yet.`;
+}
+
+fetch(FEED,{cache:"no-store"}).then(r=>r.json()).then(d=>{
+  renderTiles(d); renderChart(d); renderTables(d);
+  if(d.generated) $("#gen").textContent =
+    " Last rebuilt " + new Date(d.generated*1000).toLocaleString() + ".";
+}).catch(e=>{
+  $("#tiles").innerHTML = `<div class="empty">Could not reach the feed. ${e}</div>`;
+});
 </script>
 </body>
 </html>
