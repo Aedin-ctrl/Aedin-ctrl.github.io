@@ -1,293 +1,223 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="light">
 <title>Calibration Board</title>
 <meta name="description" content="What prediction markets were priced at, against what actually happened.">
 <style>
+  /* Light only, deliberately. This board gets read next to a venue's own
+     screen and should look the same every time. */
   :root{
-    color-scheme: light;
-    --paper:#f7f6f3; --surface-1:#fcfcfb; --line:#e4e2db; --rule:#c3c2b7;
-    --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+    --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#8b8984;
     --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
-    --good:#0ca30c; --warning:#fab219; --critical:#d03b3b;
-  }
-  @media (prefers-color-scheme: dark){
-    :root:where(:not([data-theme="light"])){
-      color-scheme: dark;
-      --paper:#141413; --surface-1:#1a1a19; --line:#2f2f2c; --rule:#383835;
-      --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#898781;
-      --s1:#3987e5; --s2:#d95926; --s3:#199e70;
-    }
-  }
-  :root[data-theme="dark"]{
-    color-scheme: dark;
-    --paper:#141413; --surface-1:#1a1a19; --line:#2f2f2c; --rule:#383835;
-    --text-primary:#f0efec; --text-secondary:#c3c2b7; --text-muted:#898781;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --good:#0a7a26; --bad:#c0392b;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html{background:var(--paper)}
+  html{background:var(--paper);-webkit-text-size-adjust:100%}
   body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-       background:var(--paper); color:var(--text-primary); line-height:1.55;
-       font-variant-numeric:tabular-nums; -webkit-font-smoothing:antialiased}
-  main{max-width:960px;margin:0 auto;padding:40px 16px 96px}
-  h1{font-size:clamp(26px,4.4vw,36px);font-weight:650;letter-spacing:-.02em}
-  h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:0 0 4px}
-  .sub{color:var(--text-secondary);max-width:62ch;margin-top:10px}
-  section{background:var(--surface-1);border:1px solid var(--line);
-          border-radius:14px;padding:22px;margin-top:22px}
-  .shead{margin-bottom:16px}
-  .shead p{color:var(--text-secondary);font-size:13.5px;max-width:70ch;margin-top:3px}
-  .tiles{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}
-  .tile{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:13px 14px}
-  .tile .k{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-muted)}
-  .tile .v{font-size:23px;font-weight:650;margin-top:3px;letter-spacing:-.02em}
-  .tile .n{font-size:12px;color:var(--text-secondary);margin-top:2px}
-  table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
-  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-  th:first-child,td:first-child{text-align:left}
-  th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;
-     color:var(--text-muted);font-weight:600}
+       background:var(--paper);color:var(--ink);line-height:1.5;
+       font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  main{max-width:1000px;margin:0 auto;padding:34px 16px 90px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:clamp(23px,3.4vw,30px);font-weight:650;letter-spacing:-.022em}
+  .tag{font-size:12px;color:var(--muted)}
+  .lede{color:var(--ink2);font-size:14px;max-width:70ch}
+
+  .grid{display:grid;gap:9px;margin-top:20px;
+        grid-template-columns:repeat(auto-fit,minmax(118px,1fr))}
+  .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .m .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--muted)}
+  .m .v{font-size:25px;font-weight:650;letter-spacing:-.025em;margin-top:2px;line-height:1.1}
+  .m .n{font-size:11.5px;color:var(--ink2);margin-top:3px}
+
+  section{background:var(--card);border:1px solid var(--line);
+          border-radius:13px;padding:18px 20px;margin-top:18px}
+  h2{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.07em;
+     color:var(--muted);margin-bottom:11px}
+  h2 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;font-weight:500}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
   tbody tr:last-child td{border-bottom:none}
-  .pos{color:var(--good)} .neg{color:var(--critical)}
-  .wrap{overflow-x:auto}
+  tbody tr:hover{background:#fafaf8}
+  .pos{color:var(--good);font-weight:600} .neg{color:var(--bad)}
+  .dim{color:var(--muted)}
+  .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+
+  .sub{font-size:11.5px;font-weight:600;color:var(--ink2);
+       margin:14px 0 2px;letter-spacing:.01em}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
   .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
-        border:1px solid var(--line);border-radius:999px;padding:2px 9px;
-        color:var(--text-secondary)}
-  .dot{width:8px;height:8px;border-radius:50%}
-  .legend{display:flex;gap:9px;flex-wrap:wrap;margin:10px 0 2px}
-  .note{font-size:12.5px;color:var(--text-secondary);margin-top:12px;
-        border-left:2px solid var(--rule);padding-left:11px}
-  .warn{border-left-color:var(--warning)}
-  .empty{color:var(--text-secondary);font-size:14px;padding:26px 0;text-align:center}
-  svg{display:block;max-width:100%;height:auto}
-  .tip{position:fixed;pointer-events:none;background:var(--surface-1);
-       border:1px solid var(--rule);border-radius:8px;padding:8px 10px;
-       font-size:12.5px;box-shadow:0 6px 22px rgba(0,0,0,.14);opacity:0;
-       transition:opacity .1s;z-index:20;max-width:230px}
-  footer{margin-top:30px;font-size:12px;color:var(--text-muted)}
+        border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink2)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .foot{font-size:11.5px;color:var(--muted);margin-top:11px;
+        border-top:1px solid var(--line);padding-top:9px}
+  .empty{color:var(--muted);font-size:13px;padding:22px 0;text-align:center}
+  svg{display:block;max-width:100%;height:auto;margin:0 auto}
+  .tip{position:fixed;pointer-events:none;background:var(--card);
+       border:1px solid var(--rule);border-radius:7px;padding:7px 9px;
+       font-size:12px;box-shadow:0 5px 18px rgba(0,0,0,.13);opacity:0;
+       transition:opacity .08s;z-index:20}
+  footer{margin-top:24px;font-size:11.5px;color:var(--muted)}
   a{color:var(--s1)}
 </style>
 </head>
 <body>
 <main>
-  <h1>Calibration Board</h1>
-  <p class="sub">What prediction markets were <em>priced</em> at, against what
-  actually <em>happened</em>. Every figure uses the price you could have
-  transacted at &mdash; the ask to buy, the bid to sell, never the midpoint
-  &mdash; and only quotes with real depth behind them.</p>
+  <header>
+    <h1>Calibration Board</h1>
+    <span class="tag" id="gen"></span>
+  </header>
+  <p class="lede">Priced versus happened. Tradeable prices only &mdash; ask to
+  buy, bid to sell.</p>
+
+  <div class="grid" id="tiles"></div>
 
   <section>
-    <div class="shead"><h2>What has been collected</h2>
-    <p>The collector runs on the Pi and keeps running with every laptop in the
-    house shut. It records the order book for open markets, then records how
-    each one settled.</p></div>
-    <div class="tiles" id="tiles"></div>
-    <div id="cats"></div>
+    <h2>Markets being watched <span id="watchn"></span></h2>
+    <div class="wrap"><table id="livetab">
+      <thead><tr><th>Category</th><th>Markets</th><th>Two-sided</th>
+      <th>Spread</th><th>Open interest</th><th>Print vs mid</th>
+      <th>Settled</th></tr></thead><tbody></tbody></table></div>
   </section>
 
   <section>
-    <div class="shead"><h2>Is the price right?</h2>
-    <p>Each point is a band of prices. The diagonal is a perfectly calibrated
-    market. A point <strong>above</strong> the line happened more often than it
-    was priced for; <strong>below</strong>, less often. Bars are 95% confidence
-    intervals &mdash; where they cross the line, the market is not measurably
-    wrong.</p></div>
-    <div id="chartwrap"></div>
+    <h2>Calibration <span>&middot; priced probability against realised frequency</span></h2>
+    <div class="chips">
+      <span class="chip"><span class="dot" style="background:var(--s1)"></span>buy side</span>
+      <span class="chip"><span class="dot" style="background:var(--s2)"></span>sell side</span>
+      <span class="chip">size = sample</span>
+    </div>
+    <div id="chart"></div>
   </section>
 
   <section>
-    <div class="shead"><h2>Could you have traded it?</h2>
-    <p>Gross is the mispricing. Net is after the Kalshi fee at a realistic order
-    size &mdash; the fee ceiling is charged per <em>order</em>, so size matters
-    a great deal. A row only counts as an edge if its confidence interval clears
-    the price <em>and</em> net is positive.</p></div>
+    <h2>Tradeable edge <span id="params"></span></h2>
     <div id="tables"></div>
-    <div class="note warn" id="caveat"></div>
+    <div class="foot" id="caveat"></div>
   </section>
 
   <footer>
-    Source <a href="https://arb.aedinlai.com/calib.json">calib.json</a>,
-    rebuilt every 5 minutes. Read-only: the collector holds no trading
-    credentials and cannot place an order.
-    <span id="gen"></span>
+    <a href="https://arb.aedinlai.com/calib.json">calib.json</a> &middot;
+    rebuilt every 5&nbsp;min &middot; collector is read-only and cannot place an order
   </footer>
 </main>
 <div class="tip" id="tip"></div>
 
 <script>
-const FEED = "https://arb.aedinlai.com/calib.json";
-const $ = s => document.querySelector(s);
-const pc = x => (100*x).toFixed(1) + "c";
-const sgn = x => (x>0?"+":"") + (100*x).toFixed(1) + "c";
+const FEED="https://arb.aedinlai.com/calib.json";
+const $=s=>document.querySelector(s);
+const N=x=>(x||0).toLocaleString();
+const C=x=>(100*x).toFixed(1)+"c";
+const S=x=>(x>0?"+":"")+(100*x).toFixed(1)+"c";
 
-function tile(k, v, n){
-  return `<div class="tile"><div class="k">${k}</div>
-          <div class="v">${v}</div>${n?`<div class="n">${n}</div>`:""}</div>`;
+function tile(k,v,n){return `<div class="m"><div class="k">${k}</div>
+  <div class="v">${v}</div>${n?`<div class="n">${n}</div>`:""}</div>`;}
+
+function tiles(d){
+  const t=d.totals||{}, days=(t.days||[]).length;
+  $("#tiles").innerHTML=
+     tile("Markets", N(d.markets_tracked), `${d.series_tracked||0} series`)
+   + tile("Snapshots", N(t.snapshots), "books recorded")
+   + tile("Settled", N(t.settled), "with a result")
+   + tile("Usable", N(t.observations), "priced + settled")
+   + tile("Days", days||"—", days?`${t.days[0].slice(5)} → ${t.days[days-1].slice(5)}`:"accumulating");
+  $("#gen").textContent = d.generated
+    ? new Date(d.generated*1000).toLocaleTimeString() : "";
+  const p=d.params||{};
+  $("#params").innerHTML = `&middot; size ${p.order_size}, ${p.target_s}s before the event`;
 }
 
-function renderTiles(d){
-  const t = d.totals || {};
-  const days = (t.days||[]).length;
-  $("#tiles").innerHTML =
-      tile("Snapshots", (t.snapshots||0).toLocaleString(), "order books recorded")
-    + tile("Settled", (t.settled||0).toLocaleString(), "markets with a result")
-    + tile("Usable", (t.observations||0).toLocaleString(), "priced AND settled")
-    + tile("Days", days || "—", days ? `${t.days[0]} → ${t.days[days-1]}` : "accumulating");
-
-  const bc = t.by_category_settled || {};
-  const keys = Object.keys(bc).sort((a,b)=>bc[b]-bc[a]);
-  if(keys.length){
-    $("#cats").innerHTML = `<div class="legend" style="margin-top:14px">` +
-      keys.map(k=>`<span class="chip">${k} · ${bc[k].toLocaleString()} settled</span>`).join("") +
-      `</div>`;
-  }
+function liveTable(d){
+  const m=d.live_metrics||{}, st=(d.totals||{}).by_category_settled||{};
+  const keys=Object.keys(m).sort((a,b)=>m[b].markets-m[a].markets);
+  $("#watchn").innerHTML = `&middot; ${N(d.markets_tracked)} markets, ${d.series_tracked||0} series`;
+  $("#livetab tbody").innerHTML = keys.length ? keys.map(k=>{
+    const v=m[k];
+    return `<tr><td>${k}</td><td>${N(v.markets)}</td>
+      <td>${v.two_sided_pct.toFixed(0)}%</td>
+      <td>${v.median_spread!=null?C(v.median_spread):"<span class='dim'>—</span>"}</td>
+      <td>${N(Math.round(v.open_interest))}</td>
+      <td>${v.median_last_vs_mid!=null?C(v.median_last_vs_mid):"<span class='dim'>—</span>"}</td>
+      <td>${N(st[k]||0)}</td></tr>`;
+  }).join("") : `<tr><td colspan="7" class="dim">starting up…</td></tr>`;
 }
 
-/* CALIBRATION CURVE. Predicted on x, actual on y, a 45-degree reference
-   line, and a 95% interval on each point. The reference line is the whole
-   point of the form: deviation from it IS the finding, so it is drawn
-   first and in ink rather than as a series. */
-function renderChart(d){
-  const all = (d.tables && d.tables.all) || null;
-  const pts = [];
-  if(all){
-    (all.buy||[]).forEach(c => pts.push({...c, side:"buy"}));
-    (all.sell||[]).forEach(c => pts.push({...c, side:"sell"}));
-  }
+function chart(d){
+  const a=(d.tables||{}).all, pts=[];
+  if(a){(a.buy||[]).forEach(c=>pts.push({...c,side:"buy"}));
+        (a.sell||[]).forEach(c=>pts.push({...c,side:"sell"}));}
   if(!pts.length){
-    $("#chartwrap").innerHTML =
-      `<div class="empty">No market has both a recorded price and a result yet.<br>
-       The first 15-minute crypto windows land within the hour; game markets
-       enter the 24-hour window as they approach.</div>`;
-    return;
-  }
-  const W=680,H=440,P={t:14,r:16,b:44,l:52};
-  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+    $("#chart").innerHTML=`<div class="empty">No market yet has both a recorded
+      price and a result. Crypto windows land first; game markets as they play.</div>`;
+    return;}
+  const W=640,H=400,P={t:10,r:14,b:38,l:46},iw=W-P.l-P.r,ih=H-P.t-P.b;
   const X=v=>P.l+v*iw, Y=v=>P.t+(1-v)*ih;
-  let s=`<svg viewBox="0 0 ${W} ${H}" role="img"
-          aria-label="Calibration curve: priced probability against realised frequency">`;
-  // grid + axes
-  for(let i=0;i<=5;i++){
-    const v=i/5;
-    s+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}"
-         stroke="var(--line)" stroke-width="1"/>`;
-    s+=`<text x="${P.l-9}" y="${Y(v)+4}" text-anchor="end" font-size="11"
-         fill="var(--text-muted)">${v.toFixed(1)}</text>`;
-    s+=`<text x="${X(v)}" y="${H-P.b+18}" text-anchor="middle" font-size="11"
-         fill="var(--text-muted)">${v.toFixed(1)}</text>`;
-  }
-  // the reference line: a perfectly priced market
-  s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}"
-       stroke="var(--rule)" stroke-width="2" stroke-dasharray="5 4"/>`;
-  s+=`<text x="${X(0.80)}" y="${Y(0.80)-9}" font-size="11.5"
-       fill="var(--text-muted)" transform="rotate(-45 ${X(0.80)} ${Y(0.80)-9})">
-       priced correctly</text>`;
-  // intervals first, marks on top
-  pts.forEach(c=>{
-    const col = c.side==="buy" ? "var(--s1)" : "var(--s2)";
-    s+=`<line x1="${X(c.price)}" y1="${Y(c.ci[0])}" x2="${X(c.price)}"
-         y2="${Y(c.ci[1])}" stroke="${col}" stroke-width="2"
-         stroke-linecap="round" opacity=".45"/>`;
-  });
-  pts.forEach((c,i)=>{
-    const col = c.side==="buy" ? "var(--s1)" : "var(--s2)";
-    const r = Math.max(5, Math.min(11, 4+Math.sqrt(c.n)/3));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Calibration curve">`;
+  for(let i=0;i<=5;i++){const v=i/5;
+    s+=`<line x1="${P.l}" y1="${Y(v)}" x2="${W-P.r}" y2="${Y(v)}" stroke="var(--line)"/>`;
+    s+=`<text x="${P.l-8}" y="${Y(v)+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${v.toFixed(1)}</text>`;
+    s+=`<text x="${X(v)}" y="${H-P.b+16}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${v.toFixed(1)}</text>`;}
+  s+=`<line x1="${X(0)}" y1="${Y(0)}" x2="${X(1)}" y2="${Y(1)}" stroke="var(--rule)" stroke-width="2" stroke-dasharray="5 4"/>`;
+  pts.forEach(c=>{const col=c.side==="buy"?"var(--s1)":"var(--s2)";
+    s+=`<line x1="${X(c.price)}" y1="${Y(c.ci[0])}" x2="${X(c.price)}" y2="${Y(c.ci[1])}"
+         stroke="${col}" stroke-width="2" stroke-linecap="round" opacity=".4"/>`;});
+  pts.forEach((c,i)=>{const col=c.side==="buy"?"var(--s1)":"var(--s2)";
+    const r=Math.max(4.5,Math.min(10,4+Math.sqrt(c.n)/3.2));
     s+=`<circle cx="${X(c.price)}" cy="${Y(c.actual)}" r="${r}" fill="${col}"
-         stroke="var(--surface-1)" stroke-width="2" data-i="${i}"
-         style="cursor:pointer"/>`;
-  });
-  s+=`<text x="${P.l+iw/2}" y="${H-6}" text-anchor="middle" font-size="12"
-       fill="var(--text-secondary)">priced probability</text>`;
-  s+=`<text transform="rotate(-90 14 ${P.t+ih/2})" x="14" y="${P.t+ih/2}"
-       text-anchor="middle" font-size="12"
-       fill="var(--text-secondary)">realised frequency</text>`;
-  s+=`</svg>`;
-  $("#chartwrap").innerHTML =
-    `<div class="legend">
-       <span class="chip"><span class="dot" style="background:var(--s1)"></span>buy side (the ask)</span>
-       <span class="chip"><span class="dot" style="background:var(--s2)"></span>sell side (the bid)</span>
-       <span class="chip">point size = sample</span>
-     </div>` + s;
-
+         stroke="#fff" stroke-width="1.8" data-i="${i}" style="cursor:pointer"/>`;});
+  s+=`<text x="${P.l+iw/2}" y="${H-4}" text-anchor="middle" font-size="11" fill="var(--ink2)">priced</text>`;
+  s+=`<text transform="rotate(-90 12 ${P.t+ih/2})" x="12" y="${P.t+ih/2}" text-anchor="middle" font-size="11" fill="var(--ink2)">happened</text></svg>`;
+  $("#chart").innerHTML=s;
   const tip=$("#tip");
-  $("#chartwrap").querySelectorAll("circle[data-i]").forEach(el=>{
-    el.addEventListener("mouseenter", e=>{
-      const c=pts[+el.dataset.i];
-      tip.innerHTML = `<strong>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</strong>
-        &middot; ${c.side}<br>priced ${c.price.toFixed(3)},
-        happened ${c.actual.toFixed(3)}<br>
-        n=${c.n} &middot; 95% [${c.ci[0].toFixed(3)}, ${c.ci[1].toFixed(3)}]<br>
-        net ${sgn(c.net)}`;
-      tip.style.opacity=1;
-    });
-    el.addEventListener("mousemove", e=>{
-      tip.style.left=Math.min(e.clientX+14, innerWidth-244)+"px";
-      tip.style.top=(e.clientY+14)+"px";
-    });
-    el.addEventListener("mouseleave", ()=>tip.style.opacity=0);
-  });
+  $("#chart").querySelectorAll("circle[data-i]").forEach(el=>{
+    el.onmouseenter=()=>{const c=pts[+el.dataset.i];
+      tip.innerHTML=`<b>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</b> ${c.side}<br>
+        ${c.price.toFixed(3)} → ${c.actual.toFixed(3)} &middot; n=${c.n}<br>net ${S(c.net)}`;
+      tip.style.opacity=1;};
+    el.onmousemove=e=>{tip.style.left=Math.min(e.clientX+13,innerWidth-200)+"px";
+      tip.style.top=(e.clientY+13)+"px";};
+    el.onmouseleave=()=>tip.style.opacity=0;});
 }
 
-function rows(cells, side){
-  if(!cells.length) return `<tr><td colspan="7" style="color:var(--text-muted)">
-     not enough samples yet</td></tr>`;
+function rows(cells){
+  if(!cells||!cells.length) return `<tr><td colspan="7" class="dim">not enough samples</td></tr>`;
   return cells.map(c=>{
-    const h=c.halves||[];
-    const oos = h.filter(x=>x&&x.holds).length;
-    return `<tr>
-      <td>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</td>
-      <td>${c.n}</td>
-      <td>${c.price.toFixed(3)}</td>
-      <td>${c.actual.toFixed(3)}</td>
-      <td class="${c.gross>0?'pos':'neg'}">${sgn(c.gross)}</td>
-      <td>${pc(c.fee)}</td>
-      <td class="${c.net>0?'pos':'neg'}"><strong>${sgn(c.net)}</strong>
-        ${c.significant?`<span class="chip" style="margin-left:6px">${oos}/2 halves</span>`:""}</td>
-    </tr>`;
+    const h=(c.halves||[]).filter(x=>x&&x.holds).length;
+    return `<tr><td>${c.lo.toFixed(2)}–${c.hi.toFixed(2)}</td><td>${c.n}</td>
+      <td>${c.price.toFixed(3)}</td><td>${c.actual.toFixed(3)}</td>
+      <td class="${c.gross>0?'pos':'neg'}">${S(c.gross)}</td><td>${C(c.fee)}</td>
+      <td class="${c.net>0?'pos':'neg'}">${S(c.net)}${c.significant?` <span class="chip">${h}/2</span>`:""}</td></tr>`;
   }).join("");
 }
 
-function renderTables(d){
+function tables(d){
   const t=d.tables||{};
-  const names=Object.keys(t).sort((a,b)=>(a==="all"?-1:b==="all"?1:t[b].n-t[a].n));
-  let out="";
-  names.forEach(name=>{
+  const names=Object.keys(t).sort((a,b)=>a==="all"?-1:b==="all"?1:t[b].n-t[a].n);
+  $("#tables").innerHTML = names.map(name=>{
     const g=t[name];
-    out+=`<h2 style="margin:20px 0 2px;font-size:14px">
-            ${name==="all"?"All categories":name}
-            <span style="color:var(--text-muted);font-weight:400"> · ${g.n.toLocaleString()} markets</span>
-          </h2>`;
-    [["Buying at the ask",g.buy,"buy"],["Selling at the bid",g.sell,"sell"]].forEach(([lab,cells,side])=>{
-      out+=`<div class="wrap"><table>
-        <thead><tr><th>${lab}</th><th>n</th><th>priced</th><th>happened</th>
-        <th>gross</th><th>fee</th><th>net</th></tr></thead>
-        <tbody>${rows(cells||[],side)}</tbody></table></div>`;
-    });
-  });
-  $("#tables").innerHTML=out;
-
-  const n=d.comparisons||0, fp=d.expected_false_positives||0;
+    return `<div class="sub">${name==="all"?"All":name} · ${N(g.n)}</div>` +
+      [["Buy at ask",g.buy],["Sell at bid",g.sell]].map(([lab,cells])=>
+        `<div class="wrap"><table><thead><tr><th>${lab}</th><th>n</th><th>priced</th>
+         <th>happened</th><th>gross</th><th>fee</th><th>net</th></tr></thead>
+         <tbody>${rows(cells)}</tbody></table></div>`).join("");
+  }).join("");
+  const n=d.comparisons||0;
   $("#caveat").innerHTML = n
-    ? `<strong>${n} comparisons</strong> are made in this report. At 95%
-       confidence you should expect about <strong>${fp}</strong> of them to look
-       significant by chance alone. One lone significant band is not a finding;
-       a band that holds in <em>both</em> halves of the data, over many days,
-       might be. Order size ${d.params.order_size}, minimum depth
-       ${d.params.min_depth} contracts, priced ${d.params.target_s}s before close.`
-    : `Nothing to caveat yet.`;
+    ? `${n} comparisons &middot; expect ~${d.expected_false_positives} to look
+       significant by chance &middot; the <b>n/2</b> chip counts how many halves
+       of the data a result survives in`
+    : "";
 }
 
 fetch(FEED,{cache:"no-store"}).then(r=>r.json()).then(d=>{
-  renderTiles(d); renderChart(d); renderTables(d);
-  if(d.generated) $("#gen").textContent =
-    " Last rebuilt " + new Date(d.generated*1000).toLocaleString() + ".";
-}).catch(e=>{
-  $("#tiles").innerHTML = `<div class="empty">Could not reach the feed. ${e}</div>`;
-});
+  tiles(d); liveTable(d); chart(d); tables(d);
+}).catch(e=>{$("#tiles").innerHTML=`<div class="empty">Feed unreachable. ${e}</div>`;});
 </script>
 </body>
 </html>
