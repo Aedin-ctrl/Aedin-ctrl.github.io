@@ -1,0 +1,742 @@
+{
+  "date": "2026-11-01",
+  "generated": "2026-11-01T18:24:29.084Z",
+  "articles": [
+    {
+      "id": "2026-11-01-follow-up-fbi-blames-north-koreas-tradertraitor-for",
+      "headline": "Follow-up: FBI blames North Korea's TraderTraitor for the record $6.43 billion Binance theft",
+      "summary": "The FBI attributes the Binance theft to TraderTraitor, a North Korea-aligned group, and says the thieves are converting the loot into Ethereum. About $2.85 billion has been frozen on-chain; Binance has started resuming withdrawals.",
+      "impacts": [
+        "A state-linked group now holds a large pool of crypto it must launder through swap services and DeFi.",
+        "Exchange staff with admin access to infrastructure are a prime target for fake-recruiter lures.",
+        "Freezes by stablecoin issuers and chains show how stolen funds can sometimes be clawed back.",
+        "If you hold crypto on an exchange, withdrawal pauses can lock you out without warning."
+      ],
+      "details": [
+        "The FBI, the U.S. Secret Service and IRS Criminal Investigation attributed the theft of more than $6 billion in virtual assets to TraderTraitor, a North Korea-aligned group also tracked as Jade Sleet, Pressure Chollima, PUKCHONG, Slow Pisces and UNC4899. The Hacker News reports the figure as $6.43 billion; earlier headlines said $6.3 billion.",
+        "According to the report, funds were taken across 11 blockchains, 82% of them on Ethereum and Bitcoin. The haul is larger than the $1.46 billion Bybit theft in February 2025, which makes it the largest crypto theft on record. The agencies said the attacker is converting stolen assets mainly into Ethereum and expects further laundering through DeFi and instant swap services. The FBI published wallet addresses used in the laundering.",
+        "Earlier coverage, per BleepingComputer's headline list, said Binance linked the theft to a compromised DevOps engineer's laptop. The Hacker News article does not describe how the Binance breach itself worked. It does describe TraderTraitor's known methods, as reported by Microsoft, SentinelOne and Zscaler: poisoned Terraform providers, a cross-platform implant called FLATROOF that drops a ROOFDECK backdoor, and fake recruiters from front companies who use AI to write lures and build personas.",
+        "On the response side, $2.85 billion has been frozen on-chain by Tether, Circle, Ripple, Arbitrum and Optimism. Binance paused withdrawals and has now resumed phase one, with a gradual restoration planned; deposits stayed open. Elliptic estimates North Korea-linked actors have stolen over $6.5 billion in crypto in recent years, and said this incident almost doubles the total stolen by the regime.",
+        "What is still unknown: the article gives no public detail on how the attacker moved from a laptop to the assets, and the amount that will ultimately be recovered is unclear. Watch for further freezes and for any additional exchanges named in the laundering trail."
+      ],
+      "category": "Economy",
+      "tags": [
+        "binance",
+        "crypto",
+        "north korea",
+        "hack",
+        "fbi",
+        "theft"
+      ],
+      "date": "2026-11-01",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/fbi-links-north-koreas-tradertraitor-to.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-alpine-linux-rebuilt-its-gitlab-server-after-an",
+      "headline": "Alpine Linux rebuilt its GitLab server after an attack and says it 'cannot rule out code execution'",
+      "summary": "Attackers tried to exploit a maximum-severity GitLab flaw on Alpine Linux's development server on October 20-21. Alpine rebuilt the server from scratch because missing logs meant it could not confirm what ran.",
+      "impacts": [
+        "Alpine is a common base for Docker images, so a tampered build recipe could spread widely.",
+        "A patched version number did not guarantee a fixed server: the real fix needed a Ruby patch.",
+        "Missing logs turned an attack attempt into a full rebuild.",
+        "Attackers downloading the container image hints at supply-chain preparation."
+      ],
+      "details": [
+        "BleepingComputer reports that attackers tried to exploit a critical GitLab vulnerability, CVE-2026-97229, on Alpine Linux's development infrastructure on October 20-21. Alpine rebuilt its GitLab server from scratch and reset all passwords because it could not rule out a compromise. The attempts repeatedly crashed GitLab processes, and some came close to succeeding.",
+        "The flaw is an integer overflow in Onigmo, the regular-expression compiler bundled with Ruby and used in GitLab's CI/CD. An unauthenticated attacker could run code by submitting a specially crafted regular expression in a pipeline configuration, under certain conditions. GitLab disclosed it and released fixes on October 12.",
+        "Alpine was exposed partly through its own packaging. It first installed GitLab 19.3.4 instead of the patched 19.3.5, and a later upgrade to 19.3.6 still did not close the hole. The fix required a Ruby patch that GitLab's official packages included but Alpine's custom container image did not.",
+        "The attacker submitted malicious CI configurations that caused eight worker crashes; four attempts were partially successful, though none appeared to fully succeed. The attackers also downloaded Alpine's GitLab container image, which may indicate preparation for a supply-chain attack. Alpine found no tampering in repository commits, packages or releases up to October 27, and its signing keys were not exposed because they are not stored on the GitLab server.",
+        "The uncertainty is the story: logs were missing and there were no outbound-connection records, so Alpine said it \"cannot rule out code execution.\" Potentially exposed data includes user details, password hashes, 2FA secrets and CI/CD secrets, though no compromise has been confirmed. Users are told to reset passwords and pull the alpinelinux/gitlab:19.3.6 image published October 27. BleepingComputer also links a report that CISA says the GitLab flaw is now exploited in the wild; I did not open that article."
+      ],
+      "category": "Tech",
+      "tags": [
+        "gitlab",
+        "alpine",
+        "supply chain",
+        "linux",
+        "rce",
+        "vulnerability"
+      ],
+      "date": "2026-11-01",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/alpine-linux-rebuilds-gitlab-after-attempted-rce-attack/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-webb-finds-the-interstellar-comet-3i-atlas-has",
+      "headline": "Webb finds the interstellar comet 3I/ATLAS has the most deuterium-rich methane ever measured in a comet",
+      "summary": "Webb measured methane on 3I/ATLAS with a deuterium-to-hydrogen ratio near 3.2%, about 13 times that of comet 67P. The authors say its ices formed somewhere extremely cold, around another star or in the cloud before it.",
+      "impacts": [
+        "It is a rare chemical sample of material from another star system.",
+        "It tests models of how ices form in the coldest star-forming gas.",
+        "It shows how much can be learned from a visitor that passes only once.",
+        "It is not a threat story: the result concerns the comet's origin."
+      ],
+      "details": [
+        "A Nature Astronomy paper led by Nathan Roth of American University and NASA Goddard reports that methane in 3I/ATLAS is unusually rich in deuterium, the heavy isotope of hydrogen. The D/H ratio is about 3.2%, which the authors say exceeds any other value measured for methane in the solar system. Phys.org covered the paper on November 1.",
+        "The team used the James Webb Space Telescope to observe the comet's coma in infrared light on December 22-23, 2025, when the comet was about 2.4 times as far from the Sun as Earth. The deuterated methane signal is faint and sits between much brighter methane features, so the researchers modeled and subtracted emission from methanol, formaldehyde, ethane and OH to isolate it.",
+        "For scale, the ratio is about 13 times the methane D/H of comet 67P, which likely formed in our solar system, and about 3 times the D/H previously measured in 3I/ATLAS's own water. Comet 67P is the only other comet with deuterated methane detected, and that came from the close-up Rosetta mission.",
+        "The interpretation is that deuterium enrichment is favored in very cold gas, around 10 K, where reactions that remove deuterium become less effective. Ice-grain chemistry could then build deuterium-rich ices. The authors suggest methane may have formed later than the water, and that the result fits a cold cloud or star-forming environment with few elements heavier than helium and a high cosmic-ray rate.",
+        "The caveats are real. The result gives a plausible history, not a unique birthplace. There are no direct methane D/H measurements from distant star-forming regions to compare against, and the few chemical models that predict such values fall short of what was measured, so the comet is a demanding test for them."
+      ],
+      "category": "Space",
+      "tags": [
+        "3i/atlas",
+        "webb",
+        "comet",
+        "interstellar",
+        "nasa",
+        "deuterium"
+      ],
+      "date": "2026-11-01",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Phys.org",
+          "url": "https://phys.org/news/2026-10-heavy-hydrogen-3iatlas-methane-frigid.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-chinese-state-hackers-used-the-ai-framework-artex",
+      "headline": "Chinese state hackers used the AI framework ARTEX against more than 200 organizations in two weeks",
+      "summary": "CrowdStrike says the China-linked group Vapor Panda has run ARTEX, an AI penetration-testing framework, since October 17. It targeted 200+ organizations and got in at nine, with planning agents using about 1.4 billion tokens in one intrusion.",
+      "impacts": [
+        "One operator directing AI agents can pursue many more targets at once.",
+        "Old weaknesses, like keys unrotated since 2022, are what the agents exploited.",
+        "Governments, telecoms and defense suppliers across several regions were in scope.",
+        "Defenders may face faster, more adaptive intrusions than human-paced ones."
+      ],
+      "details": [
+        "CrowdStrike reports that Vapor Panda, a China-linked state-sponsored group (formerly VexatiousTemper), has used ARTEX since October 17, 2026 against more than 200 distinct organizations worldwide. The Hacker News summarized the findings on October 30. Post-exploitation was confirmed at nine organizations, where the attackers deployed BLOODALCHEMY, a ShadowPad derivative. Password spraying hit at least 12 more.",
+        "ARTEX is a Go-based AI penetration-testing framework, according to Zscaler ThreatLabz, that orchestrates multiple LLM backends for reconnaissance, vulnerability identification and exploitation. In this campaign it ran with DeepSeek and an unidentified commercial LLM. It uses planner and worker agents that coordinate toward a goal, while a human operator directs them to write web shells, extract domain-admin passwords and bypass endpoint defenses. Its developer, Li Puhua (\"Autumn-27\"), has taken it closed source.",
+        "Targets include foreign ministries across Latin America, Central America, Asia and Europe, a Middle East interior ministry, and telecom providers in the U.S., Belgium and the Philippines. Nineteen U.S. organizations were notable targets, in pharmaceuticals, semiconductors, defense, nuclear and finance, plus think tanks.",
+        "Some of the intrusions relied on old weaknesses: an unsigned SAML assertion chained with an XXE flaw to reach a cloud metadata service, and a forged administrator token made with authentication keys unrotated since 2022. In one intrusion the planning agents consumed roughly 1.4 billion input tokens, and CrowdStrike says the agents shifted to other approaches when a path failed.",
+        "CrowdStrike's reading is measured: agentic tooling lets a small team expand quickly, but it is not a wholesale shift in the group's mission. What is unknown is how many of the 200+ targets were actually compromised beyond the nine confirmed. This follows an earlier story about a Korean case involving ARTEX."
+      ],
+      "category": "AI",
+      "tags": [
+        "artex",
+        "ai hacking",
+        "china",
+        "crowdstrike",
+        "espionage",
+        "agents"
+      ],
+      "date": "2026-10-30",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/chinese-hackers-use-ai-powered-artex-to.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-japans-sumitomo-pharma-reports-the-first-patient-treated",
+      "headline": "Japan's Sumitomo Pharma reports the first patient treated with iPS-cell therapy for Parkinson's",
+      "summary": "Sumitomo Pharma says a first patient received its conditionally approved therapy at Kyoto University Hospital in October. It transplants stem-cell-derived dopamine-cell precursors into both sides of the brain.",
+      "impacts": [
+        "It is a first step toward replacing lost brain cells instead of masking symptoms.",
+        "The evidence is thin: seven trial patients, four with improvement.",
+        "Approval is conditional and depends on seven years of follow-up.",
+        "If it works, it could change treatment for a common neurodegenerative disease."
+      ],
+      "details": [
+        "Sumitomo Pharma, a Japanese drugmaker, announced in an earnings press release on October 30 that the first transplant of its Parkinson's therapy was performed at Kyoto University Hospital in October. Medical Xpress reported it. The company gave no further detail, and the patient was not named.",
+        "The therapy implants millions of induced pluripotent stem (iPS) cell-derived precursors of dopamine-producing brain cells, from healthy donors, on both sides of the brain. Parkinson's destroys those cells, and current therapies improve symptoms without slowing disease progression.",
+        "Japanese regulators gave conditional approval in March. Full approval depends on confirming safety and efficacy over the next seven years, according to local media cited in the article.",
+        "In the clinical trial, seven patients aged 50 to 69 received 5 million or 10 million cells per side and were followed for two years. No major adverse effects were found, and four showed symptom improvements. That sample is very small and the article does not report how improvement was measured.",
+        "Sumitomo plans to treat 20 to 30 patients by March 2029 and is running a U.S. trial. The article does not give a price. Treat this as an early clinical step, not a proven cure."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "parkinsons",
+        "stem cells",
+        "brain",
+        "japan",
+        "clinical trial",
+        "ips"
+      ],
+      "date": "2026-10-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Medical Xpress",
+          "url": "https://medicalxpress.com/news/2026-10-patient-stem-cell-treatment-parkinson.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-the-doj-asks-a-court-to-protect-character",
+      "headline": "The DOJ asks a court to protect Character.AI chats before they can be sold in bankruptcy",
+      "summary": "The U.S. Trustee wants a consumer privacy ombudsman because Character.AI's policy is ambiguous about selling chat histories. The company has 12 million monthly users, and some chats involve minors.",
+      "impacts": [
+        "Private chats with a bot can become a bankruptcy asset.",
+        "Months of detailed chats can identify people even with names removed.",
+        "Teen users may not know a buyer could inherit their data.",
+        "It follows a similar data-for-sale issue in the 23andMe case."
+      ],
+      "details": [
+        "The Justice Department's Executive Office for U.S. Trustees filed in the Character.AI bankruptcy case asking for privacy protections for users whose chats and data could be sold, The Record reported on October 30. It asked for a consumer privacy ombudsman to advise the court on what data can be sold and under what terms.",
+        "The DOJ calls the privacy policy \"ambiguous\" and says it may permit selling at least some chat histories. The policy says the company may disclose personally identifiable information and allows transfer if the company is sold. It was updated July 1, while the company was seeking to sell assets. The chatbot tells users their conversations won't be shared \"Not without your explicit permission,\" per the filing.",
+        "Character.AI has 12 million monthly active users who typically spend about two hours a day on the platform. The DOJ notes the chats are often sensitive and sometimes involve minors. The article does not identify a buyer and gives no total chat count.",
+        "Sydney Saubestre of the Center for Democracy and Technology said a buyer is bound by the existing policy but could change practices with user consent, possibly through incentives, and that long chats can make people identifiable. She argues for opt-in consent to any data sale.",
+        "The judge could block the sale of user data, but the article does not name the court. Character.AI did not comment. At least seven families have sued over suicides or mental-health harms they link to the chatbot, and the article says those suits hastened its decline."
+      ],
+      "category": "AI",
+      "tags": [
+        "character.ai",
+        "chatbots",
+        "privacy",
+        "bankruptcy",
+        "minors",
+        "data"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/doj-raises-privacy-concerns-over-character-ai-sale"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-pentagon-investigates-whether-a-cyberattack-spoiled-food-in",
+      "headline": "Pentagon investigates whether a cyberattack spoiled food in freezers at about six US military commissaries",
+      "summary": "Freezers at around six commissaries failed in August, and one at Fort Huachuca entered defrost mode. The Pentagon is probing a possible hack, with French authorities helping after a similar incident at 350+ French stores.",
+      "impacts": [
+        "Internet-reachable industrial controls can be used to spoil food supplies.",
+        "The same trick has now been seen in France and possibly the US.",
+        "Spoilage is cheap damage for attackers and hard to detect early.",
+        "Food-sector cybersecurity legislation has stalled for years."
+      ],
+      "details": [
+        "Defense One reported on October 29 that the Pentagon is investigating a suspected cyberattack behind freezer malfunctions at U.S. military commissaries in August 2026. An anonymous U.S. official said about six commissaries were affected. At Fort Huachuca in Arizona, officials said a freezer \"had entered defrost mode and heated its contents.\" Reuters first reported the suspicion.",
+        "U.S. Cyber Command and Defense Department law-enforcement units are investigating, and it is unclear who is responsible or whether the cause has been conclusively determined. French authorities are working with U.S. officials after hackers earlier in October overrode temperature controls on commercial refrigeration equipment at more than 350 French establishments, per BBC reporting cited by Defense One.",
+        "The Signal and Silence blog flagged the unusual outages in August, Stars and Stripes reported military investigators were involved, and The Telegraph reported contact with French authorities.",
+        "Context from the article: a 2021 DHS threat assessment named refrigeration failures as a cyber risk, the Food and Agriculture ISAC warns that attackers target internet-accessible industrial controls and that the sector's sensitivity to downtime gives ransomware gangs leverage. A Farm and Food Cybersecurity Act was reintroduced in 2025.",
+        "Treat the hack as unconfirmed: the article says investigators describe it as a possible hack. Watch for an attribution or a confirmed link to the French incident."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "freezers",
+        "critical infrastructure",
+        "pentagon",
+        "france",
+        "cyberattack",
+        "food"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Defense One",
+          "url": "https://www.defenseone.com/threats/2026/10/pentagon-investigates-suspected-cyberattack-behind-military-freezer-failures/416929/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-propublica-trump-appointees-asked-cisa-to-secretly-hack",
+      "headline": "ProPublica: Trump appointees asked CISA to secretly hack a voting machine",
+      "summary": "Political appointees at DHS asked CISA to buy a voting machine, hack it, and pass the findings to the White House, ProPublica reports. Staff refused and the operation never happened.",
+      "impacts": [
+        "Staff were reportedly told not to alert the vendor to any flaws.",
+        "CISA has lost over 1,000 staff, about a third of the agency.",
+        "Some states say they will no longer share information with CISA.",
+        "Election officials went into the midterms with less federal help."
+      ],
+      "details": [
+        "ProPublica reporters Andy Mannix and Doug Bock Clark, in a piece republished by Defense One on October 19, report that political appointees at the Department of Homeland Security, a few months into Trump's second term, asked CISA to acquire a voting machine and hack it, then report the findings so they could be given to the White House. Two former administration officials described the request. The vendor and model were not identified.",
+        "Career staff were shocked and feared political interference. CISA was reportedly told not to alert the vendor if it found flaws, which departed from standard practice. One former official suspected the findings could be held to challenge election results the administration disliked. Staff said the request was impossible partly because the agents who could do such work had been laid off by DOGE. The appointees eventually stopped, and the operation was never carried out.",
+        "The administration has laid off or pushed out more than 1,000 CISA employees, shrinking it by about a third, and the 2027 budget proposal would cut $700 million more, possibly 900 layoffs. Several state officials said CISA gave them no help during key planning for the 2026 midterms, and one expert called it \"literally nonexistent\" on election work from 2025 to mid-September 2026.",
+        "The administration also declassified records containing sensitive information states had shared with CISA, which some officials say damaged trust. CISA published a 13-page election security plan on September 24, which state officials called too late.",
+        "A White House spokesperson, Lauren Bis, defended Trump's election security record. DHS and CISA did not respond to ProPublica. The claim rests on anonymous former officials; the request was never carried out."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "cisa",
+        "elections",
+        "voting machines",
+        "government",
+        "dhs",
+        "propublica"
+      ],
+      "date": "2026-10-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Defense One (ProPublica)",
+          "url": "https://www.defenseone.com/threats/2026/10/trump-appointees-cybersecurity-agency-hack-voting-machine/416692/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-hegseths-new-autonomous-warfare-command-depends-on-a",
+      "headline": "Hegseth's new Autonomous Warfare Command depends on a $54 billion request that may not pass",
+      "summary": "Defense Secretary Hegseth announced a command to buy and standardize autonomous weapons. Its $54 billion start-up money sits in a reconciliation bill whose passage is uncertain.",
+      "impacts": [
+        "A new four-star command could shape how drones and robots are bought and used.",
+        "The structure is unclear and services would have to give up people and money.",
+        "If the money fails by January, the idea may stall.",
+        "Critics warn centralizing drone operations could hurt integration with combat units."
+      ],
+      "details": [
+        "Defense One reported on October 25 that Defense Secretary Pete Hegseth announced a proposed U.S. Autonomous Warfare Command (AUTOWARCOM) at the AUSA annual meeting on October 14. He said it would become the Pentagon's official purchaser of autonomous technology but gave few details, saying \"we're still iterating, we're still adapting, we're still learning.\"",
+        "The department has a year to stand it up, with a plan of action and milestones due at the end of October. No leaders have been named. The Pentagon requested $54 billion for the Defense Autonomous Warfare Group, outside the $1 trillion base budget, through a reconciliation bill an official said should be at least $350 billion.",
+        "Retired General John Ferrari said the money must arrive by Christmas or likely won't, because reconciliation ends with the new Congress in January and the midterms could change Congress. \"If there's no money, it's an interesting concept,\" he said. Mark Cancian of CSIS questioned whether a four-star acquisition-focused command makes sense, suggesting a three-star agency with its own budget.",
+        "The command would create service component commands and a new corps of officers and enlisted personnel. The Army announced its own autonomy command, the Navy created a robotic-systems portfolio manager, and the Air Force said it is exploring options. Cancian warned that centralizing drone operations would be a poor idea because they must be tied to operating forces.",
+        "What is unknown: the structure, leadership, and whether Congress funds it. This is a plan, not an operating command."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "pentagon",
+        "autonomous weapons",
+        "drones",
+        "hegseth",
+        "military",
+        "ai"
+      ],
+      "date": "2026-10-25",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Defense One",
+          "url": "https://www.defenseone.com/threats/2026/10/funding-hegseth-autonomous-command/416800/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-a-new-estimate-says-about-74-5-of",
+      "headline": "A new estimate says about 74.5% of deceased NFL players had CTE, down from the 99% in donated brains",
+      "summary": "A Boston University team adjusted for the fact that families of symptomatic players donated brains about five times more often. Its population-level estimate is 74.5%.",
+      "impacts": [
+        "Even the corrected number means most deceased players had the disease.",
+        "CTE can only be confirmed after death, so living risk is hard to measure.",
+        "The finding bears on youth and college football safety debates.",
+        "It shows how sampling bias can inflate or distort headline medical numbers."
+      ],
+      "details": [
+        "A study in JAMA Network Open by J. Gallini and colleagues at Boston University, covered by Science News on October 28, estimates the prevalence of chronic traumatic encephalopathy among deceased NFL players at 74.5 percent. It is described as the first population-level estimate for NFL players.",
+        "A 2017 analysis of donated brains estimated about 99 percent of former NFL players had CTE. The authors argue families are more likely to donate a brain when a relative had symptoms, which could inflate that figure.",
+        "The study included all former NFL players who died from January 2008 through December 2023, more than 2,300 players. Nearly 400 had samples in the UNITE Brain Bank, and the rest were identified through the U.S. National Death Index. Families of players with CTE-related symptoms were about five times more likely to donate, and the team used that to adjust.",
+        "The figure is an estimate that depends on the bias adjustment. CTE can only be diagnosed by autopsy, and the article ties it to repeated head blows while noting it can occur outside sports, including in combat and intimate partner violence. Symptoms can include memory problems, depression and poor impulse control.",
+        "The Science News piece does not describe the statistical model or list other limitations, so those would need checking in the full paper."
+      ],
+      "category": "Health",
+      "tags": [
+        "cte",
+        "football",
+        "brain",
+        "nfl",
+        "dementia",
+        "study"
+      ],
+      "date": "2026-10-28",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/football-nfl-players-cte-brain-disease"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-northflank-tells-customers-to-assume-their-secrets-were",
+      "headline": "Northflank tells customers to assume their secrets were stolen as attacks on AI developer platforms pile up",
+      "summary": "Northflank told customers to rotate everything after a breach led to misuse of AI API keys. Wiz counts at least nine incidents at AI developer platforms in October.",
+      "impacts": [
+        "Environment variables on a hosting platform often hold database passwords and cloud keys.",
+        "Stolen AI keys can run up large bills; Wiz saw about $100,000 from 2.5 million Bedrock calls.",
+        "How the attackers got in is still undisclosed.",
+        "Developers should rotate keys and check AI billing logs."
+      ],
+      "details": [
+        "BleepingComputer reports that Northflank, a cloud platform for apps, containers and AI workloads, told customers on October 30 to rotate all credentials and secrets stored on it after a breach led to unauthorized use of customers' AI API keys. Wiz alerted Northflank at 11:43 UTC, and the status update said: \"Assume all environment variables have been decrypted. Disable/rotate all keys.\"",
+        "Northflank deployed a network-policy patch and further patches at 12:50 and 13:05, and asked Wiz's incident response team for help. It later confirmed multiple customers reported unauthorized use of AI keys. It enabled credential rotation for PostgreSQL, MongoDB, MySQL and Redis, and audit logs for all customers including free accounts.",
+        "Northflank has not said how attackers got in, how many customers were affected, or whether other credentials were abused.",
+        "Wiz's report \"Black October for AI Developer Platforms\" identified at least nine incidents in October, including Northflank, Railway, OpenCode, Warp and Lightning AI. Wiz has not confirmed the same attackers were behind all of them, but some specifically targeted environment variables holding AI credentials, known as LLMJacking.",
+        "In two cases Wiz investigated, compromised enterprise credentials drove about 2.5 million Amazon Bedrock API calls and roughly $100,000 in usage. Wiz also found infrastructure tied to reselling model access but could not link it to the initial breaches."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "northflank",
+        "api keys",
+        "ai",
+        "breach",
+        "credentials",
+        "cloud"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/northflank-security-breach-leads-to-abuse-of-customers-ai-api-keys/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-follow-up-a-hijacked-debugbear-script-drained-about",
+      "headline": "Follow-up: a hijacked DebugBear script drained about $2.7 million from Polymarket traders in 52 minutes",
+      "summary": "Attackers took over a third-party analytics script through DebugBear's DNS and used signed-in traders' own access to move positions out. Polymarket is refunding 726 wallets.",
+      "impacts": [
+        "A third-party script on a trading page can act with a trader's own session.",
+        "The attack ran about 52 minutes before Polymarket paused trading.",
+        "Refunds totaled about $3.9 million, but not every platform will cover losses.",
+        "Pinned scripts and tighter content policies are the stated fix."
+      ],
+      "details": [
+        "The Hacker News reports that attackers replaced a page-speed script Polymarket loaded from DebugBear. DebugBear said its DNS was compromised through its domain registrar, and early findings suggest only one customer's site was targeted. The malicious code reused a signed-in trader's access to read browser-stored data including trading API keys and find the order and signing code.",
+        "For wallet users it moved positions to the attackers' wallet; for email-login accounts it sold positions at progressively worse prices and moved proceeds out. Hudson Rock found no code sending keys or seed phrases to a server and noted a signing request alone does not prove the trader approved it.",
+        "Timeline on October 29 (UTC): first funds at 17:10, Polymarket's first status update at 17:38, last funds at 18:02 (about 52 minutes), cancel-only mode at 18:05. The attacker wallet collected 28.6 million POL from 33 wallets, about $2.64 million.",
+        "Polymarket is refunding about $2.7 million to 726 wallets, and separately $1.19 million to about 5,500 wallets that lost money during the pause, for $3.9 million total. By October 30, 689 of the 726 were fully refunded. It referred the case to law enforcement.",
+        "Polymarket plans to restore third-party scripts with a stronger Content Security Policy, pinned versions and sandboxing. The identity of the attacker is not reported."
+      ],
+      "category": "Economy",
+      "tags": [
+        "polymarket",
+        "crypto",
+        "supply chain",
+        "dns",
+        "hack",
+        "javascript"
+      ],
+      "date": "2026-11-01",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/hackers-steal-about-27-million-from.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-a-public-sms-of-death-exploit-can-crash",
+      "headline": "A public 'SMS of Death' exploit can crash Android phones' cellular service, and Android 12 and 13 have no fix",
+      "summary": "A proof-of-concept for CVE-2026-58882 crashes the phone process with a crafted eight-byte WAP Push text. Google patched Android 14-17 in October, but Android 12 and 13 remain vulnerable.",
+      "impacts": [
+        "A text can disconnect calls, including emergency calls, with no user action.",
+        "Repeated messages can put phones in reboot loops needing a factory reset.",
+        "Older Android devices without updates have no fix.",
+        "A public exploit lowers the bar for pranks and harassment."
+      ],
+      "details": [
+        "BleepingComputer reports on October 31 that researcher Mark Blah published a proof-of-concept for CVE-2026-58882, dubbed \"SMS of Death,\" a zero-click denial-of-service bug in Android.",
+        "The flaw is in WapPushOverSms.decodeWapPdu, which does not validate a header-length value. A short eight-byte WAP Push message, sent as a data SMS, produces a negative size, triggering a NegativeArraySizeException that crashes the com.android.phone process. Connectivity drops and ongoing calls, including emergency calls, are disconnected. Android processes the message before it reaches the inbox, so victims see no sign of the cause.",
+        "Carrier redelivery or reprocessing of stored messages can cause repeated crashes. Sending 20 messages could leave phones in reboot loops, and one Android 12 device rebooted into recovery roughly every 90 seconds and needed a factory reset.",
+        "Google reportedly patched Android 14 through 17 in the October 2026 updates, though the flaw is not in the bulletin. Android 12 and 13 remain vulnerable. A GitHub contributor found a way to remove the messages with ADB, which needs advanced knowledge and a computer.",
+        "The article's advice is to install the latest security update, though availability depends on manufacturer and carrier. It does not report any attacks in the wild."
+      ],
+      "category": "Tech",
+      "tags": [
+        "android",
+        "sms",
+        "vulnerability",
+        "exploit",
+        "phones",
+        "cve"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/new-android-sms-of-death-exploit-can-remotely-crash-unpatched-phones/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-researchers-find-embrace-browser-flaws-in-five-ai",
+      "headline": "Researchers find 'Embrace' browser flaws in five AI coding tools; Codex and VS Code issues are unpatched",
+      "summary": "Forever Security found flaws in the embedded browsers of Cursor, Copilot, Claude Desktop, VS Code and Codex, from code execution to reading any file. Two remained unpatched.",
+      "impacts": [
+        "A web page opened inside an AI coding tool could run commands or read files.",
+        "Vendors rejected some reports as outside their trust boundary, which researchers dispute.",
+        "AI agents treating page text as instructions widens the attack surface.",
+        "Developers hold keys and source code, making them valuable targets."
+      ],
+      "details": [
+        "The Register reported on October 29 that AI security startup Forever Security found flaws in five AI developer tools, naming the class \"Embrace\" for embedded browser. Each tool added capabilities to its embedded browser that a normal browser lacks, which Gal Weizman said undermined the traditional threat model.",
+        "In Cursor, a web page in the integrated browser could call the agent's composer, which treated hidden page instructions as legitimate input, allowing prompt injection and command execution on the host. In GitHub Copilot, a page could report its own address and the app only checked that it looked like a URL, allowing address-bar spoofing.",
+        "In Claude Desktop and VS Code, local pages were limited to project folders but web workers bypassed that and could read any file; in Codex a local page could read any file directly.",
+        "Status per the article: Cursor reported September 10, patched October 1 with no advisory; Copilot fixed in v1.1.29 on October 13; Claude Desktop reported July 23, first rejected as invalid, then accepted after Noma Security reported the same flaw a day later, with no patch confirmed; Codex reported July 27 and unpatched, with an OpenAI spokesperson saying it is aware and working on a fix; VS Code reported September 10, which Microsoft labeled invalid under its workspace trust boundary, and researchers say is unpatched.",
+        "Forever says it disclosed four of the flaws to vendors and that GitHub fixed Copilot on its own."
+      ],
+      "category": "Tech",
+      "tags": [
+        "ai agents",
+        "cursor",
+        "claude",
+        "vulnerability",
+        "browser",
+        "openai",
+        "microsoft"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/29/researchers-find-bugs-in-5-ai-developer-tools-with-openai-and-microsoft-flaws-still-unpatched/5306508"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-un-biodiversity-talks-end-with-the-world-behind",
+      "headline": "UN biodiversity talks end with the world behind on 22 of 23 targets and a nature fund holding about $10,000",
+      "summary": "COP17 in Yerevan adopted all major texts, but the first progress review warns the 2030 goals will not be achieved without faster action. The Cali Fund had pledges of just $10,565.",
+      "impacts": [
+        "Developed countries missed the $20bn-a-year nature finance goal for 2025.",
+        "No large company that profits from genetic data has paid into the Cali Fund.",
+        "Harmful subsidies run up to $1.8tn a year; 84% of countries missed a 2025 deadline to identify them.",
+        "Climate links were weakened after objections from Russia, Saudi Arabia and India."
+      ],
+      "details": [
+        "Carbon Brief reports COP17 opened October 19 and closed with an overnight plenary on October 31. Unlike COP16, which lost quorum, negotiators adopted all major texts. It was the halfway point of the Kunming-Montreal framework, with a 2030 deadline.",
+        "The first global review warns the 2030 goals \"will not be achieved\" without faster action. The UN report found the world is behind on 22 of the 23 targets. Only 45% of countries submitted national strategies in time. Language on harmful subsidies was softened to \"encourage\" reform.",
+        "On finance, developed countries missed the goal of at least $20bn a year for nature by 2025, and environmental funding for 2026-30 reportedly dropped 27%. The framework calls for $200bn a year from all sources by 2030. A post-2030 financial mechanism was deferred to COP18 in Quito in 2028.",
+        "The Cali Fund, meant to collect payments from companies using genetic sequence data, held about $6,000 at the start and had pledges totaling $10,565 by the end, with under $9,000 deposited. Indicative rates stay at 0.1% of revenue or 1% of profit. Industry launched a separate proposal critics say could divert support.",
+        "References to the High Seas Treaty were pared back, and mentions of a 2025 ICJ climate opinion and an IPBES assessment were removed after objections. Carbon Brief says protests were muted."
+      ],
+      "category": "Climate",
+      "tags": [
+        "biodiversity",
+        "cop17",
+        "nature",
+        "climate",
+        "extinction",
+        "funding"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Carbon Brief",
+          "url": "https://www.carbonbrief.org/cop17-key-outcomes-agreed-at-the-un-biodiversity-conference-in-yerevan"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-florida-says-4-9-million-financial-aid-applicants",
+      "headline": "Florida says 4.9 million financial aid applicants had Social Security numbers exposed",
+      "summary": "Florida's Department of Education took its financial aid site offline after an unauthorized party got in. Names, SSNs, birth dates and contact details of nearly 5 million applicants were exposed.",
+      "impacts": [
+        "SSNs and birth dates are enough for identity theft that can last years.",
+        "The cause and attacker have not been disclosed.",
+        "It follows a Florida DMV breach and a California education breach.",
+        "Applicants should monitor credit reports."
+      ],
+      "details": [
+        "The Record reported on October 30 that the Florida Department of Education said an unauthorized party accessed the Florida Student Financial Aid website. About 4.9 million people are affected, the headline says, and the article says nearly 5 million who applied for aid in Florida.",
+        "Exposed data includes names, addresses, phone numbers, genders, email addresses, Social Security numbers and dates of birth. The department says it learned of the breach on October 19 and announced it on Thursday.",
+        "The cause was not disclosed. The department declined to describe the incident or identify attackers. It took the site offline, warned other department sites may see disruptions, and is working with the Florida Digital Service and the Florida Department of Law Enforcement. It reported the incident to the Attorney General and says it is contained.",
+        "The department says financial aid, scholarships, grants and loans are not at risk and payments will not be delayed. It urged people to monitor credit and accounts.",
+        "Context from the article: it is the second major Florida government breach this year after the DMV, and follows a California education department breach a week earlier."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "data breach",
+        "ssn",
+        "florida",
+        "privacy",
+        "students",
+        "identity theft"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/florida-warns-5-million-affected-financial-aid-site-breach"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-uk-watchdog-gchq-cant-say-how-many-removable",
+      "headline": "UK watchdog: GCHQ can't say how many removable drives it lost, 'a very significant number'",
+      "summary": "The Investigatory Powers Commissioner's annual report says GCHQ lost track of removable storage that may hold surveillance-law data. It has known for years and promises a count after an asset-tracking system.",
+      "impacts": [
+        "Lost drives might hold data gathered under the Investigatory Powers Act.",
+        "An agency with large surveillance powers could not inventory its own media.",
+        "Faulty software caused five wrongful terrorism port stops.",
+        "The report also flags weak safeguards for a foreign partner's access to bulk data."
+      ],
+      "details": [
+        "The Register reported on October 30 on the annual report of the Investigatory Powers Commissioner's Office, covering 2025. It says GCHQ lost track of removable storage drives that may hold data related to the Investigatory Powers Act, a problem known for years.",
+        "There is no exact count. The report calls it \"a very significant number\". GCHQ has scoped a maximum possible number but doesn't know the real scale, and plans an automated asset-tracking system by the end of the year, after which it expects to give a more precise figure.",
+        "Commissioner Lord Brian Leveson said he remained concerned GCHQ had not established a \"sufficiently clear understanding,\" and that the delay heightens the need for senior focus. A GCHQ spokesperson said its removable-media system was \"not sufficiently robust\" and that all recommendations have been acted on.",
+        "The report also records \"significant concerns\" about safeguards on foreign partners' access to bulk-intercepted data, with one partner's arrangements inadequate for journalistic material. A target-discovery web app misidentified people as possible terrorists, leading to five port stops that caused \"serious prejudice.\"",
+        "The Register's headline says thousands, but the report itself gives no number."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "gchq",
+        "uk",
+        "surveillance",
+        "government",
+        "data",
+        "intelligence"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/30/british-intelligence-agency-misplaced-thousands-of-storage-devices-years-later-still-cant-say-how-many/5306605"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-a-study-of-25-419-psychedelic-hotline-contacts",
+      "headline": "A study of 25,419 psychedelic-hotline contacts finds 43 cases of facilitators dosing people without consent",
+      "summary": "Science Advances analyzed calls to the Fireside Project's support line. Distress rates ran 40-47% depending on the substance, and some ceremonial settings involved extra doses without consent.",
+      "impacts": [
+        "Real-world use differs from clinical trials, including multi-drug and psychiatric cases.",
+        "Retreat and ceremony settings carry abuse risks in the data.",
+        "Callers who skip emergency services may rely on peer lines.",
+        "The sample is self-selected and doses are unverified."
+      ],
+      "details": [
+        "404 Media reported on October 30 on a Science Advances study of the Fireside Project's Psychedelic Support Line, a nonprofit founded in 2020. The dataset has 25,419 anonymized phone and text interactions with 220 volunteers from April 2021 to February 2026, described as the largest of its kind.",
+        "About 40.2% of contacts were actively tripping and 32.1% were integrating afterward. Psilocybin was reported by 9,348 callers, LSD by 2,247, cannabis by 2,004, ketamine by 1,194 and MDMA by 682. Cannabis had the highest distress rate at 47.2%; other common psychedelics ran from about 40% to 42%.",
+        "The researchers found 43 cases where callers said people providing substances, often at remote retreats or ceremonies including ayahuasca, gave extra doses without consent. These cluster in ceremonial settings and involve callers with higher rates of prior PTSD diagnoses.",
+        "Using 2,777 satisfaction surveys, the team found successful calls were strongly linked to the volunteer seeming genuine and empathetic. Lead author Félix Schoeller, who is also CEO of ReWire Neurotechnologies, called the dataset a \"treasure trove.\"",
+        "Caveats: callers are self-selected, doses are self-reported and unverifiable, and the data is noisy."
+      ],
+      "category": "Health",
+      "tags": [
+        "psychedelics",
+        "mental health",
+        "study",
+        "psilocybin",
+        "drugs",
+        "abuse"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/fireside-project-psychedelic-support-line-study/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-reddit-will-gradually-lock-most-content-behind-logins",
+      "headline": "Reddit will gradually lock most content behind logins to fight scrapers",
+      "summary": "Co-founder Steve Huffman says Reddit will become a 'logged-in service' with limited access for visitors. Reddit says most unauthorized data access comes through logged-out pages.",
+      "impacts": [
+        "Open forum content that AI and search tools relied on becomes harder to reach.",
+        "Reddit will keep licensing data to AI firms under commercial deals.",
+        "Logged-in use enables more targeted ads, though opt-outs are promised.",
+        "Critics suspect the real aim is ad targeting."
+      ],
+      "details": [
+        "BleepingComputer reported on October 31 that Reddit co-founder Steve Huffman said the site will gradually become a \"logged-in service,\" giving logged-out visitors limited access. For about 20 years most of the site could be browsed without an account. Huffman argued Reddit has grown too large for that model.",
+        "Reddit gave two reasons: personalization, since upvote data from members helps surface relevant content, and scrapers, since it says most unauthorized access happens through logged-out pages.",
+        "A pilot starts in selected markets outside the United States \"in the coming months.\" Reddit has not decided which content will be restricted, which countries come first, or the timeline. The front page will stay open, and visitors from search or external links can still view at least the page they linked to.",
+        "Reddit says it will keep licensing data to AI platforms and search engines under commercial agreements, will not require real names or ID documents, will bring back a read-only incognito mode, and will let users opt out of personalized ads. It also says logged-in users let it serve more relevant ads.",
+        "The article gives no figures on scraping volume. Reader comments were skeptical, with one arguing the goal is ad targeting; these are opinions, not verified."
+      ],
+      "category": "Tech",
+      "tags": [
+        "reddit",
+        "scraping",
+        "ai",
+        "privacy",
+        "login",
+        "data"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/reddit-to-lock-content-behind-logins-to-fight-scrapers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-amazons-memo-on-ai-use-leaves-engineers-anxious",
+      "headline": "Amazon's memo on AI use leaves engineers anxious, with token leaderboards and job cuts in the background",
+      "summary": "An Amazon engineering memo calls justified non-use of AI 'a finding, not a failing' while also warning non-adopters fall behind. Columnist Corey Quinn says the mixed message chilled the workforce.",
+      "impacts": [
+        "Engineers may be judged by AI-use metrics the memo calls 'deeply flawed.'",
+        "Token-ranking leaderboards led people to create junk tasks.",
+        "Per-token billing rewards AI use for vendors even when output doesn't rise.",
+        "Many engineers are questioning their career prospects."
+      ],
+      "details": [
+        "The Register published a column by Corey Quinn on October 31 responding to an Amazon memo, written by VP and Distinguished Engineer Terk Terkowitz and originally sent to engineers in September. It stresses customer outcomes and engineering judgment and treats non-use of AI as acceptable when justified, \"a finding, not a failing.\"",
+        "It also recommends looking at the top 90th percentile of AI adoption, the teams burning the most tokens, to see if delivery rose, calls \"tokenmaxxing\" at odds with frugality, admits input metrics are \"deeply flawed\" but endorses careful use, and warns non-adopters are falling behind.",
+        "Quinn notes Amazon shut down KiroRank, an internal leaderboard of token usage, in May after employees made junk tasks to climb it. He reports Meta ran a similar leaderboard, and that Amazon reportedly announced 250 more job cuts the same week, without claiming a causal link.",
+        "His critique: three positions conflict, so managers can cite whichever fits, whether praising a non-adopter or building a performance plan. He also notes AWS charges per token, so tokenmaxxing is a problem internally but \"the revenue plan\" externally.",
+        "This is opinion commentary. It cites GitHub saying agents now start roughly 40% of pull requests, and describes broad anxiety among engineers."
+      ],
+      "category": "AI",
+      "tags": [
+        "amazon",
+        "ai",
+        "jobs",
+        "engineers",
+        "tokens",
+        "layoffs"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/10/31/amazon-sends-chills-through-its-workforce-with-mixed-message-memo-about-ai-use-corey-quinn/5306804"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-01-an-experimental-injection-that-kills-fat-cells-cut",
+      "headline": "An experimental injection that kills fat cells cut visceral fat about 12% in small trials",
+      "summary": "At a diabetes meeting, researchers showed MRI results for CBL-514, which triggers fat-cell death. Visceral fat fell by about 71 mL at four weeks versus a gain with placebo.",
+      "impacts": [
+        "Killing fat cells differs from shrinking them, as GLP-1 drugs do.",
+        "Visceral fat is the type most tied to diabetes and heart risk.",
+        "Health benefits are inferred, not measured.",
+        "Larger safety and efficacy trials are still ongoing."
+      ],
+      "details": [
+        "Science News reported on October 8 that results for CBL-514, an experimental injection, were presented October 1 at the European Association for the Study of Diabetes meeting in Milan. The drug targets fat cells and triggers apoptosis, programmed cell death, aiming to remove them rather than shrink them.",
+        "Researchers looked at MRI scans from a subset of participants in two small trials, ranging from healthy weight to overweight. Participants received injections or placebo every three weeks for up to 12 weeks into the lower abdomen.",
+        "Baseline visceral fat was about 642.5 mL in the drug group and 677.4 mL in placebo. Four weeks after treatment, the drug group lost almost 71 mL (about 12%) while placebo gained 31 mL (about 6%). At 8 to 12 weeks, the drug group had lost almost 63 mL, while placebo was more than 78 mL above baseline.",
+        "Caveats: trials were small, the analysis covered only a subset, and results were presented at a conference and are preliminary. The article says the results \"suggest\" possible diabetes and heart benefits but these were not directly measured.",
+        "Earlier research showed the drug reduces subcutaneous abdominal fat, which carries fewer health risks."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "fat",
+        "obesity",
+        "drug",
+        "diabetes",
+        "clinical trial",
+        "weight loss"
+      ],
+      "date": "2026-10-08",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/experimental-drug-kills-fat-cells"
+        }
+      ]
+    }
+  ]
+}
