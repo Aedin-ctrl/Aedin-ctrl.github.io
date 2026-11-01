@@ -1,0 +1,767 @@
+{
+  "date": "2026-10-31",
+  "generated": "2026-11-01T02:28:29.627Z",
+  "articles": [
+    {
+      "id": "2026-10-31-an-ai-agent-ran-a-live-mouse-brain",
+      "headline": "An AI agent ran a live mouse brain injection, and Claude Opus 5.5 balked at the needle",
+      "summary": "Exin Therapeutics let an AI agent plan and carry out a gene-therapy injection into a live epileptic mouse's brain. One Claude model declined to guide the needle, so the team switched models. The mouse is reportedly recovering.",
+      "impacts": [
+        "Labs may soon hand AI agents direct control of equipment, not just data analysis",
+        "Safety rules like human approval and a motor kill switch are being tested on live animals first",
+        "Agents that refuse, or are told not to change code, can stall a procedure mid-surgery",
+        "A model's refusal can be bypassed by switching to a different model"
+      ],
+      "details": [
+        "Biotech founder Gabriel Ocana Santero, CEO of San Francisco startup Exin Therapeutics, connected an AI agent to a custom surgical rig and had it perform a brain injection on a living mouse. He told WIRED he wanted to see what happens when agents get direct access to lab equipment instead of only designing experiments or analyzing results.",
+        "The rig had a motorized device to hold the mouse still and a camera so the agent could watch the procedure, move an injection needle and control delivery. The team was testing a gene therapy for seizures in a mouse with epilepsy. A veterinary surgeon first performed the craniotomy while the agent observed. The agent then chose a therapy from 19 options in a spreadsheet, picked the brain region and coordinates, and set volume and speed.",
+        "The first model tried, Claude Opus 5.5, planned the experiment but refused to guide the needle in. According to Santero, it said something in its own output told it not to proceed, suggesting it might stop partway and endanger the animal. The team then used Claude Sonnet 5, which went ahead. Anthropic did not respond to WIRED's request for comment.",
+        "Safeguards were built in: the AI had to propose an injection plan for human approval, a human-operated emergency button could cut power to the motors, and the agent was barred from editing the equipment's code. Then a glitch scrambled the coordinate system. The agent noticed the calculated position was wrong but would not change the code because its instructions forbade it. A second agent, running Opus 5, made the fix, and the team did not tell it a live surgery was underway. The procedure took a little over an hour instead of the usual 45 minutes.",
+        "What is proven is narrow: one mouse, one procedure, with a human surgeon doing the craniotomy. The therapy's effect on seizures has not been assessed yet, since the team is waiting for it to take effect. The team is testing other models such as Grok and is experimenting with agent-controlled craniotomies, but says it wants to be certain of safety before doing those on live animals. Santero says it is far too soon to use an agent on a human brain.",
+        "What to watch: whether results are published with outcomes, and how labs handle the odd behaviors seen here, namely a model declining a task and a team working around it by changing models and withholding context from another agent."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "ai agents",
+        "mouse",
+        "brain",
+        "surgery",
+        "claude",
+        "lab automation",
+        "epilepsy"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "WIRED",
+          "url": "https://www.wired.com/story/an-ai-agent-did-brain-surgery-on-live-mouse/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-cisco-talos-finds-infostealer-malware-that-asks-ai",
+      "headline": "Cisco Talos finds infostealer malware that asks AI models to write a dossier on each victim",
+      "summary": "Talos says a new infostealer called Volta-Autodoxer sends stolen data to commercial AI models and asks for an intelligence-style assessment of each victim. Talos did not track whether it has been used in the wild.",
+      "impacts": [
+        "Stolen logins may be ranked automatically, so the most valuable victims get hit first",
+        "Malware can fall back to other AI models if one provider refuses the request",
+        "Browser-saved passwords, OAuth tokens and wallet seed phrases are the main loot",
+        "The AI step is optional for the attacker, so blocking AI access alone will not stop the theft"
+      ],
+      "details": [
+        "Researchers at Cisco Talos shared with WIRED's Kernel Panic newsletter a new strain of infostealer malware that has AI built in. It calls itself Volta-Autodoxer internally. Infostealers grab usernames, passwords, tokens, cookies, card data and more from infected machines, and are behind many large breaches in recent years.",
+        "Volta first sweeps for browser-saved passwords, Microsoft OAuth tokens, cookies, payment cards, crypto wallet seed phrases, and active Discord, Telegram, Steam and Roblox sessions. A second, deeper sweep uses the first results, such as searching the victim's Gmail for receipts and order history from services like UberEats and DoorDash to build a picture of their location and habits.",
+        "It then compiles a dossier and sends it through OpenRouter, a service that routes prompts to many AI providers. By default it asks Anthropic's Claude Opus 4.6, with fallbacks to Moonshot AI's Kimi K2 and then Google's Gemini 2.5 Flash. A 240-word prompt tells the model to act as a forensic intelligence analyst and write a target assessment: an executive summary, what the person does, what they are worth, and their security habits. Talos researcher Ryan Fetterman says the prompt is worded to avoid anything overtly malicious, and the fallbacks suggest the authors expect refusals.",
+        "Talos found the malware with a new framework called CAIRN, built to spot hacking tools that use AI. Fetterman says Talos did not track whether Volta has been used in the wild, and that the tool seems built to sell to a range of attackers. The malware still works without the AI step, which he calls an add-on.",
+        "Context matters: this is an old crime with a new analysis layer. WIRED notes CrowdStrike has recently seen four distinct hacking groups using AI tools to compromise dozens of targets. Fetterman says faster identification of high-value targets improves attackers' odds of using their credentials. What to watch is whether Volta shows up in real incident reports and whether AI providers detect and block this kind of prompt."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "infostealer",
+        "ai",
+        "malware",
+        "cisco talos",
+        "credentials",
+        "privacy",
+        "hack"
+      ],
+      "date": "2026-10-31",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "WIRED",
+          "url": "https://www.wired.com/story/kernel-panic-volta-autodoxer-ai-infostealer-malware/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-flesh-eating-screwworms-reach-arizona-the-third-us",
+      "headline": "Flesh-eating screwworms reach Arizona, the third US state, and have infested 10 pets",
+      "summary": "New World screwworm has now been found in Texas, New Mexico and Arizona, with 74 US animal cases since June. Ten were pets, mostly dogs. Mexico reports 806 human cases and nine deaths.",
+      "impacts": [
+        "Livestock and pet owners near the southern border are asked to check any unusual wound",
+        "The flies spread north through Central America after a barrier at the Darién Gap was breached",
+        "Human cases are rarer but real: Mexico counts 806 and nine deaths",
+        "A parasite eradicated in the 1960s is back, and containing it relies on sterile-fly releases"
+      ],
+      "details": [
+        "The USDA and state officials say New World screwworm has spread to Arizona, joining New Mexico and Texas. Ars Technica reports 74 confirmed US animal cases since the flies re-entered the country in June. This week the USDA recorded four new cases in dogs, including Arizona's first, plus a domestic cat in New Mexico. That brings pet cases to 10. One case in a wild elk was reported last week.",
+        "Arizona's first case was a dog in Cochise County, which borders both New Mexico and Mexico. A local veterinarian examined it on October 26 and found a back wound heavily infested with maggots consistent with screwworm. The USDA confirmed it and is working with the state on a response.",
+        "The flies lay hundreds of eggs in wounds or moist body openings. The larvae burrow into living flesh and can cause severe, sometimes fatal wounds before dropping off to become adults. The US eliminated the flies in the 1960s by releasing sterile males from aircraft, which prevents successful breeding. A biological barrier at the Darién Gap, between Panama and Colombia, held them back for years, but it was breached in 2022 and the flies moved north through Central America.",
+        "Most US cases so far have been in livestock, which is why the industry worries most. But the parasite can also hit wildlife, pets and, more rarely, people. Mexico's Ministry of Health has confirmed 806 human infestations since the flies re-emerged, with nine deaths.",
+        "The number of US cases is still small, and the article does not claim an uncontrolled outbreak. What matters is the geography: three states in a few months, with the latest in a border county. Officials are urging owners to monitor animals and report odd wounds immediately. Watch for further state detections and whether sterile-fly production can keep up."
+      ],
+      "category": "Health",
+      "tags": [
+        "screwworm",
+        "parasite",
+        "livestock",
+        "usda",
+        "border",
+        "pets",
+        "outbreak"
+      ],
+      "date": "2026-10-30",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/health/2026/10/flesh-eating-screwworms-are-feasting-on-pets-4-dogs-and-cat-attacked-this-week/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-follow-up-congos-bundibugyo-ebola-outbreak-passes-5",
+      "headline": "Follow-up: Congo's Bundibugyo Ebola outbreak passes 5,000 deaths with no approved vaccine",
+      "summary": "DR Congo's health ministry reports more than 5,000 deaths and over 10,300 confirmed cases across eight provinces. The strain has no approved vaccine or treatment, and health workers have been attacked.",
+      "impacts": [
+        "It is now the second-largest Ebola outbreak ever, with a 48.6% case fatality rate",
+        "Conflict in Ituri province makes tracing and treatment harder",
+        "Cases have also been confirmed in Kenya, Nigeria and Uganda",
+        "Violence against responders threatens containment"
+      ],
+      "details": [
+        "BBC News reports that government data shows more than 5,000 people have died in the ongoing Ebola outbreak in the Democratic Republic of Congo. Eight of 26 provinces are affected, with more than 10,300 confirmed cases and a case fatality rate of 48.6%. The outbreak began in May and became the country's deadliest in August. It is the 17th outbreak in DR Congo's history and the second largest ever, according to the UN.",
+        "The previous deadliest Congo outbreak, in 2018 to 2020, recorded 2,299 deaths. The worst ever, in West Africa from 2014 to 2016, killed more than 11,325 people and spread to several countries including Italy, the UK and the US. The UN warns the current outbreak is taking lives at a much faster rate.",
+        "The cause is the Bundibugyo species, for which there is not yet a treatment or vaccine. Clinical trials of vaccines are under way. The epicenter is Ituri province in the north-east, a conflict zone, which makes the response harder. The WHO's Africa office calls for scaled-up control measures, greater access and community outreach.",
+        "Spread beyond Congo: Uganda recorded two deaths and 20 cases early on but none since August, and travel restrictions remain. Kenya has nine confirmed cases and two deaths. In Nigeria, one woman was confirmed earlier this month and flown to Switzerland for treatment, and two more suspected cases were isolated and tested on Saturday. The European Centre for Disease Prevention and Control rates the infection risk in Europe as very low.",
+        "Responders face violence. Earlier this week a nurse was killed and another health worker seriously injured after local youths accused them of contaminating water. Last month a politician promoting Ebola measures was beaten to death, and in August the Red Cross reported 11 violent incidents against its volunteers. What to watch: whether the Nigerian suspected cases are confirmed, vaccine trial results, and whether attacks on responders slow the response."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "bundibugyo",
+        "congo",
+        "outbreak",
+        "vaccine",
+        "who",
+        "nigeria"
+      ],
+      "date": "2026-10-31",
+      "unease": 5,
+      "sources": [
+        {
+          "name": "BBC News",
+          "url": "https://www.bbc.co.uk/news/articles/cj5ynryyep2yo"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-alphabet-loses-500bn-in-a-day-as-its",
+      "headline": "Alphabet loses $500bn in a day as its own AI search eats ad sales; Intel falls 28% the next",
+      "summary": "Alphabet said its AI Mode is cutting into search ad revenue, and its stock fell over 12%. On Friday Intel dropped 28%, and the Nasdaq had its worst month since March 2025 amid worries about AI spending.",
+      "impacts": [
+        "Big tech has committed about $800bn to AI spending in 2026, and investors are now questioning returns",
+        "Amazon reported negative $42bn cash flow, with spending up six-fold in three months",
+        "Publishers and platforms like Reddit say AI search is cutting referral traffic",
+        "A tech selloff can hit retirement funds and index investors, not only tech workers"
+      ],
+      "details": [
+        "BBC News reports Alphabet lost just over $500bn in market value on Thursday after saying its own AI summaries were hurting search advertising. Chief business officer Philipp Schindler said AI Mode, where Google answers conversationally, was eating into ads shown next to traditional searches, though he feels good about the trajectory. Revenue grew 25% to $127.6bn for the quarter, but advertising missed analyst forecasts. Shares fell over 12% to a six-month low, and total value dropped from $3.97 trillion to $3.46 trillion.",
+        "Amazon also unsettled investors. It reported 11% sales growth to $201bn but cash flow of negative $42bn, with spending up six-fold over three months. CEO Andy Jassy said the company sees chances at two businesses that could each reach $1 trillion, and admitted the spending would be more convenient if spread over 25 years.",
+        "On Friday, BBC reports, tech stocks fell for a second day. Intel shed 28%, more than $130bn in value, after its finance chief said it did not expect to bring in more cash than it spends this year and forecast weak fourth-quarter revenue while still raising investment. Reddit fell 29% after weaker-than-expected daily users and a warning that Google's AI search is hurting referral traffic, and Roblox fell 18%. The Nasdaq ended October with its worst monthly slide since March 2025.",
+        "Meta, Alphabet, Oracle, Amazon and Microsoft have committed about $800bn between them to 2026 spending, and Alphabet expects to spend up to $205bn this year, almost all on AI. Amazon has committed $220bn.",
+        "These are market moves, not proof of an AI bubble, and analysts disagree. Forrester's Tracy Woo said the results highlight the challenge of funding massive AI investment while keeping legacy businesses strong. An FHN Financial analyst called it growing pains but said the thinking is that the sector may slow. What to watch: next quarter's capital spending guidance and whether AI search revenue offsets the ad losses."
+      ],
+      "category": "Economy",
+      "tags": [
+        "alphabet",
+        "google",
+        "ai bubble",
+        "stocks",
+        "intel",
+        "amazon",
+        "nasdaq"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BBC News (Alphabet)",
+          "url": "https://www.bbc.co.uk/news/articles/cm9qzdqpxy48o"
+        },
+        {
+          "name": "BBC News (tech stocks)",
+          "url": "https://www.bbc.co.uk/news/articles/cvwy72e0n72yo"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-cortical-labs-puts-human-neurons-in-a-robot",
+      "headline": "Cortical Labs puts human neurons in a robot dog that steers toward a target",
+      "summary": "Australian startup Cortical Labs grew human neurons on a chip with two-way electrodes and used them to direct a robot dog to a target on a simple map. The company says it is early, slow and not yet efficient.",
+      "impacts": [
+        "Living neurons are being tried as controllers for physical machines, not just game demos",
+        "Backers pitch lower energy use and better adaptation than conventional AI",
+        "Ethical questions about using human cells as hardware grow as the demos become tangible",
+        "Training is still trial and error, so real-world use is far off"
+      ],
+      "details": [
+        "ScienceAlert reports that Cortical Labs in Australia fitted a robot dog with lab-grown human neurons that guide it toward a target on a simple map. The neurons are grown directly on a chip fitted with electrodes that send and receive electrical signals, so activity in a small group of neurons is translated into movement, and feedback loops of signals steer the robot.",
+        "Cortical Labs co-founder and CEO Brett Kagan calls it a simple demonstration that makes the opportunity tangible. He says that longer term the approach could support robots and autonomous systems that must decide in unpredictable environments, arguing that robots remain good at physical control but struggle to learn fast or adapt when conditions change.",
+        "The company has already shown neuron clusters playing Pong and Doom. In a separate virtual demo with Honda Research Institute Europe, the neurons guided an agent around a grid in search of a reward. Over more than 4,000 hours of interaction, the team tested almost 1,300 signal combinations. Honda's Daniel Tanneberg says living cells offer potential in energy efficiency, robustness and adaptation, though with many challenges.",
+        "The article stresses the limits: this is early, not particularly fast or efficient, and involved a fair amount of trial and error. Next steps include scaling the chips to harder tasks in less time, and learning how these chips retain information and what kind of memory they have. Research software engineer Johnson Zhou says the challenge is finding reliable ways to communicate with, train and understand biological systems.",
+        "The unsettling part is the substrate: human neural cells acting as a controller. The practical claim is modest, a robot walking toward a point on a map. What to watch is whether anyone shows a task conventional controllers cannot do cheaply, and how regulators and ethicists treat human-neuron computing as it scales."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "neurons",
+        "biocomputing",
+        "robot",
+        "cortical labs",
+        "brain",
+        "organoid",
+        "honda"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceAlert",
+          "url": "https://www.sciencealert.com/scientists-have-built-a-robot-dog-powered-by-human-brain-cells"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-chainalysis-says-an-attacker-using-offensive-agentic-techniques",
+      "headline": "Chainalysis says an attacker using 'offensive agentic techniques' got into its internal tools",
+      "summary": "The blockchain-analysis firm says an external actor used offensive agentic techniques to access internal tools and some customer data: names, emails, user IDs and role labels. It says no credentials, tokens or investigation content were accessed.",
+      "impacts": [
+        "A firm that traces crime for law enforcement and exchanges was itself breached",
+        "Customer names and roles could fuel targeted phishing against investigators",
+        "Chainalysis says AI-driven attacks are rising across the industry",
+        "The details of the AI method were not disclosed"
+      ],
+      "details": [
+        "The Hacker News reports Chainalysis, an American blockchain analysis company, confirmed a security incident. In a notice sent Friday, it said it detected an external actor this month using offensive agentic techniques to gain unauthorized access to its systems and internal tools.",
+        "The data accessed was described as non-sensitive customer data: user IDs, full names, email addresses and organization role labels for users provisioned on the platform. The company says the breach did not give access to its investigation content, authentication credentials or session tokens, and that it is patching vulnerabilities and hardening systems.",
+        "The phrase offensive agentic techniques suggests an AI-powered tool carried out the attack, according to The Hacker News, but Chainalysis gave no details of the methods, so that reading is an inference. The company says it sees an industry-wide rise in AI-driven attacks.",
+        "The Hacker News links the incident to a wider trend, including a China state-backed group called Vapor Panda using an agentic penetration-testing framework named ARTEX to compromise about 140 targets in 11 days. A statement from Abnormal AI quoted in the piece says AI mainly makes established attacks faster, more personalized and easier to scale.",
+        "Why it matters: Chainalysis's customers include investigators who trace stolen crypto, so a list of their names and roles is valuable for impersonation. The company's description is limited, and no independent account was published in the article. Watch for a fuller incident report and whether other security vendors disclose similar agent-driven intrusions."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "chainalysis",
+        "ai",
+        "breach",
+        "agentic",
+        "crypto",
+        "phishing",
+        "hack"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/chainalysis-confirms-intrusion-into.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-a-shared-chatgpt-link-could-run-attacker-code",
+      "headline": "A shared ChatGPT link could run attacker code in your session and read private chats",
+      "summary": "Security firm Parameter showed a crafted shared-chat link could run code in a logged-in user's ChatGPT session. OpenAI rated it P1 and fixed it within eight days. Parameter reports no real-world use.",
+      "impacts": [
+        "Opening a link and clicking Preview was enough in the most reliable version",
+        "The code could list recent chats and read private ones, acting as the user",
+        "Users need to do nothing; the fix is on OpenAI's side",
+        "It shows how small features can chain into a sandbox escape"
+      ],
+      "details": [
+        "The Hacker News reports that researchers at Parameter showed a malicious ChatGPT share link could execute an attacker's code inside the signed-in session of anyone who opened it. They reported it through OpenAI's bug bounty on October 18, and OpenAI fixed it eight days later, rating it P1, its most serious category.",
+        "The link looked like any shared conversation and could be sent by email, chat, support ticket or social post. In the most reliable version the victim opened the link and clicked ChatGPT's Preview button once. Parameter later made the page open Preview automatically, so opening the link was the only step. The code listed recent conversations, opened a private chat never shared with the attacker, and sent part of it to a server the researchers controlled.",
+        "How it worked, per Parameter: Preview turns HTML in a chat into a page run in a locked-down frame on a separate address, and that sandbox held. The way out came from an interactive graph in the same chat, which loaded a math library, MathLive, into the main page. Its listener accepted keyboard messages from any sender and let them carry raw HTML. Preview could therefore hand HTML to the trusted page, creating a frame treated as part of chatgpt.com. A script from YouTube, allowed by the content security policy, supplied the code.",
+        "This was a controlled test. Parameter reports no real-world use and ran the private-chat proof between its own accounts. OpenAI reproduced the issue, raised severity from P2 to P1, and updated two versions of the web frontend, and by October 26 both rejected the messages the attack relied on.",
+        "What it shows: three design choices lined up, namely a listener not checking the sender, HTML allowed as data, and a frame that inherited the site's identity. The YouTube step was just the last workaround. Watch for similar message-handling bugs in other AI chat products that render user-supplied content."
+      ],
+      "category": "AI",
+      "tags": [
+        "chatgpt",
+        "openai",
+        "vulnerability",
+        "xss",
+        "privacy",
+        "bug bounty",
+        "sandbox"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/a-shared-chatgpt-link-could-run.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-nasa-asks-industry-how-to-rescue-hubble-before",
+      "headline": "NASA asks industry how to rescue Hubble before it falls from orbit in the early 2030s",
+      "summary": "NASA issued a request for information on reboosting, servicing or safely deorbiting Hubble, aiming for a mission by 2032. Without help the telescope is expected to re-enter around 2033 or 2034.",
+      "impacts": [
+        "Hubble has no propulsion and has been slowly losing altitude since 2002",
+        "A reboost to 600 km could keep it up at least 25 more years",
+        "NASA is not committed to funding a mission yet",
+        "A failed capture could damage a famous telescope, so the plan must not harm it"
+      ],
+      "details": [
+        "Ars Technica reports NASA released a Request for Information asking commercial companies for ideas to reboost, service or conduct a controlled disposal of the Hubble Space Telescope. Responses are due November 30. The agency wants capabilities to capture Hubble and lift it to at least 373 miles (600 km), improve its performance, or guide it to a controlled reentry.",
+        "Left alone, Hubble is expected to fall back to Earth in the early to mid-2030s, with orbital dynamicists predicting 2033 or 2034, though solar activity can change forecasts. NASA last raised the orbit in 2002 on a shuttle visit. Since then, with no onboard propulsion, it has drifted down from about 362 miles to some 292 miles (470 km). A boost to 600 km would likely keep it up at least 25 more years.",
+        "The RFI requires that a mission must not harm the telescope and is expected to happen by 2032. The contractor would supply launch vehicle, servicing spacecraft and operations, plus crew if applicable. NASA says it is not committing to buy a mission; it wants to know who is interested, the cost and who has a realistic chance of reaching Hubble in time.",
+        "The article notes this has happened before. In 2022 Jared Isaacman proposed a crewed Dragon servicing mission and NASA issued an RFI that drew eight responses, but in 2024 the agency decided not to pursue a reboost, with an official calling the plans notional. Now Isaacman is NASA administrator, and the servicing industry has matured, including a robotic servicing satellite Northrop Grumman launched this year with DARPA.",
+        "The uncertainty is large: it is a request for ideas, not a funded mission, and reentry dates can shift. What to watch is the number and quality of November responses and whether NASA turns them into a contract."
+      ],
+      "category": "Space",
+      "tags": [
+        "hubble",
+        "nasa",
+        "orbit",
+        "reentry",
+        "servicing",
+        "telescope",
+        "isaacman"
+      ],
+      "date": "2026-10-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/space/2026/10/think-you-can-save-the-hubble-space-telescope-nasa-wants-to-know/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-earths-impenetrable-radiation-barrier-was-breached-during-the",
+      "headline": "Earth's 'impenetrable' radiation barrier was breached during the May 2024 solar superstorm",
+      "summary": "A Japanese satellite saw ultra-relativistic electrons surge inside a barrier long thought to keep them out. At around 3 MeV, flux rose more than 5,000 times, researchers report in Geophysical Research Letters.",
+      "impacts": [
+        "Satellites deeper in near-Earth space may face radiation that models said was not there",
+        "Astronauts could face a higher radiation hazard than assumed during extreme storms",
+        "Space weather forecasts may need updating for G5-class events",
+        "The effect took months to fade"
+      ],
+      "details": [
+        "ScienceAlert reports that a team led by Yoshizumi Miyoshi of Nagoya University found evidence that a barrier in the inner Van Allen belt, thought to block ultra-relativistic killer electrons, can be breached under extreme space weather. The work appears in Geophysical Research Letters.",
+        "Background: Earth sits inside two donut-shaped belts of energetic particles held by its magnetic field. In 2014, NASA's Van Allen Probes saw a sharp boundary about three Earth radii from the planet's center beyond which the most energetic electrons rarely went. It was called an impenetrable barrier. Killer electrons can penetrate satellite shielding, damage electronics and shorten spacecraft lives, and they raise radiation risk for astronauts.",
+        "The new evidence comes from the May 2024 solar superstorm, a G5 geomagnetic storm, the top category. It depleted cold plasma in the plasmasphere, creating sparse conditions where chorus waves could thrive. Instead of scattering electrons away, these waves seem to have accelerated them inside the barrier. Japan's Arase satellite detected, during the storm's recovery phase, a rise in ultra-relativistic electrons; around 3 megaelectronvolts, flux grew by more than 5,000 times over pre-storm levels.",
+        "The timing supports local acceleration: lower-energy electrons rose first, higher energies followed about half a day later, and electrons above 3 MeV about a day after the initial increase. A distinct peak in the distribution near the barrier boundary fits electrons being accelerated locally, not simply swept inward. Levels declined for months, until another solar storm in October 2024.",
+        "This is one event seen by one satellite, and cracks in the barrier idea had appeared since 2018. Miyoshi says it highlights the need to predict how energetic electrons behave in extreme conditions, which matters for assessing radiation risk to spacecraft. Watch for models updated with this effect and for checks against future superstorms."
+      ],
+      "category": "Space",
+      "tags": [
+        "van allen",
+        "solar storm",
+        "radiation",
+        "satellites",
+        "space weather",
+        "arase",
+        "electrons"
+      ],
+      "date": "2026-10-31",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceAlert",
+          "url": "https://www.sciencealert.com/earths-supposedly-impenetrable-radiation-barrier-has-been-breached"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-a-blood-test-for-p-tau217-predicted-alzheimers",
+      "headline": "A blood test for p-tau217 predicted Alzheimer's-related decline: 78% risk at 10 years in the top group",
+      "summary": "A pooled study of 2,684 cognitively normal older adults found that very high p-tau217 blood levels carried a 38% five-year and an estimated 78% ten-year risk of cognitive impairment. The 10-year figure rests on much less data.",
+      "impacts": [
+        "Blood tests could flag risk years before memory problems",
+        "There is still no proven way to prevent the decline, so results can be hard to act on",
+        "Low data at 10 years means the 78% figure is uncertain",
+        "Cleared tests may soon move from clinics into routine screening"
+      ],
+      "details": [
+        "ScienceDaily, summarizing a Mass General Brigham release, reports that an international team found a blood test could help predict Alzheimer's-related cognitive decline years before symptoms. The work was presented at the Alzheimer's Association International Conference and published in JAMA.",
+        "The biomarker is phosphorylated tau 217 (p-tau217). A test measuring it recently received federal clearance. The open question was whether it can predict who, with normal cognition, will later develop symptoms. Researchers combined six observational studies and trials in North America, Japan and Australia, covering 2,684 older adults with no impairment at entry. Participants gave blood, had PET brain scans for baseline and were followed annually, with enrollment as early as 2004 and the latest follow-up in 2025.",
+        "About 478 participants eventually developed cognitive impairment. Higher p-tau217 levels were strongly related to future problems. Among people with very high levels, the estimated probability of impairment was 38% within five years and 78% within ten. The researchers stress that substantially fewer observations were available for the 10-year estimate.",
+        "Why this matters: the results suggest blood testing could identify people at risk long before symptoms, opening a door to earlier prevention and future treatments designed to act before memory problems begin, as the release puts it. But a risk estimate for a group is not a diagnosis for one person, and the summary gives no evidence about treatments that change the outcome.",
+        "What to watch: confirmation in larger, more diverse cohorts, guidance on who should be tested, and whether early-intervention drugs show benefit in people identified this way. The uncertainty about long-term numbers should be kept in mind."
+      ],
+      "category": "Health",
+      "tags": [
+        "alzheimer",
+        "blood test",
+        "dementia",
+        "p-tau217",
+        "jama",
+        "screening",
+        "brain"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261029072142.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-a-ransomware-crew-spent-7-216-on-ai",
+      "headline": "A ransomware crew spent $7,216 on AI tools, hit 23 victims with stolen logins, then left its server open",
+      "summary": "SOCRadar says the n0n ransomware operator tried to breach 23 organizations in 14 countries using AI coding tools and weak or stolen credentials. It exploited no software bugs, and exposed its own server.",
+      "impacts": [
+        "Basic hygiene like unique passwords and MFA on VPNs and RDP blocked this whole campaign",
+        "AI helped the attackers develop tooling, but no fully autonomous attack was found",
+        "Some victims lost backups and data, not just access",
+        "Exposed cloud keys with delete rights turned into data destruction"
+      ],
+      "details": [
+        "The Register reports that threat researchers at SOCRadar found a ransomware operator called n0n had left its server exposed, revealing its methods. The group tried to break into 23 organizations across 14 countries, using a mix of AI tooling and old-fashioned stolen credentials.",
+        "SOCRadar's CISO Ensar Seker says that in every documented compromise, access relied on weak or stolen credentials, and the team found no evidence of vulnerability exploitation. The gang used widespread RDP scanning and automated credential stuffing against FortiGate SSL-VPN portals. For a US managed service provider, it tested credentials through a 15-thread residential proxy pool. It also used exposed cloud credentials and reused hosting-portal sessions.",
+        "In one case linked to e-commerce site Fanatics, per the report, n0n used an exposed AWS access key with permission to list, read and delete objects, pulled data from 40 S3 buckets of up to 110 GB each, and then deleted data, including bank-transaction archives, and purged keys across 12 sensitive buckets. In some cases the crew encrypted files and deleted backups, removing victims' ability to recover.",
+        "On AI: the operator ran up more than $7,216 in AI usage costs by October 22, using OpenCode, an open-source coding agent configured with 154 model entries across seven providers. The investigators found no evidence of a fully autonomous attack system. Seker says what stands out is AI-assisted development paired with very conventional entry points.",
+        "The story pushes back on the idea that AI-found exploits are the main danger: here the weak point was credentials. It also shows criminals are spending real money on AI. What to watch is whether such crews move from AI-assisted coding to AI-driven intrusion, as other recent incidents suggest."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ransomware",
+        "ai",
+        "credentials",
+        "fortigate",
+        "aws",
+        "opencode",
+        "hack"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/30/crim-spent-7k-on-ai-services-in-extortion-attacks-then-left-evidence-for-all-to-see/5306754"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-gm-agrees-to-pay-220-million-over-selling",
+      "headline": "GM agrees to pay $220 million over selling drivers' location and driving data to brokers",
+      "summary": "Thirty-five states and DC settled with General Motors over its Smart Driver program, which collected precise location, speed and seatbelt data and passed it to brokers that supplied insurers, without informed consent.",
+      "impacts": [
+        "Driving data could have raised some customers' insurance premiums",
+        "Dealership staff sometimes enrolled drivers without their knowledge",
+        "The fine is under 7% of GM's quarterly net income, so deterrence is debated",
+        "Other automakers' data programs face the same questions"
+      ],
+      "details": [
+        "The Register reports General Motors reached a $220 million settlement with 36 attorneys general, announced by Washington state's AG office on Thursday. The allegation: GM collected drivers' data, including precise location, speed and seatbelt use, and sold it to data brokers that supplied insurance companies, without proper consent.",
+        "The data came from GM's Smart Driver program, part of OnStar, which gave owners reports meant to improve driving habits. Unknown to many subscribers, their data also went to brokers, even though GM said it would not share it with insurers without express consent. Insurers obtained it by buying from brokers GM had deals with.",
+        "Investigators also said GM incentivized dealerships to enroll customers, with employees in some cases accepting terms on customers' behalf without their knowledge. GM failed to tell many drivers their information was being collected and shared, and its OnStar app incorrectly told more than 370,000 drivers they were not enrolled even as collection continued.",
+        "The settlement comes more than two years after a 2024 New York Times investigation exposed the sharing. The Register notes $220 million is less than 7% of the $3.3 billion net income GM reported for the quarter that ended September 30, 2026, and calls it a light slap on the wrist. The excerpt did not detail any other terms, such as changes GM must make.",
+        "What to watch: whether regulators or states push similar cases against other carmakers, and how data brokers that bought the information are treated."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "gm",
+        "driving data",
+        "privacy",
+        "insurance",
+        "data brokers",
+        "onstar",
+        "settlement"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/30/gm-cracks-the-petty-cash-box-for-multistate-driver-tracking-settlement/5306721"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-googles-suncatcher-satellite-ran-an-ai-model-in",
+      "headline": "Google's Suncatcher satellite ran an AI model in orbit; its first output was a haiku",
+      "summary": "Google's experimental orbital datacenter prototype, launched at the start of October, answered a ground-station prompt using an onboard Gemma 4 model. Google argues space compute could pay off if launch costs fall to about $200 per kilogram.",
+      "impacts": [
+        "AI compute may start moving into orbit, outside any country's datacenter rules",
+        "Google's own numbers depend on launch costs falling far from today's roughly $7,000 per kg",
+        "Orbital chips must survive radiation and thermal stress, which tests have not yet covered",
+        "It is a tiny proof of concept, not a working datacenter"
+      ],
+      "details": [
+        "The Register reports Google's Suncatcher, its first experimental orbital AI datacenter satellite, launched at the start of October and put into low Earth orbit, has returned its first inference result. Travis Beals of Google's Paradigms of Intelligence team said that with the host and TPU trays powered up and machine learning tests completed, an onboard Gemma 4 open model reached its Hello World milestone.",
+        "During a ground-station pass the team sent a prompt to write a haiku from the perspective of a TPU orbiting Earth. As the satellite passed over Svalbard, the model replied with a three-line poem about a blue marble and starlight feeding its core. They also tested space-themed limericks and telemetry prompts.",
+        "The Register does the cost math tongue in cheek: about 20 tokens would cost roughly $0.000012 through Google's cloud API, but with a satellite estimated at 500 kg, similar to a Starlink, and a retail launch price near $7,000 per kg, it is a very expensive haiku. The satellite mass is the outlet's assumption, not a Google figure.",
+        "Google's argument, per the report: if launch to low Earth orbit falls to $200/kg, amortized launch cost over the satellite's life would be about $810 to $7,500 per kW per year, comparable to US datacenter electricity spending of about $570 to $3,000. Google predicts SpaceX could reach that around 2035 and wants to prototype well beforehand. Next up are tests of TPU performance under thermal stress and radiation.",
+        "The uncertain parts are large: costs, cooling, radiation, and whether the economics ever work. The unsettling angle is the direction: as terrestrial datacenters strain power grids, firms are looking at orbit. Watch for the radiation and thermal test results."
+      ],
+      "category": "Tech",
+      "tags": [
+        "google",
+        "suncatcher",
+        "orbit",
+        "datacenter",
+        "tpu",
+        "gemma",
+        "space"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/10/31/googles-ai-satellite-sends-a-very-expensive-haiku-to-earth/5306818"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-dartmouths-provost-resigned-after-a-committee-found-he",
+      "headline": "Dartmouth's provost resigned after a committee found he hid AI use in a paper and an op-ed on AI cheating",
+      "summary": "Provost Santiago Schnell stepped down after an advisory committee found he did not disclose significant AI use in an academic paper and a Washington Post op-ed, despite publisher rules. He says he saw it as editing.",
+      "impacts": [
+        "Disclosure rules at journals and newspapers are now being enforced against senior academics",
+        "Enterprise AI logs gave investigators a detailed record of what he asked the model",
+        "What counts as editing versus authoring is still unclear to many users",
+        "Refusing to hand over personal AI logs can itself become a finding"
+      ],
+      "details": [
+        "Ars Technica reports that Dartmouth provost Santiago Schnell resigned this week after an advisory committee found he failed to disclose significant AI use in an academic paper and in an August 9 Washington Post op-ed titled 'Universities are fighting AI cheating. But there's a deeper problem.' The publishers required such disclosure.",
+        "The committee cited insufficient cooperation: Schnell turned over his Dartmouth laptop but not logs from his personal LLM accounts, and he did not agree to meet with it. It did get access to the Claude enterprise account he used through Dartmouth, which showed him using the model to revise papers, find and fix bugs in code, and edit or generate figures, including asking it to write a referee report on his own paper before submission.",
+        "Schnell has insisted he used AI as an editorial aid. He told Semafor he used chatbots to refine a few arguments and check grammar, and told one editor he did not understand that AI-assisted editing required disclosure. Ars notes that, by his own description, it would not rank near the top of AI sins, and that this is quite different from having Claude write a paper.",
+        "But the committee believes his public statements may understate the nature of his actual AI use and says he regularly went beyond his own descriptions, such as asking models to correct TeX files and the code repository and generate new figures. It also points to one Claude exchange that raises questions about whether he wanted to hide traces of LLM activity.",
+        "What is established is the committee's finding and his resignation. What is not established is the full scope of his use, which the committee itself says was unclear. Watch for whether journals tighten disclosure policies and whether other institutions audit leaders' AI use."
+      ],
+      "category": "AI",
+      "tags": [
+        "dartmouth",
+        "ai disclosure",
+        "claude",
+        "academic integrity",
+        "resignation",
+        "op-ed",
+        "provost"
+      ],
+      "date": "2026-10-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/tech-policy/2026/10/dartmouths-provost-warned-us-about-ai-cheating-but-his-own-ai-use-cost-him-his-job/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-chernobyls-dogs-differ-genetically-and-the-best-explanation",
+      "headline": "Chernobyl's dogs differ genetically, and the best explanation may be selection, not mutation",
+      "summary": "A study of 106 dogs finds those at the plant's site differ from dogs 16 km away in genome regions near cancer, immune and repair genes. The authors see signs consistent with selection but say it cannot be confirmed.",
+      "impacts": [
+        "Decades of radiation and toxic exposure may favor animals with certain existing genes",
+        "Earlier work had ruled out new mutations as the cause",
+        "The findings are suggestive, not proof of adaptation",
+        "Results may inform how animals and people respond to contaminated environments"
+      ],
+      "details": [
+        "ScienceAlert reports on a paper in Genes led by population geneticist Megan Dillon of North Carolina State University. After the 1986 explosion, authorities abandoned a roughly 2,600 square kilometer exclusion zone and liquidators destroyed many remaining animals, but enough pets' descendants survived. Several hundred dogs now live in the zone, more than 30 generations on.",
+        "A 2023 study by some of the same team found dogs near the power plant were genetically distinct from dogs farther away, raising the possibility of radiation-caused mutations. A 2024 follow-up found no evidence that mutations drove the differences. The new work tests two other explanations: natural selection or genetic drift in an isolated population.",
+        "The team analyzed whole-genome data from 106 dogs sampled in 2018 and 2019, from the plant and from Chornobyl City about 16 km away. The differences do not seem to be down to chance alone. They found changes concentrated in specific genomic regions near genes tied to cancer, cellular function and maintenance, infectious disease and immune response.",
+        "Dillon says they cannot say for certain that this is selection, but the signatures are suggestive and the genes sit in pathways that could help overcome toxicant exposure. Geneticist Matthew Breen says the consequence may not have been the dogs' genomes changing; the dogs that survived the first exposures may simply have had underlying diversity and variants that gave a higher fitness.",
+        "So the headline claim is modest: not that radiation rewrote the dogs' DNA, but that survivors may have carried helpful variants. It remains to be tested by future research. What to watch is follow-up work linking specific variants to cancer or immune outcomes in the animals."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "chernobyl",
+        "dogs",
+        "genetics",
+        "radiation",
+        "selection",
+        "evolution",
+        "genome"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceAlert",
+          "url": "https://www.sciencealert.com/chernobyls-dogs-are-genetically-different-and-we-may-finally-know-why"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-eating-disorders-are-up-71-since-1990-and",
+      "headline": "Eating disorders are up 71% since 1990, and clinicians say GLP-1 drugs are making cases worse",
+      "summary": "A JAMA Psychiatry analysis estimates anorexia and bulimia incidence rose 71% from 1990 to 2023, reaching 18.1 million people. Clinicians quoted by MIT Technology Review report GLP-1 misuse among patients, including children.",
+      "impacts": [
+        "The pooled estimates leave out other eating disorders, so the true burden is likely higher",
+        "A small study found 30% of people with eating disorders had used GLP-1s, and about 10% appeared to misuse them",
+        "Guidelines now suggest screening for eating disorders before prescribing the drugs",
+        "Compounded and online versions widen access, including for minors"
+      ],
+      "details": [
+        "MIT Technology Review's weekly biotech newsletter reports a JAMA Psychiatry study, led by Ruhai Bai at Nanjing Medical University's children's hospital, estimating that incidence of anorexia nervosa and bulimia nervosa rose 71% between 1990 and 2023 across 204 countries and territories. In 2023 an estimated 18.1 million people lived with one of the two, and the disorders cost about 3.83 million years of healthy life. The team projects 21.8 million by 2050. These come from statistical models filling data gaps, and the study did not explore causes.",
+        "Clinical psychologist Cheri Levinson of the University of Louisville says she is seeing more patients with more severe symptoms than at any time in about 20 years, and that many misuse GLP-1 drugs. She notes the two disorders are under half of all eating disorders and the real total could be about three times the reported rate.",
+        "On GLP-1s: a Gallup survey earlier this year suggested 15% of Americans had used one for weight loss. In a small study, Levinson's team found 30% of people with eating disorders had used the drugs. The drugs might help some, but about 10% appeared to misuse them, a figure she thinks is an underestimate. She has seen children develop eating disorders after being prescribed GLP-1s for medical reasons, and others, even age 11, buy versions through TikTok.",
+        "Cynthia Bulik worries the drugs will lead to even faster and more extreme weight loss in people with anorexia, so patients arrive at more advanced stages that are hard to reverse. Guidelines published this month, which Bulik contributed to, recommend screening for eating disorders before prescribing, more patient education and more monitoring.",
+        "Caveats: the evidence on GLP-1 harm is clinicians' observations and a small study, not a large trial, and the incidence study did not test the drugs as a cause. What to watch is larger studies and whether prescribing rules adopt the screening advice."
+      ],
+      "category": "Health",
+      "tags": [
+        "glp-1",
+        "eating disorders",
+        "anorexia",
+        "jama psychiatry",
+        "weight loss",
+        "ozempic",
+        "mental health"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/10/30/1147838/eating-disorders-rise-glp-1s-weight-loss-drugs/"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-webb-data-suggest-interstellar-comet-3i-atlas-carries",
+      "headline": "Webb data suggest interstellar comet 3I/ATLAS carries ice that may be billions of years older than the Sun",
+      "summary": "A Nature Astronomy study found 3I/ATLAS holds far more heavy methane than any solar-system body, 13 times comet 67P's level. The authors say its ices formed in a cold, low-metallicity environment, possibly before our Sun existed.",
+      "impacts": [
+        "It gives a rare direct sample of chemistry from another star system",
+        "Age claims depend on models and are not a direct date",
+        "It shows how much one JWST observation can reveal about a visitor passing through",
+        "No danger to Earth is suggested in the source"
+      ],
+      "details": [
+        "ScienceAlert reports on a Nature Astronomy study led by NASA Solar System Exploration Division scientists. Using the James Webb Space Telescope's infrared capabilities in late December 2025, they studied gases from comet 3I/ATLAS, discovered on July 1, 2025, when it was about 2.5 times as far from the Sun as Earth, passing through the asteroid belt.",
+        "They focused on the deuterium-to-hydrogen ratio in methane. Deuterium is a heavier form of hydrogen, and the ratio shows how much of it the ices retained since they formed. 3I/ATLAS held significantly more than any body in the Solar System, and 13 times more than comet 67P/Churyumov-Gerasimenko, the only other comet with a secure measurement, which required in-situ readings from the Rosetta spacecraft.",
+        "The authors say the elevated ratio is consistent with ices forming in a cold, low-metallicity interstellar or protostellar environment under a high rate of cosmic-ray irradiation. One possible origin is the planet-forming disk around a very young star, a region hard to observe because it is opaque, so researchers usually rely on models.",
+        "ScienceAlert's headline says the material may be 10 billion years old, and the article says the exosolar system that built the comet may have assembled it more than 7 billion years before our Sun ignited, possibly around one of the Milky Way's oldest stars. That is a hypothesis drawn from chemistry and models, not a measured age.",
+        "What is solid is the measurement of an unusually high heavy-methane ratio. What is interpretation is the age and origin. Watch for further Webb observations and independent checks of the ratio."
+      ],
+      "category": "Space",
+      "tags": [
+        "3i/atlas",
+        "comet",
+        "interstellar",
+        "jwst",
+        "webb",
+        "methane",
+        "nature astronomy"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceAlert",
+          "url": "https://www.sciencealert.com/interstellar-visitor-3i-atlas-just-got-even-weirder-and-may-contain-10-billion-year-old-material"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-ieee-retracts-1-417-conference-papers-in-one",
+      "headline": "IEEE retracts 1,417 conference papers in one day, the largest bulk retraction on record",
+      "summary": "IEEE pulled at least 1,417 papers tied to paper mills that sold authorship slots via social media ads. Nature's analysis finds nearly 3,000 IEEE retractions so far this year.",
+      "impacts": [
+        "Fake or purchased authorship has reached a major engineering publisher",
+        "Citations of the retracted papers may still be spreading in the literature",
+        "Researchers found 4,407 authorship-for-sale ads on 200+ social channels",
+        "Detection came from an outside study, not IEEE's own screening"
+      ],
+      "details": [
+        "Nature reports that the Institute of Electrical and Electronics Engineers retracted 1,417 conference papers at once, announced in an October 28 statement. Research-integrity specialists told Nature it is the largest single bulk retraction issued by any scholarly publisher. Nature's news team verified that IEEE retracted at least 1,417 papers on October 23, though the statement did not identify them.",
+        "All were previously flagged by a study, first a preprint in April and published this month in Accountability in Research, of papers traceable to social-media ads from paper mills, businesses that sell authorship slots on papers that are often low quality or fake. That study listed 2,062 papers in 366 IEEE conference proceedings from 2021 to 2026.",
+        "The retraction notices say the articles may have been offered for sale. Nature's analysis found 1,622 of the 2,062 flagged papers have now been retracted, and IEEE has retracted nearly 3,000 papers in 2026. Anna Abalkina, a co-author of the study at the Free University of Berlin, said of IEEE's speed: 'It is unbelievable. They're so fast.'",
+        "Researchers recorded 4,407 ads selling authorship on conference papers across more than 200 channels such as Telegram, WhatsApp and Facebook, and matched ad titles to published papers. Nature notes IEEE retracted over 1,200 papers from one 2011 conference in 2015, and Wiley's Hindawi retracted more than 9,500 articles by the end of 2023.",
+        "Context: a retraction does not say every paper was fake, only that it violated publication principles. About 440 flagged papers had not been retracted at the time of Nature's analysis. What to watch is whether other publishers act on similar lists and how retractions affect papers that cited this work."
+      ],
+      "category": "Tech",
+      "tags": [
+        "ieee",
+        "retraction",
+        "paper mills",
+        "research integrity",
+        "publishing",
+        "nature",
+        "fraud"
+      ],
+      "date": "2026-10-28",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Nature",
+          "url": "https://www.nature.com/articles/d41586-026-03455-8"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-cloudflare-ddos-attacks-hit-18-2-million-in",
+      "headline": "Cloudflare: DDoS attacks hit 18.2 million in Q3, one every 0.44 seconds, up 38% on Q2",
+      "summary": "Cloudflare says it blocked 18.2 million network-layer DDoS attacks and 14.4 trillion HTTP DDoS requests in Q3. Short, low-bandwidth bursts surged 208% even as the largest attacks fell 69%.",
+      "impacts": [
+        "Cheap rented booter services are driving a flood of small attacks",
+        "Attacks over 1 Tbps fell from 805 to 251, after law-enforcement action in March",
+        "New botnet variants like Dysphoria and Evooo1Bot have emerged",
+        "Media, IT and gambling sites were among the most targeted"
+      ],
+      "details": [
+        "The Hacker News reports Cloudflare's quarterly DDoS threat report. In Q3 2026 it autonomously mitigated 18.2 million network-layer attacks and 14.4 trillion HTTP DDoS requests, or about 197,400 attacks a day, 8,226 per hour, or one every 0.44 seconds. Q2 saw 13.2 million and Q1 10.0 million, so Q3 is up about 38% on Q2.",
+        "The increase is linked to DDoS-for-hire booter or stresser services responsible for hundreds of thousands of attacks. Short-burst attacks lasting under 10 minutes and under 1 Gbps surged by 208%.",
+        "At the other end, hyper-volumetric attacks above 1 Tbps fell 69%, from 805 in Q2 to 251, likely because of law-enforcement action in March against the AISURU, KimWolf, JackSkid and Mossad botnets. Cloudflare warns the threat is not neutralized, citing new variants Dysphoria and Evooo1Bot.",
+        "Other shifts: CLDAP floods declined while DNS amplification rose 215%, accounting for 3.43% of network-layer attacks. The most targeted industries were media, production and publishing, IT and services, gambling and casinos, software and telecoms. The most attacked countries were the US, China, Indonesia, the UK and Türkiye, with Canada and Israel entering the top 10 on attacks against Canadian retail, telecom and marketing.",
+        "Caution: the figures are Cloudflare's own traffic, so they describe what its network saw, not the whole internet. The picture is of volume rather than size, many small attacks that are cheap to buy. What to watch is whether the botnets taken down in March rebuild."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ddos",
+        "cloudflare",
+        "botnet",
+        "booter",
+        "attacks",
+        "network",
+        "threat report"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/cloudflare-reports-182-million-network.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-10-31-a-teamviewer-bug-lets-the-machine-you-are",
+      "headline": "A TeamViewer bug lets the machine you are controlling attack you, and updating to 15.82 did not fix it",
+      "summary": "CVE-2026-111585, scored 8.8, lets a malicious remote host crash a viewer's TeamViewer and, on Windows, run code on it. Fixed in version 15.83; no attacks in the wild are reported.",
+      "impacts": [
+        "IT staff who connect to untrusted or compromised machines are the exposed group",
+        "It works in the default setup and needs no password beyond starting a session",
+        "There is no workaround; updating to 15.83 is the only fix",
+        "The code-execution demo was shown only on Windows with a stand-in host"
+      ],
+      "details": [
+        "The Hacker News reports TeamViewer fixed a flaw that lets the controlled machine, the host, attack the computer that connected to control it, the viewer. A malicious or compromised host can crash the viewer's TeamViewer and, depending on the platform, may run code on the viewer's computer. It only works after the user starts a remote-control session to that host.",
+        "The flaw is CVE-2026-111585, scored 8.8 out of 10. It affects the Full Client on Windows, Linux and macOS, the Windows Portable edition and the Android Remote Control app in versions before 15.83, including 15.82, the September security update. The bulletin lists the Full Client, Portable and Android app but not the Host. The same update fixes two other high-severity flaws, including a separate code-execution flaw on Linux and macOS, and a companion bulletin fixes six more in Remote Management add-ons.",
+        "Omri Dar of security firm Remedio published a technical account on October 29. The host tells the viewer the screen image size, and the viewer uses it to reserve memory, but the calculation can overflow and reserve too little, so later screen data is written past the end. At minimum it crashes the session, and the host can trigger the crash repeatedly.",
+        "On Windows, Remedio says it bypassed the operating system's exploit defenses and ran code of its choosing in the viewer. The demonstration used a stand-in on the host for part of the attack data, so it is not yet an attack carried out entirely over the network. Whether it works on macOS, Linux or Android is not covered. The attack needs no password and no extra click beyond accepting the session.",
+        "TeamViewer says it knew of no attacks when it published the fix, the bug is not in CISA's Known Exploited Vulnerabilities catalog as of October 29, and Remedio reported none and released no exploit code. Users should move to 15.83 or later."
+      ],
+      "category": "Tech",
+      "tags": [
+        "teamviewer",
+        "vulnerability",
+        "remote access",
+        "remedio",
+        "cve",
+        "windows",
+        "patch"
+      ],
+      "date": "2026-10-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/10/teamviewer-flaw-lets-remote-computers.html"
+        }
+      ]
+    }
+  ]
+}
