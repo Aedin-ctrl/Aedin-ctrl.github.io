@@ -329,6 +329,8 @@ bindRange('volwin', v => v.toFixed(0));
 bindRange('kf', v => v.toFixed(2));
 bindRange('maxlev', v => v.toFixed(0) + 'x');
 bindRange('ruinAt', v => v === 0 ? 'total loss' : 'down ' + ((1 - v) * 100).toFixed(0) + '%');
+bindRange('skipProb', v => (v * 100).toFixed(0) + '%');
+bindRange('gapProb', v => (v * 100).toFixed(1) + '%');
 
 $('#sizeMode').addEventListener('change', () => {
   const m = $('#sizeMode').value;
@@ -369,6 +371,13 @@ function buildConfig(overrides = {}) {
       financingAnnual: +$('#finRate').value || 0,
       taxRate: +$('#taxRate').value || 0,
       taxMode: $('#taxMode').value,
+    },
+    exec: {
+      skipProb: +$('#skipProb').value || 0,
+      slipMeanBps: +$('#slipMean').value || 0,
+      slipSdBps: +$('#slipSd').value || 0,
+      gapProb: +$('#gapProb').value || 0,
+      gapBps: +$('#gapBps').value || 0,
     },
     ruinAt: +$('#ruinAt').value || 0,
     trials: Math.max(1, +$('#trials').value || 1),
@@ -636,7 +645,7 @@ $('#expCsv').addEventListener('click', () => {
 $('#shareBtn').addEventListener('click', async () => {
   const cfg = buildConfig();
   const share = {
-    m: cfg.model.id, p: cfg.model.params, s: cfg.sizing, c: cfg.costs,
+    m: cfg.model.id, p: cfg.model.params, s: cfg.sizing, c: cfg.costs, x: cfg.exec,
     h: cfg.horizon, y: cfg.ppy, n: cfg.paths, sd: cfg.seed, t: cfg.trials, r: cfg.ruinAt,
     ex: ST.mode === 'examples' ? exId : null,
     exk: ST.mode === 'examples' ? exKind : null,
@@ -672,6 +681,12 @@ function restoreFromHash() {
       $('#maxlev').value = o.s.maxLeverage ?? 10;
       $('#sizeMode').dispatchEvent(new Event('change'));
       ['lev', 'tgt', 'volwin', 'kf', 'maxlev'].forEach(k => $('#' + k).dispatchEvent(new Event('input')));
+    }
+    if (o.x) {
+      $('#skipProb').value = o.x.skipProb ?? 0; $('#slipMean').value = o.x.slipMeanBps ?? 0;
+      $('#slipSd').value = o.x.slipSdBps ?? 0; $('#gapProb').value = o.x.gapProb ?? 0;
+      $('#gapBps').value = o.x.gapBps ?? 0;
+      ['skipProb', 'gapProb'].forEach(k => $('#' + k).dispatchEvent(new Event('input')));
     }
     if (o.c) {
       $('#costBps').value = o.c.bpsPerPeriod ?? 0; $('#turnBps').value = o.c.bpsPerTurnover ?? 0;

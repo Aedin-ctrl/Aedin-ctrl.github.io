@@ -22,6 +22,18 @@ export const SIZING = {
   kelly: { label: 'Kelly fraction', blurb: 'Size at a fraction of mu/sigma^2. Full Kelly maximises long-run growth and is far too violent to hold; the fraction is the real decision.' },
 };
 
+/** Execution realism: the things that go wrong between the signal and the fill.
+ *  Commercial tools call these "randomly skip trades" and "randomise entry/exit
+ *  prices". They matter because a rule tested with perfect execution is tested
+ *  against a counterparty that does not exist. */
+export const DEFAULT_EXEC = {
+  skipProb: 0,      // chance a period's position is simply not taken
+  slipMeanBps: 0,   // average slippage charged per unit of turnover
+  slipSdBps: 0,     // its dispersion; the draw is floored at zero, never a rebate
+  gapProb: 0,       // chance of an extra adverse jump on entry (a gapped fill)
+  gapBps: 0,        // size of that adverse jump, in bps of exposure
+};
+
 export const DEFAULT_COSTS = {
   bpsPerPeriod: 0,       // flat drag per period, in basis points
   bpsPerTurnover: 0,     // bps charged on |change in position| (strategy mode)
@@ -45,14 +57,20 @@ export function kellyLeverage(mu, variance) {
  *  ONCE, on the EFFECTIVE exposure (sizing x strategy position) -- that is the thing
  *  actually held, and therefore the thing actually paid for. Charging turnover
  *  separately inside the strategy loop and again here double-billed every entry.
+ *  `execRng`, when supplied, drives execution noise: skipped trades and random
+ *  slippage. It is a SEPARATE substream from the one that generated the market,
+ *  so switching execution realism on does not shift the market paths and the two
+ *  runs stay directly comparable.
  *  Returns the number of periods simulated (always gross.length). */
-export function applySizing(gross, net, cfg, stratPos = null) {
+export function applySizing(gross, net, cfg, stratPos = null, execRng = null) {
   const n = gross.length;
   const sz = cfg.sizing || {};
   const mode = sz.mode || 'fixed';
   const maxLev = sz.maxLeverage ?? 10;
   const c = { ...DEFAULT_COSTS, ...(cfg.costs || {}) };
+  const x = { ...DEFAULT_EXEC, ...(cfg.exec || {}) };
   const ppy = cfg.ppy || 252;
+  const useExec = execRng && (x.skipProb > 0 || x.slipMeanBps > 0 || x.slipSdBps > 0 || x.gapProb > 0);
 
   const drag = c.bpsPerPeriod / 1e4;
   const turnCost = c.bpsPerTurnover / 1e4;
@@ -82,14 +100,26 @@ export function applySizing(gross, net, cfg, stratPos = null) {
       pos = lev;
     }
 
+    // A skipped period is one the trade never happened in: no exposure, no cost.
+    if (useExec && x.skipProb > 0 && execRng.u() < x.skipProb) pos = 0;
+
     const g = gross[i];
     let r = pos * g;
 
     // `gross` already contains stratPos[i] * market[i], so the exposure actually
     // held this bar is the product of the two.
     const exp = stratPos ? pos * stratPos[i] : pos;
+    const traded = Math.abs(exp - prevExp);
 
-    if (turnCost > 0) r -= Math.abs(exp - prevExp) * turnCost;
+    if (turnCost > 0) r -= traded * turnCost;
+    if (useExec && traded > 0) {
+      // slippage is drawn per trade and floored at zero: execution is never a gift
+      if (x.slipMeanBps > 0 || x.slipSdBps > 0) {
+        const slip = Math.max(0, x.slipMeanBps + x.slipSdBps * execRng.normal()) / 1e4;
+        r -= traded * slip;
+      }
+      if (x.gapProb > 0 && execRng.u() < x.gapProb) r -= traded * (x.gapBps / 1e4);
+    }
     if (drag > 0) r -= Math.abs(exp) * drag;
     if (finPer > 0 && exp > 1) r -= (exp - 1) * finPer;
     if (borrowPer > 0 && exp < 0) r -= (-exp) * borrowPer;
@@ -157,6 +187,11 @@ export function runBatch(cfg, lo, hi, onProgress) {
   const gross = new Float64Array(n);
   const net = new Float64Array(n);
   const posBuf = strat ? new Float64Array(n) : null;
+  /* The strategy's gross returns need their OWN buffer. Passing `net` as the
+   * scratch made useGross and net the same array: applySizing then overwrote it
+   * in place, and everything downstream that expects the raw market -- the
+   * leverage ladder -- silently read post-cost returns instead. */
+  const stratGross = strat ? new Float64Array(n) : null;
 
   const out = {};
   for (const k of PATH_METRICS) out[k] = F32(count);
@@ -189,15 +224,18 @@ export function runBatch(cfg, lo, hi, onProgress) {
   for (let p = lo; p < hi; p++) {
     const i = p - lo;
     const rng = new RNG(cfg.seed, p);          // path p <-> stream p, always
+    // execution noise draws from its own stream, so turning it on leaves the
+    // market paths untouched and the comparison stays like-for-like
+    const execRng = new RNG((cfg.seed ^ 0x5bf03635) >>> 0, p);
     fill(gross, rng);
 
     let useGross = gross;
     if (strat) {
       // the strategy sees the market path and returns a position per bar
-      useGross = strategyReturns(gross, posBuf, net, strat, cfg, rng);
+      useGross = strategyReturns(gross, posBuf, stratGross, strat, cfg, rng);
     }
 
-    applySizing(useGross, net, cfg, strat ? posBuf : null);
+    applySizing(useGross, net, cfg, strat ? posBuf : null, execRng);
     const w = new PathWalker({ start: 1, ruinAt: cfg.ruinAt ?? 0 });
     walkWithTax(net, cfg, w);
     const m = w.finish(ppy);
