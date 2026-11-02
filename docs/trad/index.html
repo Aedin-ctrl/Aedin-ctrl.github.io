@@ -146,22 +146,23 @@
                       box-shadow:inset 0 -1px 0 var(--line)}
   .callout{border-color:#d8d3c4;background:#fdfcf8}
   .callout h3{color:var(--ink)}
-  #geff td:first-child,#gcap td:first-child,#gfill td:first-child{white-space:normal}
-  #gctrl td:first-child,#gper td:first-child{white-space:normal}
-  #gctrl td,#gctrl th{padding:6px 5px}
-  #gliveTab td:first-child{color:var(--ink2);font-weight:400}
-  #gliveTab td:last-child{font-weight:620}
+  [id$="eff"] td:first-child,[id$="cap"] td:first-child,
+  [id$="fill"] td:first-child{white-space:normal}
+  [id$="ctrl"] td:first-child,[id$="per"] td:first-child{white-space:normal}
+  [id$="ctrl"] td,[id$="ctrl"] th{padding:6px 5px}
+  [id$="liveTab"] td:first-child{color:var(--ink2);font-weight:400}
+  [id$="liveTab"] td:last-child{font-weight:620}
 
   /* A grid item's default min-width is its content, so one wide table pushed
      the whole column past the viewport on a phone. Both boards had it. */
   .cols>section{min-width:0}
   /* Scorecard answers are sentences here, not two words: let them wrap, and on
      a phone put them on their own line under the question. */
-  #gscore .a{white-space:normal;text-align:right}
+  [id$="score"] .a{white-space:normal;text-align:right}
   @media(max-width:620px){
-    #gscore .row{flex-wrap:wrap}
-    #gscore .q{flex:1 1 100%}
-    #gscore .a{flex:1 1 100%;text-align:left;padding-left:25px}
+    [id$="score"] .row{flex-wrap:wrap}
+    [id$="score"] .q{flex:1 1 100%}
+    [id$="score"] .a{flex:1 1 100%;text-align:left;padding-left:25px}
   }
   code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
        background:var(--paper);padding:1px 4px;border-radius:4px}
@@ -176,6 +177,7 @@
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
     <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">gold strat</button>
+    <button type="button" class="sub-btn" data-view="mes" role="tab" aria-selected="false">mes</button>
   </div>
 
   <div class="view" id="v-bell">
@@ -336,8 +338,8 @@
       <span class="no">PART 2</span><h2>How the thing actually works</h2>
       <span class="sub">four moving parts, on real gold</span>
     </div>
-    <p class="partnote">Everything below is computed in your browser from COMEX
-       gold futures bars, so you can move the parameters and watch the stop,
+    <p class="partnote">Everything below is computed in your browser from COMEX gold futures
+       bars, so you can move the parameters and watch the stop,
        the trades and the money change. Nothing here is fitted for you.</p>
 
     <section>
@@ -369,13 +371,13 @@
     <section>
       <h3>Try it <span>· drag the parameters, the chart and the money both move</span></h3>
       <div class="ctrls">
-        <label class="ctl"><span>step <b id="lstep">0.02</b></span>
-          <input type="range" id="cstep" min="0.005" max="0.06" step="0.005" value="0.02"></label>
-        <label class="ctl"><span>max AF <b id="lmax">0.20</b></span>
-          <input type="range" id="cmax" min="0.05" max="0.50" step="0.05" value="0.20"></label>
-        <div class="ctl"><span>rule</span><div class="seg" id="cmode" role="group" aria-label="Rule"></div></div>
-        <div class="ctl"><span>costs</span><div class="seg" id="ccost" role="group" aria-label="Costs"></div></div>
-        <div class="ctl"><span>window</span><div class="seg" id="cwin" role="group" aria-label="Window"></div></div>
+        <label class="ctl"><span>step <b id="glstep">0.02</b></span>
+          <input type="range" id="gcstep" min="0.005" max="0.06" step="0.005" value="0.02"></label>
+        <label class="ctl"><span>max AF <b id="glmax">0.20</b></span>
+          <input type="range" id="gcmax" min="0.05" max="0.50" step="0.05" value="0.20"></label>
+        <div class="ctl"><span>rule</span><div class="seg" id="gcmode" role="group" aria-label="Rule"></div></div>
+        <div class="ctl"><span>costs</span><div class="seg" id="gccost" role="group" aria-label="Costs"></div></div>
+        <div class="ctl"><span>window</span><div class="seg" id="gcwin" role="group" aria-label="Window"></div></div>
       </div>
       <div class="legend" id="gchartleg"></div>
       <div id="gchart"></div>
@@ -401,9 +403,10 @@
       <span class="no">PART 3</span><h2>Is it worth trading?</h2>
       <span class="sub" id="gevrange"></span>
     </div>
-    <p class="partnote">Full history, COMEX costs, fills at the stop level. The
-       honest comparison is not gold at 100% &mdash; a rule that sits in cash 42%
-       of the time gets less risk for free. It is gold held passively at the
+    <p class="partnote">Full history, COMEX costs, fills at the stop level.
+       The honest comparison is not gold at 100% &mdash; a rule that sits in
+       cash some of the time gets less risk for free. It is gold held passively
+       at the
        <em>same average exposure</em>.</p>
 
     <section>
@@ -440,8 +443,7 @@
         <div class="wrap"><table id="gcost">
           <thead><tr><th>Venue</th><th>Round trip</th><th>Net/bar</th><th>Sharpe</th></tr></thead>
           <tbody></tbody></table></div>
-        <div class="foot">Gold is cheap on futures and expensive on a retail spot
-          CFD. That gap is larger than most effects claimed for this indicator.</div>
+        <div class="foot">Gold is cheap on futures and expensive on a retail spot CFD. That gap is larger than most effects claimed for this indicator.</div>
       </section>
     </div>
 
@@ -564,9 +566,265 @@
 
   </div>
 
+  <div class="view" id="v-mes" hidden>
+
+    <div class="score" id="mscore"></div>
+    <div class="grid" id="mtiles"></div>
+
+    <div class="part">
+      <span class="no">PART 1</span><h2>Where it stands right now</h2>
+      <span class="sub" id="mspot"></span>
+    </div>
+    <p class="partnote">Parabolic SAR is never flat. It is long or short at every
+       moment, and the only number you can act on is the stop that is
+       <em>already fixed</em> for the next bar. These are read off the last
+       closed bar on each timeframe.</p>
+
+    <section>
+      <h3>Current state <span id="masof"></span></h3>
+      <div class="wrap"><table id="mnow">
+        <thead><tr><th>Timeframe</th><th>Side</th><th>Bars in trend</th><th>Close</th>
+          <th>Stop next bar</th><th>Distance</th><th>AF</th><th>Extreme point</th>
+          <th>ADX(14)</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="mnowfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 2</span><h2>How the thing actually works</h2>
+      <span class="sub">four moving parts, on real the S&amp;P 500</span>
+    </div>
+    <p class="partnote">Everything below is computed in your browser from E-mini S&amp;P 500 futures
+       bars, so you can move the parameters and watch the stop,
+       the trades and the money change. Nothing here is fitted for you.</p>
+
+    <section>
+      <h3>The recurrence</h3>
+      <p class="note">One line does all of it. Each bar, the stop closes a fixed
+         fraction of its remaining distance to the best price the trend has
+         reached &mdash; and that fraction grows every time the trend makes a new
+         extreme, so the stop accelerates into price the longer the run lasts.</p>
+      <div class="eqn">SAR<sub>next</sub> &nbsp;=&nbsp; SAR &nbsp;+&nbsp;
+        <b class="k-af">AF</b> &times; ( <b class="k-ep">EP</b> &minus; SAR )</div>
+      <div class="defs">
+        <div><b class="k-ep">EP</b> &mdash; extreme point. The highest high since
+          the trend began (long), or the lowest low (short). Never moves against
+          the trend; resets on every flip.</div>
+        <div><b class="k-af">AF</b> &mdash; acceleration factor. Starts at
+          <code>step</code> and adds another <code>step</code> <em>every time EP
+          makes a new extreme</em> &mdash; counting new highs, not bars &mdash;
+          capped at <code>max</code>. A trend that goes sideways does not
+          accelerate.</div>
+        <div><b class="k-cl">Clamp</b> &mdash; the stop may never sit inside the
+          last two bars' range. Without it the stop could start a bar already
+          triggered, and the system would flip on every sharp move.</div>
+        <div><b class="k-fl">Flip</b> &mdash; when price trades through the stop,
+          the position reverses: the new stop becomes the old trend's EP, the new
+          EP is this bar's extreme, and AF resets to <code>step</code>.</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Try it <span>· drag the parameters, the chart and the money both move</span></h3>
+      <div class="ctrls">
+        <label class="ctl"><span>step <b id="mlstep">0.02</b></span>
+          <input type="range" id="mcstep" min="0.005" max="0.06" step="0.005" value="0.02"></label>
+        <label class="ctl"><span>max AF <b id="mlmax">0.20</b></span>
+          <input type="range" id="mcmax" min="0.05" max="0.50" step="0.05" value="0.20"></label>
+        <div class="ctl"><span>rule</span><div class="seg" id="mcmode" role="group" aria-label="Rule"></div></div>
+        <div class="ctl"><span>costs</span><div class="seg" id="mccost" role="group" aria-label="Costs"></div></div>
+        <div class="ctl"><span>window</span><div class="seg" id="mcwin" role="group" aria-label="Window"></div></div>
+      </div>
+      <div class="legend" id="mchartleg"></div>
+      <div id="mchart"></div>
+      <div class="foot" id="mchartfoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>What that setting earns <span>· in the window shown</span></h3>
+        <div class="wrap"><table id="mliveTab"><tbody></tbody></table></div>
+        <div class="foot">Recomputed in the browser. The published numbers further
+          down use the full history back to 2000, so they will not match exactly.</div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Every flip in the window</h3>
+        <div class="wrap tall" tabindex="0" role="region" aria-label="Every flip in the window"><table id="mtrades">
+          <thead><tr><th>In</th><th>Side</th><th>Entry</th><th>Out</th>
+            <th>Exit</th><th>Bars</th><th>Net</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <div class="part">
+      <span class="no">PART 3</span><h2>Is it worth trading?</h2>
+      <span class="sub" id="mevrange"></span>
+    </div>
+    <p class="partnote">Full history, MES retail costs, fills at the stop level.
+       The honest comparison is not the S&amp;P 500 at 100% &mdash; a rule that sits in
+       cash some of the time gets less risk for free. It is the S&amp;P 500 held passively
+       at the
+       <em>same average exposure</em>.</p>
+
+    <section>
+      <h3>Cumulative <span>· bps, sum of per-bar returns</span></h3>
+      <div class="legend" id="meqleg"></div>
+      <div id="meq"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Controls <span>· each one tries to explain the result away</span></h3>
+        <div class="wrap"><table id="mctrl">
+          <thead><tr><th>Control</th><th>Real</th><th>Null</th><th>p</th></tr></thead>
+          <tbody></tbody></table></div>
+        <div class="foot" id="mctrlfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>All 240 parameter sets <span>· sorted · the line is buy &amp; hold</span></h3>
+        <div class="legend" id="mcloudleg"></div>
+        <div id="mcloud"></div>
+        <div class="foot" id="mcloudfoot"></div>
+      </section>
+    </div>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>By five-year period <span>· an edge that lives in one regime is a regime</span></h3>
+        <div class="wrap"><table id="mper">
+          <thead><tr><th>Period</th><th>Trades</th><th>Strategy</th><th>S&amp;P 500</th>
+            <th>Sharpe</th><th>S&amp;P 500 Sharpe</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Cost ladder <span>· where the venue eats it</span></h3>
+        <div class="wrap"><table id="mcost">
+          <thead><tr><th>Venue</th><th>Round trip</th><th>Net/bar</th><th>Sharpe</th></tr></thead>
+          <tbody></tbody></table></div>
+        <div class="foot">The micro is not the big contract divided by ten. The spread is quoted in index points and so is the price, so half a tick costs the same 0.16&nbsp;bps on MES as on ES. Commission is quoted in dollars per contract, so it is divided by a notional ten times smaller &mdash; 0.20&nbsp;bps on MES against 0.06&nbsp;bps on ES. That is the entire cost difference between them.</div>
+      </section>
+    </div>
+
+    <section>
+      <h3>Every symbol, timeframe, rule and fill model</h3>
+      <div class="wrap tall" tabindex="0" role="region" aria-label="Every symbol, timeframe, rule and fill model"><table id="mmat">
+        <thead><tr><th>Sym</th><th>TF</th><th>Rule</th><th>Fill</th><th>Bars</th>
+          <th>Trades</th><th>Net/bar</th><th>S&amp;P 500</th><th>Matched</th>
+          <th>Sharpe</th><th>Matched Sharpe</th><th>Exposure</th><th>Max DD</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="mmatfoot"></div>
+    </section>
+
+
+    <div class="part">
+      <span class="no">PART 4</span><h2>Can it be done better?</h2>
+      <span class="sub">six levers, tested</span>
+    </div>
+    <p class="partnote">Everything below is chosen on the <b>25 years before the
+       last 252 sessions</b> and scored on those sessions afterwards. Searching
+       for a rule and then judging it on the same year is how you invent an edge.</p>
+
+    <section class="callout">
+      <h3>First, where the number on this page comes from</h3>
+      <p class="note">The board above fills a flip <em>at</em> the stop level,
+         intrabar &mdash; defensible, because the level is fixed before the bar
+         and a resting order could sit on it. It is also the whole result. Under
+         either conservative fill the rule lands exactly on top of the S&amp;P 500.</p>
+      <div class="wrap"><table id="mfill">
+        <thead><tr><th>Fill assumption</th><th>Net/bar</th><th>Sharpe</th>
+          <th>vs the S&amp;P 500</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="mfillfoot"></div>
+    </section>
+
+    <section>
+      <h3>Thirteen rules on one accounting <span>· close-to-close, turnover-charged</span></h3>
+      <p class="note">Same bars, same costs, same conservative fill, so the
+         comparison is level. <b>Break-even cost</b> is the per-side charge at
+         which each rule earns nothing &mdash; the real measure of how much
+         venue it can survive.</p>
+      <div class="wrap tall" tabindex="0" role="region" aria-label="Rule comparison">
+        <table id="meff">
+        <thead><tr><th>Rule</th><th>Net/bar</th><th>Sharpe</th><th>Calmar</th>
+          <th>Max DD</th><th>Exposure</th><th>Flips/yr</th><th>Break-even</th>
+          <th>Gross/cost</th><th>Per exposure</th><th>Holdout Sharpe</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="mefffoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>The one lever that survives <span>· volatility targeting</span></h3>
+        <p class="note">Scale the position by inverse realised volatility to a
+           constant target. It changes size, never direction, and it is the
+           best-supported single idea in the trend-following literature.</p>
+        <div class="wrap"><table id="mvt">
+          <thead><tr><th>Comparison</th><th>&Delta;Sharpe</th><th>95% CI</th>
+            <th>p</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="mvtfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>And one that is an accounting trick <span>· Heikin-Ashi</span></h3>
+        <p class="note">The widely-quoted result that Heikin-Ashi bars turn
+           Parabolic SAR from a 19% win rate into 63% is reproduced here, and
+           then taken apart.</p>
+        <div class="wrap"><table id="mha"><tbody></tbody></table></div>
+        <div class="foot" id="mhafoot"></div>
+      </section>
+    </div>
+
+    <section>
+      <h3>113 candidate rules <span id="msearchmeta"></span></h3>
+      <p class="note">Chosen on the left axis, judged on the bottom. If the
+         search worked, the cloud would run up and to the right.</p>
+      <div class="legend" id="msleg"></div>
+      <div id="msearch"></div>
+      <div class="foot" id="msearchfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 5</span><h2>The last year, every session</h2>
+      <span class="sub" id="myrmeta"></span>
+    </div>
+    <p class="partnote" id="myrlede"></p>
+
+    <div class="grid" id="myrtiles"></div>
+
+    <section>
+      <h3>Cumulative over the holdout <span>· bps</span></h3>
+      <div class="legend" id="myrleg"></div>
+      <div id="myreq"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Up days against down days <span>· the tell</span></h3>
+        <p class="note">A rule that times anything should keep more of the S&amp;P 500's
+           up days than of its down days. These keep the same share of both.</p>
+        <div class="wrap"><table id="mcap">
+          <thead><tr><th>Rule</th><th>On up days</th><th>On down days</th>
+            <th>Keeps of up</th><th>Keeps of down</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="mcapfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Session by session <span id="mdaymeta"></span></h3>
+        <div class="wrap tall" tabindex="0" role="region" aria-label="Every session of the last year">
+          <table id="mday">
+          <thead><tr><th>Date</th><th>S&amp;P 500</th><th>Pos</th><th>SAR</th>
+            <th>+ vol target</th><th>Ensemble</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <section>
+      <h3>Data, and what is wrong with it</h3>
+      <div class="wrap"><table id="mdata">
+        <thead><tr><th>Series</th><th>Interval</th><th>Bars</th><th>From</th>
+          <th>To</th><th>Repaired</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="mdatafoot"></div>
+    </section>
+
+  </div>
+
   <footer>
     <span id="mode"></span> &middot; data: Yahoo, free tier &middot;
     <a href="index.json">index.json</a> &middot; <a href="gold.json">gold.json</a>
+    &middot; <a href="mes.json">mes.json</a>
   </footer>
 </main>
 <div class="tip" id="tip"></div>
@@ -1257,10 +1515,24 @@ function runStrat(b,p){
       matched:bhm*w, matchedSharpe:bhsd>0?bhm/bhsd*ann:NaN}};
 }
 
+/* ===================================================================== *
+ *  One board, instantiated per market. PFX is the element-id prefix and
+ *  VIEW is the panel id, so gold and the S&P render from the same code
+ *  against the same JSON schema -- a second market cannot drift into a
+ *  second, subtly different implementation.
+ * ===================================================================== */
+const BOARDS = {};
+function makeBoard(PFX, VIEW, URL){
 /* ---------------- state --------------------------------------------- */
 let GD=null, BARS=null;
+/* Set from the blob in boot(). Every market-specific word on the board reads
+   from here, so a second market is a second JSON file and nothing else. The
+   defaults only matter if a blob ever ships without a market block. */
+let MKT={label:"Gold", asset:"gold", hold_noun:"gold", familiar:"GC=F", clean:"GLD"};
 let GP={step:0.02,afmax:0.20,mode:"long_only",cost:1,win:756,warmup:200,barsPerYear:252};
-const COSTS=[{n:"none",rt:0},{n:"COMEX",rt:1.0},{n:"CFD raw",rt:2.0},{n:"CFD std",rt:14.0}];
+/* Filled from the blob's venue ladder, which differs per market: gold's worst
+   venue is a retail spot CFD at 14 bps, the S&P's is a dearer micro broker. */
+let COSTS=[{n:"none",rt:0},{n:"retail",rt:1.0}];
 
 function seg2(host,items,cur,cb){
   host.innerHTML=items.map(s=>
@@ -1294,32 +1566,36 @@ function gHead(d){
   const v=d.verdict||[], yes=v.filter(x=>x.mark==="yes").length;
   const h=d.headline||{}, mb=d.matched_bh||{};
   const half=Math.ceil(v.length/2);
-  $$("#gscore").innerHTML=
-    `<div class="sc"><h4>Long-only Parabolic SAR on gold</h4>
-       <div class="cap">COMEX futures &middot; ${(h.bars||0).toLocaleString()} daily bars
+  const MK=MKT;
+  $$("#"+PFX+"score").innerHTML=
+    `<div class="sc"><h4>Long-only Parabolic SAR on ${MK.label}</h4>
+       <div class="cap">${MK.familiar} &middot; ${(h.bars||0).toLocaleString()} daily bars
          &middot; ${h.trades} trades &middot; ${d.headline.costs} costs</div>
        ${v.slice(0,half).map(x=>row(x.q,x.a,x.mark)).join("")}</div>`+
     `<div class="sc"><h4>&hellip;and the questions that decide it</h4>
        <div class="cap">${yes} of ${v.length} answered yes</div>
        ${v.slice(half).map(x=>row(x.q,x.a,x.mark)).join("")}</div>`;
   const w=d.wilder||{};
-  $$("#gtiles").innerHTML=
-      gTile("Net","+"+(h.net_per_bar_bps||0).toFixed(2),"bps per day")
-    + gTile("Gold itself","+"+(h.buy_hold_per_bar_bps||0).toFixed(2),"bps per day",
+  // fg(), not "+"+toFixed -- a negative value rendered as "+-3.06" on the
+  // first market whose Wilder rule lost money.
+  const AS=MK.label;
+  $$("#"+PFX+"tiles").innerHTML=
+      gTile("Net",fg(h.net_per_bar_bps),"bps per day", (h.net_per_bar_bps||0)<0)
+    + gTile(AS+" itself",fg(h.buy_hold_per_bar_bps),"bps per day",
             h.net_per_bar_bps<h.buy_hold_per_bar_bps)
-    + gTile("Same exposure","+"+(mb.net_per_bar_bps||0).toFixed(2),"bps per day")
-    + gTile("Sharpe",(h.sharpe||0).toFixed(2),"gold "+(h.buy_hold_sharpe||0).toFixed(2))
-    + gTile("Max drawdown",Math.round(h.max_dd_bps||0).toLocaleString(),
-            "bps &middot; gold "+Math.round(mb.max_dd_bps||0).toLocaleString())
+    + gTile("Same exposure",fg(mb.net_per_bar_bps),"bps per day")
+    + gTile("Sharpe",fx(h.sharpe),AS+" "+fx(h.buy_hold_sharpe))
+    + gTile("Max drawdown",fi(h.max_dd_bps),
+            "bps &middot; "+AS+" "+fi(mb.max_dd_bps))
     + gTile("In the market",Math.round((h.exposure||0)*100)+"%","rest in cash")
-    + gTile("Stop &amp; reverse","+"+(w.net_per_bar_bps||0).toFixed(2),
+    + gTile("Stop &amp; reverse",fg(w.net_per_bar_bps),
             "Wilder's own rule", (w.net_per_bar_bps||0)<(h.net_per_bar_bps||0));
 }
 
 function gNow(d){
   const sp=(d.live||{}).spot, st=(d.live||{}).states||[];
   const names={"1d":"Daily","1wk":"Weekly","4h":"4 hour","1h":"1 hour"};
-  $$("#gnow tbody").innerHTML=st.map(s=>{
+  $$("#"+PFX+"now tbody").innerHTML=st.map(s=>{
     const long=s.direction==="long";
     return `<tr><td>${names[s.interval]||s.interval}</td>
       <td class="${long?"pos":"neg"}">${long?"LONG":"SHORT"}</td>
@@ -1332,20 +1608,36 @@ function gNow(d){
       <td>${s.adx14==null?"<span class='dim'>&mdash;</span>":s.adx14.toFixed(1)}</td></tr>`;
   }).join("")||`<tr><td colspan="9" class="dim">no state</td></tr>`;
   const d1=st.find(s=>s.interval==="1d");
+  const MK=MKT;
   if(sp&&d1){
     const basis=d1.close-sp.price;
-    $$("#gspot").innerHTML=`spot XAU/USD $${sp.price.toLocaleString(undefined,{minimumFractionDigits:2})}`;
-    $$("#gnowfoot").innerHTML=`Stops are on <b>COMEX futures</b>, which last traded
-      ${basis>=0?"$"+basis.toFixed(2)+" above":"$"+Math.abs(basis).toFixed(2)+" below"}
+    $$("#"+PFX+"spot").innerHTML=`spot XAU/USD $${fx2(sp.price)}`;
+    $$("#"+PFX+"nowfoot").innerHTML=`Stops are on <b>${MK.familiar||"the futures"}</b>, which
+      last traded ${basis>=0?"$"+basis.toFixed(2)+" above":"$"+Math.abs(basis).toFixed(2)+" below"}
       spot. Subtract that basis before putting these levels on a spot chart.
       Distance is to the stop that is <b>already fixed</b> &mdash; nothing the next
       bar does can move it. Read-only: this page is connected to no broker.`;
+  }else if(d1&&MK.multiplier){
+    // No spot feed for an index: say what the contract is worth instead, which
+    // is the number that decides whether any of this is tradeable at all.
+    const notional=d1.close*MK.multiplier;
+    const stopDist=Math.abs(d1.close-d1.stop_next_bar);
+    const ticks=MK.tick?stopDist/MK.tick:0;
+    const rt=notional*(MK.round_trip_bps||0)/1e4;
+    $$("#"+PFX+"spot").innerHTML=`${MK.contract} &middot; $${fi(notional)} of index per contract`;
+    $$("#"+PFX+"nowfoot").innerHTML=`<b>${MK.contract_label}.</b> At ${fx2(d1.close)} one
+      contract carries <b>$${fi(notional)}</b> of index. The daily stop sits
+      ${d1.distance_pct.toFixed(2)}% away &mdash; ${fi(ticks)} ticks at
+      $${(MK.tick_value||0).toFixed(2)}, about <b>$${fi(stopDist*MK.multiplier)}</b>
+      per contract. A round trip costs ${(MK.round_trip_bps||0).toFixed(2)}&nbsp;bps,
+      roughly $${rt.toFixed(2)}. Levels are on <b>${MK.familiar}</b>, which the micro
+      tracks tick for tick. Read-only: this page is connected to no broker.`;
   }
-  $$("#gasof").textContent = d1 ? "· last closed bar "+String(d1.as_of).slice(0,10) : "";
+  $$("#"+PFX+"asof").textContent = d1 ? "· last closed bar "+String(d1.as_of).slice(0,10) : "";
 }
 
 function chart(){
-  const host=$$("#gchart"); host.innerHTML="";
+  const host=$$("#"+PFX+"chart"); host.innerHTML="";
   if(!BARS) return;
   const n=BARS.c.length;
   const lo=GP.win>=n?0:n-GP.win;
@@ -1366,7 +1658,7 @@ function chart(){
                        mx=Math.max(mx,sub.h[i],res.S.sar[off+i]||-Infinity);}
   const pad=(mx-mn)*0.04; mn-=pad; mx+=pad;
   const X=i=>P.l+(m<2?0:i/(m-1))*iw, Y=v=>P.t+(1-(v-mn)/(mx-mn))*ih;
-  const s=mkSVG(W,H); s.setAttribute("aria-label","Gold with its Parabolic SAR");
+  const s=mkSVG(W,H); s.setAttribute("aria-label",MKT.label+" with its Parabolic SAR");
   for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;
     E(s,"line",{x1:P.l,y1:Y(v),x2:W-P.r,y2:Y(v),class:"gl"});
     T(s,W-P.r+6,Y(v)+4,Math.round(v).toLocaleString(),"ax","start");}
@@ -1404,13 +1696,13 @@ function chart(){
   hit.addEventListener("mouseleave",guntip);
   host.appendChild(s);
 
-  $$("#gchartleg").innerHTML=
-    `<span class="lg"><span class="sw" style="background:var(--ink)"></span>gold close</span>
+  $$("#"+PFX+"chartleg").innerHTML=
+    `<span class="lg"><span class="sw" style="background:var(--ink)"></span>${MKT.asset} close</span>
      <span class="lg"><span class="sw d" style="background:var(--s3)"></span>stop, long</span>
      <span class="lg"><span class="sw d" style="background:var(--s2)"></span>stop, short</span>
      ${m<=400?'<span class="lg">faint rule = flip</span>':""}`;
   const st=res.stats;
-  $$("#gchartfoot").innerHTML=`${m.toLocaleString()} bars shown, ${sub.d[0]} →
+  $$("#"+PFX+"chartfoot").innerHTML=`${m.toLocaleString()} bars shown, ${sub.d[0]} →
      ${sub.d[m-1]}. The recurrence is warmed on ${pre} bars before the window, so
      the first dot you see is the dot a longer chart would draw.`;
   liveTable(st);
@@ -1422,21 +1714,21 @@ function liveTable(st){
     ["Trades",st.trades.toLocaleString(),""],
     ["Win rate",isNaN(st.win)?"—":(st.win*100).toFixed(1)+"%",""],
     ["Net per bar",g2(st.net)+" bps",gcls(st.net)],
-    ["Gold itself",g2(st.bh)+" bps",""],
-    ["Gold at the same exposure",g2(st.matched)+" bps",""],
+    [MKT.label+" itself",g2(st.bh)+" bps",""],
+    [MKT.label+" at the same exposure",g2(st.matched)+" bps",""],
     ["Against that",g2(st.net-st.matched)+" bps",gcls(st.net-st.matched)],
     ["Sharpe",st.sharpe.toFixed(2),gcls(st.sharpe)],
-    ["Gold Sharpe",st.bhSharpe.toFixed(2),""],
+    [MKT.label+" Sharpe",st.bhSharpe.toFixed(2),""],
     ["Max drawdown",Math.round(st.dd).toLocaleString()+" bps",""],
     ["In the market",(st.exposure*100).toFixed(0)+"%",""],
     ["Total",g2(st.total)+" bps",gcls(st.total)]];
-  $$("#gliveTab tbody").innerHTML=rows.map(([k,v,c])=>
+  $$("#"+PFX+"liveTab tbody").innerHTML=rows.map(([k,v,c])=>
     `<tr><td>${k}</td><td class="${c}">${v}</td></tr>`).join("");
 }
 
 function tradeTable(res,off,sub){
   const rows=res.trades.filter(t=>t.i0>=off).slice(-220).reverse();
-  $$("#gtrades tbody").innerHTML=rows.length?rows.map(t=>
+  $$("#"+PFX+"trades tbody").innerHTML=rows.length?rows.map(t=>
     `<tr><td>${sub.d[t.i0-off]}</td>
       <td class="${t.side>0?"pos":"neg"}">${t.side>0?"long":"short"}</td>
       <td>${t.entry.toFixed(1)}</td><td>${sub.d[Math.min(t.i1-off,sub.d.length-1)]}</td>
@@ -1466,7 +1758,7 @@ function lines(hostId,legId,series,labels,alt){
 }
 
 function cloud(d){
-  const host=$$("#gcloud"); host.innerHTML="";
+  const host=$$("#"+PFX+"cloud"); host.innerHTML="";
   const sets=[...(d.cloud.sets||[])].sort((a,b)=>a.net-b.net);
   const W=host.clientWidth||520,H=270,P={t:10,r:46,b:30,l:10};
   const iw=W-P.l-P.r, ih=H-P.t-P.b, n=sets.length;
@@ -1489,13 +1781,13 @@ function cloud(d){
     c.addEventListener("mouseleave",guntip);});
   T(s,P.l+iw/2,H-6,"240 parameter sets, worst to best");
   host.appendChild(s);
-  $$("#gcloudleg").innerHTML=
+  $$("#"+PFX+"cloudleg").innerHTML=
     `<span class="lg"><span class="sw d" style="background:var(--s3)"></span>long only</span>
      <span class="lg"><span class="sw d" style="background:var(--s2)"></span>stop &amp; reverse</span>
      <span class="lg"><span class="sw" style="background:var(--s1)"></span>buy &amp; hold</span>`;
-  $$("#gcloudfoot").innerHTML=`median ${d.cloud.median.toFixed(2)},
+  $$("#"+PFX+"cloudfoot").innerHTML=`median ${d.cloud.median.toFixed(2)},
      best ${d.cloud.best.toFixed(2)}, buy &amp; hold ${d.cloud.buy_hold.toFixed(2)} bps/bar.
-     <b>${d.cloud.beat_buy_hold} of ${d.cloud.n}</b> settings beat simply holding gold.
+     <b>${d.cloud.beat_buy_hold} of ${d.cloud.n}</b> settings beat simply holding ${MKT.hold_noun}.
      Picking the best of ${d.cloud.n} draws is not a finding &mdash; the split-sample
      test below is what decides whether that pick means anything.`;
 }
@@ -1504,39 +1796,39 @@ function tables(d){
   const c=d.controls||{}, rd=c.random_direction||{}, rt=c.random_timing||{},
         bs=c.bootstrap||{}, sd=c.sharpe_diff||{}, sp=d.split||{};
   const pcell=p=>`<td class="${p<0.05?"pos":"neg"}">${p<0.0001?"&lt;0.0001":p.toFixed(4)}</td>`;
-  $$("#gctrl tbody").innerHTML=`
+  $$("#"+PFX+"ctrl tbody").innerHTML=`
     <tr><td>Random direction, same flips</td><td>${g2(rd.real)}</td>
       <td>${g2(rd.mean)} &plusmn; ${(rd.sd||0).toFixed(2)}</td>${pcell(rd.p_one_sided)}</tr>
     <tr><td>Random entries, same lengths</td><td>${g2(rt.real)}</td>
       <td>${g2(rt.mean)} &plusmn; ${(rt.sd||0).toFixed(2)}</td>${pcell(rt.p_one_sided)}</tr>
-    <tr><td>Gold, trends shuffled out</td><td>${g2(bs.real_bps)}</td>
+    <tr><td>${MKT.label}, trends shuffled out</td><td>${g2(bs.real_bps)}</td>
       <td>${g2(bs.null_bps_mean)} (95th ${g2(bs.null_bps_95)})</td>${pcell(bs.p_bps)}</tr>
-    <tr><td>&hellip;excess over matched gold</td><td>${g2(bs.real_excess_bps)}</td>
+    <tr><td>&hellip;excess over matched ${MKT.hold_noun}</td><td>${g2(bs.real_excess_bps)}</td>
       <td>${g2(bs.null_excess_mean)}</td>${pcell(bs.p_excess)}</tr>
-    <tr><td>Sharpe above matched gold</td><td>${g2(sd.difference)}</td>
+    <tr><td>Sharpe above matched ${MKT.hold_noun}</td><td>${g2(sd.difference)}</td>
       <td>CI [${g2(sd.ci95?sd.ci95[0]:0)}, ${g2(sd.ci95?sd.ci95[1]:0)}]</td>${pcell(sd.p_two_sided)}</tr>
     <tr><td>First half&rsquo;s best, on the second</td>
       <td>${g2(sp.best_in_sample_score)}</td><td>${g2(sp.best_in_sample_out_of_sample)}</td>
       <td class="dim">&rho; ${(sp.rho||0).toFixed(2)}</td></tr>`;
-  $$("#gctrlfoot").innerHTML=`The first three it passes: the flips are not random
-     and gold's trends are what it eats. The one that matters it does not &mdash;
-     the Sharpe gain over gold held at the same exposure is
+  $$("#"+PFX+"ctrlfoot").innerHTML=`The first three it passes: the flips are not random
+     and ${MKT.asset}'s trends are what it eats. The one that matters it does not
+     &mdash; the Sharpe gain over ${MKT.hold_noun} held at the same exposure is
      <b>${g2(sd.difference)}</b> with a 95% interval that
      ${sd.ci95&&sd.ci95[0]>0?"excludes":"still contains"} zero.`;
 
-  $$("#gper tbody").innerHTML=(d.periods||[]).map(p=>
+  $$("#"+PFX+"per tbody").innerHTML=(d.periods||[]).map(p=>
     `<tr><td>${p.period}</td><td>${p.trades}</td>
       <td class="${gcls(p.net_per_bar_bps)}">${g2(p.net_per_bar_bps)}</td>
       <td class="${gcls(p.buy_hold_per_bar_bps)}">${g2(p.buy_hold_per_bar_bps)}</td>
       <td>${p.sharpe.toFixed(2)}</td><td>${p.buy_hold_sharpe.toFixed(2)}</td></tr>`).join("");
 
-  $$("#gcost tbody").innerHTML=(d.costs||[]).map(r=>
+  $$("#"+PFX+"cost tbody").innerHTML=(d.costs||[]).map(r=>
     `<tr><td>${r.venue}</td><td>${r.round_trip_bps.toFixed(1)} bps</td>
       <td class="${gcls(r.net_per_bar_bps)}">${g2(r.net_per_bar_bps)}</td>
       <td>${r.sharpe.toFixed(2)}</td></tr>`).join("");
 
   const names={"1d":"daily","1wk":"weekly","4h":"4h","1h":"1h"};
-  $$("#gmat tbody").innerHTML=(d.matrix||[]).map(r=>
+  $$("#"+PFX+"mat tbody").innerHTML=(d.matrix||[]).map(r=>
     `<tr class="${r.mode==="long_only"&&r.fill==="stop"?"tracked":""}">
       <td>${r.symbol}</td><td>${names[r.interval]}</td>
       <td>${r.mode==="long_only"?"long only":"stop &amp; reverse"}</td><td>${r.fill}</td>
@@ -1545,45 +1837,50 @@ function tables(d){
       <td>${g2(r.matched_bh)}</td><td>${r.sharpe.toFixed(2)}</td>
       <td>${r.matched_sharpe.toFixed(2)}</td><td>${(r.exposure*100).toFixed(0)}%</td>
       <td>${Math.round(r.dd).toLocaleString()}</td></tr>`).join("");
-  $$("#gmatfoot").innerHTML=`Shaded row is the rule this page leads with. Long only
-     beats stop-and-reverse in <b>every one of the 16 pairs</b>: shorting gold
+  $$("#"+PFX+"matfoot").innerHTML=`Shaded row is the rule this page leads with. Long only
+     beats stop-and-reverse in <b>every one of the 16 pairs</b>: shorting ${MKT.hold_noun}
      through a twenty-five year bull market is what does the damage, not the
      indicator. The intraday rows cover 2024&ndash;26 only, which is one regime.`;
 
-  $$("#gdata tbody").innerHTML=(d.data||[]).map(r=>
+  $$("#"+PFX+"data tbody").innerHTML=(d.data||[]).map(r=>
     `<tr><td>${r.symbol}</td><td>${names[r.interval]||r.interval}</td>
       <td>${r.bars.toLocaleString()}</td><td>${String(r.first).slice(0,10)}</td>
       <td>${String(r.last).slice(0,10)}</td>
       <td class="${r.repaired?"neg":"dim"}">${r.repaired||"—"}</td></tr>`).join("");
-  $$("#gdatafoot").innerHTML=`<b>GC=F is a rolled series.</b> At each contract roll
-     it jumps to the next month, printing an overnight gap nobody could trade.
-     A stop-and-reverse rule is exactly what such a gap flatters or wrecks, which
-     is why GLD &mdash; an actual tradeable instrument with no roll &mdash; is
-     carried alongside, and why the result is weaker on it.
-     <b>441 GC=F daily bars before Nov 2011</b> carried a settlement close outside
-     their own high/low; their range was widened to contain it rather than the
-     bars being dropped, because a hole in a recursive indicator silently rewrites
-     every value after it. GLD has none at any interval.`;
+  const rep=(d.data||[]).filter(x=>x.repaired>0);
+  const worst=rep.slice().sort((a,b)=>b.repaired-a.repaired)[0];
+  $$("#"+PFX+"datafoot").innerHTML=`<b>${MKT.familiar} is a rolled series.</b> At each
+     contract roll it jumps to the next month, printing an overnight gap nobody
+     could trade. A stop-and-reverse rule is exactly what such a gap flatters or
+     wrecks, which is why <b>${MKT.clean}</b> &mdash; an actual tradeable instrument
+     with no roll &mdash; is carried alongside, and why the result differs on it.`
+   + (worst ? ` <b>${worst.repaired} ${worst.symbol} ${worst.interval} bars</b>
+     carried a close outside their own high/low; their range was widened to contain
+     it rather than the bars being dropped, because a hole in a recursive indicator
+     silently rewrites every value after it.
+     ${(d.data||[]).filter(x=>x.symbol===MKT.clean&&x.repaired>0).length
+        ? "" : MKT.clean+" has none at any interval."}`
+     : ` No series here needed an OHLC repair.`);
 }
 
 function evidence(d){
   const eq=d.equity||{};
-  lines("#geq","#geqleg",[eq.strategy||[],eq.buyhold||[],eq.matched||[]],
+  lines("#"+PFX+"eq","#"+PFX+"eqleg",[eq.strategy||[],eq.buyhold||[],eq.matched||[]],
     [{t:"long-only SAR",c:"var(--s3)"},
-     {t:"gold, held",c:"var(--s1)"},
-     {t:`gold at ${Math.round((eq.weight||0)*100)}% exposure`,c:"var(--s2)",w:1.3}],
-    "Cumulative return of long-only Parabolic SAR against gold held outright and gold held at the same average exposure");
+     {t:MKT.hold_noun+", held",c:"var(--s1)"},
+     {t:`${MKT.hold_noun} at ${Math.round((eq.weight||0)*100)}% exposure`,c:"var(--s2)",w:1.3}],
+    "Cumulative return of long-only Parabolic SAR against "+MKT.hold_noun+" held outright and at the same average exposure");
   const h=d.headline||{};
-  $$("#gevrange").textContent=`${(h.bars||0).toLocaleString()} daily bars · `+
-    `${(d.data||[]).filter(x=>x.symbol==="GC=F"&&x.interval==="1d").map(x=>String(x.first).slice(0,10)+" → "+String(x.last).slice(0,10))[0]||""}`;
-  safe("the parameter cloud", "#gcloud", ()=>cloud(d));
+  $$("#"+PFX+"evrange").textContent=`${(h.bars||0).toLocaleString()} daily bars · `+
+    `${(d.data||[]).filter(x=>x.symbol===MKT.familiar&&x.interval==="1d").map(x=>String(x.first).slice(0,10)+" → "+String(x.last).slice(0,10))[0]||""}`;
+  safe("the parameter cloud", "#"+PFX+"cloud", ()=>cloud(d));
   safe("the evidence tables", null, ()=>tables(d));
-  safe("the fill-model table", "#gfillfoot", ()=>fillBlock(d));
-  safe("the rule comparison", "#gefffoot", ()=>effTable(d));
-  safe("the volatility-target test", "#gvtfoot", ()=>vtBlock(d));
-  safe("the Heikin-Ashi block", "#ghafoot", ()=>haBlock(d));
-  safe("the search cloud", "#gsearch", ()=>searchPlot(d));
-  safe("the holdout year", "#gyreq", ()=>yearBlock(d));
+  safe("the fill-model table", "#"+PFX+"fillfoot", ()=>fillBlock(d));
+  safe("the rule comparison", "#"+PFX+"efffoot", ()=>effTable(d));
+  safe("the volatility-target test", "#"+PFX+"vtfoot", ()=>vtBlock(d));
+  safe("the Heikin-Ashi block", "#"+PFX+"hafoot", ()=>haBlock(d));
+  safe("the search cloud", "#"+PFX+"search", ()=>searchPlot(d));
+  safe("the holdout year", "#"+PFX+"yreq", ()=>yearBlock(d));
 }
 
 
@@ -1595,24 +1892,24 @@ function fillBlock(d){
     return `<tr class="${k==='stop'?'hl':''}"><td>${lab}${note?` <span class="dim">${note}</span>`:""}</td>
       <td class="${gcls(x.net)}">${g2(x.net||0)}</td><td>${(x.sharpe||0).toFixed(3)}</td>
       <td class="${gcls(dv)}">${g2(dv)}</td></tr>`;};
-  $$("#gfill tbody").innerHTML =
+  $$("#"+PFX+"fill tbody").innerHTML =
       row("stop","Filled at the stop level","· what the board above uses")
     + row("nextopen","Filled at the next open","· you only looked at the close")
     + row("close_to_close","Close to close","· the common accounting in Part 4")
-    + `<tr><td>Gold, held</td><td>${g2((f.buy_hold||{}).net||0)}</td>
+    + `<tr><td>${MKT.label}, held</td><td>${g2((f.buy_hold||{}).net||0)}</td>
         <td>${bh.toFixed(3)}</td><td class="dim">&mdash;</td></tr>`;
-  $$("#gfillfoot").innerHTML = `The whole advantage is the fill: <b>${g2(f.edge_from_fill||0)}</b>
+  $$("#"+PFX+"fillfoot").innerHTML = `The whole advantage is the fill: <b>${g2(f.edge_from_fill||0)}</b>
     Sharpe of the gap between filling at the stop and marking close to close.
-    Against gold it is <b>${g2(f.edge_over_hold_at_stop_fill||0)}</b> at the stop fill and
+    Against ${MKT.hold_noun} it is <b>${g2(f.edge_over_hold_at_stop_fill||0)}</b> at the stop fill and
     <b>${g2(f.edge_over_hold_at_close_fill||0)}</b> close to close. A resting stop really
-    can sit on a level known in advance &mdash; but it fills with slippage, and gold gaps
-    on a Sunday open. Everything in Part 4 uses the conservative version.`;
+    can sit on a level known in advance &mdash; but it fills with slippage, and ${MKT.asset}
+    gaps on a Sunday open. Everything in Part 4 uses the conservative version.`;
 }
 
 function effTable(d){
   const rows=(d.efficiency||{}).rows||[];
   const best=Math.max(...rows.map(r=>ok(r.train_sharpe)?r.train_sharpe:-1e9));
-  $$("#geff tbody").innerHTML=rows.map(r=>{
+  $$("#"+PFX+"eff tbody").innerHTML=rows.map(r=>{
     const be=r.breakeven_cost_bps;
     return `<tr class="${r.train_sharpe===best?"tracked":""}">
       <td>${r.label}</td><td class="${gcls(r.train_net)}">${fg(r.train_net)}</td>
@@ -1625,12 +1922,12 @@ function effTable(d){
       <td class="${gcls(r.hold_sharpe)}">${fx(r.hold_sharpe)}</td></tr>`;}).join("");
   const sar=rows.find(r=>r.label==="sar 0.02/0.2")||{}, bh=rows.find(r=>r.label==="buy & hold")||{};
   const ma=rows.find(r=>r.label==="ma 50/200")||{};
-  $$("#gefffoot").innerHTML=`Read the <b>break-even</b> column, not the Sharpe column.
+  $$("#"+PFX+"efffoot").innerHTML=`Read the <b>break-even</b> column, not the Sharpe column.
     Plain SAR dies at ${fi(sar.breakeven_cost_bps)}&nbsp;bps per side; a
     50/200 moving-average cross survives ${fi(ma.breakeven_cost_bps)}&nbsp;bps
     because it trades ${fx(ma.flips_per_year,1)} times a year against SAR's
     ${fx(sar.flips_per_year,0)}. On this accounting SAR's Sharpe
-    (${fx(sar.train_sharpe)}) and gold's (${fx(bh.train_sharpe)})
+    (${fx(sar.train_sharpe)}) and ${MKT.hold_noun}'s (${fx(bh.train_sharpe)})
     are the same number. Buffering the flip, confirming it, gating it on a weekly
     chart and swapping the stop for a Chandelier or a Donchian all made it worse.`;
 }
@@ -1642,12 +1939,12 @@ function vtBlock(d){
     return `<tr><td>${lab}</td><td class="${gcls(x.diff)}">${g2(x.diff||0)}</td>
       <td class="${sig?"pos":"dim"}">[${g2(x.ci95?x.ci95[0]:0)}, ${g2(x.ci95?x.ci95[1]:0)}]</td>
       <td class="${(x.p_two_sided||1)<0.05?"pos":"neg"}">${(x.p_two_sided||0).toFixed(3)}</td></tr>`;};
-  $$("#gvt tbody").innerHTML =
+  $$("#"+PFX+"vt tbody").innerHTML =
       r("Vol target vs plain SAR","voltgt_vs_sar")
-    + r("Vol target vs gold","voltgt_vs_hold")
-    + r("Plain SAR vs gold","sar_vs_hold");
+    + r("Vol target vs "+MKT.hold_noun,"voltgt_vs_hold")
+    + r("Plain SAR vs "+MKT.hold_noun,"sar_vs_hold");
   const a=v.voltgt_vs_sar||{};
-  $$("#gvtfoot").innerHTML=`It raises Sharpe from ${(a.b_sharpe||0).toFixed(2)} to
+  $$("#"+PFX+"vtfoot").innerHTML=`It raises Sharpe from ${(a.b_sharpe||0).toFixed(2)} to
     ${(a.a_sharpe||0).toFixed(2)} and it is the only change tested that helps at all
     &mdash; ${(d.search||{}).n_candidates?`most of the top rules in the search below use it`:""}.
     On 6,000 sessions it still has a 95% interval that
@@ -1658,14 +1955,14 @@ function vtBlock(d){
 
 function haBlock(d){
   const h=d.ha||{};
-  $$("#gha tbody").innerHTML=`
+  $$("#"+PFX+"ha tbody").innerHTML=`
     <tr><td>Positions that differ from plain SAR</td>
       <td class="str">${(h.position_differs_pct||0).toFixed(1)}%</td></tr>
     <tr><td>Sharpe, filled at real closes</td><td class="str">${(h.honest_sharpe||0).toFixed(2)}</td></tr>
     <tr><td>Sharpe, marked against Heikin-Ashi closes</td>
       <td class="str pos">${(h.marked_sharpe||0).toFixed(2)}</td></tr>
     <tr><td>Inflation</td><td class="str neg">${g2(h.inflation||0)}</td></tr>`;
-  $$("#ghafoot").innerHTML=`Heikin-Ashi changes the SAR signal on
+  $$("#"+PFX+"hafoot").innerHTML=`Heikin-Ashi changes the SAR signal on
     <b>${(h.position_differs_pct||0).toFixed(1)}%</b> of bars &mdash; it is very nearly
     the same rule. Fill it at real prices and it earns
     ${(h.honest_sharpe||0).toFixed(2)} against plain SAR's ${(h.plain_sharpe||0).toFixed(2)}.
@@ -1677,7 +1974,7 @@ function haBlock(d){
 }
 
 function searchPlot(d){
-  const s=d.search||{}, pts=s.cloud||[], host=$$("#gsearch"); host.innerHTML="";
+  const s=d.search||{}, pts=s.cloud||[], host=$$("#"+PFX+"search"); host.innerHTML="";
   if(!pts.length) return;
   const W=host.clientWidth||880,H=330,P={t:12,r:48,b:38,l:12};
   const iw=W-P.l-P.r, ih=H-P.t-P.b;
@@ -1703,12 +2000,12 @@ function searchPlot(d){
     c.addEventListener("mouseleave",guntip);});
   T(g,P.l+iw/2,H-4,"Sharpe on the 25 training years","ax");
   host.appendChild(g);
-  $$("#gsleg").innerHTML=
+  $$("#"+PFX+"sleg").innerHTML=
     `<span class="lg"><span class="sw d" style="background:var(--s3)"></span>uses vol targeting</span>
      <span class="lg"><span class="sw d" style="background:var(--s2)"></span>does not</span>
      <span class="lg"><span class="sw d" style="background:var(--ink)"></span>picked on train</span>`;
-  $$("#gsearchmeta").textContent=`· trained before ${s.cut_date}, scored on the ${s.holdout_bars} sessions after`;
-  $$("#gsearchfoot").innerHTML=`The rule the search picked (<b>${s.winner}</b>) scored
+  $$("#"+PFX+"searchmeta").textContent=`· trained before ${s.cut_date}, scored on the ${s.holdout_bars} sessions after`;
+  $$("#"+PFX+"searchfoot").innerHTML=`The rule the search picked (<b>${s.winner}</b>) scored
     ${s.winner_train_sharpe.toFixed(2)} on the training years and
     <b>${s.winner_hold_sharpe.toFixed(2)}</b> on the holdout, against a best-possible
     ${s.best_possible_hold_sharpe.toFixed(2)} (${s.best_possible_hold_label}) and a
@@ -1721,16 +2018,16 @@ function searchPlot(d){
 function yearBlock(d){
   const y=d.year||{}, sm=y.summary||{}, keys=Object.keys(sm);
   const sar=sm["sar 0.02/0.2"]||{}, bh=sm["buy & hold"]||{};
-  $$("#gyrmeta").textContent=`· ${y.sessions} sessions · ${y.from} → ${y.to}`;
-  $$("#gyrlede").innerHTML=`Every session the market was open, scored on the
+  $$("#"+PFX+"yrmeta").textContent=`· ${y.sessions} sessions · ${y.from} → ${y.to}`;
+  $$("#"+PFX+"yrlede").innerHTML=`Every session the market was open, scored on the
     conservative accounting. Before reading a single number: this sample can
     resolve <b>&plusmn;${(sar.mde_bps||0).toFixed(1)} bps/bar</b> at 95%, and every
     effect in Part 4 is between 0.1 and 2. <b>The year cannot tell you which rule is
     better.</b> It can tell you what each one did, which is a different and smaller
     claim, and it is the one made here.`;
-  $$("#gyrtiles").innerHTML=
+  $$("#"+PFX+"yrtiles").innerHTML=
       gTile("Sessions",y.sessions,`${bh.n_up} up, ${bh.n_down} down`)
-    + gTile("Gold",g2(bh.net_per_bar_bps||0),"bps per day")
+    + gTile(MKT.label,g2(bh.net_per_bar_bps||0),"bps per day")
     + gTile("SAR",g2(sar.net_per_bar_bps||0),"bps per day")
     + gTile("+ vol target",g2((sm["sar + voltgt"]||{}).net_per_bar_bps||0),"bps per day")
     + gTile("Ensemble + VT",g2((sm["ensemble + voltgt"]||{}).net_per_bar_bps||0),"bps per day")
@@ -1738,34 +2035,44 @@ function yearBlock(d){
   const C=y.cum||{}, cols={"sar 0.02/0.2":"var(--s2)","sar + voltgt":"var(--s3)",
     "ensemble + voltgt":"#7a5bd6","buy & hold":"var(--s1)"};
   const order=["buy & hold","sar 0.02/0.2","sar + voltgt","ensemble + voltgt"];
-  lines("#gyreq","#gyrleg",order.map(k=>C[k]||[]),
+  lines("#"+PFX+"yreq","#"+PFX+"yrleg",order.map(k=>C[k]||[]),
     order.map(k=>({t:k,c:cols[k],w:k==="buy & hold"?1.3:1.7})),
     "Cumulative return of each rule over the held-out year");
-  $$("#gcap tbody").innerHTML=order.map(k=>{
+  $$("#"+PFX+"cap tbody").innerHTML=order.map(k=>{
     const s=sm[k]||{};
     return `<tr class="${k==="buy & hold"?"":""}"><td>${k}</td>
       <td class="${gcls(s.net_on_up_days)}">${g2(s.net_on_up_days||0)}</td>
       <td class="${gcls(s.net_on_down_days)}">${g2(s.net_on_down_days||0)}</td>
       <td class="str">${(s.capture_up||0).toFixed(2)}</td>
       <td class="str">${(s.capture_down||0).toFixed(2)}</td></tr>`;}).join("");
-  $$("#gcapfoot").innerHTML=`Gold rose on ${bh.n_up} of ${y.sessions} sessions,
-    averaging ${g2(bh.bh_on_up_days||0)} bps, and fell on ${bh.n_down} averaging
-    ${g2(bh.bh_on_down_days||0)}. Plain SAR kept <b>${(sar.capture_up||0).toFixed(2)}</b>
-    of the up days and <b>${(sar.capture_down||0).toFixed(2)}</b> of the down days
-    &mdash; the same fraction of each. Over this year it was not a timing rule at all;
-    it was gold at ${Math.round((sar.capture_up||0)*100)}% size.`;
+  // "the same fraction of each" was written against gold, where it is true.
+  // On the S&P the rule keeps MORE of the downside than the upside, which is a
+  // worse finding, not the same one. Say whichever is actually the case.
+  const cu=sar.capture_up||0, cd=sar.capture_down||0;
+  const verdict = cd > cu + 0.03
+    ? `<b>more of the down days than the up days</b> &mdash; over this year it did
+       not just fail to time anything, it kept the wrong half`
+    : (cu > cd + 0.03
+      ? `rather more of the up days than the down days, which is the direction a
+         timing rule should go, though not by much`
+      : `the same fraction of each. Over this year it was not a timing rule at
+         all; it was ${MKT.hold_noun} at ${Math.round(cu*100)}% size`);
+  $$("#"+PFX+"capfoot").innerHTML=`${MKT.label} rose on ${bh.n_up} of ${y.sessions}
+    sessions, averaging ${g2(bh.bh_on_up_days||0)} bps, and fell on ${bh.n_down}
+    averaging ${g2(bh.bh_on_down_days||0)}. Plain SAR kept <b>${fx(cu)}</b> of the
+    up days and <b>${fx(cd)}</b> of the down days &mdash; ${verdict}.`;
   const rows=(y.rows||[]).slice().reverse();
   // A long-only rule in a downtrend is FLAT, and a column of 0.00 reads as a
   // broken table rather than as "in cash". Say it in words.
   const cell=(v,pos)=>pos===0 ? `<td class="dim">&mdash;</td>`
                               : `<td class="${gcls(v)}">${g2(v)}</td>`;
   const flat=rows.filter(r=>r.sarp===0).length;
-  $$("#gday tbody").innerHTML=rows.map(r=>
+  $$("#"+PFX+"day tbody").innerHTML=rows.map(r=>
     `<tr><td>${r.d}</td><td class="${gcls(r.gold)}">${g2(r.gold)}</td>
       <td class="${r.sarp>0?"pos":"dim"}">${r.sarp>0?r.sarp.toFixed(2):"flat"}</td>
       ${cell(r.sar,r.sarp)}${cell(r.vt,r.vtp===undefined?r.sarp:r.vtp)}
       ${cell(r.ens,r.ensp===undefined?r.sarp:r.ensp)}</tr>`).join("");
-  $$("#gdaymeta").textContent=`\u00b7 ${rows.length} rows, newest first \u00b7 `
+  $$("#"+PFX+"daymeta").textContent=`\u00b7 ${rows.length} rows, newest first \u00b7 `
     + `flat on ${flat} of them`;
 }
 
@@ -1773,41 +2080,50 @@ function redrawGold(){ if(GD){chart();} }
 
 /* ---------------- wiring -------------------------------------------- */
 function controls(){
-  const st=$$("#cstep"), mx=$$("#cmax");
-  st.oninput=()=>{GP.step=+st.value;$$("#lstep").textContent=GP.step.toFixed(3);
-    if(GP.afmax<GP.step){GP.afmax=GP.step;mx.value=GP.step;$$("#lmax").textContent=GP.afmax.toFixed(2);}
+  const st=$$("#"+PFX+"cstep"), mx=$$("#"+PFX+"cmax");
+  st.oninput=()=>{GP.step=+st.value;$$("#"+PFX+"lstep").textContent=GP.step.toFixed(3);
+    if(GP.afmax<GP.step){GP.afmax=GP.step;mx.value=GP.step;$$("#"+PFX+"lmax").textContent=GP.afmax.toFixed(2);}
     chart();};
-  mx.oninput=()=>{GP.afmax=Math.max(+mx.value,GP.step);$$("#lmax").textContent=GP.afmax.toFixed(2);chart();};
-  seg2($$("#cmode"),[{v:"long_only",t:"long only"},{v:"reverse",t:"stop &amp; reverse"}],
+  mx.oninput=()=>{GP.afmax=Math.max(+mx.value,GP.step);$$("#"+PFX+"lmax").textContent=GP.afmax.toFixed(2);chart();};
+  seg2($$("#"+PFX+"cmode"),[{v:"long_only",t:"long only"},{v:"reverse",t:"stop &amp; reverse"}],
     GP.mode,v=>{GP.mode=v;chart();});
-  seg2($$("#ccost"),COSTS.map((c,i)=>({v:String(i),t:c.n})),String(GP.cost),
+  seg2($$("#"+PFX+"ccost"),COSTS.map((c,i)=>({v:String(i),t:c.n})),String(GP.cost),
     v=>{GP.cost=+v;chart();});
-  seg2($$("#cwin"),[{v:"252",t:"1y"},{v:"756",t:"3y"},{v:"1260",t:"5y"},{v:"99999",t:"all"}],
+  seg2($$("#"+PFX+"cwin"),[{v:"252",t:"1y"},{v:"756",t:"3y"},{v:"1260",t:"5y"},{v:"99999",t:"all"}],
     String(GP.win),v=>{GP.win=+v;chart();});
 }
 
 function boot(d){
   GD=d;
+  if(d.market) MKT={...MKT, ...d.market};
+  if((d.venues||[]).length){
+    COSTS=d.venues.map(v=>({n:v.name,rt:v.round_trip_bps}));
+    GP.cost=Math.min(1,COSTS.length-1);
+  }
   const rows=(d.bars||{}).rows||[];
   BARS={d:rows.map(r=>r[0]),o:rows.map(r=>r[1]),h:rows.map(r=>r[2]),
         l:rows.map(r=>r[3]),c:rows.map(r=>r[4])};
-  safe("the scorecard", "#gscore", ()=>gHead(d));
-  safe("the current state", "#gnowfoot", ()=>gNow(d));
+  safe("the scorecard", "#"+PFX+"score", ()=>gHead(d));
+  safe("the current state", "#"+PFX+"nowfoot", ()=>gNow(d));
   safe("the controls", null, ()=>controls());
   evidence(d);
-  safe("the chart", "#gchart", ()=>chart());
-  addEventListener("resize",()=>{if(!$$("#v-gold").hidden){chart();evidence(d);}});
+  safe("the chart", "#"+PFX+"chart", ()=>chart());
+  addEventListener("resize",()=>{if(!$$("#v-"+VIEW).hidden){chart();evidence(d);}});
 }
 
-window.__goldBoot=boot;
-window.__goldRedraw=()=>{ if(GD){chart();evidence(GD);} };
 
-fetch("gold.json",{cache:"no-store"}).then(r=>r.json()).then(boot).catch(e=>{
-  console.error("gold board failed:",e);
-  const h=$$("#gscore");
-  if(h)h.innerHTML=`<div class="sc"><h4>Could not load gold.json</h4>
-    <div class="cap">${(e&&e.message)||e}</div></div>`;
-});
+  BOARDS[VIEW] = { boot, redraw: ()=>{ if(GD){chart();evidence(GD);} } };
+  fetch(URL,{cache:"no-store"}).then(r=>r.json()).then(boot).catch(e=>{
+    console.error(VIEW+" board failed:",e);
+    const h=$$("#"+PFX+"score");
+    if(h)h.innerHTML=`<div class="sc"><h4>Could not load ${URL}</h4>
+      <div class="cap">${(e&&e.message)||e}</div></div>`;
+  });
+}
+
+makeBoard("g", "gold", "gold.json");
+makeBoard("m", "mes",  "mes.json");
+window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
 })();
 </script>
 
@@ -1816,18 +2132,21 @@ fetch("gold.json",{cache:"no-store"}).then(r=>r.json()).then(boot).catch(e=>{
    decides which is on screen and tells the gold board to re-measure, because
    an SVG laid out while display:none has no width to lay out against. */
 (function(){
-  const views={bell:document.getElementById("v-bell"),gold:document.getElementById("v-gold")};
+  const views={bell:document.getElementById("v-bell"),
+               gold:document.getElementById("v-gold"),
+               mes:document.getElementById("v-mes")};
   const btns=[...document.querySelectorAll(".sub-btn")];
   const LEDE={
     bell:"Two ways of trading the opening bell, tested. Neither is tradeable \u2014 for different reasons.",
-    gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal."};
+    gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal.",
+    mes:"The same rig, the same tests, pointed at the Micro E-mini S&P 500. Nothing here is a gold result \u2014 it is the control that says whether any of it was about the indicator."};
   function show(v,push){
     if(!views[v]) v="bell";
     for(const k in views) if(views[k]) views[k].hidden = (k!==v);
     btns.forEach(b=>b.setAttribute("aria-selected", b.dataset.view===v ? "true":"false"));
     const l=document.getElementById("lede"); if(l&&LEDE[v]) l.textContent=LEDE[v];
     if(push&&history.replaceState) history.replaceState(null,"","#"+v);
-    if(v==="gold"&&window.__goldRedraw) window.__goldRedraw();
+    if(window.__boardRedraw) window.__boardRedraw(v);
     if(push) scrollTo(0,0);
   }
   btns.forEach(b=>b.addEventListener("click",()=>show(b.dataset.view,true)));
