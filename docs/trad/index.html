@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Trad</title>
-<meta name="description" content="Two opening-bell strategies, measured. What the evidence says, against what gets sold.">
+<meta name="description" content="Opening-bell strategies and gold's Parabolic SAR, measured. What the evidence says, against what gets sold.">
 <style>
   /* Light only, matching the calibration board. Read next to a broker screen. */
   :root{
     --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
-    --ink:#0b0b0b; --ink2:#52514e; --muted:#8b8984;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#706e6a;
     --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
     --good:#0a7a26; --bad:#c0392b; --band:#eceae3; --tint:#f4f8fd;
   }
@@ -112,6 +112,51 @@
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .08s;
        background:var(--ink);color:#fff;font-size:11.5px;padding:6px 9px;
        border-radius:7px;z-index:9;white-space:pre;line-height:1.45}
+
+  /* subtabs */
+  .subtabs{display:flex;gap:2px;margin-top:18px;border-bottom:1px solid var(--line);
+           flex-wrap:wrap;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sub-btn{appearance:none;border:0;background:transparent;font:inherit;font-size:13.5px;
+           color:var(--muted);padding:9px 14px;cursor:pointer;white-space:nowrap;
+           border-bottom:2px solid transparent;margin-bottom:-1px}
+  .sub-btn:hover{color:var(--ink2)}
+  .sub-btn[aria-selected="true"]{color:var(--ink);font-weight:620;border-bottom-color:var(--ink)}
+  .sub-btn:focus-visible{outline:2px solid var(--s1);outline-offset:-3px;border-radius:6px}
+  .view[hidden]{display:none}
+
+  /* the SAR explainer */
+  .eqn{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:clamp(14px,2.6vw,18px);
+       background:var(--paper);border:1px solid var(--line);border-radius:10px;
+       padding:14px 16px;text-align:center;letter-spacing:.01em;margin-top:4px}
+  .eqn sub{font-size:.7em}
+  .defs{display:grid;gap:10px;margin-top:13px;font-size:13px;color:var(--ink2)}
+  @media(min-width:800px){.defs{grid-template-columns:1fr 1fr}}
+  .defs>div{border-left:2px solid var(--line);padding-left:11px}
+  /* darkened from --s1/--s2/--s3: the series colours are fine as 3px marks on
+     a chart and fail AA as 13px bold text next to a paragraph */
+  .k-ep{color:#1f5ea8} .k-af{color:#a8441b} .k-cl{color:#0b6b48} .k-fl{color:var(--ink)}
+  .ctrls{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin:2px 0 15px}
+  .ctl{display:flex;flex-direction:column;gap:6px;font-size:11px;color:var(--muted);
+       text-transform:uppercase;letter-spacing:.07em}
+  .ctl b{color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums;
+         text-transform:none;letter-spacing:0}
+  .ctl input[type=range]{width:min(170px,42vw);accent-color:var(--ink);cursor:pointer}
+  #gctrl td:first-child,#gper td:first-child{white-space:normal}
+  #gctrl td,#gctrl th{padding:6px 5px}
+  #gliveTab td:first-child{color:var(--ink2);font-weight:400}
+  #gliveTab td:last-child{font-weight:620}
+
+  /* A grid item's default min-width is its content, so one wide table pushed
+     the whole column past the viewport on a phone. Both boards had it. */
+  .cols>section{min-width:0}
+  /* Scorecard answers are sentences here, not two words: let them wrap, and on
+     a phone put them on their own line under the question. */
+  #gscore .a{white-space:normal;text-align:right}
+  @media(max-width:620px){
+    #gscore .row{flex-wrap:wrap}
+    #gscore .q{flex:1 1 100%}
+    #gscore .a{flex:1 1 100%;text-align:left;padding-left:25px}
+  }
   code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
        background:var(--paper);padding:1px 4px;border-radius:4px}
 </style>
@@ -119,9 +164,15 @@
 <body data-palette="#2a78d6,#eb6834,#1baf7a">
 <main>
   <header><h1>Trad</h1><span class="tag" id="gen"></span></header>
-  <p class="lede">Two ways of trading the opening bell, tested. Neither is tradeable —
-     for different reasons.</p>
+  <p class="lede" id="lede">Two ways of trading the opening bell, tested. Neither is
+     tradeable — for different reasons.</p>
 
+  <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
+    <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
+    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Gold &middot; Parabolic SAR</button>
+  </div>
+
+  <div class="view" id="v-bell">
   <div class="score" id="score"></div>
   <div class="grid" id="tiles"></div>
 
@@ -250,9 +301,167 @@
     </section>
   </div>
 
+  </div>
+
+  <div class="view" id="v-gold" hidden>
+
+    <div class="score" id="gscore"></div>
+    <div class="grid" id="gtiles"></div>
+
+    <div class="part">
+      <span class="no">PART 1</span><h2>Where it stands right now</h2>
+      <span class="sub" id="gspot"></span>
+    </div>
+    <p class="partnote">Parabolic SAR is never flat. It is long or short at every
+       moment, and the only number you can act on is the stop that is
+       <em>already fixed</em> for the next bar. These are read off the last
+       closed bar on each timeframe.</p>
+
+    <section>
+      <h3>Current state <span id="gasof"></span></h3>
+      <div class="wrap"><table id="gnow">
+        <thead><tr><th>Timeframe</th><th>Side</th><th>Bars in trend</th><th>Close</th>
+          <th>Stop next bar</th><th>Distance</th><th>AF</th><th>Extreme point</th>
+          <th>ADX(14)</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="gnowfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 2</span><h2>How the thing actually works</h2>
+      <span class="sub">four moving parts, on real gold</span>
+    </div>
+    <p class="partnote">Everything below is computed in your browser from COMEX
+       gold futures bars, so you can move the parameters and watch the stop,
+       the trades and the money change. Nothing here is fitted for you.</p>
+
+    <section>
+      <h3>The recurrence</h3>
+      <p class="note">One line does all of it. Each bar, the stop closes a fixed
+         fraction of its remaining distance to the best price the trend has
+         reached &mdash; and that fraction grows every time the trend makes a new
+         extreme, so the stop accelerates into price the longer the run lasts.</p>
+      <div class="eqn">SAR<sub>next</sub> &nbsp;=&nbsp; SAR &nbsp;+&nbsp;
+        <b class="k-af">AF</b> &times; ( <b class="k-ep">EP</b> &minus; SAR )</div>
+      <div class="defs">
+        <div><b class="k-ep">EP</b> &mdash; extreme point. The highest high since
+          the trend began (long), or the lowest low (short). Never moves against
+          the trend; resets on every flip.</div>
+        <div><b class="k-af">AF</b> &mdash; acceleration factor. Starts at
+          <code>step</code> and adds another <code>step</code> <em>every time EP
+          makes a new extreme</em> &mdash; counting new highs, not bars &mdash;
+          capped at <code>max</code>. A trend that goes sideways does not
+          accelerate.</div>
+        <div><b class="k-cl">Clamp</b> &mdash; the stop may never sit inside the
+          last two bars' range. Without it the stop could start a bar already
+          triggered, and the system would flip on every sharp move.</div>
+        <div><b class="k-fl">Flip</b> &mdash; when price trades through the stop,
+          the position reverses: the new stop becomes the old trend's EP, the new
+          EP is this bar's extreme, and AF resets to <code>step</code>.</div>
+      </div>
+    </section>
+
+    <section>
+      <h3>Try it <span>· drag the parameters, the chart and the money both move</span></h3>
+      <div class="ctrls">
+        <label class="ctl"><span>step <b id="lstep">0.02</b></span>
+          <input type="range" id="cstep" min="0.005" max="0.06" step="0.005" value="0.02"></label>
+        <label class="ctl"><span>max AF <b id="lmax">0.20</b></span>
+          <input type="range" id="cmax" min="0.05" max="0.50" step="0.05" value="0.20"></label>
+        <div class="ctl"><span>rule</span><div class="seg" id="cmode" role="group" aria-label="Rule"></div></div>
+        <div class="ctl"><span>costs</span><div class="seg" id="ccost" role="group" aria-label="Costs"></div></div>
+        <div class="ctl"><span>window</span><div class="seg" id="cwin" role="group" aria-label="Window"></div></div>
+      </div>
+      <div class="legend" id="gchartleg"></div>
+      <div id="gchart"></div>
+      <div class="foot" id="gchartfoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>What that setting earns <span>· in the window shown</span></h3>
+        <div class="wrap"><table id="gliveTab"><tbody></tbody></table></div>
+        <div class="foot">Recomputed in the browser. The published numbers further
+          down use the full history back to 2000, so they will not match exactly.</div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Every flip in the window</h3>
+        <div class="wrap tall" tabindex="0" role="region" aria-label="Every flip in the window"><table id="gtrades">
+          <thead><tr><th>In</th><th>Side</th><th>Entry</th><th>Out</th>
+            <th>Exit</th><th>Bars</th><th>Net</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </div>
+
+    <div class="part">
+      <span class="no">PART 3</span><h2>Is it worth trading?</h2>
+      <span class="sub" id="gevrange"></span>
+    </div>
+    <p class="partnote">Full history, COMEX costs, fills at the stop level. The
+       honest comparison is not gold at 100% &mdash; a rule that sits in cash 42%
+       of the time gets less risk for free. It is gold held passively at the
+       <em>same average exposure</em>.</p>
+
+    <section>
+      <h3>Cumulative <span>· bps, sum of per-bar returns</span></h3>
+      <div class="legend" id="geqleg"></div>
+      <div id="geq"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Controls <span>· each one tries to explain the result away</span></h3>
+        <div class="wrap"><table id="gctrl">
+          <thead><tr><th>Control</th><th>Real</th><th>Null</th><th>p</th></tr></thead>
+          <tbody></tbody></table></div>
+        <div class="foot" id="gctrlfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>All 240 parameter sets <span>· sorted · the line is buy &amp; hold</span></h3>
+        <div class="legend" id="gcloudleg"></div>
+        <div id="gcloud"></div>
+        <div class="foot" id="gcloudfoot"></div>
+      </section>
+    </div>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>By five-year period <span>· an edge that lives in one regime is a regime</span></h3>
+        <div class="wrap"><table id="gper">
+          <thead><tr><th>Period</th><th>Trades</th><th>Strategy</th><th>Gold</th>
+            <th>Sharpe</th><th>Gold Sharpe</th></tr></thead><tbody></tbody></table></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Cost ladder <span>· where the venue eats it</span></h3>
+        <div class="wrap"><table id="gcost">
+          <thead><tr><th>Venue</th><th>Round trip</th><th>Net/bar</th><th>Sharpe</th></tr></thead>
+          <tbody></tbody></table></div>
+        <div class="foot">Gold is cheap on futures and expensive on a retail spot
+          CFD. That gap is larger than most effects claimed for this indicator.</div>
+      </section>
+    </div>
+
+    <section>
+      <h3>Every symbol, timeframe, rule and fill model</h3>
+      <div class="wrap tall" tabindex="0" role="region" aria-label="Every symbol, timeframe, rule and fill model"><table id="gmat">
+        <thead><tr><th>Sym</th><th>TF</th><th>Rule</th><th>Fill</th><th>Bars</th>
+          <th>Trades</th><th>Net/bar</th><th>Gold</th><th>Matched</th>
+          <th>Sharpe</th><th>Matched Sharpe</th><th>Exposure</th><th>Max DD</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="gmatfoot"></div>
+    </section>
+
+    <section>
+      <h3>Data, and what is wrong with it</h3>
+      <div class="wrap"><table id="gdata">
+        <thead><tr><th>Series</th><th>Interval</th><th>Bars</th><th>From</th>
+          <th>To</th><th>Repaired</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="gdatafoot"></div>
+    </section>
+
+  </div>
+
   <footer>
     <span id="mode"></span> &middot; data: Yahoo, free tier &middot;
-    <a href="index.json">index.json</a>
+    <a href="index.json">index.json</a> &middot; <a href="gold.json">gold.json</a>
   </footer>
 </main>
 <div class="tip" id="tip"></div>
@@ -794,6 +1003,517 @@ fetch("index.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
   if(h) h.innerHTML=`<div class="sc"><h4>Could not load index.json</h4>
     <div class="cap">${(e&&e.message)||e}</div></div>`;
 });
+</script>
+<script>
+/* ===================================================================== *
+ *  Gold / Parabolic SAR subtab.
+ *
+ *  The indicator below is a line-for-line port of gold/sar.py, which is
+ *  itself bit-exact against TA-Lib's ta_SAR.c across 48 configurations.
+ *  If you change one, change the other: the page's whole claim is that the
+ *  thing you can drag is the thing that was tested.
+ * ===================================================================== */
+(function(){
+const $$=s=>document.querySelector(s);
+const TIPG=$$("#tip");
+const g2=x=>(x>0?"+":"")+x.toFixed(2);
+const gcls=x=>x>0?"pos":(x<0?"neg":"dim");
+const fx2=x=>x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+const SVGNS="http://www.w3.org/2000/svg";
+const mkSVG=(w,h)=>{const s=document.createElementNS(SVGNS,"svg");
+  s.setAttribute("viewBox",`0 0 ${w} ${h}`);s.setAttribute("role","img");return s;};
+const E=(p,n,a={})=>{const e=document.createElementNS(SVGNS,n);
+  for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;};
+const T=(p,x,y,s,c="ax",anc="middle")=>{const t=E(p,"text",{x,y,"text-anchor":anc});
+  t.setAttribute("class",c);t.textContent=s;return t;};
+function gtip(e,html){TIPG.textContent=html;TIPG.style.opacity=1;
+  const r=TIPG.getBoundingClientRect();
+  TIPG.style.left=Math.min(e.clientX+13,innerWidth-r.width-8)+"px";
+  TIPG.style.top=Math.max(e.clientY-r.height-11,6)+"px";}
+function guntip(){TIPG.style.opacity=0;}
+
+/* ---------------- Wilder's Parabolic SAR ----------------------------- */
+function psar(H,L,step,afmax){
+  const n=H.length;
+  const sar=new Float64Array(n).fill(NaN), trg=new Float64Array(n).fill(NaN),
+        ep=new Float64Array(n).fill(NaN), af=new Float64Array(n).fill(NaN);
+  const lng=new Uint8Array(n), fl=new Uint8Array(n);
+  if(n<2) return {sar,trg,lng,ep,af,fl};
+  const s=1;
+  const plus=H[s]-H[s-1], minus=L[s-1]-L[s];
+  let isLong=!(minus>plus&&minus>0);
+  let cur = isLong ? L[s-1] : H[s-1];
+  let e   = isLong ? H[s]   : L[s];
+  let a=step, nh=H[s], nl=L[s];
+  for(let t=s;t<n;t++){
+    const ph=nh, pl=nl; nh=H[t]; nl=L[t];
+    const hi=nh, lo=nl;
+    if(t>s) trg[t]=cur;
+    let nxt;
+    if(isLong){
+      if(lo<=cur){                                   /* flip long -> short */
+        isLong=false; cur=Math.max(e,ph,hi); fl[t]=1; e=lo; a=step;
+        sar[t]=cur; nxt=Math.max(cur+a*(e-cur),ph,hi);
+      }else{
+        sar[t]=cur;
+        if(hi>e){e=hi; a=Math.min(a+step,afmax);}
+        nxt=Math.min(cur+a*(e-cur),pl,lo);
+      }
+    }else{
+      if(hi>=cur){                                   /* flip short -> long */
+        isLong=true; cur=Math.min(e,pl,lo); fl[t]=1; e=hi; a=step;
+        sar[t]=cur; nxt=Math.min(cur+a*(e-cur),pl,lo);
+      }else{
+        sar[t]=cur;
+        if(lo<e){e=lo; a=Math.min(a+step,afmax);}
+        nxt=Math.max(cur+a*(e-cur),ph,hi);
+      }
+    }
+    lng[t]=isLong?1:0; ep[t]=e; af[t]=a; cur=nxt;
+  }
+  return {sar,trg,lng,ep,af,fl};
+}
+
+/* ---------------- the strategy, same rules as gold/engine.py ---------- */
+function runStrat(b,p){
+  const S=psar(b.h,b.l,p.step,p.afmax);
+  const n=b.c.length, start=Math.max(Math.min(p.warmup,n-6),2);
+  const dirBefore=new Int8Array(n); dirBefore[0]=1;
+  for(let i=1;i<n;i++) dirBefore[i]=S.lng[i-1]?1:-1;
+  const ps=p.perSide/1e4, fill=(px,side)=>px*(1+side*ps);
+  const allowL=p.mode!=="short_only", allowS=p.mode==="reverse";
+  const barNet=new Float64Array(n), held=new Int8Array(n), trades=[];
+  let pos=0, entryRaw=NaN, entryFill=NaN, mark=NaN, entryI=-1;
+  for(let i=start;i<n;i++){
+    const t=S.trg[i], prevMark=mark, dir=dirBefore[i];
+    const pen = !isNaN(t) && ((dir===1&&b.l[i]<=t)||(dir===-1&&b.h[i]>=t));
+    let raw=NaN, gapped=false;
+    if(pen){ gapped=(dir===1&&b.o[i]<=t)||(dir===-1&&b.o[i]>=t); raw=gapped?b.o[i]:t; }
+    if(pos!==0&&pen){
+      const ex=fill(raw,-pos);
+      barNet[i]+=pos*(ex-prevMark)/prevMark*1e4;
+      trades.push({i0:entryI,i1:i,side:pos,entry:entryRaw,exit:raw,bars:i-entryI,
+                   net:pos*(ex-entryFill)/entryFill*1e4, why:gapped?"gap":"sar"});
+      held[i]=pos; pos=0; mark=NaN;
+    }
+    if(pos===0&&pen){
+      const side=-dir;
+      if((side===1&&allowL)||(side===-1&&allowS)){
+        entryRaw=raw; entryFill=fill(raw,side); entryI=i; pos=side;
+        barNet[i]+=side*(b.c[i]-entryFill)/entryFill*1e4; mark=b.c[i]; held[i]=side;
+      }
+      continue;
+    }
+    if(pos!==0){ barNet[i]+=pos*(b.c[i]-prevMark)/prevMark*1e4; mark=b.c[i]; held[i]=pos; }
+  }
+  if(pos!==0){
+    const raw=b.c[n-1], ex=fill(raw,-pos);
+    barNet[n-1]+=pos*(ex-mark)/mark*1e4;
+    trades.push({i0:entryI,i1:n-1,side:pos,entry:entryRaw,exit:raw,bars:n-1-entryI,
+                 net:pos*(ex-entryFill)/entryFill*1e4, why:"end"});
+  }
+  /* ---- statistics, on every bar in the window, not every trade ---- */
+  let sum=0,m=0,cnt=0,expo=0;
+  for(let i=start;i<n;i++){sum+=barNet[i];cnt++;if(held[i]!==0)expo++;}
+  m=sum/cnt;
+  let v=0; for(let i=start;i<n;i++){const d=barNet[i]-m; v+=d*d;}
+  const sd=Math.sqrt(v/(cnt-1));
+  let peak=-1e18,run=0,dd=0;
+  for(let i=start;i<n;i++){run+=barNet[i]; if(run>peak)peak=run; dd=Math.max(dd,peak-run);}
+  let bh=0, bhv=[];
+  for(let i=start;i<n;i++){const r=(b.c[i]/b.c[i-1]-1)*1e4; bh+=r; bhv.push(r);}
+  const bhm=bh/bhv.length;
+  let bv=0; for(const x of bhv){bv+=(x-bhm)*(x-bhm);}
+  const bhsd=Math.sqrt(bv/(bhv.length-1));
+  /* annualise on the window's real calendar span, exactly as gold/engine.py
+     does -- a hard-coded 252 drifts from the published figure by ~0.1 Sharpe */
+  let byr=252;
+  if(b.d&&b.d.length>2){
+    const d0=Date.parse(b.d[start]), d1=Date.parse(b.d[n-1]);
+    const days=(d1-d0)/86400000;
+    if(days>1) byr=cnt/(days/365.25);
+  }
+  const ann=Math.sqrt(byr);
+  const w=expo/cnt;
+  const wins=trades.filter(t=>t.net>0).length;
+  return {S,start,trades,barNet,held,
+    stats:{bars:cnt,trades:trades.length,net:m,total:sum,sd,
+      sharpe:sd>0?m/sd*ann:NaN, dd, exposure:w,
+      win:trades.length?wins/trades.length:NaN,
+      bh:bhm, bhSharpe:bhsd>0?bhm/bhsd*ann:NaN,
+      matched:bhm*w, matchedSharpe:bhsd>0?bhm/bhsd*ann:NaN}};
+}
+
+/* ---------------- state --------------------------------------------- */
+let GD=null, BARS=null;
+let GP={step:0.02,afmax:0.20,mode:"long_only",cost:1,win:756,warmup:200,barsPerYear:252};
+const COSTS=[{n:"none",rt:0},{n:"COMEX",rt:1.0},{n:"CFD raw",rt:2.0},{n:"CFD std",rt:14.0}];
+
+function seg2(host,items,cur,cb){
+  host.innerHTML=items.map(s=>
+    `<button type="button" aria-pressed="${s.v===cur}" data-v="${s.v}">${s.t}</button>`).join("");
+  host.onclick=e=>{const b=e.target.closest("button"); if(!b)return;
+    [...host.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+    cb(b.dataset.v);};
+}
+
+/* ---------------- renderers ----------------------------------------- */
+function gTile(k,v,n,flag){return `<div class="m${flag?" flag":""}"><div class="k">${k}</div>
+  <div class="v">${v}</div>${n?`<div class="n">${n}</div>`:""}</div>`;}
+
+function gHead(d){
+  const mk=o=>`<span class="mk ${o}">${o==="yes"?"✓":(o==="no"?"✕":"–")}</span>`;
+  const row=(q,a,o)=>`<div class="row">${mk(o)}<span class="q">${q}</span>
+    <span class="a" style="color:var(--${o==="yes"?"good":(o==="no"?"bad":"muted")})">${a}</span></div>`;
+  const v=d.verdict||[], yes=v.filter(x=>x.mark==="yes").length;
+  const h=d.headline||{}, mb=d.matched_bh||{};
+  const half=Math.ceil(v.length/2);
+  $$("#gscore").innerHTML=
+    `<div class="sc"><h4>Long-only Parabolic SAR on gold</h4>
+       <div class="cap">COMEX futures &middot; ${(h.bars||0).toLocaleString()} daily bars
+         &middot; ${h.trades} trades &middot; ${d.headline.costs} costs</div>
+       ${v.slice(0,half).map(x=>row(x.q,x.a,x.mark)).join("")}</div>`+
+    `<div class="sc"><h4>&hellip;and the questions that decide it</h4>
+       <div class="cap">${yes} of ${v.length} answered yes</div>
+       ${v.slice(half).map(x=>row(x.q,x.a,x.mark)).join("")}</div>`;
+  const w=d.wilder||{};
+  $$("#gtiles").innerHTML=
+      gTile("Net","+"+(h.net_per_bar_bps||0).toFixed(2),"bps per day")
+    + gTile("Gold itself","+"+(h.buy_hold_per_bar_bps||0).toFixed(2),"bps per day",
+            h.net_per_bar_bps<h.buy_hold_per_bar_bps)
+    + gTile("Same exposure","+"+(mb.net_per_bar_bps||0).toFixed(2),"bps per day")
+    + gTile("Sharpe",(h.sharpe||0).toFixed(2),"gold "+(h.buy_hold_sharpe||0).toFixed(2))
+    + gTile("Max drawdown",Math.round(h.max_dd_bps||0).toLocaleString(),
+            "bps &middot; gold "+Math.round(mb.max_dd_bps||0).toLocaleString())
+    + gTile("In the market",Math.round((h.exposure||0)*100)+"%","rest in cash")
+    + gTile("Stop &amp; reverse","+"+(w.net_per_bar_bps||0).toFixed(2),
+            "Wilder's own rule", (w.net_per_bar_bps||0)<(h.net_per_bar_bps||0));
+}
+
+function gNow(d){
+  const sp=(d.live||{}).spot, st=(d.live||{}).states||[];
+  const names={"1d":"Daily","1wk":"Weekly","4h":"4 hour","1h":"1 hour"};
+  $$("#gnow tbody").innerHTML=st.map(s=>{
+    const long=s.direction==="long";
+    return `<tr><td>${names[s.interval]||s.interval}</td>
+      <td class="${long?"pos":"neg"}">${long?"LONG":"SHORT"}</td>
+      <td>${s.bars_in_trend}</td>
+      <td>${fx2(s.close)}</td>
+      <td class="str">${fx2(s.stop_next_bar)}</td>
+      <td>${s.distance_pct.toFixed(2)}%</td>
+      <td>${s.af.toFixed(2)}</td>
+      <td>${fx2(s.ep)}</td>
+      <td>${s.adx14==null?"<span class='dim'>&mdash;</span>":s.adx14.toFixed(1)}</td></tr>`;
+  }).join("")||`<tr><td colspan="9" class="dim">no state</td></tr>`;
+  const d1=st.find(s=>s.interval==="1d");
+  if(sp&&d1){
+    const basis=d1.close-sp.price;
+    $$("#gspot").innerHTML=`spot XAU/USD $${sp.price.toLocaleString(undefined,{minimumFractionDigits:2})}`;
+    $$("#gnowfoot").innerHTML=`Stops are on <b>COMEX futures</b>, which last traded
+      ${basis>=0?"$"+basis.toFixed(2)+" above":"$"+Math.abs(basis).toFixed(2)+" below"}
+      spot. Subtract that basis before putting these levels on a spot chart.
+      Distance is to the stop that is <b>already fixed</b> &mdash; nothing the next
+      bar does can move it. Read-only: this page is connected to no broker.`;
+  }
+  $$("#gasof").textContent = d1 ? "· last closed bar "+String(d1.as_of).slice(0,10) : "";
+}
+
+function chart(){
+  const host=$$("#gchart"); host.innerHTML="";
+  if(!BARS) return;
+  const n=BARS.c.length;
+  const lo=GP.win>=n?0:n-GP.win;
+  const sub={d:BARS.d.slice(lo),o:BARS.o.slice(lo),h:BARS.h.slice(lo),
+             l:BARS.l.slice(lo),c:BARS.c.slice(lo)};
+  /* warm the recurrence on the bars before the window so the first dot in
+     view is the same dot it would be on a longer chart */
+  const pre=Math.min(lo,260);
+  const calcFrom=lo-pre;
+  const full={d:BARS.d.slice(calcFrom),o:BARS.o.slice(calcFrom),h:BARS.h.slice(calcFrom),
+              l:BARS.l.slice(calcFrom),c:BARS.c.slice(calcFrom)};
+  const res=runStrat(full,{...GP,perSide:COSTS[GP.cost].rt/2,warmup:pre});
+  const off=pre;
+  const W=host.clientWidth||880, H=340, P={t:12,r:52,b:26,l:10};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, m=sub.c.length;
+  let mn=Infinity,mx=-Infinity;
+  for(let i=0;i<m;i++){mn=Math.min(mn,sub.l[i],res.S.sar[off+i]||Infinity);
+                       mx=Math.max(mx,sub.h[i],res.S.sar[off+i]||-Infinity);}
+  const pad=(mx-mn)*0.04; mn-=pad; mx+=pad;
+  const X=i=>P.l+(m<2?0:i/(m-1))*iw, Y=v=>P.t+(1-(v-mn)/(mx-mn))*ih;
+  const s=mkSVG(W,H); s.setAttribute("aria-label","Gold with its Parabolic SAR");
+  for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;
+    E(s,"line",{x1:P.l,y1:Y(v),x2:W-P.r,y2:Y(v),class:"gl"});
+    T(s,W-P.r+6,Y(v)+4,Math.round(v).toLocaleString(),"ax","start");}
+  let yr=sub.d[0].slice(0,4);
+  for(let i=1;i<m;i++){
+    const y=sub.d[i].slice(0,4);
+    if(y===yr) continue;
+    E(s,"line",{x1:X(i),y1:P.t,x2:X(i),y2:P.t+ih,class:"zl","stroke-dasharray":"2 4"});
+    T(s,X(i),H-8,y);
+    yr=y;
+  }
+  let path="";
+  for(let i=0;i<m;i++) path+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(sub.c[i]).toFixed(1);
+  E(s,"path",{d:path,fill:"none",stroke:"var(--ink)","stroke-width":1.2,opacity:.75});
+  const r=m>900?0.9:(m>400?1.3:2.1), marks=m<=400;
+  for(let i=0;i<m;i++){
+    const v=res.S.sar[off+i]; if(isNaN(v))continue;
+    const long=res.S.lng[off+i];
+    E(s,"circle",{cx:X(i).toFixed(1),cy:Y(v).toFixed(1),r,
+      fill:long?"var(--s3)":"var(--s2)"});
+    /* a flip rule per flip is legible at a year, noise at five: past ~400
+       bars the colour change in the dots carries it on its own */
+    if(marks&&res.S.fl[off+i]) E(s,"line",{x1:X(i),y1:P.t,x2:X(i),y2:P.t+ih,
+      stroke:long?"var(--s3)":"var(--s2)","stroke-width":.8,opacity:.3});
+  }
+  const hit=E(s,"rect",{x:P.l,y:P.t,width:iw,height:ih,fill:"transparent"});
+  hit.addEventListener("mousemove",ev=>{
+    const bb=s.getBoundingClientRect();
+    const i=Math.max(0,Math.min(m-1,Math.round(((ev.clientX-bb.left)/bb.width*W-P.l)/iw*(m-1))));
+    const j=off+i;
+    gtip(ev,`${sub.d[i]}\nclose ${sub.c[i].toLocaleString()}\n`
+      +`SAR ${(res.S.sar[j]||0).toFixed(1)}  ${res.S.lng[j]?"long":"short"}\n`
+      +`EP ${(res.S.ep[j]||0).toFixed(1)}   AF ${(res.S.af[j]||0).toFixed(2)}`
+      +(res.S.fl[j]?"\nFLIP":""));});
+  hit.addEventListener("mouseleave",guntip);
+  host.appendChild(s);
+
+  $$("#gchartleg").innerHTML=
+    `<span class="lg"><span class="sw" style="background:var(--ink)"></span>gold close</span>
+     <span class="lg"><span class="sw d" style="background:var(--s3)"></span>stop, long</span>
+     <span class="lg"><span class="sw d" style="background:var(--s2)"></span>stop, short</span>
+     ${m<=400?'<span class="lg">faint rule = flip</span>':""}`;
+  const st=res.stats;
+  $$("#gchartfoot").innerHTML=`${m.toLocaleString()} bars shown, ${sub.d[0]} →
+     ${sub.d[m-1]}. The recurrence is warmed on ${pre} bars before the window, so
+     the first dot you see is the dot a longer chart would draw.`;
+  liveTable(st);
+  tradeTable(res,off,sub);
+}
+
+function liveTable(st){
+  const rows=[
+    ["Trades",st.trades.toLocaleString(),""],
+    ["Win rate",isNaN(st.win)?"—":(st.win*100).toFixed(1)+"%",""],
+    ["Net per bar",g2(st.net)+" bps",gcls(st.net)],
+    ["Gold itself",g2(st.bh)+" bps",""],
+    ["Gold at the same exposure",g2(st.matched)+" bps",""],
+    ["Against that",g2(st.net-st.matched)+" bps",gcls(st.net-st.matched)],
+    ["Sharpe",st.sharpe.toFixed(2),gcls(st.sharpe)],
+    ["Gold Sharpe",st.bhSharpe.toFixed(2),""],
+    ["Max drawdown",Math.round(st.dd).toLocaleString()+" bps",""],
+    ["In the market",(st.exposure*100).toFixed(0)+"%",""],
+    ["Total",g2(st.total)+" bps",gcls(st.total)]];
+  $$("#gliveTab tbody").innerHTML=rows.map(([k,v,c])=>
+    `<tr><td>${k}</td><td class="${c}">${v}</td></tr>`).join("");
+}
+
+function tradeTable(res,off,sub){
+  const rows=res.trades.filter(t=>t.i0>=off).slice(-220).reverse();
+  $$("#gtrades tbody").innerHTML=rows.length?rows.map(t=>
+    `<tr><td>${sub.d[t.i0-off]}</td>
+      <td class="${t.side>0?"pos":"neg"}">${t.side>0?"long":"short"}</td>
+      <td>${t.entry.toFixed(1)}</td><td>${sub.d[Math.min(t.i1-off,sub.d.length-1)]}</td>
+      <td>${t.exit.toFixed(1)}</td><td>${t.bars}</td>
+      <td class="${gcls(t.net)}">${g2(t.net)}</td></tr>`).join("")
+    :`<tr><td colspan="7" class="dim">no flips in this window</td></tr>`;
+}
+
+function lines(hostId,legId,series,labels,alt){
+  const host=$$(hostId); host.innerHTML="";
+  const W=host.clientWidth||600,H=300,P={t:10,r:52,b:24,l:10};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=series[0].length;
+  let mn=Infinity,mx=-Infinity;
+  series.forEach(a=>a.forEach(v=>{mn=Math.min(mn,v);mx=Math.max(mx,v);}));
+  const X=i=>P.l+(n<2?0:i/(n-1))*iw, Y=v=>P.t+(1-(v-mn)/(mx-mn||1))*ih;
+  const s=mkSVG(W,H); s.setAttribute("aria-label",alt||"chart");
+  for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;
+    E(s,"line",{x1:P.l,y1:Y(v),x2:W-P.r,y2:Y(v),class:"gl"});
+    T(s,W-P.r+6,Y(v)+4,Math.round(v).toLocaleString(),"ax","start");}
+  if(mn<0&&mx>0) E(s,"line",{x1:P.l,y1:Y(0),x2:W-P.r,y2:Y(0),class:"zl"});
+  series.forEach((a,k)=>{let d="";
+    a.forEach((v,i)=>{d+=(i?"L":"M")+X(i).toFixed(1)+" "+Y(v).toFixed(1);});
+    E(s,"path",{d,fill:"none",stroke:labels[k].c,"stroke-width":labels[k].w||1.7});});
+  host.appendChild(s);
+  if(legId) $$(legId).innerHTML=labels.map(l=>
+    `<span class="lg"><span class="sw" style="background:${l.c}"></span>${l.t}</span>`).join("");
+}
+
+function cloud(d){
+  const host=$$("#gcloud"); host.innerHTML="";
+  const sets=[...(d.cloud.sets||[])].sort((a,b)=>a.net-b.net);
+  const W=host.clientWidth||520,H=270,P={t:10,r:46,b:30,l:10};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=sets.length;
+  const vals=sets.map(s=>s.net).concat([d.cloud.buy_hold,0]);
+  const mn=Math.min(...vals)-.3, mx=Math.max(...vals)+.3;
+  const X=i=>P.l+(i/(n-1))*iw, Y=v=>P.t+(1-(v-mn)/(mx-mn))*ih;
+  const s=mkSVG(W,H);
+  s.setAttribute("aria-label","Net return of all 240 parameter sets, sorted worst to best, against buy and hold");
+  for(let k=0;k<=4;k++){const v=mn+(mx-mn)*k/4;
+    E(s,"line",{x1:P.l,y1:Y(v),x2:W-P.r,y2:Y(v),class:"gl"});
+    T(s,W-P.r+6,Y(v)+4,v.toFixed(1),"ax","start");}
+  E(s,"line",{x1:P.l,y1:Y(0),x2:W-P.r,y2:Y(0),class:"zl"});
+  E(s,"line",{x1:P.l,y1:Y(d.cloud.buy_hold),x2:W-P.r,y2:Y(d.cloud.buy_hold),
+    stroke:"var(--s1)","stroke-width":1.6,"stroke-dasharray":"6 4"});
+  sets.forEach((st,i)=>{
+    const c=E(s,"circle",{cx:X(i).toFixed(1),cy:Y(st.net).toFixed(1),r:2.4,
+      fill:st.mode==="long_only"?"var(--s3)":"var(--s2)",opacity:.8});
+    c.addEventListener("mousemove",ev=>gtip(ev,
+      `${st.label}\n${g2(st.net)} bps/bar  sharpe ${st.sharpe.toFixed(2)}\n${st.trades} trades`));
+    c.addEventListener("mouseleave",guntip);});
+  T(s,P.l+iw/2,H-6,"240 parameter sets, worst to best");
+  host.appendChild(s);
+  $$("#gcloudleg").innerHTML=
+    `<span class="lg"><span class="sw d" style="background:var(--s3)"></span>long only</span>
+     <span class="lg"><span class="sw d" style="background:var(--s2)"></span>stop &amp; reverse</span>
+     <span class="lg"><span class="sw" style="background:var(--s1)"></span>buy &amp; hold</span>`;
+  $$("#gcloudfoot").innerHTML=`median ${d.cloud.median.toFixed(2)},
+     best ${d.cloud.best.toFixed(2)}, buy &amp; hold ${d.cloud.buy_hold.toFixed(2)} bps/bar.
+     <b>${d.cloud.beat_buy_hold} of ${d.cloud.n}</b> settings beat simply holding gold.
+     Picking the best of ${d.cloud.n} draws is not a finding &mdash; the split-sample
+     test below is what decides whether that pick means anything.`;
+}
+
+function tables(d){
+  const c=d.controls||{}, rd=c.random_direction||{}, rt=c.random_timing||{},
+        bs=c.bootstrap||{}, sd=c.sharpe_diff||{}, sp=d.split||{};
+  const pcell=p=>`<td class="${p<0.05?"pos":"neg"}">${p<0.0001?"&lt;0.0001":p.toFixed(4)}</td>`;
+  $$("#gctrl tbody").innerHTML=`
+    <tr><td>Random direction, same flips</td><td>${g2(rd.real)}</td>
+      <td>${g2(rd.mean)} &plusmn; ${(rd.sd||0).toFixed(2)}</td>${pcell(rd.p_one_sided)}</tr>
+    <tr><td>Random entries, same lengths</td><td>${g2(rt.real)}</td>
+      <td>${g2(rt.mean)} &plusmn; ${(rt.sd||0).toFixed(2)}</td>${pcell(rt.p_one_sided)}</tr>
+    <tr><td>Gold, trends shuffled out</td><td>${g2(bs.real_bps)}</td>
+      <td>${g2(bs.null_bps_mean)} (95th ${g2(bs.null_bps_95)})</td>${pcell(bs.p_bps)}</tr>
+    <tr><td>&hellip;excess over matched gold</td><td>${g2(bs.real_excess_bps)}</td>
+      <td>${g2(bs.null_excess_mean)}</td>${pcell(bs.p_excess)}</tr>
+    <tr><td>Sharpe above matched gold</td><td>${g2(sd.difference)}</td>
+      <td>CI [${g2(sd.ci95?sd.ci95[0]:0)}, ${g2(sd.ci95?sd.ci95[1]:0)}]</td>${pcell(sd.p_two_sided)}</tr>
+    <tr><td>First half&rsquo;s best, on the second</td>
+      <td>${g2(sp.best_in_sample_score)}</td><td>${g2(sp.best_in_sample_out_of_sample)}</td>
+      <td class="dim">&rho; ${(sp.rho||0).toFixed(2)}</td></tr>`;
+  $$("#gctrlfoot").innerHTML=`The first three it passes: the flips are not random
+     and gold's trends are what it eats. The one that matters it does not &mdash;
+     the Sharpe gain over gold held at the same exposure is
+     <b>${g2(sd.difference)}</b> with a 95% interval that
+     ${sd.ci95&&sd.ci95[0]>0?"excludes":"still contains"} zero.`;
+
+  $$("#gper tbody").innerHTML=(d.periods||[]).map(p=>
+    `<tr><td>${p.period}</td><td>${p.trades}</td>
+      <td class="${gcls(p.net_per_bar_bps)}">${g2(p.net_per_bar_bps)}</td>
+      <td class="${gcls(p.buy_hold_per_bar_bps)}">${g2(p.buy_hold_per_bar_bps)}</td>
+      <td>${p.sharpe.toFixed(2)}</td><td>${p.buy_hold_sharpe.toFixed(2)}</td></tr>`).join("");
+
+  $$("#gcost tbody").innerHTML=(d.costs||[]).map(r=>
+    `<tr><td>${r.venue}</td><td>${r.round_trip_bps.toFixed(1)} bps</td>
+      <td class="${gcls(r.net_per_bar_bps)}">${g2(r.net_per_bar_bps)}</td>
+      <td>${r.sharpe.toFixed(2)}</td></tr>`).join("");
+
+  const names={"1d":"daily","1wk":"weekly","4h":"4h","1h":"1h"};
+  $$("#gmat tbody").innerHTML=(d.matrix||[]).map(r=>
+    `<tr class="${r.mode==="long_only"&&r.fill==="stop"?"tracked":""}">
+      <td>${r.symbol}</td><td>${names[r.interval]}</td>
+      <td>${r.mode==="long_only"?"long only":"stop &amp; reverse"}</td><td>${r.fill}</td>
+      <td>${r.bars.toLocaleString()}</td><td>${r.trades}</td>
+      <td class="${gcls(r.net)}">${g2(r.net)}</td><td>${g2(r.bh)}</td>
+      <td>${g2(r.matched_bh)}</td><td>${r.sharpe.toFixed(2)}</td>
+      <td>${r.matched_sharpe.toFixed(2)}</td><td>${(r.exposure*100).toFixed(0)}%</td>
+      <td>${Math.round(r.dd).toLocaleString()}</td></tr>`).join("");
+  $$("#gmatfoot").innerHTML=`Shaded row is the rule this page leads with. Long only
+     beats stop-and-reverse in <b>every one of the 16 pairs</b>: shorting gold
+     through a twenty-five year bull market is what does the damage, not the
+     indicator. The intraday rows cover 2024&ndash;26 only, which is one regime.`;
+
+  $$("#gdata tbody").innerHTML=(d.data||[]).map(r=>
+    `<tr><td>${r.symbol}</td><td>${names[r.interval]||r.interval}</td>
+      <td>${r.bars.toLocaleString()}</td><td>${String(r.first).slice(0,10)}</td>
+      <td>${String(r.last).slice(0,10)}</td>
+      <td class="${r.repaired?"neg":"dim"}">${r.repaired||"—"}</td></tr>`).join("");
+  $$("#gdatafoot").innerHTML=`<b>GC=F is a rolled series.</b> At each contract roll
+     it jumps to the next month, printing an overnight gap nobody could trade.
+     A stop-and-reverse rule is exactly what such a gap flatters or wrecks, which
+     is why GLD &mdash; an actual tradeable instrument with no roll &mdash; is
+     carried alongside, and why the result is weaker on it.
+     <b>441 GC=F daily bars before Nov 2011</b> carried a settlement close outside
+     their own high/low; their range was widened to contain it rather than the
+     bars being dropped, because a hole in a recursive indicator silently rewrites
+     every value after it. GLD has none at any interval.`;
+}
+
+function evidence(d){
+  const eq=d.equity||{};
+  lines("#geq","#geqleg",[eq.strategy||[],eq.buyhold||[],eq.matched||[]],
+    [{t:"long-only SAR",c:"var(--s3)"},
+     {t:"gold, held",c:"var(--s1)"},
+     {t:`gold at ${Math.round((eq.weight||0)*100)}% exposure`,c:"var(--s2)",w:1.3}],
+    "Cumulative return of long-only Parabolic SAR against gold held outright and gold held at the same average exposure");
+  const h=d.headline||{};
+  $$("#gevrange").textContent=`${(h.bars||0).toLocaleString()} daily bars · `+
+    `${(d.data||[]).filter(x=>x.symbol==="GC=F"&&x.interval==="1d").map(x=>String(x.first).slice(0,10)+" → "+String(x.last).slice(0,10))[0]||""}`;
+  cloud(d); tables(d);
+}
+
+function redrawGold(){ if(GD){chart();} }
+
+/* ---------------- wiring -------------------------------------------- */
+function controls(){
+  const st=$$("#cstep"), mx=$$("#cmax");
+  st.oninput=()=>{GP.step=+st.value;$$("#lstep").textContent=GP.step.toFixed(3);
+    if(GP.afmax<GP.step){GP.afmax=GP.step;mx.value=GP.step;$$("#lmax").textContent=GP.afmax.toFixed(2);}
+    chart();};
+  mx.oninput=()=>{GP.afmax=Math.max(+mx.value,GP.step);$$("#lmax").textContent=GP.afmax.toFixed(2);chart();};
+  seg2($$("#cmode"),[{v:"long_only",t:"long only"},{v:"reverse",t:"stop &amp; reverse"}],
+    GP.mode,v=>{GP.mode=v;chart();});
+  seg2($$("#ccost"),COSTS.map((c,i)=>({v:String(i),t:c.n})),String(GP.cost),
+    v=>{GP.cost=+v;chart();});
+  seg2($$("#cwin"),[{v:"252",t:"1y"},{v:"756",t:"3y"},{v:"1260",t:"5y"},{v:"99999",t:"all"}],
+    String(GP.win),v=>{GP.win=+v;chart();});
+}
+
+function boot(d){
+  GD=d;
+  const rows=(d.bars||{}).rows||[];
+  BARS={d:rows.map(r=>r[0]),o:rows.map(r=>r[1]),h:rows.map(r=>r[2]),
+        l:rows.map(r=>r[3]),c:rows.map(r=>r[4])};
+  gHead(d); gNow(d); controls(); evidence(d); chart();
+  addEventListener("resize",()=>{if(!$$("#v-gold").hidden){chart();evidence(d);}});
+}
+
+window.__goldBoot=boot;
+window.__goldRedraw=()=>{ if(GD){chart();evidence(GD);} };
+
+fetch("gold.json",{cache:"no-store"}).then(r=>r.json()).then(boot).catch(e=>{
+  console.error("gold board failed:",e);
+  const h=$$("#gscore");
+  if(h)h.innerHTML=`<div class="sc"><h4>Could not load gold.json</h4>
+    <div class="cap">${(e&&e.message)||e}</div></div>`;
+});
+})();
+</script>
+
+<script>
+/* subtab router. Each board owns its markup and its own script; this only
+   decides which is on screen and tells the gold board to re-measure, because
+   an SVG laid out while display:none has no width to lay out against. */
+(function(){
+  const views={bell:document.getElementById("v-bell"),gold:document.getElementById("v-gold")};
+  const btns=[...document.querySelectorAll(".sub-btn")];
+  const LEDE={
+    bell:"Two ways of trading the opening bell, tested. Neither is tradeable \u2014 for different reasons.",
+    gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal."};
+  function show(v,push){
+    if(!views[v]) v="bell";
+    for(const k in views) if(views[k]) views[k].hidden = (k!==v);
+    btns.forEach(b=>b.setAttribute("aria-selected", b.dataset.view===v ? "true":"false"));
+    const l=document.getElementById("lede"); if(l&&LEDE[v]) l.textContent=LEDE[v];
+    if(push&&history.replaceState) history.replaceState(null,"","#"+v);
+    if(v==="gold"&&window.__goldRedraw) window.__goldRedraw();
+    if(push) scrollTo(0,0);
+  }
+  btns.forEach(b=>b.addEventListener("click",()=>show(b.dataset.view,true)));
+  addEventListener("hashchange",()=>show(location.hash.slice(1),false));
+  show(location.hash.slice(1)||"bell",false);
+})();
 </script>
 </body>
 </html>
