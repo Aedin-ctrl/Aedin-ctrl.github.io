@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
 <title>Trad</title>
-<meta name="description" content="Opening-bell strategies and gold's Parabolic SAR, measured. What the evidence says, against what gets sold.">
+<meta name="description" content="Opening-bell strategies, gold's Parabolic SAR and three Goldman Sachs strategies, measured. What the evidence says, against what gets sold.">
 <style>
   /* Light only, matching the calibration board. Read next to a broker screen. */
   :root{
@@ -30,7 +30,7 @@
   @media(min-width:720px){.score{grid-template-columns:1fr 1fr}}
   .sc{background:var(--card);border:1px solid var(--line);border-radius:12px;
       padding:14px 16px 10px}
-  .sc h4{font-size:13.5px;font-weight:660;letter-spacing:-.01em;margin-bottom:2px}
+  .sc h4,.sc h2{font-size:13.5px;font-weight:660;letter-spacing:-.01em;margin-bottom:2px}
   .sc .cap{font-size:11.5px;color:var(--muted);margin-bottom:10px}
   .sc .row{display:flex;align-items:center;gap:9px;padding:6px 0;
            border-top:1px solid var(--line);font-size:12.5px}
@@ -109,6 +109,11 @@
         border-top:1px solid var(--line);padding-top:9px;max-width:82ch}
   footer{margin-top:26px;font-size:11.5px;color:var(--muted)}
   footer a{color:var(--ink2)}
+  .buglist{margin:4px 0 0 18px;font-size:13px;color:var(--ink2);max-width:82ch}
+  .buglist li{margin-bottom:9px;padding-left:3px}
+  .buglist li::marker{color:var(--muted);font-weight:650}
+  .buglist code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+    background:var(--band);border-radius:4px;padding:1px 4px}
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .08s;
        background:var(--ink);color:#fff;font-size:11.5px;padding:6px 9px;
        border-radius:7px;z-index:9;white-space:pre;line-height:1.45}
@@ -178,6 +183,7 @@
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
     <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">gold strat</button>
     <button type="button" class="sub-btn" data-view="mes" role="tab" aria-selected="false">mes</button>
+    <button type="button" class="sub-btn" data-view="gs" role="tab" aria-selected="false">goldman</button>
   </div>
 
   <div class="view" id="v-bell">
@@ -821,10 +827,237 @@
 
   </div>
 
+  <div class="view" id="v-gs" hidden>
+
+    <div class="score" id="xscore"></div>
+    <div class="grid" id="xtiles"></div>
+
+    <div class="part">
+      <span class="no">PART 1</span><h2>What Goldman actually publishes</h2>
+      <span class="sub">and what it leaves out</span>
+    </div>
+    <p class="partnote">Two of these are real products with public rule books. The
+       factor definitions below are quoted from the <em>ActiveBeta Low Vol Plus Equity
+       Indexes Methodology</em> (June 2024), which describes the construction behind
+       US patents 8,285,620 and 8,473,398. The basket rules come from the
+       <em>Hedge Fund Trend Monitor</em> of 20 February 2025. Everything on this page
+       is rebuilt from those documents and from the same public filings Goldman uses
+       &mdash; no Goldman data, no Goldman code.</p>
+
+    <section>
+      <h3>The four factor scores <span>&middot; quoted, then implemented</span></h3>
+      <div class="wrap" tabindex="0" role="region" aria-label="Factor definitions"><table>
+        <thead><tr><th>Factor</th><th style="text-align:left">Goldman's definition</th>
+          <th style="text-align:left">What that means in code</th></tr></thead>
+        <tbody>
+          <tr><td>Value</td>
+            <td style="text-align:left">&ldquo;A composite of three valuation measures:
+              book value-to-price, sales-to-price, and free cash flow-to-price. The
+              earnings-to-price ratio is used instead of free cash flow-to-price for
+              financial stocks.&rdquo;</td>
+            <td style="text-align:left" class="dim">Three ratios, each ranked to
+              [&minus;1,&nbsp;+1], averaged over whichever a company reports.</td></tr>
+          <tr><td>Momentum</td>
+            <td style="text-align:left">&ldquo;Beta- and volatility-adjusted total
+              return over the 11-month period ending one month before the Rebalance
+              Date.&rdquo;</td>
+            <td style="text-align:left" class="dim">The t-statistic of alpha from a
+              daily market regression &mdash; adjusting a return for beta is the
+              regression, and for volatility is dividing by its standard error.</td></tr>
+          <tr><td>Quality</td>
+            <td style="text-align:left">&ldquo;Gross profit divided by total assets, or
+              return on equity for financial stocks or when gross profit is not
+              available.&rdquo;</td>
+            <td style="text-align:left" class="dim">Trailing-twelve-month gross profit
+              over assets, falling back to ROE.</td></tr>
+          <tr><td>Low volatility</td>
+            <td style="text-align:left">&ldquo;The inverse of the standard deviation of
+              daily total stock returns over the past 12 months &hellip; and the inverse
+              of the market capitalization.&rdquo;</td>
+            <td style="text-align:left" class="dim">Inverse 12-month daily volatility;
+              the market-cap leg is their 2024 revision and is tested both ways.</td></tr>
+        </tbody></table></div>
+      <div class="foot">Portfolio construction is the patented scheme itself: rank
+        every stock, convert ranks to scores in [&minus;1,&nbsp;+1], split at a cut-off,
+        then fund the overweights <em>exactly</em> out of the underweights, capped at
+        20&times; universe weight. Goldman state they prefer <b>mixing</b> &mdash; build
+        four portfolios and blend &mdash; over <b>integrating</b> a single combined
+        score. Both are implemented here so the choice is measured, not assumed.
+        Rebalance is the first Wednesday of February, May, August and November, with
+        the signal frozen six trading days earlier: their calendar, not mine.</div>
+    </section>
+
+    <section>
+      <h3>The Hedge Fund VIP list <span>&middot; rebuilt from 54 quarters of 13F filings</span></h3>
+      <p class="note">&ldquo;The positions that appear most frequently among the top 10
+        holdings within hedge fund portfolios &hellip; we limit our universe to hedge
+        funds with 10 to 200 distinct equity positions in an attempt to isolate
+        fundamentally-driven investors from quantitative funds.&rdquo; Fifty stocks,
+        equally weighted, rebalanced each quarter. Goldman's own published scorecard
+        for it: <b>+52bp average quarterly excess return, 60% hit rate, information
+        ratio 0.16</b>, across 95 quarters since 2001.</p>
+      <div class="foot">That information ratio is the whole story before you start.
+        0.16 over 95 quarters is a t-statistic of about <b>1.5</b> &mdash; the claim was
+        never statistically established, only published. The one honest difference
+        between their basket and this one: Goldman know which filers are hedge funds
+        and restrict to 695 of them. The stated position filter alone admits two to
+        five thousand managers, so a top-500-by-assets variant is run alongside as the
+        closest public proxy.</div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 2</span><h2>The scoreboard</h2>
+      <span class="sub" id="xwin"></span>
+    </div>
+    <p class="partnote">Every number below is net of 10bps one-way trading cost and
+       50bps a year of borrow on short legs, over the same days, against the same
+       benchmark. The alpha column is a CAPM alpha against SPY, because a strategy
+       running a beta of 0.5 should not be scored on an information ratio that
+       punishes it for not being the index.</p>
+
+    <section>
+      <h3>Growth of $1 <span>&middot; log scale &middot; net of costs</span></h3>
+      <div class="legend" id="xeqleg"></div>
+      <div id="xeq"></div>
+      <div class="foot">The Hedge Fund VIP basket is the flat one. Following the most
+        crowded hedge fund positions returned less than simply buying the index, over
+        the whole window.</div>
+    </section>
+
+    <section>
+      <h3>All of it, side by side</h3>
+      <div class="wrap" tabindex="0" role="region" aria-label="Results for every strategy"><table id="xtab">
+        <thead><tr><th>Strategy</th><th>CAGR</th><th>Vol</th><th>Sharpe</th>
+          <th>Max DD</th><th>&alpha; vs SPY</th><th>t</th><th>&beta;</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="xtabfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 3</span><h2>Is the one that worked real?</h2>
+      <span class="sub">four ways to kill it</span>
+    </div>
+    <p class="partnote">The top-100 book beat SPY on Sharpe. So would a lot of things,
+       by luck, out of 69 attempts. These are the checks that a lucky result fails.</p>
+
+    <section>
+      <h3>Against random selection <span>&middot; the one that matters</span></h3>
+      <p class="note">One hundred names picked at random from the same universe on the
+        same dates, equally weighted, twenty different seeds. If the factor scores are
+        decoration, this is where it shows.</p>
+      <div id="xctrl"></div>
+      <div class="foot" id="xctrlfoot"></div>
+    </section>
+
+    <section>
+      <h3>Alpha by sub-period <span>&middot; where the result actually lives</span></h3>
+      <div class="legend" id="xsubleg"></div>
+      <div id="xsub"></div>
+      <div class="foot" id="xsubfoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>How much cost does it survive?</h3>
+        <div class="legend" id="xcostleg"></div>
+        <div id="xcost"></div>
+        <div class="foot">Turnover is 1&ndash;2&times; a year, so cost is not what
+          decides this one. The published index is the fragile one: it stops paying
+          at about 50bps.</div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Is the parameter a knife-edge?</h3>
+        <div class="wrap" tabindex="0" role="region" aria-label="Parameter neighbourhood"><table id="xnh">
+          <thead><tr><th>Hold</th><th>CAGR</th><th>Vol</th><th>Sharpe</th>
+            <th>&alpha;</th><th>t</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot">Twenty names through a hundred and fifty all land in the
+          same place. A result that only works at one setting is a coincidence; this
+          one is flat across its neighbourhood.</div>
+      </section>
+    </div>
+
+    <div class="part">
+      <span class="no">PART 4</span><h2>The Monte Carlo verdict</h2>
+      <span class="sub" id="xmcsub"></span>
+    </div>
+    <p class="partnote">Run through the same engine as
+       <a href="mc/">the Monte Carlo lab</a>. Each series is fitted to four market
+       models that disagree exactly where it matters &mdash; a bootstrap cannot invent
+       a day worse than the worst one already in the sample, a fitted Student-t and a
+       GARCH can. A strategy that only survives the resampler has not been tested.</p>
+
+    <section>
+      <h3>Five years forward <span id="xsimcap"></span></h3>
+      <div class="wrap" tabindex="0" role="region" aria-label="Five-year forward simulation"><table id="xsim">
+        <thead><tr><th>Strategy</th><th style="text-align:left">Market model</th>
+          <th>CAGR p5</th><th>median</th><th>p95</th><th>median DD</th>
+          <th>1-in-100 DD</th><th>P(lose money)</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="xsimfoot"></div>
+    </section>
+
+    <section>
+      <h3>Does it survive having searched 69 variants?</h3>
+      <p class="note">These are run on CAPM residuals, so beta cannot buy
+        significance: in a fourteen-year bull market any high-beta variant has a
+        positive mean active return, and a test on raw active returns would call that
+        a discovery.</p>
+      <div class="wrap" tabindex="0" role="region" aria-label="Data table"><table id="xbat"><tbody></tbody></table></div>
+      <div class="foot" id="xbatfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 5</span><h2>What I believe, and what it holds today</h2>
+    </div>
+
+    <section>
+      <h3>The honest summary</h3>
+      <p class="note" id="xverdict"></p>
+      <div class="foot">What would change it: the post-2019 alpha recovering above
+        t&nbsp;&asymp;&nbsp;2 on data this study has not seen; or point-in-time index
+        membership with the delisted names restored, showing the effect holds through
+        2008&ndash;2010.</div>
+    </section>
+
+    <section>
+      <h3>Today's book <span id="xtodaycap"></span></h3>
+      <div class="chips" id="xtodaysec"></div>
+      <div class="foot" id="xtodaylist"></div>
+    </section>
+
+    <section>
+      <h3>Four bugs that produced plausible wrong answers</h3>
+      <ol class="buglist">
+        <li><b>Split-adjusted prices &times; as-reported share counts.</b> Yahoo
+          back-adjusts for splits; the SEC does not. The product gave GE a
+          <b>$997bn</b> market cap in 2015 (it was about $250bn) and Nabors $150bn
+          (about $4bn), which corrupted every cap weight &mdash; and therefore the
+          benchmark every alpha on this page is measured against.</li>
+        <li><b>VIP baskets dated eight years late.</b> A handful of managers amend an
+          old quarter years afterwards, so taking the latest observed filing date
+          pushed the 2018&nbsp;Q2 basket's start to 2026.</li>
+        <li><b>ETFs selected as stocks.</b> SPY was the sixth most common top-10
+          &ldquo;holding&rdquo; in 2018&nbsp;Q2. Excluding them meant keeping delisted
+          stocks, which look much the same in the data and whose removal would have
+          quietly reintroduced survivorship bias.</li>
+        <li><b>A block length that was an object, not a number.</b> Rounding it gave
+          <code>NaN</code>, which made the stationary bootstrap's restart probability
+          <code>NaN</code>, which made every resample a circular rotation of the
+          original. Confidence intervals came back as [estimate,&nbsp;estimate] and
+          every Reality Check p-value pinned at the floor of 0.0002. <b>This one
+          briefly had me believing the headline was significant.</b></li>
+      </ol>
+      <div class="foot">Survivorship is reduced here, not eliminated: 683 of 993
+        historical index members still have price data, running about 65% of the real
+        index in 2010 and 95% in 2024. That is why the primary benchmark is the
+        cap-weighted universe of the <em>same names on the same dates</em> &mdash; it
+        is inflated by exactly the same missing companies.</div>
+    </section>
+  </div>
+
   <footer>
     <span id="mode"></span> &middot; data: Yahoo, free tier &middot;
     <a href="index.json">index.json</a> &middot; <a href="gold.json">gold.json</a>
-    &middot; <a href="mes.json">mes.json</a>
+    &middot; <a href="mes.json">mes.json</a> &middot; <a href="gs.json">gs.json</a>
   </footer>
 </main>
 <div class="tip" id="tip"></div>
@@ -2128,18 +2361,421 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
 </script>
 
 <script>
+/* ======================================================================
+ *  Goldman board.  Reads gs.json; owns only ids prefixed "x".
+ *  Charts follow the page's existing conventions: 2px strokes, recessive
+ *  grid, direct labels in ink with a coloured dot carrying identity, and a
+ *  hover layer on every plot.
+ * ==================================================================== */
+(function(){
+  const $=s=>document.querySelector(s), NS="http://www.w3.org/2000/svg";
+  const S1="var(--s1)", S2="var(--s2)", S3="var(--s3)", INK="var(--ink2)";
+  const ok=v=>typeof v==="number"&&isFinite(v);
+  const pc=(v,n=1)=>ok(v)?(v*100).toFixed(n)+"%":"—";
+  const sg=(v,n=1)=>ok(v)?((v>0?"+":"")+(v*100).toFixed(n)+"%"):"—";
+  const f2=(v,n=2)=>ok(v)?v.toFixed(n):"—";
+  const t2=v=>ok(v)?((v>0?"+":"")+v.toFixed(2)):"—";
+  const cls=v=>!ok(v)?"dim":(v>0?"pos":(v<0?"neg":"dim"));
+
+  let TIPX=$("#xtip");
+  if(!TIPX){TIPX=document.createElement("div");TIPX.className="tip";TIPX.id="xtip";
+            document.body.appendChild(TIPX);}
+  const tip=(e,s)=>{TIPX.textContent=s;TIPX.style.opacity=1;
+    const r=TIPX.getBoundingClientRect();
+    TIPX.style.left=Math.min(e.clientX+13,innerWidth-r.width-8)+"px";
+    TIPX.style.top=Math.max(e.clientY-r.height-11,6)+"px";};
+  const untip=()=>{TIPX.style.opacity=0;};
+  const hov=(n,s)=>{n.addEventListener("mousemove",e=>tip(e,s));
+                    n.addEventListener("mouseleave",untip);
+                    n.addEventListener("touchstart",e=>tip(e.touches[0],s),{passive:true});};
+
+  const mk=(w,h,lab)=>{const s=document.createElementNS(NS,"svg");
+    s.setAttribute("viewBox",`0 0 ${w} ${h}`);s.setAttribute("role","img");
+    if(lab)s.setAttribute("aria-label",lab);return s;};
+  const E=(p,n,a={})=>{const e=document.createElementNS(NS,n);
+    for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;};
+  const T=(p,x,y,s,c="ax",anc="middle")=>{const t=E(p,"text",{x,y,"text-anchor":anc});
+    t.setAttribute("class",c);t.textContent=s;return t;};
+  const legend=(host,items)=>{host.innerHTML=items.map(i=>
+    `<span class="lg"><span class="sw${i.dot?" d":""}" style="background:${i.c}"></span>${i.t}</span>`).join("");};
+
+  /* a bar with its far end rounded; anchored on the zero baseline */
+  function bar(p,x,y0,y1,w,fill,r=4){
+    const up=y1<y0, h=Math.abs(y1-y0), rr=Math.min(r,w/2,h);
+    const top=up?y1:y0;
+    const d=up
+      ? `M${x},${y0} L${x},${top+rr} Q${x},${top} ${x+rr},${top} L${x+w-rr},${top} Q${x+w},${top} ${x+w},${top+rr} L${x+w},${y0} Z`
+      : `M${x},${y0} L${x},${y0+h-rr} Q${x},${y0+h} ${x+rr},${y0+h} L${x+w-rr},${y0+h} Q${x+w},${y0+h} ${x+w},${y0+h-rr} L${x+w},${y0} Z`;
+    return E(p,"path",{d,fill});
+  }
+
+  const PFX="x";
+  let D=null;
+
+  /* ---------------- scorecard + tiles -------------------------------- */
+  function head(){
+    const m=D.meta, b=D.battery.net, c=D.control;
+    const byKey=Object.fromEntries(D.table.map(r=>[r.key,r]));
+    const ab=byKey["A1_activebeta_base"], vip=byKey["C_vip_bigAUM_vsSPY"], d1=byKey["D1_top100_equal"];
+    const sub=D.subperiod.series["D1_top100_equal"];
+    const second=sub.t[4];
+    const card=(title,cap,rows)=>`<div class="sc"><h2>${title}</h2><div class="cap">${cap}</div>`+
+      rows.map(r=>`<div class="row"><span class="mk ${r.m}">${r.m==="yes"?"✓":(r.m==="no"?"✗":"–")}</span>
+        <span class="q">${r.q}</span><span class="a">${r.a}</span></div>`).join("")+`</div>`;
+    $("#xscore").innerHTML =
+      card("Do Goldman's own strategies beat the market?",
+           `${m.years} years &middot; ${m.rebalances} rebalances &middot; net of costs`,
+        [{m:"no", q:"ActiveBeta index replication beats SPY",
+          a:`${sg(ab.alpha)}/yr, t&nbsp;${t2(ab.t)}`},
+         {m:"no", q:"Hedge Fund VIP basket beats SPY",
+          a:`${sg(vip.alpha)}/yr, t&nbsp;${t2(vip.t)}`},
+         {m:"na", q:"Either was ever testable at this length",
+          a:`MDE on IR ${f2(b.mde)}`}]) +
+      card("Does the one that did work survive scrutiny?",
+           "equal-weight top 100 of the blended four-factor score",
+        [{m:"yes", q:"Beats SPY on Sharpe",
+          a:`${f2(d1.sharpe)} vs ${f2(byKey["SPY"].sharpe)}`},
+         {m:"yes", q:"Beats a random 100-stock book",
+          a:`${c.n_positive_alpha} of ${c.n_seeds} seeds positive`},
+         {m:"no", q:"Survives the 69-variant search",
+          a:`Hansen SPA p&nbsp;=&nbsp;${f2(b.spa,3)}`},
+         {m:"no", q:"Still working after 2019",
+          a:`t&nbsp;${t2(second)}`}]);
+
+    const tile=(k,v,n,flag)=>`<div class="m${flag?" flag":""}"><div class="k">${k}</div>
+      <div class="v">${v}</div><div class="n">${n}</div></div>`;
+    $("#xtiles").innerHTML=
+      tile("Top-100 Sharpe", f2(d1.sharpe), `SPY ${f2(byKey["SPY"].sharpe)} over the same days`)+
+      tile("Alpha vs SPY", sg(d1.alpha), `t&nbsp;${t2(d1.t)} &middot; beta ${f2(d1.beta)}`)+
+      tile("VIP long / SPY short", sg(vip.alpha), "following crowded hedge funds", true)+
+      tile("Variants searched", String(m.variants), `PBO ${pc(b.pbo,0)} &middot; DSR ${f2(b.per["D1_top100_equal"].dsr)}`, true)+
+      tile("Smallest detectable IR", f2(b.mde), `best observed ${f2(b.per["D4_betaneutral_q0.1"].ir)}`, true)+
+      tile("Universe", `${m.univ_min}–${m.univ_max}`, "point-in-time index members");
+
+    $("#xwin").textContent=`${m.start} to ${m.end} · ${m.days.toLocaleString()} trading days`;
+    $("#xmcsub").textContent=`${D.mcsim.paths.toLocaleString()} paths × ${D.mcsim.years} years × 4 models`;
+    $("#xsimcap").innerHTML=`&middot; ${D.mcsim.paths.toLocaleString()} simulated paths per cell`;
+  }
+
+  /* ---------------- results table ------------------------------------ */
+  function table(){
+    const tb=$("#xtab").querySelector("tbody");
+    tb.innerHTML=D.table.map(r=>{
+      const trc = r.kind==="mine" ? ' class="tracked"' : (r.kind==="control" ? ' class="hl"' : "");
+      return `<tr${trc}><td>${r.label}</td><td>${pc(r.cagr)}</td><td>${pc(r.vol)}</td>
+        <td class="str">${f2(r.sharpe)}</td><td class="neg">${pc(r.maxdd)}</td>
+        <td class="${cls(r.alpha)}">${sg(r.alpha)}</td>
+        <td class="${cls(r.t)}">${t2(r.t)}</td><td class="dim">${f2(r.beta)}</td></tr>`;}).join("");
+    $("#xtabfoot").innerHTML=`Blue rows are mine, not Goldman's. The bottom row runs the
+      same signal with its sign reversed &mdash; it loses ${pc(Math.abs(D.table.at(-1).maxdd),0)}
+      of capital at worst, which is the cheapest evidence that the signal points the
+      right way. Alpha and t are CAPM against SPY; a beta near 1 makes alpha and excess
+      return the same thing, a beta near 0.5 does not.`;
+    const nh=$("#xnh").querySelector("tbody");
+    nh.innerHTML=D.nhold.map(r=>`<tr${r.n===100?' class="tracked"':""}><td>${r.n}</td>
+      <td>${pc(r.cagr)}</td><td>${pc(r.vol)}</td><td class="str">${f2(r.sharpe)}</td>
+      <td class="${cls(r.alpha)}">${sg(r.alpha)}</td>
+      <td class="${cls(r.t)}">${t2(r.t)}</td></tr>`).join("");
+  }
+
+  /* ---------------- equity curves ------------------------------------ */
+  const EQ=[{k:"SPY",c:INK,dash:"5 4"},{k:"D1_top100_equal",c:S1},
+            {k:"A1_activebeta_base",c:S3},{k:"C_vip_bigAUM",c:S2}];
+  function equity(){
+    const host=$("#xeq"); host.innerHTML="";
+    const W=860,H=330,L=46,R=108,Tp=14,B=28;
+    const s=mk(W,H,"Growth of one dollar, log scale"); host.appendChild(s);
+    const dates=D.equity.dates, ser=D.equity.series, n=dates.length;
+    let lo=Infinity,hi=-Infinity;
+    EQ.forEach(e=>ser[e.k].v.forEach(v=>{if(ok(v)&&v>0){lo=Math.min(lo,v);hi=Math.max(hi,v);}}));
+    lo=Math.min(lo,1); const l0=Math.log(lo), l1=Math.log(hi*1.04);
+    const X=i=>L+i*(W-L-R)/(n-1), Y=v=>Tp+(1-(Math.log(v)-l0)/(l1-l0))*(H-Tp-B);
+    [1,2,3,5,8].filter(v=>v>=lo&&v<=hi*1.04).forEach(v=>{
+      E(s,"line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:v===1?"zl":"gl"});
+      T(s,L-7,Y(v)+3.5,"$"+v,"ax","end");});
+    let prevY=null;
+    dates.forEach((d,i)=>{ if(d.slice(5,7)!=="01"||d.slice(0,4)===prevY)return; prevY=d.slice(0,4);
+      if(+prevY%3)return;
+      E(s,"line",{x1:X(i),x2:X(i),y1:Tp,y2:H-B,class:"gl"});
+      T(s,X(i),H-9,prevY,"ax");});
+    const ends=[];
+    EQ.forEach(e=>{
+      const v=ser[e.k].v;
+      let d="",started=false;
+      v.forEach((y,i)=>{ if(!ok(y)||y<=0)return;
+        d+=(started?"L":"M")+X(i).toFixed(1)+","+Y(y).toFixed(1); started=true;});
+      const a={d,fill:"none",stroke:e.c,"stroke-width":2,"stroke-linejoin":"round","stroke-linecap":"round"};
+      if(e.dash)a["stroke-dasharray"]=e.dash;
+      E(s,"path",a);
+      const last=v.filter(ok).at(-1);
+      ends.push({y:Y(last),c:e.c,t:ser[e.k].label,v:last});});
+    /* each end label is two lines tall, so 14px of separation overlapped them.
+       Spread to 26px, then slide the whole stack back inside the plot. */
+    ends.sort((a,b)=>a.y-b.y);
+    const GAP=26;
+    for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<GAP) ends[i].y=ends[i-1].y+GAP;
+    const over=ends.at(-1).y-(H-B-6);
+    if(over>0) ends.forEach(e=>e.y-=over);
+    if(ends[0].y<Tp+8){const up=Tp+8-ends[0].y; ends.forEach(e=>e.y+=up);}
+    ends.forEach(e=>{
+      E(s,"circle",{cx:W-R+6,cy:e.y,r:4,fill:e.c,stroke:"var(--card)","stroke-width":2});
+      const g=T(s,W-R+15,e.y-1,e.t,"dl","start"); g.setAttribute("fill","var(--ink)");
+      T(s,W-R+15,e.y+11,"$"+e.v.toFixed(2),"ax","start");});
+    /* crosshair */
+    const cl=E(s,"line",{x1:0,x2:0,y1:Tp,y2:H-B,class:"zl",opacity:0});
+    const hit=E(s,"rect",{x:L,y:Tp,width:W-L-R,height:H-Tp-B,fill:"transparent"});
+    hit.addEventListener("mousemove",ev=>{
+      const r=s.getBoundingClientRect();
+      const i=Math.max(0,Math.min(n-1,Math.round(((ev.clientX-r.left)/r.width*W-L)/((W-L-R)/(n-1)))));
+      cl.setAttribute("x1",X(i));cl.setAttribute("x2",X(i));cl.setAttribute("opacity",1);
+      tip(ev,dates[i]+"\n"+EQ.map(e=>ser[e.k].label+"  $"+(ser[e.k].v[i]||0).toFixed(2)).join("\n"));});
+    hit.addEventListener("mouseleave",()=>{cl.setAttribute("opacity",0);untip();});
+    legend($("#xeqleg"),EQ.map(e=>({c:e.c,t:ser[e.k].label})));
+  }
+
+  /* ---------------- random-selection control ------------------------- */
+  function control(){
+    const host=$("#xctrl"); host.innerHTML="";
+    const c=D.control, W=860,H=228,L=20,R=20,Tp=92,B=40;
+    const s=mk(W,H,"Sharpe ratio of twenty random hundred-stock portfolios against the strategy");
+    host.appendChild(s);
+    const all=c.sharpes.concat([c.d1.sharpe,c.spy.sharpe,c.lowvol.sharpe,c.highvol.sharpe]);
+    const lo=Math.min(...all)-.05, hi=Math.max(...all)+.05;
+    const X=v=>L+(v-lo)/(hi-lo)*(W-L-R);
+    const base=H-B;
+    E(s,"line",{x1:L,x2:W-R,y1:base,y2:base,class:"zl"});
+    for(let v=Math.ceil(lo*20)/20;v<=hi;v+=.05){
+      if(Math.abs(v*100%10)>1)continue;
+      E(s,"line",{x1:X(v),x2:X(v),y1:base,y2:base+5,class:"gl"});
+      T(s,X(v),base+19,v.toFixed(2),"ax");}
+    T(s,(L+W-R)/2,H-6,"Sharpe ratio, 2011–2026, net of costs","ax");
+    /* the random cloud */
+    c.sharpes.forEach((v,i)=>{
+      const y=base-14-((i%4)*11);
+      const d=E(s,"circle",{cx:X(v),cy:y,r:4.5,fill:"var(--muted)",opacity:.75,
+                            stroke:"var(--card)","stroke-width":2});
+      hov(d,`random seed ${i}\nSharpe ${v.toFixed(3)}\nalpha ${(c.alphas[i]*100).toFixed(2)}%`);});
+    /* One row per marker, ordered left to right, so two labels can never share
+       a line. Each is anchored toward whichever side of its rule has room. */
+    const marks=[{v:c.highvol.sharpe,t:"highest-vol 100",c:S2},
+                 {v:c.lowvol.sharpe,t:"lowest-vol 100",c:S3},
+                 {v:c.spy.sharpe,t:"SPY",c:INK},
+                 {v:c.d1.sharpe,t:"top 100 by factor score",c:S1}]
+      .sort((a,b)=>a.v-b.v);
+    marks.forEach((m,i)=>{
+      const y=16+i*17;
+      E(s,"line",{x1:X(m.v),x2:X(m.v),y1:y+5,y2:base,stroke:m.c,"stroke-width":2,opacity:.5});
+      E(s,"circle",{cx:X(m.v),cy:base,r:5.5,fill:m.c,stroke:"var(--card)","stroke-width":2});
+      const anc=X(m.v)>W*0.62?"end":"start";
+      const tx=T(s,X(m.v)+(anc==="end"?-9:9),y+9,m.t+"  "+m.v.toFixed(3),"dl",anc);
+      tx.setAttribute("fill","var(--ink)");});
+    const z=(c.d1.sharpe-c.sharpe_mean)/c.sharpe_sd;
+    $("#xctrlfoot").innerHTML=`Grey dots are the twenty random books: Sharpe
+      ${f2(c.sharpe_mean,3)} &plusmn; ${f2(c.sharpe_sd,3)}, average alpha
+      <b class="neg">${sg(c.alpha_mean,2)}</b> &mdash; and
+      <b>${c.n_positive_alpha} of ${c.n_seeds}</b> had positive alpha at all (best
+      t&nbsp;${t2(c.t_max)}). Equal-weighting a random hundred S&amp;P names
+      <em>lost</em> to SPY over this period, so &ldquo;it is just equal weighting&rdquo;
+      does not explain the result &mdash; the factor book sits ${f2(z,1)} standard
+      deviations above that cloud. Nor is it only the low-volatility tilt: sorting
+      purely on volatility gives Sharpe ${f2(c.lowvol.sharpe)} and
+      ${pc(c.lowvol.cagr)} a year, against ${f2(c.d1.sharpe)} and
+      ${pc(c.d1.cagr)}. The factor book gets low-vol's risk reduction
+      <em>and</em> three more points of return.`;
+  }
+
+  /* ---------------- sub-period alpha --------------------------------- */
+  const CAND=[{k:"D1_top100_equal",t:"Top-100",c:S1},
+              {k:"D4_betaneutral_q0.1",t:"Beta-neutral L/S",c:S3},
+              {k:"A1_activebeta_base",t:"ActiveBeta",c:S2}];
+  function subperiod(){
+    const host=$("#xsub"); host.innerHTML="";
+    const sp=D.subperiod, W=860,H=270,L=52,R=16,Tp=16,B=46;
+    const s=mk(W,H,"Annualised alpha versus SPY by sub-period"); host.appendChild(s);
+    const vals=CAND.flatMap(c=>sp.series[c.k].alpha).filter(ok);
+    const hi=Math.max(...vals,0.02)*1.15, lo=Math.min(...vals,-0.01)*1.15;
+    const Y=v=>Tp+(1-(v-lo)/(hi-lo))*(H-Tp-B);
+    const nW=sp.windows.length, slot=(W-L-R)/nW, gw=slot*0.76, bw=(gw-2*2)/3;
+    for(let v=Math.ceil(lo*20)/20;v<=hi;v+=.05){
+      E(s,"line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:Math.abs(v)<1e-9?"zl":"gl"});
+      T(s,L-7,Y(v)+3.5,(v*100).toFixed(0)+"%","ax","end");}
+    E(s,"line",{x1:L,x2:W-R,y1:Y(0),y2:Y(0),class:"zl"});
+    sp.windows.forEach((w,i)=>{
+      const x0=L+i*slot+(slot-gw)/2;
+      T(s,L+i*slot+slot/2,H-24,w,"ax");
+      if(i>=3)T(s,L+i*slot+slot/2,H-10,"(overlapping split)","ax");
+      CAND.forEach((c,j)=>{
+        const v=sp.series[c.k].alpha[i], t=sp.series[c.k].t[i];
+        if(!ok(v))return;
+        const x=x0+j*(bw+2);
+        const b=bar(s,x,Y(0),Y(v),bw,c.c);
+        b.setAttribute("opacity",Math.abs(t)>=2?1:0.52);
+        hov(b,`${c.t} · ${w}\nalpha ${(v*100).toFixed(2)}%/yr\nt ${t.toFixed(2)}`);
+        if(Math.abs(t)>=2){const l=T(s,x+bw/2,Y(v)+(v>0?-6:14),"t "+t.toFixed(1),"ax");
+          l.setAttribute("fill","var(--ink)");}
+      });});
+    legend($("#xsubleg"),CAND.map(c=>({c:c.c,t:c.t})));
+    const d1=sp.series["D1_top100_equal"];
+    $("#xsubfoot").innerHTML=`Solid bars are significant at t&nbsp;&ge;&nbsp;2; faded
+      ones are not. The top-100 book earned <b>${sg(d1.alpha[3],2)}</b> a year with
+      t&nbsp;${t2(d1.t[3])} over the first half of the sample and
+      <b>${sg(d1.alpha[4],2)}</b> with t&nbsp;${t2(d1.t[4])} over the second.
+      <b>That decay is the single number that would stop me sizing this up</b>, and it
+      is the honest reason the scorecard above marks &ldquo;still working after
+      2019&rdquo; as a no. The last two columns re-cut the same days as one split, so
+      they are not independent of the first three.`;
+  }
+
+  /* ---------------- cost curve --------------------------------------- */
+  function costchart(){
+    const host=$("#xcost"); host.innerHTML="";
+    const c=D.cost, W=430,H=250,L=48,R=78,Tp=14,B=38;
+    const s=mk(W,H,"Alpha against SPY as trading cost rises"); host.appendChild(s);
+    const vals=CAND.flatMap(k=>c.series[k.k].alpha).filter(ok);
+    const hi=Math.max(...vals)*1.1, lo=Math.min(...vals,0)*1.1-0.004;
+    const X=i=>L+i*(W-L-R)/(c.bps.length-1), Y=v=>Tp+(1-(v-lo)/(hi-lo))*(H-Tp-B);
+    for(let v=Math.ceil(lo*50)/50;v<=hi;v+=.02){
+      E(s,"line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),class:Math.abs(v)<1e-9?"zl":"gl"});
+      T(s,L-7,Y(v)+3.5,(v*100).toFixed(0)+"%","ax","end");}
+    c.bps.forEach((b,i)=>{ if(i%2&&i!==c.bps.length-1)return;
+      T(s,X(i),H-20,String(b),"ax");});
+    T(s,(L+W-R)/2,H-5,"one-way cost, basis points","ax");
+    const ends=[];
+    CAND.forEach(k=>{
+      const a=c.series[k.k].alpha;
+      E(s,"path",{d:a.map((v,i)=>(i?"L":"M")+X(i)+","+Y(v)).join(""),fill:"none",
+                  stroke:k.c,"stroke-width":2,"stroke-linecap":"round"});
+      a.forEach((v,i)=>{const d=E(s,"circle",{cx:X(i),cy:Y(v),r:4,fill:k.c,
+          stroke:"var(--card)","stroke-width":2});
+        hov(d,`${k.t}\n${c.bps[i]}bps  alpha ${(v*100).toFixed(2)}%  t ${c.series[k.k].t[i].toFixed(2)}`);});
+      ends.push({y:Y(a.at(-1)),c:k.c,t:k.t});});
+    ends.sort((a,b)=>a.y-b.y);
+    for(let i=1;i<ends.length;i++) if(ends[i].y-ends[i-1].y<13) ends[i].y=ends[i-1].y+13;
+    ends.forEach(e=>{E(s,"circle",{cx:W-R+6,cy:e.y,r:4,fill:e.c,stroke:"var(--card)","stroke-width":2});
+      const g=T(s,W-R+14,e.y+3.5,e.t,"ax","start"); g.setAttribute("fill","var(--ink2)");});
+    legend($("#xcostleg"),CAND.map(k=>({c:k.c,t:k.t})));
+  }
+
+  /* ---------------- forward simulation + battery --------------------- */
+  const SIMLAB={SPY:"SPY",D1_top100_equal:"Top-100",
+    "D4_betaneutral_q0.1":"Beta-neutral L/S","C_vip_bigAUM_vsSPY":"VIP long / SPY short"};
+  function mcsim(){
+    const tb=$("#xsim").querySelector("tbody"); let html="";
+    for(const k in D.mcsim.rows){
+      const rows=D.mcsim.rows[k], ids=Object.keys(rows);
+      ids.forEach((mid,i)=>{const v=rows[mid];
+        html+=`<tr${k==="D1_top100_equal"?' class="tracked"':(k==="C_vip_bigAUM_vsSPY"?' class="hl"':"")}>
+          <td>${i?"":SIMLAB[k]||k}</td><td style="text-align:left" class="dim">${v.label}</td>
+          <td class="${cls(v.p5)}">${pc(v.p5)}</td><td class="str">${pc(v.p50)}</td>
+          <td class="dim">${pc(v.p95)}</td><td class="neg">${pc(v.dd50)}</td>
+          <td class="neg">${pc(v.dd99)}</td><td>${pc(v.plose,0)}</td></tr>`;});}
+    tb.innerHTML=html;
+    const d1=D.mcsim.rows["D1_top100_equal"], spy=D.mcsim.rows["SPY"];
+    const vip=D.mcsim.rows["C_vip_bigAUM_vsSPY"];
+    const plo=Math.min(...Object.values(vip).map(v=>v.plose)),
+          phi=Math.max(...Object.values(vip).map(v=>v.plose));
+    $("#xsimfoot").innerHTML=`The top-100 book is ahead of SPY under <b>every</b> model,
+      not just the resampler &mdash; its 5th-percentile five-year CAGR stays positive
+      where SPY's goes negative under the regime model. The beta-neutral book has the
+      bigger alpha and a much worse tail: under GARCH its one-in-a-hundred drawdown is
+      ${pc(D.mcsim.rows["D4_betaneutral_q0.1"].garch.dd99,0)}. And following crowded
+      hedge fund positions against SPY loses money in
+      <b>${pc(plo,0)}&ndash;${pc(phi,0)}</b> of simulated five-year paths, whichever
+      model you believe.`;
+  }
+
+  function battery(){
+    const n=D.battery.net, g=D.battery.gross;
+    const row=(q,a,b,note)=>`<tr><td>${q}</td><td class="str">${a}</td>
+      <td class="dim">${b}</td><td style="text-align:left" class="dim">${note}</td></tr>`;
+    const pd1=n.per["D1_top100_equal"], gd1=g.per["D1_top100_equal"];
+    $("#xbat").innerHTML=`<thead><tr><th>Test</th><th>Net of costs</th><th>Gross</th>
+      <th style="text-align:left">What it is asking</th></tr></thead><tbody>`+
+      row("White Reality Check, best of "+D.meta.variants, f2(n.rc,3), f2(g.rc,3),
+          "Could the best variant's edge come from searching this many?")+
+      row("Hansen SPA (recentred)", `<span class="neg">${f2(n.spa,3)}</span>`, f2(g.spa,3),
+          "The same question, with bad variants stopped from flattering the winner")+
+      row("Probability of backtest overfitting", pc(n.pbo,0), pc(g.pbo,0),
+          "How often the in-sample winner lands below median out of sample")+
+      row("Top-100 alpha-IR", `${f2(pd1.ir)} <span class="dim">[${f2(pd1.ci[0])}, ${f2(pd1.ci[1])}]</span>`,
+          `${f2(gd1.ir)}`, "Stationary-bootstrap 95% interval — it barely clears zero")+
+      row("Top-100 deflated Sharpe", f2(pd1.dsr), f2(gd1.dsr),
+          "Probability the true Sharpe beats zero once "+D.meta.variants+" trials are priced in")+
+      row("Top-100 sign-flip null", f2(pd1.signflip,3), f2(gd1.signflip,3),
+          "A null that keeps the series' own shape instead of assuming a normal")+
+      row("Minimum track record", f2(pd1.mintrl,1)+" yr", f2(gd1.mintrl,1)+" yr",
+          "How long it would take to establish at 95% — against "+D.meta.years+" available")+
+      row("Smallest detectable IR, 80% power", f2(n.mde), f2(g.mde),
+          "Below this the experiment cannot resolve an edge at all")+
+      row("Survives Benjamini–Hochberg–Yekutieli", `<span class="neg">no</span>`,
+          `<span class="neg">no</span>`, "Nothing among the "+D.meta.variants+" does")+
+      `</tbody>`;
+    $("#xbatfoot").innerHTML=`The two multiplicity corrections disagree, and the reason
+      is worth knowing: White's Reality Check accounts for the fact that these 69
+      variants are highly correlated &mdash; they are built from the same four factors
+      &mdash; while the deflated Sharpe assumes ${D.meta.variants} independent trials
+      and over-penalises. The truth is between them. Neither is comfortable, and
+      <b>Hansen's SPA, the better-behaved of the two tests, does not reject the null
+      at ${f2(n.spa,3)}</b>.`;
+
+    const s=D.subperiod.series["D1_top100_equal"];
+    $("#xverdict").innerHTML=`The top-100 book is the only thing here I would consider
+      running: long only, no shorting, no borrow, about one and a half turns of the
+      book a year, a Sharpe clearly above SPY's, a decisive random control, and it
+      stays ahead under every forward market model. But the alpha
+      <b>has decayed</b> &mdash; ${sg(s.alpha[3],2)}/yr with t&nbsp;${t2(s.t[3])}
+      before 2019, ${sg(s.alpha[4],2)}/yr with t&nbsp;${t2(s.t[4])} after &mdash; it
+      does not survive the search that found it (SPA p&nbsp;${f2(n.spa,3)}, PBO
+      ${pc(n.pbo,0)}), and the effect I am reading is smaller than the smallest this
+      experiment could resolve. Goldman's own published index, faithfully replicated,
+      is not distinguishable from its benchmark at this sample length by construction:
+      it runs 50&ndash;200bp of tracking error on purpose.`;
+  }
+
+  function today(){
+    if(!D.today){$("#xtodaycap").textContent="";return;}
+    const t=D.today;
+    $("#xtodaycap").innerHTML=`&middot; ${t.n} names, equally weighted &middot; scored ${t.as_of}`;
+    const tot=Object.values(t.sectors).reduce((a,b)=>a+b,0);
+    $("#xtodaysec").innerHTML=Object.entries(t.sectors).sort((a,b)=>b[1]-a[1])
+      .map(([k,v])=>`<span class="chip">${k} <b>${v}</b></span>`).join("");
+    $("#xtodaylist").innerHTML=`<b>${t.holdings.join(" · ")}</b><br><br>
+      Value, quality and low volatility together pull the book toward defensives,
+      financials and healthcare, and away from the mega-cap growth names that carried
+      the index. That tilt is where both the lower volatility and the post-2019 decay
+      come from. This is what the rules produce, not a recommendation &mdash;
+      <b>${tot} positions</b> at 1% each, rebalanced quarterly.`;
+  }
+
+  function draw(){ if(!D)return; equity(); control(); subperiod(); costchart(); }
+
+  fetch("gs.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+    D=d; head(); table(); mcsim(); battery(); today(); draw();
+    addEventListener("resize",()=>{ if(!$("#v-gs").hidden) draw(); });
+  }).catch(e=>{
+    console.error("goldman board failed:",e);
+    $("#xscore").innerHTML=`<div class="sc"><h2>Could not load gs.json</h2>
+      <div class="cap">${(e&&e.message)||e}</div></div>`;});
+
+  window.__gsRedraw = draw;
+})();
+</script>
+
+<script>
 /* subtab router. Each board owns its markup and its own script; this only
    decides which is on screen and tells the gold board to re-measure, because
    an SVG laid out while display:none has no width to lay out against. */
 (function(){
   const views={bell:document.getElementById("v-bell"),
                gold:document.getElementById("v-gold"),
-               mes:document.getElementById("v-mes")};
+               mes:document.getElementById("v-mes"),
+               gs:document.getElementById("v-gs")};
   const btns=[...document.querySelectorAll(".sub-btn")];
   const LEDE={
     bell:"Two ways of trading the opening bell, tested. Neither is tradeable \u2014 for different reasons.",
     gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal.",
-    mes:"The same rig, the same tests, pointed at the Micro E-mini S&P 500. Nothing here is a gold result \u2014 it is the control that says whether any of it was about the indicator."};
+    mes:"The same rig, the same tests, pointed at the Micro E-mini S&P 500. Nothing here is a gold result \u2014 it is the control that says whether any of it was about the indicator.",
+    gs:"Three Goldman Sachs strategies rebuilt from their own published rule books and their own source filings. Two of them do not beat the market. The third thing \u2014 which is mine, not theirs \u2014 does, and then decays."};
   function show(v,push){
     if(!views[v]) v="bell";
     for(const k in views) if(views[k]) views[k].hidden = (k!==v);
@@ -2147,6 +2783,7 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
     const l=document.getElementById("lede"); if(l&&LEDE[v]) l.textContent=LEDE[v];
     if(push&&history.replaceState) history.replaceState(null,"","#"+v);
     if(window.__boardRedraw) window.__boardRedraw(v);
+    if(v==="gs"&&window.__gsRedraw) window.__gsRedraw();
     if(push) scrollTo(0,0);
   }
   btns.forEach(b=>b.addEventListener("click",()=>show(b.dataset.view,true)));
