@@ -16,10 +16,31 @@
 import * as S from './stats.mjs';
 import * as M from './metrics.mjs';
 
+/** Realistic frictions for a daily ETF strategy. Stated rather than assumed,
+ *  because the default is doing a lot of work in every result below.
+ *
+ *  `bpsPerTurnover` is the one-way cost of trading 100% of capital: roughly the
+ *  half-spread plus slippage. At a 1-cent spread, SPY (~$690) is about 0.7bp and
+ *  IWM (~$250) about 2bp, so a single default cannot be right for both.
+ *
+ *  Financing and borrow are charged on the exposure actually held, not on the
+ *  notional: a rule that sits flat half the time pays nothing while it is flat. */
+export const COST_PRESETS = {
+  SPY: { bpsPerTurnover: 1.0, note: '1-cent spread on a ~$690 share' },
+  QQQ: { bpsPerTurnover: 1.2, note: '1-cent spread on a ~$600 share' },
+  IWM: { bpsPerTurnover: 2.5, note: '1-cent spread on a ~$250 share, wider in stress' },
+};
+
 /** Score a parameter set over one contiguous slice. Returns null on a degenerate
  *  result rather than a misleading number. */
 export function runStrategy(market, fn, params, opts = {}) {
-  const { bpsPerTurnover = 1, ppy = 252, minTrades = 1, rng = null } = opts;
+  const {
+    bpsPerTurnover = 1, ppy = 252, minTrades = 1, rng = null,
+    financingAnnual = 0,     // cost of exposure above 1x
+    shortBorrowAnnual = 0,   // extra cost of negative exposure
+    bpsPerPeriod = 0,        // flat holding drag, scaled by exposure
+    maxExposure = Infinity,  // what the account can actually hold
+  } = opts;
   const n = market.length;
   if (n < 10) return null;
   const pos = new Float64Array(n);
@@ -27,16 +48,29 @@ export function runStrategy(market, fn, params, opts = {}) {
   try { fn(market, pos, ctx); } catch { return null; }
 
   const c = bpsPerTurnover / 1e4;
+  const drag = bpsPerPeriod / 1e4;
+  const finPer = financingAnnual / 100 / ppy;
+  const borrowPer = shortBorrowAnnual / 100 / ppy;
   const net = new Float64Array(n);
   const gross = new Float64Array(n);
-  let prev = 0, trades = 0, turnover = 0;
+  let prev = 0, trades = 0, turnover = 0, maxAbs = 0;
   for (let t = 0; t < n; t++) {
-    const p = Number.isFinite(pos[t]) ? pos[t] : 0;
+    let p = Number.isFinite(pos[t]) ? pos[t] : 0;
+    // an account cannot hold more than it can hold; clamping here rather than
+    // letting a rule quietly assume unlimited leverage
+    if (p > maxExposure) p = maxExposure;
+    if (p < -maxExposure) p = -maxExposure;
+    pos[t] = p;
     const d = Math.abs(p - prev);
     if (d > 1e-12) trades++;
     turnover += d;
+    if (Math.abs(p) > maxAbs) maxAbs = Math.abs(p);
     gross[t] = p * market[t];
-    net[t] = gross[t] - d * c;
+    let r = gross[t] - d * c;
+    if (drag > 0) r -= Math.abs(p) * drag;
+    if (finPer > 0 && p > 1) r -= (p - 1) * finPer;
+    if (borrowPer > 0 && p < 0) r -= (-p) * borrowPer;
+    net[t] = r;
     prev = p;
   }
   if (trades < minTrades) return null;
@@ -47,6 +81,9 @@ export function runStrategy(market, fn, params, opts = {}) {
     sharpe: a.sharpe, grossSharpe: g.sharpe, cagr: a.cagr, maxDD: a.maxDD,
     calmar: a.calmar, vol: a.vol, meanBps: S.mean(net) * 1e4,
     trades, turnoverPerPeriod: turnover / n, n,
+    maxExposure: maxAbs,
+    usesShorts: (() => { for (let t = 0; t < n; t++) if (pos[t] < -1e-12) return true; return false; })(),
+    usesLeverage: maxAbs > 1 + 1e-9,
     net, gross,
   };
 }

@@ -1,7 +1,7 @@
 /* idea.mjs -- the "test an idea" flow: controls, worker, rendering. */
 import * as C from './charts.mjs';
 import { IDEA_EXAMPLES } from '../lib/ideatest.mjs';
-import { extractParamSpec, expandGrid } from '../lib/strategylab.mjs';
+import { extractParamSpec, expandGrid, COST_PRESETS } from '../lib/strategylab.mjs';
 import * as S from '../lib/stats.mjs';
 
 const $ = s => document.querySelector(s);
@@ -63,6 +63,13 @@ export function initIdea(ctx) {
       ${e.from} to ${e.to} · buy-and-hold Sharpe
       <b>${(m.mean / m.sd * Math.sqrt(252)).toFixed(2)}</b>. Your idea has to beat that.`;
     $$('#ideaMarket button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mk === id)));
+    // the right cost is not the same for a $690 share and a $250 one
+    const sym = (id.split('_')[0] || '').toUpperCase();
+    const preset = COST_PRESETS[sym];
+    if (preset) {
+      $('#ideaCost').value = preset.bpsPerTurnover;
+      $('#ideaCostHint').innerHTML = `${preset.bpsPerTurnover}bp suggested for ${esc(sym)} — ${esc(preset.note)}`;
+    }
   }
 
   let worker = null;
@@ -113,6 +120,7 @@ export function initIdea(ctx) {
         folds: +$('#ideaFolds').value, isFraction: +$('#ideaIS').value,
         anchored: $('#ideaWindow').value === 'anchored',
         objective: $('#ideaObj').value, bpsPerTurnover: +$('#ideaCost').value,
+        financingAnnual: +$('#ideaFin').value || 0, shortBorrowAnnual: +$('#ideaBorrow').value || 0,
         radius: +$('#ideaRadius').value, ppy: 252, seed: +($('#seed').value || 1),
       },
     });
@@ -135,7 +143,38 @@ function render(r) {
   renderGates(r);
   renderWalkForward(r);
   renderSensitivity(r);
+  renderStress(r);
   renderStats(r);
+}
+
+function renderStress(r) {
+  const st = r.stress;
+  if (!st) { $('#stressFoot').innerHTML = '<span class="neg">execution stress did not run</span>'; return; }
+  const ladder = st.rows.filter(x => x.skip === 0 && x.slipSd === 0);
+  C.lineChart($('#stressChart'), {
+    series: [{ name: 'out of sample', x: ladder.map(x => x.mult), y: ladder.map(x => x.score),
+               color: 'var(--s2)', points: true }],
+    height: 230, xLabel: 'multiple of the assumed cost', yLabel: r.objective,
+    xFmt: v => v + '\u00d7', yFmt: f2, zeroLine: true,
+  });
+  $('#stressTab').querySelector('tbody').innerHTML = st.rows.map(x => {
+    const d = x.score - st.assumed;
+    return `<tr${x.id === 'assumed' ? ' class="hl"' : ''}>
+      <td>${esc(x.label)}</td>
+      <td class="${x.score > 0 ? 'pos' : 'neg'}">${f2(x.score)}</td>
+      <td class="${d > 0 ? 'pos' : d < 0 ? 'neg' : 'dim'}">${x.id === 'assumed' ? '—' : (d >= 0 ? '+' : '') + d.toFixed(3)}</td></tr>`;
+  }).join('');
+  $('#stressFoot').innerHTML = `At the assumed ${st.assumedBps}bp the out-of-sample score is
+    <b>${f2(st.assumed)}</b>.
+    ${Number.isFinite(st.breakEvenMult)
+      ? `It reaches zero at about <b>${st.breakEvenBps.toFixed(1)}bp</b>, ${st.breakEvenMult.toFixed(1)}× the assumption.`
+      : 'It stays positive even at five times the assumption.'}
+    ${st.holdsAt2 ? 'Doubling the cost keeps most of it.' : '<b>Doubling the cost takes most of it away</b> — the result depends on the cost estimate being right.'}
+    ${st.skipHelps
+      ? ` <b>Randomly skipping trades improves the result</b> (${esc(st.bestMiss.label.toLowerCase())} scores
+          ${f2(st.bestMiss.score)} against ${f2(st.assumed)}). The trades are on net harmful: the signal is
+          subtracting value rather than adding it.`
+      : ' Skipping trades makes it worse, which is what a rule whose trades add value should do.'}`;
 }
 
 function renderGates(r) {
