@@ -255,13 +255,25 @@
       <div class="step">
         <h4><i>3</i>How to test it</h4>
         <div class="grid-ctl">
+          <div><label class="f" for="ideaPeriod">Test period</label>
+            <select id="ideaPeriod">
+              <option value="1">The last 1 year, every day</option>
+              <option value="2">The last 2 years, every day</option>
+              <option value="3">The last 3 years, every day</option>
+              <option value="5" selected>The last 5 years, every day</option>
+              <option value="10">The last 10 years, every day</option>
+              <option value="">Proportional split (use the slider)</option>
+            </select>
+            <div class="hint" id="ideaPeriodHint"></div></div>
+          <div><label class="f" for="ideaCapital">Starting capital ($)</label>
+            <input type="number" id="ideaCapital" value="10000" min="100" step="1000"></div>
           <div><label class="f" for="ideaFolds">Walk-forward folds <output id="ideaFoldsO">5</output></label>
             <div class="rangewrap"><input type="range" id="ideaFolds" min="3" max="10" step="1" value="5"></div></div>
-          <div><label class="f" for="ideaIS">In-sample share <output id="ideaISO">50%</output></label>
+          <div id="wISRow" hidden><label class="f" for="ideaIS">In-sample share <output id="ideaISO">50%</output></label>
             <div class="rangewrap"><input type="range" id="ideaIS" min="0.3" max="0.8" step="0.05" value="0.5"></div></div>
           <div><label class="f" for="ideaWindow">Window</label>
-            <select id="ideaWindow"><option value="rolling">Rolling (adapts, forgets)</option>
-              <option value="anchored">Anchored (never forgets)</option></select></div>
+            <select id="ideaWindow"><option value="anchored" selected>Anchored (train on everything before)</option>
+              <option value="rolling">Rolling (fixed-width training window)</option></select></div>
           <div><label class="f" for="ideaObj">Optimise for</label>
             <select id="ideaObj"><option value="sharpe">Sharpe ratio</option>
               <option value="calmar">Calmar (CAGR / max drawdown)</option>
@@ -322,6 +334,74 @@
         <h3>The neighbourhood <span>&middot; every combination within the radius</span></h3>
         <div class="grid" id="sensTiles"></div>
         <div id="sensHist" style="margin-top:12px"></div>
+      </section>
+
+      <div class="part"><span class="no">THE MONEY</span><h2>What it would have done to an account</h2>
+        <span class="sub" id="moneySub"></span></div>
+      <p class="partnote">Every number below is from the <b>out-of-sample</b> period only — days the parameters
+        were never fitted to. The strategy is compared against simply buying and holding the same thing.</p>
+
+      <div class="grid" id="moneyTiles"></div>
+
+      <section>
+        <h3>Account value <span>&middot; strategy against buy and hold</span></h3>
+        <div class="legend" id="eqLeg"></div>
+        <div id="moneyEquity"></div>
+        <div class="foot" id="moneyEqFoot"></div>
+      </section>
+
+      <div class="cols two">
+        <section style="margin-top:0">
+          <h3>Profit and loss by month</h3>
+          <div id="monthBars"></div>
+          <div class="foot" id="monthFoot"></div>
+        </section>
+        <section style="margin-top:0">
+          <h3>How far below the high water mark <span>&middot; in dollars</span></h3>
+          <div id="ddArea"></div>
+          <div class="foot" id="ddFoot"></div>
+        </section>
+      </div>
+
+      <section>
+        <h3>Year by year</h3>
+        <div class="wrap"><table id="yearTab">
+          <thead><tr><th>Year</th><th>Days</th><th>Strategy</th><th>P&amp;L</th>
+            <th>Account at year end</th><th>Buy and hold</th><th>Difference</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="yearFoot"></div>
+      </section>
+
+      <section>
+        <h3>Against the alternatives <span>&middot; the same dollars over the same days</span></h3>
+        <div class="note">Not just the benchmark: what else you could have done with the money over exactly
+          this period, including holding bonds, gold, or a balanced mix.</div>
+        <div id="altChart"></div>
+        <div class="wrap" style="margin-top:12px"><table id="altTab">
+          <thead><tr><th>Where the money went</th><th>Final value</th><th>Profit</th><th>CAGR</th>
+            <th>Worst drawdown</th><th>Sharpe</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="altFoot"></div>
+      </section>
+
+      <div class="part"><span class="no">WHICH MARKETS</span><h2>Where the money came from</h2>
+        <span class="sub">and where it did not</span></div>
+      <p class="partnote">A single Sharpe ratio hides this. A rule that makes everything in turbulent bear
+        markets is a very different proposition from one that grinds steadily, even at the same headline
+        number — and you cannot size them the same way. Every regime below is classified from information
+        available <b>before</b> the day it labels.</p>
+
+      <div id="regimeBlocks"></div>
+
+      <section>
+        <h3>How concentrated is the result?</h3>
+        <div class="grid" id="concTiles"></div>
+        <div class="foot" id="concFoot"></div>
+      </section>
+
+      <section>
+        <h3>Rolling 12-month return <span>&middot; is it consistent, or was it one stretch?</span></h3>
+        <div class="legend" id="rollLeg"></div>
+        <div id="rollChart"></div>
+        <div class="foot" id="rollFoot"></div>
       </section>
 
       <section>

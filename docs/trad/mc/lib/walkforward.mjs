@@ -25,18 +25,32 @@ export function walkForward(market, fn, spec, opts = {}) {
   const {
     folds = 5, isFraction = 0.6, anchored = false,
     objective = 'sharpe', ppy = 252, bpsPerTurnover = 1, minOOS = 40,
+    oosPeriods = null,   // test exactly this many periods, trained on everything before
   } = opts;
   const n = market.length;
   const obj = OBJECTIVES[objective] || OBJECTIVES.sharpe;
 
-  // Lay out the folds: the history after the first in-sample block is split into
-  // `folds` equal out-of-sample periods, each preceded by its own in-sample window.
-  const oosTotal = Math.floor(n * (1 - isFraction));
+  /* Two ways to lay out the test period.
+   *
+   * `oosPeriods` states it directly -- "test the last five years, every day" --
+   * and gives the whole of the rest of the history to training. That is the one
+   * to use when you have a period in mind, because it does not quietly shrink
+   * the test window when you change the fold count.
+   *
+   * `isFraction` splits proportionally instead, which is the right default when
+   * you care more about having long training windows than about a specific span.
+   */
+  const oosTotal = oosPeriods != null
+    ? Math.min(oosPeriods, n - 100)
+    : Math.floor(n * (1 - isFraction));
   const oosLen = Math.floor(oosTotal / folds);
   if (oosLen < minOOS) {
-    return { ok: false, note: `each out-of-sample fold would be ${oosLen} periods; need at least ${minOOS}. Use fewer folds or more data.` };
+    return { ok: false, note: `each out-of-sample fold would be ${oosLen} periods; need at least ${minOOS}. Use fewer folds, a longer test period, or more data.` };
   }
   const firstOOS = n - oosLen * folds;
+  if (firstOOS < 100) {
+    return { ok: false, note: `only ${firstOOS} periods left for training. Shorten the test period or add history.` };
+  }
   const isLen = anchored ? null : firstOOS;
 
   const results = [];
@@ -54,7 +68,13 @@ export function walkForward(market, fn, spec, opts = {}) {
     const se = search(isSlice, fn, spec, { objective, ppy, bpsPerTurnover });
     if (!se.best) { results.push({ fold: k, ok: false, note: 'no valid parameter set in sample' }); continue; }
 
-    const oos = runStrategy(oosSlice, fn, se.best.params, { ppy, bpsPerTurnover });
+    /* minTrades: 0 for the OUT-OF-SAMPLE evaluation. If the chosen parameters say
+     * "stay flat this fold", that IS the result -- a zero return -- and it has to
+     * stay in the stitched curve. Dropping no-trade folds silently removes the
+     * flat stretches and overstates both the activity and the score. The search
+     * above keeps minTrades: 1, because optimising INTO a no-trade solution is a
+     * different problem and one worth refusing. */
+    const oos = runStrategy(oosSlice, fn, se.best.params, { ...opts, ppy, bpsPerTurnover, minTrades: 0 });
     const isScore = se.best.score;
     const oosScore = oos ? obj.get(oos) : NaN;
 
@@ -63,7 +83,8 @@ export function walkForward(market, fn, spec, opts = {}) {
     const hindsight = search(oosSlice, fn, spec, { objective, ppy, bpsPerTurnover });
 
     results.push({
-      fold: k, ok: true,
+      fold: k, ok: !!oos,
+      note: oos ? undefined : 'the chosen parameters produced no usable out-of-sample result',
       isRange: [isStart, isEnd], oosRange: [oosStart, oosEnd],
       isLen: isEnd - isStart, oosLen,
       params: se.best.params,
@@ -81,6 +102,7 @@ export function walkForward(market, fn, spec, opts = {}) {
 
   const good = results.filter(r => r.ok && Number.isFinite(r.oosScore));
   if (!good.length) return { ok: false, note: 'no fold produced a usable out-of-sample result' };
+  // a fold that ran but could not be scored must not vanish without a trace
 
   // the concatenated out-of-sample curve: the only unfitted equity curve here
   let total = 0;
@@ -112,6 +134,11 @@ export function walkForward(market, fn, spec, opts = {}) {
 
   return {
     ok: true, folds: good.length, anchored, objective, isFraction,
+    // the ACTUAL length of the stitched curve, not the length it was meant to be
+    oosPeriods: total,
+    oosRequested: oosLen * folds,
+    foldsDropped: results.filter(r => !r.ok).length,
+    trainPeriods: firstOOS,
     results, stitched, stitchedStats,
     meanIS, meanOOS, meanHindsight: meanHind,
     // Walk-forward efficiency: how much of the in-sample score survived. The

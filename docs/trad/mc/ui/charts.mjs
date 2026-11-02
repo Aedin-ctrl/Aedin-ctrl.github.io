@@ -588,3 +588,132 @@ export function legend(host, entries) {
   }
   return host;
 }
+
+/* ======================= signed bar chart ======================= */
+/** Monthly or yearly P&L: positive up in green, negative down in red.
+ *  Status colours, used for their reserved meaning (good / bad), never as
+ *  categorical series slots. */
+export function signedBars(host, {
+  values, labels, height = 240, fmt = v => v.toFixed(0), xLabel = '', yLabel = '',
+  maxLabels = 14,
+}) {
+  const w = 760, m = { l: 62, r: 14, t: 12, b: 42 };
+  const h = height;
+  const s = svg(host, w, h);
+  const plot = makePlot(s, w, h, m);
+  const n = values.length;
+  if (!n) return s;
+  let lo = Math.min(0, ...values), hi = Math.max(0, ...values);
+  const pad = (hi - lo) * 0.08 || 1;
+  lo -= pad; hi += pad;
+  const sx = linScale(0, n, plot.x0, plot.x1);
+  const sy = linScale(lo, hi, plot.y1, plot.y0);
+  plot.sx = sx; plot.sy = sy;
+
+  for (const t of ticks(lo, hi, 6)) {
+    const y = sy(t);
+    if (y < plot.y0 - 0.5 || y > plot.y1 + 0.5) continue;
+    el(s, 'line', { x1: plot.x0, x2: plot.x1, y1: y, y2: y, class: 'gl' });
+    txt(s, plot.x0 - 7, y + 3.5, fmt(t), 'ax', 'end');
+  }
+  const zy = sy(0);
+  el(s, 'line', { x1: plot.x0, x2: plot.x1, y1: zy, y2: zy, class: 'zl' });
+
+  const bw = (plot.x1 - plot.x0) / n;
+  const every = Math.max(1, Math.ceil(n / maxLabels));
+  for (let i = 0; i < n; i++) {
+    const v = values[i];
+    const y = sy(Math.max(v, 0));
+    const hgt = Math.abs(sy(v) - zy);
+    const r = el(s, 'rect', {
+      x: plot.x0 + i * bw + 0.8, y, width: Math.max(0.6, bw - 1.6),
+      height: Math.max(0.6, hgt), rx: Math.min(2, bw / 3),
+      fill: v >= 0 ? 'var(--good)' : 'var(--bad)', opacity: 0.85,
+    });
+    r.addEventListener('mousemove', e => showTip(e, `<b>${labels[i]}</b>\n${fmt(v)}`));
+    r.addEventListener('mouseleave', hideTip);
+    if (i % every === 0) {
+      const t = txt(s, plot.x0 + i * bw + bw / 2, plot.y1 + 15, labels[i], 'ax');
+      if (n > 24) t.setAttribute('transform', `rotate(-45 ${plot.x0 + i * bw + bw / 2} ${plot.y1 + 15})`);
+    }
+  }
+  if (yLabel) { const t = txt(s, 0, 0, yLabel, 'axlab'); t.setAttribute('transform', `translate(11,${(plot.y0 + plot.y1) / 2}) rotate(-90)`); }
+  if (xLabel) txt(s, (plot.x0 + plot.x1) / 2, h - 5, xLabel, 'axlab');
+  return s;
+}
+
+/* ======================= grouped horizontal bars ======================= */
+/** Two measures per row, for "strategy against benchmark" in each regime.
+ *  Exactly two series, so the validated categorical pair is enough and both
+ *  are directly labelled. */
+export function groupedBars(host, {
+  rows, height = null, fmt = v => v.toFixed(1), xLabel = '',
+  nameA = 'strategy', nameB = 'benchmark',
+}) {
+  const rowH = 38, w = 760, m = { l: 210, r: 70, t: 24, b: 40 };
+  const h = height || (rows.length * rowH + m.t + m.b);
+  const s = svg(host, w, h);
+  const plot = makePlot(s, w, h, m);
+  const vals = rows.flatMap(r => [r.a, r.b]).filter(Number.isFinite);
+  let lo = Math.min(0, ...vals), hi = Math.max(0, ...vals);
+  const pad = (hi - lo) * 0.1 || 1;
+  lo -= pad; hi += pad;
+  const sx = linScale(lo, hi, plot.x0, plot.x1);
+  for (const t of ticks(lo, hi, 6)) {
+    el(s, 'line', { x1: sx(t), x2: sx(t), y1: plot.y0, y2: plot.y1, class: 'gl' });
+    txt(s, sx(t), plot.y1 + 15, fmt(t), 'ax');
+  }
+  el(s, 'line', { x1: sx(0), x2: sx(0), y1: plot.y0, y2: plot.y1, class: 'zl' });
+  txt(s, plot.x0, plot.y0 - 9, nameA, 'dlab', 'start').setAttribute('fill', SERIES[0]);
+  txt(s, plot.x0 + 86, plot.y0 - 9, nameB, 'dlab', 'start').setAttribute('fill', SERIES[1]);
+
+  rows.forEach((r, i) => {
+    const y = plot.y0 + i * rowH;
+    txt(s, plot.x0 - 9, y + rowH / 2 + 1, r.label, 'rowlab', 'end');
+    if (r.sub) txt(s, plot.x0 - 9, y + rowH / 2 + 13, r.sub, 'ax', 'end');
+    [[r.a, SERIES[0], 0], [r.b, SERIES[1], 1]].forEach(([v, c, k]) => {
+      if (!Number.isFinite(v)) return;
+      const x0 = sx(Math.min(0, v)), x1 = sx(Math.max(0, v));
+      const bar = el(s, 'rect', {
+        x: x0, y: y + 6 + k * 11, width: Math.max(1, x1 - x0), height: 9,
+        fill: c, rx: 2, opacity: 0.88,
+      });
+      bar.addEventListener('mousemove', e => showTip(e, `<b>${r.label}</b>\n${k ? nameB : nameA}: ${fmt(v)}${r.sub ? '\n' + r.sub : ''}`));
+      bar.addEventListener('mouseleave', hideTip);
+    });
+    txt(s, plot.x1 + 6, y + rowH / 2 + 3, fmt(r.a), 'dlab', 'start').setAttribute('fill', SERIES[0]);
+  });
+  if (xLabel) txt(s, (plot.x0 + plot.x1) / 2, h - 4, xLabel, 'axlab');
+  return s;
+}
+
+/* ======================= filled area (underwater) ======================= */
+export function areaChart(host, {
+  x, y, height = 220, color = 'var(--bad)', fmt = v => v.toFixed(0),
+  xLabel = '', yLabel = '', xFmt = v => String(Math.round(v)),
+}) {
+  const w = 760, m = { l: 66, r: 14, t: 12, b: 40 };
+  const h = height;
+  const s = svg(host, w, h);
+  const plot = makePlot(s, w, h, m);
+  let lo = Math.min(0, ...y), hi = Math.max(0, ...y);
+  const pad = (hi - lo) * 0.06 || 1;
+  lo -= pad;
+  const sx = linScale(x[0], x[x.length - 1], plot.x0, plot.x1);
+  const sy = linScale(lo, hi, plot.y1, plot.y0);
+  plot.sx = sx; plot.sy = sy;
+  frame(s, plot, { xTicks: ticks(x[0], x[x.length - 1], 7), yTicks: ticks(lo, hi, 5),
+    xFmt, yFmt: fmt, xLabel, yLabel, zeroAt: 0 });
+  let d = `M${sx(x[0])},${sy(0)}`;
+  for (let i = 0; i < x.length; i++) d += `L${sx(x[i]).toFixed(1)},${sy(y[i]).toFixed(1)}`;
+  d += `L${sx(x[x.length - 1])},${sy(0)}Z`;
+  el(s, 'path', { d, fill: color, opacity: 0.22, stroke: 'none' });
+  let line = '';
+  for (let i = 0; i < x.length; i++) line += `${i ? 'L' : 'M'}${sx(x[i]).toFixed(1)},${sy(y[i]).toFixed(1)}`;
+  el(s, 'path', { d: line, fill: 'none', stroke: color, 'stroke-width': 1.5 });
+  const worst = Math.min(...y), wi = y.indexOf(worst);
+  el(s, 'circle', { cx: sx(x[wi]), cy: sy(worst), r: 4, fill: color, stroke: 'var(--card)', 'stroke-width': 2 });
+  txt(s, sx(x[wi]), sy(worst) + 16, fmt(worst), 'dlab').setAttribute('fill', color);
+  crosshair(s, plot, x.map(v => sx(v)), i => `<b>${xFmt(x[i])}</b>\n${fmt(y[i])}`);
+  return s;
+}

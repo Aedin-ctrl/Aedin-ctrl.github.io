@@ -26,6 +26,8 @@ import { detectLookahead } from './strategy.mjs';
 import * as T from './tests.mjs';
 import * as S from './stats.mjs';
 import * as M from './metrics.mjs';
+import { report, compare, rolling } from './performance.mjs';
+import { regimeAnalysis } from './regimes.mjs';
 
 export function testIdea(market, fn, spec, opts = {}) {
   const {
@@ -33,6 +35,10 @@ export function testIdea(market, fn, spec, opts = {}) {
     radius = 1, ppy = 252, bpsPerTurnover = 1, seed = 1,
     financingAnnual = 0, shortBorrowAnnual = 0, maxExposure = Infinity,
     benchmark = null, randomTrials = 12, onProgress = null,
+    oosPeriods = null,          // test exactly this many periods (e.g. the last 5 years)
+    dates = null,               // calendar dates, for the money report
+    capital = 10000,            // starting capital, so results are in dollars
+    alternatives = null,        // { label: returnsArray } to compare against
   } = opts;
   const costs = { bpsPerTurnover, financingAnnual, shortBorrowAnnual, maxExposure, ppy };
   const step = (p, label) => onProgress && onProgress(p, label);
@@ -55,7 +61,7 @@ export function testIdea(market, fn, spec, opts = {}) {
 
   /* --- 2. walk-forward --- */
   step(0.2, 'walking forward');
-  const wf = walkForward(market, fn, spec, { folds, isFraction, anchored, objective, ...costs });
+  const wf = walkForward(market, fn, spec, { folds, isFraction, anchored, objective, oosPeriods, ...costs });
   out.walkForward = wf.ok ? {
     ...wf,
     stitched: undefined,
@@ -65,7 +71,7 @@ export function testIdea(market, fn, spec, opts = {}) {
 
   step(0.5, 'testing a random parameter choice');
   out.randomControl = wf.ok
-    ? walkForwardRandomControl(market, fn, spec, { folds, isFraction, anchored, objective, ...costs, trials: randomTrials, seed })
+    ? walkForwardRandomControl(market, fn, spec, { folds, isFraction, anchored, objective, oosPeriods, ...costs, trials: randomTrials, seed })
     : { ok: false };
 
   /* --- 3. sensitivity around the full-sample choice --- */
@@ -117,6 +123,47 @@ export function testIdea(market, fn, spec, opts = {}) {
     tradesPerYear: fsr.turnoverPerPeriod * ppy,
     financingCharged: financingAnnual > 0, borrowCharged: shortBorrowAnnual > 0,
   };
+
+  /* --- 7. the money, the regimes, and the comparisons --- *
+   * Everything from here answers "what would this have done to an account",
+   * which is a different question from "is the edge real" and needs the
+   * out-of-sample slice of the calendar, not the whole history. */
+  if (wf.ok && dates && wf.stitched && wf.stitched.length) {
+    const folds2 = wf.results.filter(r => r.ok);
+    const lo = folds2[0].oosRange[0], hi = folds2[folds2.length - 1].oosRange[1];
+    const oosDates = dates.slice(lo, hi);
+    out.window = { from: oosDates[0], to: oosDates[oosDates.length - 1], n: oosDates.length,
+                   trainFrom: dates[0], trainTo: dates[Math.max(0, lo - 1)], trainPeriods: wf.trainPeriods };
+
+    step(0.92, 'working out the money');
+    out.money = stripBig(report(wf.stitched, oosDates, { capital, ppy, label: 'strategy' }));
+    out.equityCurve = Array.from(report(wf.stitched, oosDates, { capital, ppy }).equity);
+    out.oosDates = oosDates;
+
+    if (benchmark) {
+      const bOOS = Float64Array.from(benchmark.slice(lo, hi));
+      const cmp = compare(wf.stitched, bOOS, oosDates, { capital, ppy });
+      out.comparison = { ...cmp, strategy: stripBig(cmp.strategy), benchmark: stripBig(cmp.benchmark) };
+      out.benchmarkCurve = Array.from(report(bOOS, oosDates, { capital, ppy }).equity);
+
+      step(0.94, 'splitting by market regime');
+      out.regimes = regimeAnalysis(wf.stitched, bOOS, oosDates, { ppy });
+      out.rolling = {
+        strategy: rolling(wf.stitched, Math.min(252, Math.floor(wf.stitched.length / 3))),
+        benchmark: rolling(bOOS, Math.min(252, Math.floor(bOOS.length / 3))),
+        window: Math.min(252, Math.floor(wf.stitched.length / 3)),
+      };
+    }
+
+    if (alternatives) {
+      step(0.95, 'comparing against the alternatives');
+      out.alternatives = Object.entries(alternatives).map(([label, series]) => {
+        const alt = Float64Array.from(series.slice(lo, hi));
+        const rep = report(alt, oosDates, { capital, ppy, label });
+        return { label, ...stripBig(rep), curve: downsample(Array.from(rep.equity), 400) };
+      });
+    }
+  }
 
   step(0.97, 'scoring the gates');
   out.gates = scoreGates(out);
@@ -227,6 +274,29 @@ function detectLookaheadParam(fn, spec, ppy) {
   const d = defaultParams(spec);
   const wrapped = (market, pos, ctx) => fn(market, pos, { ...ctx, params: { ...d, ...ctx.params } });
   return detectLookahead(wrapped, { n: 260 });
+}
+
+/** Strip the heavy arrays before the payload crosses a worker boundary. */
+function stripBig(r) {
+  if (!r) return r;
+  /* `years` on a report is the DURATION in years, a number. The per-calendar-year
+   * buckets are `yearly`. Collapsing the two names turned mo.years into an array
+   * and broke mo.years.toFixed(), which is the sort of thing that only shows up
+   * when something tries to format it. */
+  const { equity, drawdownDollars, dollarDaily, months, years_, ...rest } = r;
+  return { ...rest,
+    months: (months || []).map(m => ({ key: m.key, ret: m.ret, pnl: m.pnl, n: m.n })),
+    yearly: (years_ || []).map(y => ({ key: y.key, ret: y.ret, pnl: y.pnl, n: y.n,
+                                       startEquity: y.startEquity, endEquity: y.endEquity })),
+    drawdownDollars: downsample(Array.from(drawdownDollars || []), 600),
+  };
+}
+function downsample(arr, max) {
+  if (arr.length <= max) return arr;
+  const step = arr.length / max, out = [];
+  for (let i = 0; i < max; i++) out.push(arr[Math.floor(i * step)]);
+  out.push(arr[arr.length - 1]);
+  return out;
 }
 
 const stripSeries = (r) => {

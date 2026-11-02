@@ -31,6 +31,22 @@ export function initIdea(ctx) {
   bind('ideaIS', v => (v * 100).toFixed(0) + '%');
   bind('ideaRadius', v => v + ' step' + (v > 1 ? 's' : ''));
 
+  const periodHint = () => {
+    const yrs = $('#ideaPeriod').value;
+    $('#wISRow').hidden = !!yrs;
+    if (!yrs) { $('#ideaPeriodHint').textContent = 'the split is set by the slider instead'; return; }
+    const need = Math.round(+yrs * 252);
+    const have = ST.market ? ST.market.length : 0;
+    const train = have - need;
+    $('#ideaPeriodHint').innerHTML = have
+      ? (train < 250
+          ? `<span class="neg">only ${n0(Math.max(0, train))} days left to train on — pick a shorter period</span>`
+          : `tests ${n0(need)} days, trains on the ${n0(train)} before them`)
+      : '';
+  };
+  $('#ideaPeriod').addEventListener('change', periodHint);
+  ST.periodHint = periodHint;
+
   function refreshGrid() {
     const spec = extractParamSpec($('#ideaBox').value);
     if (!spec) { $('#ideaGrid').innerHTML = '<span class="neg">no PARAMS block found</span>'; return null; }
@@ -58,11 +74,13 @@ export function initIdea(ctx) {
     ST.market = Float64Array.from(e.r);
     ST.benchmark = ST.market;            // buy and hold the same thing
     ST.marketId = id; ST.marketLabel = e.label;
+    ST.real = real;
     const m = S.moments(ST.market);
     $('#ideaMarketNote').innerHTML = `${esc(e.label)} · <b>${n0(e.n)}</b> trading days,
       ${e.from} to ${e.to} · buy-and-hold Sharpe
       <b>${(m.mean / m.sd * Math.sqrt(252)).toFixed(2)}</b>. Your idea has to beat that.`;
     $$('#ideaMarket button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mk === id)));
+    if (ST.periodHint) ST.periodHint();
     // the right cost is not the same for a $690 share and a $250 one
     const sym = (id.split('_')[0] || '').toUpperCase();
     const preset = COST_PRESETS[sym];
@@ -113,12 +131,24 @@ export function initIdea(ctx) {
       }
     };
     w.addEventListener('message', onMsg);
+    // everything else the money could have gone into, over the same days
+    const alts = {};
+    if (ST.real) {
+      const sym = (ST.marketId.split('_')[0] || '').toUpperCase();
+      for (const [k, v] of Object.entries(ST.real.markets || {})) if (k !== sym) alts[v.name] = v.r;
+      for (const v of Object.values(ST.real.blends || {})) alts[v.label] = v.r;
+    }
+    const yrs = $('#ideaPeriod').value;
     w.postMessage({
       id, src: $('#ideaBox').value,
       market: Array.from(ST.market), benchmark: Array.from(ST.benchmark),
+      dates: ST.real ? ST.real.dates : null,
+      alternatives: alts,
       opts: {
-        folds: +$('#ideaFolds').value, isFraction: +$('#ideaIS').value,
+        oosPeriods: yrs ? Math.round(+yrs * 252) : null,
+        capital: +$('#ideaCapital').value || 10000,
         anchored: $('#ideaWindow').value === 'anchored',
+        folds: +$('#ideaFolds').value, isFraction: +$('#ideaIS').value,
         objective: $('#ideaObj').value, bpsPerTurnover: +$('#ideaCost').value,
         financingAnnual: +$('#ideaFin').value || 0, shortBorrowAnnual: +$('#ideaBorrow').value || 0,
         radius: +$('#ideaRadius').value, ppy: 252, seed: +($('#seed').value || 1),
@@ -142,6 +172,8 @@ export function initIdea(ctx) {
 function render(r) {
   renderGates(r);
   renderWalkForward(r);
+  renderMoney(r);
+  renderRegimes(r);
   renderSensitivity(r);
   renderStress(r);
   renderStats(r);
@@ -330,4 +362,222 @@ function renderStats(r) {
     multiple testing. ${v.mdeRatio < 1
       ? `<b>The sample cannot resolve an edge this small</b> — it would take roughly ${n0(Math.min(1e7, 1 / 0 || 0) || 0)}` : ''}
     ${v.mdeRatio < 1 ? `about ${n0(Math.ceil(Math.pow((1.959963984540054 + 0.8416212335729143) / Math.max(v.sharpePeriod, 1e-9), 2)))} periods to settle it, so neither a positive nor a null result here means much.` : ''}`;
+}
+
+/* ---------------- the money ---------------- */
+const $m = (v, d = 0) => (v < 0 ? '-$' : '$') + Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d });
+const $sgn = (v, d = 0) => (v >= 0 ? '+' : '-') + '$' + Math.abs(v).toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d });
+
+function renderMoney(r) {
+  const mo = r.money, c = r.comparison, w = r.window;
+  if (!mo) { $('#moneySub').textContent = 'no calendar supplied'; return; }
+  $('#moneySub').textContent = `${w.from} to ${w.to} · ${n0(w.n)} trading days · ${$m(mo.capital)} start`;
+
+  const tile = (k, v, n, mod = '') => `<div class="m ${mod}"><div class="k">${k}</div>
+    <div class="v">${v}</div><div class="n">${n}</div></div>`;
+  const beat = c ? mo.profit > c.benchmark.profit : null;
+  $('#moneyTiles').innerHTML = [
+    tile('Final account value', $m(mo.final), `from ${$m(mo.capital)}`, mo.profit > 0 ? 'good' : 'flag'),
+    tile('Profit', $sgn(mo.profit), `${(mo.profitPct * 100).toFixed(1)}% over ${mo.years.toFixed(1)} years`,
+      mo.profit > 0 ? 'good' : 'flag'),
+    tile('Per year', pct(mo.cagr), 'compound annual growth', mo.cagr > 0 ? 'good' : 'flag'),
+    c ? tile('Against buy and hold', $sgn(c.excessProfit),
+      `it made ${$m(c.benchmark.profit)}`, beat ? 'good' : 'flag') : '',
+    tile('Worst drawdown', $m(Math.abs(mo.maxDDDollars)), `${pct(mo.maxDD)} · ${mo.maxDDFrom} to ${mo.maxDDTo}`,
+      mo.maxDD > 0.25 ? 'flag' : ''),
+    tile('Worst day', $m(mo.worstDay.pnl), `${pct(mo.worstDay.ret, 2)} on ${mo.worstDay.date}`),
+    tile('Winning months', `${mo.positiveMonths}/${mo.months.length}`,
+      `best ${$sgn(mo.bestMonth.pnl)}, worst ${$sgn(mo.worstMonth.pnl)}`),
+    tile('Recovery', mo.maxDDRecovered ? `${n0(mo.maxDDRecoveryDays)} days` : 'never',
+      mo.maxDDRecovered ? `back to the high by ${mo.maxDDRecovered}` : 'still below its high at the end',
+      mo.maxDDRecovered ? '' : 'flag'),
+  ].filter(Boolean).join('');
+
+  // the headline chart: account value in dollars
+  const eq = r.equityCurve, be = r.benchmarkCurve;
+  const xs = eq.map((_, i) => i);
+  C.legend($('#eqLeg'), [
+    { color: 'var(--s1)', label: 'your strategy' },
+    { color: 'var(--s2)', label: 'buy and hold' },
+  ]);
+  C.lineChart($('#moneyEquity'), {
+    series: [
+      { name: 'strategy', x: xs, y: eq, color: 'var(--s1)' },
+      be ? { name: 'buy & hold', x: xs, y: be, color: 'var(--s2)' } : null,
+    ].filter(Boolean),
+    height: 320, xLabel: 'trading days in the test period', yLabel: 'account value',
+    xFmt: v => String(Math.round(v)), yFmt: v => $m(v), zeroLine: false,
+  });
+  $('#moneyEqFoot').innerHTML = c
+    ? `${$m(mo.capital)} became <b>${$m(mo.final)}</b> with the strategy and <b>${$m(c.benchmark.final)}</b>
+       buying and holding — a difference of <b>${$sgn(c.excessProfit)}</b>.
+       The strategy's worst fall was ${$m(Math.abs(mo.maxDDDollars))} against ${$m(Math.abs(c.benchmark.maxDDDollars))}.
+       ${beat ? 'It made more money.' : 'It made less money'}${!beat && mo.maxDD < c.benchmark.maxDD
+         ? `, but with a smaller worst loss — whether that trade is worth making is a question about you, not about the data.` : '.'}`
+    : `${$m(mo.capital)} became <b>${$m(mo.final)}</b>.`;
+
+  // monthly P&L
+  C.signedBars($('#monthBars'), {
+    values: mo.months.map(x => x.pnl), labels: mo.months.map(x => x.key),
+    height: 250, fmt: v => $m(v), yLabel: 'profit and loss',
+  });
+  const up = mo.positiveMonths, tot = mo.months.length;
+  $('#monthFoot').innerHTML = `<b>${up} of ${tot}</b> months made money (${pct(up / tot, 0)}).
+    Best ${mo.bestMonth.key} at ${$sgn(mo.bestMonth.pnl)}, worst ${mo.worstMonth.key} at
+    ${$sgn(mo.worstMonth.pnl)}.`;
+
+  // underwater, in dollars
+  const dd = mo.drawdownDollars;
+  C.areaChart($('#ddArea'), {
+    x: dd.map((_, i) => i), y: dd, height: 250, fmt: v => $m(v),
+    yLabel: 'below the high water mark', xLabel: 'test period',
+  });
+  $('#ddFoot').innerHTML = `The deepest point was <b>${$m(Math.abs(mo.maxDDDollars))}</b> below the high
+    (${pct(mo.maxDD)}), from ${mo.maxDDFrom} to ${mo.maxDDTo}.
+    ${mo.maxDDRecovered
+      ? `It took <b>${n0(mo.maxDDRecoveryDays)} trading days</b> to get back, reaching the old high on ${mo.maxDDRecovered}.`
+      : '<b>It had not recovered by the end of the test.</b>'}
+    This is the chart to look at before deciding how much to risk: it is what you would have had to sit through.`;
+
+  // year by year
+  const by = c ? c.benchmark.yearly : null;
+  $('#yearTab').querySelector('tbody').innerHTML = mo.yearly.map((y, i) => {
+    const b = by && by[i];
+    const diff = b ? y.pnl - b.pnl : null;
+    return `<tr>
+      <td>${y.key}</td><td class="dim">${y.n}</td>
+      <td class="${y.ret > 0 ? 'pos' : 'neg'}">${sgn(y.ret)}</td>
+      <td class="${y.pnl > 0 ? 'pos' : 'neg'}">${$sgn(y.pnl)}</td>
+      <td>${$m(y.endEquity)}</td>
+      <td class="dim">${b ? sgn(b.ret) : '—'}</td>
+      <td class="${diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'dim'}">${diff != null ? $sgn(diff) : '—'}</td></tr>`;
+  }).join('');
+  const wins = by ? mo.yearly.filter((y, i) => by[i] && y.pnl > by[i].pnl).length : 0;
+  $('#yearFoot').innerHTML = by
+    ? `The strategy beat buy and hold in <b>${wins} of ${mo.yearly.length}</b> calendar years.
+       Note the partial years at each end — the test period does not start on 1 January.`
+    : '';
+
+  // alternatives
+  if (r.alternatives && r.alternatives.length) {
+    const rows = [{ label: 'Your strategy', final: mo.final, profit: mo.profit, cagr: mo.cagr, maxDD: mo.maxDD, sharpe: mo.sharpe, me: true }];
+    if (c) rows.push({ label: 'Buy and hold the same thing', final: c.benchmark.final, profit: c.benchmark.profit,
+      cagr: c.benchmark.cagr, maxDD: c.benchmark.maxDD, sharpe: c.benchmark.sharpe });
+    for (const a of r.alternatives) rows.push({ label: a.label, final: a.final, profit: a.profit, cagr: a.cagr, maxDD: a.maxDD, sharpe: a.sharpe });
+    rows.push({ label: 'Cash (0%)', final: mo.capital, profit: 0, cagr: 0, maxDD: 0, sharpe: 0 });
+    const sorted = [...rows].sort((a, b) => b.final - a.final);
+    C.barsCI($('#altChart'), {
+      items: sorted.map(x => ({ label: x.label, value: x.profit,
+        color: x.me ? 'var(--s1)' : (x.profit >= 0 ? 'var(--s3)' : 'var(--s2)'),
+        note: `${pct(x.cagr)} a year, worst fall ${pct(x.maxDD)}` })),
+      fmt: v => $m(v), xLabel: 'profit over the test period', zero: 0,
+    });
+    $('#altTab').querySelector('tbody').innerHTML = sorted.map(x => `<tr${x.me ? ' class="hl"' : ''}>
+      <td>${esc(x.label)}${x.me ? ' <span class="dim">&larr; yours</span>' : ''}</td>
+      <td>${$m(x.final)}</td>
+      <td class="${x.profit > 0 ? 'pos' : x.profit < 0 ? 'neg' : 'dim'}">${$sgn(x.profit)}</td>
+      <td class="${x.cagr > 0 ? 'pos' : x.cagr < 0 ? 'neg' : 'dim'}">${sgn(x.cagr)}</td>
+      <td>${pct(x.maxDD)}</td><td>${f2(x.sharpe)}</td></tr>`).join('');
+    const rank = sorted.findIndex(x => x.me) + 1;
+    $('#altFoot').innerHTML = `Over this exact period your strategy finished <b>${rank} of ${sorted.length}</b>
+      by profit. ${rank === 1 ? 'It beat every alternative here.'
+        : `${esc(sorted[0].label)} made ${$m(sorted[0].profit)}.`}
+      Five years is one sample: a different five years reorders this table, which is what the Monte Carlo
+      section is for.`;
+  }
+}
+
+/* ---------------- which markets ---------------- */
+function renderRegimes(r) {
+  const rg = r.regimes, c = r.comparison;
+  if (!rg) { $('#regimeBlocks').innerHTML = '<div class="hint">needs a benchmark</div>'; return; }
+
+  const blocks = [];
+  for (const [key, d] of Object.entries(rg.dims)) {
+    const rows = d.rows.map(x => ({
+      label: x.label, sub: `${n0(x.n)} days · ${pct(x.share, 0)} of the test`,
+      a: x.stratTotal * 100, b: x.benchTotal * 100, raw: x,
+    }));
+    blocks.push(`<section><h3>${esc(d.label)} <span>&middot; ${esc(d.note)}</span></h3>
+      <div id="rg_${key}"></div>
+      <div class="wrap" style="margin-top:10px"><table id="rgt_${key}">
+        <thead><tr><th>Regime</th><th>Days</th><th>Strategy total</th><th>Benchmark total</th>
+          <th>Per day</th><th>Win rate</th><th>Share of the result</th></tr></thead>
+        <tbody>${d.rows.map(x => `<tr>
+          <td>${esc(x.label)}</td><td class="dim">${n0(x.n)}</td>
+          <td class="${x.stratTotal > 0 ? 'pos' : 'neg'}">${sgn(x.stratTotal)}</td>
+          <td class="dim">${sgn(x.benchTotal)}</td>
+          <td>${x.stratPerDayBps.toFixed(2)} bps</td>
+          <td>${pct(x.winRate, 0)}</td>
+          <td class="${x.pnlShare > 0 ? 'pos' : 'neg'}">${Number.isFinite(x.pnlShare) ? pct(x.pnlShare, 0) : '—'}</td>
+          </tr>`).join('')}</tbody></table></div></section>`);
+  }
+  $('#regimeBlocks').innerHTML = blocks.join('');
+  for (const [key, d] of Object.entries(rg.dims)) {
+    C.groupedBars($('#rg_' + key), {
+      rows: d.rows.map(x => ({ label: x.label.replace(/\s*\(.*\)$/, ''),
+        sub: `${n0(x.n)} days`, a: x.stratTotal * 100, b: x.benchTotal * 100 })),
+      fmt: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%',
+      xLabel: 'total return over all days in that regime',
+      nameA: 'strategy', nameB: 'benchmark',
+    });
+  }
+
+  // a plain-language summary of where the money came from
+  const best = rg.best, worst = rg.worst;
+  if (best && worst && best !== worst) {
+    const note = document.createElement('div');
+    note.className = 'msg info';
+    note.style.marginTop = '12px';
+    note.innerHTML = `<b>Best in: ${esc(best.label)}</b> (${esc(best.dim)}) — ${sgn(best.stratTotal)} over
+      ${n0(best.n)} days, against ${sgn(best.benchTotal)} for the benchmark.
+      <b>Worst in: ${esc(worst.label)}</b> (${esc(worst.dim)}) — ${sgn(worst.stratTotal)} over ${n0(worst.n)} days.
+      ${c ? `Across the whole period it captured <b>${pct(c.upCapture, 0)}</b> of the benchmark's up days and
+        <b>${pct(c.downCapture, 0)}</b> of its down days${c.downCapture < c.upCapture
+          ? ' — it takes less of the falls than it gives up of the rises, which is the shape you want.'
+          : ' — it takes more of the falls than it keeps of the rises, which is the shape you do not want.'}
+        Beta to the benchmark is ${f2(c.beta)}.` : ''}`;
+    $('#regimeBlocks').appendChild(note);
+  }
+
+  // concentration
+  const k = rg.concentration;
+  const tile = (a, b, cc, mod = '') => `<div class="m ${mod}"><div class="k">${a}</div>
+    <div class="v">${b}</div><div class="n">${cc}</div></div>`;
+  $('#concTiles').innerHTML = [
+    tile('Best 1% of days', Number.isFinite(k.top1Pct) ? pct(k.top1Pct, 0) : '—', 'of the whole result',
+      k.top1Pct > 0.7 ? 'flag' : ''),
+    tile('Best 5% of days', Number.isFinite(k.top5Pct) ? pct(k.top5Pct, 0) : '—', 'of the whole result'),
+    tile('Best 10 days', Number.isFinite(k.top10Days) ? pct(k.top10Days, 0) : '—', `of ${n0(k.n)} days`),
+    tile('Without those 10 days', pct(k.annualWithoutTop10), 'a year', k.annualWithoutTop10 < 0 ? 'flag' : ''),
+  ].join('');
+  $('#concFoot').innerHTML = `The best 1% of days account for <b>${Number.isFinite(k.top1Pct) ? pct(k.top1Pct, 0) : '—'}</b>
+    of the result. Strip out the ten best days and what is left compounds at
+    <b>${pct(k.annualWithoutTop10)}</b> a year.
+    ${k.top1Pct > 0.7
+      ? '<b>That is very concentrated.</b> A result that rests on a handful of days is a lottery ticket with a backtest attached — and those days are exactly the ones you are most likely to miss in practice.'
+      : 'That is reasonably spread out, which is what a durable edge looks like.'}`;
+
+  // rolling
+  if (r.rolling) {
+    const w = r.rolling.window;
+    C.legend($('#rollLeg'), [
+      { color: 'var(--s1)', label: 'strategy' },
+      { color: 'var(--s2)', label: 'buy and hold' },
+    ]);
+    C.lineChart($('#rollChart'), {
+      series: [
+        { name: 'strategy', x: r.rolling.strategy.x, y: r.rolling.strategy.y.map(v => v * 100), color: 'var(--s1)' },
+        { name: 'buy & hold', x: r.rolling.benchmark.x, y: r.rolling.benchmark.y.map(v => v * 100), color: 'var(--s2)' },
+      ],
+      height: 260, xLabel: 'trading day in the test period',
+      yLabel: `rolling ${w}-day return`, yFmt: v => v.toFixed(0) + '%', zeroLine: true,
+    });
+    const ys = r.rolling.strategy.y;
+    const posWin = ys.filter(v => v > 0).length;
+    $('#rollFoot').innerHTML = `Each point is the return over the previous ${w} trading days.
+      The strategy was positive over <b>${pct(posWin / ys.length, 0)}</b> of those windows.
+      A line that spends long stretches below zero is one you would have abandoned, whatever the
+      final number says.`;
+  }
 }
