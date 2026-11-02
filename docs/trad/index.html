@@ -268,7 +268,11 @@ function head(d){
     <div class="cap">JFE 2018 · ${spy.sessions} sessions · 30-minute hold</div>
     ${row("Beats a coin flip?",`${spy.hit}% · p ${spy.hit_p}`,"no")}
     ${row("Gross edge above zero?",`${f2(spy.gross_bps)} · t ${spy.gross_t}`,"no")}
-    ${row("Could this sample even see it?",`±${spy.power.mde} vs +${spy.power.paper_implied} needed`,"na")}
+    ${(()=>{const can=spy.power.mde<=spy.power.paper_implied;
+      return row(can?"Sample big enough to see the paper's edge?"
+                    :"Could this sample even see it?",
+        `±${spy.power.mde} vs +${spy.power.paper_implied} needed`,
+        can?"yes":"na");})()}
     ${row("Does fading it work?",`${spy.fade_hit}% · p ${spy.fade_p}`,"no")}
     ${row("Beats buy &amp; hold?",`${f2(spy.mean_bps)} vs ${f2(spy.bh_bps)}`,"no")}
   </div>`);
@@ -288,7 +292,9 @@ function head(d){
     t.push(tile("Hit rate",spy.hit+"%",`p = ${spy.hit_p}`));
     t.push(tile("Gross edge",f2(spy.gross_bps),`t = ${spy.gross_t}`));
     t.push(tileF("Can resolve","±"+spy.power.mde,"bps/day"));
-    t.push(tileF("Paper needs","+"+spy.power.paper_implied,"invisible here"));
+    t.push(spy.power.mde<=spy.power.paper_implied
+      ? tile("Paper needs","+"+spy.power.paper_implied,"would be visible")
+      : tileF("Paper needs","+"+spy.power.paper_implied,"invisible here"));
     t.push(tile("Sessions needed",spy.power.n_for_paper,"have "+spy.sessions));
   }
   t.push(tile("ORB positive",`${totPos}/${totSets}`,"coin flip = half"));
