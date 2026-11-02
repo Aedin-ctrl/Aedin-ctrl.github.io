@@ -217,6 +217,71 @@ function finish(vals, opts, colWhy) {
   };
 }
 
+/** Parse a multi-column paste as a SET OF VARIANTS -- one candidate per column.
+ *
+ *  This is the input the overfitting tests actually need. "I tried 36 parameter
+ *  sets and this was the best" cannot be checked from the winner alone; it needs
+ *  all 36, which is what a sweep's output file already looks like.
+ */
+export function parseVariants(text, opts = {}) {
+  const trimmed = String(text).trim();
+  if (!trimmed) return { error: 'nothing to parse' };
+
+  // JSON: an object of named arrays, or an array of equal-length arrays
+  if (/^[[{]/.test(trimmed)) {
+    try {
+      const j = JSON.parse(trimmed);
+      let cols = null;
+      if (Array.isArray(j) && j.length && Array.isArray(j[0])) {
+        cols = j.map((a, i) => ({ name: `variant ${i + 1}`, values: a.map(num) }));
+      } else if (j && typeof j === 'object' && !Array.isArray(j)) {
+        const entries = Object.entries(j).filter(([, v]) => Array.isArray(v) && v.length > 10);
+        if (entries.length > 1) cols = entries.map(([k, v]) => ({ name: k, values: v.map(num) }));
+      }
+      if (cols) return finishVariants(cols, opts);
+    } catch { /* fall through */ }
+  }
+
+  const { rows } = parseDelimited(trimmed);
+  if (!rows.length) return { error: 'no rows found' };
+  const firstNumeric = rows[0].some(c => Number.isFinite(num(c)));
+  const header = firstNumeric ? null : rows[0];
+  const body = header ? rows.slice(1) : rows;
+  if (body.length < 20) return { error: 'need at least 20 rows to test variants' };
+
+  const width = Math.max(...body.map(r => r.length));
+  const cols = [];
+  for (let c = 0; c < width; c++) {
+    const vals = body.map(r => num(r[c]));
+    const finite = vals.filter(Number.isFinite).length;
+    if (finite < body.length * 0.9) continue;                 // not a data column
+    const dateish = body.slice(0, 10).filter(r => looksLikeDate(r[c])).length;
+    if (dateish > 5) continue;                                 // a date column
+    cols.push({ name: header && header[c] ? header[c] : `column ${c + 1}`, values: vals });
+  }
+  if (cols.length < 2) return { error: `found ${cols.length} numeric column(s); variant testing needs at least 2` };
+  return finishVariants(cols, opts);
+}
+
+function finishVariants(cols, opts) {
+  const n = Math.min(...cols.map(c => c.values.filter(Number.isFinite).length));
+  if (n < 20) return { error: 'the shortest column has fewer than 20 usable values' };
+  const flat = cols.flatMap(c => c.values.filter(Number.isFinite));
+  const cls = opts.kind ? { kind: opts.kind, why: 'set by hand' } : classify(flat);
+  const variants = cols.map(c => {
+    const v = c.values.filter(Number.isFinite).slice(0, n);
+    return { name: c.name, returns: toReturns(v, cls.kind, opts) };
+  });
+  return {
+    variants, n: variants[0].returns.length, count: variants.length,
+    kind: cls.kind, why: `${cols.length} numeric columns; ${cls.why}`,
+    warnings: [
+      variants[0].returns.length < 100 ? 'fewer than 100 observations per variant -- the overfitting tests will be weak' : null,
+      cols.length > 200 ? 'more than 200 variants; the CSCV split count grows fast' : null,
+    ].filter(Boolean),
+  };
+}
+
 /** JSON-safe serialisation. json/JSON.parse chokes on bare NaN and Infinity, and a
  *  single one in an exported result file makes the whole thing unloadable. Every
  *  export path goes through this. */

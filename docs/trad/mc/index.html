@@ -212,6 +212,7 @@
         <button role="tab" aria-selected="true" data-pane="pExamples">Built-in</button>
         <button role="tab" aria-selected="false" data-pane="pPaste">Paste data</button>
         <button role="tab" aria-selected="false" data-pane="pStrat">Write a strategy</button>
+        <button role="tab" aria-selected="false" data-pane="pVar">Many variants</button>
         <button role="tab" aria-selected="false" data-pane="pSaved">Saved</button>
       </div>
 
@@ -247,6 +248,20 @@
           market path, your code sets the position for each bar. The rule is that
           <code>pos[t]</code> may only use <code>market[0..t-1]</code>, and the check enforces it.</div>
         <div id="stratMsg"></div>
+      </div>
+
+      <div class="pane" id="pVar" hidden>
+        <div class="hint" style="margin-bottom:8px">Paste the output of a parameter sweep &mdash;
+          <b>one column per variant</b>, one row per period. A date column is ignored. This is the input the
+          overfitting tests actually need: &ldquo;I tried 36 sets and this was the best&rdquo; cannot be checked
+          from the winner alone.</div>
+        <textarea id="varBox" spellcheck="false" placeholder="set1,set2,set3,set4&#10;0.0031,-0.0012,0.0008,0.0022&#10;-0.0044,0.0019,-0.0031,0.0005&#10;..."></textarea>
+        <div class="row" style="margin-top:9px">
+          <button class="btn" id="varParse">Read the variants</button>
+          <span class="spacer"></span>
+          <span class="hint">The best column becomes the series the simulation runs on.</span>
+        </div>
+        <div id="varMsg"></div>
       </div>
 
       <div class="pane" id="pSaved" hidden>
@@ -395,6 +410,22 @@
         reach on pure noise.</div>
       <div id="dsrChart"></div>
       <div class="foot" id="dsrFoot"></div>
+    </section>
+
+    <section id="varSection" hidden>
+      <h3>Across every variant you tried <span>&middot; the overfitting tests</span></h3>
+      <div class="note">These need all the candidates, not just the winner. Probability of backtest overfitting
+        comes from combinatorially symmetric cross-validation; the Reality Check asks whether the best of them
+        beats zero once you admit how many you looked at.</div>
+      <div class="grid" id="varTiles"></div>
+      <div class="cols two" style="margin-top:13px">
+        <div><div class="legend" id="varLeg"></div><div id="varHist"></div></div>
+        <div><div id="varLambda"></div></div>
+      </div>
+      <div class="wrap tall" style="margin-top:12px"><table id="varTab">
+        <thead><tr><th>Variant</th><th>Sharpe</th><th>mean bps</th><th>t (NW)</th><th>max DD</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="varFoot"></div>
     </section>
 
     <div class="part"><span class="no">PART 3</span><h2>How much to bet</h2>

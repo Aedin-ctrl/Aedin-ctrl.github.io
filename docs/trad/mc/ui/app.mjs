@@ -2,7 +2,7 @@
 import { MODELS, fitAll, optimalBlockLength, fitT } from '../lib/generators.mjs';
 import { mergeBatches, kellyLeverage } from '../lib/engine.mjs';
 import { buildResults, tailCeiling, parametricWorst } from '../lib/results.mjs';
-import { parseSource, KINDS, jsonSafe } from '../lib/sources.mjs';
+import { parseSource, parseVariants, KINDS, jsonSafe } from '../lib/sources.mjs';
 import { EXAMPLES as DATA_EXAMPLES, buildExample } from '../lib/examples.mjs';
 import { EXAMPLES as STRAT_EXAMPLES, validateStrategy, STRATEGY_HEADER } from '../lib/strategy.mjs';
 import { verdict, sharpeNull } from '../lib/tests.mjs';
@@ -30,6 +30,7 @@ const ST = {
   lastVerdict: null,
   lastCfg: null,
   lastNull: null,
+  variants: null,
   running: false,
 };
 
@@ -40,9 +41,9 @@ $('#gen').textContent = 'simulation lab';
 /* ---------------- tabs ---------------- */
 $$('#srcTabs button').forEach(b => b.addEventListener('click', () => {
   $$('#srcTabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
-  for (const p of ['pExamples', 'pPaste', 'pStrat', 'pSaved']) $('#' + p).hidden = true;
+  for (const p of ['pExamples', 'pPaste', 'pStrat', 'pVar', 'pSaved']) $('#' + p).hidden = true;
   $('#' + b.dataset.pane).hidden = false;
-  ST.mode = { pExamples: 'examples', pPaste: 'paste', pStrat: 'strategy', pSaved: 'saved' }[b.dataset.pane];
+  ST.mode = { pExamples: 'examples', pPaste: 'paste', pStrat: 'strategy', pVar: 'variants', pSaved: 'saved' }[b.dataset.pane];
   if (ST.mode === 'saved') renderSaved();
   refreshModelChips();
   updateSourceSummary();
@@ -170,6 +171,31 @@ function checkStrategy() {
   afterSourceChange();
   return true;
 }
+
+/* ---------------- many variants ---------------- */
+$('#varParse').addEventListener('click', () => {
+  const r = parseVariants($('#varBox').value);
+  if (r.error) { $('#varMsg').innerHTML = `<div class="msg bad"><b>Could not read that.</b> ${esc(r.error)}</div>`; return; }
+  ST.variants = r;
+  // the best variant by Sharpe becomes the series the simulation runs on
+  let best = 0, bestSR = -Infinity;
+  r.variants.forEach((v, i) => {
+    const sd = S.sd(v.returns);
+    const sr = sd > 0 ? S.mean(v.returns) / sd : 0;
+    if (sr > bestSR) { bestSR = sr; best = i; }
+  });
+  ST.source = r.variants[best].returns;
+  ST.sourceLabel = `best of ${r.count} variants (${r.variants[best].name})`;
+  ST.sourceNote = r.why;
+  ST.strategySrc = '';
+  $('#trials').value = r.count;
+  const warn = r.warnings.length ? `<div class="msg warn">${r.warnings.map(esc).join(' &middot; ')}</div>` : '';
+  $('#varMsg').innerHTML = `<div class="msg ok"><b>Read ${r.count} variants of ${n0(r.n)} periods.</b>
+    ${esc(r.why)}. The best by Sharpe is <b>${esc(r.variants[best].name)}</b> at
+    ${(bestSR * Math.sqrt(+$('#ppy').value || 252)).toFixed(2)} annualised — that is the series the simulation
+    will run on, and &ldquo;variants you tried&rdquo; has been set to ${r.count}.</div>${warn}`;
+  afterSourceChange();
+});
 
 /* ---------------- saved attachments ---------------- */
 const LSKEY = 'mc.saved.v1';
@@ -513,6 +539,11 @@ async function run() {
         if (!Number.isFinite(tail.t.q01)) tail.t = null;
       } catch { tail.t = null; }
     }
+    // the overfitting battery, when a whole sweep was attached
+    if (ST.mode === 'variants' && ST.variants) {
+      R.renderVariants(ST.variants, cfg);
+      $('#varSection').hidden = false;
+    } else { $('#varSection').hidden = true; }
     R.renderInheritNote(vd, cfg, cfg.model.id);
     R.renderPaths(res, cfg, tail);
     R.renderEvidence(res, vd, cfg, nullRes);

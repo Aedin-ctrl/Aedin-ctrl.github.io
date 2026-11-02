@@ -416,3 +416,101 @@ export function renderComparison(list) {
       ? '<b>The tail is a modelling choice here, not a fact.</b> Quote the pessimistic one, or say which model you used every time you quote a drawdown.'
       : 'The models broadly agree, which is the best case: the conclusion does not hinge on the tail assumption.'}`;
 }
+
+/* ---------------- the overfitting battery ---------------- */
+/** Needs every candidate, not just the winner. This is the panel that answers
+ *  "I tried 36 parameter sets and this one was the best" -- a claim the winner's
+ *  own statistics cannot address at all. */
+export function renderVariants(v, cfg) {
+  const ppy = cfg.ppy || 252;
+  const mat = v.variants.map(x => Array.from(x.returns));
+  const rows = v.variants.map(x => {
+    const a = S.moments(x.returns);
+    const lrv = S.neweyWestVar(x.returns);
+    return {
+      name: x.name,
+      sharpe: a.sd > 0 ? a.mean / a.sd * Math.sqrt(ppy) : 0,
+      meanBps: a.mean * 1e4,
+      t: lrv > 0 ? a.mean / Math.sqrt(lrv / x.returns.length) : 0,
+      maxDD: M_maxDD(x.returns),
+    };
+  });
+  const sorted = [...rows].sort((a, b) => b.sharpe - a.sharpe);
+  const best = sorted[0];
+  const sr = rows.map(r => r.sharpe);
+
+  const pboRes = T.pbo(mat, { S: 10 });
+  const rc = T.realityCheck(mat, { iters: 1500, seed: cfg.seed || 1, L: 10 });
+
+  const tile = (k, val, n, mod = '') => `<div class="m ${mod}"><div class="k">${k}</div>
+    <div class="v">${val}</div><div class="n">${n}</div></div>`;
+  const pboPct = Number.isFinite(pboRes.pbo) ? (pboRes.pbo * 100).toFixed(0) + '%' : '--';
+  $('#varTiles').innerHTML = [
+    tile('Variants tested', n0(v.count), `${n0(v.n)} periods each`),
+    tile('Best Sharpe', best.sharpe.toFixed(2), esc(best.name)),
+    tile('Median variant', S.quantile(sr, 0.5).toFixed(2), `spread ${S.quantile(sr, 0.05).toFixed(2)} to ${S.quantile(sr, 0.95).toFixed(2)}`),
+    tile('Probability of overfitting', pboPct,
+      Number.isFinite(pboRes.pbo) ? `${pboRes.combos} in/out splits` : (pboRes.note || ''),
+      Number.isFinite(pboRes.pbo) && pboRes.pbo > 0.5 ? 'flag' : (pboRes.pbo < 0.2 ? 'good' : '')),
+    tile('Reality Check p', rc.pRC < 0.001 ? '<0.001' : rc.pRC.toFixed(3),
+      'best variant beats zero?', rc.pRC < 0.05 ? 'good' : 'flag'),
+    tile('Hansen SPA p', rc.pSPA < 0.001 ? '<0.001' : rc.pSPA.toFixed(3),
+      'the stricter version', rc.pSPA < 0.05 ? 'good' : 'flag'),
+  ].join('');
+
+  // where the winner sits among its own siblings
+  const h = S.histogram(Float64Array.from(sr), Math.min(40, Math.max(8, Math.round(v.count / 2))));
+  C.legend($('#varLeg'), [{ color: '#b8cfe9', label: 'all variants' }, { color: 'var(--s2)', label: 'the one you picked' }]);
+  C.histogram($('#varHist'), {
+    counts: h.counts, edges: h.edges, height: 230, color: '#b8cfe9', total: v.count,
+    xLabel: 'annualised Sharpe of each variant', yLabel: 'variants',
+    xFmt: x => x.toFixed(2),
+    markers: [{ at: best.sharpe, label: 'best', color: 'var(--s2)', dash: '0', anchor: 'end' }],
+  });
+
+  // the CSCV logits: negative means the in-sample winner underperformed out of sample
+  if (pboRes.lambdas && pboRes.lambdas.length) {
+    const lh = S.histogram(Float64Array.from(pboRes.lambdas), 36);
+    C.histogram($('#varLambda'), {
+      counts: lh.counts, edges: lh.edges, height: 230, color: '#cfd9c8', total: pboRes.lambdas.length,
+      xLabel: 'out-of-sample rank of the in-sample winner (logit)', yLabel: 'splits',
+      xFmt: x => x.toFixed(1),
+      markers: [{ at: 0, label: 'below median', color: 'var(--bad)', dash: '4 3', anchor: 'start' }],
+    });
+  }
+
+  $('#varTab').querySelector('tbody').innerHTML = sorted.map(r => `<tr${r === best ? ' class="hl"' : ''}>
+    <td>${esc(r.name)}${r === best ? ' <span class="dim">&larr; your pick</span>' : ''}</td>
+    <td class="${cls(r.sharpe)}">${r.sharpe.toFixed(2)}</td>
+    <td class="${cls(r.meanBps)}">${r.meanBps.toFixed(2)}</td>
+    <td>${r.t.toFixed(2)}</td>
+    <td>${pct(r.maxDD)}</td></tr>`).join('');
+
+  const beats = rows.filter(r => r.sharpe > 0).length;
+  $('#varFoot').innerHTML = `
+    ${Number.isFinite(pboRes.pbo)
+      ? `<b>Probability of backtest overfitting: ${pboPct}.</b> Across ${pboRes.combos} ways of splitting the
+         history in half, the variant that won in sample landed below the median out of sample that often.
+         ${pboRes.pbo > 0.5 ? 'Above one half means selection is actively misleading — the winner is more likely than not to be the worse choice going forward.'
+            : pboRes.pbo > 0.3 ? 'Around one half is what pure noise produces; this is not far off it.'
+            : 'Below 0.3 means the ranking carried real information across the split.'} `
+      : `Overfitting test not run: ${esc(pboRes.note || 'not enough data')}. `}
+    ${beats} of ${v.count} variants had a positive Sharpe.
+    The Reality Check gives p = ${rc.pRC < 0.001 ? '&lt;0.001' : rc.pRC.toFixed(3)}
+    ${rc.pRC < 0.05
+      ? 'for the hypothesis that the best variant has no edge, so the best one survives being chosen from this many.'
+      : `for the hypothesis that the best variant has no edge — <b>it does not survive</b> being chosen from ${v.count}.`}
+    Note the null here is "beats zero". If what you need is "beats buying the index", test these against the
+    benchmark's returns instead, which moves the answer a great deal.`;
+}
+
+function M_maxDD(rets) {
+  let eq = 1, peak = 1, mdd = 0, dead = false;
+  for (let i = 0; i < rets.length; i++) {
+    if (!dead) { eq *= 1 + rets[i]; if (!(eq > 0)) { eq = 0; dead = true; } }
+    if (eq > peak) peak = eq;
+    const d = peak > 0 ? (peak - eq) / peak : 1;
+    if (d > mdd) mdd = d;
+  }
+  return mdd;
+}
