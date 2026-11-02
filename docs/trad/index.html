@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Trad</title>
+<meta name="description" content="Two opening-bell strategies, measured. What the evidence says, against what gets sold.">
+<style>
+  /* Light only, matching the calibration board. Read next to a broker screen. */
+  :root{
+    --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#8b8984;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --good:#0a7a26; --bad:#c0392b; --band:#eceae3; --tint:#f4f8fd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper);-webkit-text-size-adjust:100%}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       background:var(--paper);color:var(--ink);line-height:1.5;
+       font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  main{max-width:1060px;margin:0 auto;padding:36px 16px 96px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  h1{font-size:clamp(24px,3.6vw,33px);font-weight:660;letter-spacing:-.024em}
+  .tag{font-size:12px;color:var(--muted)}
+  .lede{color:var(--ink2);font-size:14.5px;max-width:74ch;margin-top:7px}
+
+  /* verdict scorecard -- replaces the paragraphs */
+  .score{margin-top:20px;display:grid;gap:10px;grid-template-columns:1fr}
+  @media(min-width:720px){.score{grid-template-columns:1fr 1fr}}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:12px;
+      padding:14px 16px 10px}
+  .sc h4{font-size:13.5px;font-weight:660;letter-spacing:-.01em;margin-bottom:2px}
+  .sc .cap{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .sc .row{display:flex;align-items:center;gap:9px;padding:6px 0;
+           border-top:1px solid var(--line);font-size:12.5px}
+  .sc .row:first-of-type{border-top:0}
+  .sc .q{color:var(--ink2);flex:1;min-width:0}
+  .sc .a{font-weight:650;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .mk{width:16px;height:16px;border-radius:50%;flex:none;display:grid;
+      place-items:center;font-size:11px;font-weight:800;color:#fff}
+  .mk.no{background:var(--bad)} .mk.yes{background:var(--good)}
+  .mk.na{background:var(--muted)}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 2px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;
+        border:1px solid var(--line);background:var(--card);border-radius:999px;
+        padding:3px 11px;color:var(--ink2)}
+  .chip b{color:var(--ink);font-weight:620}
+
+  .grid{display:grid;gap:9px;margin-top:16px;
+        grid-template-columns:repeat(auto-fit,minmax(132px,1fr))}
+  .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .m .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .m .v{font-size:25px;font-weight:660;letter-spacing:-.028em;margin-top:3px;line-height:1.08}
+  .m .n{font-size:11.5px;color:var(--ink2);margin-top:3px}
+  .m.flag{border-color:#e9cdc8;background:#fffaf9}
+  .m.flag .v{color:var(--bad)}
+
+  /* part dividers */
+  .part{margin:36px 0 2px;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .part .no{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--muted)}
+  .part h2{font-size:19px;font-weight:650;letter-spacing:-.018em;color:var(--ink);
+           text-transform:none}
+  .part .sub{font-size:12.5px;color:var(--muted)}
+  .partnote{font-size:13.5px;color:var(--ink2);max-width:80ch;margin-top:5px}
+
+  section{background:var(--card);border:1px solid var(--line);
+          border-radius:13px;padding:18px 20px;margin-top:13px}
+  h3{font-size:11.5px;font-weight:660;text-transform:uppercase;letter-spacing:.075em;
+     color:var(--muted);margin-bottom:4px}
+  h3 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
+  .note{font-size:12.5px;color:var(--ink2);margin-bottom:13px;max-width:78ch}
+  .cols{display:grid;gap:13px;grid-template-columns:1fr}
+  @media(min-width:760px){.cols.two{grid-template-columns:1fr 1fr}}
+
+  .bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:14px 0 0}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:var(--card);color:var(--ink2);
+    font:inherit;font-size:12px;padding:5px 13px;cursor:pointer;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  .seg button:focus-visible{outline:2px solid var(--s1);outline-offset:-2px}
+
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink2);margin-bottom:4px}
+  .lg{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:14px;height:3px;border-radius:2px;flex:none}
+  .sw.d{width:9px;height:9px;border-radius:50%}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;font-weight:500}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:650}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafaf8}
+  tr.tracked td{background:var(--tint)}
+  tr.tracked:hover td{background:#eaf2fb}
+  tr.hl td{background:#fffaf9}
+  .pos{color:var(--good);font-weight:600} .neg{color:var(--bad);font-weight:600}
+  .dim{color:var(--muted)} .str{font-weight:650}
+  .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  .wrap.tall{max-height:340px;overflow-y:auto}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .ax{font-size:10.5px;fill:var(--muted)}
+  .gl{stroke:var(--line);stroke-width:1}
+  .zl{stroke:var(--rule);stroke-width:1}
+  .dl{font-size:11px;font-weight:650}
+  .empty{color:var(--muted);font-size:13px;padding:26px 0;text-align:center}
+  .foot{font-size:11.5px;color:var(--muted);margin-top:12px;
+        border-top:1px solid var(--line);padding-top:9px;max-width:82ch}
+  footer{margin-top:26px;font-size:11.5px;color:var(--muted)}
+  footer a{color:var(--ink2)}
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .08s;
+       background:var(--ink);color:#fff;font-size:11.5px;padding:6px 9px;
+       border-radius:7px;z-index:9;white-space:pre;line-height:1.45}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+       background:var(--paper);padding:1px 4px;border-radius:4px}
+</style>
+</head>
+<body data-palette="#2a78d6,#eb6834,#1baf7a">
+<main>
+  <header><h1>Trad</h1><span class="tag" id="gen"></span></header>
+  <p class="lede">Two ways of trading the opening bell, tested. Neither is tradeable —
+     for different reasons.</p>
+
+  <div class="score" id="score"></div>
+  <div class="grid" id="tiles"></div>
+
+  <div class="part">
+    <span class="no">PART 1</span><h2>Market intraday momentum</h2>
+    <span class="sub" id="imomrange"></span>
+  </div>
+  <div class="chips" id="imchips"></div>
+
+  <div class="bar"><div class="seg" id="imsel" role="group" aria-label="Symbol"></div></div>
+
+  <section>
+    <h3>Hit rate <span>· 95% intervals · all cross the coin-flip line</span></h3>
+    <div id="hit"></div>
+  </section>
+
+  <div class="cols two">
+    <section style="margin-top:0">
+      <h3>Can this sample see it? <span>· no</span></h3>
+      <div id="imcost"></div>
+    </section>
+    <section style="margin-top:0">
+      <h3>Published record <span>· Sharpe by source</span></h3>
+      <div id="imlit"></div>
+    </section>
+  </div>
+
+  <section>
+    <h3>Cumulative <span>· bps, 3bps round trip</span></h3>
+    <div class="legend" id="imleg"></div>
+    <div id="imeq"></div>
+  </section>
+
+  <section>
+    <h3>Statistics</h3>
+    <div class="wrap"><table id="imtab">
+      <thead><tr><th>Sym</th><th>Sessions</th><th>Hit</th><th>p</th>
+        <th>Gross</th><th>t</th><th>p</th><th>Can resolve</th>
+        <th>Net @3bps</th><th>Buy &amp; hold</th></tr></thead><tbody></tbody></table></div>
+    <div class="foot" id="imstatfoot"></div>
+  </section>
+
+  <div class="part">
+    <span class="no">PART 2</span><h2>Opening range breakout</h2>
+    <span class="sub">the one that gets sold</span>
+  </div>
+  <div class="chips" id="orbchips"></div>
+
+  <div class="bar"><div class="seg" id="symsel" role="group" aria-label="Symbol"></div></div>
+
+  <section>
+    <h3>All 36 parameter sets <span>· sorted · the best is the tail of a losing cloud</span></h3>
+    <div class="legend" id="dsleg"></div>
+    <div id="dist"></div>
+  </section>
+
+  <section>
+    <h3>Last session <span id="lsmeta"></span></h3>
+    <div id="intraday"></div>
+  </section>
+
+  <div class="cols two">
+    <section style="margin-top:0">
+      <h3>Cumulative <span>· bps</span></h3>
+      <div class="legend" id="eqleg"></div>
+      <div id="equity"></div>
+    </section>
+    <section style="margin-top:0">
+      <h3>Day by day <span id="dpmeta"></span></h3>
+      <div id="daily"></div>
+    </section>
+  </div>
+
+  <section>
+    <h3>Selection controls</h3>
+    <div class="wrap"><table id="ctrl">
+      <thead><tr><th>Sample</th><th>Sets</th><th>Mean</th><th>Median</th>
+        <th>Best</th><th>Worst</th><th>Positive</th></tr></thead><tbody></tbody></table></div>
+    <div class="foot" id="ctrlfoot"></div>
+  </section>
+
+  <section>
+    <h3>Forward paper log <span>· lag = data staleness at signal</span></h3>
+    <div class="wrap"><table id="fwd">
+      <thead><tr><th>Date</th><th>Sym</th><th>Side</th><th>Range</th>
+        <th>Entry</th><th>Exit</th><th>Why</th><th>Lag</th><th>Net</th></tr></thead>
+      <tbody></tbody></table></div>
+  </section>
+
+  <section>
+    <h3>Every parameter set</h3>
+    <div class="wrap tall"><table id="ptab">
+      <thead><tr><th>Sym</th><th>Set</th><th>OR</th><th>Stop</th><th>Target</th>
+        <th>Trades</th><th>Win</th><th>bps/trade</th><th>bps/session</th></tr></thead>
+      <tbody></tbody></table></div>
+  </section>
+
+  <footer>
+    <span id="mode"></span> &middot; data: Yahoo, free tier &middot;
+    <a href="index.json">index.json</a>
+  </footer>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const TIP=$("#tip");
+const S=["var(--s1)","var(--s2)","var(--s3)"];
+const f2=x=>(x>0?"+":"")+x.toFixed(2);
+const cls=x=>x>0?"pos":(x<0?"neg":"dim");
+const stars=p=>p<.01?"***":(p<.05?"**":(p<.10?"*":""));
+
+function tip(e,html){TIP.textContent=html;TIP.style.opacity=1;
+  const r=TIP.getBoundingClientRect();
+  TIP.style.left=Math.min(e.clientX+13,innerWidth-r.width-8)+"px";
+  TIP.style.top=Math.max(e.clientY-r.height-11,6)+"px";}
+function untip(){TIP.style.opacity=0;}
+function hov(el,txt){el.addEventListener("mousemove",e=>tip(e,txt));
+  el.addEventListener("mouseleave",untip);}
+const SVG=(w,h)=>{const s=document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox",`0 0 ${w} ${h}`);s.setAttribute("role","img");return s;}
+function el(p,n,a={}){const e=document.createElementNS("http://www.w3.org/2000/svg",n);
+  for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+function txt(p,x,y,s,c="ax",anc="middle"){const t=el(p,"text",{x,y,"text-anchor":anc});
+  t.setAttribute("class",c);t.textContent=s;return t;}
+
+let DATA=null, SYM="QQQ", IM="SPY";
+const DEFAULT_RT=3;
+
+/* ================= header ============================================= */
+function head(d){
+  const v=d.verdict, ss=v.samples||{}, k=Object.keys(ss);
+  const totPos=k.reduce((a,x)=>a+ss[x].positive,0), totSets=k.reduce((a,x)=>a+ss[x].sets,0);
+  const im=(d.imom||{}).samples||{}, spy=im.SPY||im[Object.keys(im)[0]];
+  const spyC=(v.controls||[]).find(c=>c.symbol==="SPY");
+
+  const mk=o=>`<span class="mk ${o}">${o==="yes"?"✓":(o==="no"?"✕":"–")}</span>`;
+  const row=(q,ans,o)=>`<div class="row">${mk(o)}<span class="q">${q}</span>
+    <span class="a" style="color:var(--${o==="yes"?"good":(o==="no"?"bad":"muted")})">${ans}</span></div>`;
+
+  const cards=[];
+  if(spy) cards.push(`<div class="sc">
+    <h4>Market intraday momentum</h4>
+    <div class="cap">JFE 2018 · ${spy.sessions} sessions · 30-minute hold</div>
+    ${row("Beats a coin flip?",`${spy.hit}% · p ${spy.hit_p}`,"no")}
+    ${row("Gross edge above zero?",`${f2(spy.gross_bps)} · t ${spy.gross_t}`,"no")}
+    ${row("Could this sample even see it?",`±${spy.power.mde} vs +${spy.power.paper_implied} needed`,"na")}
+    ${row("Does fading it work?",`${spy.fade_hit}% · p ${spy.fade_p}`,"no")}
+    ${row("Beats buy &amp; hold?",`${f2(spy.mean_bps)} vs ${f2(spy.bh_bps)}`,"no")}
+  </div>`);
+  cards.push(`<div class="sc">
+    <h4>Opening range breakout</h4>
+    <div class="cap">SSRN working paper · ${totSets} combinations tested</div>
+    ${row("More winners than a coin flip?",`${totPos}/${totSets}`,"no")}
+    ${row("Any sample with a positive median?",`0 of ${k.length}`,"no")}
+    ${row("Params transfer between samples?",spyC?`ρ ${spyC.rho} · p ${spyC.p}`:"—","no")}
+    ${row("Beats a random direction?","p 0.10 – 0.40","no")}
+    ${row("Forward paper log running?",`${(d.forward||[]).length} session${(d.forward||[]).length===1?"":"s"}`,"na")}
+  </div>`);
+  $("#score").innerHTML=cards.join("");
+
+  const t=[];
+  if(spy){
+    t.push(tile("Hit rate",spy.hit+"%",`p = ${spy.hit_p}`));
+    t.push(tile("Gross edge",f2(spy.gross_bps),`t = ${spy.gross_t}`));
+    t.push(tileF("Can resolve","±"+spy.power.mde,"bps/day"));
+    t.push(tileF("Paper needs","+"+spy.power.paper_implied,"invisible here"));
+    t.push(tile("Sessions needed",spy.power.n_for_paper,"have "+spy.sessions));
+  }
+  t.push(tile("ORB positive",`${totPos}/${totSets}`,"coin flip = half"));
+  $("#tiles").innerHTML=t.join("");
+
+  $("#imchips").innerHTML=spy?[
+    `Gao, Han, Li &amp; Zhou · <b>JFE 2018</b>`,
+    `signal <b>first window</b> from prev close`,
+    `trade <b>15:30–16:00</b>`,
+    `hold <b>30 min</b>, flat overnight`,
+    `published <b>SR 1.33</b>`].map(c=>`<span class="chip">${c}</span>`).join(""):"";
+  $("#orbchips").innerHTML=[
+    `break the <b>first 30 min</b> range`,
+    `flat by <b>15:55</b>`,
+    `independent replication: <b>net ≈ 0</b>`,
+    `tracked on <b>paper</b>`].map(c=>`<span class="chip">${c}</span>`).join("");
+
+  $("#gen").textContent="updated "+new Date(d.generated).toLocaleString();
+  $("#mode").textContent=(d.account||{}).mode||"PAPER";
+}
+const tile=(k,v,n)=>`<div class="m"><div class="k">${k}</div><div class="v">${v}</div>`
+  +(n?`<div class="n">${n}</div>`:"")+`</div>`;
+const tileF=(k,v,n)=>`<div class="m flag"><div class="k">${k}</div><div class="v">${v}</div>`
+  +(n?`<div class="n">${n}</div>`:"")+`</div>`;
+
+/* ================= PART 1 charts ====================================== */
+function hitChart(d){
+  const host=$("#hit"), im=d.imom||{};
+  const s=(im.samples||{})[IM], yrs=(im.hit_by_year||{})[IM]||{};
+  if(!s){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  // 95% CI on a proportion: p +- 1.96*sqrt(p(1-p)/n)
+  const ci=(pc,n)=>196*Math.sqrt((pc/100)*(1-pc/100)/n);
+  const rows=[{k:"All "+s.sessions+" sessions",v:s.hit,n:s.sessions,big:true}]
+    .concat(Object.entries(yrs).map(([y,o])=>({k:y,v:o.hit,n:o.n})))
+    .concat([{k:"Fading the signal",v:s.fade_hit,n:s.sessions,fade:true}]);
+  rows.forEach(r=>r.ci=ci(r.v,r.n));
+  const W=940,H=74+rows.length*38,P={t:18,r:16,b:30,l:168};
+  const iw=W-P.l-P.r, lo=36, hi=64;
+  const X=v=>P.l+(Math.max(lo,Math.min(hi,v))-lo)/(hi-lo)*iw;
+  const sv=SVG(W,H); host.innerHTML=""; host.appendChild(sv);
+  for(let v=lo+4;v<=hi;v+=4){
+    el(sv,"line",{x1:X(v),x2:X(v),y1:P.t-5,y2:H-P.b+2,class:v===50?"zl":"gl",opacity:v===50?1:.55});
+    txt(sv,X(v),H-P.b+17,v+"%","ax");}
+  txt(sv,X(50),P.t-9,"coin flip","ax");
+  rows.forEach((r,i)=>{
+    const y=P.t+12+i*38, h=r.big?17:13;
+    const x0=X(50), x1=X(r.v);
+    const g=el(sv,"rect",{x:Math.min(x0,x1),y:y-h/2,width:Math.max(2,Math.abs(x1-x0)),
+      height:h,rx:3.5,fill:r.v>=50?"var(--good)":"var(--bad)",opacity:r.fade?.35:.55});
+    // the confidence interval is the point of this chart
+    const a=X(r.v-r.ci), b=X(r.v+r.ci);
+    el(sv,"line",{x1:a,x2:b,y1:y,y2:y,stroke:"var(--ink2)","stroke-width":1.4});
+    [a,b].forEach(x=>el(sv,"line",{x1:x,x2:x,y1:y-5,y2:y+5,stroke:"var(--ink2)","stroke-width":1.4}));
+    el(sv,"circle",{cx:X(r.v),cy:y,r:4,fill:"var(--ink)",stroke:"#fff","stroke-width":1.5});
+    hov(g,`${r.k}\n${r.v}% hit rate\n95% CI ${(r.v-r.ci).toFixed(1)}% to ${(r.v+r.ci).toFixed(1)}%`
+      +`\n${r.n} sessions\n\nthe interval crosses 50% -> not distinguishable from chance`);
+    const lab=txt(sv,P.l-12,y+4,r.k,"ax","end");
+    if(r.big)lab.setAttribute("style","font-weight:650;fill:var(--ink)");
+    txt(sv,b+8,y+4,r.v.toFixed(1)+"%","dl","start");
+  });
+}
+
+function imEquity(d){
+  const host=$("#imeq"), e=((d.imom||{}).equity||{})[IM];
+  if(!e){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const W=940,H=290,P={t:14,r:120,b:28,l:52};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b, n=e.strategy.length;
+  const all=e.strategy.map(p=>p[1]).concat(e.buyhold.map(p=>p[1]));
+  let y0=Math.min(0,...all), y1=Math.max(0,...all); const pad=(y1-y0)*.1||1; y0-=pad;y1+=pad;
+  const X=i=>P.l+i/(n-1)*iw, Y=v=>P.t+(1-(v-y0)/(y1-y0))*ih;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  for(let i=0;i<=4;i++){const v=y0+(y1-y0)*i/4;
+    el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),class:"gl",opacity:.6});
+    txt(s,P.l-9,Y(v)+3.5,v.toFixed(0),"ax","end");}
+  el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(0),y2:Y(0),class:"zl"});
+  const taken=[];
+  const slot=y=>{let v=y,g=0;while(taken.some(t=>Math.abs(t-v)<17)&&g++<40)v+=17;taken.push(v);return v;};
+  [["strategy","var(--s2)","the strategy"],["buyhold","var(--s1)","buy & hold"]].forEach(([k,c,nm])=>{
+    const pts=e[k];
+    el(s,"path",{d:pts.map((p,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(""),
+      fill:"none",stroke:c,"stroke-width":2,"stroke-linejoin":"round"});
+    const last=pts[pts.length-1], ly=slot(Y(last[1])+3.5);
+    el(s,"circle",{cx:X(n-1),cy:Y(last[1]),r:3.5,fill:c,stroke:"#fff","stroke-width":2});
+    const t=txt(s,P.l+iw+9,ly,f2(last[1]),"dl","start"); t.setAttribute("fill",c);
+    txt(s,P.l+iw+9,ly+12,nm,"ax","start");});
+  [0,n-1].forEach(i=>txt(s,X(i),H-8,e.strategy[i][0],"ax",i?"end":"start"));
+  // crosshair
+  const cl=el(s,"line",{x1:0,x2:0,y1:P.t,y2:P.t+ih,class:"zl",opacity:0});
+  s.addEventListener("mousemove",ev=>{
+    const r=s.getBoundingClientRect();
+    const i=Math.round(((ev.clientX-r.left)/r.width*W-P.l)/iw*(n-1));
+    if(i<0||i>=n)return;
+    cl.setAttribute("x1",X(i));cl.setAttribute("x2",X(i));cl.setAttribute("opacity",.55);
+    tip(ev,`${e.strategy[i][0]}\nstrategy  ${f2(e.strategy[i][1])} bps\nbuy & hold ${f2(e.buyhold[i][1])} bps`);});
+  s.addEventListener("mouseleave",()=>{untip();cl.setAttribute("opacity",0);});
+  $("#imleg").innerHTML=
+    `<span class="lg"><span class="sw" style="background:var(--s2)"></span>Intraday momentum, after costs</span>`
+   +`<span class="lg"><span class="sw" style="background:var(--s1)"></span>Open-to-close buy &amp; hold</span>`;
+  const st=((d.imom||{}).samples||{})[IM];
+  if(st&&$("#imfoot"))$("#imfoot").innerHTML="";
+}
+
+function imCost(d){
+  const host=$("#imcost"), a=((d.imom||{}).samples||{})[IM];
+  if(!a||!a.power){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const pw=a.power;
+  const rows=[
+    {k:"Paper's edge (SR 1.33)", v:pw.paper_implied, c:"var(--s1)"},
+    {k:"Current edge (SR 0.37)", v:pw.oos_implied,  c:"var(--s3)"},
+    {k:"Measured, this sample",  v:a.gross_bps,     c:"var(--s2)"}];
+  const W=460,H=176,P={t:30,r:16,b:34,l:146};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const mx=Math.max(pw.mde, ...rows.map(r=>Math.abs(r.v)))*1.25;
+  const X=v=>P.l+(v+mx)/(2*mx)*iw;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  // the noise band -- anything inside it is invisible to this sample
+  el(s,"rect",{x:X(-pw.mde),y:P.t-12,width:X(pw.mde)-X(-pw.mde),height:ih+18,
+    fill:"var(--band)"});
+  txt(s,X(0),P.t-17,`can't be seen: ±${pw.mde} bps`,"ax");
+  el(s,"line",{x1:X(0),x2:X(0),y1:P.t-12,y2:P.t+ih+6,class:"zl"});
+  rows.forEach((r,i)=>{
+    const y=P.t+12+i*32;
+    const c=el(s,"circle",{cx:X(r.v),cy:y,r:5.5,fill:r.c,stroke:"#fff","stroke-width":2});
+    hov(c,`${r.k}\n${f2(r.v)} bps/day\n`
+      +(Math.abs(r.v)<pw.mde?"inside the noise band -- invisible here":"resolvable"));
+    txt(s,P.l-11,y+4,r.k,"ax","end");
+    const t=txt(s,X(r.v)+(r.v>=0?9:-9),y+4,f2(r.v),"dl",r.v>=0?"start":"end");
+    t.setAttribute("fill",r.c);});
+  txt(s,X(-mx)+4,H-10,(-mx).toFixed(1),"ax","start");
+  txt(s,X(mx)-4,H-10,"+"+mx.toFixed(1)+" bps/day","ax","end");
+}
+
+function imLit(d){
+  const host=$("#imlit"), lit=((d.imom||{}).paper||{}).oos_sharpe_literature||[];
+  const pub=((d.imom||{}).paper||{}).published_sharpe;
+  if(!lit.length){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const rows=[{source:"Published (JFE 2018)",sharpe:pub,pub:true}].concat(lit);
+  const W=460,H=34+rows.length*34,P={t:12,r:58,b:20,l:198};
+  const iw=W-P.l-P.r, mx=Math.max(...rows.map(r=>r.sharpe))*1.08;
+  const X=v=>P.l+Math.max(0,v)/mx*iw;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  [0,.5,1,1.5].forEach(v=>{if(v>mx)return;
+    el(s,"line",{x1:X(v),x2:X(v),y1:P.t-3,y2:H-P.b+2,class:"gl",opacity:.65});
+    txt(s,X(v),H-P.b+15,v.toFixed(1),"ax");});
+  rows.forEach((r,i)=>{
+    const y=P.t+9+i*34;
+    const c=r.sharpe>=1?"var(--s1)":"var(--s2)";
+    const b=el(s,"rect",{x:P.l,y:y-7,width:Math.max(2,X(r.sharpe)-P.l),height:14,rx:3,
+      fill:c,opacity:r.pub?.95:.7});
+    hov(b,`${r.source}\nSharpe ${r.sharpe}`);
+    const lb=txt(s,P.l-11,y+4,r.source,"ax","end");
+    if(r.pub)lb.setAttribute("style","font-weight:650;fill:var(--ink)");
+    const v=txt(s,X(r.sharpe)+7,y+4,r.sharpe.toFixed(2),"dl","start");
+    v.setAttribute("fill",c);});
+}
+
+/* ================= PART 2 charts ====================================== */
+function intraday(d){
+  const ls=d.last_session, host=$("#intraday");
+  if(!ls||!ls.bars||!ls.bars.length){host.innerHTML=`<div class="empty">No session yet.</div>`;return;}
+  $("#lsmeta").textContent=`· ${ls.symbol} · ${ls.date}`;
+  const W=940,H=270,P={t:12,r:54,b:26,l:8};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const lo=Math.min(...ls.bars.map(b=>b[3])), hi=Math.max(...ls.bars.map(b=>b[2]));
+  const pad=(hi-lo)*.08||1, y0=lo-pad, y1=hi+pad;
+  const X=i=>P.l+i/(ls.bars.length-1)*iw, Y=v=>P.t+(1-(v-y0)/(y1-y0))*ih;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  if(ls.or_high!=null){
+    el(s,"rect",{x:P.l,y:Y(ls.or_high),width:iw,
+      height:Math.max(1,Y(ls.or_low)-Y(ls.or_high)),fill:"var(--band)"});
+    [ls.or_high,ls.or_low].forEach(v=>{
+      el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),class:"zl","stroke-dasharray":"3 3"});
+      txt(s,P.l+iw+6,Y(v)+3.5,v.toFixed(2),"ax","start");});
+    txt(s,P.l+6,Y(ls.or_high)-6,`opening range · ${ls.or_min} min`,"ax","start");}
+  for(let i=0;i<=3;i++){const v=y0+(y1-y0)*i/3;
+    el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),class:"gl",opacity:.5});}
+  el(s,"path",{d:ls.bars.map((b,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(b[1]).toFixed(1)}`).join(""),
+    fill:"none",stroke:"var(--s1)","stroke-width":2,"stroke-linejoin":"round"});
+  [0,Math.floor(ls.bars.length/2),ls.bars.length-1].forEach(i=>
+    txt(s,X(i),H-8,ls.bars[i][0],"ax",i===0?"start":(i===ls.bars.length-1?"end":"middle")));
+  const cl=el(s,"line",{x1:0,x2:0,y1:P.t,y2:P.t+ih,class:"zl",opacity:0});
+  const dot=el(s,"circle",{r:4,fill:"var(--s1)",stroke:"#fff","stroke-width":2,opacity:0});
+  s.addEventListener("mousemove",e=>{
+    const r=s.getBoundingClientRect();
+    const i=Math.round(((e.clientX-r.left)/r.width*W-P.l)/iw*(ls.bars.length-1));
+    if(i<0||i>=ls.bars.length)return;
+    const b=ls.bars[i];
+    cl.setAttribute("x1",X(i));cl.setAttribute("x2",X(i));cl.setAttribute("opacity",.6);
+    dot.setAttribute("cx",X(i));dot.setAttribute("cy",Y(b[1]));dot.setAttribute("opacity",1);
+    tip(e,`${b[0]}\n${ls.symbol} ${b[1].toFixed(2)}\nhigh ${b[2].toFixed(2)}  low ${b[3].toFixed(2)}`);});
+  s.addEventListener("mouseleave",()=>{untip();cl.setAttribute("opacity",0);dot.setAttribute("opacity",0);});
+}
+
+function equity(d){
+  const host=$("#equity"), keys=d.tracked.map(t=>`${SYM} ${t}`).filter(k=>d.equity[k]);
+  if(!keys.length){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const W=470,H=250,P={t:12,r:104,b:26,l:44};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const all=keys.flatMap(k=>d.equity[k].map(p=>p[1])), n=d.equity[keys[0]].length;
+  let y0=Math.min(0,...all), y1=Math.max(0,...all); const pad=(y1-y0)*.1||1; y0-=pad;y1+=pad;
+  const X=i=>P.l+(n<2?iw/2:i/(n-1)*iw), Y=v=>P.t+(1-(v-y0)/(y1-y0))*ih;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  for(let i=0;i<=3;i++){const v=y0+(y1-y0)*i/3;
+    el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),class:"gl",opacity:.6});
+    txt(s,P.l-8,Y(v)+3.5,v.toFixed(0),"ax","end");}
+  el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(0),y2:Y(0),class:"zl"});
+  const taken=[];
+  const slot=y=>{let v=y,g=0;while(taken.some(t=>Math.abs(t-v)<15)&&g++<40)v+=15;taken.push(v);return v;};
+  keys.forEach((k,ki)=>{
+    const pts=d.equity[k];
+    el(s,"path",{d:pts.map((p,i)=>`${i?"L":"M"}${X(i).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(""),
+      fill:"none",stroke:S[ki],"stroke-width":2,"stroke-linejoin":"round"});
+    const last=pts[pts.length-1], ly=slot(Y(last[1])+3.5);
+    el(s,"circle",{cx:X(pts.length-1),cy:Y(last[1]),r:3.2,fill:S[ki],stroke:"#fff","stroke-width":2});
+    if(Math.abs(ly-(Y(last[1])+3.5))>4)
+      el(s,"line",{x1:P.l+iw+2,y1:Y(last[1]),x2:P.l+iw+7,y2:ly-4,stroke:S[ki],"stroke-width":1,opacity:.5});
+    const t=txt(s,P.l+iw+9,ly,f2(last[1]),"dl","start"); t.setAttribute("fill",S[ki]);});
+  [0,n-1].forEach(i=>txt(s,X(i),H-8,d.equity[keys[0]][i][0].slice(5),"ax",i?"end":"start"));
+  $("#eqleg").innerHTML=keys.map((k,i)=>
+    `<span class="lg"><span class="sw" style="background:${S[i]}"></span>${k.split(" ")[1]}</span>`).join("");
+}
+
+function daily(d){
+  const host=$("#daily"), lbl=d.tracked[0];
+  const rows=(d.daily||[]).filter(r=>r.symbol===SYM&&r.params===lbl);
+  $("#dpmeta").textContent=`· ${SYM} ${lbl}`;
+  if(!rows.length){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const W=470,H=250,P={t:12,r:12,b:26,l:50};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const mx=Math.max(.01,...rows.map(r=>Math.abs(r.net_bps)));
+  const bw=Math.max(3,iw/rows.length-3);
+  const X=i=>P.l+i*(iw/rows.length)+(iw/rows.length-bw)/2;
+  const Y=v=>P.t+ih/2-(v/mx)*(ih/2);
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  [mx,0,-mx].forEach(v=>{el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),
+      class:v===0?"zl":"gl",opacity:v===0?1:.6});
+    txt(s,P.l-8,Y(v)+3.5,v.toFixed(0),"ax","end");});
+  rows.forEach((r,i)=>{
+    const h=Math.max(1,Math.abs(Y(r.net_bps)-Y(0)));
+    const b=el(s,"rect",{x:X(i),y:r.net_bps>=0?Y(r.net_bps):Y(0),width:bw,height:h,
+      rx:Math.min(3,bw/2),fill:r.net_bps>=0?"var(--good)":"var(--bad)",opacity:.85});
+    hov(b,`${r.date}\n${r.status==="filled"?(r.side>0?"long":"short"):r.status}`
+      +`\n${f2(r.net_bps)} bps`+(r.reason?`\nexit: ${r.reason}`:""));});
+  [0,rows.length-1].forEach(i=>txt(s,X(i)+bw/2,H-8,rows[i].date.slice(5),"ax",i?"end":"start"));
+}
+
+function dist(d){
+  const host=$("#dist");
+  const rows=(d.params||[]).filter(r=>r.symbol===SYM).slice()
+    .sort((a,b)=>a.net_per_session_bps-b.net_per_session_bps);
+  if(!rows.length){host.innerHTML=`<div class="empty">No data.</div>`;return;}
+  const W=940,H=240,P={t:14,r:14,b:32,l:48};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const v=rows.map(r=>r.net_per_session_bps);
+  let y0=Math.min(...v), y1=Math.max(...v); const pad=(y1-y0)*.12||1; y0-=pad;y1+=pad;
+  const med=v[Math.floor(v.length/2)];
+  const X=i=>P.l+(i+.5)/rows.length*iw, Y=x=>P.t+(1-(x-y0)/(y1-y0))*ih;
+  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
+  for(let i=0;i<=4;i++){const q=y0+(y1-y0)*i/4;
+    el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(q),y2:Y(q),class:"gl",opacity:.55});
+    txt(s,P.l-8,Y(q)+3.5,q.toFixed(0),"ax","end");}
+  el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(0),y2:Y(0),class:"zl"});
+  txt(s,P.l+iw-2,Y(0)-7,"break even","ax","end");
+  el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(med),y2:Y(med),stroke:"var(--s2)",
+    "stroke-width":1.5,"stroke-dasharray":"5 4"});
+  const mt=txt(s,P.l+2,Y(med)+14,`median ${f2(med)}`,"dl","start");
+  mt.setAttribute("fill","var(--s2)");
+  rows.forEach((r,i)=>{
+    const c=el(s,"circle",{cx:X(i),cy:Y(r.net_per_session_bps),r:r.tracked?5:3.4,
+      fill:r.tracked?"var(--s1)":"var(--muted)",opacity:r.tracked?1:.5,
+      stroke:"#fff","stroke-width":r.tracked?2:0});
+    hov(c,`${r.params}\n${f2(r.net_per_session_bps)} bps/session`
+      +`\n${r.trades} trades  ${(r.win_rate*100).toFixed(0)}% win`+(r.tracked?"\n\ntracked forward":""));});
+  txt(s,P.l,H-9,"worst","ax","start"); txt(s,P.l+iw,H-9,"best","ax","end");
+  $("#dsleg").innerHTML=
+    `<span class="lg"><span class="sw d" style="background:var(--s1)"></span>tracked forward</span>`
+   +`<span class="lg"><span class="sw d" style="background:var(--muted);opacity:.5"></span>other sets</span>`
+   +`<span class="lg"><span class="sw" style="background:var(--s2)"></span>median</span>`;
+}
+
+/* ================= tables ============================================= */
+function tables(d){
+  const im=(d.imom||{}).samples||{};
+  $("#imtab tbody").innerHTML=Object.entries(im).map(([k,v])=>
+    `<tr class="${k===IM?"hl":""}"><td>${k}</td><td>${v.sessions}</td>
+     <td>${v.hit}%</td><td class="dim">${v.hit_p}</td>
+     <td class="${cls(v.gross_bps)}">${f2(v.gross_bps)}</td>
+     <td>${v.gross_t}${stars(v.gross_p)}</td><td class="dim">${v.gross_p}</td>
+     <td class="dim">±${v.power.mde}</td>
+     <td class="${cls(v.mean_bps)}">${f2(v.mean_bps)}</td>
+     <td class="${cls(v.bh_bps)}">${f2(v.bh_bps)} <span class="dim">SR ${v.bh_sharpe}</span></td></tr>`).join("");
+  const a=im[IM];
+  $("#imstatfoot").innerHTML=a?`bps per session. <b>t tests GROSS</b> — a t-test on
+     cost-subtracted returns measures the spread, not the signal.
+     "Can resolve" = smallest edge ${a.sessions} sessions separate from zero at p&lt;.05.`:"";
+
+  const s=d.verdict.samples||{};
+  $("#ctrl tbody").innerHTML=Object.entries(s).map(([k,v])=>
+    `<tr><td>${k} <span class="dim">· ${v.sessions} sessions</span></td><td>${v.sets}</td>
+     <td class="${cls(v.mean)}">${f2(v.mean)}</td><td class="${cls(v.median)}">${f2(v.median)}</td>
+     <td class="${cls(v.best)}">${f2(v.best)}</td><td class="${cls(v.worst)}">${f2(v.worst)}</td>
+     <td>${v.positive}/${v.sets}</td></tr>`).join("");
+  $("#ctrlfoot").innerHTML=(d.verdict.controls||[]).map(c=>
+    `<b>${c.symbol}</b> 1m↔5m rank ρ = ${c.rho} (p ${c.p}) · best-on-1m
+     <code>${c.best_1m_set}</code> scores ${f2(c.best_1m_on_1m)} → <b>${f2(c.best_1m_on_5m)}</b>`
+    ).join("<br>");
+
+  const fw=d.forward||[];
+  $("#fwd tbody").innerHTML=fw.length?fw.map(r=>
+    `<tr><td>${r.date||"—"}</td><td>${r.symbol||"—"}</td>
+     <td>${r.side?(r.side>0?"long":"short"):'<span class="dim">—</span>'}</td>
+     <td class="dim">${r.or_low!=null?r.or_low+"–"+r.or_high:"—"}</td>
+     <td>${r.entry??'<span class="dim">—</span>'}</td><td>${r.exit??'<span class="dim">—</span>'}</td>
+     <td class="dim">${r.reason||"—"}</td>
+     <td class="dim">${r.fill_lag_s!=null?r.fill_lag_s+"s":"replay"}</td>
+     <td class="${cls(r.net_bps||0)}">${r.net_bps!=null?f2(r.net_bps):"—"}</td></tr>`).join("")
+   :`<tr><td colspan="9" class="dim">No forward session logged yet.</td></tr>`;
+
+  $("#ptab tbody").innerHTML=(d.params||[]).slice()
+    .sort((a,b)=>b.net_per_session_bps-a.net_per_session_bps).map(r=>
+    `<tr class="${r.tracked?"tracked":""}"><td>${r.symbol}</td><td>${r.params}</td>
+     <td>${r.or_min}m</td><td class="dim">${r.stop}</td><td class="dim">${r.target}</td>
+     <td>${r.trades}</td><td>${(r.win_rate*100).toFixed(0)}%</td>
+     <td class="${cls(r.mean_net_bps)}">${f2(r.mean_net_bps)}</td>
+     <td class="${cls(r.net_per_session_bps)}">${f2(r.net_per_session_bps)}</td></tr>`).join("");
+}
+
+function redrawORB(){equity(DATA);daily(DATA);dist(DATA);}
+function redrawIM(){hitChart(DATA);imEquity(DATA);imCost(DATA);imLit(DATA);tables(DATA);}
+
+function seg(host,syms,cur,cb){
+  host.innerHTML=syms.map(s=>
+    `<button type="button" aria-pressed="${s===cur}" data-s="${s}">${s}</button>`).join("");
+  host.addEventListener("click",e=>{
+    const b=e.target.closest("button"); if(!b)return;
+    [...host.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+    cb(b.dataset.s);});
+}
+
+fetch("index.json",{cache:"no-store"}).then(r=>r.json()).then(d=>{
+  DATA=d;
+  const syms=[...new Set((d.params||[]).map(r=>r.symbol))];
+  SYM=syms.includes("QQQ")?"QQQ":syms[0];
+  const ims=Object.keys((d.imom||{}).samples||{});
+  IM=ims.includes("SPY")?"SPY":ims[0];
+  const a=((d.imom||{}).samples||{})[IM];
+  if(a)$("#imomrange").textContent=`${a.sessions} sessions · ${a.first} → ${a.last}`;
+  seg($("#symsel"),syms,SYM,s=>{SYM=s;redrawORB();});
+  seg($("#imsel"),ims,IM,s=>{IM=s;redrawIM();});
+  head(d);intraday(d);redrawORB();redrawIM();
+  addEventListener("resize",()=>{redrawORB();redrawIM();intraday(d);});
+}).catch(e=>{$("#vtext1").textContent="Could not load index.json — "+e.message;});
+</script>
+</body>
+</html>
