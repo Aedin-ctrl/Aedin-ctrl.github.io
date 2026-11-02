@@ -49,20 +49,61 @@ $$('#srcTabs button').forEach(b => b.addEventListener('click', () => {
 }));
 
 /* ---------------- built-in data ---------------- */
-let exId = 'index';
-function renderExamples() {
-  $('#exChips').innerHTML = Object.entries(DATA_EXAMPLES).map(([id, e]) =>
-    `<button class="chip" data-ex="${id}" aria-pressed="${id === exId}">${esc(e.label)}</button>`).join('');
-  $$('#exChips button').forEach(b => b.addEventListener('click', () => { exId = b.dataset.ex; pickExample(); }));
+let exId = 'spy_full', exKind = 'real';
+let REAL = null, realLoading = null;
+
+/* The real series are ~100KB gzipped, so they are fetched the first time one is
+ * picked rather than on every page load. */
+async function loadReal() {
+  if (REAL) return REAL;
+  if (!realLoading) {
+    realLoading = fetch(new URL('../data/real.json', import.meta.url))
+      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then(j => (REAL = j));
+  }
+  return realLoading;
 }
+
+function renderExamples() {
+  const realChips = $('#realChips');
+  if (REAL) {
+    realChips.innerHTML = Object.entries(REAL.series).map(([id, e]) =>
+      `<button class="chip" data-real="${id}" aria-pressed="${exKind === 'real' && id === exId}">${esc(e.label)}</button>`).join('');
+    $$('#realChips button').forEach(b => b.addEventListener('click', () => { exKind = 'real'; exId = b.dataset.real; pickExample(); }));
+  } else {
+    realChips.innerHTML = `<button class="chip" id="loadReal">Load real market data (SPY, QQQ, IWM &middot; 15 years)</button>`;
+    $('#loadReal').addEventListener('click', async (ev) => {
+      ev.target.textContent = 'loading...'; ev.target.disabled = true;
+      try { await loadReal(); exKind = 'real'; exId = 'spy_full'; pickExample(); }
+      catch (e) { ev.target.textContent = 'could not load: ' + e.message; }
+    });
+  }
+  $('#exChips').innerHTML = Object.entries(DATA_EXAMPLES).map(([id, e]) =>
+    `<button class="chip" data-ex="${id}" aria-pressed="${exKind === 'gen' && id === exId}">${esc(e.label)}</button>`).join('');
+  $$('#exChips button').forEach(b => b.addEventListener('click', () => { exKind = 'gen'; exId = b.dataset.ex; pickExample(); }));
+}
+
 function pickExample() {
-  const ex = buildExample(exId);
-  ST.source = ex.returns;
-  ST.sourceLabel = ex.label;
-  ST.sourceNote = ex.note;
-  ST.strategySrc = '';
-  $('#ppy').value = ex.ppy;
-  $('#exNote').innerHTML = esc(ex.note) + ' <b>Generated data, not a real market.</b>';
+  if (exKind === 'real') {
+    const e = REAL && REAL.series[exId];
+    if (!e) { exKind = 'gen'; exId = 'index'; return pickExample(); }
+    ST.source = Float64Array.from(e.r);
+    ST.sourceLabel = e.label;
+    ST.sourceNote = e.note;
+    ST.strategySrc = '';
+    $('#ppy').value = e.ppy || 252;
+    $('#horizon').value = Math.max(252, Math.min(5040, e.n));
+    $('#exNote').innerHTML = `${esc(e.note)} <b>Real market data</b> &middot; ${e.from} to ${e.to} &middot;
+      ${e.n.toLocaleString()} trading days &middot; source: Yahoo daily, adjusted.`;
+  } else {
+    const ex = buildExample(exId);
+    ST.source = ex.returns;
+    ST.sourceLabel = ex.label;
+    ST.sourceNote = ex.note;
+    ST.strategySrc = '';
+    $('#ppy').value = ex.ppy;
+    $('#exNote').innerHTML = esc(ex.note) + ' <b>Generated data, not a real market.</b>';
+  }
   renderExamples();
   afterSourceChange();
 }
@@ -598,6 +639,7 @@ $('#shareBtn').addEventListener('click', async () => {
     m: cfg.model.id, p: cfg.model.params, s: cfg.sizing, c: cfg.costs,
     h: cfg.horizon, y: cfg.ppy, n: cfg.paths, sd: cfg.seed, t: cfg.trials, r: cfg.ruinAt,
     ex: ST.mode === 'examples' ? exId : null,
+    exk: ST.mode === 'examples' ? exKind : null,
     st: ST.mode === 'strategy' ? ST.strategySrc : null,
   };
   const url = location.origin + location.pathname + '#' + btoa(encodeURIComponent(JSON.stringify(jsonSafe(share))));
@@ -609,7 +651,8 @@ function restoreFromHash() {
   if (!location.hash || location.hash.length < 8) return false;
   try {
     const o = JSON.parse(decodeURIComponent(atob(location.hash.slice(1))));
-    if (o.ex && DATA_EXAMPLES[o.ex]) { exId = o.ex; pickExample(); }
+    if (o.ex && o.exk === 'real') { loadReal().then(() => { exKind = 'real'; exId = o.ex; pickExample(); }).catch(() => {}); }
+    else if (o.ex && DATA_EXAMPLES[o.ex]) { exKind = 'gen'; exId = o.ex; pickExample(); }
     if (o.st) {
       ST.strategySrc = o.st; $('#stratBox').value = o.st;
       $$('#srcTabs button').find(b => b.dataset.pane === 'pStrat').click();
@@ -642,6 +685,7 @@ function restoreFromHash() {
 
 /* ---------------- boot ---------------- */
 window.__mcGen = { optimalBlockLength };
+exKind = 'gen'; exId = 'index';
 renderExamples();
 pickExample();
 $('#sizeMode').dispatchEvent(new Event('change'));

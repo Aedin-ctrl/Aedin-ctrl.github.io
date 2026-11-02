@@ -87,6 +87,10 @@
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .spacer{flex:1}
 
+  .grouplab{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+            font-weight:660;margin:10px 0 1px}
+  .grouplab:first-child{margin-top:0}
+  .grouplab em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:400}
   .chips{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 2px}
   .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;
         border:1px solid var(--line);background:var(--card);border-radius:999px;
@@ -212,6 +216,9 @@
       </div>
 
       <div class="pane" id="pExamples">
+        <div class="grouplab">Real market data <em>Yahoo daily, split and dividend adjusted</em></div>
+        <div class="chips" id="realChips"></div>
+        <div class="grouplab">Generated <em>synthetic, for showing what a known truth looks like</em></div>
         <div class="chips" id="exChips"></div>
         <div class="hint" id="exNote"></div>
       </div>

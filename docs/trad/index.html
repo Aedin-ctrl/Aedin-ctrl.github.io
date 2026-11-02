@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>First 90 Min</title>
+<title>Trad</title>
 <meta name="description" content="Opening-bell strategies and gold's Parabolic SAR, measured. What the evidence says, against what gets sold.">
 <style>
   /* Light only, matching the calibration board. Read next to a broker screen. */
@@ -122,11 +122,6 @@
   .sub-btn:hover{color:var(--ink2)}
   .sub-btn[aria-selected="true"]{color:var(--ink);font-weight:620;border-bottom-color:var(--ink)}
   .sub-btn:focus-visible{outline:2px solid var(--s1);outline-offset:-3px;border-radius:6px}
-  /* a link out to the simulator, not one of the tab views above */
-  .sub-link{margin-left:auto;align-self:center;font-size:13px;color:var(--s1);
-            text-decoration:none;padding:9px 4px 9px 14px;white-space:nowrap}
-  .sub-link:hover{color:var(--ink);text-decoration:underline}
-  .sub-link:focus-visible{outline:2px solid var(--s1);outline-offset:-2px;border-radius:6px}
   .view[hidden]{display:none}
 
   /* the SAR explainer */
@@ -146,6 +141,9 @@
   .ctl b{color:var(--ink);font-weight:650;font-variant-numeric:tabular-nums;
          text-transform:none;letter-spacing:0}
   .ctl input[type=range]{width:min(170px,42vw);accent-color:var(--ink);cursor:pointer}
+  .callout{border-color:#d8d3c4;background:#fdfcf8}
+  .callout h3{color:var(--ink)}
+  #geff td:first-child,#gcap td:first-child,#gfill td:first-child{white-space:normal}
   #gctrl td:first-child,#gper td:first-child{white-space:normal}
   #gctrl td,#gctrl th{padding:6px 5px}
   #gliveTab td:first-child{color:var(--ink2);font-weight:400}
@@ -168,14 +166,13 @@
 </head>
 <body data-palette="#2a78d6,#eb6834,#1baf7a">
 <main>
-  <header><h1>First 90 Min</h1><span class="tag" id="gen"></span></header>
+  <header><h1>Trad</h1><span class="tag" id="gen"></span></header>
   <p class="lede" id="lede">Two ways of trading the opening bell, tested. Neither is
      tradeable — for different reasons.</p>
 
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
-    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Gold &middot; Parabolic SAR</button>
-    <a class="sub-link" href="mc/">Monte Carlo &rarr;</a>
+    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">gold strat</button>
   </div>
 
   <div class="view" id="v-bell">
@@ -281,17 +278,6 @@
     <span class="sub" id="labmeta"></span>
   </div>
   <div class="chips" id="labchips"></div>
-
-  <section>
-    <h3>Cross-validated, every split <span id="cvmeta"></span></h3>
-    <p class="note">One train/test cut gives one number that depends on where the
-       cut fell. This splits the timeline into 10 blocks and tests every pair of
-       them — 45 separate out-of-sample tests, each purged and embargoed so no
-       training session touches a test block.</p>
-    <div class="legend" id="cvleg"></div>
-    <div id="cvchart"></div>
-    <div class="foot" id="cvfoot"></div>
-  </section>
 
   <section>
     <h3>Does searching harder help? <span>· no — it is the opposite</span></h3>
@@ -465,6 +451,105 @@
         <tbody></tbody></table></div>
       <div class="foot" id="gmatfoot"></div>
     </section>
+
+
+    <div class="part">
+      <span class="no">PART 4</span><h2>Can it be done better?</h2>
+      <span class="sub">six levers, tested</span>
+    </div>
+    <p class="partnote">Everything below is chosen on the <b>25 years before the
+       last 252 sessions</b> and scored on those sessions afterwards. Searching
+       for a rule and then judging it on the same year is how you invent an edge.</p>
+
+    <section class="callout">
+      <h3>First, where the number on this page comes from</h3>
+      <p class="note">The board above fills a flip <em>at</em> the stop level,
+         intrabar &mdash; defensible, because the level is fixed before the bar
+         and a resting order could sit on it. It is also the whole result. Under
+         either conservative fill the rule lands exactly on top of gold.</p>
+      <div class="wrap"><table id="gfill">
+        <thead><tr><th>Fill assumption</th><th>Net/bar</th><th>Sharpe</th>
+          <th>vs gold</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="gfillfoot"></div>
+    </section>
+
+    <section>
+      <h3>Thirteen rules on one accounting <span>· close-to-close, turnover-charged</span></h3>
+      <p class="note">Same bars, same costs, same conservative fill, so the
+         comparison is level. <b>Break-even cost</b> is the per-side charge at
+         which each rule earns nothing &mdash; the real measure of how much
+         venue it can survive.</p>
+      <div class="wrap tall" tabindex="0" role="region" aria-label="Rule comparison">
+        <table id="geff">
+        <thead><tr><th>Rule</th><th>Net/bar</th><th>Sharpe</th><th>Calmar</th>
+          <th>Max DD</th><th>Exposure</th><th>Flips/yr</th><th>Break-even</th>
+          <th>Gross/cost</th><th>Per exposure</th><th>Holdout Sharpe</th></tr></thead>
+        <tbody></tbody></table></div>
+      <div class="foot" id="gefffoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>The one lever that survives <span>· volatility targeting</span></h3>
+        <p class="note">Scale the position by inverse realised volatility to a
+           constant target. It changes size, never direction, and it is the
+           best-supported single idea in the trend-following literature.</p>
+        <div class="wrap"><table id="gvt">
+          <thead><tr><th>Comparison</th><th>&Delta;Sharpe</th><th>95% CI</th>
+            <th>p</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="gvtfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>And one that is an accounting trick <span>· Heikin-Ashi</span></h3>
+        <p class="note">The widely-quoted result that Heikin-Ashi bars turn
+           Parabolic SAR from a 19% win rate into 63% is reproduced here, and
+           then taken apart.</p>
+        <div class="wrap"><table id="gha"><tbody></tbody></table></div>
+        <div class="foot" id="ghafoot"></div>
+      </section>
+    </div>
+
+    <section>
+      <h3>113 candidate rules <span id="gsearchmeta"></span></h3>
+      <p class="note">Chosen on the left axis, judged on the bottom. If the
+         search worked, the cloud would run up and to the right.</p>
+      <div class="legend" id="gsleg"></div>
+      <div id="gsearch"></div>
+      <div class="foot" id="gsearchfoot"></div>
+    </section>
+
+    <div class="part">
+      <span class="no">PART 5</span><h2>The last year, every session</h2>
+      <span class="sub" id="gyrmeta"></span>
+    </div>
+    <p class="partnote" id="gyrlede"></p>
+
+    <div class="grid" id="gyrtiles"></div>
+
+    <section>
+      <h3>Cumulative over the holdout <span>· bps</span></h3>
+      <div class="legend" id="gyrleg"></div>
+      <div id="gyreq"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Up days against down days <span>· the tell</span></h3>
+        <p class="note">A rule that times anything should keep more of gold's
+           up days than of its down days. These keep the same share of both.</p>
+        <div class="wrap"><table id="gcap">
+          <thead><tr><th>Rule</th><th>On up days</th><th>On down days</th>
+            <th>Keeps of up</th><th>Keeps of down</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="gcapfoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Session by session <span id="gdaymeta"></span></h3>
+        <div class="wrap tall" tabindex="0" role="region" aria-label="Every session of the last year">
+          <table id="gday">
+          <thead><tr><th>Date</th><th>Gold</th><th>Pos</th><th>SAR</th>
+            <th>+ vol target</th><th>Ensemble</th></tr></thead><tbody></tbody></table></div>
+      </section>
+    </div>
 
     <section>
       <h3>Data, and what is wrong with it</h3>
@@ -879,55 +964,6 @@ function tables(d){
      <td class="${cls(r.net_per_session_bps)}">${f2(r.net_per_session_bps)}</td></tr>`).join("");
 }
 
-function cvChart(d){
-  const host=$("#cvchart"), cv=(d.lab||{}).cpcv;
-  if(!cv||!cv.split_points||!cv.split_points.length){
-    host.innerHTML=`<div class="empty">No cross-validation data.</div>`;return;}
-  const pts=cv.split_points.filter(p=>p.test_sr!=null);
-  const W=940,H=320,P={t:16,r:18,b:42,l:52};
-  const iw=W-P.l-P.r, ih=H-P.t-P.b;
-  const xs=pts.map(p=>p.train_sr), ys=pts.map(p=>p.test_sr);
-  const lo=Math.min(...xs,...ys), hi=Math.max(...xs,...ys);
-  const pad=(hi-lo)*.1||1, a=lo-pad, b=hi+pad;
-  const X=v=>P.l+(v-a)/(b-a)*iw, Y=v=>P.t+(1-(v-a)/(b-a))*ih;
-  const s=SVG(W,H); host.innerHTML=""; host.appendChild(s);
-  // quadrant shading: bottom-right = looked good, did badly
-  el(s,"rect",{x:X(0),y:Y(0),width:Math.max(0,X(b)-X(0)),
-    height:Math.max(0,Y(a)-Y(0)),fill:"#fdf1ef"});
-  for(let i=0;i<=4;i++){const v=a+(b-a)*i/4;
-    el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(v),y2:Y(v),class:"gl",opacity:.5});
-    el(s,"line",{x1:X(v),x2:X(v),y1:P.t,y2:P.t+ih,class:"gl",opacity:.5});
-    txt(s,P.l-9,Y(v)+3.5,v.toFixed(1),"ax","end");
-    txt(s,X(v),H-24,v.toFixed(1),"ax");}
-  el(s,"line",{x1:P.l,x2:P.l+iw,y1:Y(0),y2:Y(0),class:"zl"});
-  el(s,"line",{x1:X(0),x2:X(0),y1:P.t,y2:P.t+ih,class:"zl"});
-  // y=x: where a split would land if train performance carried over
-  el(s,"line",{x1:X(a),y1:Y(a),x2:X(b),y2:Y(b),stroke:"var(--muted)",
-    "stroke-width":1,"stroke-dasharray":"4 4",opacity:.7});
-  txt(s,X(b)-4,Y(b)+13,"carries over perfectly","ax","end");
-  pts.forEach(p=>{
-    const c=el(s,"circle",{cx:X(p.train_sr),cy:Y(p.test_sr),r:5,
-      fill:p.test_sr>0?"var(--good)":"var(--bad)",opacity:.62,
-      stroke:"#fff","stroke-width":1.2});
-    hov(c,`train ${f2(p.train_sr)}  ->  out of sample ${f2(p.test_sr)}`
-      +`\nreality-check p = ${p.rc_p.toFixed(3)}`);});
-  txt(s,P.l+iw/2,H-6,"best-on-train Sharpe (annualised)","ax");
-  const yl=txt(s,14,P.t+ih/2,"out of sample","ax","middle");
-  yl.setAttribute("transform",`rotate(-90 14 ${P.t+ih/2})`);
-  $("#cvleg").innerHTML=
-    `<span class="lg"><span class="sw d" style="background:var(--good)"></span>stayed positive</span>`
-   +`<span class="lg"><span class="sw d" style="background:var(--bad)"></span>went negative</span>`
-   +`<span class="lg"><span class="sw" style="background:#fdf1ef;height:9px"></span>looked good, did badly</span>`;
-  $("#cvmeta").textContent=`· ${cv.n_splits} splits · ${cv.n_instruments} instruments `
-    +`· ${(cv.total_draws||0).toLocaleString()} draws in ${cv.secs}s`;
-  $("#cvfoot").innerHTML=`Mean best-on-train <b>${f2(cv.train_sr_mean)}</b>;
-    the same strategy out of sample <b class="neg">${f2(cv.test_sr_mean)}</b>
-    (median ${f2(cv.test_sr_median)}, sd ${cv.test_sr_std.toFixed(2)}).
-    Positive in <b>${cv.test_positive} of ${cv.test_n}</b> splits
-    (${(cv.test_positive/cv.test_n*100).toFixed(0)}%, chance is 50%).
-    Reality-check p below 0.05 in <b>${cv.rc_p_below_05} of ${cv.n_splits}</b>.`;
-}
-
 function overfitChart(d){
   const host=$("#overfit"), L=d.lab||{}, cur=(L.overfit||{})[OFK];
   if(!cur||!cur.length){host.innerHTML=`<div class="empty">No data.</div>`;return;}
@@ -1038,7 +1074,7 @@ function labTable(d){
 }
 
 function redrawORB(){equity(DATA);daily(DATA);dist(DATA);}
-function redrawLab(){cvChart(DATA);overfitChart(DATA);groupsChart(DATA);labTable(DATA);}
+function redrawLab(){overfitChart(DATA);groupsChart(DATA);labTable(DATA);}
 function redrawIM(){hitChart(DATA);imEquity(DATA);imCost(DATA);imLit(DATA);tables(DATA);}
 
 function seg(host,syms,cur,cb){
@@ -1517,6 +1553,186 @@ function evidence(d){
   $$("#gevrange").textContent=`${(h.bars||0).toLocaleString()} daily bars · `+
     `${(d.data||[]).filter(x=>x.symbol==="GC=F"&&x.interval==="1d").map(x=>String(x.first).slice(0,10)+" → "+String(x.last).slice(0,10))[0]||""}`;
   cloud(d); tables(d);
+  fillBlock(d); effTable(d); vtBlock(d); haBlock(d);
+  searchPlot(d); yearBlock(d);
+}
+
+
+/* ================= PART 4/5: efficiency search + the holdout year ===== */
+function fillBlock(d){
+  const f=d.fill||{}; const bh=(f.buy_hold||{}).sharpe||0;
+  const row=(k,lab,note)=>{const x=f[k]||{};
+    const dv=(x.sharpe||0)-bh;
+    return `<tr class="${k==='stop'?'hl':''}"><td>${lab}${note?` <span class="dim">${note}</span>`:""}</td>
+      <td class="${gcls(x.net)}">${g2(x.net||0)}</td><td>${(x.sharpe||0).toFixed(3)}</td>
+      <td class="${gcls(dv)}">${g2(dv)}</td></tr>`;};
+  $$("#gfill tbody").innerHTML =
+      row("stop","Filled at the stop level","· what the board above uses")
+    + row("nextopen","Filled at the next open","· you only looked at the close")
+    + row("close_to_close","Close to close","· the common accounting in Part 4")
+    + `<tr><td>Gold, held</td><td>${g2((f.buy_hold||{}).net||0)}</td>
+        <td>${bh.toFixed(3)}</td><td class="dim">&mdash;</td></tr>`;
+  $$("#gfillfoot").innerHTML = `The whole advantage is the fill: <b>${g2(f.edge_from_fill||0)}</b>
+    Sharpe of the gap between filling at the stop and marking close to close.
+    Against gold it is <b>${g2(f.edge_over_hold_at_stop_fill||0)}</b> at the stop fill and
+    <b>${g2(f.edge_over_hold_at_close_fill||0)}</b> close to close. A resting stop really
+    can sit on a level known in advance &mdash; but it fills with slippage, and gold gaps
+    on a Sunday open. Everything in Part 4 uses the conservative version.`;
+}
+
+function effTable(d){
+  const rows=(d.efficiency||{}).rows||[];
+  const best=Math.max(...rows.map(r=>r.train_sharpe));
+  $$("#geff tbody").innerHTML=rows.map(r=>{
+    const be=r.breakeven_cost_bps;
+    return `<tr class="${r.train_sharpe===best?"tracked":""}">
+      <td>${r.label}</td><td class="${gcls(r.train_net)}">${g2(r.train_net)}</td>
+      <td class="str">${r.train_sharpe.toFixed(2)}</td><td>${r.train_calmar.toFixed(2)}</td>
+      <td>${Math.round(r.train_dd).toLocaleString()}</td>
+      <td>${(r.exposure*100).toFixed(0)}%</td><td>${r.flips_per_year.toFixed(1)}</td>
+      <td class="${be<10?"neg":(be>100?"pos":"")}">${isFinite(be)?be.toFixed(0):"&infin;"}</td>
+      <td>${isFinite(r.gross_per_cost)?r.gross_per_cost.toFixed(0):"&infin;"}</td>
+      <td>${g2(r.net_per_exposure)}</td>
+      <td class="${gcls(r.hold_sharpe)}">${r.hold_sharpe.toFixed(2)}</td></tr>`;}).join("");
+  const sar=rows.find(r=>r.label==="sar 0.02/0.2")||{}, bh=rows.find(r=>r.label==="buy & hold")||{};
+  const ma=rows.find(r=>r.label==="ma 50/200")||{};
+  $$("#gefffoot").innerHTML=`Read the <b>break-even</b> column, not the Sharpe column.
+    Plain SAR dies at ${(sar.breakeven_cost_bps||0).toFixed(0)}&nbsp;bps per side; a
+    50/200 moving-average cross survives ${isFinite(ma.breakeven_cost_bps)?Math.round(ma.breakeven_cost_bps).toLocaleString():"&infin;"}&nbsp;bps
+    because it trades ${(ma.flips_per_year||0).toFixed(1)} times a year against SAR's
+    ${(sar.flips_per_year||0).toFixed(0)}. On this accounting SAR's Sharpe
+    (${(sar.train_sharpe||0).toFixed(2)}) and gold's (${(bh.train_sharpe||0).toFixed(2)})
+    are the same number. Buffering the flip, confirming it, gating it on a weekly
+    chart and swapping the stop for a Chandelier or a Donchian all made it worse.`;
+}
+
+function vtBlock(d){
+  const v=d.voltarget||{};
+  const r=(lab,k)=>{const x=v[k]||{};
+    const sig=x.ci95&&x.ci95[0]>0;
+    return `<tr><td>${lab}</td><td class="${gcls(x.diff)}">${g2(x.diff||0)}</td>
+      <td class="${sig?"pos":"dim"}">[${g2(x.ci95?x.ci95[0]:0)}, ${g2(x.ci95?x.ci95[1]:0)}]</td>
+      <td class="${(x.p_two_sided||1)<0.05?"pos":"neg"}">${(x.p_two_sided||0).toFixed(3)}</td></tr>`;};
+  $$("#gvt tbody").innerHTML =
+      r("Vol target vs plain SAR","voltgt_vs_sar")
+    + r("Vol target vs gold","voltgt_vs_hold")
+    + r("Plain SAR vs gold","sar_vs_hold");
+  const a=v.voltgt_vs_sar||{};
+  $$("#gvtfoot").innerHTML=`It raises Sharpe from ${(a.b_sharpe||0).toFixed(2)} to
+    ${(a.a_sharpe||0).toFixed(2)} and it is the only change tested that helps at all
+    &mdash; ${(d.search||{}).n_candidates?`most of the top rules in the search below use it`:""}.
+    On 6,000 sessions it still has a 95% interval that
+    ${a.ci95&&a.ci95[0]>0?"clears":"grazes"} zero (p&nbsp;=&nbsp;${(a.p_two_sided||0).toFixed(3)}).
+    That is the honest ceiling on this whole exercise: the best available idea,
+    on 25 years of data, is borderline.`;
+}
+
+function haBlock(d){
+  const h=d.ha||{};
+  $$("#gha tbody").innerHTML=`
+    <tr><td>Positions that differ from plain SAR</td>
+      <td class="str">${(h.position_differs_pct||0).toFixed(1)}%</td></tr>
+    <tr><td>Sharpe, filled at real closes</td><td class="str">${(h.honest_sharpe||0).toFixed(2)}</td></tr>
+    <tr><td>Sharpe, marked against Heikin-Ashi closes</td>
+      <td class="str pos">${(h.marked_sharpe||0).toFixed(2)}</td></tr>
+    <tr><td>Inflation</td><td class="str neg">${g2(h.inflation||0)}</td></tr>`;
+  $$("#ghafoot").innerHTML=`Heikin-Ashi changes the SAR signal on
+    <b>${(h.position_differs_pct||0).toFixed(1)}%</b> of bars &mdash; it is very nearly
+    the same rule. Fill it at real prices and it earns
+    ${(h.honest_sharpe||0).toFixed(2)} against plain SAR's ${(h.plain_sharpe||0).toFixed(2)}.
+    Mark the same trades against the smoothed HA closes and it jumps to
+    <b>${(h.marked_sharpe||0).toFixed(2)}</b>. An HA close is an average of four
+    prices, not a price: it sits on the favourable side of the real close most of
+    the time, so every trade books a gift. That ${g2(h.inflation||0)} Sharpe is the
+    published result, and it is entirely the marking.`;
+}
+
+function searchPlot(d){
+  const s=d.search||{}, pts=s.cloud||[], host=$$("#gsearch"); host.innerHTML="";
+  if(!pts.length) return;
+  const W=host.clientWidth||880,H=330,P={t:12,r:48,b:38,l:12};
+  const iw=W-P.l-P.r, ih=H-P.t-P.b;
+  const xs=pts.map(p=>p.train), ys=pts.map(p=>p.hold);
+  const xmn=Math.min(...xs)-.05, xmx=Math.max(...xs)+.05;
+  const ymn=Math.min(...ys)-.08, ymx=Math.max(...ys)+.08;
+  const X=v=>P.l+(v-xmn)/(xmx-xmn)*iw, Y=v=>P.t+(1-(v-ymn)/(ymx-ymn))*ih;
+  const g=mkSVG(W,H);
+  g.setAttribute("aria-label","Each candidate rule's Sharpe on the training years against its Sharpe on the held-out year");
+  for(let k=0;k<=4;k++){const v=ymn+(ymx-ymn)*k/4;
+    E(g,"line",{x1:P.l,y1:Y(v),x2:W-P.r,y2:Y(v),class:"gl"});
+    T(g,W-P.r+6,Y(v)+4,v.toFixed(1),"ax","start");}
+  for(let k=0;k<=4;k++){const v=xmn+(xmx-xmn)*k/4;
+    T(g,X(v),H-20,v.toFixed(1));}
+  if(ymn<0&&ymx>0) E(g,"line",{x1:P.l,y1:Y(0),x2:W-P.r,y2:Y(0),class:"zl"});
+  pts.forEach(pt=>{
+    const c=E(g,"circle",{cx:X(pt.train).toFixed(1),cy:Y(pt.hold).toFixed(1),
+      r:pt.label===s.winner?5.5:3,
+      fill:pt.label===s.winner?"var(--ink)":(pt.vt?"var(--s3)":"var(--s2)"),
+      opacity:pt.label===s.winner?1:.72});
+    c.addEventListener("mousemove",ev=>gtip(ev,
+      `${pt.label}\ntrain ${pt.train.toFixed(2)}  holdout ${pt.hold.toFixed(2)}`));
+    c.addEventListener("mouseleave",guntip);});
+  T(g,P.l+iw/2,H-4,"Sharpe on the 25 training years","ax");
+  host.appendChild(g);
+  $$("#gsleg").innerHTML=
+    `<span class="lg"><span class="sw d" style="background:var(--s3)"></span>uses vol targeting</span>
+     <span class="lg"><span class="sw d" style="background:var(--s2)"></span>does not</span>
+     <span class="lg"><span class="sw d" style="background:var(--ink)"></span>picked on train</span>`;
+  $$("#gsearchmeta").textContent=`· trained before ${s.cut_date}, scored on the ${s.holdout_bars} sessions after`;
+  $$("#gsearchfoot").innerHTML=`The rule the search picked (<b>${s.winner}</b>) scored
+    ${s.winner_train_sharpe.toFixed(2)} on the training years and
+    <b>${s.winner_hold_sharpe.toFixed(2)}</b> on the holdout, against a best-possible
+    ${s.best_possible_hold_sharpe.toFixed(2)} (${s.best_possible_hold_label}) and a
+    median of ${s.median_hold_sharpe.toFixed(2)}. Rank correlation train&rarr;holdout is
+    <b>&rho;&nbsp;${s.rho_sharpe.toFixed(2)}</b> (p&nbsp;${s.p_sharpe<0.001?"&lt;0.001":s.p_sharpe.toFixed(3)}):
+    weakly positive, which is better than nothing and far short of a selection rule
+    you would stake money on.`;
+}
+
+function yearBlock(d){
+  const y=d.year||{}, sm=y.summary||{}, keys=Object.keys(sm);
+  const sar=sm["sar 0.02/0.2"]||{}, bh=sm["buy & hold"]||{};
+  $$("#gyrmeta").textContent=`· ${y.sessions} sessions · ${y.from} → ${y.to}`;
+  $$("#gyrlede").innerHTML=`Every session the market was open, scored on the
+    conservative accounting. Before reading a single number: this sample can
+    resolve <b>&plusmn;${(sar.mde_bps||0).toFixed(1)} bps/bar</b> at 95%, and every
+    effect in Part 4 is between 0.1 and 2. <b>The year cannot tell you which rule is
+    better.</b> It can tell you what each one did, which is a different and smaller
+    claim, and it is the one made here.`;
+  $$("#gyrtiles").innerHTML=
+      gTile("Sessions",y.sessions,`${bh.n_up} up, ${bh.n_down} down`)
+    + gTile("Gold",g2(bh.net_per_bar_bps||0),"bps per day")
+    + gTile("SAR",g2(sar.net_per_bar_bps||0),"bps per day")
+    + gTile("+ vol target",g2((sm["sar + voltgt"]||{}).net_per_bar_bps||0),"bps per day")
+    + gTile("Ensemble + VT",g2((sm["ensemble + voltgt"]||{}).net_per_bar_bps||0),"bps per day")
+    + gTile("Can resolve","±"+(sar.mde_bps||0).toFixed(1),"bps per day",true);
+  const C=y.cum||{}, cols={"sar 0.02/0.2":"var(--s2)","sar + voltgt":"var(--s3)",
+    "ensemble + voltgt":"#7a5bd6","buy & hold":"var(--s1)"};
+  const order=["buy & hold","sar 0.02/0.2","sar + voltgt","ensemble + voltgt"];
+  lines("#gyreq","#gyrleg",order.map(k=>C[k]||[]),
+    order.map(k=>({t:k,c:cols[k],w:k==="buy & hold"?1.3:1.7})),
+    "Cumulative return of each rule over the held-out year");
+  $$("#gcap tbody").innerHTML=order.map(k=>{
+    const s=sm[k]||{};
+    return `<tr class="${k==="buy & hold"?"":""}"><td>${k}</td>
+      <td class="${gcls(s.net_on_up_days)}">${g2(s.net_on_up_days||0)}</td>
+      <td class="${gcls(s.net_on_down_days)}">${g2(s.net_on_down_days||0)}</td>
+      <td class="str">${(s.capture_up||0).toFixed(2)}</td>
+      <td class="str">${(s.capture_down||0).toFixed(2)}</td></tr>`;}).join("");
+  $$("#gcapfoot").innerHTML=`Gold rose on ${bh.n_up} of ${y.sessions} sessions,
+    averaging ${g2(bh.bh_on_up_days||0)} bps, and fell on ${bh.n_down} averaging
+    ${g2(bh.bh_on_down_days||0)}. Plain SAR kept <b>${(sar.capture_up||0).toFixed(2)}</b>
+    of the up days and <b>${(sar.capture_down||0).toFixed(2)}</b> of the down days
+    &mdash; the same fraction of each. Over this year it was not a timing rule at all;
+    it was gold at ${Math.round((sar.capture_up||0)*100)}% size.`;
+  const rows=(y.rows||[]).slice().reverse();
+  $$("#gdaymeta").textContent=`· ${rows.length} rows, newest first`;
+  $$("#gday tbody").innerHTML=rows.map(r=>
+    `<tr><td>${r.d}</td><td class="${gcls(r.gold)}">${g2(r.gold)}</td>
+      <td class="${r.sarp>0?"pos":"dim"}">${r.sarp.toFixed(2)}</td>
+      <td class="${gcls(r.sar)}">${g2(r.sar)}</td>
+      <td class="${gcls(r.vt)}">${g2(r.vt)}</td>
+      <td class="${gcls(r.ens)}">${g2(r.ens)}</td></tr>`).join("");
 }
 
 function redrawGold(){ if(GD){chart();} }
