@@ -122,6 +122,11 @@
   .sub-btn:hover{color:var(--ink2)}
   .sub-btn[aria-selected="true"]{color:var(--ink);font-weight:620;border-bottom-color:var(--ink)}
   .sub-btn:focus-visible{outline:2px solid var(--s1);outline-offset:-3px;border-radius:6px}
+  /* a link out to the simulator, not one of the tab views above */
+  .sub-link{margin-left:auto;align-self:center;font-size:13px;color:var(--s1);
+            text-decoration:none;padding:9px 4px 9px 14px;white-space:nowrap}
+  .sub-link:hover{color:var(--ink);text-decoration:underline}
+  .sub-link:focus-visible{outline:2px solid var(--s1);outline-offset:-2px;border-radius:6px}
   .view[hidden]{display:none}
 
   /* the SAR explainer */
@@ -170,6 +175,7 @@
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
     <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Gold &middot; Parabolic SAR</button>
+    <a class="sub-link" href="mc/">Monte Carlo lab &rarr;</a>
   </div>
 
   <div class="view" id="v-bell">

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Monte Carlo</title>
+<meta name="description" content="Attach a return series or a strategy, simulate it under a dozen market models, and find out whether the edge is real.">
+<style>
+  :root{
+    --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#8b8984;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --good:#0a7a26; --bad:#c0392b; --warn:#9a6700; --band:#eceae3; --tint:#f4f8fd;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper);-webkit-text-size-adjust:100%}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       background:var(--paper);color:var(--ink);line-height:1.5;
+       font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  main{max-width:1060px;margin:0 auto;padding:36px 16px 110px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  h1{font-size:clamp(24px,3.6vw,33px);font-weight:660;letter-spacing:-.024em}
+  .tag{font-size:12px;color:var(--muted)}
+  .lede{color:var(--ink2);font-size:14.5px;max-width:76ch;margin-top:7px}
+  a{color:var(--s1)} a:hover{color:var(--ink)}
+
+  .part{margin:40px 0 2px;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .part .no{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--muted)}
+  .part h2{font-size:19px;font-weight:650;letter-spacing:-.018em}
+  .part .sub{font-size:12.5px;color:var(--muted)}
+  .partnote{font-size:13.5px;color:var(--ink2);max-width:82ch;margin-top:5px}
+
+  section{background:var(--card);border:1px solid var(--line);border-radius:13px;
+          padding:18px 20px;margin-top:13px}
+  h3{font-size:11.5px;font-weight:660;text-transform:uppercase;letter-spacing:.075em;
+     color:var(--muted);margin-bottom:4px}
+  h3 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
+  .note{font-size:12.5px;color:var(--ink2);margin-bottom:13px;max-width:80ch}
+  .cols{display:grid;gap:13px;grid-template-columns:1fr}
+  @media(min-width:800px){.cols.two{grid-template-columns:1fr 1fr}
+                          .cols.three{grid-template-columns:1fr 1fr 1fr}}
+
+  /* ---------- setup panel ---------- */
+  .setup{background:var(--card);border:1px solid var(--line);border-radius:13px;
+         margin-top:18px;overflow:hidden}
+  .step{border-top:1px solid var(--line);padding:15px 18px}
+  .step:first-child{border-top:0}
+  .step > h4{font-size:12px;font-weight:660;letter-spacing:.03em;color:var(--ink);
+             margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .step > h4 i{font-style:normal;width:19px;height:19px;border-radius:50%;background:var(--ink);
+               color:#fff;font-size:10.5px;display:grid;place-items:center;flex:none;font-weight:700}
+  .step > h4 em{font-style:normal;font-weight:400;color:var(--muted);font-size:11.5px}
+
+  .tabs{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:11px}
+  .tabs button{appearance:none;border:0;background:var(--card);color:var(--ink2);font:inherit;
+    font-size:12px;padding:5px 13px;cursor:pointer;border-right:1px solid var(--line)}
+  .tabs button:last-child{border-right:0}
+  .tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+  .tabs button:focus-visible{outline:2px solid var(--s1);outline-offset:-2px}
+  .pane[hidden]{display:none}
+
+  .grid-ctl{display:grid;gap:10px 14px;grid-template-columns:repeat(auto-fit,minmax(168px,1fr))}
+  label.f{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;
+          text-transform:uppercase;letter-spacing:.055em;font-weight:620}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;font:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);
+    border-radius:7px;background:var(--paper);color:var(--ink);font-variant-numeric:tabular-nums}
+  textarea{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.55;
+           resize:vertical;min-height:120px;background:#fbfbf9}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--s1);outline-offset:-1px;border-color:var(--s1)}
+  input[type=range]{width:100%;accent-color:var(--s1)}
+  .rangewrap{display:block}
+  .rangewrap input[type=range]{display:block;width:100%}
+  label.f{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  label.f output{font-size:12px;color:var(--ink);font-weight:660;letter-spacing:0;
+                 text-transform:none;font-variant-numeric:tabular-nums}
+  .hint{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.45}
+
+  button.btn{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+    font:inherit;font-size:12.5px;padding:7px 14px;border-radius:8px;cursor:pointer}
+  button.btn:hover{background:var(--paper)}
+  button.btn:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+  button.btn.primary{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:620}
+  button.btn.primary:hover{background:#000}
+  button.btn:disabled{opacity:.45;cursor:default}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .spacer{flex:1}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0 2px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;
+        border:1px solid var(--line);background:var(--card);border-radius:999px;
+        padding:3px 11px;color:var(--ink2)}
+  .chip b{color:var(--ink);font-weight:620}
+  button.chip{cursor:pointer;font:inherit;font-size:11.5px}
+  button.chip:hover{background:var(--paper)}
+  button.chip[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.chip[aria-pressed=true] b{color:#fff}
+
+  .msg{font-size:12.5px;border-radius:8px;padding:9px 12px;margin-top:10px;line-height:1.5}
+  .msg.ok{background:#f0f8f2;border:1px solid #cce5d4;color:#15512a}
+  .msg.bad{background:#fdf3f2;border:1px solid #efcdc8;color:#8c2b20}
+  .msg.warn{background:#fdf8ec;border:1px solid #ecdcb8;color:#6d4e07}
+  .msg.info{background:var(--tint);border:1px solid #d3e3f7;color:#1b4a80}
+  .msg b{font-weight:660}
+  .msg code{background:rgba(0,0,0,.05);padding:1px 4px;border-radius:4px;font-size:11.5px}
+
+  /* ---------- verdict + tiles ---------- */
+  .score{margin-top:16px;display:grid;gap:10px;grid-template-columns:1fr}
+  @media(min-width:760px){.score{grid-template-columns:1fr 1fr}}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px 10px}
+  .sc h4{font-size:13.5px;font-weight:660;letter-spacing:-.01em;margin-bottom:2px}
+  .sc .cap{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .sc .row2{display:flex;align-items:center;gap:9px;padding:6px 0;
+            border-top:1px solid var(--line);font-size:12.5px}
+  .sc .row2:first-of-type{border-top:0}
+  .sc .q{color:var(--ink2);flex:1;min-width:0}
+  .sc .a{font-weight:650;white-space:nowrap}
+  .mk{width:16px;height:16px;border-radius:50%;flex:none;display:grid;place-items:center;
+      font-size:11px;font-weight:800;color:#fff}
+  .mk.no{background:var(--bad)} .mk.yes{background:var(--good)}
+  .mk.na{background:var(--muted)} .mk.mid{background:var(--warn)}
+
+  .grid{display:grid;gap:9px;margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
+  .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .m .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+  .m .v{font-size:24px;font-weight:660;letter-spacing:-.028em;margin-top:3px;line-height:1.08}
+  .m .n{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4}
+  .m.flag{border-color:#e9cdc8;background:#fffaf9} .m.flag .v{color:var(--bad)}
+  .m.good{border-color:#cce5d4;background:#f8fcf9} .m.good .v{color:var(--good)}
+
+  /* ---------- charts ---------- */
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .ax{font-size:10.5px;fill:var(--muted)}
+  .axlab{font-size:10.5px;fill:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+  .dlab{font-size:11px;font-weight:650}
+  .rowlab{font-size:11.5px;fill:var(--ink2)}
+  .cell{font-size:10px;font-weight:600}
+  .gl{stroke:var(--line);stroke-width:1}
+  .zl{stroke:var(--rule);stroke-width:1}
+  .cross{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 3}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink2);margin-bottom:6px}
+  .lg{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:14px;height:3px;border-radius:2px;flex:none;display:inline-block}
+  .sw.d{width:9px;height:9px;border-radius:50%}
+  .facets{display:grid;gap:11px}
+  .facet{border:1px solid var(--line);border-radius:10px;padding:8px 9px 4px;background:var(--card)}
+  .facet-h{font-size:11.5px;margin-bottom:2px;display:flex;justify-content:space-between;gap:6px}
+  .facet-h b{font-weight:640} .facet-h span{color:var(--muted);font-size:11px}
+  .flatpanel{font-size:12px;color:var(--muted);text-align:center;padding:48px 8px;line-height:1.5}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;font-weight:500}
+  th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:650}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafaf8}
+  tr.hl td{background:var(--tint)}
+  .pos{color:var(--good);font-weight:600} .neg{color:var(--bad);font-weight:600}
+  .dim{color:var(--muted)} .str{font-weight:650}
+  .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  .wrap.tall{max-height:420px;overflow-y:auto}
+  .foot{font-size:11.5px;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);
+        padding-top:9px;max-width:84ch;line-height:1.55}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+       background:var(--paper);padding:1px 4px;border-radius:4px}
+
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .08s;
+       background:var(--ink);color:#fff;font-size:11.5px;padding:6px 9px;border-radius:7px;
+       z-index:40;white-space:pre;line-height:1.45;font-variant-numeric:tabular-nums}
+
+  .bar{position:sticky;bottom:0;background:rgba(247,246,243,.94);
+       backdrop-filter:blur(8px);border-top:1px solid var(--line);
+       padding:10px 16px;margin:0 -16px -110px;z-index:20;
+       display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+  .prog{flex:1;min-width:120px;height:5px;background:var(--band);border-radius:3px;overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:var(--s1);transition:width .12s;border-radius:3px}
+  .runstat{font-size:11.5px;color:var(--ink2);min-width:130px}
+
+  details{margin-top:10px;border-top:1px solid var(--line);padding-top:9px}
+  summary{font-size:11.5px;color:var(--ink2);cursor:pointer;font-weight:600}
+  summary:hover{color:var(--ink)}
+  details .inner{font-size:12.5px;color:var(--ink2);margin-top:8px;line-height:1.6;max-width:84ch}
+  details .inner p{margin-bottom:7px}
+  footer{margin-top:30px;font-size:11.5px;color:var(--muted);line-height:1.7}
+  .skip{position:absolute;left:-9999px}
+  .skip:focus{left:8px;top:8px;background:var(--ink);color:#fff;padding:8px 12px;border-radius:7px;z-index:99}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body data-palette="#2a78d6,#eb6834,#1baf7a">
+<a class="skip" href="#results">Skip to results</a>
+<main>
+  <header>
+    <h1>Monte Carlo</h1>
+    <span class="tag" id="gen"></span>
+  </header>
+  <p class="lede">Attach a return series or write a strategy, simulate it under a dozen
+    market models, and see what the spread of outcomes actually looks like &mdash; together
+    with the tests that say whether the edge was ever there. Everything runs in this
+    browser and every run is reproducible from its seed.</p>
+
+  <!-- ============ SETUP ============ -->
+  <div class="setup" id="setup">
+    <div class="step">
+      <h4><i>1</i>Attach something <em>a return series, or code</em></h4>
+      <div class="tabs" role="tablist" id="srcTabs">
+        <button role="tab" aria-selected="true" data-pane="pExamples">Built-in</button>
+        <button role="tab" aria-selected="false" data-pane="pPaste">Paste data</button>
+        <button role="tab" aria-selected="false" data-pane="pStrat">Write a strategy</button>
+        <button role="tab" aria-selected="false" data-pane="pSaved">Saved</button>
+      </div>
+
+      <div class="pane" id="pExamples">
+        <div class="chips" id="exChips"></div>
+        <div class="hint" id="exNote"></div>
+      </div>
+
+      <div class="pane" id="pPaste" hidden>
+        <textarea id="pasteBox" spellcheck="false" placeholder="Paste returns, prices, an equity curve or a trade list.&#10;CSV, TSV, JSON or one number per line. Headers are fine.&#10;&#10;0.0123&#10;-0.0045&#10;0.0067"></textarea>
+        <div class="row" style="margin-top:9px">
+          <button class="btn" id="parseBtn">Read it</button>
+          <label class="f" style="margin:0 0 0 6px;text-transform:none;letter-spacing:0">Read as</label>
+          <select id="kindSel" style="width:auto"><option value="">auto-detect</option></select>
+          <span class="spacer"></span>
+          <button class="btn" id="saveSrcBtn">Save this</button>
+        </div>
+        <div id="parseMsg"></div>
+      </div>
+
+      <div class="pane" id="pStrat" hidden>
+        <div class="row" style="margin-bottom:8px">
+          <label class="f" style="margin:0;text-transform:none;letter-spacing:0">Start from</label>
+          <select id="stratEx" style="width:auto"></select>
+          <span class="spacer"></span>
+          <button class="btn" id="checkBtn">Check for look-ahead</button>
+        </div>
+        <textarea id="stratBox" spellcheck="false" style="min-height:210px"></textarea>
+        <div class="hint">A strategy trades a <b>simulated market</b>: the model below generates the
+          market path, your code sets the position for each bar. The rule is that
+          <code>pos[t]</code> may only use <code>market[0..t-1]</code>, and the check enforces it.</div>
+        <div id="stratMsg"></div>
+      </div>
+
+      <div class="pane" id="pSaved" hidden>
+        <div id="savedList"></div>
+        <div class="hint">Saved in this browser only. Nothing is uploaded anywhere.</div>
+      </div>
+
+      <div id="srcSummary"></div>
+    </div>
+
+    <div class="step">
+      <h4><i>2</i>Choose a market model <em>what kind of world to simulate</em></h4>
+      <div class="chips" id="modelChips"></div>
+      <div class="hint" id="modelNote" style="margin-bottom:10px"></div>
+      <div class="grid-ctl" id="modelParams"></div>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="fitBtn">Fit to my data</button>
+        <button class="btn" id="resetParams">Reset</button>
+        <span class="spacer"></span>
+        <span class="hint" id="fitNote"></span>
+      </div>
+    </div>
+
+    <div class="step">
+      <h4><i>3</i>Size it and pay for it <em>leverage, costs, tax</em></h4>
+      <div class="grid-ctl">
+        <div>
+          <label class="f" for="sizeMode">Sizing</label>
+          <select id="sizeMode">
+            <option value="fixed">Fixed leverage</option>
+            <option value="voltarget">Volatility target</option>
+            <option value="kelly">Kelly fraction</option>
+          </select>
+        </div>
+        <div id="wLev"><label class="f" for="lev">Leverage <output id="levO">1.00x</output></label><div class="rangewrap"><input type="range" id="lev" min="0" max="5" step="0.05" value="1"></div></div>
+        <div id="wTgt" hidden><label class="f" for="tgt">Target volatility <output id="tgtO">15%</output></label><div class="rangewrap"><input type="range" id="tgt" min="0.02" max="0.6" step="0.01" value="0.15"></div></div>
+        <div id="wWin" hidden><label class="f" for="volwin">Estimator half-life <output id="volwinO">60</output></label><div class="rangewrap"><input type="range" id="volwin" min="5" max="250" step="5" value="60"></div></div>
+        <div id="wKf" hidden><label class="f" for="kf">Kelly fraction <output id="kfO">0.50</output></label><div class="rangewrap"><input type="range" id="kf" min="0" max="2" step="0.05" value="0.5"></div></div>
+        <div><label class="f" for="maxlev">Leverage cap <output id="maxlevO">10x</output></label><div class="rangewrap"><input type="range" id="maxlev" min="1" max="30" step="1" value="10"></div></div>
+      </div>
+      <div class="grid-ctl" style="margin-top:11px">
+        <div><label class="f" for="costBps">Cost per period (bps)</label><input type="number" id="costBps" value="0" min="0" step="0.5"></div>
+        <div><label class="f" for="turnBps">Cost per turnover (bps)</label><input type="number" id="turnBps" value="0" min="0" step="0.5"></div>
+        <div><label class="f" for="finRate">Financing above 1x (%/yr)</label><input type="number" id="finRate" value="0" min="0" step="0.25"></div>
+        <div><label class="f" for="taxRate">Tax rate (%)</label><input type="number" id="taxRate" value="0" min="0" max="60" step="1"></div>
+        <div><label class="f" for="taxMode">Tax basis</label>
+          <select id="taxMode"><option value="net">Annual net gains</option><option value="gross">Every winning period (gross)</option></select></div>
+        <div><label class="f" for="ruinAt">Stop trading at <output id="ruinAtO">total loss</output></label><div class="rangewrap"><input type="range" id="ruinAt" min="0" max="0.9" step="0.05" value="0"></div></div>
+      </div>
+      <div class="hint" style="margin-top:7px">Costs are charged once, on the exposure actually held
+        (sizing &times; strategy position). &ldquo;Stop trading at&rdquo; freezes a path once equity falls
+        that far &mdash; the simulated version of giving up.</div>
+    </div>
+
+    <div class="step">
+      <h4><i>4</i>Run it <em>reproducible from the seed</em></h4>
+      <div class="grid-ctl">
+        <div><label class="f" for="paths">Paths</label>
+          <select id="paths">
+            <option>2000</option><option>10000</option><option selected>25000</option>
+            <option>50000</option><option>100000</option><option>250000</option>
+          </select></div>
+        <div><label class="f" for="horizon">Horizon (periods)</label><input type="number" id="horizon" value="1260" min="10" max="20000" step="10"></div>
+        <div><label class="f" for="ppy">Periods per year</label><input type="number" id="ppy" value="252" min="1" max="100000" step="1"></div>
+        <div><label class="f" for="seed">Seed</label><input type="number" id="seed" value="1" min="0" step="1"></div>
+        <div><label class="f" for="trials">Variants you tried</label><input type="number" id="trials" value="1" min="1" step="1">
+          <div class="hint">How many parameter sets you tested before choosing this one. It sets the bar the Sharpe has to clear.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="results" hidden>
+    <div class="score" id="score"></div>
+    <div class="grid" id="tiles"></div>
+
+    <div class="part"><span class="no">PART 1</span><h2>The spread of outcomes</h2>
+      <span class="sub" id="p1sub"></span></div>
+    <p class="partnote">One backtest is one draw. These are the others.</p>
+    <div id="inheritNote"></div>
+
+    <section>
+      <h3>Equity fan <span>&middot; percentile bands of simulated equity</span></h3>
+      <div class="legend" id="fanLeg"></div>
+      <div id="fan"></div>
+      <div id="tailNote"></div>
+      <div class="foot" id="fanFoot"></div>
+    </section>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Where you end up <span>&middot; terminal equity</span></h3>
+        <div id="histTerm"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Worst drawdown <span>&middot; peak to trough, each path</span></h3>
+        <div id="histDD"></div>
+      </section>
+    </div>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Growth against pain <span>&middot; one dot per path</span></h3>
+        <div id="scatterDD"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Share of paths under water <span>&middot; below their starting value</span></h3>
+        <div id="uwChart"></div>
+      </section>
+    </div>
+
+    <div class="part"><span class="no">PART 2</span><h2>Is the edge real</h2>
+      <span class="sub">the part that is supposed to disappoint you</span></div>
+    <p class="partnote" id="p2note"></p>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Observed against its own null <span>&middot; sign-flipped</span></h3>
+        <div id="nullChart"></div>
+        <div class="foot" id="nullFoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Could this sample even see it? <span>&middot; power</span></h3>
+        <div id="powerChart"></div>
+        <div class="foot" id="powerFoot"></div>
+      </section>
+    </div>
+
+    <section>
+      <h3>Sharpe, deflated for how many things you tried</h3>
+      <div class="note">A Sharpe ratio is a sample statistic. The more variants you test, the higher the best
+        one will be by luck alone. The dotted line is what the best of your stated number of trials would
+        reach on pure noise.</div>
+      <div id="dsrChart"></div>
+      <div class="foot" id="dsrFoot"></div>
+    </section>
+
+    <div class="part"><span class="no">PART 3</span><h2>How much to bet</h2>
+      <span class="sub">growth, drawdown and ruin against leverage</span></div>
+    <p class="partnote">Each rung below sees exactly the same simulated markets, so the differences
+      are the leverage and nothing else.</p>
+
+    <section>
+      <h3>The leverage ladder</h3>
+      <div class="note">Separate panels rather than one chart with two axes: growth, drawdown and ruin
+        share an x axis and nothing else, and overlaying them on two scales is the quickest way to
+        make a leverage decision look better than it is.</div>
+      <div id="ladderFacets"></div>
+      <div class="wrap" style="margin-top:12px"><table id="ladderTab">
+        <thead><tr><th>Leverage</th><th>Median CAGR</th><th>5th pct CAGR</th><th>Mean log growth</th>
+          <th>Mean max DD</th><th>P(ruin)</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="ladderFoot"></div>
+    </section>
+
+    <div class="part"><span class="no">PART 4</span><h2>Does the model matter</h2>
+      <span class="sub">the same strategy under different worlds</span></div>
+    <p class="partnote">If the answer changes when the market model changes, the answer was about the
+      model. Run this before trusting anything above.</p>
+    <section>
+      <h3>The same run under every model <span id="cmpSub"></span></h3>
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn" id="cmpBtn">Compare models</button>
+        <span class="hint" id="cmpNote">Runs the current setup under each market model in turn.</span>
+      </div>
+      <div id="cmpFacets"></div>
+      <div class="wrap" style="margin-top:12px"><table id="cmpTab">
+        <thead><tr><th>Model</th><th>Median CAGR</th><th>5th pct</th><th>Median max DD</th>
+          <th>95th pct DD</th><th>P(loss)</th><th>P(ruin)</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot" id="cmpFoot"></div>
+    </section>
+
+    <div class="part"><span class="no">PART 5</span><h2>Diagnostics</h2>
+      <span class="sub">did the simulation converge, and does the model fit</span></div>
+
+    <div class="cols two">
+      <section style="margin-top:0">
+        <h3>Convergence <span>&middot; estimate &plusmn; 95% as paths accumulate</span></h3>
+        <div id="convChart"></div>
+        <div class="foot" id="convFoot"></div>
+      </section>
+      <section style="margin-top:0">
+        <h3>Your data against a normal <span>&middot; quantile-quantile</span></h3>
+        <div id="qqChart"></div>
+        <div class="foot" id="qqFoot"></div>
+      </section>
+    </div>
+
+    <section>
+      <h3>Serial dependence in your data <span>&middot; returns and squared returns</span></h3>
+      <div class="note">The right-hand bars are what a bootstrap has to preserve. If squared returns are
+        autocorrelated and you simulate with an IID bootstrap, your drawdowns will come out too mild.</div>
+      <div class="legend" id="acfLeg"></div>
+      <div id="acfChart"></div>
+      <div class="foot" id="acfFoot"></div>
+    </section>
+
+    <section>
+      <h3>Every percentile</h3>
+      <div class="wrap tall"><table id="pctTab">
+        <thead><tr><th>Metric</th><th>1%</th><th>5%</th><th>25%</th><th>Median</th>
+          <th>75%</th><th>95%</th><th>99%</th><th>Mean</th><th>MC error</th></tr></thead><tbody></tbody></table></div>
+      <div class="foot">&ldquo;MC error&rdquo; is the standard error of the median from this many paths &mdash;
+        the digit at which the simulation itself stops being meaningful. Add paths until it is smaller
+        than the difference you care about.</div>
+    </section>
+
+    <section>
+      <h3>Take it with you</h3>
+      <div class="row">
+        <button class="btn" id="expJson">Download results (JSON)</button>
+        <button class="btn" id="expCsv">Download paths (CSV)</button>
+        <button class="btn" id="shareBtn">Copy a link to this setup</button>
+        <span class="spacer"></span>
+        <span class="hint" id="expNote"></span>
+      </div>
+      <div class="foot" id="runFoot"></div>
+    </section>
+  </div>
+
+  <details>
+    <summary>How this works, and what it cannot tell you</summary>
+    <div class="inner">
+      <p><b>What it does.</b> It takes a return series &mdash; yours, or one generated by a model fitted
+        to yours &mdash; and replays it thousands of times, applying your sizing, costs and tax rules to
+        each path. Every path is compounded with an absorbing floor: an account that reaches zero stays
+        there rather than multiplying back through a negative.</p>
+      <p><b>Reproducibility.</b> Path <i>p</i> always draws from random substream <i>p</i>, derived from
+        the seed alone. The result is identical whether it runs on one core or sixteen, today or next
+        year. The run fingerprint under the export button covers every input.</p>
+      <p><b>What it cannot do.</b> A simulation cannot create information that is not in your data. If
+        you resample a backtest, you learn how much of its shape was ordering luck &mdash; not whether the
+        edge was real, because the bootstrap inherits whatever edge the sample happened to contain. That
+        is what Part&nbsp;2 is for, and why it is deliberately hostile. A model fitted to a quiet sample
+        will simulate quiet futures; the worst event in your simulation is usually bounded by the worst
+        event in your data, which is precisely the event you should worry about.</p>
+      <p><b>The number that matters most</b> is rarely the median. It is the fifth percentile, the
+        drawdown you would have had to sit through, and the probability of ruin at the leverage you
+        actually intend to use.</p>
+    </div>
+  </details>
+
+  <footer>
+    Runs entirely in your browser &mdash; nothing is uploaded.
+    <span id="coreNote"></span><br>
+    Built-in series are <b>generated, not market data</b>.
+    <a href="../">Back to Trad</a>
+  </footer>
+
+  <div class="bar" id="runbar">
+    <button class="btn primary" id="runBtn">Run simulation</button>
+    <button class="btn" id="cancelBtn" hidden>Cancel</button>
+    <div class="prog"><i id="progBar"></i></div>
+    <span class="runstat" id="runStat">ready</span>
+  </div>
+</main>
+
+<script type="module" src="ui/app.mjs"></script>
+</body>
+</html>
