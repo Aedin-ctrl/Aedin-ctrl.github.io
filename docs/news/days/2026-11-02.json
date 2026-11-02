@@ -1,0 +1,776 @@
+{
+  "date": "2026-11-02",
+  "generated": "2026-11-02T18:19:49.027Z",
+  "articles": [
+    {
+      "id": "2026-11-02-follow-up-a-second-wave-of-hackers-defrosts",
+      "headline": "Follow-up: a second wave of hackers defrosts supermarket fridges in six European countries",
+      "summary": "Overnight on Nov. 1-2, attackers remotely switched fridges and freezers into defrost mode at more than 115 stores in Belgium, the Netherlands, Sweden, Luxembourg, Ireland and Estonia. No one has been named.",
+      "impacts": [
+        "Food retail depends on internet-managed cooling that is often old, unpatched and run by small contractors.",
+        "A single remote setting change can destroy a store's whole fresh and frozen stock in hours.",
+        "A software update alone may not fix some units, so recovery can be slow and costly.",
+        "Pharmacies, hospitals and labs that rely on similar controllers face the same kind of risk."
+      ],
+      "details": [
+        "Attackers remotely changed the settings of fridges and freezers at supermarkets in several European countries overnight between Sunday and Monday, Nov. 1-2, 2026. BleepingComputer counts more than 115 stores across Belgium, the Netherlands, Sweden, Luxembourg, Ireland and Estonia. Counts vary by outlet and are approximate: they come from company statements and press reports.",
+        "Chains named include Ahold Delhaize (around 40 locations in Belgium and Luxembourg), Carrefour (about 15 Belgian stores), Intermarche, Spar, SuperValu in Ireland (13 stores), ICA and Coop in Sweden, and one Selver store in Estonia. A Swedish store manager said freezers were set to +50 C and could not be changed back, so frozen food was thrown out. Delhaize warned managers by text message around 4 a.m., and some stores used refrigerated trucks to save stock.",
+        "This follows a mid-October wave in France, where hundreds of stores had their cooling set to defrost. The Register reports that at least some French stores ran outdated firmware on Danfoss controllers, and that France's CERT-FR issued an alert about Danfoss AK-SM and AK-SC units. TechCrunch says security researchers link the units to Danfoss, which they say no longer provides security updates, and notes that Claroty warned in August these units were at risk.",
+        "The vendor picture for the new wave is less clear. The Register says the companies did not identify the equipment. BleepingComputer cites Belgian broadcaster RTL naming Sabcobel as the refrigeration vendor at several sites; Sabcobel's director, Stephan Moelans, said the attacker used the same vulnerability as in France and that a software update alone is not enough because some refrigerators also need physical modifications. Sabcobel had not responded to BleepingComputer's request for comment.",
+        "Nobody has claimed responsibility, and it is unclear whether the incidents are one coordinated campaign or several separate ones. TechCrunch also mentions a separate U.S. Defense Department probe into whether Iran-backed hackers disrupted freezers at military bases; it is unconfirmed and not tied to the European attacks.",
+        "What to watch: whether a vendor or government names the actor, whether the stores' cooling can be reconnected safely, and whether the same controllers are being scanned elsewhere. The honest takeaway so far is narrow: a known, unfixed weakness in internet-connected cooling is being used for destruction rather than theft."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "supermarkets",
+        "freezers",
+        "danfoss",
+        "critical infrastructure",
+        "europe",
+        "cyberattack",
+        "food"
+      ],
+      "date": "2026-11-02",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-disrupt-refrigeration-systems-at-european-supermarkets/"
+        },
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/cyber-crime/2026/11/02/frozen-part-ii-hackers-remotely-defrost-produce-in-euro-supermarkets-again/5306924"
+        },
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/02/a-fresh-wave-of-cyberattacks-has-hit-europes-supermarket-refrigerators-destroying-food-across-countries/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-stat-clinics-sell-three-parent-ivf-to-women",
+      "headline": "STAT: clinics sell 'three-parent IVF' to women in their 40s with little proof it works",
+      "summary": "An eight-month STAT investigation finds clinics abroad charging up to $30,000 for mitochondrial replacement as an infertility treatment for older women. Scientists say there is no published evidence it works for women over 40.",
+      "impacts": [
+        "Patients can pay tens of thousands of dollars for an experimental procedure with no proven benefit for their age group.",
+        "Unregulated clinics may never publish failures, so safety data stays thin.",
+        "Long-term effects on children from donor mitochondrial DNA are unknown and could take decades to assess.",
+        "Where the U.S. bars a technique, medical tourism moves it to places with weaker oversight."
+      ],
+      "details": [
+        "Mitochondrial replacement therapy (MRT), often called three-parent IVF, was developed to stop mothers from passing mitochondrial disease to their children. STAT's Megan Molteni and freelancer Edward Chen spent eight months on an investigation, including 45 interviews and a review of business filings, contracts and social media posts. They found clinics marketing MRT to women 35 and older as a fertility treatment, which professional organizations do not recommend.",
+        "The U.S. effectively bars MRT because of a congressional rider that stops the FDA from reviewing applications. Patients travel to places such as Albania, where SAGA Clinic in Tirana is the main site for International Fertility Group (IFG) clients. IFG's package rose from $20,000 to $30,000 earlier this year and covers MRT on up to 15 embryos plus the first egg retrieval; drugs, donor eggs and genetic testing cost extra. IFG says 34 babies had been born through its program as of February 2025, and industry insiders estimate up to 200 MRT births worldwide.",
+        "The evidence for older women is weak. IFG's site claimed a 54% pregnancy rate per cycle, which it has not substantiated and has since removed. A 2025 paper reporting a 48.3% live birth rate across 27 older patients appeared in a journal that is not indexed in major repositories, was published in under three weeks, and had a co-author on its editorial board. The only peer-reviewed infertility study, from Greece in 2023, reported 31.6% per transfer for patients under 40, and under 10% for 12 patients aged 39. For comparison, one large study found a 4.4% live birth rate per transfer for IVF in women 45 and older.",
+        "Experts quoted are blunt. Heidi Mertes of Ghent University said no published study shows this works for women above 40. Dieter Egli of Columbia said the science is not sound enough. Jeffrey Kahn of Johns Hopkins said patients are paying for the privilege of being a guinea pig. The European fertility society ESHRE opposes commercial MRT, saying the safety of nuclear transfer cannot be established.",
+        "STAT also reports shoddy record keeping, overlapping companies with family ties, and social posts calling MRT a miracle for women as old as 45; those posts were removed after STAT's inquiries. IFG paused new MRT enrollment in July 2026, and its embryologist has taken a break from performing it. IFG's clinical director said she never claimed MRT would fix aging.",
+        "What is uncertain: MRT does have a legitimate use for preventing mitochondrial disease, and the UK allows it case by case at one approved clinic. Whether it helps older women has simply not been tested in a controlled trial, which is what Harvard's I. Glenn Cohen says is needed."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "ivf",
+        "mitochondrial replacement",
+        "fertility",
+        "medical tourism",
+        "three-parent",
+        "stat",
+        "regulation"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/11/02/three-parent-ivf-fertility-tourism-investigation-mrt-therapy/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-russia-and-ukraine-say-hackers-hijacked-their-emergency",
+      "headline": "Russia and Ukraine say hackers hijacked their emergency alert apps to send fake warnings",
+      "summary": "On Nov. 1, both countries reported attacks on their alert apps. Ukrainians got fake warnings of street fights, chemical attacks and radiation as a six-day Kherson ceasefire ended; Russian users got a fake nuclear strike alert.",
+      "impacts": [
+        "Alert apps that people trust in an emergency can be turned into a channel for panic.",
+        "False alerts can erode trust, so people may ignore a real one later.",
+        "Timing an attack to a military event shows how information operations and fighting can be linked.",
+        "Officials urging people to use sirens and broadcast alerts shows why backup channels matter."
+      ],
+      "details": [
+        "The Register reports that on Sunday evening, Nov. 1, 2026, Ukraine's 'Alarm!' app (also called Air Alert) began sending false messages around 2100 UTC. They described street fights in Kyiv, chemical attacks and radiation hazards. One of the earliest alerts was in Russian and mentioned the Oreshnik missile, which made officials doubt it was real.",
+        "Russia reported its own incident. The Ministry of Emergency Situations' mobile app sent fake messages, including one warning of nuclear strikes 'at all regions of Russia' that referenced 'P1-Sun', the name of a Ukrainian attack drone. The ministry said the app was being patched and about 90 minutes later said it was working normally. It stressed that an app attack does not compromise the national alert system, which relies on sirens, SMS and broadcast media.",
+        "Ukraine's Air Force said the app was likely compromised and that there was no radiation threat. The Ministry of Digital Affairs told citizens to use other channels such as device emergency alerts, sirens and official government social media.",
+        "The timing matters. The attacks coincided with the end of a six-day ceasefire in Kherson that Russia had agreed to so hundreds of Ukrainians could be evacuated from the occupied city of Olehsky. Russia declined a proposed extension, and the ceasefire ended around the same time the fake alerts began.",
+        "No group has claimed responsibility. Ukrainian parliamentarian Oleksander Merezhko, who chairs the foreign affairs committee, told the BBC it was almost certainly part of Russia's cyber war. That is one official's assessment, not forensic attribution, and Russia has not explicitly blamed Ukraine. The details come from official statements and social media posts as relayed by The Register.",
+        "What to watch: whether either government publishes a technical account of how the apps were compromised, and whether more attacks follow military events."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "ukraine",
+        "russia",
+        "alert app",
+        "cyberattack",
+        "disinformation",
+        "kherson",
+        "ceasefire"
+      ],
+      "date": "2026-11-02",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/02/nuclear-threats-and-street-brawls-russia-ukraine-report-attacks-on-their-emergency-alert-apps/5306901"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-google-breaks-up-a-1-3m-device-android",
+      "headline": "Google breaks up a 1.3M-device Android botnet; says the TV-box maker built the backdoor",
+      "summary": "Google took down servers behind the 'x.cpe' backdoor in mostly TV set-top boxes and says Shenzhen maker Videostrong built it on purpose and sold access to criminals.",
+      "impacts": [
+        "Cheap connected devices can arrive already infected, with a backdoor signed by the manufacturer.",
+        "Your home internet connection can be sold as a 'residential proxy' without your knowledge.",
+        "Removing the malware may not stick: it reinstalls on restart, so some boxes may need replacing.",
+        "Listings that say 'Google Certified' are not a guarantee a device is clean."
+      ],
+      "details": [
+        "The Hacker News reports that Google led a takedown in late October 2026 of the infrastructure behind a botnet of more than 1.3 million Android devices, mostly TV set-top boxes. The backdoor is called x.cpe. Google says it is 'highly confident' that Videostrong, a Shenzhen device maker that sells TV boxes under its own name and for other brands, intentionally built the backdoor and sold access to criminals. It does not say it was a rogue insider or a mistake.",
+        "The backdoor runs as a system app in the device firmware, reports to command servers and disables Google Play Protect's app checks so software can be installed silently. Operators could install apps, run commands, capture screens, send keystrokes, copy account and device data, and map the local network. It was found in many brands over several years, including telehealth devices, karaoke machines and digital signage.",
+        "Criminals used it for residential proxy services, which sell access to a home connection, and for ad fraud. TrendAI counted 1,472,554 infected devices across 206 models between June 3 and October 1, mostly in Malaysia, Brazil, Iraq, Mexico and Taiwan, with roughly 26,000 to 42,000 each in the U.S., Germany, the U.K., Australia and Canada.",
+        "Google used legal action to take down the botnet's domains and servers, plus control domains for more than a dozen malware families loaded through the backdoor. It worked with Japan's National Police Agency, Lumen, HUMAN Security, Plume, Synthient and TrendAI. It also banned Videostrong and any future affiliates from building or selling certified Android devices. Google expects the action to cut criminals' access to at least 10 million more infected devices that were spread through other means.",
+        "The cleanup is the hard part. TrendAI says the backdoor is signed with the maker's key, so removal needs vendor action, platform protection or replacing the device. Plume recommends a factory reset but does not say it removes x.cpe; Synthient advises throwing infected boxes away. A model name alone does not prove infection, and the article carries no response from Videostrong. As of Nov. 2, its website still listed products it calls 'Google Certified Android TV Box'."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "botnet",
+        "android",
+        "tv box",
+        "google",
+        "supply chain",
+        "backdoor",
+        "proxy"
+      ],
+      "date": "2026-11-02",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/google-disrupts-13-million-device.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-google-thieves-of-ai-access-keys-are-running",
+      "headline": "Google: thieves of AI access keys are running up $100,000+ a day in charges on victims",
+      "summary": "A Google Mandiant report says 'LLMjacking' is growing: stolen cloud and API credentials are used to run expensive AI models on the victim's bill, in some cases up to $1 million before access was cut.",
+      "impacts": [
+        "A leaked API key can turn into a six-figure bill within a day.",
+        "Stolen AI access is cheap to resell, so it gets laundered through discount token services.",
+        "Small teams without billing alerts or key rotation are exposed the most.",
+        "Phishing pages that capture live tokens can bypass passwords and multi-factor codes."
+      ],
+      "details": [
+        "The Register, citing a Google Mandiant report and comments from the Google Threat Intelligence Group, says fraudulent charges from stolen large-language-model access can exceed $100,000 a day. At some organizations, cumulative charges reached $1 million before access was revoked. Google predicts attackers will increasingly prioritize 'LLMjacking' over other resource theft such as cryptojacking.",
+        "The scale of abuse can be fast. A CrowdStrike report from August described one thief sending about 200,000 API requests in two minutes. One cluster, UNC6993, stole LLM API keys, generated more keys and enabled services in the victim's cloud projects, causing about $100,000 in charges. Another actor enrolled victim accounts in pay-as-you-go billing, ran high-volume inference on premium models, and used a 'burn and rotate' tactic of repeatedly creating and deleting short-lived service accounts to dodge rate limits.",
+        "Google also describes a token routing service called Jet Night that made over 500,000 LLM API calls in under eight hours. GTIG believes it relies on stolen keys because its prices are well below market rates. The explanation for a Jet Night outage is described as 'likely', not confirmed.",
+        "The theft methods are ordinary. Attackers use misconfigured service account keys on cloud instances, or fake 'application portal' pages that trick users into pasting a raw JSON payload containing a live access token, which bypasses passwords and multi-factor authentication. Some actors specialize in initial access while 'LLM Mixers' handle monetization.",
+        "Google's advice: prioritize identity and access management, use centralized secrets management and rotate keys, apply least privilege to users and service accounts, and automate scanning of code for exposed API keys. The dollar figures come from specific incidents in the reports, not from a comprehensive industry total."
+      ],
+      "category": "AI",
+      "tags": [
+        "llmjacking",
+        "api keys",
+        "google",
+        "mandiant",
+        "credentials",
+        "cloud",
+        "ai"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/02/token-thieves-costing-companies-100k-per-day-in-illicit-llm-charges/5306967"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-a-new-analysis-says-global-warming-has-sped",
+      "headline": "A new analysis says global warming has sped up to about 0.35 C per decade since 2015",
+      "summary": "Potsdam Institute researchers report that warming has nearly doubled in pace, with over 98% statistical confidence. If the pace holds, the 1.5 C Paris limit could be exceeded on a long-term basis before 2030.",
+      "impacts": [
+        "A faster warming rate shortens the time before the 1.5 C Paris Agreement threshold is crossed for good.",
+        "Planning for heat, sea level and crop stress based on the old trend may underestimate what is coming.",
+        "The result raises pressure to cut fossil fuel emissions to zero sooner.",
+        "It shows why a single record year is less important than the underlying trend."
+      ],
+      "details": [
+        "A paper in Geophysical Research Letters by Grant Foster and Stefan Rahmstorf of the Potsdam Institute for Climate Impact Research (PIK), titled 'Global Warming Has Accelerated Significantly', finds that warming sped up from around 2015. The recent rate is about 0.35 C per decade, compared with just under 0.2 C per decade on average from 1970 to 2015.",
+        "The authors report statistical confidence of over 98% after removing natural fluctuations such as El Nino. The result held across five temperature datasets (NASA, NOAA, HadCRUT, Berkeley Earth and ERA5) and two statistical methods, and signs of acceleration showed up in all five by 2013 or 2014.",
+        "The paper says 2023 and 2024 are still the warmest years on the instrumental record after adjustment, though their adjusted values are somewhat lower. In other words, the record years are partly explained by natural swings, but the underlying trend has still steepened.",
+        "The implication is stark but conditional: if the past decade's rate continues, the 1.5 C Paris limit could be exceeded on a long-term basis before 2030. Rahmstorf says the pace of future warming depends on how fast fossil-fuel CO2 emissions are cut to zero.",
+        "Limits to keep in mind: the study was not designed to identify why warming accelerated, and the observed trend is consistent with what current climate models can produce. The exact rate varies by dataset, 98% confidence is not certainty, and the pre-2030 projection assumes the last decade's rate simply continues."
+      ],
+      "category": "Climate",
+      "tags": [
+        "climate",
+        "global warming",
+        "acceleration",
+        "paris agreement",
+        "pik",
+        "temperature"
+      ],
+      "date": "2026-10-29",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "ScienceDaily (Potsdam Institute release)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261027231200.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-ucla-study-links-long-term-chlorpyrifos-exposure-to",
+      "headline": "UCLA study links long-term chlorpyrifos exposure to 2.5 times the Parkinson's risk",
+      "summary": "A study of 829 people with Parkinson's and 824 without links residential exposure to the pesticide with over 2.5 times the risk. Mouse and zebrafish experiments suggest it damages dopamine neurons.",
+      "impacts": [
+        "It adds evidence that farm chemicals can affect people who live near fields, not just workers.",
+        "A pesticide restricted years ago may still carry health costs that show up decades later.",
+        "Findings in mice and fish point to cell cleanup pathways that drugs might one day target.",
+        "People in farming areas may want to check local spraying and drinking-water information."
+      ],
+      "details": [
+        "UCLA Health researchers led by Dr. Jeff Bronstein report that long-term residential exposure to chlorpyrifos, a widely used agricultural pesticide, was linked to more than 2.5 times the risk of Parkinson's disease. U.S. residential use was banned in 2001, and agricultural uses faced further restrictions in 2021. The paper is in Molecular Neurodegeneration.",
+        "The human part of the study drew on UCLA's Parkinson's Environment and Genes study: 829 people with Parkinson's and 824 without. Researchers combined California pesticide application records with participants' residential and workplace histories to estimate exposure.",
+        "The team then tested the biology. Mice exposed to chlorpyrifos as an aerosol for 11 weeks developed movement difficulties, lost dopamine-producing neurons, and showed brain inflammation and abnormal buildup of alpha-synuclein, a protein tied to Parkinson's. In zebrafish, the pesticide disrupted autophagy, the cell's cleanup process; restoring autophagy or removing synuclein protected neurons.",
+        "What this does not show: the population analysis cannot establish that the pesticide directly caused Parkinson's, and the mechanism work comes from mice and zebrafish. Whether boosting autophagy would prevent pesticide damage in people is unknown. Bronstein calls the link 'likely causal' based on the animal work, which is a stronger claim than the population data alone supports.",
+        "What to watch: replication in other regions, and whether regulators revisit the remaining agricultural uses of chlorpyrifos in light of the findings."
+      ],
+      "category": "Health",
+      "tags": [
+        "parkinsons",
+        "pesticide",
+        "chlorpyrifos",
+        "brain",
+        "neurodegeneration",
+        "ucla",
+        "environment"
+      ],
+      "date": "2026-11-01",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily (UCLA Health release)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261031013035.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-a-glucose-burning-implant-lowered-blood-sugar-and",
+      "headline": "A glucose-burning implant lowered blood sugar and weight in diabetic mice",
+      "summary": "ETH Zurich researchers built a wireless implant that converts excess glucose into gluconate, which the body excretes. It worked for six weeks in diabetic mice; it has not been tested in humans.",
+      "impacts": [
+        "If it ever works in people, it could manage type 2 diabetes and weight without insulin or drugs.",
+        "A body-worn device linked to a phone adds a new security and privacy surface for medical data.",
+        "It shows engineering approaches, not just drugs, being used for metabolic disease.",
+        "Mouse results often fail to carry over, so any human benefit is years away at best."
+      ],
+      "details": [
+        "ETH Zurich researchers led by Martin Fussenegger report an electronic implant that lowers blood sugar without insulin or conventional drugs. The paper is in Science, titled 'Wireless electrocatalytic closed-loop system for drug-free management of diabesity'.",
+        "The implant's catalyst is graphite felt coated with gold clusters, which are coated with platinum particles. It converts excess glucose into gluconate, which the body eliminates in urine. A glucose sensor measures tissue glucose and signals a smartphone or smartwatch over Bluetooth, which switches the implant on; it shuts off once glucose returns to the target range. An electronic controller in a 3D-printed housing receives wireless power at 13.56 MHz.",
+        "In the lab, a 5-liter glucose solution, roughly the volume of blood in an adult, showed the catalyst could convert glucose at that scale. In diabetic mice, the implant regulated blood sugar and led to weight loss over a six-week study. It worked reliably and was well tolerated, and the researchers reported no evidence of tissue damage from electrical or thermal effects. ScienceDaily's write-up does not give the number of mice.",
+        "The limits are plain: the device 'has not yet been tested in humans', and human safety and effectiveness are unknown. The team's next step is to develop it into a medical device suitable for clinical testing.",
+        "What to watch: larger and longer animal studies, safety data on the metal catalyst over time, and whether a human trial is approved."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "diabetes",
+        "implant",
+        "eth zurich",
+        "blood sugar",
+        "weight loss",
+        "medical device",
+        "science"
+      ],
+      "date": "2026-10-31",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (ETH Zurich release)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261031221151.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-curl-moves-low-severity-bug-reports-into-public",
+      "headline": "curl moves low-severity bug reports into public because of a report 'avalanche'",
+      "summary": "The curl project says it is 'struggling' under a flood of vulnerability reports, some AI-assisted. Since Oct. 26 it has handled low and medium reports in public and kept only high and critical ones private.",
+      "impacts": [
+        "Software that runs on billions of devices relies on a few overloaded volunteers.",
+        "AI-generated bug reports can bury real ones and wear out maintainers.",
+        "Public handling of lower-severity flaws gives attackers more time before fixes ship.",
+        "If key open-source maintainers burn out, security of everything built on top gets weaker."
+      ],
+      "details": [
+        "The Register reported on Oct. 20, 2026 that curl, the widely used data-transfer tool and library, is changing how it handles security reports. Maintainer Daniel Stenberg described an 'avalanche of vulnerability reports that keep pouring in' and said it will not let up for 'several months'. In his words: 'We are struggling as a project as all key maintainers feel strained, overloaded' and 'We must act to survive.'",
+        "From Oct. 26, low- and medium-severity reports go in curl's public GitHub repository. High and critical reports stay private. Researchers unsure of a report's severity can still submit on HackerOne, where curl will say what severity it assigns. According to the article, over 90 percent of submissions in recent years could quickly be assessed as below high severity.",
+        "AI is part of the strain. The article says AI-generated submissions added to the workload, and curl shut its bug bounty program earlier this year because of them. Stenberg has said not all AI-assisted reports are bad, but he notes some researchers using AI test unusual option combinations that real applications are unlikely to use and then report minor discrepancies as vulnerabilities.",
+        "The curl team lists benefits of working in the open: more people can assess reports, write fixes and advisories, and spot related problems before releases. The article stresses these are theory, and that public handling does not reduce the work per report.",
+        "The trade-off is real. Public disclosure gives attackers more time to exploit flaws before fixes ship. Stenberg calls that unfortunate but unavoidable, and the practice is limited to sub-high issues for that reason. He says this may not be the project's last survival step."
+      ],
+      "category": "Tech",
+      "tags": [
+        "curl",
+        "open source",
+        "vulnerabilities",
+        "ai",
+        "maintainers",
+        "security reports",
+        "hackerone"
+      ],
+      "date": "2026-10-20",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/10/20/swamped-curl-maintainers-take-low-level-flaws-public-to-survive-vulnerability-avalanche/5304198"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-suse-will-cut-about-one-in-ten-staff",
+      "headline": "SUSE will cut about one in ten staff, and its CEO blames 'automation and AI'",
+      "summary": "The Linux company says tooling has 'greatly diminished' the need for some roles. Voluntary separation in September did not attract enough takers, so the cuts are now mandatory.",
+      "impacts": [
+        "Companies are now openly naming AI as the reason for cutting jobs, not just citing 'restructuring'.",
+        "Engineering and support roles in open-source companies are not exempt.",
+        "Employees who tracked AI use or adoption may find it becomes part of job decisions.",
+        "A private-equity owner exploring a sale adds cost pressure on top of the AI shift."
+      ],
+      "details": [
+        "The Register reported on Nov. 2, 2026 that SUSE will cut about 10% of its global workforce. The article puts the workforce at roughly 1,900, which implies about 190 roles, though it does not state a figure. CEO Dirk-Peter van Leeuwen cites 'automation and AI' as the driver and says the company's current organizational design and cost base will not support its future.",
+        "He wrote that 'modern tooling is already changing our daily workflows' and that 'the requirement for some existing roles has greatly diminished'. SUSE says it reviewed its 'future strategy, required capabilities, and team structures' before deciding. It adds that decisions were based on how roles can evolve, not on individual talent or commitment.",
+        "The timeline is short. Affected staff are told by Nov. 4, employee representatives are named Nov. 5, and one-to-one meetings begin the following week. The FY2027 strategy is due to staff on Nov. 16. In September SUSE offered voluntary separation; The Register reports that not enough employees accepted, so the cuts are now mandatory.",
+        "Context: Swedish private equity firm EQT bought SUSE from Micro Focus in 2018 for $2.5 billion, listed it in Frankfurt in 2021 and took it private again in 2023. Reuters reported in March 2026 that EQT was considering selling it.",
+        "What is not known: which roles are affected, and whether AI will directly replace the work of the eliminated positions. The company's statement links the cuts to AI, but the article does not show that AI is doing those jobs."
+      ],
+      "category": "Economy",
+      "tags": [
+        "suse",
+        "layoffs",
+        "ai",
+        "jobs",
+        "linux",
+        "automation",
+        "workforce"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/software/2026/11/02/suse-to-cut-one-in-ten-employees-because-of-ai/5306950"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-protons-ceo-called-security-review-loser-thinking-staff",
+      "headline": "Proton's CEO called security review 'loser thinking', staff describe fear over AI quotas",
+      "summary": "404 Media says Proton's CEO pushed AI use over pentesting, tracked AI-generated code, and planned 'AI re-interviews'. After the story, the re-interviews were cancelled.",
+      "impacts": [
+        "Security products built under speed pressure may skip checks users assume are being done.",
+        "Tracking AI-generated code per worker turns AI adoption into a job-performance metric.",
+        "Employees who fear raising security concerns are a risk signal for a privacy company.",
+        "The case shows how AI mandates can collide with a company's own security promises."
+      ],
+      "details": [
+        "404 Media reported on Oct. 29, 2026, based on eight current employees and one former employee, plus Slack messages, meeting recordings and a CTO-written AI manifesto, that Proton CEO Andy Yen has pushed engineers hard to adopt AI. In late August, when an employee asked for new code to be pentested for a few days before release, Yen reportedly called the idea 'loser thinking' and told the team to focus on being faster.",
+        "According to the report, he told engineers to stop handcrafting code, set up an email address to flag anything slowing AI adoption, and had software installed on workers' computers to track how much AI-generated code they produce. He reportedly said this is the last year Proton will hire engineers, and that future hires will be people who build with AI. The company said it would 're-interview' staff about their AI use, which the article implies could decide who keeps a job.",
+        "Employees described a culture of fear. Some had security concerns about building security products with AI but felt unable to raise them. An internal document said Proton is not on track to meet its annual revenue target 'due to insufficient velocity' and that 'by all metrics that matter, we're an underperforming company'.",
+        "The report also says that Proton's post-quantum encryption, launched in May, applies only to emails written after the feature launched, and that Yen reportedly objected to Proton publicizing this limitation.",
+        "On Oct. 30, 404 Media reported that Yen cancelled the re-interviews after its investigation. A Proton spokesperson did not dispute the reporting, said some staff are unhappy or misunderstand the direction, and said the company has been 'too blunt or too slow in explaining ourselves to our people'. The account relies on anonymous employee sources and internal records seen by 404 Media."
+      ],
+      "category": "Tech",
+      "tags": [
+        "proton",
+        "ai",
+        "security",
+        "layoffs",
+        "engineers",
+        "privacy",
+        "management"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/manifestos-fear-and-loser-thinking-inside-protons-ai-reckoning/"
+        },
+        {
+          "name": "404 Media (roundup)",
+          "url": "https://www.404media.co/reaping-and-sowing-ceo-edition/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-iran-linked-darkblinders-used-fake-recruiter-coding-tests",
+      "headline": "Iran-linked DarkBlinders used fake recruiter coding tests on Israel and Iraqi Kurdistan",
+      "summary": "Dream Research Labs says the group ran a spear-phishing campaign from August to October 2026 that compromised a prominent person in Israel and a government cloud in Iraq's Kurdistan Region.",
+      "impacts": [
+        "Job-offer coding challenges can carry malware straight into a developer's machine.",
+        "Government cloud accounts can be reached through a single phished person.",
+        "Attribution to a state rests on vendor analysis, so governments may respond slowly or not at all.",
+        "Fake video-conferencing apps show attackers copying everyday work tools."
+      ],
+      "details": [
+        "The Hacker News reported on Nov. 2, 2026 on DarkBlinders, an Iran-nexus threat actor assessed to be active since at least September 2024. The primary report is from Dream Research Labs; Palo Alto Networks' Unit 42, Elastic Security Labs and Group-IB have tracked related activity under other names.",
+        "The campaign ran from August to October 2026 and compromised a high-profile individual in Israel and a government cloud environment in Iraq's Kurdistan Region. Earlier activity targeted aviation and telecommunications in the UAE and Iraq. The article does not give a full victim count.",
+        "The methods are social engineering. The group sent fake recruiter lures posing as Dubai Airports with a booby-trapped Visual Studio coding challenge that sideloads malware called SHELBYLOADER V2 and SHELBYC2. It also used credential-phishing pages on lookalike government, webmail and cloud domains, trojanized utilities, and a decoy videoconferencing app called 'StarkMeet' that launches the same payloads.",
+        "On attribution, Dream describes the group as Iran state-aligned and assesses with medium confidence that related clusters may be sub-clusters within APT34. The same report says DarkBlinders shows no technical overlap with other known groups, which sits uneasily with the cluster links it also reports.",
+        "The caveats are important. Attribution to Iran rests on vendor analysis, not government confirmation, and the APT34 link is only medium confidence. The campaign appears targeted rather than a mass attack."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "iran",
+        "darkblinders",
+        "apt34",
+        "spear-phishing",
+        "espionage",
+        "israel",
+        "iraq"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/darkblinders-compromises-israeli-target.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-follow-up-ivanti-patches-two-more-bugs-chained",
+      "headline": "Follow-up: Ivanti patches two more bugs chained for root access on Connect Secure VPNs",
+      "summary": "Attackers tracked as UTA0576 chained flaws to run code as root on fully patched Ivanti VPN devices. Ivanti has now patched two more bugs, and CISA ordered federal agencies to fix the authentication bypass.",
+      "impacts": [
+        "A fully patched VPN gateway can still be taken over when bugs are chained.",
+        "The attacker left no malware or web shell, so ordinary scans may not find them.",
+        "Log tampering evaded Ivanti's own Integrity Checker Tool.",
+        "Over 5,000 internet-exposed instances are being tracked, and how many are secured is unknown."
+      ],
+      "details": [
+        "BleepingComputer reported on Nov. 2, 2026 that Ivanti released fixes for two more Connect Secure flaws that attackers have chained in zero-day attacks since around Oct. 1 (Defused's date) or Oct. 3 (Volexity's). Volexity tracks the actor as UTA0576. The chain gave unauthenticated root-level code execution on fully patched devices.",
+        "The flaws are an authentication bypass, CVE-2026-104935, patched in October with Ivanti noting 'limited exploitation in the wild'; a high-severity privilege escalation, CVE-2026-111357; and a file upload flaw for authenticated attackers, CVE-2026-118527. The latter two are newly patched. Ivanti said it had a fix for the bypass in QA when it found the escalation flaw, so it shipped that fix first.",
+        "Volexity reported that the actor deployed no malware or web shell. Instead it re-exploited the device for each command and tampered with logs to evade Ivanti's Integrity Checker Tool. This makes compromise harder to detect on a device.",
+        "CISA added CVE-2026-104935 to its Known Exploited Vulnerabilities catalog on Tuesday and ordered federal agencies to patch by Friday. The article does not say whether CISA added the two newer CVEs. Shadowserver tracks over 5,000 internet-exposed Ivanti instances, but how many have been secured is not known.",
+        "What the article does not cover: the patched software versions, the number of compromised devices, and the victims."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ivanti",
+        "vpn",
+        "zero-day",
+        "volexity",
+        "cisa",
+        "root",
+        "exploit chain"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/ivanti-patches-two-more-connect-secure-zero-days-chained-in-attacks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-a-24-year-study-of-8-200-adults",
+      "headline": "A 24-year study of 8,200 adults links higher BMI to faster memory and executive decline",
+      "summary": "University of Georgia researchers tracked people over 50 and found each BMI point was tied to a faster decline. The link does not prove excess weight causes it, and weight management was tied to slower decline.",
+      "impacts": [
+        "The effect was strongest in adults over 65, the group with the highest dementia risk.",
+        "Weight change was associated with slower decline, possibly within two years.",
+        "Dementia affects more than 7 million Americans, a number expected to double by 2050.",
+        "BMI alone is an incomplete measure of obesity, so the findings are a rough guide."
+      ],
+      "details": [
+        "A University of Georgia team led by Suhang Song reports in the Journal of Neurology that a higher cumulative average BMI is associated with faster declines in memory, overall cognitive performance and executive functioning. The study followed more than 8,200 adults over age 50 from a nationally representative study for 24 years.",
+        "Each one-point BMI increase was associated with a faster rate of decline. The association peaked around year eight of follow-up, and adults over 65 showed the most pronounced effects. The authors propose inflammation, impaired circulation and insulin resistance as mechanisms, but these are unconfirmed.",
+        "On a more encouraging note, managing weight was associated with slower cognitive decline, with benefits possibly visible within two years.",
+        "The study does not show that excess weight directly causes cognitive decline. It is an observational cohort. Some scientists argue BMI alone is an incomplete measure of obesity; the article notes that including waist measurements and related conditions raises the estimated share of U.S. adults with obesity from about 2 in 5 to 75%.",
+        "Context from the release: more than 7 million Americans live with dementia, and that number is expected to double by 2050."
+      ],
+      "category": "Health",
+      "tags": [
+        "bmi",
+        "dementia",
+        "cognitive decline",
+        "brain",
+        "obesity",
+        "memory",
+        "aging"
+      ],
+      "date": "2026-11-02",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Georgia release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261101010559.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-nasa-satellites-show-a-skull-shaped-patch-of",
+      "headline": "NASA satellites show a skull-shaped patch of bare ice on an Antarctic island",
+      "summary": "Landsat 9 images show Vega Island's snow-free rock and glaciers resembling a skull in October 2026. Unusually warm winter conditions left little fresh snow, exposing dark ice that absorbs more sunlight.",
+      "impacts": [
+        "Dark exposed ice absorbs more heat, which can speed up melting.",
+        "Glacier retreat is already changing the island's shapes.",
+        "A single warm winter does not prove a trend, but it shows how fast the surface can change.",
+        "Sea-level projections depend on how Antarctic glaciers respond to such warm spells."
+      ],
+      "details": [
+        "NASA's Earth Observatory published images of Vega Island, in the Weddell Sea east of the Antarctic Peninsula, that resemble a grinning skull in profile. A nunatak (a rocky peak above the ice) forms the eye socket, a lateral moraine outlines the mouth, and Devil's Bay Glacier forms the lower jaw. ScienceDaily relayed the story on Nov. 2, 2026.",
+        "Landsat 9 captured the island on March 22, 2025, when snow covered it, and on Oct. 10, 2026, when large areas were snow-free. Clouds obscured the island in March 2026. The article attributes the difference to unusually warm winter conditions in 2026, especially in June, which left little fresh snow. Sublimation and strong winds removed more of what did fall.",
+        "The article makes the central point: exposed dark ice absorbs more solar energy, which could speed melting as temperatures rise. A 1982 study documented 29 glaciers and four ice caps on Vega Island, and Devil's Bay Glacier has been monitored since the 1998-1999 Antarctic summer, showing an overall loss of mass. No specific temperature readings are given.",
+        "Glaciologist Mauri Pelto of Nichols College provided analysis. He notes that a thin layer of spring snow would help in the short term. As the glaciers retreat, the skull's features will weather away, changing the jawline and expanding the eye socket.",
+        "The 'skull' is only a visual resemblance. The real news is glacier loss on a single island after one warm winter, which should not be read as proof of a continent-wide trend."
+      ],
+      "category": "Climate",
+      "tags": [
+        "antarctica",
+        "glacier",
+        "nasa",
+        "landsat",
+        "ice",
+        "warm winter",
+        "satellite"
+      ],
+      "date": "2026-11-02",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (NASA Earth Observatory)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261101010538.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-uva-uses-ultrasound-to-carry-microrna-past-the",
+      "headline": "UVA uses ultrasound to carry microRNA past the blood-brain barrier against glioblastoma",
+      "summary": "A preclinical study used MRI-guided focused ultrasound and nanoparticles to carry microRNAs into brain tumors, slowing growth and extending survival in animal models. No human trial has started.",
+      "impacts": [
+        "Glioblastoma kills over 13,000 people a year in the U.S., and treatment options are limited.",
+        "The blood-brain barrier blocks most drugs, so safe temporary opening is a major goal.",
+        "Gene-targeting molecules could hit several cancer-driving genes at once.",
+        "Animal results often do not carry over, so patients are far from benefit."
+      ],
+      "details": [
+        "University of Virginia researchers led by Roger Abounader describe an experimental strategy against glioblastoma, the most common and aggressive malignant brain tumor in adults. The article says it claims more than 13,000 U.S. lives each year. The work is in the Journal of Clinical Investigation, and ScienceDaily reported it on Nov. 1, 2026.",
+        "The approach uses microRNAs, small genetic molecules that can suppress several cancer-driving genes at once. Nanoparticles carry them into the brain. Focused ultrasound guided by MRI, working with microbubbles, temporarily opens the blood-brain barrier so the particles can reach the tumor.",
+        "In laboratory experiments and animal models, the microRNA treatment slowed tumor growth and helped the animals survive longer. The write-up gives no specific survival figures.",
+        "This is preclinical work. The team hopes to move to clinical trials in patients with glioblastoma and other brain tumors, but none have started. The authors call the strategy experimental and say it will require additional research before testing in humans. The article provides no human data and no details on dosing or safety.",
+        "What to watch: safety data on repeated barrier opening, and whether a first-in-human trial is cleared."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "glioblastoma",
+        "brain cancer",
+        "ultrasound",
+        "microrna",
+        "blood-brain barrier",
+        "uva",
+        "nanoparticles"
+      ],
+      "date": "2026-11-01",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (UVA Health release)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261030003017.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-ford-launches-a-privacy-promise-as-only-14",
+      "headline": "Ford launches a 'privacy promise' as only 14% of drivers say they know what cars collect",
+      "summary": "Ford says it does not share driving behavior with data brokers or use data for targeted ads. The pledge comes after GM's $220 million settlement over selling driver data.",
+      "impacts": [
+        "Modern cars collect data on location, maintenance and driving, and many owners do not know it.",
+        "Turning off connected services also disables real-time navigation and built-in roadside assistance.",
+        "A company's own promise is not the same as independent verification or enforcement.",
+        "Other carmakers now face pressure to explain their data practices."
+      ],
+      "details": [
+        "TechCrunch reported on Nov. 2, 2026 that Ford launched what it calls an 'explicit commitment' to keep customers' vehicle data safe and give them control over what they share. It launched a website explaining what data it collects, how it uses it, and how customers can opt in or out.",
+        "Ford says the controls have existed for years and the new push is about communicating them more clearly before launching more connected vehicles, including those on its upcoming 'universal electric vehicle' platform. Vehicle health data gives owners real-time maintenance information and also supports research and development.",
+        "Chief privacy officer Kristin Jones says Ford does not share driving behavior data with data brokers, is not trying to monetize data, and will not use it for targeted advertising. She cited an internal survey of 1,000 consumers in which 91% called data privacy a key consideration.",
+        "The trade-off is that turning off connected services disables real-time navigation and built-in roadside assistance.",
+        "Context in the article: only 14% of U.S. respondents in one cited poll said they fully understand what data their vehicle collects. General Motors faced an FTC action over selling driver data and recently agreed to a $220 million settlement with 36 states. The article is based largely on Ford's own statements and an interview with Jones, and includes no independent verification or details on enforcement."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "ford",
+        "car data",
+        "privacy",
+        "gm",
+        "data brokers",
+        "connected cars",
+        "driving data"
+      ],
+      "date": "2026-11-02",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/02/ford-launches-a-privacy-promise-and-explains-how-and-why-it-uses-a-customers-data/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-btcpay-server-operators-told-to-take-old-versions",
+      "headline": "BTCPay Server operators told to take old versions offline after hot wallets were drained",
+      "summary": "The open-source crypto payment processor says attackers drained hot wallets on instances running version 2.4.1 or older, with unauthorized Bitcoin and Litecoin payments. No loss total has been given.",
+      "impacts": [
+        "Self-hosted crypto payment servers keep money in online hot wallets that attackers can reach if the software is old.",
+        "Operators who skip updates can lose funds with no bank to reverse the payments.",
+        "The project says it has no credible reports of drains on the latest release, 2.4.7.",
+        "Merchants running old instances should treat them as potentially compromised until checked."
+      ],
+      "details": [
+        "BleepingComputer reported on Nov. 2, 2026 that the maintainer of BTCPay Server, an open-source, self-hosted payment processor that lets businesses accept Bitcoin and other crypto directly into their own wallets, is urging users to upgrade after attackers drained hot wallets on older instances. Unauthorized Bitcoin and Litecoin payments were made. The project first told operators to shut down servers during the investigation.",
+        "The project said it identified an attack vector targeting instances running version 2.4.1 (July 23, 2026) or earlier. Founder Nicolas Dorier said clues point to attackers exploiting flaws in versions before 2.4.2, released Aug. 7, and investigators were examining how attackers logged in as administrator on instances older than 2.4.2. Dorier said the attacks did not target public servers.",
+        "On Oct. 29, the project disclosed a critical vulnerability found by Anthropic's Frontier OSS scanner, which led to an emergency 2.4.7 release. The article names no CVE and does not say that this specific flaw was the one used in the thefts.",
+        "Recommended steps: update to 2.4.7 through Server Settings, Maintenance, Update (or the btcpayserver-docker update script for Docker installs), and take instances running 2.4.1 or older offline as soon as possible. Affected users should email security@btcpayserver.org and report losses to local authorities. The project says it has no credible reports of hot wallet drains for users on 2.4.7, which covers only the absence of reports so far.",
+        "What is not known: the total amount stolen, the number of victims, and a full technical account of the exploit. The article gives no full method beyond the administrator logins."
+      ],
+      "category": "Economy",
+      "tags": [
+        "btcpay",
+        "bitcoin",
+        "crypto",
+        "hot wallet",
+        "theft",
+        "self-hosted",
+        "vulnerability"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/btcpay-server-warns-of-hot-wallet-thefts-targeting-outdated-instances/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-perseverance-has-driven-28-miles-on-mars-farther",
+      "headline": "Perseverance has driven 28 miles on Mars, farther than any vehicle on another world",
+      "summary": "NASA's rover passed 45.22 km on Oct. 11, 2026. Engineers loosened driving limits, and its navigation uses a processor not built to withstand Mars' radiation, protected by software.",
+      "impacts": [
+        "Longer autonomous drives let rovers cover more ground between commands from Earth.",
+        "Using a processor not hardened for radiation trades risk for capability.",
+        "NASA is only investigating generative AI for route planning, not using it yet.",
+        "Mars missions are shifting toward more onboard decision-making."
+      ],
+      "details": [
+        "ScienceDaily reported on Nov. 2, 2026, based on NASA materials, that Perseverance's total driving distance reached 45.22 km (28.10 miles) on Sol 2006 (Oct. 11, 2026). Guinness World Records recognized it as the farthest any vehicle has driven on another celestial body.",
+        "The rover was about 200 meters short of the record around two months earlier. Rather than drive it in one AutoNav run, it spent weeks on short trips studying ancient rock outcrops and taking close-up measurements. It then resumed driving and passed the record.",
+        "Engineers simulated thousands of scenarios and changed several limits. The rover can now tolerate tilts up to 24 degrees, belly pan clearance was reduced to 20 cm, steering motor current limits were nearly doubled, braking software was updated, and 'dynamic slip tables' were added to the flight software.",
+        "Its Global Localization system determines position by comparing surface images with orbital images, without Earth-based location fixes. The extra processor for it was not designed to withstand Mars' radiation, so engineers added software protections against 'transient bit flips'. The article does not say how well they work over time.",
+        "The rover is still active and climbing the rim of its crater. The article gives no health report, and it says NASA is only 'investigating' generative AI for route planning."
+      ],
+      "category": "Space",
+      "tags": [
+        "mars",
+        "perseverance",
+        "nasa",
+        "rover",
+        "autonomy",
+        "record",
+        "radiation"
+      ],
+      "date": "2026-11-02",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (NASA release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261101010536.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-icecube-catches-ghost-particles-with-10-billion-times",
+      "headline": "IceCube catches 'ghost particles' with 10 billion times solar-neutrino energy",
+      "summary": "The Antarctic detector sees only a few dozen of the most energetic neutrinos a year. A UC San Diego physicist says the origin of one reported ultra-high-energy neutrino is unknown.",
+      "impacts": [
+        "These particles pass through matter and can carry information from the most violent cosmic events.",
+        "Unknown sources point to physics or astrophysics we have not yet identified.",
+        "Detector science needs a cubic kilometer of ice, which shows the scale of the instruments.",
+        "Findings may eventually test ideas about the early universe."
+      ],
+      "details": [
+        "ScienceDaily reported on Nov. 2, 2026, from a UC San Diego release, on IceCube, a detector embedded in about one cubic kilometer of Antarctic ice that detects high-energy neutrinos from distant cosmic sources. It detects only a few dozen of the most energetic neutrinos each year.",
+        "Photomultiplier tubes on strings detect faint blue Cherenkov light produced when a neutrino interacts with the ice. The light pattern lets researchers estimate energy and reconstruct arrival direction.",
+        "Physicist George Fuller says some ultra-high-energy neutrinos have roughly 10 billion times the energy of a typical solar neutrino. Another similar experiment reported one with about 200 times that energy, and Fuller says: 'We don't really know where that neutrino came from.' The 10 billion and 200 times figures are from his quoted remarks, not from a cited measurement paper.",
+        "For scale, about 100 billion neutrinos pass through each square centimeter of your body per second, since they interact extremely weakly. Francis Halzen received the 2026 Nobel Prize in Physics for his contributions to IceCube and the discovery of high-energy astrophysical neutrinos.",
+        "The article says neutrino research could shed light on the Big Bang, but that is an expectation, not an established result. Neutrino masses and the sources of the highest-energy events remain unknown."
+      ],
+      "category": "Space",
+      "tags": [
+        "icecube",
+        "neutrino",
+        "antarctica",
+        "physics",
+        "nobel",
+        "cosmic rays",
+        "astrophysics"
+      ],
+      "date": "2026-11-02",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (UC San Diego release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261101010533.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-02-experts-say-blood-pressure-guidelines-should-stress-potassium",
+      "headline": "Experts say blood pressure guidelines should stress potassium as much as cutting salt",
+      "summary": "A review in the American Journal of Clinical Nutrition says potassium intake is far below optimal worldwide and should get equal emphasis alongside sodium reduction. It describes proposals, not new trial data.",
+      "impacts": [
+        "More than 1.28 billion adults worldwide have hypertension.",
+        "Swapping some table salt for potassium salt could lower sodium and add potassium at once.",
+        "People with kidney disease or on certain medicines can have trouble handling extra potassium.",
+        "Official guidance has not changed; these are proposals for future guidelines."
+      ],
+      "details": [
+        "University of Vermont researchers led by Naomi K. Fukagawa published 'Rethinking the impact of dietary sodium and potassium on blood pressure to advance public health' in The American Journal of Clinical Nutrition. ScienceDaily reported it on Nov. 2, 2026.",
+        "The core claim is that current advice focuses on cutting sodium, while increasing potassium should get equal emphasis because the two work together to manage blood pressure. The authors call sodium reduction a 'foundational strategy' and propose expanding guidance rather than replacing it.",
+        "They cite more than 1.28 billion adults worldwide with hypertension, average sodium intake that still exceeds recommended levels, and potassium intake that is 'far below optimal levels in both developed and developing nations'.",
+        "Suggested approaches include eating more potassium-rich foods such as bananas, potatoes, beans, leafy greens and yogurt, and replacing some sodium chloride with potassium salts.",
+        "Limits: potassium salts can add a metallic taste, which limits how much manufacturers can use. People with kidney disease or those on certain medications may have trouble regulating potassium, and supplements and potassium-based salt substitutes should only be used with medical guidance. This is a review of existing evidence, not new trial data, and the recommendations are proposals rather than current official policy."
+      ],
+      "category": "Health",
+      "tags": [
+        "blood pressure",
+        "hypertension",
+        "potassium",
+        "sodium",
+        "diet",
+        "guidelines",
+        "heart"
+      ],
+      "date": "2026-11-02",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Vermont release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261102075553.htm"
+        }
+      ]
+    }
+  ]
+}
