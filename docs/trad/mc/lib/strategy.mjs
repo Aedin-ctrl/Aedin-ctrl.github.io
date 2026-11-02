@@ -86,13 +86,22 @@ export function detectLookahead(fn, { n = 240, probes = 12, seed = 1 } = {}) {
   const posA = new Float64Array(n), posB = new Float64Array(n);
   const ctx = k => ({ n, ppy: 252, params: {}, random: () => 0.5 });
 
+  /* User code can throw. If it does, that is a reportable condition, not a
+   * reason for the whole tester to die -- and it certainly must not take the
+   * worker with it. */
+  let threw = null;
   const run = (mkt, out) => {
     out.fill(0);
-    fn(mkt, out, ctx());
+    try { fn(mkt, out, ctx()); }
+    catch (e) { threw = String((e && e.message) || e); return false; }
     for (let i = 0; i < n; i++) if (!Number.isFinite(out[i])) out[i] = 0;
+    return true;
   };
 
-  run(base, posA);
+  if (!run(base, posA)) {
+    return { clean: false, error: threw, violations: [], probes, barsAhead: 0,
+             message: `The strategy threw before it could be checked: ${threw}` };
+  }
   const violations = [];
   for (let p = 0; p < probes; p++) {
     const k = Math.floor(n * (p + 1) / (probes + 1));
@@ -100,7 +109,10 @@ export function detectLookahead(fn, { n = 240, probes = 12, seed = 1 } = {}) {
     const r = new RNG(seed + 1000 + p, 0);
     // change everything from bar k onward, substantially
     for (let i = k; i < n; i++) alt[i] = -base[i] + 0.03 * r.normal();
-    run(alt, posB);
+    if (!run(alt, posB)) {
+      return { clean: false, error: threw, violations: [], probes, barsAhead: 0,
+               message: `The strategy threw on a perturbed market: ${threw}` };
+    }
     for (let t = 0; t <= k; t++) {
       if (posA[t] !== posB[t]) {
         violations.push({ probe: k, bar: t, before: posA[t], after: posB[t], lead: k - t });

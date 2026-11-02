@@ -60,8 +60,10 @@ export function sensitivity(market, fn, spec, chosen, opts = {}) {
       worst: finite.length ? finite.reduce((a, b) => b.score < a.score ? b : a) : null,
       median: finite.length ? S.quantile(finite.map(p => p.score), 0.5) : NaN,
       positiveShare: finite.length ? finite.filter(p => p.score > 0).length / finite.length : 0,
-      stepLeft: Number.isFinite(left) ? left - base.score : NaN,
-      stepRight: Number.isFinite(right) ? right - base.score : NaN,
+      // null, not NaN: there is no neighbour on that side, which is a fact
+      // about the range rather than a failed calculation
+      stepLeft: Number.isFinite(left) ? left - base.score : null,
+      stepRight: Number.isFinite(right) ? right - base.score : null,
       // the chosen value sitting at an EDGE of its range is its own warning:
       // the optimiser wanted to go further and was not allowed to
       atEdge: idx === 0 || idx === vals.length - 1,

@@ -118,6 +118,14 @@ export function initIdea(ctx) {
         w.removeEventListener('message', onMsg);
         ST.running = false; $('#ideaRun').disabled = false;
         $('#progBar').style.width = '100%';
+        // a refusal is a result too, and it has to be shown rather than rendered
+        if (!e.data.res || !e.data.res.ok) {
+          $('#ideaMsg').innerHTML = `<div class="msg bad"><b>Nothing to test.</b>
+            ${esc((e.data.res && e.data.res.note) || 'the run produced no usable result')}</div>`;
+          $('#ideaResults').hidden = true;
+          $('#runStat').textContent = 'nothing to test';
+          return;
+        }
         ST.last = e.data.res;
         render(e.data.res);
         $('#runStat').textContent = `${e.data.res.gates.passed} of ${e.data.res.gates.total} gates passed`;
@@ -198,9 +206,9 @@ function renderStress(r) {
   }).join('');
   $('#stressFoot').innerHTML = `At the assumed ${st.assumedBps}bp the out-of-sample score is
     <b>${f2(st.assumed)}</b>.
-    ${Number.isFinite(st.breakEvenMult)
-      ? `It reaches zero at about <b>${st.breakEvenBps.toFixed(1)}bp</b>, ${st.breakEvenMult.toFixed(1)}× the assumption.`
-      : 'It stays positive even at five times the assumption.'}
+    ${st.beyondRange
+      ? `It stays positive even at <b>${st.maxTestedMult}×</b> the assumption — though look at the ladder to see how little is left there.`
+      : `It reaches zero at about <b>${st.breakEvenBps.toFixed(1)}bp</b>, ${st.breakEvenMult.toFixed(1)}× the assumption.`}
     ${st.holdsAt2 ? 'Doubling the cost keeps most of it.' : '<b>Doubling the cost takes most of it away</b> — the result depends on the cost estimate being right.'}
     ${st.skipHelps
       ? ` <b>Randomly skipping trades improves the result</b> (${esc(st.bestMiss.label.toLowerCase())} scores

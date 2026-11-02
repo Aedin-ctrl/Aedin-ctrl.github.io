@@ -49,6 +49,11 @@ export function testIdea(market, fn, spec, opts = {}) {
   /* --- 0. does it cheat? nothing else means anything until this passes --- */
   step(0.02, 'checking for look-ahead');
   out.lookahead = detectLookaheadParam(fn, spec, ppy);
+  if (out.lookahead.error) {
+    return { ...out, ok: false,
+             note: `the strategy threw while running: ${out.lookahead.error}`,
+             gates: { gates: [], passed: 0, total: 0, allPassed: false, blocking: null } };
+  }
 
   /* --- 1. the full-sample fit: the number you would have quoted --- */
   step(0.08, 'searching the parameter grid');
@@ -57,7 +62,19 @@ export function testIdea(market, fn, spec, opts = {}) {
     ? { params: full.best.params, score: full.best.score, result: stripSeries(full.best.result),
         medianScore: S.quantile(full.scores, 0.5), positiveShare: full.scores.filter(v => v > 0).length / full.scores.length }
     : null;
-  if (!out.fullSample) return { ...out, ok: false, note: 'no parameter set produced a usable result' };
+  if (!out.fullSample) {
+    /* Say WHY. The usual cause is a rule that never changes position, which the
+     * search refuses on purpose -- but "no usable result" tells the person
+     * nothing about what to change. */
+    const probe = runStrategy(market, fn, defaultParams(spec), { ...costs, minTrades: 0 });
+    const note = !probe
+      ? 'the strategy threw, or produced no finite positions, on every parameter set'
+      : probe.trades === 0
+        ? 'the strategy never changes position, so there is nothing to optimise or test. Write to `pos` and make it vary.'
+        : 'no parameter set produced a usable result — every combination was rejected';
+    return { ...out, ok: false, note,
+             gates: { gates: [], passed: 0, total: 0, allPassed: false, blocking: null } };
+  }
 
   /* --- 2. walk-forward --- */
   step(0.2, 'walking forward');
@@ -168,7 +185,24 @@ export function testIdea(market, fn, spec, opts = {}) {
   step(0.97, 'scoring the gates');
   out.gates = scoreGates(out);
   out.ok = true;
-  return out;
+  /* One structural guarantee at the boundary: no non-finite number leaves here.
+   * Individual fields are legitimately undefined -- a Calmar ratio with no
+   * drawdown, a step to a neighbour that does not exist -- and each becomes
+   * null, which survives JSON, crosses a worker boundary intact, and routes
+   * through Number.isFinite() the way the consumers already expect. The gates
+   * are scored above, on the live values, so nothing is lost. */
+  return finiteOnly(out);
+}
+
+/** Deep-convert every non-finite number to null. Returns a new object. */
+export function finiteOnly(v) {
+  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
+  if (v == null || typeof v !== 'object') return v;
+  if (ArrayBuffer.isView(v)) return Array.from(v, x => (Number.isFinite(x) ? x : null));
+  if (Array.isArray(v)) return v.map(finiteOnly);
+  const o = {};
+  for (const k of Object.keys(v)) o[k] = finiteOnly(v[k]);
+  return o;
 }
 
 /** Re-run every out-of-sample fold under harsher execution assumptions.
@@ -218,8 +252,13 @@ export function executionStress(market, fn, wf, opts = {}) {
       break;
     }
   }
-  if (breakEvenMult === null && ladder[ladder.length - 1].score > 0) breakEvenMult = Infinity;
+  /* `null` means "no break-even inside the tested range", not Infinity. Infinity
+   * does not survive JSON, and relying on Number.isFinite(null) being false to
+   * route the right branch afterwards works only by coincidence. With null the
+   * invariant "no non-finite number ever leaves the engine" is simply true, and
+   * can be asserted. */
   if (breakEvenMult === null && ladder[0].score <= 0) breakEvenMult = 0;
+  const beyondRange = breakEvenMult === null;
 
   /* Does SKIPPING trades help? If randomly missing a share of the trades improves
    * the result, the trades are on net harmful and the signal is not adding value.
@@ -239,8 +278,10 @@ export function executionStress(market, fn, wf, opts = {}) {
   const at2 = ladder.find(r => r.mult === 2);
   const holdsAt2 = !!(at2 && assumed > 0 && at2.score > 0 && at2.score >= assumed * 0.5);
 
-  return { rows, assumed, breakEvenMult, assumedBps: bpsPerTurnover,
-           breakEvenBps: Number.isFinite(breakEvenMult) ? breakEvenMult * bpsPerTurnover : Infinity,
+  return { rows, assumed, breakEvenMult, beyondRange,
+           assumedBps: bpsPerTurnover,
+           breakEvenBps: beyondRange ? null : breakEvenMult * bpsPerTurnover,
+           maxTestedMult: ladder[ladder.length - 1].mult,
            skipHelps, bestMiss, holdsAt2 };
 }
 
@@ -373,7 +414,7 @@ function scoreGates(o) {
         st.holdsAt2,
         `at twice the ${st.assumedBps}bp assumed it scores ` +
         `${Number.isFinite(st.rows[1].score) ? st.rows[1].score.toFixed(3) : '--'} against ${st.assumed.toFixed(3)}` +
-        (Number.isFinite(st.breakEvenMult) ? `; zero at ${st.breakEvenBps.toFixed(1)}bp` : '; still positive at 5x, but only just'),
+        (st.beyondRange ? `; still positive at ${st.maxTestedMult}x the assumption` : `; zero at ${st.breakEvenBps.toFixed(1)}bp`),
         'The cost is always a guess, and it is the most load-bearing number in any backtest. A rule that only works at exactly the cost you assumed is not a rule, it is a cost estimate. Keeping a positive sign is not enough — it has to keep most of its score.');
 
     add('trades_help', 'Its trades actually add value',
