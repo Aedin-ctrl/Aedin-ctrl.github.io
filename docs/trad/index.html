@@ -122,6 +122,12 @@
   .sub-btn:hover{color:var(--ink2)}
   .sub-btn[aria-selected="true"]{color:var(--ink);font-weight:620;border-bottom-color:var(--ink)}
   .sub-btn:focus-visible{outline:2px solid var(--s1);outline-offset:-3px;border-radius:6px}
+  /* a link out to the simulator, not one of the tab views above: the subtab JS
+     only ever queries .sub-btn, so this cannot become a broken tab */
+  .sub-link{margin-left:auto;align-self:center;font-size:13px;color:var(--s1);
+            text-decoration:none;padding:9px 4px 9px 14px;white-space:nowrap}
+  .sub-link:hover{color:var(--ink);text-decoration:underline}
+  .sub-link:focus-visible{outline:2px solid var(--s1);outline-offset:-2px;border-radius:6px}
   .view[hidden]{display:none}
 
   /* the SAR explainer */
@@ -173,6 +179,7 @@
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
     <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">gold strat</button>
+    <a class="sub-link" href="mc/">Monte Carlo &rarr;</a>
   </div>
 
   <div class="view" id="v-bell">
@@ -1121,6 +1128,14 @@ const TIPG=$$("#tip");
 const g2=x=>(x>0?"+":"")+x.toFixed(2);
 const gcls=x=>x>0?"pos":(x<0?"neg":"dim");
 const fx2=x=>x.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+/* JSON carries null where a metric was infinite (buy & hold never turns over,
+   so its break-even cost is infinite). isFinite(null) is TRUE in JS, because
+   Number(null) is 0 -- so the obvious guard passes and null.toFixed() then
+   throws and blanks the whole tab. Every optional number goes through these. */
+const ok=x=>x!=null&&typeof x==="number"&&isFinite(x);
+const fx=(x,n=2,dash="\u2014")=>ok(x)?x.toFixed(n):dash;
+const fg=(x,n=2,dash="\u2014")=>ok(x)?((x>0?"+":"")+x.toFixed(n)):dash;
+const fi=(x,dash="\u221e")=>ok(x)?Math.round(x).toLocaleString():dash;
 const SVGNS="http://www.w3.org/2000/svg";
 const mkSVG=(w,h)=>{const s=document.createElementNS(SVGNS,"svg");
   s.setAttribute("viewBox",`0 0 ${w} ${h}`);s.setAttribute("role","img");return s;};
@@ -1257,6 +1272,19 @@ function seg2(host,items,cur,cb){
   host.onclick=e=>{const b=e.target.closest("button"); if(!b)return;
     [...host.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
     cb(b.dataset.v);};
+}
+
+/* One section failing must not blank the other twelve. Each render is wrapped,
+   and a failure leaves a visible note where that section was instead of an
+   empty card and a silent console. */
+function safe(name, host, fn){
+  try{ fn(); }
+  catch(e){
+    console.error("gold board: "+name+" failed:", e);
+    const el = host && $$(host);
+    if(el) el.innerHTML = `<div class="empty">${name} could not be drawn &mdash; `
+      + `${(e&&e.message)||e}</div>`;
+  }
 }
 
 /* ---------------- renderers ----------------------------------------- */
@@ -1552,9 +1580,14 @@ function evidence(d){
   const h=d.headline||{};
   $$("#gevrange").textContent=`${(h.bars||0).toLocaleString()} daily bars · `+
     `${(d.data||[]).filter(x=>x.symbol==="GC=F"&&x.interval==="1d").map(x=>String(x.first).slice(0,10)+" → "+String(x.last).slice(0,10))[0]||""}`;
-  cloud(d); tables(d);
-  fillBlock(d); effTable(d); vtBlock(d); haBlock(d);
-  searchPlot(d); yearBlock(d);
+  safe("the parameter cloud", "#gcloud", ()=>cloud(d));
+  safe("the evidence tables", null, ()=>tables(d));
+  safe("the fill-model table", "#gfillfoot", ()=>fillBlock(d));
+  safe("the rule comparison", "#gefffoot", ()=>effTable(d));
+  safe("the volatility-target test", "#gvtfoot", ()=>vtBlock(d));
+  safe("the Heikin-Ashi block", "#ghafoot", ()=>haBlock(d));
+  safe("the search cloud", "#gsearch", ()=>searchPlot(d));
+  safe("the holdout year", "#gyreq", ()=>yearBlock(d));
 }
 
 
@@ -1582,26 +1615,26 @@ function fillBlock(d){
 
 function effTable(d){
   const rows=(d.efficiency||{}).rows||[];
-  const best=Math.max(...rows.map(r=>r.train_sharpe));
+  const best=Math.max(...rows.map(r=>ok(r.train_sharpe)?r.train_sharpe:-1e9));
   $$("#geff tbody").innerHTML=rows.map(r=>{
     const be=r.breakeven_cost_bps;
     return `<tr class="${r.train_sharpe===best?"tracked":""}">
-      <td>${r.label}</td><td class="${gcls(r.train_net)}">${g2(r.train_net)}</td>
-      <td class="str">${r.train_sharpe.toFixed(2)}</td><td>${r.train_calmar.toFixed(2)}</td>
-      <td>${Math.round(r.train_dd).toLocaleString()}</td>
-      <td>${(r.exposure*100).toFixed(0)}%</td><td>${r.flips_per_year.toFixed(1)}</td>
-      <td class="${be<10?"neg":(be>100?"pos":"")}">${isFinite(be)?be.toFixed(0):"&infin;"}</td>
-      <td>${isFinite(r.gross_per_cost)?r.gross_per_cost.toFixed(0):"&infin;"}</td>
-      <td>${g2(r.net_per_exposure)}</td>
-      <td class="${gcls(r.hold_sharpe)}">${r.hold_sharpe.toFixed(2)}</td></tr>`;}).join("");
+      <td>${r.label}</td><td class="${gcls(r.train_net)}">${fg(r.train_net)}</td>
+      <td class="str">${fx(r.train_sharpe)}</td><td>${fx(r.train_calmar)}</td>
+      <td>${fi(r.train_dd)}</td>
+      <td>${ok(r.exposure)?(r.exposure*100).toFixed(0)+"%":"\u2014"}</td><td>${fx(r.flips_per_year,1)}</td>
+      <td class="${!ok(be)?"dim":(be<10?"neg":(be>100?"pos":""))}">${fi(be)}</td>
+      <td>${fi(r.gross_per_cost)}</td>
+      <td>${fg(r.net_per_exposure)}</td>
+      <td class="${gcls(r.hold_sharpe)}">${fx(r.hold_sharpe)}</td></tr>`;}).join("");
   const sar=rows.find(r=>r.label==="sar 0.02/0.2")||{}, bh=rows.find(r=>r.label==="buy & hold")||{};
   const ma=rows.find(r=>r.label==="ma 50/200")||{};
   $$("#gefffoot").innerHTML=`Read the <b>break-even</b> column, not the Sharpe column.
-    Plain SAR dies at ${(sar.breakeven_cost_bps||0).toFixed(0)}&nbsp;bps per side; a
-    50/200 moving-average cross survives ${isFinite(ma.breakeven_cost_bps)?Math.round(ma.breakeven_cost_bps).toLocaleString():"&infin;"}&nbsp;bps
-    because it trades ${(ma.flips_per_year||0).toFixed(1)} times a year against SAR's
-    ${(sar.flips_per_year||0).toFixed(0)}. On this accounting SAR's Sharpe
-    (${(sar.train_sharpe||0).toFixed(2)}) and gold's (${(bh.train_sharpe||0).toFixed(2)})
+    Plain SAR dies at ${fi(sar.breakeven_cost_bps)}&nbsp;bps per side; a
+    50/200 moving-average cross survives ${fi(ma.breakeven_cost_bps)}&nbsp;bps
+    because it trades ${fx(ma.flips_per_year,1)} times a year against SAR's
+    ${fx(sar.flips_per_year,0)}. On this accounting SAR's Sharpe
+    (${fx(sar.train_sharpe)}) and gold's (${fx(bh.train_sharpe)})
     are the same number. Buffering the flip, confirming it, gating it on a weekly
     chart and swapping the stop for a Chandelier or a Donchian all made it worse.`;
 }
@@ -1757,7 +1790,11 @@ function boot(d){
   const rows=(d.bars||{}).rows||[];
   BARS={d:rows.map(r=>r[0]),o:rows.map(r=>r[1]),h:rows.map(r=>r[2]),
         l:rows.map(r=>r[3]),c:rows.map(r=>r[4])};
-  gHead(d); gNow(d); controls(); evidence(d); chart();
+  safe("the scorecard", "#gscore", ()=>gHead(d));
+  safe("the current state", "#gnowfoot", ()=>gNow(d));
+  safe("the controls", null, ()=>controls());
+  evidence(d);
+  safe("the chart", "#gchart", ()=>chart());
   addEventListener("resize",()=>{if(!$$("#v-gold").hidden){chart();evidence(d);}});
 }
 
