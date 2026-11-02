@@ -9,6 +9,7 @@ import { verdict, sharpeNull } from '../lib/tests.mjs';
 import * as S from '../lib/stats.mjs';
 import { hashConfig } from '../lib/rng.mjs';
 import * as R from './render.mjs';
+import { initIdea } from './idea.mjs';
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -60,7 +61,13 @@ async function loadReal() {
   if (!realLoading) {
     realLoading = fetch(new URL('../data/real.json', import.meta.url))
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(j => (REAL = j));
+      .then(j => {
+        REAL = j;
+        // the idea tester may have triggered this load; the Built-in pane is
+        // showing a stale "Load real market data" button until it is redrawn
+        try { renderExamples(); } catch {}
+        return j;
+      });
   }
   return realLoading;
 }
@@ -729,6 +736,49 @@ function restoreFromHash() {
   } catch { return false; }
 }
 
+/* ---------------- mode switch ---------------- */
+/* Two jobs, one page. "Test an idea" is the primary flow -- a rule plus the
+ * ranges it may be searched over, run through all three robustness tests.
+ * "Monte Carlo only" is for when you already have a return series and just want
+ * the path, leverage and ruin analysis. */
+function setMode(mode) {
+  const idea = mode === 'idea';
+  $('#mIdea').setAttribute('aria-selected', String(idea));
+  $('#mMC').setAttribute('aria-selected', String(!idea));
+  $('#ideaPane').hidden = !idea;
+  $('#setup').hidden = idea;
+  $('#results').hidden = idea || !ST.lastResults;
+  $('#ideaResults').hidden = !idea || !IDEA.last;
+  $('#ideaRun').hidden = !idea;
+  $('#runBtn').hidden = idea;
+  $('#runStat').textContent = 'ready';
+  try { localStorage.setItem('mc.mode', mode); } catch {}
+}
+$('#mIdea').addEventListener('click', () => setMode('idea'));
+$('#mMC').addEventListener('click', () => setMode('mc'));
+
+const IDEA = initIdea({
+  loadReal,
+  sendToMonteCarlo(returns, label, trials) {
+    ST.source = returns;
+    ST.sourceLabel = label;
+    ST.sourceNote = 'walk-forward out-of-sample output — never fitted to';
+    ST.strategySrc = '';
+    ST.mode = 'paste';
+    exKind = 'gen';
+    $('#trials').value = Math.max(1, trials || 1);
+    $('#horizon').value = Math.max(252, Math.min(5040, returns.length));
+    setMode('mc');
+    $$('#srcTabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.pane === 'pPaste')));
+    for (const p of ['pExamples', 'pPaste', 'pStrat', 'pVar', 'pSaved']) $('#' + p).hidden = true;
+    $('#pPaste').hidden = false;
+    $('#parseMsg').innerHTML = `<div class="msg ok"><b>Loaded ${n0(returns.length)} out-of-sample returns</b>
+      from the walk-forward run. Trials set to ${n0(trials || 1)} from the grid you searched.</div>`;
+    afterSourceChange();
+    $('#setup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  },
+});
+
 /* ---------------- boot ---------------- */
 window.__mcGen = { optimalBlockLength };
 exKind = 'gen'; exId = 'index';
@@ -739,3 +789,6 @@ $('#stratMsg').innerHTML = `<div class="msg info">${esc(STRAT_EXAMPLES.sma.note)
 if (!restoreFromHash()) { /* defaults already in place */ }
 refreshModelChips();
 renderParams();
+let savedMode = 'idea';
+try { savedMode = localStorage.getItem('mc.mode') || 'idea'; } catch {}
+setMode(location.hash && location.hash.length > 8 ? 'mc' : savedMode);

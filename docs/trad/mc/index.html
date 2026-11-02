@@ -42,6 +42,25 @@
                           .cols.three{grid-template-columns:1fr 1fr 1fr}}
 
   /* ---------- setup panel ---------- */
+  .modeswitch{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+  .modeswitch button{appearance:none;flex:1;min-width:220px;text-align:left;
+    border:1px solid var(--line);background:var(--card);color:var(--ink2);font:inherit;
+    font-size:14px;font-weight:620;padding:11px 15px;border-radius:11px;cursor:pointer;line-height:1.35}
+  .modeswitch button em{display:block;font-style:normal;font-weight:400;font-size:11.5px;
+    color:var(--muted);margin-top:2px}
+  .modeswitch button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .modeswitch button[aria-selected="true"] em{color:#bdbdb8}
+  .modeswitch button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+
+  .gate{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .gate:first-child{border-top:0}
+  .gate .mk{margin-top:2px}
+  .gate .gt{flex:1;min-width:0}
+  .gate .gl{font-size:13.5px;font-weight:620;stroke:none}
+  .gate .gd{font-size:12px;color:var(--ink2);margin-top:2px;font-variant-numeric:tabular-nums}
+  .gate .gw{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;max-width:78ch}
+  .gate.fail .gl{color:var(--bad)}
+
   .setup{background:var(--card);border:1px solid var(--line);border-radius:13px;
          margin-top:18px;overflow:hidden}
   .step{border-top:1px solid var(--line);padding:15px 18px}
@@ -203,6 +222,118 @@
     market models, and see what the spread of outcomes actually looks like &mdash; together
     with the tests that say whether the edge was ever there. Everything runs in this
     browser and every run is reproducible from its seed.</p>
+
+  <div class="modeswitch" role="tablist" aria-label="What to run">
+    <button role="tab" id="mIdea" aria-selected="true">Test an idea
+      <em>walk-forward · sensitivity · Monte Carlo</em></button>
+    <button role="tab" id="mMC" aria-selected="false">Monte Carlo only
+      <em>for a return series you already have</em></button>
+  </div>
+
+  <!-- ============ IDEA TESTER ============ -->
+  <div id="ideaPane">
+    <div class="setup">
+      <div class="step">
+        <h4><i>1</i>The market to test on <em>real daily data</em></h4>
+        <div class="chips" id="ideaMarket"></div>
+        <div class="hint" id="ideaMarketNote"></div>
+      </div>
+      <div class="step">
+        <h4><i>2</i>Your idea <em>a rule, and the ranges it may be searched over</em></h4>
+        <div class="row" style="margin-bottom:8px">
+          <label class="f" style="margin:0;text-transform:none;letter-spacing:0">Start from</label>
+          <select id="ideaEx" style="width:auto"></select>
+          <span class="spacer"></span>
+          <span class="hint" id="ideaGrid"></span>
+        </div>
+        <textarea id="ideaBox" spellcheck="false" style="min-height:260px"></textarea>
+        <div class="hint">Declare <code>const PARAMS = { name: {min, max, step, def} }</code> and the tester
+          searches that grid. <b>The grid size becomes your trial count</b> — search 240 combinations and the
+          Deflated Sharpe will hold you to 240 trials.</div>
+        <div id="ideaMsg"></div>
+      </div>
+      <div class="step">
+        <h4><i>3</i>How to test it</h4>
+        <div class="grid-ctl">
+          <div><label class="f" for="ideaFolds">Walk-forward folds <output id="ideaFoldsO">5</output></label>
+            <div class="rangewrap"><input type="range" id="ideaFolds" min="3" max="10" step="1" value="5"></div></div>
+          <div><label class="f" for="ideaIS">In-sample share <output id="ideaISO">50%</output></label>
+            <div class="rangewrap"><input type="range" id="ideaIS" min="0.3" max="0.8" step="0.05" value="0.5"></div></div>
+          <div><label class="f" for="ideaWindow">Window</label>
+            <select id="ideaWindow"><option value="rolling">Rolling (adapts, forgets)</option>
+              <option value="anchored">Anchored (never forgets)</option></select></div>
+          <div><label class="f" for="ideaObj">Optimise for</label>
+            <select id="ideaObj"><option value="sharpe">Sharpe ratio</option>
+              <option value="calmar">Calmar (CAGR / max drawdown)</option>
+              <option value="cagr">CAGR</option></select></div>
+          <div><label class="f" for="ideaCost">Cost per turnover (bps)</label>
+            <input type="number" id="ideaCost" value="1" min="0" step="0.5"></div>
+          <div><label class="f" for="ideaRadius">Sensitivity radius <output id="ideaRadiusO">1 step</output></label>
+            <div class="rangewrap"><input type="range" id="ideaRadius" min="1" max="3" step="1" value="1"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="ideaResults" hidden>
+      <div class="part"><span class="no">VERDICT</span><h2 id="ideaVerdictH">Does the idea survive?</h2>
+        <span class="sub" id="ideaVerdictSub"></span></div>
+      <div id="ideaBlock"></div>
+      <section><h3>The gates</h3>
+        <div class="note">Every one has to pass. They fail for different reasons, and the reason is the
+          useful part — each row says what it is testing and why it matters.</div>
+        <div id="ideaGates"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 1</span><h2>Walk-forward</h2>
+        <span class="sub">does the parameter choice survive being re-picked?</span></div>
+      <p class="partnote">Optimise on a window, trade the <b>next</b> window with whatever that optimisation
+        chose, roll forward. The stitched out-of-sample curve is the only equity curve here that was never
+        fitted to.</p>
+      <section>
+        <h3>In sample against out of sample <span>&middot; by fold</span></h3>
+        <div class="legend" id="wfLeg"></div>
+        <div id="wfChart"></div>
+        <div class="wrap" style="margin-top:12px"><table id="wfTab">
+          <thead><tr><th>Fold</th><th>In-sample window</th><th>Chosen</th><th>IS score</th>
+            <th>OOS score</th><th>Best possible OOS</th><th>Rank of choice</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="wfFoot"></div>
+      </section>
+      <section>
+        <h3>The unfitted equity curve <span>&middot; out-of-sample folds, end to end</span></h3>
+        <div id="wfEquity"></div>
+        <div class="foot" id="wfEqFoot"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 2</span><h2>Parameter sensitivity</h2>
+        <span class="sub">a plateau, or a spike?</span></div>
+      <p class="partnote">A real effect does not know what number you typed. If one step destroys it, it was
+        a coincidence that happened to land on that setting.</p>
+      <section>
+        <h3>One parameter at a time <span>&middot; the rest held at the chosen values</span></h3>
+        <div id="sensProfiles"></div>
+        <div class="foot" id="sensFoot"></div>
+      </section>
+      <section>
+        <h3>The neighbourhood <span>&middot; every combination within the radius</span></h3>
+        <div class="grid" id="sensTiles"></div>
+        <div id="sensHist" style="margin-top:12px"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 3</span><h2>Monte Carlo</h2>
+        <span class="sub">on the out-of-sample series, because that is the one that was not fitted</span></div>
+      <p class="partnote">Running a Monte Carlo on an in-sample curve launders a fitted result through a
+        thousand pretty paths. This one resamples the walk-forward output instead.</p>
+      <section>
+        <h3>The out-of-sample series, tested</h3>
+        <div class="grid" id="ideaStatTiles"></div>
+        <div class="foot" id="ideaStatFoot"></div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="ideaToMC">Send this series to the full Monte Carlo</button>
+          <span class="hint">Loads the out-of-sample returns into the simulator for the path, leverage and ruin analysis.</span>
+        </div>
+      </section>
+    </div>
+  </div>
 
   <!-- ============ SETUP ============ -->
   <div class="setup" id="setup">
@@ -540,7 +671,8 @@
   </footer>
 
   <div class="bar" id="runbar">
-    <button class="btn primary" id="runBtn">Run simulation</button>
+    <button class="btn primary" id="ideaRun">Test the idea</button>
+    <button class="btn primary" id="runBtn" hidden>Run simulation</button>
     <button class="btn" id="cancelBtn" hidden>Cancel</button>
     <div class="prog"><i id="progBar"></i></div>
     <span class="runstat" id="runStat">ready</span>
