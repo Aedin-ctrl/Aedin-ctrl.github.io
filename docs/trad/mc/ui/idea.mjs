@@ -3,6 +3,7 @@ import * as C from './charts.mjs';
 import { IDEA_EXAMPLES } from '../lib/ideatest.mjs';
 import { extractParamSpec, expandGrid, COST_PRESETS } from '../lib/strategylab.mjs';
 import * as S from '../lib/stats.mjs';
+import { condense } from './density.mjs';
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -185,6 +186,8 @@ function render(r) {
   renderSensitivity(r);
   renderStress(r);
   renderStats(r);
+  // newly filled prose blocks need their toggle, and empty ones need it hidden
+  condense();
 }
 
 function renderStress(r) {
@@ -194,7 +197,7 @@ function renderStress(r) {
   C.lineChart($('#stressChart'), {
     series: [{ name: 'out of sample', x: ladder.map(x => x.mult), y: ladder.map(x => x.score),
                color: 'var(--s2)', points: true }],
-    height: 230, xLabel: 'multiple of the assumed cost', yLabel: r.objective,
+    height: 150, xLabel: 'multiple of the assumed cost', yLabel: r.objective,
     xFmt: v => v + '\u00d7', yFmt: f2, zeroLine: true,
   });
   $('#stressTab').querySelector('tbody').innerHTML = st.rows.map(x => {
@@ -235,13 +238,24 @@ function renderGates(r) {
       : `<div class="msg warn" style="margin-top:10px"><b>${g.total - g.passed} gate${g.total - g.passed === 1 ? '' : 's'} failed.</b>
          The failures are the informative part — each one below says what it was testing and why it matters.</div>`;
 
-  $('#ideaGates').innerHTML = g.gates.map(x => `
+  /* The reason each gate exists is worth keeping and not worth reading every
+   * time. Label and evidence stay visible; the explanation goes behind the
+   * info button, like everything else on the page. */
+  $('#ideaGates').innerHTML = g.gates.map((x, i) => `
     <div class="gate ${x.pass ? '' : 'fail'}">
-      <span class="mk ${x.pass ? 'yes' : 'no'}">${x.pass ? '✓' : '✕'}</span>
-      <div class="gt"><div class="gl">${esc(x.label)}</div>
+      <span class="mk ${x.pass ? 'yes' : 'no'}">${x.pass ? '\u2713' : '\u2715'}</span>
+      <div class="gt">
+        <div class="gl">${esc(x.label)}<button class="infobtn" type="button"
+          aria-expanded="false" data-gate="${i}" title="why this matters">i</button></div>
         <div class="gd">${esc(x.detail)}</div>
-        <div class="gw">${esc(x.why)}</div></div>
+        <div class="gw" id="gw${i}" hidden>${esc(x.why)}</div></div>
     </div>`).join('');
+  $$('#ideaGates .infobtn').forEach(b => b.addEventListener('click', () => {
+    const t = $('#gw' + b.dataset.gate);
+    const open = t.hasAttribute('hidden');
+    if (open) t.removeAttribute('hidden'); else t.setAttribute('hidden', '');
+    b.setAttribute('aria-expanded', String(open));
+  }));
 }
 
 function renderWalkForward(r) {
@@ -261,7 +275,7 @@ function renderWalkForward(r) {
       { name: 'out of sample', x: folds, y: good.map(x => x.oosScore), color: 'var(--s2)', points: true },
       { name: 'hindsight', x: folds, y: good.map(x => x.hindsightScore), color: 'var(--s3)', points: true, dash: '4 3' },
     ],
-    height: 260, xLabel: 'fold', yLabel: r.objective, xFmt: v => String(Math.round(v)), yFmt: f2,
+    height: 118, xLabel: 'fold', yLabel: r.objective, xFmt: v => String(Math.round(v)), yFmt: f2,
   });
 
   $('#wfTab').querySelector('tbody').innerHTML = good.map(x => `<tr>
@@ -292,7 +306,7 @@ function renderWalkForward(r) {
     for (let i = 0; i < oos.length; i++) { eq *= 1 + oos[i]; curve.push(Math.log(Math.max(eq, 1e-12))); xs.push(i + 1); }
     C.lineChart($('#wfEquity'), {
       series: [{ name: 'out of sample', x: xs, y: curve, color: 'var(--s2)' }],
-      height: 280, xLabel: 'out-of-sample periods', yLabel: 'equity (log)',
+      height: 175, xLabel: 'out-of-sample periods', yLabel: 'equity (log)',
       yFmt: v => Math.exp(v).toFixed(2) + 'x', zeroLine: true,
     });
     const m = r.oosMetrics;
@@ -311,7 +325,7 @@ function renderSensitivity(r) {
     return { title: k, sub: `chosen ${se.chosen[k]}${p.atEdge ? ' · at the edge' : ''}`,
       x: p.values, y: p.points.map(q => q.score), color: p.atEdge ? 'var(--s2)' : 'var(--s1)',
       points: true, mark: se.chosen[k], yFmt: f2 };
-  }), { cols: Math.min(3, Math.max(1, keys.length)), height: 160, sharedY: false,
+  }), { cols: Math.min(3, Math.max(1, keys.length)), height: 150, sharedY: false,
         xFmt: v => String(v), yFmt: f2 });
 
   const tile = (k, v, n, mod = '') => `<div class="m ${mod}"><div class="k">${k}</div>
@@ -330,7 +344,7 @@ function renderSensitivity(r) {
   if (scores.length > 3) {
     const h = S.histogram(Float64Array.from(scores), Math.min(24, Math.max(6, scores.length)));
     C.histogram($('#sensHist'), {
-      counts: h.counts, edges: h.edges, height: 210, color: '#b8cfe9', total: scores.length,
+      counts: h.counts, edges: h.edges, height: 150, color: '#b8cfe9', total: scores.length,
       xLabel: `${r.objective} across the neighbourhood`, yLabel: 'settings', xFmt: f2,
       markers: [{ at: se.chosenScore, label: 'chosen', color: 'var(--s2)', dash: '0', anchor: 'end' }],
     });
@@ -413,7 +427,7 @@ function renderMoney(r) {
       { name: 'strategy', x: xs, y: eq, color: 'var(--s1)' },
       be ? { name: 'buy & hold', x: xs, y: be, color: 'var(--s2)' } : null,
     ].filter(Boolean),
-    height: 320, xLabel: 'trading days in the test period', yLabel: 'account value',
+    height: 200, xLabel: 'trading days in the test period', yLabel: 'account value',
     xFmt: v => String(Math.round(v)), yFmt: v => $m(v), zeroLine: false,
   });
   $('#moneyEqFoot').innerHTML = c
@@ -427,7 +441,7 @@ function renderMoney(r) {
   // monthly P&L
   C.signedBars($('#monthBars'), {
     values: mo.months.map(x => x.pnl), labels: mo.months.map(x => x.key),
-    height: 250, fmt: v => $m(v), yLabel: 'profit and loss',
+    height: 155, fmt: v => $m(v), yLabel: 'profit and loss',
   });
   const up = mo.positiveMonths, tot = mo.months.length;
   $('#monthFoot').innerHTML = `<b>${up} of ${tot}</b> months made money (${pct(up / tot, 0)}).
@@ -437,7 +451,7 @@ function renderMoney(r) {
   // underwater, in dollars
   const dd = mo.drawdownDollars;
   C.areaChart($('#ddArea'), {
-    x: dd.map((_, i) => i), y: dd, height: 250, fmt: v => $m(v),
+    x: dd.map((_, i) => i), y: dd, height: 155, fmt: v => $m(v),
     yLabel: 'below the high water mark', xLabel: 'test period',
   });
   $('#ddFoot').innerHTML = `The deepest point was <b>${$m(Math.abs(mo.maxDDDollars))}</b> below the high
@@ -520,7 +534,18 @@ function renderRegimes(r) {
           <td class="${x.pnlShare > 0 ? 'pos' : 'neg'}">${Number.isFinite(x.pnlShare) ? pct(x.pnlShare, 0) : '—'}</td>
           </tr>`).join('')}</tbody></table></div></section>`);
   }
+  /* Four stacked dimensions was four charts and four tables of scrolling. One at
+     a time, picked from a tab strip, says the same thing in a quarter of the page. */
   $('#regimeBlocks').innerHTML = blocks.join('');
+  const keys = Object.keys(rg.dims);
+  $('#regimeTabs').innerHTML = keys.map((k, i) =>
+    `<button type="button" role="tab" data-rg="${k}" aria-selected="${i === 0}">${esc(rg.dims[k].label)}</button>`).join('');
+  const showDim = (k) => {
+    $$('#regimeBlocks > section').forEach((sec, i) => { sec.hidden = keys[i] !== k; });
+    $$('#regimeTabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.rg === k)));
+  };
+  $$('#regimeTabs button').forEach(b => b.addEventListener('click', () => showDim(b.dataset.rg)));
+  showDim(keys[0]);
   for (const [key, d] of Object.entries(rg.dims)) {
     C.groupedBars($('#rg_' + key), {
       rows: d.rows.map(x => ({ label: x.label.replace(/\s*\(.*\)$/, ''),
@@ -578,7 +603,7 @@ function renderRegimes(r) {
         { name: 'strategy', x: r.rolling.strategy.x, y: r.rolling.strategy.y.map(v => v * 100), color: 'var(--s1)' },
         { name: 'buy & hold', x: r.rolling.benchmark.x, y: r.rolling.benchmark.y.map(v => v * 100), color: 'var(--s2)' },
       ],
-      height: 260, xLabel: 'trading day in the test period',
+      height: 118, xLabel: 'trading day in the test period',
       yLabel: `rolling ${w}-day return`, yFmt: v => v.toFixed(0) + '%', zeroLine: true,
     });
     const ys = r.rolling.strategy.y;

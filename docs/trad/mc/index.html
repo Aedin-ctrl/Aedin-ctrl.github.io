@@ -18,52 +18,76 @@
   body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
        background:var(--paper);color:var(--ink);line-height:1.5;
        font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-  main{max-width:1060px;margin:0 auto;padding:36px 16px 110px}
+  main{max-width:1180px;margin:0 auto;padding:18px 16px 92px}
+
+  /* ---- density: this is a tool, not an essay ---- */
+  .infobtn{appearance:none;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);width:17px;height:17px;border-radius:50%;font:inherit;
+    font-size:10px;font-weight:700;font-style:italic;line-height:1;cursor:pointer;
+    padding:0;margin-left:7px;vertical-align:1px;flex:none}
+  .infobtn:hover{color:var(--ink);border-color:var(--rule)}
+  .infobtn[aria-expanded="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .infobtn:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+  .folded{margin-top:8px;padding:9px 11px;background:var(--paper);
+          border:1px solid var(--line);border-radius:8px;font-size:12px;
+          color:var(--ink2);line-height:1.55;max-width:none}
+  .infostub{display:block;height:0}
+  .infostub .infobtn{margin:0 0 6px 0}
+  h3{display:flex;align-items:center;flex-wrap:wrap;gap:0}
+  .part .infobtn{margin-left:9px}
   header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
   h1{font-size:clamp(24px,3.6vw,33px);font-weight:660;letter-spacing:-.024em}
   .tag{font-size:12px;color:var(--muted)}
   .lede{color:var(--ink2);font-size:14.5px;max-width:76ch;margin-top:7px}
   a{color:var(--s1)} a:hover{color:var(--ink)}
 
-  .part{margin:40px 0 2px;display:flex;align-items:baseline;gap:11px;flex-wrap:wrap}
+  .part{margin:22px 0 2px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
   .part .no{font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--muted)}
-  .part h2{font-size:19px;font-weight:650;letter-spacing:-.018em}
+  .part h2{font-size:16px;font-weight:650;letter-spacing:-.018em}
   .part .sub{font-size:12.5px;color:var(--muted)}
   .partnote{font-size:13.5px;color:var(--ink2);max-width:82ch;margin-top:5px}
 
-  section{background:var(--card);border:1px solid var(--line);border-radius:13px;
-          padding:18px 20px;margin-top:13px}
-  h3{font-size:11.5px;font-weight:660;text-transform:uppercase;letter-spacing:.075em;
-     color:var(--muted);margin-bottom:4px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:11px;
+          padding:13px 15px;margin-top:9px}
+  h3{font-size:11px;font-weight:660;text-transform:uppercase;letter-spacing:.07em;
+     color:var(--muted);margin-bottom:3px}
   h3 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
   .note{font-size:12.5px;color:var(--ink2);margin-bottom:13px;max-width:80ch}
-  .cols{display:grid;gap:13px;grid-template-columns:1fr}
+  .cols{display:grid;gap:9px;grid-template-columns:1fr}
   @media(min-width:800px){.cols.two{grid-template-columns:1fr 1fr}
                           .cols.three{grid-template-columns:1fr 1fr 1fr}}
 
   /* ---------- setup panel ---------- */
-  .modeswitch{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
-  .modeswitch button{appearance:none;flex:1;min-width:220px;text-align:left;
+  .modeswitch{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+  .modeswitch button{appearance:none;text-align:left;
     border:1px solid var(--line);background:var(--card);color:var(--ink2);font:inherit;
-    font-size:14px;font-weight:620;padding:11px 15px;border-radius:11px;cursor:pointer;line-height:1.35}
+    font-size:13px;font-weight:620;padding:7px 14px;border-radius:9px;cursor:pointer;line-height:1.3}
   .modeswitch button em{display:block;font-style:normal;font-weight:400;font-size:11.5px;
     color:var(--muted);margin-top:2px}
   .modeswitch button[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
   .modeswitch button[aria-selected="true"] em{color:#bdbdb8}
   .modeswitch button:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
 
-  .gate{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+  .gate{display:flex;gap:8px;align-items:center;padding:3px 0;border-top:1px solid var(--line)}
   .gate:first-child{border-top:0}
-  .gate .mk{margin-top:2px}
-  .gate .gt{flex:1;min-width:0}
-  .gate .gl{font-size:13.5px;font-weight:620;stroke:none}
+  .gate .mk{width:14px;height:14px;font-size:9px}
+  .gate .gt{flex:1;min-width:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .gate .gl{font-size:12.5px;font-weight:620;stroke:none;display:flex;align-items:center;flex:none}
+  .gate .gd{margin-top:0 !important;flex:1;min-width:0;text-align:right;font-size:11.5px;
+            color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gate .gw{flex-basis:100%;order:9}
+  @media(max-width:700px){.gate .gt{flex-direction:column;align-items:flex-start;gap:1px}
+                          .gate .gd{text-align:left;white-space:normal}}
+  .gate .gw[hidden]{display:none}
+  .gate .gw{background:var(--paper);border:1px solid var(--line);border-radius:7px;
+            padding:7px 9px;margin-top:5px}
   .gate .gd{font-size:12px;color:var(--ink2);margin-top:2px;font-variant-numeric:tabular-nums}
   .gate .gw{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;max-width:78ch}
   .gate.fail .gl{color:var(--bad)}
 
-  .setup{background:var(--card);border:1px solid var(--line);border-radius:13px;
-         margin-top:18px;overflow:hidden}
-  .step{border-top:1px solid var(--line);padding:15px 18px}
+  .setup{background:var(--card);border:1px solid var(--line);border-radius:11px;
+         margin-top:12px;overflow:hidden}
+  .step{border-top:1px solid var(--line);padding:11px 14px}
   .step:first-child{border-top:0}
   .step > h4{font-size:12px;font-weight:660;letter-spacing:.03em;color:var(--ink);
              margin-bottom:9px;display:flex;align-items:center;gap:8px}
@@ -144,10 +168,10 @@
   .mk.no{background:var(--bad)} .mk.yes{background:var(--good)}
   .mk.na{background:var(--muted)} .mk.mid{background:var(--warn)}
 
-  .grid{display:grid;gap:9px;margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}
-  .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .grid{display:grid;gap:7px;margin-top:10px;grid-template-columns:repeat(auto-fit,minmax(124px,1fr))}
+  .m{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px}
   .m .k{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .m .v{font-size:24px;font-weight:660;letter-spacing:-.028em;margin-top:3px;line-height:1.08}
+  .m .v{font-size:19px;font-weight:660;letter-spacing:-.028em;margin-top:2px;line-height:1.08}
   .m .n{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.4}
   .m.flag{border-color:#e9cdc8;background:#fffaf9} .m.flag .v{color:var(--bad)}
   .m.good{border-color:#cce5d4;background:#f8fcf9} .m.good .v{color:var(--good)}
@@ -162,11 +186,23 @@
   .gl{stroke:var(--line);stroke-width:1}
   .zl{stroke:var(--rule);stroke-width:1}
   .cross{stroke:var(--rule);stroke-width:1;stroke-dasharray:3 3}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--ink2);margin-bottom:6px}
+  .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink2);margin-bottom:4px}
   .lg{display:inline-flex;align-items:center;gap:6px}
   .sw{width:14px;height:3px;border-radius:2px;flex:none;display:inline-block}
   .sw.d{width:9px;height:9px;border-radius:50%}
-  .facets{display:grid;gap:11px}
+  .rgtabs{display:inline-flex;border:1px solid var(--line);border-radius:8px;
+          overflow:hidden;margin:10px 0 0}
+  .rgtabs button{appearance:none;border:0;background:var(--card);color:var(--ink2);
+    font:inherit;font-size:12px;padding:5px 12px;cursor:pointer;border-right:1px solid var(--line)}
+  .rgtabs button:last-child{border-right:0}
+  .rgtabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+  /* A facet panel scales to its column, so ONE panel across the full page is a
+     2.7x blow-up of the same chart. Cap the column width and they stay small
+     however many there are. */
+  .facets{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(230px,300px)) !important;
+          justify-content:start}
+  .facet{padding:6px 7px 2px}
+  .facet-h{font-size:11px}
   .facet{border:1px solid var(--line);border-radius:10px;padding:8px 9px 4px;background:var(--card)}
   .facet-h{font-size:11.5px;margin-bottom:2px;display:flex;justify-content:space-between;gap:6px}
   .facet-h b{font-weight:640} .facet-h span{color:var(--muted);font-size:11px}
@@ -182,6 +218,9 @@
   .pos{color:var(--good);font-weight:600} .neg{color:var(--bad);font-weight:600}
   .dim{color:var(--muted)} .str{font-weight:650}
   .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  .wrap[hidden]{display:none}
+  table{font-size:12px}
+  th,td{padding:4px 7px}
   .wrap.tall{max-height:420px;overflow-y:auto}
   .foot{font-size:11.5px;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);
         padding-top:9px;max-width:84ch;line-height:1.55}
@@ -224,10 +263,8 @@
     browser and every run is reproducible from its seed.</p>
 
   <div class="modeswitch" role="tablist" aria-label="What to run">
-    <button role="tab" id="mIdea" aria-selected="true">Test an idea
-      <em>walk-forward · sensitivity · Monte Carlo</em></button>
-    <button role="tab" id="mMC" aria-selected="false">Monte Carlo only
-      <em>for a return series you already have</em></button>
+    <button role="tab" id="mIdea" aria-selected="true">Test an idea</button>
+    <button role="tab" id="mMC" aria-selected="false">Monte Carlo only</button>
   </div>
 
   <!-- ============ IDEA TESTER ============ -->
@@ -310,7 +347,7 @@
         <h3>In sample against out of sample <span>&middot; by fold</span></h3>
         <div class="legend" id="wfLeg"></div>
         <div id="wfChart"></div>
-        <div class="wrap" style="margin-top:12px"><table id="wfTab">
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="wfTab">
           <thead><tr><th>Fold</th><th>In-sample window</th><th>Chosen</th><th>IS score</th>
             <th>OOS score</th><th>Best possible OOS</th><th>Rank of choice</th></tr></thead><tbody></tbody></table></div>
         <div class="foot" id="wfFoot"></div>
@@ -376,7 +413,7 @@
         <div class="note">Not just the benchmark: what else you could have done with the money over exactly
           this period, including holding bonds, gold, or a balanced mix.</div>
         <div id="altChart"></div>
-        <div class="wrap" style="margin-top:12px"><table id="altTab">
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="altTab">
           <thead><tr><th>Where the money went</th><th>Final value</th><th>Profit</th><th>CAGR</th>
             <th>Worst drawdown</th><th>Sharpe</th></tr></thead><tbody></tbody></table></div>
         <div class="foot" id="altFoot"></div>
@@ -389,6 +426,7 @@
         number — and you cannot size them the same way. Every regime below is classified from information
         available <b>before</b> the day it labels.</p>
 
+      <div class="rgtabs" id="regimeTabs" role="tablist"></div>
       <div id="regimeBlocks"></div>
 
       <section>
@@ -410,7 +448,7 @@
           Rather than defend one figure, every out-of-sample fold is re-run across a range of them. Only the
           frictions change; the parameters the walk-forward chose stay fixed.</div>
         <div id="stressChart"></div>
-        <div class="wrap" style="margin-top:12px"><table id="stressTab">
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="stressTab">
           <thead><tr><th>Scenario</th><th>Out-of-sample score</th><th>Change</th></tr></thead><tbody></tbody></table></div>
         <div class="foot" id="stressFoot"></div>
       </section>
@@ -666,7 +704,7 @@
         share an x axis and nothing else, and overlaying them on two scales is the quickest way to
         make a leverage decision look better than it is.</div>
       <div id="ladderFacets"></div>
-      <div class="wrap" style="margin-top:12px"><table id="ladderTab">
+      <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="ladderTab">
         <thead><tr><th>Leverage</th><th>Median CAGR</th><th>5th pct CAGR</th><th>Mean log growth</th>
           <th>Mean max DD</th><th>P(ruin)</th></tr></thead><tbody></tbody></table></div>
       <div class="foot" id="ladderFoot"></div>
@@ -683,7 +721,7 @@
         <span class="hint" id="cmpNote">Runs the current setup under each market model in turn.</span>
       </div>
       <div id="cmpFacets"></div>
-      <div class="wrap" style="margin-top:12px"><table id="cmpTab">
+      <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="cmpTab">
         <thead><tr><th>Model</th><th>Median CAGR</th><th>5th pct</th><th>Median max DD</th>
           <th>95th pct DD</th><th>P(loss)</th><th>P(ruin)</th></tr></thead><tbody></tbody></table></div>
       <div class="foot" id="cmpFoot"></div>

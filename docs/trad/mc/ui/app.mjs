@@ -10,6 +10,7 @@ import * as S from '../lib/stats.mjs';
 import { hashConfig } from '../lib/rng.mjs';
 import * as R from './render.mjs';
 import { initIdea } from './idea.mjs';
+import { autoCondense, condense as autoCondenseNow } from './density.mjs';
 import { loadBoard, BOARDS } from '../lib/boards.mjs';
 
 const $ = s => document.querySelector(s);
@@ -558,6 +559,7 @@ async function run() {
     R.renderLadder(res, cfg);
     R.renderDiagnostics(res, ST.mode === 'strategy' ? null : ST.source, cfg);
     R.renderTable(res);
+    autoCondenseNow();
 
     $('#progBar').style.width = '100%';
     $('#runStat').textContent = `${n0(cfg.paths)} paths in ${(ms / 1000).toFixed(2)}s`;
@@ -845,3 +847,6 @@ let savedMode = 'idea';
 try { savedMode = localStorage.getItem('mc.mode') || 'idea'; } catch {}
 setMode(location.hash && location.hash.length > 8 ? 'mc' : savedMode);
 restoreFromBoard();
+/* Fold every explanatory block behind an info button, now and for anything
+   rendered later. The prose stays; it just stops taking up the page. */
+autoCondense();

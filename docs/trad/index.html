@@ -133,6 +133,36 @@
             text-decoration:none;padding:9px 4px 9px 14px;white-space:nowrap}
   .sub-link:hover{color:var(--ink);text-decoration:underline}
   .sub-link:focus-visible{outline:2px solid var(--s1);outline-offset:-2px;border-radius:6px}
+  .mkt{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;
+       align-self:center;margin-left:10px}
+  /* a class that sets display beats the UA rule for [hidden]; say it explicitly */
+  .mkt[hidden]{display:none}
+  .mkt button{appearance:none;border:0;background:var(--card);color:var(--ink2);font:inherit;
+              font-size:11.5px;padding:3px 10px;cursor:pointer;border-right:1px solid var(--line)}
+  .mkt button:last-child{border-right:0}
+  .mkt button[aria-pressed="true"]{background:var(--ink);color:#fff}
+  /* density: this is a tool, not an essay */
+  main{padding-top:18px}
+  section{padding:13px 15px;margin-top:9px;border-radius:11px}
+  .part{margin:22px 0 2px}
+  .part h2{font-size:16px}
+  h3{font-size:11px;letter-spacing:.07em;margin-bottom:3px;
+     display:flex;align-items:center;flex-wrap:wrap;gap:0}
+  .m{padding:8px 10px;border-radius:9px}
+  .m .v{font-size:19px;margin-top:2px}
+  .grid{gap:7px;margin-top:10px;grid-template-columns:repeat(auto-fit,minmax(124px,1fr))}
+  table{font-size:12px} th,td{padding:4px 7px}
+  .infobtn{appearance:none;border:1px solid var(--line);background:var(--card);
+    color:var(--muted);width:17px;height:17px;border-radius:50%;font:inherit;
+    font-size:10px;font-weight:700;font-style:italic;line-height:1;cursor:pointer;
+    padding:0;margin-left:7px;vertical-align:1px;flex:none}
+  .infobtn:hover{color:var(--ink);border-color:var(--rule)}
+  .infobtn[aria-expanded="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .folded{margin-top:8px;padding:9px 11px;background:var(--paper);
+          border:1px solid var(--line);border-radius:8px;font-size:12px;
+          color:var(--ink2);line-height:1.55;max-width:none}
+  .folded[hidden]{display:none}
+  .infostub{display:block;height:0}
   button.sub-link{appearance:none;-webkit-appearance:none;background:transparent;border:0;
                   font:inherit;font-size:13px;font-weight:620;cursor:pointer;color:var(--s1)}
   button.sub-link[aria-expanded="true"]{color:var(--ink)}
@@ -201,14 +231,12 @@
 <body data-palette="#2a78d6,#eb6834,#1baf7a">
 <main>
   <header><h1>Trad</h1><span class="tag" id="gen"></span></header>
-  <p class="lede" id="lede">Two ways of trading the opening bell, tested. Neither is
-     tradeable — for different reasons.</p>
 
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
     <button type="button" class="sub-btn" data-view="gs" role="tab" aria-selected="true">Goldman</button>
-    <button type="button" class="sub-btn" data-view="mes" role="tab" aria-selected="false">MES</button>
-    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Gold &middot; SAR</button>
+    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Parabolic SAR</button>
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="false">Opening bell</button>
+    <span class="mkt" id="sarMkt" hidden><button type="button" data-mkt="gold" aria-pressed="true">Gold</button><button type="button" data-mkt="mes" aria-pressed="false">MES</button></span>
     <button type="button" class="sub-link" id="testBtn" aria-expanded="false">Test &#9656;</button>
   </div>
 
@@ -2827,8 +2855,8 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
      a series through a URL. The link carries only the board id. */
   const TEST={
     gs:{label:"Goldman",desc:"791 weekly points, 2011 to today, four strategies including the SPY benchmark. The lab resamples them for paths, drawdown and ruin, and runs the overfitting battery across all four."},
-    mes:{label:"MES",desc:"706 trade-level points over 25 years, plus a volatility-matched variant."},
-    gold:{label:"Gold \u00b7 SAR",desc:"703 trade-level points over 25 years, plus a volatility-matched variant."},
+    mes:{label:"Parabolic SAR \u00b7 MES",desc:"706 trade-level points over 25 years, plus a volatility-matched variant."},
+    gold:{label:"Parabolic SAR \u00b7 Gold",desc:"703 trade-level points over 25 years, plus a volatility-matched variant."},
     bell:{label:"Opening bell",desc:"722 daily points of intraday momentum for SPY and QQQ. (The opening-range forward log is 120 trades \u2014 too short to resample.)"}
   };
   function syncTest(v){
@@ -2848,10 +2876,21 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
     });
   })();
 
+  /* MES is a MARKET, not a strategy: the same Parabolic SAR rig pointed at the
+     Micro E-mini. So SAR is one tab and the market is a toggle beside it. */
+  let sarMarket = "gold";
+
   function show(v,push){
+    if(v==="sar") v=sarMarket;
+    if(v==="gold"||v==="mes") sarMarket=v;
     if(!views[v]) v="gs";
     for(const k in views) if(views[k]) views[k].hidden = (k!==v);
-    btns.forEach(b=>b.setAttribute("aria-selected", b.dataset.view===v ? "true":"false"));
+    const isSar = (v==="gold"||v==="mes");
+    btns.forEach(b=>b.setAttribute("aria-selected",
+      (b.dataset.view===v || (b.dataset.view==="gold"&&isSar)) ? "true":"false"));
+    const mbox=document.getElementById("sarMkt");
+    if(mbox){ mbox.hidden=!isSar;
+      mbox.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.mkt===v))); }
     const l=document.getElementById("lede"); if(l&&LEDE[v]) l.textContent=LEDE[v];
     if(push&&history.replaceState) history.replaceState(null,"","#"+v);
     if(window.__boardRedraw) window.__boardRedraw(v);
@@ -2860,8 +2899,25 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
     if(push) scrollTo(0,0);
   }
   btns.forEach(b=>b.addEventListener("click",()=>show(b.dataset.view,true)));
+  (function(){
+    const box=document.getElementById("sarMkt"); if(!box) return;
+    box.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>show(b.dataset.mkt,true)));
+  })();
   addEventListener("hashchange",()=>show(location.hash.slice(1),false));
   show(location.hash.slice(1)||"gs",false);
+})();
+
+/* Every explanatory block folds behind an info button. The prose stays; it just
+   stops occupying the page. Shared with the lab so the two cannot drift apart. */
+(async function(){
+  try{
+    const m = await import("./mc/ui/density.mjs");
+    m.autoCondense();
+    if(window.__boardRedraw){
+      const orig = window.__boardRedraw;
+      window.__boardRedraw = function(v){ orig(v); setTimeout(()=>m.condense(), 0); };
+    }
+  }catch(e){ /* the lab may not be deployed yet; the page still works without this */ }
 })();
 </script>
 </body>

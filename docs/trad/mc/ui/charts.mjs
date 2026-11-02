@@ -12,6 +12,11 @@
  */
 
 const NS = 'http://www.w3.org/2000/svg';
+
+/* Charts scale to their container by viewBox, so a WIDER page makes them TALLER
+ * unless the viewBox widens with it. 1120 against a ~1150px column renders at
+ * roughly 1:1, which is what the stated heights assume. */
+export const CHART_W = 1120;
 export const SERIES = ['var(--s1)', 'var(--s2)', 'var(--s3)'];
 export const SERIES_HEX = ['#2a78d6', '#eb6834', '#1baf7a'];
 /** Sequential ramp for percentile bands: light (outer/rare) to dark (inner/likely). */
@@ -170,10 +175,10 @@ function makePlot(s, w, h, m) {
  * sample paths. Sequential single-hue bands: darker = more likely.
  */
 export function fanChart(host, {
-  grid, bands, samples = [], actual = null, height = 320,
+  grid, bands, samples = [], actual = null, height = 200,
   xLabel = 'periods', yLabel = 'equity (x start)', ruinLevel = null, fmtY = null,
 }) {
-  const w = 760, h = height, m = { l: 58, r: 16, t: 12, b: 44 };
+  const w = CHART_W, h = height, m = { l: 58, r: 16, t: 12, b: 44 };
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
 
@@ -246,10 +251,10 @@ export function fanChart(host, {
 
 /* ======================= histogram ======================= */
 export function histogram(host, {
-  counts, edges, height = 250, color = 'var(--s1)', markers = [], xFmt = v => v.toFixed(2),
+  counts, edges, height = 165, color = 'var(--s1)', markers = [], xFmt = v => v.toFixed(2),
   xLabel = '', yLabel = 'paths', logX = false, total = null,
 }) {
-  const w = 760, h = height, m = { l: 54, r: 16, t: 12, b: 44 };
+  const w = CHART_W, h = height, m = { l: 54, r: 16, t: 12, b: 44 };
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
   const n = counts.length;
@@ -293,7 +298,7 @@ export function histogram(host, {
 
 /* ======================= null vs observed ======================= */
 /** The significance chart: where the real number sits inside its own null. */
-export function nullVsObserved(host, { dist, obs, height = 230, xLabel = 'Sharpe under the null', pval = null, bins = 56 }) {
+export function nullVsObserved(host, { dist, obs, height = 155, xLabel = 'Sharpe under the null', pval = null, bins = 56 }) {
   const lo = Math.min(Math.min(...dist), obs), hi = Math.max(Math.max(...dist), obs);
   const pad = (hi - lo) * 0.05 || 1;
   const e0 = lo - pad, e1 = hi + pad;
@@ -318,10 +323,10 @@ export function nullVsObserved(host, { dist, obs, height = 230, xLabel = 'Sharpe
 /* ======================= multi-series line ======================= */
 /** At most three series. Legend always present; each line also directly labelled. */
 export function lineChart(host, {
-  series, height = 280, xLabel = '', yLabel = '', xFmt = v => String(Math.round(v)),
+  series, height = 180, xLabel = '', yLabel = '', xFmt = v => String(Math.round(v)),
   yFmt = v => v.toFixed(2), zeroLine = true, logY = false, bandsFor = null,
 }) {
-  const w = 760, h = height, m = { l: 60, r: 76, t: 12, b: 44 };
+  const w = CHART_W, h = height, m = { l: 60, r: 76, t: 12, b: 44 };
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
   let xlo = Infinity, xhi = -Infinity, ylo = Infinity, yhi = -Infinity;
@@ -382,8 +387,8 @@ export function lineChart(host, {
 }
 
 /* ======================= scatter ======================= */
-export function scatter(host, { x, y, height = 300, xLabel = '', yLabel = '', xFmt = v => v.toFixed(2), yFmt = v => v.toFixed(2), color = 'var(--s1)', maxPoints = 4000, markers = [] }) {
-  const w = 760, h = height, m = { l: 60, r: 16, t: 12, b: 44 };
+export function scatter(host, { x, y, height = 190, xLabel = '', yLabel = '', xFmt = v => v.toFixed(2), yFmt = v => v.toFixed(2), color = 'var(--s1)', maxPoints = 4000, markers = [] }) {
+  const w = CHART_W, h = height, m = { l: 60, r: 16, t: 12, b: 44 };
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
   const step = Math.max(1, Math.ceil(x.length / maxPoints));
@@ -417,8 +422,8 @@ export function scatter(host, { x, y, height = 300, xLabel = '', yLabel = '', xF
 }
 
 /* ======================= QQ plot ======================= */
-export function qqPlot(host, { sample, theoretical, height = 300, xLabel = 'normal quantile', yLabel = 'observed quantile' }) {
-  const w = 380, h = height, m = { l: 58, r: 14, t: 12, b: 44 };
+export function qqPlot(host, { sample, theoretical, height = 190, xLabel = 'normal quantile', yLabel = 'observed quantile' }) {
+  const w = CHART_W / 2, h = height, m = { l: 58, r: 14, t: 12, b: 44 };
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
   let lo = Infinity, hi = -Infinity;
@@ -471,7 +476,7 @@ export function smallMultiples(host, panels, { cols = 3, height = 150, yFmt = v 
       body.appendChild(note);
       continue;
     }
-    const w = 300, h = height, m = { l: 46, r: 10, t: 6, b: 26 };
+    const w = 420, h = height, m = { l: 46, r: 10, t: 6, b: 26 };
     const s = svg(body, w, h);
     const plot = makePlot(s, w, h, m);
     const lo = sharedY ? ylo : Math.min(...finiteYs);
@@ -501,8 +506,8 @@ export function smallMultiples(host, panels, { cols = 3, height = 150, yFmt = v 
 }
 
 /* ======================= heatmap ======================= */
-export function heatmap(host, { matrix, rows, cols, height = 300, fmt = v => (v * 100).toFixed(0) + '%', rowLabel = '', colLabel = '', title = '' }) {
-  const w = 760, m = { l: 74, r: 18, t: 12, b: 48 };
+export function heatmap(host, { matrix, rows, cols, height = 190, fmt = v => (v * 100).toFixed(0) + '%', rowLabel = '', colLabel = '', title = '' }) {
+  const w = CHART_W, m = { l: 74, r: 18, t: 12, b: 48 };
   const h = height;
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
@@ -545,7 +550,7 @@ export function heatmap(host, { matrix, rows, cols, height = 300, fmt = v => (v 
 
 /* ======================= horizontal bars with CI ======================= */
 export function barsCI(host, { items, height = null, fmt = v => v.toFixed(2), xLabel = '', zero = 0 }) {
-  const rowH = 26, w = 760, m = { l: 150, r: 60, t: 10, b: 40 };
+  const rowH = 20, w = CHART_W, m = { l: 190, r: 76, t: 8, b: 32 };
   const h = height || (items.length * rowH + m.t + m.b);
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
@@ -594,10 +599,10 @@ export function legend(host, entries) {
  *  Status colours, used for their reserved meaning (good / bad), never as
  *  categorical series slots. */
 export function signedBars(host, {
-  values, labels, height = 240, fmt = v => v.toFixed(0), xLabel = '', yLabel = '',
+  values, labels, height = 160, fmt = v => v.toFixed(0), xLabel = '', yLabel = '',
   maxLabels = 14,
 }) {
-  const w = 760, m = { l: 62, r: 14, t: 12, b: 42 };
+  const w = CHART_W, m = { l: 62, r: 14, t: 12, b: 42 };
   const h = height;
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
@@ -650,7 +655,7 @@ export function groupedBars(host, {
   rows, height = null, fmt = v => v.toFixed(1), xLabel = '',
   nameA = 'strategy', nameB = 'benchmark',
 }) {
-  const rowH = 38, w = 760, m = { l: 210, r: 70, t: 24, b: 40 };
+  const rowH = 28, w = CHART_W, m = { l: 250, r: 86, t: 20, b: 32 };
   const h = height || (rows.length * rowH + m.t + m.b);
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);
@@ -675,7 +680,7 @@ export function groupedBars(host, {
       if (!Number.isFinite(v)) return;
       const x0 = sx(Math.min(0, v)), x1 = sx(Math.max(0, v));
       const bar = el(s, 'rect', {
-        x: x0, y: y + 6 + k * 11, width: Math.max(1, x1 - x0), height: 9,
+        x: x0, y: y + 4 + k * 9, width: Math.max(1, x1 - x0), height: 7,
         fill: c, rx: 2, opacity: 0.88,
       });
       bar.addEventListener('mousemove', e => showTip(e, `<b>${r.label}</b>\n${k ? nameB : nameA}: ${fmt(v)}${r.sub ? '\n' + r.sub : ''}`));
@@ -689,10 +694,10 @@ export function groupedBars(host, {
 
 /* ======================= filled area (underwater) ======================= */
 export function areaChart(host, {
-  x, y, height = 220, color = 'var(--bad)', fmt = v => v.toFixed(0),
+  x, y, height = 150, color = 'var(--bad)', fmt = v => v.toFixed(0),
   xLabel = '', yLabel = '', xFmt = v => String(Math.round(v)),
 }) {
-  const w = 760, m = { l: 66, r: 14, t: 12, b: 40 };
+  const w = CHART_W, m = { l: 66, r: 14, t: 12, b: 40 };
   const h = height;
   const s = svg(host, w, h);
   const plot = makePlot(s, w, h, m);

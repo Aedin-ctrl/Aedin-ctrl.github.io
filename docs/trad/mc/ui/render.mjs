@@ -124,7 +124,7 @@ export function renderPaths(res, cfg, tail) {
   ]);
   C.fanChart($('#fan'), {
     grid: res.grid, bands: res.bands, samples: res.samples,
-    height: 340, xLabel: 'periods', yLabel: 'equity (multiple of start)',
+    height: 210, xLabel: 'periods', yLabel: 'equity (multiple of start)',
   });
   // The single most important caveat on the page, with its number computed.
   const tn = $('#tailNote');
@@ -155,7 +155,7 @@ export function renderPaths(res, cfg, tail) {
 
   const h = res.hist.terminal;
   C.histogram($('#histTerm'), {
-    counts: h.counts, edges: h.edges, height: 250, color: 'var(--s1)',
+    counts: h.counts, edges: h.edges, height: 155, color: 'var(--s1)',
     xFmt: v => x2(Math.exp(v)), xLabel: 'terminal equity (log scale)', total: res.n,
     markers: [
       { at: 0, label: 'break even', color: 'var(--bad)', row: 0 },
@@ -165,7 +165,7 @@ export function renderPaths(res, cfg, tail) {
 
   const d = res.hist.maxDD;
   C.histogram($('#histDD'), {
-    counts: d.counts, edges: d.edges, height: 250, color: '#b8cfe9',
+    counts: d.counts, edges: d.edges, height: 155, color: '#b8cfe9',
     xFmt: v => pct(v, 0), xLabel: 'worst peak-to-trough fall', total: res.n,
     markers: [
       { at: res.stats.maxDD.median, label: 'median', color: 'var(--ink)', row: 0 },
@@ -174,7 +174,7 @@ export function renderPaths(res, cfg, tail) {
   });
 
   C.scatter($('#scatterDD'), {
-    x: res.scatter.maxDD, y: res.scatter.cagr, height: 290,
+    x: res.scatter.maxDD, y: res.scatter.cagr, height: 180,
     xLabel: 'worst drawdown', yLabel: 'CAGR',
     xFmt: v => pct(v, 0), yFmt: v => pct(v, 0),
     markers: [{ y: 0, label: 'break even', color: 'var(--bad)' }],
@@ -183,7 +183,7 @@ export function renderPaths(res, cfg, tail) {
   const uw = res.underwater;
   C.lineChart($('#uwChart'), {
     series: [{ name: 'under water', x: res.grid, y: Array.from(uw), color: 'var(--s1)' }],
-    height: 290, xLabel: 'periods', yLabel: 'share of paths below the start',
+    height: 180, xLabel: 'periods', yLabel: 'share of paths below the start',
     yFmt: v => pct(v, 0), zeroLine: true,
   });
 }
@@ -201,7 +201,7 @@ export function renderEvidence(res, vd, cfg, nullRes) {
     was real &mdash; only this can.`;
 
   C.nullVsObserved($('#nullChart'), {
-    dist: nullRes.dist, obs: nullRes.obs, pval: nullRes.p, height: 240,
+    dist: nullRes.dist, obs: nullRes.obs, pval: nullRes.p, height: 150,
     xLabel: 'annualised Sharpe when the signs are shuffled',
   });
   $('#nullFoot').innerHTML = `Each shuffle flips the sign of every return at random, which destroys any
@@ -228,7 +228,7 @@ export function renderEvidence(res, vd, cfg, nullRes) {
       { name: `n = ${n0(vd.n)}`, x: xs, y: ys, color: 'var(--s1)' },
       { name: `4× the data`, x: xs, y: ys2, color: 'var(--s3)', dash: '5 3' },
     ],
-    height: 240, xLabel: 'true annualised Sharpe', yLabel: 'chance of detecting it',
+    height: 150, xLabel: 'true annualised Sharpe', yLabel: 'chance of detecting it',
     xFmt: v => v.toFixed(1), yFmt: v => pct(v, 0), zeroLine: true,
   });
   $('#powerFoot').innerHTML = `With ${n0(vd.n)} observations this sample can resolve an edge of
@@ -251,7 +251,7 @@ export function renderEvidence(res, vd, cfg, nullRes) {
       { name: 'noise bar', x: trialsAxis, y: bar, color: 'var(--s2)', dash: '5 3' },
       { name: 'your Sharpe', x: trialsAxis, y: trialsAxis.map(() => vd.sharpeAnnual), color: 'var(--s1)' },
     ],
-    height: 250, xLabel: 'number of variants tried', yLabel: 'annualised Sharpe',
+    height: 155, xLabel: 'number of variants tried', yLabel: 'annualised Sharpe',
     xFmt: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : String(v), yFmt: v => v.toFixed(2), zeroLine: true,
   });
   let crossing = null;
@@ -282,7 +282,7 @@ export function renderLadder(res, cfg) {
     { title: 'Mean max drawdown', sub: 'what you have to sit through', x: xs, y: L.map(r => r.maxDD * 100), color: 'var(--s2)', points: true, yFmt: pc1 },
     { title: 'Probability of ruin', sub: 'wiped out before the end', x: xs, y: L.map(r => r.ruin * 100), color: 'var(--bad)', points: true,
       yFmt: pc1, flatNote: v => v === 0 ? 'No path was ruined at any leverage on this ladder.' : `${pc1(v)} at every leverage.` },
-  ], { cols: 3, height: 142, sharedY: false, xFmt: v => v + 'x', yFmt: v => v.toFixed(2) });
+  ], { cols: 3, height: 150, sharedY: false, xFmt: v => v + 'x', yFmt: v => v.toFixed(2) });
 
   const best = L.reduce((a, b) => b.meanLogGrowth > a.meanLogGrowth ? b : a, L[0]);
   const tb = $('#ladderTab').querySelector('tbody');
@@ -310,7 +310,7 @@ export function renderDiagnostics(res, source, cfg) {
     C.lineChart($('#convChart'), {
       series: [{ name: 'mean log growth', x: cv.x, y: cv.y, color: 'var(--s1)' }],
       bandsFor: [{ x: cv.x, lo: cv.lo, hi: cv.hi }],
-      height: 250, xLabel: 'paths simulated', yLabel: 'mean log growth',
+      height: 155, xLabel: 'paths simulated', yLabel: 'mean log growth',
       xFmt: v => v >= 1000 ? (v / 1000).toFixed(0) + 'k' : String(v), yFmt: v => v.toFixed(3), zeroLine: false,
     });
     const rel = Math.abs(cv.finalSE / (cv.final || 1));
@@ -331,7 +331,7 @@ export function renderDiagnostics(res, source, cfg) {
     const step = Math.max(1, Math.floor(n / 900));
     const ss = [], tt = [];
     for (let i = 0; i < n; i += step) { ss.push(a[i]); tt.push(theo[i]); }
-    C.qqPlot($('#qqChart'), { sample: ss, theoretical: tt, height: 290 });
+    C.qqPlot($('#qqChart'), { sample: ss, theoretical: tt, height: 180 });
     const mo = S.moments(source);
     const jb = S.jarqueBera(source);
     $('#qqFoot').innerHTML = `Skew <b>${mo.skew.toFixed(2)}</b>, excess kurtosis <b>${mo.kurtosis.toFixed(1)}</b>.
@@ -353,7 +353,7 @@ export function renderDiagnostics(res, source, cfg) {
         { name: 'returns', x: lagsX, y: lagsX.map(k => ac[k]), color: 'var(--s1)', points: true },
         { name: 'squared', x: lagsX, y: lagsX.map(k => acSq[k]), color: 'var(--s2)', points: true },
       ],
-      height: 250, xLabel: 'lag', yLabel: 'autocorrelation', yFmt: v => v.toFixed(2), zeroLine: true,
+      height: 155, xLabel: 'lag', yLabel: 'autocorrelation', yFmt: v => v.toFixed(2), zeroLine: true,
     });
     const lb = S.ljungBox(source, 10), lbSq = S.ljungBox(sq, 10);
     const { optimalBlockLength } = window.__mcGen || {};
@@ -390,7 +390,7 @@ export function renderComparison(list) {
     color: 'var(--s1)',
   }));
   C.smallMultiples($('#cmpFacets'), panels, {
-    cols: 3, height: 136, sharedY: true,
+    cols: 3, height: 150, sharedY: true,
     xFmt: v => String(Math.round(v)), yFmt: v => v.toFixed(1),
   });
   const tb = $('#cmpTab').querySelector('tbody');
@@ -462,7 +462,7 @@ export function renderVariants(v, cfg) {
   const h = S.histogram(Float64Array.from(sr), Math.min(40, Math.max(8, Math.round(v.count / 2))));
   C.legend($('#varLeg'), [{ color: '#b8cfe9', label: 'all variants' }, { color: 'var(--s2)', label: 'the one you picked' }]);
   C.histogram($('#varHist'), {
-    counts: h.counts, edges: h.edges, height: 230, color: '#b8cfe9', total: v.count,
+    counts: h.counts, edges: h.edges, height: 150, color: '#b8cfe9', total: v.count,
     xLabel: 'annualised Sharpe of each variant', yLabel: 'variants',
     xFmt: x => x.toFixed(2),
     markers: [{ at: best.sharpe, label: 'best', color: 'var(--s2)', dash: '0', anchor: 'end' }],
@@ -472,7 +472,7 @@ export function renderVariants(v, cfg) {
   if (pboRes.lambdas && pboRes.lambdas.length) {
     const lh = S.histogram(Float64Array.from(pboRes.lambdas), 36);
     C.histogram($('#varLambda'), {
-      counts: lh.counts, edges: lh.edges, height: 230, color: '#cfd9c8', total: pboRes.lambdas.length,
+      counts: lh.counts, edges: lh.edges, height: 150, color: '#cfd9c8', total: pboRes.lambdas.length,
       xLabel: 'out-of-sample rank of the in-sample winner (logit)', yLabel: 'splits',
       xFmt: x => x.toFixed(1),
       markers: [{ at: 0, label: 'below median', color: 'var(--bad)', dash: '4 3', anchor: 'start' }],
