@@ -127,6 +127,31 @@
   .sub-btn:hover{color:var(--ink2)}
   .sub-btn[aria-selected="true"]{color:var(--ink);font-weight:620;border-bottom-color:var(--ink)}
   .sub-btn:focus-visible{outline:2px solid var(--s1);outline-offset:-3px;border-radius:6px}
+  /* The Test button and its panel. A link out of the tab strip, not a tab: the
+     subtab JS only ever queries .sub-btn, so this cannot become a broken view. */
+  .sub-link{margin-left:auto;align-self:center;font-size:13px;color:var(--s1);
+            text-decoration:none;padding:9px 4px 9px 14px;white-space:nowrap}
+  .sub-link:hover{color:var(--ink);text-decoration:underline}
+  .sub-link:focus-visible{outline:2px solid var(--s1);outline-offset:-2px;border-radius:6px}
+  button.sub-link{appearance:none;-webkit-appearance:none;background:transparent;border:0;
+                  font:inherit;font-size:13px;font-weight:620;cursor:pointer;color:var(--s1)}
+  button.sub-link[aria-expanded="true"]{color:var(--ink)}
+  #testPanel{border:1px solid var(--line);border-radius:12px;background:var(--card);
+             margin-top:13px;overflow:hidden}
+  .tp-head{font-size:11px;font-weight:660;text-transform:uppercase;letter-spacing:.07em;
+           color:var(--muted);padding:13px 16px 0}
+  .tp-head em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)}
+  .tp-row{display:flex;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+  .tp-row:first-of-type{border-top:0;padding-top:10px}
+  .tp-main{flex:1;min-width:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+  .tp-main b{display:block;font-size:13.5px;color:var(--ink);font-weight:650;margin-bottom:2px}
+  .tp-go{flex:none;font-size:12.5px;font-weight:620;text-decoration:none;white-space:nowrap;
+         background:var(--ink);color:#fff;padding:8px 14px;border-radius:8px}
+  .tp-go:hover{background:#000;color:#fff;text-decoration:none}
+  .tp-go.alt{background:var(--card);color:var(--s1);border:1px solid var(--line)}
+  .tp-go.alt:hover{background:var(--paper);color:var(--ink)}
+  @media(max-width:560px){.tp-row{flex-direction:column;align-items:stretch}
+                          .tp-go{text-align:center}}
   .view[hidden]{display:none}
 
   /* the SAR explainer */
@@ -180,10 +205,30 @@
      tradeable — for different reasons.</p>
 
   <div class="subtabs" id="subtabs" role="tablist" aria-label="Boards">
-    <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="true">Opening bell</button>
-    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">gold strat</button>
-    <button type="button" class="sub-btn" data-view="mes" role="tab" aria-selected="false">mes</button>
-    <button type="button" class="sub-btn" data-view="gs" role="tab" aria-selected="false">goldman</button>
+    <button type="button" class="sub-btn" data-view="gs" role="tab" aria-selected="true">Goldman</button>
+    <button type="button" class="sub-btn" data-view="mes" role="tab" aria-selected="false">MES</button>
+    <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Gold &middot; SAR</button>
+    <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="false">Opening bell</button>
+    <button type="button" class="sub-link" id="testBtn" aria-expanded="false">Test &#9656;</button>
+  </div>
+
+  <div id="testPanel" hidden>
+    <div class="tp-head">Test this board <em id="tpWhich"></em></div>
+    <div class="tp-row">
+      <div class="tp-main">
+        <b>Monte Carlo this board</b>
+        <span id="tpDesc"></span>
+      </div>
+      <a class="tp-go" id="tpRun" href="mc/">Run now &rarr;</a>
+    </div>
+    <div class="tp-row">
+      <div class="tp-main">
+        <b>Full three-test on a rule</b>
+        <span>Walk-forward and parameter sensitivity re-optimise and nudge the rule, so they need it
+          as runnable code rather than as a finished equity curve. This opens the idea tester.</span>
+      </div>
+      <a class="tp-go alt" href="mc/">Open &rarr;</a>
+    </div>
   </div>
 
   <div class="view" id="v-bell">
@@ -2776,19 +2821,47 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
     gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal.",
     mes:"The same rig, the same tests, pointed at the Micro E-mini S&P 500. Nothing here is a gold result \u2014 it is the control that says whether any of it was about the indicator.",
     gs:"Three Goldman Sachs strategies rebuilt from their own published rule books and their own source filings. Two of them do not beat the market. The third thing \u2014 which is mine, not theirs \u2014 does, and then decays."};
+  /* The Test button. Each board stores its results differently -- cumulative
+     basis points on trade dates, weekly equity multiples -- so the lab reads the
+     board's own JSON and converts it there rather than this page trying to pass
+     a series through a URL. The link carries only the board id. */
+  const TEST={
+    gs:{label:"Goldman",desc:"791 weekly points, 2011 to today, four strategies including the SPY benchmark. The lab resamples them for paths, drawdown and ruin, and runs the overfitting battery across all four."},
+    mes:{label:"MES",desc:"706 trade-level points over 25 years, plus a volatility-matched variant."},
+    gold:{label:"Gold \u00b7 SAR",desc:"703 trade-level points over 25 years, plus a volatility-matched variant."},
+    bell:{label:"Opening bell",desc:"722 daily points of intraday momentum for SPY and QQQ. (The opening-range forward log is 120 trades \u2014 too short to resample.)"}
+  };
+  function syncTest(v){
+    const t=TEST[v]; if(!t) return;
+    const w=document.getElementById("tpWhich"); if(w) w.textContent="\u00b7 "+t.label;
+    const d=document.getElementById("tpDesc"); if(d) d.textContent=t.desc;
+    const r=document.getElementById("tpRun"); if(r) r.href="mc/#board="+v;
+  }
+  (function(){
+    const b=document.getElementById("testBtn"), p=document.getElementById("testPanel");
+    if(!b||!p) return;
+    b.addEventListener("click",()=>{
+      const open=p.hidden;
+      p.hidden=!open;
+      b.setAttribute("aria-expanded",String(open));
+      b.innerHTML=open?"Test \u25be":"Test \u25b8";
+    });
+  })();
+
   function show(v,push){
-    if(!views[v]) v="bell";
+    if(!views[v]) v="gs";
     for(const k in views) if(views[k]) views[k].hidden = (k!==v);
     btns.forEach(b=>b.setAttribute("aria-selected", b.dataset.view===v ? "true":"false"));
     const l=document.getElementById("lede"); if(l&&LEDE[v]) l.textContent=LEDE[v];
     if(push&&history.replaceState) history.replaceState(null,"","#"+v);
     if(window.__boardRedraw) window.__boardRedraw(v);
     if(v==="gs"&&window.__gsRedraw) window.__gsRedraw();
+    syncTest(v);
     if(push) scrollTo(0,0);
   }
   btns.forEach(b=>b.addEventListener("click",()=>show(b.dataset.view,true)));
   addEventListener("hashchange",()=>show(location.hash.slice(1),false));
-  show(location.hash.slice(1)||"bell",false);
+  show(location.hash.slice(1)||"gs",false);
 })();
 </script>
 </body>

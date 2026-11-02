@@ -10,6 +10,7 @@ import * as S from '../lib/stats.mjs';
 import { hashConfig } from '../lib/rng.mjs';
 import * as R from './render.mjs';
 import { initIdea } from './idea.mjs';
+import { loadBoard, BOARDS } from '../lib/boards.mjs';
 
 const $ = s => document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
@@ -779,6 +780,57 @@ const IDEA = initIdea({
   },
 });
 
+/* ---------------- arriving from a /trad board ---------------- */
+/* The Test button on a board links here with #board=<id>&series=<key>. The data
+ * is fetched from the board's own JSON rather than stuffed into the URL, so the
+ * link stays short and the lab is always reading the published figures. */
+async function restoreFromBoard() {
+  const m = /(?:^|[#&])board=([a-z0-9_]+)/i.exec(location.hash || '');
+  if (!m) return false;
+  const id = m[1];
+  if (!BOARDS[id]) return false;
+  const want = (/(?:^|[#&])series=([^&]+)/.exec(location.hash || '') || [])[1];
+  $('#runStat').textContent = `loading the ${BOARDS[id].label} board...`;
+  try {
+    const b = await loadBoard(id, '../');
+    const chosen = (want && b.series.find(s2 => s2.key === decodeURIComponent(want))) || b.series[0];
+    ST.source = Float64Array.from(chosen.returns);
+    ST.sourceLabel = `${b.label} — ${chosen.label}`;
+    ST.sourceNote = b.note;
+    ST.strategySrc = '';
+    ST.mode = 'paste';
+    exKind = 'gen';
+    $('#ppy').value = b.ppy;
+    $('#horizon').value = Math.max(60, Math.min(5040, chosen.n));
+    $('#trials').value = Math.max(1, b.series.length);
+    setMode('mc');
+    $$('#srcTabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.pane === 'pPaste')));
+    for (const pane of ['pExamples', 'pPaste', 'pStrat', 'pVar', 'pSaved']) $('#' + pane).hidden = true;
+    $('#pPaste').hidden = false;
+
+    const warn = b.unit === 'cumbps'
+      ? `<div class="msg warn"><b>The board reports this additively, on a fixed stake.</b>
+         Its published total is <b>${(chosen.additiveTotal * 100).toFixed(1)}%</b> — the sum of each period's
+         result on the same notional. This simulator compounds instead, which turns the same series into
+         <b>${(chosen.compoundedTotal * 100).toFixed(1)}%</b>. Neither is wrong; they are two different
+         bet-sizing rules, and the leverage ladder below is exactly where that choice gets examined.</div>`
+      : '';
+    $('#parseMsg').innerHTML = `<div class="msg ok"><b>Loaded ${n0(chosen.n)} periods from the
+      ${esc(b.label)} board</b> (${esc(chosen.label)}), ${b.ppy} periods a year.
+      ${b.verified ? 'The conversion was checked against the figure the board itself publishes.'
+                   : '<b>Warning: the conversion did not reproduce the board\'s published figure.</b>'}
+      ${b.series.length > 1 ? `Trials set to ${b.series.length} — the number of variants that board shows.` : ''}
+      </div>${warn}`;
+    afterSourceChange();
+    $('#runStat').textContent = 'ready';
+    return true;
+  } catch (e) {
+    $('#parseMsg').innerHTML = `<div class="msg bad"><b>Could not load that board.</b> ${esc(e.message)}</div>`;
+    $('#runStat').textContent = 'board failed to load';
+    return false;
+  }
+}
+
 /* ---------------- boot ---------------- */
 window.__mcGen = { optimalBlockLength };
 exKind = 'gen'; exId = 'index';
@@ -792,3 +844,4 @@ renderParams();
 let savedMode = 'idea';
 try { savedMode = localStorage.getItem('mc.mode') || 'idea'; } catch {}
 setMode(location.hash && location.hash.length > 8 ? 'mc' : savedMode);
+restoreFromBoard();
