@@ -479,7 +479,7 @@ function runOnPool(cfg, onProgress) {
 }
 
 /* ---------------- run ---------------- */
-$('#runBtn').addEventListener('click', run);
+$('#runBtn').addEventListener('click', () => run());
 $('#cancelBtn').addEventListener('click', () => {
   cancelled = true;
   POOL.forEach(w => w.terminate());
@@ -493,9 +493,20 @@ function setRunning(on) {
   $('#runBtn').disabled = on;
   $('#cancelBtn').hidden = !on;
   $('#cmpBtn').disabled = on;
+  showBar(on);
 }
 
-async function run() {
+/* The progress strip sticks to the bottom of the window, so leaving it up
+ * permanently costs a line of the page forever. It appears for the run and
+ * goes away after it; the verdict heading says how the run went. */
+let barTimer = 0;
+export function showBar(on) {
+  clearTimeout(barTimer);
+  if (on) { $('#runbar').hidden = false; return; }
+  barTimer = setTimeout(() => { $('#runbar').hidden = true; }, 1800);
+}
+
+async function run(opts = {}) {
   if (ST.running) return;
   const M = MODELS[ST.modelId];
   if (M.needsSource && (!ST.source || !ST.source.length)) {
@@ -562,12 +573,13 @@ async function run() {
     autoCondenseNow();
 
     $('#progBar').style.width = '100%';
-    $('#runStat').textContent = `${n0(cfg.paths)} paths in ${(ms / 1000).toFixed(2)}s`;
+    // chained from the idea tester, the status line belongs to the three-test run
+    if (!opts.quiet) $('#runStat').textContent = `${n0(cfg.paths)} paths in ${(ms / 1000).toFixed(2)}s`;
     $('#runFoot').innerHTML = `Run fingerprint <code>${hashConfig(cfg)}</code> &middot; seed
       <code>${cfg.seed}</code> &middot; ${n0(cfg.paths)} paths &times; ${n0(cfg.horizon)} periods
       &middot; ${MODELS[cfg.model.id].label} &middot; ${(ms / 1000).toFixed(2)}s on ${CORES} worker${CORES > 1 ? 's' : ''}.
       The same seed and settings reproduce these numbers exactly.`;
-    $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!opts.quiet) $('#results').scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (e) {
     $('#runStat').textContent = 'failed';
     $('#score').innerHTML = `<div class="msg bad"><b>The run failed.</b> ${esc(e.message)}</div>`;
@@ -749,20 +761,87 @@ function setMode(mode) {
   $('#mIdea').setAttribute('aria-selected', String(idea));
   $('#mMC').setAttribute('aria-selected', String(!idea));
   $('#ideaPane').hidden = !idea;
-  $('#setup').hidden = idea;
-  $('#results').hidden = idea || !ST.lastResults;
+  $('#mcBrief').hidden = idea;
+  $('#setup').hidden = idea || !mcOpen;
+  if (!idea) syncMcLine();
+  $('#results').hidden = !ST.lastResults;   // test 3's output, whichever mode produced it
   $('#ideaResults').hidden = !idea || !IDEA.last;
   $('#ideaRun').hidden = !idea;
   $('#runBtn').hidden = idea;
+  syncTests(idea);
   $('#runStat').textContent = 'ready';
   try { localStorage.setItem('mc.mode', mode); } catch {}
+}
+
+/* The Monte-Carlo-only controls are four steps of sliders. They stay shut until
+ * asked for, and the state survives mode switches so it does not keep closing
+ * itself under someone who opened it on purpose. */
+let mcOpen = false;
+$('#mcToggle').addEventListener('click', () => {
+  mcOpen = !mcOpen;
+  $('#setup').hidden = !mcOpen;
+  $('#mcToggle').setAttribute('aria-expanded', String(mcOpen));
+  $('#mcToggle').textContent = mcOpen ? 'Done' : 'Change';
+});
+
+/* One line standing in for the four steps. Built from the live controls, so it
+ * cannot drift from what will actually be run. */
+function syncMcLine() {
+  const bits = [];
+  if (ST.sourceLabel) bits.push(ST.sourceLabel);
+  if (ST.source && ST.source.length) bits.push(`${n0(ST.source.length)} periods`);
+  if (MODELS[ST.modelId]) bits.push(MODELS[ST.modelId].label);
+  bits.push(`${n0(+$('#paths').value || 0)} paths`);
+  bits.push(`${n0(+$('#horizon').value || 0)} ahead`);
+  $('#mcLine').textContent = bits.join(' \u00b7 ');
+}
+$('#setup').addEventListener('input', syncMcLine);
+$('#setup').addEventListener('change', syncMcLine);
+$('#setup').addEventListener('click', () => setTimeout(syncMcLine, 0));
+
+/* The three tests are the page in BOTH modes. Walk-forward and sensitivity
+ * re-optimise and nudge the rule, so a finished return series -- which is all a
+ * published board hands over -- can only take the third one. Greying the other
+ * two and saying why beats quietly running one test under a heading of three. */
+function syncTests(idea) {
+  for (const id of ['#t-wf', '#t-sens']) {
+    const li = $(id); if (!li) continue;
+    const em = li.querySelector('em');
+    if (!em.dataset.on) em.dataset.on = em.textContent;
+    li.classList.toggle('off', !idea);
+    em.textContent = idea ? em.dataset.on : em.dataset.why;
+  }
+  $('#runHint').textContent = idea
+    ? 'Runs in this browser. Same seed, same answer, every time.'
+    : 'A finished return series has no parameters left, so only the third test applies.';
+}
+
+/* Back. Inside the site shell the shell owns the address bar and the tab strip,
+ * so it is asked to navigate rather than the frame moving under it. Standalone,
+ * this is just the folder above. */
+function goBack() {
+  try {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ source: 'trad', go: 'back' }, location.origin);
+      return;
+    }
+  } catch { /* cross-origin parent: fall through to the plain link */ }
+  location.href = '../';
+}
+for (const id of ['#backBtn', '#backBtn2']) {
+  const b = $(id); if (b) b.addEventListener('click', goBack);
 }
 $('#mIdea').addEventListener('click', () => setMode('idea'));
 $('#mMC').addEventListener('click', () => setMode('mc'));
 
 const IDEA = initIdea({
   loadReal,
-  sendToMonteCarlo(returns, label, trials) {
+  showBar,
+  /* Attach the walk-forward's out-of-sample returns as the simulator's source.
+   * These are the only returns worth resampling: the parameters were never
+   * fitted to them. Trials carry over, because searching a grid IS multiple
+   * testing and the Deflated Sharpe has to be told how wide the search was. */
+  loadOos(returns, label, trials) {
     ST.source = returns;
     ST.sourceLabel = label;
     ST.sourceNote = 'walk-forward out-of-sample output — never fitted to';
@@ -770,15 +849,29 @@ const IDEA = initIdea({
     ST.mode = 'paste';
     exKind = 'gen';
     $('#trials').value = Math.max(1, trials || 1);
+    $('#ppy').value = 252;
     $('#horizon').value = Math.max(252, Math.min(5040, returns.length));
-    setMode('mc');
     $$('#srcTabs button').forEach(x => x.setAttribute('aria-selected', String(x.dataset.pane === 'pPaste')));
     for (const p of ['pExamples', 'pPaste', 'pStrat', 'pVar', 'pSaved']) $('#' + p).hidden = true;
     $('#pPaste').hidden = false;
     $('#parseMsg').innerHTML = `<div class="msg ok"><b>Loaded ${n0(returns.length)} out-of-sample returns</b>
       from the walk-forward run. Trials set to ${n0(trials || 1)} from the grid you searched.</div>`;
     afterSourceChange();
+  },
+  sendToMonteCarlo(returns, label, trials) {
+    this.loadOos(returns, label, trials);
+    setMode('mc');
     $('#setup').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  },
+  /* Test 3, on the same button press. One button was asked for, so the third
+   * test cannot be a second button -- it runs here and its results land under
+   * the other two. Quiet, because the status line belongs to the whole run. */
+  async chainMonteCarlo(returns, label, trials) {
+    this.loadOos(returns, label, trials);
+    await run({ quiet: true });
+    $('#ideaResults').hidden = false;
+    $('#results').hidden = !ST.lastResults;
+    return !!ST.lastResults;
   },
 });
 
@@ -824,6 +917,11 @@ async function restoreFromBoard() {
       ${b.series.length > 1 ? `Trials set to ${b.series.length} — the number of variants that board shows.` : ''}
       </div>${warn}`;
     afterSourceChange();
+    /* The attach pane is folded away by default, and the additive-vs-compounded
+     * warning is not a detail -- it is the difference between +290% and +1,414%.
+     * Mirror it where it can still be read. */
+    $('#mcNote').innerHTML = $('#parseMsg').innerHTML;
+    syncMcLine();
     $('#runStat').textContent = 'ready';
     return true;
   } catch (e) {
@@ -847,6 +945,9 @@ let savedMode = 'idea';
 try { savedMode = localStorage.getItem('mc.mode') || 'idea'; } catch {}
 setMode(location.hash && location.hash.length > 8 ? 'mc' : savedMode);
 restoreFromBoard();
+/* The shell navigates between boards by changing this frame's fragment, which
+ * does NOT reload the document -- so the board has to be re-read here. */
+addEventListener('hashchange', () => { restoreFromBoard(); });
 /* Fold every explanatory block behind an info button, now and for anything
    rendered later. The prose stays; it just stops taking up the page. */
 autoCondense();

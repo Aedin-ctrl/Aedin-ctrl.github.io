@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>Monte Carlo</title>
-<meta name="description" content="Attach a return series or a strategy, simulate it under a dozen market models, and find out whether the edge is real.">
+<title>Test</title>
+<meta name="description" content="Walk-forward, parameter sensitivity and Monte Carlo, run together on one idea.">
 <style>
   :root{
     --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
@@ -56,6 +56,66 @@
   .cols{display:grid;gap:9px;grid-template-columns:1fr}
   @media(min-width:800px){.cols.two{grid-template-columns:1fr 1fr}
                           .cols.three{grid-template-columns:1fr 1fr 1fr}}
+
+  /* ---------- the test bench: back out, name, mode ---------- */
+  .topbar{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+  .topbar h1{font-size:23px}
+  .back{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink2);
+        font:inherit;font-size:12px;font-weight:620;padding:5px 11px;border-radius:8px;cursor:pointer}
+  .back:hover{background:var(--paper);color:var(--ink)}
+  .back:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+  .topbar .modeswitch{margin-top:0}
+  .topbar .modeswitch button{font-size:11.5px;padding:5px 11px}
+
+  /* ---------- what is being tested: one line each ---------- */
+  .brief{background:var(--card);border:1px solid var(--line);border-radius:11px;
+         padding:2px 14px 4px;margin-top:11px}
+  .brow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+        padding:9px 0;border-top:1px solid var(--line)}
+  .brow:first-child{border-top:0}
+  .bk{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+      font-weight:660;width:58px;flex:none}
+  .brow .chips{margin:0}
+  .brow .hint{margin-top:0;flex:1;min-width:0}
+  .brow select{width:auto}
+  .mini{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--s1);
+        font:inherit;font-size:11.5px;font-weight:620;padding:4px 10px;border-radius:7px;cursor:pointer}
+  .mini:hover{background:var(--paper);color:var(--ink)}
+  .mini:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+  #ruleWrap,#setWrap{padding:0 0 11px}
+  #ideaBox{min-height:230px}
+
+  /* ---------- results, as a contents page ---------- */
+  .part.fold{cursor:pointer;align-items:center;border-top:1px solid var(--line);
+             padding-top:11px;margin-top:14px;user-select:none}
+  .part.fold:hover h2,.part.fold:hover .no{color:var(--s1)}
+  .part.fold:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:6px}
+  .part.fold .pcount{font-size:11px;color:var(--muted);margin-left:auto;
+                     font-variant-numeric:tabular-nums}
+  .part.fold .chev{font-size:13px;color:var(--rule);transition:transform .12s,color .12s;
+                   display:inline-block;width:13px;text-align:center;line-height:1}
+  .part.fold:hover .chev{color:var(--ink)}
+  .part.fold[aria-expanded="true"] .chev{transform:rotate(90deg);color:var(--ink2)}
+  .part.fold[aria-expanded="true"] h2{color:var(--ink)}
+  .partbody[hidden]{display:none}
+  .partbody > section:first-child{margin-top:7px}
+
+  /* ---------- the three tests ---------- */
+  .tests{list-style:none;margin:11px 0 0;display:grid;gap:7px;grid-template-columns:1fr}
+  @media(min-width:820px){.tests{grid-template-columns:1fr 1fr 1fr}}
+  .tests li{display:flex;gap:9px;align-items:flex-start;background:var(--card);
+            border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .tests .tn{width:19px;height:19px;border-radius:50%;background:var(--ink);color:#fff;
+             font-size:10.5px;font-weight:700;display:grid;place-items:center;flex:none;margin-top:1px}
+  .tests b{display:block;font-size:13px;font-weight:650;letter-spacing:-.01em}
+  .tests em{font-style:normal;font-size:11.5px;color:var(--ink2);line-height:1.45;display:block;margin-top:2px}
+  .tests li.off{opacity:.6}
+  .tests li.off .tn{background:var(--muted)}
+  .tests li.off em{color:var(--bad)}
+
+  .runrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+  button.btn.big{font-size:14px;padding:11px 24px;border-radius:9px}
+  .runrow .hint{margin-top:0}
 
   /* ---------- setup panel ---------- */
   .modeswitch{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
@@ -253,44 +313,46 @@
 <body data-palette="#2a78d6,#eb6834,#1baf7a">
 <a class="skip" href="#results">Skip to results</a>
 <main>
-  <header>
-    <h1>Monte Carlo</h1>
+  <div class="topbar">
+    <button type="button" class="back" id="backBtn">&larr;&nbsp;Trad</button>
+    <h1>Test</h1>
     <span class="tag" id="gen"></span>
-  </header>
-  <p class="lede">Attach a return series or write a strategy, simulate it under a dozen
-    market models, and see what the spread of outcomes actually looks like &mdash; together
-    with the tests that say whether the edge was ever there. Everything runs in this
-    browser and every run is reproducible from its seed.</p>
-
-  <div class="modeswitch" role="tablist" aria-label="What to run">
-    <button role="tab" id="mIdea" aria-selected="true">Test an idea</button>
-    <button role="tab" id="mMC" aria-selected="false">Monte Carlo only</button>
+    <span class="spacer"></span>
+    <div class="modeswitch" role="tablist" aria-label="What to run">
+      <button role="tab" id="mIdea" aria-selected="true">All three</button>
+      <button role="tab" id="mMC" aria-selected="false">Monte Carlo only</button>
+    </div>
   </div>
 
-  <!-- ============ IDEA TESTER ============ -->
+  <!-- ============ WHAT IS BEING TESTED ============ -->
   <div id="ideaPane">
-    <div class="setup">
-      <div class="step">
-        <h4><i>1</i>The market to test on <em>real daily data</em></h4>
+    <div class="brief">
+      <div class="brow">
+        <span class="bk">Market</span>
         <div class="chips" id="ideaMarket"></div>
-        <div class="hint" id="ideaMarketNote"></div>
+        <span class="hint" id="ideaMarketNote"></span>
       </div>
-      <div class="step">
-        <h4><i>2</i>Your idea <em>a rule, and the ranges it may be searched over</em></h4>
-        <div class="row" style="margin-bottom:8px">
-          <label class="f" style="margin:0;text-transform:none;letter-spacing:0">Start from</label>
-          <select id="ideaEx" style="width:auto"></select>
-          <span class="spacer"></span>
-          <span class="hint" id="ideaGrid"></span>
-        </div>
-        <textarea id="ideaBox" spellcheck="false" style="min-height:260px"></textarea>
+
+      <div class="brow">
+        <span class="bk">Rule</span>
+        <select id="ideaEx"></select>
+        <span class="hint" id="ideaGrid"></span>
+        <button type="button" class="mini" id="ruleToggle" aria-expanded="false">Show the code</button>
+      </div>
+      <div id="ruleWrap" hidden>
+        <textarea id="ideaBox" spellcheck="false"></textarea>
         <div class="hint">Declare <code>const PARAMS = { name: {min, max, step, def} }</code> and the tester
-          searches that grid. <b>The grid size becomes your trial count</b> — search 240 combinations and the
-          Deflated Sharpe will hold you to 240 trials.</div>
-        <div id="ideaMsg"></div>
+          searches that grid. <b>The grid size becomes your trial count</b> &mdash; search 240 combinations and
+          the Deflated Sharpe will hold you to 240 trials.</div>
       </div>
-      <div class="step">
-        <h4><i>3</i>How to test it</h4>
+      <div id="ideaMsg"></div>
+
+      <div class="brow">
+        <span class="bk">Setup</span>
+        <span class="hint" id="setupLine"></span>
+        <button type="button" class="mini" id="setToggle" aria-expanded="false">Change</button>
+      </div>
+      <div id="setWrap" hidden>
         <div class="grid-ctl">
           <div><label class="f" for="ideaPeriod">Test period</label>
             <select id="ideaPeriod">
@@ -327,149 +389,20 @@
         </div>
       </div>
     </div>
-
-    <div id="ideaResults" hidden>
-      <div class="part"><span class="no">VERDICT</span><h2 id="ideaVerdictH">Does the idea survive?</h2>
-        <span class="sub" id="ideaVerdictSub"></span></div>
-      <div id="ideaBlock"></div>
-      <section><h3>The gates</h3>
-        <div class="note">Every one has to pass. They fail for different reasons, and the reason is the
-          useful part — each row says what it is testing and why it matters.</div>
-        <div id="ideaGates"></div>
-      </section>
-
-      <div class="part"><span class="no">TEST 1</span><h2>Walk-forward</h2>
-        <span class="sub">does the parameter choice survive being re-picked?</span></div>
-      <p class="partnote">Optimise on a window, trade the <b>next</b> window with whatever that optimisation
-        chose, roll forward. The stitched out-of-sample curve is the only equity curve here that was never
-        fitted to.</p>
-      <section>
-        <h3>In sample against out of sample <span>&middot; by fold</span></h3>
-        <div class="legend" id="wfLeg"></div>
-        <div id="wfChart"></div>
-        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="wfTab">
-          <thead><tr><th>Fold</th><th>In-sample window</th><th>Chosen</th><th>IS score</th>
-            <th>OOS score</th><th>Best possible OOS</th><th>Rank of choice</th></tr></thead><tbody></tbody></table></div>
-        <div class="foot" id="wfFoot"></div>
-      </section>
-      <section>
-        <h3>The unfitted equity curve <span>&middot; out-of-sample folds, end to end</span></h3>
-        <div id="wfEquity"></div>
-        <div class="foot" id="wfEqFoot"></div>
-      </section>
-
-      <div class="part"><span class="no">TEST 2</span><h2>Parameter sensitivity</h2>
-        <span class="sub">a plateau, or a spike?</span></div>
-      <p class="partnote">A real effect does not know what number you typed. If one step destroys it, it was
-        a coincidence that happened to land on that setting.</p>
-      <section>
-        <h3>One parameter at a time <span>&middot; the rest held at the chosen values</span></h3>
-        <div id="sensProfiles"></div>
-        <div class="foot" id="sensFoot"></div>
-      </section>
-      <section>
-        <h3>The neighbourhood <span>&middot; every combination within the radius</span></h3>
-        <div class="grid" id="sensTiles"></div>
-        <div id="sensHist" style="margin-top:12px"></div>
-      </section>
-
-      <div class="part"><span class="no">THE MONEY</span><h2>What it would have done to an account</h2>
-        <span class="sub" id="moneySub"></span></div>
-      <p class="partnote">Every number below is from the <b>out-of-sample</b> period only — days the parameters
-        were never fitted to. The strategy is compared against simply buying and holding the same thing.</p>
-
-      <div class="grid" id="moneyTiles"></div>
-
-      <section>
-        <h3>Account value <span>&middot; strategy against buy and hold</span></h3>
-        <div class="legend" id="eqLeg"></div>
-        <div id="moneyEquity"></div>
-        <div class="foot" id="moneyEqFoot"></div>
-      </section>
-
-      <div class="cols two">
-        <section style="margin-top:0">
-          <h3>Profit and loss by month</h3>
-          <div id="monthBars"></div>
-          <div class="foot" id="monthFoot"></div>
-        </section>
-        <section style="margin-top:0">
-          <h3>How far below the high water mark <span>&middot; in dollars</span></h3>
-          <div id="ddArea"></div>
-          <div class="foot" id="ddFoot"></div>
-        </section>
-      </div>
-
-      <section>
-        <h3>Year by year</h3>
-        <div class="wrap"><table id="yearTab">
-          <thead><tr><th>Year</th><th>Days</th><th>Strategy</th><th>P&amp;L</th>
-            <th>Account at year end</th><th>Buy and hold</th><th>Difference</th></tr></thead><tbody></tbody></table></div>
-        <div class="foot" id="yearFoot"></div>
-      </section>
-
-      <section>
-        <h3>Against the alternatives <span>&middot; the same dollars over the same days</span></h3>
-        <div class="note">Not just the benchmark: what else you could have done with the money over exactly
-          this period, including holding bonds, gold, or a balanced mix.</div>
-        <div id="altChart"></div>
-        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="altTab">
-          <thead><tr><th>Where the money went</th><th>Final value</th><th>Profit</th><th>CAGR</th>
-            <th>Worst drawdown</th><th>Sharpe</th></tr></thead><tbody></tbody></table></div>
-        <div class="foot" id="altFoot"></div>
-      </section>
-
-      <div class="part"><span class="no">WHICH MARKETS</span><h2>Where the money came from</h2>
-        <span class="sub">and where it did not</span></div>
-      <p class="partnote">A single Sharpe ratio hides this. A rule that makes everything in turbulent bear
-        markets is a very different proposition from one that grinds steadily, even at the same headline
-        number — and you cannot size them the same way. Every regime below is classified from information
-        available <b>before</b> the day it labels.</p>
-
-      <div class="rgtabs" id="regimeTabs" role="tablist"></div>
-      <div id="regimeBlocks"></div>
-
-      <section>
-        <h3>How concentrated is the result?</h3>
-        <div class="grid" id="concTiles"></div>
-        <div class="foot" id="concFoot"></div>
-      </section>
-
-      <section>
-        <h3>Rolling 12-month return <span>&middot; is it consistent, or was it one stretch?</span></h3>
-        <div class="legend" id="rollLeg"></div>
-        <div id="rollChart"></div>
-        <div class="foot" id="rollFoot"></div>
-      </section>
-
-      <section>
-        <h3>Execution stress <span>&middot; the same parameters, harsher assumptions</span></h3>
-        <div class="note">The cost is always a guess and it is the most load-bearing number in any backtest.
-          Rather than defend one figure, every out-of-sample fold is re-run across a range of them. Only the
-          frictions change; the parameters the walk-forward chose stay fixed.</div>
-        <div id="stressChart"></div>
-        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="stressTab">
-          <thead><tr><th>Scenario</th><th>Out-of-sample score</th><th>Change</th></tr></thead><tbody></tbody></table></div>
-        <div class="foot" id="stressFoot"></div>
-      </section>
-
-      <div class="part"><span class="no">TEST 3</span><h2>Monte Carlo</h2>
-        <span class="sub">on the out-of-sample series, because that is the one that was not fitted</span></div>
-      <p class="partnote">Running a Monte Carlo on an in-sample curve launders a fitted result through a
-        thousand pretty paths. This one resamples the walk-forward output instead.</p>
-      <section>
-        <h3>The out-of-sample series, tested</h3>
-        <div class="grid" id="ideaStatTiles"></div>
-        <div class="foot" id="ideaStatFoot"></div>
-        <div class="row" style="margin-top:12px">
-          <button class="btn" id="ideaToMC">Send this series to the full Monte Carlo</button>
-          <span class="hint">Loads the out-of-sample returns into the simulator for the path, leverage and ruin analysis.</span>
-        </div>
-      </section>
-    </div>
   </div>
 
-  <!-- ============ SETUP ============ -->
+  <!-- ============ MONTE-CARLO-ONLY SETUP ============ -->
+  <!-- Four steps of controls is the opposite of "three tests and one button",
+       so in this mode too the setup is one line until you ask for it. -->
+  <div class="brief" id="mcBrief" hidden>
+    <div class="brow">
+      <span class="bk">Series</span>
+      <span class="hint" id="mcLine"></span>
+      <button type="button" class="mini" id="mcToggle" aria-expanded="false">Change</button>
+    </div>
+    <div id="mcNote"></div>
+  </div>
+
   <div class="setup" id="setup">
     <div class="step">
       <h4><i>1</i>Attach something <em>a return series, or code</em></h4>
@@ -612,7 +545,170 @@
     </div>
   </div>
 
+  <!-- ============ THE THREE TESTS, AND THE ONE BUTTON ============ -->
+  <ol class="tests" id="testList">
+    <li id="t-wf"><span class="tn">1</span><div><b>Walk-forward</b>
+      <em data-why="Needs the rule as runnable code. A finished equity curve has no parameters left to re-optimise.">Optimise on one window, score the next one. Only the windows the search never saw count.</em></div></li>
+    <li id="t-sens"><span class="tn">2</span><div><b>Parameter sensitivity</b>
+      <em data-why="Same reason. There is nothing to nudge once a strategy has been reduced to its returns.">Nudge every parameter a step at a time. A real edge is a plateau, not a spike.</em></div></li>
+    <li id="t-mc"><span class="tn">3</span><div><b>Monte Carlo</b>
+      <em>Resample what survived, thousands of times, and read the spread rather than the one history.</em></div></li>
+  </ol>
+
+  <div class="runrow">
+    <button class="btn primary big" id="ideaRun">Run all three</button>
+    <button class="btn primary big" id="runBtn" hidden>Run the Monte Carlo</button>
+    <span class="hint" id="runHint">Runs in this browser. Same seed, same answer, every time.</span>
+  </div>
+
+  <div id="ideaResults" hidden>
+      <div class="part"><span class="no">VERDICT</span><h2 id="ideaVerdictH">Does the idea survive?</h2>
+        <span class="sub" id="ideaVerdictSub"></span></div>
+      <div id="ideaBlock"></div>
+      <section><h3>The gates</h3>
+        <div class="note">Every one has to pass. They fail for different reasons, and the reason is the
+          useful part — each row says what it is testing and why it matters.</div>
+        <div id="ideaGates"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 1</span><h2>Walk-forward</h2>
+        <span class="sub">does the parameter choice survive being re-picked?</span></div>
+      <p class="partnote">Optimise on a window, trade the <b>next</b> window with whatever that optimisation
+        chose, roll forward. The stitched out-of-sample curve is the only equity curve here that was never
+        fitted to.</p>
+      <section>
+        <h3>In sample against out of sample <span>&middot; by fold</span></h3>
+        <div class="legend" id="wfLeg"></div>
+        <div id="wfChart"></div>
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="wfTab">
+          <thead><tr><th>Fold</th><th>In-sample window</th><th>Chosen</th><th>IS score</th>
+            <th>OOS score</th><th>Best possible OOS</th><th>Rank of choice</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="wfFoot"></div>
+      </section>
+      <section>
+        <h3>The unfitted equity curve <span>&middot; out-of-sample folds, end to end</span></h3>
+        <div id="wfEquity"></div>
+        <div class="foot" id="wfEqFoot"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 2</span><h2>Parameter sensitivity</h2>
+        <span class="sub">a plateau, or a spike?</span></div>
+      <p class="partnote">A real effect does not know what number you typed. If one step destroys it, it was
+        a coincidence that happened to land on that setting.</p>
+      <section>
+        <h3>One parameter at a time <span>&middot; the rest held at the chosen values</span></h3>
+        <div id="sensProfiles"></div>
+        <div class="foot" id="sensFoot"></div>
+      </section>
+      <section>
+        <h3>The neighbourhood <span>&middot; every combination within the radius</span></h3>
+        <div class="grid" id="sensTiles"></div>
+        <div id="sensHist" style="margin-top:12px"></div>
+      </section>
+
+      <div class="part"><span class="no">THE MONEY</span><h2>What it would have done to an account</h2>
+        <span class="sub" id="moneySub"></span></div>
+      <p class="partnote">Every number below is from the <b>out-of-sample</b> period only — days the parameters
+        were never fitted to. The strategy is compared against simply buying and holding the same thing.</p>
+
+      <div class="grid" id="moneyTiles"></div>
+
+      <section>
+        <h3>Account value <span>&middot; strategy against buy and hold</span></h3>
+        <div class="legend" id="eqLeg"></div>
+        <div id="moneyEquity"></div>
+        <div class="foot" id="moneyEqFoot"></div>
+      </section>
+
+      <div class="cols two">
+        <section style="margin-top:0">
+          <h3>Profit and loss by month</h3>
+          <div id="monthBars"></div>
+          <div class="foot" id="monthFoot"></div>
+        </section>
+        <section style="margin-top:0">
+          <h3>How far below the high water mark <span>&middot; in dollars</span></h3>
+          <div id="ddArea"></div>
+          <div class="foot" id="ddFoot"></div>
+        </section>
+      </div>
+
+      <section>
+        <h3>Year by year</h3>
+        <div class="wrap"><table id="yearTab">
+          <thead><tr><th>Year</th><th>Days</th><th>Strategy</th><th>P&amp;L</th>
+            <th>Account at year end</th><th>Buy and hold</th><th>Difference</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="yearFoot"></div>
+      </section>
+
+      <section>
+        <h3>Against the alternatives <span>&middot; the same dollars over the same days</span></h3>
+        <div class="note">Not just the benchmark: what else you could have done with the money over exactly
+          this period, including holding bonds, gold, or a balanced mix.</div>
+        <div id="altChart"></div>
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="altTab">
+          <thead><tr><th>Where the money went</th><th>Final value</th><th>Profit</th><th>CAGR</th>
+            <th>Worst drawdown</th><th>Sharpe</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="altFoot"></div>
+      </section>
+
+      <div class="part"><span class="no">WHICH MARKETS</span><h2>Where the money came from</h2>
+        <span class="sub">and where it did not</span></div>
+      <p class="partnote">A single Sharpe ratio hides this. A rule that makes everything in turbulent bear
+        markets is a very different proposition from one that grinds steadily, even at the same headline
+        number — and you cannot size them the same way. Every regime below is classified from information
+        available <b>before</b> the day it labels.</p>
+
+      <div class="rgtabs" id="regimeTabs" role="tablist"></div>
+      <div id="regimeBlocks"></div>
+
+      <section>
+        <h3>How concentrated is the result?</h3>
+        <div class="grid" id="concTiles"></div>
+        <div class="foot" id="concFoot"></div>
+      </section>
+
+      <section>
+        <h3>Rolling 12-month return <span>&middot; is it consistent, or was it one stretch?</span></h3>
+        <div class="legend" id="rollLeg"></div>
+        <div id="rollChart"></div>
+        <div class="foot" id="rollFoot"></div>
+      </section>
+
+      <section>
+        <h3>Execution stress <span>&middot; the same parameters, harsher assumptions</span></h3>
+        <div class="note">The cost is always a guess and it is the most load-bearing number in any backtest.
+          Rather than defend one figure, every out-of-sample fold is re-run across a range of them. Only the
+          frictions change; the parameters the walk-forward chose stay fixed.</div>
+        <div id="stressChart"></div>
+        <div class="wrap" data-fold="the numbers behind the chart" style="margin-top:9px"><table id="stressTab">
+          <thead><tr><th>Scenario</th><th>Out-of-sample score</th><th>Change</th></tr></thead><tbody></tbody></table></div>
+        <div class="foot" id="stressFoot"></div>
+      </section>
+
+      <div class="part"><span class="no">TEST 3</span><h2>Monte Carlo</h2>
+        <span class="sub">on the out-of-sample series, because that is the one that was not fitted</span></div>
+      <p class="partnote">Running a Monte Carlo on an in-sample curve launders a fitted result through a
+        thousand pretty paths. This one resamples the walk-forward output instead.</p>
+      <section>
+        <h3>The out-of-sample series, tested</h3>
+        <div class="grid" id="ideaStatTiles"></div>
+        <div class="foot" id="ideaStatFoot"></div>
+        <div class="hint" id="mcChained" hidden>The full simulation of this series &mdash; the spread of
+          paths, the drawdown you would have sat through, the leverage ladder and the chance of ruin
+          &mdash; is below.</div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn" id="ideaToMC">Send this series to the full Monte Carlo</button>
+          <span class="hint">Loads the out-of-sample returns into the simulator for the path, leverage and ruin analysis.</span>
+        </div>
+      </section>
+  </div>
+
   <div id="results" hidden>
+    <!-- The headline needs a header of its own. Without one it rendered directly
+         under the SHUT "Test 3" group above it and read as that group's contents. -->
+    <div class="part"><span class="no">RESULT</span><h2>What the simulation says</h2>
+      <span class="sub">the third test, in two cards and eight numbers</span></div>
     <div class="score" id="score"></div>
     <div class="grid" id="tiles"></div>
 
@@ -762,6 +858,8 @@
         than the difference you care about.</div>
     </section>
 
+    <div class="part"><span class="no">EXPORT</span><h2>Take it with you</h2></div>
+
     <section>
       <h3>Take it with you</h3>
       <div class="row">
@@ -834,12 +932,12 @@
     Runs entirely in your browser &mdash; nothing is uploaded.
     <span id="coreNote"></span><br>
     Built-in series are <b>generated, not market data</b>.
-    <a href="../">Back to Trad</a>
+    <button type="button" class="back" id="backBtn2">&larr;&nbsp;Back to Trad</button>
   </footer>
 
-  <div class="bar" id="runbar">
-    <button class="btn primary" id="ideaRun">Test the idea</button>
-    <button class="btn primary" id="runBtn" hidden>Run simulation</button>
+  <!-- The run buttons live with the thing they run. This bar is only the
+       progress strip, so there is nothing to scroll past before starting. -->
+  <div class="bar" id="runbar" hidden>
     <button class="btn" id="cancelBtn" hidden>Cancel</button>
     <div class="prog"><i id="progBar"></i></div>
     <span class="runstat" id="runStat">ready</span>

@@ -26,6 +26,35 @@ export function initIdea(ctx) {
   });
   $('#ideaBox').addEventListener('input', refreshGrid);
 
+  /* The rule and the setup fold away. Before a run the page's job is to say what
+     will happen and offer one button; the controls are one click behind that. */
+  function wireFold(btnSel, boxSel, labels) {
+    const b = $(btnSel), box = $(boxSel);
+    if (!b || !box) return;
+    b.addEventListener('click', () => {
+      const open = box.hidden;
+      box.hidden = !open;
+      b.setAttribute('aria-expanded', String(open));
+      b.textContent = labels[open ? 1 : 0];
+    });
+  }
+  wireFold('#ruleToggle', '#ruleWrap', ['Show the code', 'Hide the code']);
+  wireFold('#setToggle', '#setWrap', ['Change', 'Done']);
+
+  /* One line standing in for ten controls. It has to be built from the controls
+     themselves, not from the defaults, or it starts lying the first time one moves. */
+  function setupLine() {
+    const yrs = $('#ideaPeriod').value;
+    const period = yrs ? `last ${yrs} year${yrs === '1' ? '' : 's'}, every day` : 'proportional split';
+    const obj = $('#ideaObj').selectedOptions[0].textContent.split(' (')[0].toLowerCase();
+    const cap = (+$('#ideaCapital').value || 0).toLocaleString();
+    $('#setupLine').textContent = `${period} · ${$('#ideaFolds').value} folds, ` +
+      `${$('#ideaWindow').value} · optimising ${obj} · ${$('#ideaCost').value}bp a turn · $${cap}`;
+  }
+  $('#setWrap').addEventListener('input', setupLine);
+  $('#setWrap').addEventListener('change', setupLine);
+  ST.setupLine = setupLine;
+
   const bind = (id, fmt) => { const i = $('#' + id), o = $('#' + id + 'O');
     const u = () => o.textContent = fmt(+i.value); i.addEventListener('input', u); u(); };
   bind('ideaFolds', v => String(v));
@@ -89,6 +118,7 @@ export function initIdea(ctx) {
       $('#ideaCost').value = preset.bpsPerTurnover;
       $('#ideaCostHint').innerHTML = `${preset.bpsPerTurnover}bp suggested for ${esc(sym)} — ${esc(preset.note)}`;
     }
+    if (ST.setupLine) ST.setupLine();
   }
 
   let worker = null;
@@ -106,21 +136,22 @@ export function initIdea(ctx) {
     ST.running = true;
     $('#ideaRun').disabled = true;
     $('#ideaMsg').innerHTML = '';
+    if (ctx.showBar) ctx.showBar(true);
     $('#runStat').textContent = 'testing...';
 
     const id = Math.random().toString(36).slice(2);
     const w = getWorker();
-    const onMsg = (e) => {
+    const onMsg = async (e) => {
       if (e.data.id !== id) return;
       if (e.data.type === 'progress') {
         $('#progBar').style.width = (e.data.p * 100).toFixed(0) + '%';
         $('#runStat').textContent = e.data.label;
       } else if (e.data.type === 'done') {
         w.removeEventListener('message', onMsg);
-        ST.running = false; $('#ideaRun').disabled = false;
         $('#progBar').style.width = '100%';
         // a refusal is a result too, and it has to be shown rather than rendered
         if (!e.data.res || !e.data.res.ok) {
+          ST.running = false; $('#ideaRun').disabled = false; if (ctx.showBar) ctx.showBar(false);
           $('#ideaMsg').innerHTML = `<div class="msg bad"><b>Nothing to test.</b>
             ${esc((e.data.res && e.data.res.note) || 'the run produced no usable result')}</div>`;
           $('#ideaResults').hidden = true;
@@ -129,12 +160,30 @@ export function initIdea(ctx) {
         }
         ST.last = e.data.res;
         render(e.data.res);
-        $('#runStat').textContent = `${e.data.res.gates.passed} of ${e.data.res.gates.total} gates passed`;
+        const gatesMsg = `${e.data.res.gates.passed} of ${e.data.res.gates.total} gates passed`;
         $('#ideaResults').hidden = false;
         $('#ideaResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        /* Test 3 runs here rather than behind its own button: one press was
+           asked for, and the Monte Carlo belongs on the out-of-sample series
+           this run just produced. Its results render below the other two. */
+        let chained = false;
+        const oos = e.data.res.oosReturns;
+        if (ctx.chainMonteCarlo && oos && oos.length > 60) {
+          $('#runStat').textContent = 'test 3 of 3: simulating\u2026';
+          try {
+            chained = await ctx.chainMonteCarlo(Float64Array.from(oos),
+              `walk-forward out-of-sample (${ST.marketLabel})`, e.data.res.gridSize);
+          } catch (err) { chained = false; }
+        }
+        const row = $('#ideaToMC').closest('.row');
+        if (row) row.hidden = chained;
+        $('#mcChained').hidden = !chained;
+        ST.running = false; $('#ideaRun').disabled = false; if (ctx.showBar) ctx.showBar(false);
+        $('#runStat').textContent = gatesMsg;
       } else if (e.data.type === 'error') {
         w.removeEventListener('message', onMsg);
-        ST.running = false; $('#ideaRun').disabled = false;
+        ST.running = false; $('#ideaRun').disabled = false; if (ctx.showBar) ctx.showBar(false);
         $('#ideaMsg').innerHTML = `<div class="msg bad"><b>Could not run.</b> ${esc(e.data.message)}</div>`;
         $('#runStat').textContent = 'failed';
       }
@@ -174,6 +223,7 @@ export function initIdea(ctx) {
 
   renderMarkets();
   refreshGrid();
+  setupLine();
   return ST;
 }
 

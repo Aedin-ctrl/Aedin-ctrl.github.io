@@ -686,7 +686,10 @@
         <button class="tab-btn" data-tab="links">links</button>
         <!-- Shown only while the projects tab (or one of these) is open. -->
         <button class="tab-btn" data-tab="arb" data-market hidden>arb</button>
-        <button class="tab-btn" data-tab="trad" data-market hidden>first 90 min</button>
+        <button class="tab-btn" data-tab="trad" data-market hidden>trad</button>
+        <!-- test is a subdivision of trad: it sits in the bar beside it, both light
+             up together, and clicking trad is the way back. -->
+        <button class="tab-btn" data-tab="test" data-sub="trad" data-route="/trad/test" hidden>test</button>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
           <button class="tab-btn" data-tab="secret_projects" data-route="/secret_projects">secret projects</button>
@@ -1374,7 +1377,8 @@
     '/links': { type:'panel', panel:'links' },
     '/news': { type:'iframe', src:'news/', title:'News' },
     '/arb': { type:'iframe', src:'arb/', title:'Cross-venue sports arbitrage' },
-    '/trad': { type:'iframe', src:'trad/', title:'First 90 min — opening-bell strategies, measured' },
+    '/trad': { type:'iframe', src:'trad/', title:'Trad — trading models, built and measured' },
+    '/trad/test': { type:'iframe', src:'trad/mc/', title:'Test — walk-forward, parameter sensitivity and Monte Carlo' },
     '/projects/cal-tracker': { type:'iframe', src:'cal/', title:'Cal Tracker' },
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io', title:'Hallway Marathon event site' },
     '/projects/casino': { type:'iframe', src: CASINO_BASE, title:'Casino practice tools' },
@@ -1410,6 +1414,9 @@
   }
 
   let currentPath = '/';
+  // Set just before navigating when the destination page needs a fragment (the
+  // test page carries the board it was opened from). Cleared once it is used.
+  let frameHash = '';
   // Set by the combo lock; not persisted, so every reload starts locked.
   let secretUnlocked = false;
 
@@ -1446,7 +1453,10 @@
       panelsViewport.style.display = 'none';
       contentFrame.style.display = 'block';
       contentFrame.title = route.title || 'Embedded project';
-      contentFrame.src = route.src;
+      // Assigning the same document with a NEW fragment fires hashchange inside
+      // the frame instead of reloading it, so the page keeps whatever it had.
+      contentFrame.src = route.src + frameHash;
+      frameHash = '';
       // Hand the keyboard to the embedded page once it has loaded. Without this, a game that says
       // "press space" gets nothing: the keypress goes to this page, which does not want it.
       contentFrame.addEventListener('load', () => {
@@ -1458,17 +1468,23 @@
 
   function highlightTab(path){
     const tab = path === '/' ? 'general' : path.startsWith('/secret_projects/devices') ? 'devices' : path.split('/')[1];
-    buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    syncMarketTabs(tab);
+    // /trad/test is a tab of its own AND a subdivision of trad, so both are marked.
+    const on = new Set([tab]);
+    if(tab === 'trad' && path.split('/')[2] === 'test') on.add('test');
+    buttons.forEach(b => b.classList.toggle('active', on.has(b.dataset.tab)));
+    syncMarketTabs(tab, on);
   }
 
   // arb and trad sit behind projects: they appear when projects is open, stay
   // while either is itself open so they can be clicked, and go away elsewhere.
   const marketTabs = [...document.querySelectorAll('.tab-btn[data-market]')];
+  const subTabs = [...document.querySelectorAll('.tab-btn[data-sub]')];
   const MARKET_HOSTS = new Set(['projects', 'arb', 'trad']);
-  function syncMarketTabs(tab){
+  function syncMarketTabs(tab, on){
     const show = MARKET_HOSTS.has(tab);
     marketTabs.forEach(b => { b.hidden = !show; });
+    // A subdivision is in the bar only while its parent -- or it -- is open.
+    subTabs.forEach(b => { b.hidden = !(b.dataset.sub === tab || (on && on.has(b.dataset.tab))); });
   }
 
   function showPanel(id){
@@ -2080,6 +2096,20 @@
         label.textContent = 'Copy';
       }, 1600);
     });
+  });
+
+  // trad asks for its test page; the test page asks to come back. Same origin,
+  // but an iframe is still a door, so the origin is checked either way.
+  window.addEventListener('message', (event) => {
+    if(event.origin !== location.origin) return;
+    const d = event.data;
+    if(!d || d.source !== 'trad') return;
+    if(d.go === 'test'){
+      frameHash = d.board ? '#board=' + encodeURIComponent(String(d.board).slice(0, 32)) : '';
+      navigateTo('/trad/test');
+    } else if(d.go === 'back'){
+      navigateTo('/trad');
+    }
   });
 
   window.addEventListener('message', (event) => {

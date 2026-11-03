@@ -166,22 +166,19 @@
   button.sub-link{appearance:none;-webkit-appearance:none;background:transparent;border:0;
                   font:inherit;font-size:13px;font-weight:620;cursor:pointer;color:var(--s1)}
   button.sub-link[aria-expanded="true"]{color:var(--ink)}
-  #testPanel{border:1px solid var(--line);border-radius:12px;background:var(--card);
-             margin-top:13px;overflow:hidden}
-  .tp-head{font-size:11px;font-weight:660;text-transform:uppercase;letter-spacing:.07em;
-           color:var(--muted);padding:13px 16px 0}
-  .tp-head em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink)}
-  .tp-row{display:flex;gap:14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
-  .tp-row:first-of-type{border-top:0;padding-top:10px}
-  .tp-main{flex:1;min-width:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
-  .tp-main b{display:block;font-size:13.5px;color:var(--ink);font-weight:650;margin-bottom:2px}
-  .tp-go{flex:none;font-size:12.5px;font-weight:620;text-decoration:none;white-space:nowrap;
-         background:var(--ink);color:#fff;padding:8px 14px;border-radius:8px}
-  .tp-go:hover{background:#000;color:#fff;text-decoration:none}
-  .tp-go.alt{background:var(--card);color:var(--s1);border:1px solid var(--line)}
-  .tp-go.alt:hover{background:var(--paper);color:var(--ink)}
-  @media(max-width:560px){.tp-row{flex-direction:column;align-items:stretch}
-                          .tp-go{text-align:center}}
+  /* Each numbered part is a group you open: a board is a contents page first,
+     twelve screens of charts second. */
+  .part.fold{cursor:pointer;align-items:center;border-top:1px solid var(--line);
+             padding-top:12px;margin:18px 0 2px;user-select:none}
+  .part.fold:hover h2,.part.fold:hover .no{color:var(--s1)}
+  .part.fold:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:6px}
+  .part.fold .pcount{font-size:11px;color:var(--muted);margin-left:auto;
+                     font-variant-numeric:tabular-nums}
+  .part.fold .chev{font-size:13px;color:var(--rule);transition:transform .12s,color .12s;
+                   display:inline-block;width:13px;text-align:center;line-height:1}
+  .part.fold:hover .chev{color:var(--ink)}
+  .part.fold[aria-expanded="true"] .chev{transform:rotate(90deg);color:var(--ink2)}
+  .partbody[hidden]{display:none}
   .view[hidden]{display:none}
 
   /* the SAR explainer */
@@ -237,29 +234,11 @@
     <button type="button" class="sub-btn" data-view="gold" role="tab" aria-selected="false">Parabolic SAR</button>
     <button type="button" class="sub-btn" data-view="bell" role="tab" aria-selected="false">Opening bell</button>
     <span class="mkt" id="sarMkt" hidden><button type="button" data-mkt="gold" aria-pressed="true">Gold</button><button type="button" data-mkt="mes" aria-pressed="false">MES</button></span>
-    <button type="button" class="sub-link" id="testBtn" aria-expanded="false">Test &#9656;</button>
+    <button type="button" class="sub-link" id="testBtn">Test &rarr;</button>
   </div>
 
-  <div id="testPanel" hidden>
-    <div class="tp-head">Test this board <em id="tpWhich"></em></div>
-    <div class="tp-row">
-      <div class="tp-main">
-        <b>Monte Carlo this board</b>
-        <span id="tpDesc"></span>
-      </div>
-      <a class="tp-go" id="tpRun" href="mc/">Run now &rarr;</a>
-    </div>
-    <div class="tp-row">
-      <div class="tp-main">
-        <b>Full three-test on a rule</b>
-        <span>Walk-forward and parameter sensitivity re-optimise and nudge the rule, so they need it
-          as runnable code rather than as a finished equity curve. This opens the idea tester.</span>
-      </div>
-      <a class="tp-go alt" href="mc/">Open &rarr;</a>
-    </div>
-  </div>
 
-  <div class="view" id="v-bell">
+  <div class="view" data-groups id="v-bell">
   <div class="score" id="score"></div>
   <div class="grid" id="tiles"></div>
 
@@ -390,7 +369,7 @@
 
   </div>
 
-  <div class="view" id="v-gold" hidden>
+  <div class="view" data-groups id="v-gold" hidden>
 
     <div class="score" id="gscore"></div>
     <div class="grid" id="gtiles"></div>
@@ -645,7 +624,7 @@
 
   </div>
 
-  <div class="view" id="v-mes" hidden>
+  <div class="view" data-groups id="v-mes" hidden>
 
     <div class="score" id="mscore"></div>
     <div class="grid" id="mtiles"></div>
@@ -900,7 +879,7 @@
 
   </div>
 
-  <div class="view" id="v-gs" hidden>
+  <div class="view" data-groups id="v-gs" hidden>
 
     <div class="score" id="xscore"></div>
     <div class="grid" id="xtiles"></div>
@@ -2849,31 +2828,27 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
     gold:"Wilder's Parabolic SAR on gold: what every part of it does, and whether the whole thing beats simply owning the metal.",
     mes:"The same rig, the same tests, pointed at the Micro E-mini S&P 500. Nothing here is a gold result \u2014 it is the control that says whether any of it was about the indicator.",
     gs:"Three Goldman Sachs strategies rebuilt from their own published rule books and their own source filings. Two of them do not beat the market. The third thing \u2014 which is mine, not theirs \u2014 does, and then decays."};
-  /* The Test button. Each board stores its results differently -- cumulative
-     basis points on trade dates, weekly equity multiples -- so the lab reads the
-     board's own JSON and converts it there rather than this page trying to pass
-     a series through a URL. The link carries only the board id. */
-  const TEST={
-    gs:{label:"Goldman",desc:"791 weekly points, 2011 to today, four strategies including the SPY benchmark. The lab resamples them for paths, drawdown and ruin, and runs the overfitting battery across all four."},
-    mes:{label:"Parabolic SAR \u00b7 MES",desc:"706 trade-level points over 25 years, plus a volatility-matched variant."},
-    gold:{label:"Parabolic SAR \u00b7 Gold",desc:"703 trade-level points over 25 years, plus a volatility-matched variant."},
-    bell:{label:"Opening bell",desc:"722 daily points of intraday momentum for SPY and QQQ. (The opening-range forward log is 120 trades \u2014 too short to resample.)"}
-  };
-  function syncTest(v){
-    const t=TEST[v]; if(!t) return;
-    const w=document.getElementById("tpWhich"); if(w) w.textContent="\u00b7 "+t.label;
-    const d=document.getElementById("tpDesc"); if(d) d.textContent=t.desc;
-    const r=document.getElementById("tpRun"); if(r) r.href="mc/#board="+v;
+  /* The Test button leaves this page. Inside the site shell it asks the shell to
+     navigate, so "test" appears in the tab bar beside "trad" and both stay lit;
+     opened on its own it just follows the link. Either way the board id travels
+     in the fragment -- each board stores its results differently, so the lab
+     reads the board's own JSON and converts it there. */
+  window.__board="gs";
+  function openTest(){
+    const board=window.__board||"gs";
+    const url="mc/#board="+board;
+    try{
+      if(window.parent && window.parent!==window){
+        window.parent.postMessage({source:"trad",go:"test",board},location.origin);
+        return;
+      }
+    }catch(e){ /* cross-origin parent: fall through to the plain link */ }
+    location.href=url;
   }
+  function syncTest(v){ window.__board=v; }
   (function(){
-    const b=document.getElementById("testBtn"), p=document.getElementById("testPanel");
-    if(!b||!p) return;
-    b.addEventListener("click",()=>{
-      const open=p.hidden;
-      p.hidden=!open;
-      b.setAttribute("aria-expanded",String(open));
-      b.innerHTML=open?"Test \u25be":"Test \u25b8";
-    });
+    const b=document.getElementById("testBtn");
+    if(b) b.addEventListener("click",openTest);
   })();
 
   /* MES is a MARKET, not a strategy: the same Parabolic SAR rig pointed at the
@@ -2913,6 +2888,13 @@ window.__boardRedraw = v => { if(BOARDS[v]) BOARDS[v].redraw(); };
   try{
     const m = await import("./mc/ui/density.mjs");
     m.autoCondense();
+    /* Several charts here take their width from their container, so one drawn
+       inside a shut group was laid out against the fallback. Redraw on open. */
+    document.addEventListener("partopen",()=>{
+      const b=window.__board||"gs";
+      if(window.__boardRedraw) window.__boardRedraw(b);
+      if(b==="gs"&&window.__gsRedraw) window.__gsRedraw();
+    });
     if(window.__boardRedraw){
       const orig = window.__boardRedraw;
       window.__boardRedraw = function(v){ orig(v); setTimeout(()=>m.condense(), 0); };
