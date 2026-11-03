@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>Terminal</title>
+<title>Bloom</title>
 <link rel="stylesheet" href="terminal.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='700' fill='%23ff9e18' text-anchor='middle'>T</text></svg>">
 </head>
@@ -64,10 +64,10 @@
   </footer>
 </div>
 <script>
-  /* The panel opens this page as terminal/#k=KEY. The fragment is never sent
-     to any server; the app reads it here and puts it in an Authorization
-     header on each request to the Pi. With no key the page loads and every
-     screen says it is locked, which is all a scraper gets. */
+  /* Public: no key, and the service behind this does not ask for one. If a
+     key IS present in the fragment -- a gated deployment -- it is read here
+     and sent as an Authorization header instead, and stripped from the address
+     below so it can never be mistaken for a command. */
   window.TERMINAL_API_BASE = 'https://vault.aedinlai.com/terminal';
   var _p = new URLSearchParams(location.hash.slice(1));
   window.TERMINAL_KEY = _p.get('k') || '';

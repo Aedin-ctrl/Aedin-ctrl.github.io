@@ -717,12 +717,15 @@
              and collapses back the moment you go anywhere else, smaller and tighter
              than a real tab so it reads as part of trad rather than a sibling. -->
         <span class="tab-sub" id="subTab" aria-hidden="true"><i>&rsaquo;</i>test</span>
+        <!-- A real tab, but only while trad is open. It sits after the test
+             breadcrumb on purpose: when that slides out, this is pushed right
+             to make room for it. -->
+        <button class="tab-btn" id="bloomTab" data-tab="bloom" data-route="/trad/bloom" hidden>bloom</button>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
           <button class="tab-btn" data-tab="secret_projects" data-route="/secret_projects">secret projects</button>
           <button class="tab-btn" data-tab="devices" data-route="/secret_projects/devices">devices</button>
           <button class="tab-btn" data-tab="trends" data-route="/secret_projects/trends">trends</button>
-          <button class="tab-btn" data-tab="terminal" data-route="/secret_projects/terminal">terminal</button>
         </span>
       </div>
 
@@ -1407,6 +1410,7 @@
     '/arb': { type:'iframe', src:'arb/', title:'Cross-venue sports arbitrage' },
     '/trad': { type:'iframe', src:'trad/', title:'Trad — trading models, built and measured' },
     '/trad/test': { type:'iframe', src:'trad/mc/', title:'Test — walk-forward, parameter sensitivity and Monte Carlo' },
+    '/trad/bloom': { type:'iframe', src:'bloom/', title:'Bloom — a market terminal' },
     '/projects/cal-tracker': { type:'iframe', src:'cal/', title:'Cal Tracker' },
     '/projects/hallway-marathon': { type:'iframe', src:'https://hallway-marathon.github.io', title:'Hallway Marathon event site' },
     '/projects/casino': { type:'iframe', src: CASINO_BASE, title:'Casino practice tools' },
@@ -1495,6 +1499,7 @@
   }
 
   const subTab = document.getElementById('subTab');
+  const bloomTab = document.getElementById('bloomTab');
   function highlightTab(path){
     const tab = path === '/' ? 'general' : path.startsWith('/secret_projects/devices') ? 'devices' : path.split('/')[1];
     buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
@@ -1503,6 +1508,12 @@
     const onTest = path === '/trad/test';
     subTab.classList.toggle('on', onTest);
     subTab.setAttribute('aria-hidden', String(!onTest));
+    // bloom belongs to trad and goes away with it. The loop above cannot light
+    // it: every /trad/* path reports its tab as "trad", which is what keeps
+    // trad itself lit, so this one is marked by path instead.
+    const inTrad = tab === 'trad';
+    bloomTab.hidden = !inTrad;
+    bloomTab.classList.toggle('active', path === '/trad/bloom');
     syncMarketTabs(tab);
   }
 
