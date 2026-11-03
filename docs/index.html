@@ -152,6 +152,32 @@
   }
   .tab-btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
 
+  /* The subdivision breadcrumb. It is never clickable: it is only ever on
+     screen when you are already looking at the page it names. Width, not
+     display, does the hiding -- display:none cannot be animated, and the whole
+     point is that it looks like it came out of the tab next to it. */
+  .tab-sub{
+    display:inline-flex; align-items:center;
+    padding:11px 0 10px;
+    margin-left:-4px;              /* cancel the strip gap while collapsed */
+    font-size:11px;
+    color:var(--ink);
+    white-space:nowrap; overflow:hidden;
+    max-width:0; opacity:0;
+    border-bottom:2px solid transparent;
+    pointer-events:none; user-select:none;
+    transition:max-width .24s cubic-bezier(.4,0,.2,1),
+               margin-left .24s cubic-bezier(.4,0,.2,1),
+               opacity .16s ease .05s;
+  }
+  .tab-sub i{font-style:normal; color:var(--faint); font-size:12px; margin-right:3px;}
+  .tab-sub.on{
+    max-width:70px; opacity:1;
+    margin-left:-20px;             /* tuck in against trad */
+    border-bottom-color:var(--ink);
+  }
+  @media (prefers-reduced-motion:reduce){ .tab-sub{transition:none;} }
+
   .viewport{
     background:var(--paper);
     flex:1;
@@ -687,9 +713,10 @@
         <!-- Shown only while the projects tab (or one of these) is open. -->
         <button class="tab-btn" data-tab="arb" data-market hidden>arb</button>
         <button class="tab-btn" data-tab="trad" data-market hidden>trad</button>
-        <!-- test is a subdivision of trad: it sits in the bar beside it, both light
-             up together, and clicking trad is the way back. -->
-        <button class="tab-btn" data-tab="test" data-sub="trad" data-route="/trad/test" hidden>test</button>
+        <!-- Not a tab. It slides out of the trad tab while the test page is open
+             and collapses back the moment you go anywhere else, smaller and tighter
+             than a real tab so it reads as part of trad rather than a sibling. -->
+        <span class="tab-sub" id="subTab" aria-hidden="true"><i>&rsaquo;</i>test</span>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
           <button class="tab-btn" data-tab="secret_projects" data-route="/secret_projects">secret projects</button>
@@ -1467,25 +1494,25 @@
     return true;
   }
 
+  const subTab = document.getElementById('subTab');
   function highlightTab(path){
     const tab = path === '/' ? 'general' : path.startsWith('/secret_projects/devices') ? 'devices' : path.split('/')[1];
-    // /trad/test is a tab of its own AND a subdivision of trad, so both are marked.
-    const on = new Set([tab]);
-    if(tab === 'trad' && path.split('/')[2] === 'test') on.add('test');
-    buttons.forEach(b => b.classList.toggle('active', on.has(b.dataset.tab)));
-    syncMarketTabs(tab, on);
+    buttons.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    // /trad/test leaves trad lit and slides its breadcrumb out beside it. Going
+    // anywhere else -- including another tab -- collapses it again.
+    const onTest = path === '/trad/test';
+    subTab.classList.toggle('on', onTest);
+    subTab.setAttribute('aria-hidden', String(!onTest));
+    syncMarketTabs(tab);
   }
 
   // arb and trad sit behind projects: they appear when projects is open, stay
   // while either is itself open so they can be clicked, and go away elsewhere.
   const marketTabs = [...document.querySelectorAll('.tab-btn[data-market]')];
-  const subTabs = [...document.querySelectorAll('.tab-btn[data-sub]')];
   const MARKET_HOSTS = new Set(['projects', 'arb', 'trad']);
-  function syncMarketTabs(tab, on){
+  function syncMarketTabs(tab){
     const show = MARKET_HOSTS.has(tab);
     marketTabs.forEach(b => { b.hidden = !show; });
-    // A subdivision is in the bar only while its parent -- or it -- is open.
-    subTabs.forEach(b => { b.hidden = !(b.dataset.sub === tab || (on && on.has(b.dataset.tab))); });
   }
 
   function showPanel(id){
