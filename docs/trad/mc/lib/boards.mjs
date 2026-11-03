@@ -39,7 +39,7 @@ export const BOARDS = {
     }),
   },
   mes: {
-    id: 'mes', label: 'MES', file: 'mes.json',
+    id: 'mes', label: 'Parabolic SAR · MES', file: 'mes.json',
     note: 'The gold rig pointed at the Micro E-mini S&P 500 — the control that says whether any of it was about the indicator.',
     unit: 'cumbps',
     extract: (d) => ({
@@ -52,7 +52,7 @@ export const BOARDS = {
     }),
   },
   gold: {
-    id: 'gold', label: 'Gold · SAR', file: 'gold.json',
+    id: 'gold', label: 'Parabolic SAR · Gold', file: 'gold.json',
     note: "Wilder's Parabolic SAR on gold, 25 years, trade level.",
     unit: 'cumbps',
     extract: (d) => ({

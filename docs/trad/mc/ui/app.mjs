@@ -268,6 +268,8 @@ function updateSourceSummary() {
 }
 
 function afterSourceChange() {
+  // whatever is attached now, it is not a board series until pickBoard says so
+  ST.boardKey = null;
   updateSourceSummary();
   refreshModelChips();
   if (ST.source && ST.source.length > 40 && MODELS[ST.modelId] && MODELS[ST.modelId].needsSource) {
@@ -769,6 +771,7 @@ function setMode(mode) {
   $('#ideaRun').hidden = !idea;
   $('#runBtn').hidden = idea;
   syncTests(idea);
+  syncWhatPick(mode);
   $('#runStat').textContent = 'ready';
   try { localStorage.setItem('mc.mode', mode); } catch {}
 }
@@ -777,12 +780,13 @@ function setMode(mode) {
  * asked for, and the state survives mode switches so it does not keep closing
  * itself under someone who opened it on purpose. */
 let mcOpen = false;
-$('#mcToggle').addEventListener('click', () => {
-  mcOpen = !mcOpen;
-  $('#setup').hidden = !mcOpen;
-  $('#mcToggle').setAttribute('aria-expanded', String(mcOpen));
-  $('#mcToggle').textContent = mcOpen ? 'Done' : 'Change';
-});
+function openSetup(on) {
+  mcOpen = on;
+  $('#setup').hidden = !on;
+  $('#mcToggle').setAttribute('aria-expanded', String(on));
+  $('#mcToggle').textContent = on ? 'Done' : 'Change';
+}
+$('#mcToggle').addEventListener('click', () => openSetup(!mcOpen));
 
 /* One line standing in for the four steps. Built from the live controls, so it
  * cannot drift from what will actually be run. */
@@ -812,7 +816,7 @@ function syncTests(idea) {
     em.textContent = idea ? em.dataset.on : em.dataset.why;
   }
   $('#runHint').textContent = idea
-    ? 'Runs in this browser. Same seed, same answer, every time.'
+    ? 'Same seed, same answer, every time.'
     : 'A finished return series has no parameters left, so only the third test applies.';
 }
 
@@ -875,22 +879,118 @@ const IDEA = initIdea({
   },
 });
 
-/* ---------------- arriving from a /trad board ---------------- */
-/* The Test button on a board links here with #board=<id>&series=<key>. The data
- * is fetched from the board's own JSON rather than stuffed into the URL, so the
- * link stays short and the lab is always reading the published figures. */
+/* ---------------- what is being tested ---------------- */
+/* Every strategy published on /trad, in one list, together with the rule flow.
+ * Choosing also decides the mode, because the choice IS the mode: a board
+ * publishes a finished return series, which can only take test 3.
+ *
+ * The boards are read in parallel in the background. You almost always arrive
+ * here from /trad, which has just fetched the same four files, so they come
+ * back from the HTTP cache. */
+function renderWhatOptions(groups) {
+  $('#whatPick').innerHTML =
+    '<optgroup label="Your own">' +
+      '<option value="rule">A rule I write</option>' +
+      '<option value="attach">A series I paste in</option>' +
+    '</optgroup>' +
+    groups.map((g) => {
+      /* Closed, a select shows only the option -- not the group it came from.
+         Two boards both offer a series called "Parabolic SAR", so the market
+         has to ride on the option itself or the collapsed control is a lie. */
+      const market = g.label.includes(' \u00b7 ') ? g.label.split(' \u00b7 ').pop() : null;
+      return `<optgroup label="${esc(g.label)}">` + g.series.map((x) => {
+        const label = market && !x.label.includes(market) ? `${market} \u00b7 ${x.label}` : x.label;
+        return `<option value="board:${esc(g.id)}:${esc(x.key)}">${esc(label)}</option>`;
+      }).join('') + '</optgroup>';
+    }).join('');
+}
+
+/* Keep the dropdown telling the truth about what is actually attached --
+ * including when that is neither a rule nor a board, which is what the idea
+ * tester hands over when it chains into the Monte Carlo. */
+function syncWhatPick(mode) {
+  const sel = $('#whatPick');
+  if (mode === 'idea') { sel.value = 'rule'; return; }
+  if (ST.boardKey && [...sel.options].some(o => o.value === ST.boardKey)) { sel.value = ST.boardKey; return; }
+  let other = sel.querySelector('option[value="other"]');
+  if (!other) {
+    const g = document.createElement('optgroup');
+    g.label = 'Attached here';
+    other = document.createElement('option');
+    other.value = 'other';
+    g.appendChild(other);
+    sel.insertBefore(g, sel.firstChild);
+  }
+  other.textContent = ST.sourceLabel || 'the attached series';
+  sel.value = 'other';
+}
+
+async function buildWhatList() {
+  renderWhatOptions([]);
+  $('#whatNote').textContent = 'reading\u2026';
+  // the order the tabs are in on /trad, so the two lists read the same way
+  const ORDER = ['gs', 'gold', 'mes', 'bell'];
+  const ids = [...ORDER.filter(x => BOARDS[x]), ...Object.keys(BOARDS).filter(x => !ORDER.includes(x))];
+  const loaded = await Promise.all(ids.map(id => getBoard(id).catch(() => null)));
+  const groups = [];
+  ids.forEach((id, i) => {
+    const b = loaded[i];
+    if (b && b.series && b.series.length) groups.push({ id, label: b.label, series: b.series });
+  });
+  renderWhatOptions(groups);
+  syncWhatPick($('#ideaPane').hidden ? 'mc' : 'idea');
+  const n = groups.reduce((a, g) => a + g.series.length, 0);
+  // the groups name themselves; a count underneath would just be more words
+  $('#whatNote').textContent = groups.length ? '' : 'no boards could be read';
+}
+
+$('#whatPick').addEventListener('change', async () => {
+  const v = $('#whatPick').value;
+  if (v === 'other') return;                       // already attached; nothing to do
+  if (v === 'rule' || v === 'attach') {
+    // drop the board fragment, or the link still points at a board
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    if (v === 'rule') { setMode('idea'); return; }
+    // "paste something in" has to open the pane you paste into
+    setMode('mc');
+    openSetup(true);
+    $('#setup').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
+  const m = /^board:([a-z0-9_]+):(.*)$/i.exec(v);
+  if (m) await pickBoard(m[1], m[2]);
+});
+
+/* ---------------- the /trad boards ---------------- */
+/* The Test button on a board links here with #board=<id>&series=<key>, and the
+ * dropdown at the top of the page switches between all of them. The data is
+ * fetched from each board's own JSON rather than stuffed into a URL, so the lab
+ * is always reading the published figures. Converted boards are cached: there
+ * is no reason to re-read and re-verify one you have already looked at. */
+const boardCache = new Map();
+function getBoard(id) {
+  if (!boardCache.has(id)) boardCache.set(id, loadBoard(id, '../'));
+  return boardCache.get(id);
+}
+
 async function restoreFromBoard() {
   const m = /(?:^|[#&])board=([a-z0-9_]+)/i.exec(location.hash || '');
   if (!m) return false;
   const id = m[1];
   if (!BOARDS[id]) return false;
   const want = (/(?:^|[#&])series=([^&]+)/.exec(location.hash || '') || [])[1];
+  return pickBoard(id, want && decodeURIComponent(want));
+}
+
+async function pickBoard(id, want) {
+  if (!BOARDS[id]) return false;
   $('#runStat').textContent = `loading the ${BOARDS[id].label} board...`;
   try {
-    const b = await loadBoard(id, '../');
-    const chosen = (want && b.series.find(s2 => s2.key === decodeURIComponent(want))) || b.series[0];
+    const b = await getBoard(id);
+    const chosen = (want && b.series.find(s2 => s2.key === want)) || b.series[0];
     ST.source = Float64Array.from(chosen.returns);
-    ST.sourceLabel = `${b.label} — ${chosen.label}`;
+    // "Parabolic SAR · Gold — Parabolic SAR" says it twice
+    ST.sourceLabel = b.label.includes(chosen.label) ? b.label : `${b.label} — ${chosen.label}`;
     ST.sourceNote = b.note;
     ST.strategySrc = '';
     ST.mode = 'paste';
@@ -911,7 +1011,7 @@ async function restoreFromBoard() {
          bet-sizing rules, and the leverage ladder below is exactly where that choice gets examined.</div>`
       : '';
     $('#parseMsg').innerHTML = `<div class="msg ok"><b>Loaded ${n0(chosen.n)} periods from the
-      ${esc(b.label)} board</b> (${esc(chosen.label)}), ${b.ppy} periods a year.
+      ${esc(ST.sourceLabel)} board</b>, ${b.ppy} periods a year.
       ${b.verified ? 'The conversion was checked against the figure the board itself publishes.'
                    : '<b>Warning: the conversion did not reproduce the board\'s published figure.</b>'}
       ${b.series.length > 1 ? `Trials set to ${b.series.length} — the number of variants that board shows.` : ''}
@@ -922,6 +1022,12 @@ async function restoreFromBoard() {
      * Mirror it where it can still be read. */
     $('#mcNote').innerHTML = $('#parseMsg').innerHTML;
     syncMcLine();
+    /* The address has to follow the choice, or copying the link hands someone
+     * the board you arrived from rather than the one you are looking at. */
+    const frag = `#board=${id}&series=${encodeURIComponent(chosen.key)}`;
+    if (location.hash !== frag) history.replaceState(null, '', frag);
+    ST.boardKey = `board:${id}:${chosen.key}`;
+    syncWhatPick('mc');
     $('#runStat').textContent = 'ready';
     return true;
   } catch (e) {
@@ -944,7 +1050,7 @@ renderParams();
 let savedMode = 'idea';
 try { savedMode = localStorage.getItem('mc.mode') || 'idea'; } catch {}
 setMode(location.hash && location.hash.length > 8 ? 'mc' : savedMode);
-restoreFromBoard();
+restoreFromBoard().then(buildWhatList);
 /* The shell navigates between boards by changing this frame's fragment, which
  * does NOT reload the document -- so the board has to be re-read here. */
 addEventListener('hashchange', () => { restoreFromBoard(); });

@@ -82,6 +82,7 @@
         font:inherit;font-size:11.5px;font-weight:620;padding:4px 10px;border-radius:7px;cursor:pointer}
   .mini:hover{background:var(--paper);color:var(--ink)}
   .mini:focus-visible{outline:2px solid var(--s1);outline-offset:1px}
+  #whatPick{font-weight:620;max-width:min(420px,60vw)}
   #ruleWrap,#setWrap{padding:0 0 11px}
   #ideaBox{min-height:230px}
 
@@ -317,11 +318,21 @@
     <button type="button" class="back" id="backBtn">&larr;&nbsp;Trad</button>
     <h1>Test</h1>
     <span class="tag" id="gen"></span>
-    <span class="spacer"></span>
-    <div class="modeswitch" role="tablist" aria-label="What to run">
-      <button role="tab" id="mIdea" aria-selected="true">All three</button>
-      <button role="tab" id="mMC" aria-selected="false">Monte Carlo only</button>
+  </div>
+
+  <!-- One control decides what is being tested: a rule, or any strategy on
+       /trad. It also decides the mode, so there is nothing else to set first.
+       The two mode buttons stay as the thing setMode() writes its state to. -->
+  <div class="brief" id="whatBrief">
+    <div class="brow">
+      <span class="bk">Testing</span>
+      <select id="whatPick" aria-label="What to test"></select>
+      <span class="hint" id="whatNote"></span>
     </div>
+  </div>
+  <div hidden>
+    <button role="tab" id="mIdea" aria-selected="true">All three</button>
+    <button role="tab" id="mMC" aria-selected="false">Monte Carlo only</button>
   </div>
 
   <!-- ============ WHAT IS BEING TESTED ============ -->
@@ -396,7 +407,7 @@
        so in this mode too the setup is one line until you ask for it. -->
   <div class="brief" id="mcBrief" hidden>
     <div class="brow">
-      <span class="bk">Series</span>
+      <span class="bk">Setup</span>
       <span class="hint" id="mcLine"></span>
       <button type="button" class="mini" id="mcToggle" aria-expanded="false">Change</button>
     </div>
@@ -558,7 +569,7 @@
   <div class="runrow">
     <button class="btn primary big" id="ideaRun">Run all three</button>
     <button class="btn primary big" id="runBtn" hidden>Run the Monte Carlo</button>
-    <span class="hint" id="runHint">Runs in this browser. Same seed, same answer, every time.</span>
+    <span class="hint" id="runHint">Same seed, same answer, every time.</span>
   </div>
 
   <div id="ideaResults" hidden>
