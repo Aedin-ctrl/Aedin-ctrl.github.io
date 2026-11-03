@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-theme="terminal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Terminal</title>
+<link rel="stylesheet" href="terminal.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='16' y='23' font-family='monospace' font-size='20' font-weight='700' fill='%23ff9e18' text-anchor='middle'>T</text></svg>">
+</head>
+<body>
+<div id="app">
+
+  <!-- scrolling cross-asset strip -->
+  <div class="tape" id="tape" aria-label="Market ticker tape">
+    <div class="tape-track" id="tapeTrack"></div>
+  </div>
+
+  <!-- the command line -->
+  <header class="cmdbar">
+    <div class="cmd-wrap">
+      <span class="prompt" aria-hidden="true">&gt;</span>
+      <input id="cmd" type="text" autocomplete="off" autocapitalize="off" spellcheck="false"
+             aria-label="Command line. Type a ticker and a function, then press Enter."
+             placeholder="AAPL US Equity DES &lt;GO&gt;   ·   type HELP for the function list">
+      <ul id="ac" class="autocomplete" role="listbox" aria-label="Function suggestions" hidden></ul>
+    </div>
+    <button id="go" class="key-go" type="button" title="Run the command (Enter)">GO</button>
+    <button id="cancel" class="key-cancel" type="button" title="Clear the command line (Esc)">CANCEL</button>
+    <div class="clock" id="clock"><span id="clockTime">--:--:--</span><span class="clock-tz">NEW YORK</span></div>
+  </header>
+
+  <!-- loaded security -->
+  <section class="sechdr" id="sechdr" hidden></section>
+
+  <!-- the panels -->
+  <main class="screen" id="screen" tabindex="-1">
+    <div class="boot" id="boot">
+      <pre class="boot-art">
+ ████████ ███████ ██████  ███    ███ ██ ███    ██  █████  ██
+    ██    ██      ██   ██ ████  ████ ██ ████   ██ ██   ██ ██
+    ██    █████   ██████  ██ ████ ██ ██ ██ ██  ██ ███████ ██
+    ██    ██      ██   ██ ██  ██  ██ ██ ██  ██ ██ ██   ██ ██
+    ██    ███████ ██   ██ ██      ██ ██ ██   ████ ██   ██ ███████</pre>
+      <p class="boot-line">MARKET DATA · FUNDAMENTALS · MACRO · NEWS SENTIMENT</p>
+      <p class="boot-sub">yfinance &nbsp;·&nbsp; SEC EDGAR XBRL &nbsp;·&nbsp; FRED &nbsp;·&nbsp; FinBERT</p>
+      <div class="boot-grid" id="bootGrid"></div>
+      <nav class="boot-nav" id="bootNav" aria-label="Jump to a market screen"></nav>
+      <p class="boot-hint">Type a ticker and press <b>ENTER</b> &nbsp;·&nbsp; <b>HELP</b> lists every function
+        &nbsp;·&nbsp; <b>F1</b>–<b>F8</b> jump &nbsp;·&nbsp; <b>ALT</b>+<b>←</b>/<b>→</b> history</p>
+    </div>
+  </main>
+
+  <!-- function keys + status -->
+  <footer class="fkeys">
+    <nav class="fkey-row" id="fkeys" aria-label="Function keys"></nav>
+    <div class="statusline">
+      <span id="stConn" class="st st-ok">●&nbsp;LIVE</span>
+      <span id="stMkt" class="st"></span>
+      <span id="stAge" class="st"></span>
+      <span id="stSent" class="st"></span>
+      <span id="stMsg" class="st st-msg"></span>
+    </div>
+  </footer>
+</div>
+<script>
+  /* The panel opens this page as terminal/#k=KEY. The fragment is never sent
+     to any server; the app reads it here and puts it in an Authorization
+     header on each request to the Pi. With no key the page loads and every
+     screen says it is locked, which is all a scraper gets. */
+  window.TERMINAL_API_BASE = 'https://vault.aedinlai.com/terminal';
+  var _p = new URLSearchParams(location.hash.slice(1));
+  window.TERMINAL_KEY = _p.get('k') || '';
+  if (_p.has('k')) {
+    /* Drop it from the address as soon as it is in hand. The app reads the
+       fragment as a deep link, so a key left there becomes a command and gets
+       sent to the server in a query string -- straight into its logs. */
+    _p.delete('k');
+    var _rest = _p.toString();
+    history.replaceState(null, '', location.pathname + location.search + (_rest ? '#' + _rest : ''));
+  }
+</script>
+<script src="charts.js"></script>
+<script src="terminal.js"></script>
+</body>
+</html>
