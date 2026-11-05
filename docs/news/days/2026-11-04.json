@@ -1,0 +1,751 @@
+{
+  "date": "2026-11-04",
+  "generated": "2026-11-05T00:38:30.710Z",
+  "articles": [
+    {
+      "id": "2026-11-04-a-cyberattack-on-a-refrigeration-supplier-raised-temperatures",
+      "headline": "A cyberattack on a refrigeration supplier raised temperatures at three French blood-service sites",
+      "summary": "France's blood service says an attack on its refrigeration supplier changed temperature and defrost settings at three facilities on Nov. 2. It reports no loss of blood products. The same family of attacks has hit supermarkets across Europe.",
+      "impacts": [
+        "Remote-monitored cold storage is now a target, and blood and plasma depend on it staying cold.",
+        "A supplier's weak spot can reach hospitals and blood banks that were never attacked directly.",
+        "The attackers' tools and goals are unknown, so the pattern could spread to other cold-chain sites."
+      ],
+      "details": [
+        "The French Blood Establishment (EFS) confirmed that a cyberattack raised temperature and defrost settings on refrigeration equipment at three of its facilities. It happened on November 2, and EFS published a statement on November 3. EFS says it was not the direct target: its equipment supplier was.",
+        "EFS has not named the supplier. A European refrigeration provider, Coolworld Rentals, confirmed a cybersecurity incident involving remote monitoring software that affected what it called a limited number of refrigeration units. BleepingComputer notes that the article does not confirm Coolworld is EFS's supplier, and Coolworld did not say how many units were hit. Coolworld said attackers used a vulnerability in a third-party component outside its direct control, without naming it.",
+        "EFS says its monitoring and alarm systems caught the temperature change quickly. Staff either repaired the equipment or moved products to other refrigeration. Plasma bags for transfusion and plasma used to make medicines were transferred or secured. EFS reports no health impact and no loss of blood products, and says blood collection and distribution continued without interruption. It is working with France's cyber agency ANSSI and the Ministry of Health, and has increased monitoring of refrigeration equipment.",
+        "The incident follows a wave against supermarkets. In October, an estimated 250 to 350 French stores reportedly had their refrigeration controllers compromised, with defrost cycles triggered remotely and food thrown away. Targeted devices reportedly included Danfoss AK-SM/AK-SC and Copeland/Dixell XWEB controllers. In November a second wave reportedly hit more than 115 stores in Belgium, the Netherlands, Sweden, Luxembourg, Ireland and Estonia. One Swedish store's system reportedly began generating heat, and another store reported settings changed to 50 C (122 F). Belgian company Sabcobel said the November attackers used the same vulnerability as in October.",
+        "What is not established: BleepingComputer says it has not been confirmed that the Danfoss flaws disclosed by CISA in 2025 (CVE-2025-41450 and CVE-2025-41451) are being exploited here, and nothing publicly links the blood-service incident to the supermarket campaign. No group has been identified. The reassuring part is that alarms worked and nothing was lost. The worrying part is how little it took to reach medical cold storage, through a supplier's remote tool.",
+        "What to watch: whether EFS or Coolworld names the component, whether other blood or hospital cold-storage operators report similar changes, and whether investigators tie the cases together."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "freezers",
+        "critical infrastructure",
+        "blood",
+        "france",
+        "supply chain",
+        "cyberattack",
+        "refrigeration"
+      ],
+      "date": "2026-11-04",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/cyberattack-disrupts-blood-storage-refrigeration-systems-in-france/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-anthropics-ipo-filing-says-it-may-imminently-meet",
+      "headline": "Anthropic's IPO filing says it 'may imminently meet' its own bar for AI-accelerated AI development",
+      "summary": "Anthropic's revised S-1 says internal estimates suggest it may soon reach its policy's definition of dramatically accelerated progress driven by AI. It says no current model has crossed that line and that it has missed such jumps before.",
+      "impacts": [
+        "A lab is telling investors that AI helping build AI could outrun its own ability to notice.",
+        "If the threshold is crossed, the company's Responsible Scaling Policy would require extra safeguards.",
+        "Because an S-1 also markets the company, outsiders cannot easily verify how close the line really is."
+      ],
+      "details": [
+        "Anthropic filed a revised S-1/A with the SEC on Monday, November 2. TechCrunch reports that the Risk Factors section says the company has in the past not identified significant acceleration in its own development rate until after it happened, and that it has used AI to develop new models whose capability gains it did not recognize at the time.",
+        "The key line concerns Anthropic's Responsible Scaling Policy. Based on internal estimates and expectations about future models, the filing says the company may imminently meet the policy's definition of dramatically accelerated progress attributable to AI. TechCrunch's headline calls this being very close to recursive self-improvement, but that is the outlet's framing, not the filing's wording.",
+        "The filing is explicit about what has not happened. Anthropic has not designated any current model as exceeding the threshold and says it is still assessing the underlying data. It also says that using AI to help build more capable AI could pose a considerable safety risk, and that it does not expect to safely let Claude fully autonomously design and build successive generations of frontier models without meaningful human supervision. It says it is considering updates to the policy to keep humans in control of frontier development.",
+        "Context matters. TechCrunch notes that skeptics see an S-1 as both disclosure and marketing, so a claim of being near self-building AI could be promotional. The same article points to Claude's rapid gains in coding, math and cybersecurity this year as a reason to take the warning seriously. Both readings can be true: a company can be legally required to disclose a risk and also benefit from looking like it leads the field.",
+        "What is uncertain: how the threshold is measured, what the underlying data show, and what the company would actually do if a model crossed it. Those details are not in the TechCrunch summary. Watch for the final prospectus, any policy update, and comment from independent safety researchers."
+      ],
+      "category": "AI",
+      "tags": [
+        "anthropic",
+        "ipo",
+        "ai risk",
+        "recursive self-improvement",
+        "responsible scaling policy",
+        "claude",
+        "ai safety"
+      ],
+      "date": "2026-11-02",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/02/anthropic-warns-that-its-very-close-to-rsi-capability-aka-self-building-ai/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-apple-will-start-checking-public-icloud-share-links",
+      "headline": "Apple will start checking public iCloud share links for 'harmful content'",
+      "summary": "A new Apple support page says iOS 27.3 and matching releases will check content shared through 'Anyone with the Link' iCloud links for harmful content. Apple does not define the term or explain how the checks work.",
+      "impacts": [
+        "Public links already lack end-to-end encryption, and now they will be actively reviewed.",
+        "An undefined 'harmful content' category leaves the rules to Apple's judgment.",
+        "Automated review can make mistakes, and the support page does not describe an appeal process."
+      ],
+      "details": [
+        "According to The Register, Apple published a support page on Tuesday, November 3, saying that in version 27.3 of iOS, iPadOS, macOS and visionOS it will check content shared through publicly accessible iCloud links. 27.3 went to developers in beta on Tuesday, and a general release is expected in December.",
+        "The scope is narrow. The checks cover only items shared with the 'Anyone with the Link' option, not content shared directly with specific people. Apple's help page says that option removes end-to-end encryption from the shared item, even for users with Advanced Data Protection turned on. Apple says such content 'will be checked by Apple for harmful content.'",
+        "Apple says it may move, refuse, modify, remove or delete harmful content at any time, may block or disable accounts linked to it, and may involve law enforcement when necessary. It does not define harmful content. The Register suggests categories such as child sexual abuse material and malware could be included, but says Apple has not confirmed that.",
+        "Key unknowns: Apple has not said how the checks work or whether people, automated systems or both will decide what is removed. Apple did not respond to The Register's questions.",
+        "The criticism in the article is the author's opinion: that an undefined term leaves users dependent on Apple's discretion, that political pressure could shape removals (the piece offers no evidence this has happened), and that AI-based moderation can be wrong. The plain facts are more modest. Anyone using public links already gave up end-to-end encryption for those items, and Apple is now saying it will look at them. Watch for the final release notes and any technical description of the checks."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "apple",
+        "icloud",
+        "privacy",
+        "encryption",
+        "content moderation",
+        "surveillance",
+        "sharing"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/04/apple-turns-icloud-into-spy-cloud-will-start-looking-at-public-share-links/5307681"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-french-bank-says-a-supplier-breach-let",
+      "headline": "A French bank says a supplier breach let attackers move money from its own account; est. $133M",
+      "summary": "Crédit Mutuel Arkéa confirmed a 'sophisticated attack' through an unnamed supplier. Blockchain investigator ZachXBT estimates over $133 million was stolen. The bank has not confirmed the figure and says customer accounts were not touched.",
+      "impacts": [
+        "A supplier's platform can be a route to a bank's own accounts, not only customer data.",
+        "Stolen money moved into crypto exchanges quickly, which makes recovery harder.",
+        "Customers say they are unaffected, but the bank has not published a final loss or timeline."
+      ],
+      "details": [
+        "Crédit Mutuel Arkéa, a major French banking group, confirmed on Wednesday, November 4 that it suffered a 'sophisticated attack.' The Record reports that attackers made transfers from the bank's own account after compromising an unnamed supplier. The bank says customer accounts were not accessed and customers' assets are not affected.",
+        "The first public report came on Monday from ZachXBT, a pseudonymous blockchain investigator, who later named Arkéa as the victim and said the attack ran over several days. He estimated the theft at more than $133 million, based on withdrawals from crypto exchange accounts and transactions that appeared intended to launder the funds.",
+        "Arkéa did not confirm that number. It said it could 'validate the order of magnitude' but that the final loss had not been established. It said the loss is 'absolutely not of a nature' to threaten its solvency, citing total assets above 237 billion in its latest annual report.",
+        "On method, the bank says the attackers went through a service provider's platform to reach the group directly, then used the bank's account to send transfers to other institutions, which may have let them convert the money to crypto through specialized platforms. It says its systems flagged the activity quickly, that some converted assets have been frozen, and that the incident is now under control. It is working with police and judicial authorities.",
+        "Disputed or unknown: French media reported the attackers got in through Fortuneo, Arkéa's online-banking subsidiary, which the bank disputes. The supplier, the attackers and the amount recovered are all unidentified. The $133 million figure comes from an outside investigator, not the bank. Watch for the bank naming the supplier, the final loss figure, and any attribution by French authorities."
+      ],
+      "category": "Economy",
+      "tags": [
+        "bank",
+        "heist",
+        "france",
+        "supply chain",
+        "crypto",
+        "laundering",
+        "zachxbt"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/french-bank-confirms-cyber-heist"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-cyberattack-wiped-cloud-data-at-beget-one",
+      "headline": "A cyberattack wiped cloud data at Beget, one of Russia's biggest hosting companies",
+      "summary": "Scripts erased data tied to Beget's virtual servers, cloud storage and Kubernetes services, and all binary backups of virtual servers were lost. More than 1,000 servers must be checked by hand. No group has claimed it.",
+      "impacts": [
+        "Wiping attacks on hosting providers can take down hundreds of small businesses at once.",
+        "Backups kept on the same infrastructure can be destroyed with everything else.",
+        "Customers were told to rotate passwords and keys that may have been stored on affected systems."
+      ],
+      "details": [
+        "The Record reports that a cyberattack destroyed data across Beget's cloud infrastructure on a Sunday night and disrupted hundreds of websites. Beget is one of Russia's largest domain registrars and hosting companies. By Wednesday, November 4, it had begun bringing some servers back.",
+        "Attackers reached the systems used to manage Beget's infrastructure and ran scripts designed to erase data. Data tied to virtual private servers, cloud storage and Kubernetes was wiped, and all binary backups of virtual servers were lost. File-level backups survived and may recover some information. Beget says nearly all shared-hosting sites can probably be recovered, but each server has to be checked manually. In its words, 'more than 1,000 servers must be manually inspected.'",
+        "Kommersant reported that small and medium-sized businesses running online stores and corporate sites were hit hardest. Named casualties include the Naryan-Mar city administration website, the Chestny Znak product-labeling system, and a Russian Academy of Sciences solar astronomy lab whose site was down because of registrar problems. Beget was the second-largest .RU registrar in October, with about 540,700 domains, or 14.7% of the market, per figures Kommersant cited.",
+        "Beget says it found no evidence the attackers tried to download or modify customer data on servers holding it, and urged customers to change credentials. It also told customers the incident could count as force majeure under Russian law.",
+        "Context from the same article: in October, hackers exploited software at hosting provider FirstVDS to steal customer data, and Ukrainian drones struck three Yandex data centers, taking two offline. Earlier this year the EU sanctioned Beget and a co-owner for providing digital services to Russian-backed authorities in occupied Ukrainian regions and to defense-related entities.",
+        "Unknown: how the attackers got in, who is responsible, how much data is recoverable, and whether the 'no evidence' statement on customer data will hold up. No claim of responsibility has been reported, so any link to the war is inference."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "russia",
+        "hosting",
+        "wiper",
+        "cyberattack",
+        "backups",
+        "ukraine",
+        "cloud"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/russia-cyberattack-beget-cloud"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-sekoia-ties-zero-click-ios-and-android-attacks",
+      "headline": "Sekoia ties zero-click iOS and Android attacks to APT29, delivered via a hijacked analytics script",
+      "summary": "Sekoia reports a campaign that profiled visitors on compromised and lookalike sites and pushed matching exploit chains to iPhones and Chrome on Android without any tap. It attributes the campaign to APT29 with moderate-to-high confidence. All flaws are patched.",
+      "impacts": [
+        "Simply visiting a trusted site was enough, if the phone was missing patches.",
+        "Old, already-patched bugs still work against devices that have not updated.",
+        "A reboot ends the implants, which here did not persist, but data was taken first."
+      ],
+      "details": [
+        "BleepingComputer summarizes a Sekoia report on a watering-hole campaign targeting iOS and Android users. Sekoia attributes it with moderate-to-high confidence, not certainty, to APT29, also known as Midnight Blizzard. Visitors to compromised or lookalike websites in the U.S., Ukraine, the Czech Republic and Bulgaria all received the same payload.",
+        "Compromised legitimate sites included a Ukrainian gas producer, a U.S. chemical-industry trade association and a Bulgarian military-related site. Lookalike domains impersonated the official America250 site and the Raffles London at The OWO hotel, relaying the real sites' content to visitors. The attacker also compromised Plerdy, a Ukrainian web-analytics provider, and modified its SEO tracker, which thousands of sites, mostly in Ukraine, loaded between August 27 and September 3.",
+        "JavaScript first profiled each visitor's device and browser. The command server then pushed a matching 'platform-specific n-day exploit chain without user interaction.' N-day means already-patched flaws. On iOS 16.7 the target was Safari cookies. On iOS 18.5 it was WhatsApp and Telegram databases, Keychain credentials, location data and photos. On Chrome for Android versions 139 to 145 (excluding 143) it was cookies, logins, browsing history and saved Wi-Fi credentials. One iOS bug, CVE-2025-43529, is linked to the 'DarkSword' exploit kit used by multiple groups since at least November 2025.",
+        "None of the payloads established persistence, so a reboot stops the activity until the user visits an infected site again. Apple and Google have patched all targeted flaws, and some fixes were backported to older iOS releases. The advice is to install current updates.",
+        "Gaps in the reporting: the number of victims is not given, the article does not explain why Chrome 143 was excluded, and it does not say how Plerdy was compromised. Attribution rests on similarities to earlier APT29 operations, infrastructure overlaps and a compromised site a partner linked to a 2025 campaign, which is circumstantial evidence rather than proof."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "apt29",
+        "zero-click",
+        "ios",
+        "android",
+        "watering hole",
+        "sekoia",
+        "supply chain"
+      ],
+      "date": "2026-11-04",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-use-n-day-exploits-in-zero-click-attacks-on-ios-android-devices/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-six-asian-airlines-report-passenger-data-breaches-traced",
+      "headline": "Six Asian airlines report passenger-data breaches traced to one reservation-system vendor, Amadeus",
+      "summary": "Japan Airlines, Cathay Pacific, Korean Air, Asiana, Singapore Airlines and Malaysia Airlines have disclosed breaches tied to Amadeus. Reported counts include about 92,000 at JAL and 53,000 at Cathay. Amadeus says no payment data was accessed.",
+      "impacts": [
+        "One vendor's flaw exposed passengers at many airlines at once.",
+        "Booking numbers and itineraries can be used for convincing phishing aimed at travelers.",
+        "Some Cathay records included passport details, which raises identity-fraud risk."
+      ],
+      "details": [
+        "The Record reports that several Asian airlines have disclosed data breaches traced to Amadeus IT Group, the Spanish company behind many airline reservation, ticketing and check-in systems. The airlines came forward over roughly the week before November 4: Japan Airlines, Cathay Pacific, Korean Air and Asiana, Singapore Airlines and Malaysia Airlines.",
+        "Reported numbers: about 92,000 Japan Airlines customers had information stolen, 46,000 Singapore Airlines records were accessed, and 53,000 Cathay Pacific records were stolen, including booking numbers, names and flight details, with some also holding passport or travel-document data, frequent-flyer numbers and email addresses. The article gives no figures for Korean Air, Asiana or Malaysia Airlines.",
+        "Amadeus says it recently learned of a vulnerability affecting a travel booking display environment and that 'certain booking-display data was accessible.' It says there is no evidence payment or financial data was accessed and no indication of ransomware, and that it has fixed the flaw and added monitoring. It told the airlines the attackers used login credentials assigned to its system account, though the airlines did not elaborate. It declined to say whether attackers had contacted it or how many victims there are.",
+        "Singapore Airlines said confirmation numbers, itineraries and names leaked, and it plans to contact passengers with upcoming flights so they can change exposed booking numbers. All the airlines say their own systems and operations were unaffected.",
+        "Open questions: the total number of people affected is unknown, the breach dates are not given, and the vulnerability and the credential theft are not explained. Airlines describe data as 'stolen' or 'accessed' while Amadeus says 'accessible,' so how much was actually taken is not settled. Expect more airlines to report and watch for phishing that uses real booking details."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "amadeus",
+        "airlines",
+        "data breach",
+        "supply chain",
+        "passport",
+        "phishing",
+        "travel"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/asian-airlines-announce-data-breach-it-provider-incident"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-former-us-government-it-worker-pleads-guilty",
+      "headline": "A former US government IT worker pleads guilty to sending Top Secret files to Ethiopia",
+      "summary": "Abraham Teklu Lemma, 53, pleaded guilty to espionage offenses and agreed to 10 to about 21.8 years in prison. Prosecutors say he copied at least 133 intelligence reports and passed material to Ethiopian officials. Sentencing has not happened yet.",
+      "impacts": [
+        "IT staff with broad file-moving powers are a major insider risk, even with security controls in place.",
+        "The FBI says the information was used in military operations during an ongoing conflict.",
+        "Burned discs and mislabeled media show how old-fashioned methods can get past classified-network protections."
+      ],
+      "details": [
+        "The Register reports that Abraham Teklu Lemma, 53, of Maryland, a naturalized US citizen, pleaded guilty to espionage offenses, which the Justice Department confirmed on Tuesday, November 3. He agreed to a prison term of 120 to 262 months, about 10 to 21.8 years. The sentence has not been imposed.",
+        "Lemma worked for the US government from 2019 to 2023 across the National Reconnaissance Office, the State Department and the Justice Department, and held a Top Secret clearance from 2020. At State he worked evening IT help-desk shifts; at Justice he worked days as a contract management analyst. He had 'downdraft' authority to move files between classified systems and from classified to unclassified ones.",
+        "Prosecutors allege he copied information from at least 133 intelligence reports without a need to know, downloaded more than 100 documents, burned them to discs and removed classification markings. He allegedly used discs with green labels, meant for unclassified material, for Secret and Top Secret content, carried them out in a jacket pocket, and took handwritten notes. They say he sent documents, photos, notes and maps covering command centers, logistics centers and military compounds to Ethiopian officials over an encrypted messaging app, and that officials remotely accessed copies on his drives between April and June 2023.",
+        "The Register reports bank deposits above $66,000 during the period, and an occasion when he allegedly discouraged bank staff from filing a currency transaction report. FBI counterintelligence chief Roman Rozhavsky said Lemma 'betrayed our country,' and that Ethiopian officials used the information in military operations during an ongoing conflict, citing Lemma's own admission.",
+        "Caveats: the details above come from prosecutors' filings, and only the guilty plea is an admission. The article notes inconsistent start dates (July 2022 in the complaint, 2021 later) and a message dated December 2021 that does not match the stated timeline. The sentence is still to come."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "espionage",
+        "insider threat",
+        "ethiopia",
+        "classified",
+        "clearance",
+        "fbi",
+        "intelligence"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/04/us-gov-it-worker-pleads-guilty-to-sending-top-secret-files-to-ethiopia/5307595"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-data-centers-are-losing-at-the-ballot-box",
+      "headline": "Data centers are losing at the ballot box: voters opposed them in 38 local races, 404 Media counts",
+      "summary": "404 Media counts voters opposing data centers in 38 of 40-plus local ballot races across 13 states. Data Center Watch says 43% of 74 selected gubernatorial candidates backed a ban or moratorium. Both tallies were incomplete when published.",
+      "impacts": [
+        "Building out AI computing power now faces local votes, not just permits.",
+        "Moratorium talk is bipartisan, which could slow projects tied to AI company spending plans.",
+        "Tallies are partial and mix advocacy sources, so the size of the shift is not certain."
+      ],
+      "details": [
+        "Two outlets published tallies on Wednesday, November 4. 404 Media reports data center proposals on the ballot in more than 40 races across 13 states, with voters opposing them in 38 and the count still going. It says six cities voted to ban data centers outright, twelve places voted to limit how many megawatts such buildings can draw, Emporia, Kansas banned high-impact ones, and the mayor of Yukon, Oklahoma lost a recall after backing a hyperscale project.",
+        "The Register, citing Data Center Watch, looked at 74 selected candidates in the 36 states electing governors. Of them, 43% backed a ban or moratorium on new projects, 51% backed more regulation or conditional development, and about 5% had no position. Ban or moratorium support was 60% among Democrats and 30% among Republicans. Data Centers on the Ballot counted 43 of 46 municipal restrictions approved, with Harwood, North Dakota rejecting one and two results pending.",
+        "Texas is the big example. Democrat Gina Hinojosa beat Gov. Greg Abbott and supports a temporary moratorium; she takes office in January. Abbott had ordered a pause earlier this year while energy and water audits were done, though 404 Media reports regulators kept approving projects and calls the pause not real, a claim based on its own earlier reporting. Texas has more than 300 operating data centers, 404 Media says.",
+        "Earlier polling in The Register's piece: Gallup found more than 70% of Americans would oppose a data center in their neighborhood, and Pew found growing concern about environmental effects and household energy bills.",
+        "Caveats: the 74 candidates were selected, so the sample may not represent all candidates or voters, and the percentages describe candidate positions, not voter preferences. The 404 Media piece leans toward opinion and relies heavily on one advocacy network for commentary. Neither article shows data centers were the deciding factor in any race over cost of living or other issues. The Register notes its own headline overstates how united the country is."
+      ],
+      "category": "Economy",
+      "tags": [
+        "data centers",
+        "ai bubble",
+        "elections",
+        "moratorium",
+        "texas",
+        "energy",
+        "politics"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "404 Media",
+          "url": "https://www.404media.co/american-voters-overwhelmingly-reject-ai-data-centers/"
+        },
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/systems/2026/11/04/america-unites-on-one-issue-reining-in-datacenters/5307536"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-esas-hera-probe-sights-the-asteroid-pair-dart",
+      "headline": "ESA's Hera probe sights the asteroid pair DART hit; the orbit change was bigger than predicted",
+      "summary": "Hera took its first image of Didymos and Dimorphos as separate objects on Oct. 18 from about 1,280 km. DART's 2022 impact shortened Dimorphos's orbit by about 33 minutes, more than simulations predicted. Detailed images are due Nov. 25.",
+      "impacts": [
+        "It is the first measured change to a natural object's orbit by a human-made spacecraft.",
+        "Deflection would need to be well understood before an actual threat appears.",
+        "How the asteroid is built inside is still unknown, and that decides how well the method works."
+      ],
+      "details": [
+        "ScienceDaily, relaying ESA, reports that the Hera spacecraft's Asteroid Framing Camera captured its first image showing Didymos and Dimorphos as separate objects on the evening of October 18, from about 1,280 km away. The pair were about 197 million km from Earth, and Dimorphos was roughly one pixel across. Two thruster burns about a week apart in early October cut Hera's speed relative to the asteroids to 20 meters per second.",
+        "The numbers: Dimorphos is about 151 meters across and Didymos about 780 meters. Dimorphos orbits at an average distance of 1.15 km, moving at roughly 18 cm per second. ESA plans to release the first detailed images of Dimorphos on November 25.",
+        "Background: on September 26, 2022, NASA's DART hit Dimorphos at about 6.1 km per second. The impact threw debris up to 10,000 km into space and shortened Dimorphos's orbital period around Didymos by about 33 minutes. That was much larger than computer simulations predicted. The article describes Dimorphos as the first object whose orbit has been measurably changed by human action.",
+        "Hera is there to explain why the result was so big. Open questions include whether DART left a crater or substantially changed Dimorphos's shape, and what its mass, composition and internal structure are. Over coming months Hera will run a 'crash site investigation,' release two shoebox-sized CubeSats for close observation, and eventually attempt landing operations.",
+        "The caution: one test on one rubble-pile-like target does not guarantee a deflection would work on a different asteroid, which is why the mass and structure measurements matter. This is not a threat story; no known asteroid is on course for Earth in the article. The point is that the tool works, and Hera will show how well we understand it."
+      ],
+      "category": "Space",
+      "tags": [
+        "asteroid",
+        "hera",
+        "dart",
+        "planetary defense",
+        "esa",
+        "nasa",
+        "dimorphos"
+      ],
+      "date": "2026-11-03",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261103003154.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-zyxel-switch-bug-that-bypassed-the-june",
+      "headline": "A Zyxel switch bug that bypassed the June patch hit nearly 1,000 devices; fixed Oct. 22",
+      "summary": "Binarly found an exploit that still worked on all ten patched Zyxel GS1900 firmware releases. Zyxel assigned a new CVE and shipped a fix. GreyNoise had seen 996 switches compromised in 48 countries by a suspected Chinese-speaking actor.",
+      "impacts": [
+        "A patch that closes one path can leave a nearby one open, so patched devices were still exposed.",
+        "Network switches rarely run security tools, so a compromise can go unnoticed.",
+        "Admins need the October firmware, not just the June one."
+      ],
+      "details": [
+        "BleepingComputer reports that CVE-2026-107441 is an out-of-bounds write in the web management interface of Zyxel GS1900 series switches. An unauthenticated attacker with network access can run operating-system commands with crafted HTTP requests. Ten GS1900 models are affected. Zyxel released fixes on October 22 and published an advisory on November 3.",
+        "The history: on June 16, Zyxel patched CVE-2026-7273, a pre-authentication buffer overflow in the same switches. GreyNoise disclosed attacks on September 21 and attributed them to that CVE, and CISA added it to its Known Exploited Vulnerabilities list the same day. GreyNoise saw exploitation starting around August 17 by a suspected Chinese-speaking actor it tracks as Kapibala, and counted 996 compromised devices across 48 countries. After gaining command execution, attackers downloaded a script that collected configurations, hashed root credentials and network information.",
+        "Binarly, investigating infrastructure linked to the Red Heron campaign, found an exposed archive containing an obfuscated Python exploit for these switches. It checked for firmware versions patched against the June bug. On September 28 Binarly confirmed it still worked against all ten patched releases, because attackers could bypass the new overflow checks by corrupting a parameter counter before it was validated. Binarly reported it September 29, and Zyxel confirmed a new vulnerability October 11. The October firmware limits parameter sizes and validates the parameter count before copying data.",
+        "What is unclear, per the article: whether the exploit was deliberately built to get around the June patches or abused a related flaw those patches did not fully address. GreyNoise's count reflects the earlier flaw's attacks, and BleepingComputer does not say how many devices were hit through the new CVE.",
+        "The advice is simple: install the latest firmware on GS1900 switches and keep their management interfaces off untrusted networks."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "zyxel",
+        "zero-day",
+        "switches",
+        "greynoise",
+        "binarly",
+        "exploited",
+        "patch"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/zyxel-fixes-zero-day-exploited-to-hack-nearly-1-000-network-switches/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-hackers-took-over-the-kyiv-independents-newsletter-to",
+      "headline": "Hackers took over the Kyiv Independent's newsletter to send subscribers a fake nuclear-strike alert",
+      "summary": "Attackers got into the outlet's website system and newsletter service and emailed subscribers false claims, including that Zelensky had launched a nuclear warhead at Kyiv. The outlet suspects Russia but gave no technical proof.",
+      "impacts": [
+        "A trusted outlet's mailing list became a delivery channel for panic.",
+        "Fake alerts follow days after hackers abused a widely used Ukrainian air-raid app.",
+        "Attribution rests on message content, not forensic evidence, so the source is not established."
+      ],
+      "details": [
+        "The Record reports that the Kyiv Independent, a Ukrainian English-language news outlet, said on Wednesday, November 4 that a suspected Russian cyberattack disrupted its website. Hackers gained access to its website management system and to the service it uses to send newsletters.",
+        "They posted false messages on the site, which staff removed quickly, and sent fabricated emails to subscribers in Russian and English. One Russian-language email claimed Zelensky had launched a nuclear warhead at Kyiv as a 'proof of friendship' after meeting Putin, urged recipients to take shelter and included the username of an anonymous Telegram channel. Other emails made fabricated claims about a physical attack on Zelensky.",
+        "The outlet attributed the attack to suspected Russian actors based on the content of the messages and did not provide technical evidence linking the breach to Moscow. Editor-in-Chief Olga Rudenko said such attacks are part of the war the outlet covers daily and are meant to sow confusion, and that this was the first attack of this kind it has faced. It says donors' and members' banking information was not compromised because payments run through third-party services.",
+        "Background from the article: the Kyiv Independent was founded in November 2021, reported nearly 3 million monthly readers in 2025, mostly outside Ukraine, and has more than 35,000 paying members. Days earlier, hackers compromised Ukraine's widely used air-raid alert app and sent fake warnings about nuclear and chemical threats; one pointed to a Telegram channel linked to a previously unknown group calling itself Hitcore Corp.",
+        "No confirmed connection between the two incidents has been established. The staff say they are working with cybersecurity specialists to find the weakness. The facts are narrow: access was gained and false emails went out. Who did it and how remains unproven."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "ukraine",
+        "russia",
+        "disinformation",
+        "kyiv independent",
+        "newsletter",
+        "cyberattack",
+        "nuclear"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/ukraine-kyiv-independent-cyberattack"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-drug-first-built-for-spinal-cord-injury",
+      "headline": "A drug first built for spinal-cord injury repaired DNA damage in Alzheimer's mice",
+      "summary": "King's College London researchers report that KCL-286, an oral drug that has passed Phase 1 safety trials for another use, helped repair DNA breaks and reduce inflammation in a mouse model of Alzheimer's. No human efficacy has been shown.",
+      "impacts": [
+        "It points to a different target than the amyloid and tau drugs, aimed at early disease processes.",
+        "Prior safety data in people could shorten the path to a trial, if the mouse results hold.",
+        "Mouse results often fail in people, so the finding is a lead, not a treatment."
+      ],
+      "details": [
+        "ScienceDaily, relaying a King's College London release dated November 2, reports a study in FEBS Open Bio (DOI 10.1002/2211-5463.70284) on KCL-286. The paper's title describes it as ameliorating neuronal DNA damage and inflammation in a mouse model of Alzheimer's disease. Jonathan Corcoran, a professor of neuroscience at King's, is among the authors.",
+        "KCL-286 is described as a first-in-class, orally available small molecule that activates retinoic acid receptor-beta, part of the vitamin A-related retinoic acid pathway. It was originally developed for spinal-cord injury and has completed Phase 1 human trials of safety and tolerability. Earlier work found it promoted repair of DNA double-strand breaks in neuropathic pain research, and the team had identified molecular pathways shared by spinal-cord injury and Alzheimer's.",
+        "In the Alzheimer's-like mice, the drug helped repair DNA double-strand breaks and reduced brain inflammation. The authors argue this targets early disease processes, unlike treatments focused mainly on amyloid-beta or tau.",
+        "The caveats matter. These are mouse findings, and the article says human effectiveness has not been established. Phase 1 trials assessed safety and tolerability, not whether the drug works for Alzheimer's. Additional studies and clinical trials are needed to learn whether it can slow progression or improve outcomes. Phrases like 'first-in-class' come from the researchers, and ScienceDaily notes the content may have been edited for style and length.",
+        "What to watch: whether a trial in people with early Alzheimer's is announced, and whether independent labs replicate the DNA-repair effect."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "alzheimer",
+        "drug",
+        "dna repair",
+        "inflammation",
+        "kings college london",
+        "mouse study",
+        "brain"
+      ],
+      "date": "2026-11-02",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261102075806.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-nycs-mayor-condemns-madison-square-gardens-face-scanning",
+      "headline": "NYC's mayor condemns Madison Square Garden's face-scanning, as Dolan sues Wired over the reporting",
+      "summary": "Mayor Zohran Mamdani told Wired MSG's surveillance technology reflects what is wrong in the country. Wired reported MSG tracks visitors with face scanning. MSG calls the reporting false, and two City Council bills on biometrics have been introduced.",
+      "impacts": [
+        "Venues can ban people using face matching, as happened to a lawyer in 2021 at Radio City.",
+        "Rules on biometric collection in public places are being drafted in New York City.",
+        "The company disputes the reporting and the lawsuit is unresolved, so some claims are unproven."
+      ],
+      "details": [
+        "TechCrunch reports that New York City Mayor Zohran Mamdani criticized Madison Square Garden owner James Dolan over the company's surveillance technology in an interview with Wired. Per Wired's reporting as summarized by TechCrunch, MSG uses cameras and face-scanning technology to track people at and outside its venues.",
+        "Wired also reported that MSG keeps a database marking some visitors, including celebrity performers, as 'LGBTQIA.' TechCrunch says the reasons for that are unclear. It also recalls that in 2021 facial recognition led to a woman being banned from Radio City, another Dolan-owned venue, after she was identified as an attorney suing MSG's parent company, though she was not involved in that litigation.",
+        "Mamdani said surveillance technologies are 'indicative of much that is wrong in our country today,' and called draft legislation to ban collecting biometric data such as facial recognition in public places 'an important response.' City Council member Shahana Hanif introduced two pieces of local legislation. Since 2021, New York City has required businesses to disclose when they collect visitors' biometric data.",
+        "MSG disputes the reporting. A spokesperson, Mikyl Cordova, called it 'inaccurate and false' and said the company is pursuing legal remedies, without giving evidence in TechCrunch's piece. Dolan has sued Wired.",
+        "Uncertain: whether the bills will pass or in what form, why the database labels exist, and how the lawsuit will end. The facts that are on the record are the mayor's statements, the bills' introduction, the existing disclosure law and the 2021 ban as reported."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "facial recognition",
+        "msg",
+        "new york",
+        "biometrics",
+        "privacy",
+        "wired",
+        "mamdani"
+      ],
+      "date": "2026-11-03",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/03/new-york-citys-mamdani-criticizes-madison-square-garden-owner-over-surveillance-tech/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-follow-up-blackstone-now-expects-a-junk-credit",
+      "headline": "Follow-up: Blackstone now expects a 'junk' credit rating for Anthropic after its IPO, the FT reports",
+      "summary": "The Financial Times reports that Blackstone, anchor investor in a $63 billion chip-financing deal, told investors it expects a double-B rating for Anthropic after it goes public, down from an earlier hope of investment grade. It is a forecast, not a rating.",
+      "impacts": [
+        "A lower rating would make borrowing for computing capacity costlier.",
+        "It shows that investors are weighing AI spending commitments against revenue.",
+        "The claim is secondhand and unconfirmed, so treat it as a forecast."
+      ],
+      "details": [
+        "TechCrunch, citing the Financial Times, reports that Blackstone, the anchor investor in a recent $63 billion deal to finance Anthropic's chips, told investors it expects Anthropic to receive a 'high' junk rating after going public.",
+        "Blackstone previously expected an investment-grade rating before 2027. It now expects a double-B rating, which TechCrunch describes as the top tier of speculative, or junk, grade. Investment grade means lower risk for lenders; speculative grade usually means higher borrowing costs.",
+        "The context is spending. Anthropic has signed large compute and power deals over the past 12 months, which TechCrunch says has worried investors. The company filed to go public in the week of the report. Our earlier coverage described its filing's compute commitments against revenue.",
+        "The caveats are plain. This is Blackstone's expectation as relayed by the FT, not a decision by credit agencies. TechCrunch asked Anthropic and Blackstone for comment; both declined, and TechCrunch did not independently verify the FT's reporting. If the rating comes in that high, TechCrunch says Anthropic would likely face more difficult and costlier fundraising to fund its spending.",
+        "What to watch: the agencies' actual ratings after the IPO, and whether financing terms for the compute deals change."
+      ],
+      "category": "Economy",
+      "tags": [
+        "anthropic",
+        "ipo",
+        "credit rating",
+        "blackstone",
+        "debt",
+        "ai bubble",
+        "compute"
+      ],
+      "date": "2026-10-30",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/10/30/anthropic-expected-to-receive-high-junk-rating-from-credit-agencies-following-ipo-report-says/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-openais-policy-chief-says-the-2028-election-will",
+      "headline": "OpenAI's policy chief says the 2028 election will decide AI's future; critics call it self-serving",
+      "summary": "Chris Lehane, OpenAI's global affairs chief, published an essay urging candidates to answer public anxiety about AI with a 'third path,' while warning against data center moratoriums. An AI Now Institute researcher called the safety stances 'disingenuous.'",
+      "impacts": [
+        "A leading AI company is openly trying to shape the next presidential campaign's AI platform.",
+        "The proposals mostly encourage AI adoption and infrastructure and do not force wealth sharing.",
+        "Calls for enforceable safety standards sit alongside a record of opposing some state laws."
+      ],
+      "details": [
+        "TechCrunch reports that OpenAI chief global affairs officer Chris Lehane published an essay on Substack arguing the 2028 presidential election could be a defining moment for AI, and urging politicians to address public anxiety rather than just acknowledge anti-AI sentiment and data center backlash. He compares AI's economic impact to the New Deal and calls for a 'compelling third path' so that people share in AI's benefits.",
+        "The political backdrop in TechCrunch's telling: Democrats flipped Congress in the midterms amid frustration over living costs, and data center opposition was bipartisan in several races. Lehane acknowledges concerns but stresses construction jobs and local tax revenue, and warns that a moratorium could jeopardize the U.S. lead over China, comparing that position to the 2002 Iraq war authorization vote.",
+        "His priorities include worker protections, education, AI safety and data center development. Tax ideas include incentives to learn AI skills, easier capital for entrepreneurs, and employee ownership and profit-sharing; TechCrunch notes none is a binding requirement that workers share AI wealth or that companies pay for displacement. On safety, he calls for enforceable standards, independent evaluations, public oversight and the ability to restrict or shut down AI systems. He also backs age-appropriate protections and safeguards for AI companions used by minors.",
+        "Critics: Kate Brennan of the AI Now Institute said the essay marks a shift from OpenAI's 2025 agenda of accelerating AI and cutting regulation, called the New Deal framing 'ahistorical at best and harmful at worst,' and called the safety positions 'disingenuous' given OpenAI's history. TechCrunch recalls OpenAI opposed California's SB 1047 in 2024 and sought to limit state AI rules in 2025, though it has more recently backed some state safety laws.",
+        "Also noted: the claim that AI improves learning is unproven, and the article says recent studies found OpenAI and other labs have not published comprehensive plans for containing a model that escapes human control. OpenAI did not respond to requests for specifics. Unclear: whether these policies would spread or concentrate economic power."
+      ],
+      "category": "AI",
+      "tags": [
+        "openai",
+        "election",
+        "policy",
+        "data centers",
+        "regulation",
+        "lobbying",
+        "ai safety"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/04/openai-is-already-trying-to-shape-the-2028-election/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-follow-up-nasas-swift-observatory-re-entered-near",
+      "headline": "Follow-up: NASA's Swift observatory re-entered near Indonesia after the rescue craft crashed",
+      "summary": "The US Space Force confirmed Swift reentered on Wednesday near Indonesia. It is not known how much of the 1.4-ton spacecraft burned up. The failed Katalyst rescue crashed in September. NASA is now weighing options to keep Hubble in orbit.",
+      "impacts": [
+        "A working science satellite was lost to a decaying orbit because a rescue attempt failed.",
+        "Solar activity lowers orbits, and Hubble is also losing altitude.",
+        "NASA put the risk to anyone on Earth at about 1 in 2,100 beforehand, which it called unlikely."
+      ],
+      "details": [
+        "Phys.org, carrying an AP report dated November 4, says Swift reentered Earth's atmosphere on Wednesday and the U.S. Space Force confirmed the reentry near Indonesia after tracking its declining orbit. The article gives no exact time or coordinates. Intense solar activity over the past few years steadily lowered the spacecraft's orbit.",
+        "NASA had contracted Katalyst Space for an orbit-boosting mission, but its three-armed robotic craft ran into trouble after a July launch and crashed in September. Before the event, NASA estimated the risk of harm to anyone on Earth at about 1 in 2,100, called harm unlikely, and said debris from surviving parts would fall between 20.6 degrees south and 20.6 degrees north latitude, according to a separate report on the NASA forecast. How much of the roughly 1.4-metric-ton spacecraft burned up is not yet known; NASA expected some denser pieces to survive.",
+        "Swift launched in 2004 for a planned two-year study of gamma-ray bursts and exploding stars, ran about 11 times longer than planned, and observed thousands of these events, acting as a first responder for other telescopes. Its final science observation was October 20, and operators then ended its operations.",
+        "The Hubble angle: launched in 1990, Hubble is also losing altitude from solar activity and is expected to reenter by the mid-2030s. NASA is asking private companies about boosting its orbit, upgrading its systems or a controlled reentry, and any such mission would have to happen by 2032. Administrator Jared Isaacman said Hubble 'still has important science ahead,' and NASA science chief Nicky Fox said the agency has more time to explore Hubble options than it had for Swift.",
+        "What to watch: reports of any debris recovery, and NASA's response to the Hubble industry inquiry. Nothing in these reports suggests damage on the ground."
+      ],
+      "category": "Space",
+      "tags": [
+        "swift",
+        "nasa",
+        "reentry",
+        "hubble",
+        "space debris",
+        "solar activity",
+        "katalyst"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Phys.org (AP)",
+          "url": "https://phys.org/news/2026-11-nasa-space-telescope-plunges-earth.html"
+        },
+        {
+          "name": "Tech Insider",
+          "url": "https://tech-insider.org/nasa-swift-observatory-re-entry-1-in-2100-risk-2026"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-clade-1-mpox-turns-up-in-california-among",
+      "headline": "Clade 1 mpox turns up in California among people who say they did not travel",
+      "summary": "Officials in Stanislaus County, California, report four recent mpox cases that were or may have been clade 1, a strain usually seen in Africa. Two are confirmed and two suspected. Three patients say they did not leave the county in the past year.",
+      "impacts": [
+        "Cases without travel suggest local spread of a strain with a higher reported fatality rate.",
+        "Clade 1's case-fatality rate is listed at 1% to 10%, versus 1% to 4% for clade 2.",
+        "Four cases is a small number, and the confirmation of two suspected cases is still pending."
+      ],
+      "details": [
+        "CIDRAP reports that officials in Stanislaus County, California, reported four recent mpox cases that were, or may have been, caused by clade 1, a strain that usually circulates in Africa. Two are confirmed clade 1, and two are suspected pending analysis.",
+        "Three of the four patients reported not leaving Stanislaus County in the past year. The fourth patient's travel history is still being investigated. Lack of travel is what makes the finding notable, since it suggests transmission within the community, though the article does not conclude that.",
+        "Clade 1 has a reported case-fatality rate of 1% to 10%, versus 1% to 4% for clade 2, and both spread mainly through close contact. Those are ranges quoted in the report; actual outcomes depend heavily on health care access and underlying health, and the article does not report any severe outcomes in these four patients.",
+        "From the same CIDRAP roundup, for context: Hong Kong's health agency reported two new human H9N2 avian flu cases in mainland China (a 2-year-old in Hubei and a 77-year-old in Jiangxi), with 164 confirmed human H9N2 infections since 2015 and two deaths. The Ebola outbreak in Congo has killed 5,376 people among 10,444 cases, and has no approved vaccines or therapeutics for the Bundibugyo strain.",
+        "What is not known: whether more cases will appear, how the patients were exposed, and what the final lab results will show. Watch for California health department updates and any vaccination guidance."
+      ],
+      "category": "Health",
+      "tags": [
+        "mpox",
+        "clade 1",
+        "california",
+        "outbreak",
+        "public health",
+        "cidrap",
+        "community spread"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/mpox/quick-takes-clade-1-mpox-california-h9n2-avian-flu-cases-china-more-ebola-deaths"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-bosses-trusted-employees-24-of-the-time-when",
+      "headline": "Bosses trusted employees 24% of the time when they used AI, versus 68% when they did the work themselves",
+      "summary": "A six-study paper in The Leadership Quarterly finds supervisors trust workers less when told the work used ChatGPT-style tools, regardless of quality. The penalty faded when organizations explicitly encouraged AI use.",
+      "impacts": [
+        "Workers may hide AI use, which the authors warn could push it into undisclosed \"shadow AI\".",
+        "Trust and promotion ratings dropped based on how work was made, not how good it was.",
+        "Clear company policy encouraging AI removed the statistically significant penalty."
+      ],
+      "details": [
+        "Phys.org, relaying a Hebrew University of Jerusalem release dated November 4, reports a paper titled \"Psychological Reactions to Subordinates' LLM Use at Work\" in The Leadership Quarterly (DOI 10.1016/j.leaqua.2026.102004). The authors are Samuel Meyers, Yochanan Bigman of Hebrew University and Roman Briker of WHU in Germany.",
+        "Across six studies, employees' use of large language models such as ChatGPT was linked to lower supervisor trust and to poorer ratings of performance, contribution and suitability for promotion. In one experiment, employees who did the work themselves had a 68% chance of earning supervisor trust, versus 24% when they used AI.",
+        "AI-assisted work was viewed more favorably than plagiarized work but less favorably than independent work. Importantly, trust was not based on the quality of the finished product but on knowing how it was produced. A study of academic supervisors rating graduate students' real work found that more extensive AI use corresponded with less trust.",
+        "When organizations explicitly encouraged AI use, the trust penalty was no longer statistically significant. When AI use was prohibited or there was no policy, the penalty remained. Neither task importance nor supervisors' own AI experience consistently removed it. The authors warn the penalty could encourage shadow AI, meaning undisclosed use.",
+        "Caveats: the Phys.org piece does not report sample sizes, effect sizes or detailed methods, and its short summary box was generated by an LLM, so the original paper should be checked for precise figures. These are experiments and surveys about perceptions, not measurements of real promotion outcomes."
+      ],
+      "category": "AI",
+      "tags": [
+        "chatgpt",
+        "workplace",
+        "trust",
+        "llm",
+        "shadow ai",
+        "study",
+        "jobs"
+      ],
+      "date": "2026-11-04",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Phys.org (Hebrew University of Jerusalem)",
+          "url": "https://phys.org/news/2026-11-chatgpt-boss.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-a-brain-scan-score-from-super-agers-predicted",
+      "headline": "A brain-scan score from 'super agers' predicted who would go on to Alzheimer's decline",
+      "summary": "Stanford researchers trained a brain-connectivity score on 180 super agers versus 110 Alzheimer's patients, then applied it to over 1,300 healthy 55-to-70-year-olds. They report it predicted decline better than demographics, biomarkers or genetics. It is not a diagnostic.",
+      "impacts": [
+        "A resting brain scan might someday flag decline risk years before symptoms.",
+        "Scores that predict decline raise privacy and insurance questions if misused.",
+        "No intervention has been shown to change the score or the outcome, so a high-risk result gives no clear action."
+      ],
+      "details": [
+        "Medical Xpress reports a Science Advances paper published November 4, 'A functional connectome identifies vulnerability to cognitive decline and Alzheimer's disease progression' (DOI 10.1126/sciadv.aed9351), led by Stanford Medicine. Kanhao (Alex) Zhao is lead author and Yu Zhang is senior author.",
+        "Method: resting-state fMRI data came from three research datasets. The team trained the ARC (Alzheimer's resilience-vulnerability connectome) score by contrasting 180 super agers, people 75 or older with memory typical of a 45-year-old and normal executive function for their age, with 110 people with Alzheimer's disease aged 75 or older. The score separated those groups with roughly 85% accuracy.",
+        "It was then applied to more than 1,300 cognitively unimpaired adults aged 55 to 70, with follow-up up to 12 years, though most data covered about 5 to 6 years. Per the article, the score predicted cognitive decline, amyloid-beta plaque development and Alzheimer's diagnosis, did better than demographics, amyloid and tau biomarkers and genetics, and improved prediction when combined with existing biomarkers. About 10% of older adults may qualify as super agers, depending on criteria.",
+        "Limits: the ARC score is not diagnostic and is described as a guide for monitoring. A score is a snapshot, not destiny, and super-ager-like scores become less common with age. The 85% accuracy applies to distinguishing two extreme groups, not to the middle-aged unimpaired people the score was later used on. The article says that interventions such as transcranial magnetic stimulation or cognitive training have not been tested for decline, and it is unknown whether shifting brain patterns would change disease course. The team plans a trial of scores before and after cognitive training.",
+        "What to watch: replication in independent groups, and whether the planned training trial shifts scores and outcomes."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "alzheimer",
+        "fmri",
+        "brain",
+        "super agers",
+        "prediction",
+        "stanford",
+        "connectome"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Medical Xpress",
+          "url": "https://medicalxpress.com/news/2026-11-brain-patterns-alzheimer-years-memory.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-04-doctors-propose-a-five-question-test-for-one",
+      "headline": "Doctors propose a five-question test for one-time gene editing, because edits can't be undone",
+      "summary": "In a JAMA Internal Medicine perspective, two Michigan cardiologists lay out five questions for judging durable genomic therapies. Their concerns include irreversibility, limited redosing, rare delayed side effects and costs above $1 million per patient.",
+      "impacts": [
+        "If one-dose gene editing reaches common diseases, rare harms could affect millions of people.",
+        "Unlike a pill, a permanent edit has no easy stop button, and off-switches are unproven.",
+        "This is expert opinion, not new trial data, so it frames the debate rather than settling it."
+      ],
+      "details": [
+        "ScienceDaily, relaying Michigan Medicine on November 3, reports a perspective article in JAMA Internal Medicine, 'Clinical Framework for Durable Genomic Interventions' (DOI 10.1001/jamainternmed.2026.4690), by cardiologists Eric D. Smith and Venkatesh L. Murthy of the University of Michigan. It is a framework paper, not a clinical trial or an original-data study.",
+        "Background numbers: more than 6,000 rare genetic disorders have been identified, but only a small share have treatable targets, and some existing gene therapies have list prices above $1 million per patient, with several costing substantially more.",
+        "The five questions are about disease severity, whether existing treatments can be adjusted or stopped, whether the target tissue suits a one-dose lasting intervention, whether delivery risks are reasonable for the severity of disease, and whether long-term safety and effectiveness can be monitored over many years.",
+        "The 'catch' they describe: permanent changes cannot be easily undone, unlike medications that can be stopped, and built-in off-switches are possible but unproven. Viral delivery vehicles can trigger immune responses that make repeat dosing hard. Small, short trials may miss rare side effects that appear after years. Treatments for common diseases could reach millions, so even rare harms could add up, and prices suited to rare diseases would strain health systems.",
+        "Caveats from the article: this is opinion-based guidance, not evidence that any therapy works for common diseases. Early studies are testing whether a single gene-editing dose can lower LDL cholesterol long-term, but the article reports no results from them. The authors say the goal is responsible introduction, not restricting genetic medicine."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "gene editing",
+        "crispr",
+        "ldl",
+        "irreversible",
+        "jama",
+        "cost",
+        "safety"
+      ],
+      "date": "2026-11-03",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261102202829.htm"
+        }
+      ]
+    }
+  ]
+}
