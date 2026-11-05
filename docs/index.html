@@ -1923,6 +1923,181 @@
     }
   }
 
+  // ---------- the Minecraft switch ----------
+  // The panel markup carries the keypad; this only wires it up. Nothing here knows the
+  // code, and nothing here can start or stop anything: every digit typed is checked on
+  // the Pi, which is also the only thing that can act on the answer. A page this public
+  // is not allowed to hold either half of that.
+  async function askVaultJson(path, body){
+    try{
+      const res = await fetch(VAULT + path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if(!res.ok) return null;
+      return await res.json();
+    }catch(err){
+      return null;
+    }
+  }
+
+  function wireMinecraftSwitch(root){
+    const box = root.querySelector('[data-mc-root]');
+    if(!box) return;
+    const dot = box.querySelector('[data-mc-dot]');
+    const label = box.querySelector('[data-mc-state]');
+    const openBtn = box.querySelector('[data-mc-open]');
+    const pad = box.querySelector('[data-mc-pad]');
+    const slots = [...box.querySelectorAll('.mc-slot')];
+    const msg = box.querySelector('[data-mc-msg]');
+    const live = box.querySelector('[data-mc-live]');
+    const fine = box.querySelector('[data-mc-fine]');
+    const actions = [...box.querySelectorAll('[data-mc-action]')];
+    const MAX = slots.length;
+
+    let typed = '', token = null, relockTimer = null, busy = false;
+
+    function paint(){
+      slots.forEach((s, i) => {
+        const on = i < typed.length;
+        s.textContent = on ? '•' : '';
+        if(on) s.setAttribute('data-filled', ''); else s.removeAttribute('data-filled');
+      });
+    }
+    function say(text, bad){
+      msg.textContent = text || '';
+      if(bad) msg.setAttribute('data-bad', ''); else msg.removeAttribute('data-bad');
+    }
+    function setDot(v){ dot.setAttribute('data-on', v); }
+
+    function showState(st){
+      if(!st){ label.textContent = 'Unknown'; setDot('busy'); return; }
+      setDot(st.running ? 'yes' : 'no');
+      label.textContent = st.running ? 'Running' : 'Off';
+      actions.forEach(b => { b.disabled = busy || (b.dataset.mcAction === 'start') === !!st.running; });
+      const who = st.players;
+      fine.textContent = !st.running ? 'The server is off. Nothing is using the Pi for it.'
+        : who && who.length ? `${who.length} online: ${who.join(', ')}`
+        : 'Nobody online.';
+    }
+
+    function relock(){
+      token = null;
+      clearTimeout(relockTimer);
+      typed = ''; paint(); say('');
+      pad.hidden = true;
+      live.hidden = true;
+      openBtn.hidden = false;
+      openBtn.disabled = false;
+      openBtn.textContent = 'Unlock';
+      label.textContent = 'Locked';
+      dot.removeAttribute('data-on');
+    }
+
+    function armRelock(ttl){
+      clearTimeout(relockTimer);
+      relockTimer = setTimeout(relock, Math.max(5000, ttl || 600000));
+    }
+
+    openBtn.addEventListener('click', () => {
+      pad.hidden = false;
+      openBtn.hidden = true;
+      typed = ''; paint(); say('');
+    });
+
+    box.querySelectorAll('[data-mc-key]').forEach(k => {
+      k.addEventListener('click', () => {
+        if(typed.length >= MAX) return;
+        typed += k.dataset.mcKey;
+        paint(); say('');
+      });
+    });
+    box.querySelector('[data-mc-back]').addEventListener('click', () => {
+      typed = typed.slice(0, -1); paint(); say('');
+    });
+    box.querySelector('[data-mc-enter]').addEventListener('click', submit);
+
+    // Typing works too, but only while the pad is showing, and the keys are swallowed
+    // so they cannot also reach anything else listening on the page.
+    document.addEventListener('keydown', ev => {
+      if(pad.hidden || !box.isConnected) return;
+      if(ev.key >= '0' && ev.key <= '9' && typed.length < MAX){ typed += ev.key; paint(); say(''); }
+      else if(ev.key === 'Backspace'){ typed = typed.slice(0, -1); paint(); say(''); }
+      else if(ev.key === 'Enter'){ submit(); }
+      else if(ev.key === 'Escape'){ relock(); return; }
+      else return;
+      ev.preventDefault();
+      ev.stopPropagation();
+    });
+
+    async function submit(){
+      if(busy || !typed) return;
+      busy = true;
+      say('Checking…');
+      const r = await askVaultJson('/mc/unlock', { code: typed });
+      busy = false;
+      if(!r || !r.token){
+        typed = ''; paint();
+        // Deliberately vague, like every other refusal here: the gate does not say
+        // which part was wrong, or how long the right answer is.
+        say('That did not open it.', true);
+        return;
+      }
+      token = r.token;
+      armRelock(r.ttl);
+      pad.hidden = true;
+      live.hidden = false;
+      typed = ''; paint(); say('');
+      showState(r.state);
+      if(!r.state) refresh();
+    }
+
+    async function refresh(){
+      if(!token) return;
+      const r = await askVaultJson('/mc/status', { token });
+      if(!r){ relock(); return; }
+      if(r.ok) showState(r.state);
+      else { label.textContent = 'Switch unavailable'; setDot('busy'); fine.textContent = 'The Pi answered, but the control daemon did not.'; }
+    }
+
+    // Starting loads a world off an SD card and stopping saves one back, so both take
+    // longer than a click feels like it should. Poll until the Pi agrees it is done.
+    async function waitFor(want, ms){
+      const until = Date.now() + ms;
+      while(Date.now() < until && token){
+        await new Promise(r => setTimeout(r, 5000));
+        if(!token) return;
+        const r = await askVaultJson('/mc/status', { token });
+        if(r && r.ok && r.state){
+          if(r.state.running === want){ busy = false; showState(r.state); return; }
+        }
+      }
+      busy = false;
+      refresh();
+    }
+
+    actions.forEach(b => b.addEventListener('click', async () => {
+      if(busy || !token) return;
+      const action = b.dataset.mcAction;
+      busy = true;
+      actions.forEach(x => { x.disabled = true; });
+      setDot('busy');
+      label.textContent = action === 'start' ? 'Starting…' : 'Stopping…';
+      fine.textContent = action === 'start'
+        ? 'Loading the world. This usually takes a minute or two.'
+        : 'Saving the world first. Do not close this until it finishes.';
+      const r = await askVaultJson('/mc/' + action, { token });
+      armRelock(600000);
+      if(!r){ busy = false; relock(); return; }
+      if(!r.ok){ busy = false; label.textContent = 'Switch unavailable'; fine.textContent = 'The control daemon on the Pi did not answer.'; return; }
+      if(r.state && r.state.running === (action === 'start')){ busy = false; showState(r.state); return; }
+      waitFor(action === 'start', 240000);
+    }));
+
+    relock();
+  }
+
   // Resolves to the one shared project's HTML, or null. Expiry is the Pi's own clock now,
   // not a guess made from commit dates.
   // Shaped exactly like what temp.mjs mints (12 random bytes, base64url). Anything else
@@ -2020,6 +2195,9 @@
           wirePathLinks(panel);
           wireCopyButtons(panel);
           registerSecretRoutes(panel);
+          // Only here, not in showSharedProject: a shared single-project link is handed
+          // out deliberately, and should not come with the Pi's switch attached.
+          wireMinecraftSwitch(panel);
           secretLoaded = true;
         }
         // Stay on the current page; the secret tabs appear on the right.
