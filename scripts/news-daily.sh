@@ -35,10 +35,14 @@ trap 'rm -rf "$LOCK"' EXIT
 
 if [ ! -d "$SITE/.git" ]; then
   log "cloning $REMOTE"
-  git clone -q "$REMOTE" "$SITE" || { log "clone failed"; exit 1; }
+  # Shallow and single-branch: this runner only ever writes docs/news and pushes
+  # main. A full clone drags the whole site's history down -- 546 MB of it on the
+  # Pi, against 2.9 MB of actual news -- onto a 14 GB SD card.
+  git clone -q --depth 1 --single-branch --branch main "$REMOTE" "$SITE" || { log "clone failed"; exit 1; }
 fi
 cd "$SITE" || exit 1
-git fetch -q origin main || { log "fetch failed (offline?)"; exit 1; }
+# --depth 1 here too, or the repo quietly deepens back to full history over time.
+git fetch -q --depth 1 origin main || { log "fetch failed (offline?)"; exit 1; }
 git reset -q --hard origin/main
 git clean -qfd
 
