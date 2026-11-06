@@ -1945,23 +1945,24 @@
   function wireMinecraftSwitch(root){
     const box = root.querySelector('[data-mc-root]');
     if(!box) return;
-    const dot = box.querySelector('[data-mc-dot]');
-    const label = box.querySelector('[data-mc-state]');
-    const openBtn = box.querySelector('[data-mc-open]');
-    const pad = box.querySelector('[data-mc-pad]');
-    const slots = [...box.querySelectorAll('.mc-slot')];
-    const msg = box.querySelector('[data-mc-msg]');
-    const live = box.querySelector('[data-mc-live]');
-    const fine = box.querySelector('[data-mc-fine]');
-    const actions = [...box.querySelectorAll('[data-mc-action]')];
+    const what    = box.querySelector('[data-mc-what]');
+    const padBtn  = box.querySelector('[data-mc-open]');
+    const lockBtn = box.querySelector('[data-mc-lock]');
+    const toggle  = box.querySelector('[data-mc-toggle]');
+    const pad     = box.querySelector('[data-mc-pad]');
+    const slots   = [...box.querySelectorAll('.mc-slot')];
+    const msg     = box.querySelector('[data-mc-msg]');
     const MAX = slots.length;
 
-    let typed = '', token = null, relockTimer = null, busy = false;
+    // running is the last thing the Pi told us; want is where a flip is heading.
+    // They are separate so the toggle can move the moment it is clicked while the
+    // label still reports what is actually true on the box.
+    let typed = '', token = null, relockTimer = null, busy = false, running = null, want = null;
 
-    function paint(){
+    function paintSlots(){
       slots.forEach((s, i) => {
         const on = i < typed.length;
-        s.textContent = on ? '•' : '';
+        s.textContent = on ? '\u2022' : '';
         if(on) s.setAttribute('data-filled', ''); else s.removeAttribute('data-filled');
       });
     }
@@ -1969,63 +1970,63 @@
       msg.textContent = text || '';
       if(bad) msg.setAttribute('data-bad', ''); else msg.removeAttribute('data-bad');
     }
-    function setDot(v){ dot.setAttribute('data-on', v); }
 
-    function showState(st){
-      if(!st){ label.textContent = 'Unknown'; setDot('busy'); return; }
-      setDot(st.running ? 'yes' : 'no');
-      label.textContent = st.running ? 'Running' : 'Off';
-      actions.forEach(b => { b.disabled = busy || (b.dataset.mcAction === 'start') === !!st.running; });
-      const who = st.players;
-      fine.textContent = !st.running ? 'The server is off. Nothing is using the Pi for it.'
-        : who && who.length ? `${who.length} online: ${who.join(', ')}`
-        : 'Nobody online.';
+    function paintState(){
+      if(!token){
+        padBtn.hidden = false; lockBtn.hidden = true; toggle.hidden = true;
+        what.textContent = 'locked';
+        return;
+      }
+      padBtn.hidden = true; lockBtn.hidden = false; toggle.hidden = false;
+      lockBtn.disabled = busy;
+      const shown = busy ? want : running;
+      toggle.setAttribute('aria-checked', shown ? 'true' : 'false');
+      toggle.disabled = busy || running === null;
+      what.textContent = busy
+        ? (want ? 'starting it on the Pi \u2014 the world takes a minute or two to load'
+                : 'stopping it on the Pi \u2014 saving the world first')
+        : running === null ? 'asking the Pi\u2026'
+        : running ? 'running on the Pi'
+                  : 'off \u2014 nothing of it is using the Pi';
     }
 
     function relock(){
-      token = null;
+      token = null; running = null; want = null; busy = false;
       clearTimeout(relockTimer);
-      typed = ''; paint(); say('');
+      typed = ''; paintSlots(); say('');
       pad.hidden = true;
-      live.hidden = true;
-      openBtn.hidden = false;
-      openBtn.disabled = false;
-      openBtn.textContent = 'Unlock';
-      label.textContent = 'Locked';
-      dot.removeAttribute('data-on');
+      paintState();
     }
-
     function armRelock(ttl){
       clearTimeout(relockTimer);
       relockTimer = setTimeout(relock, Math.max(5000, ttl || 600000));
     }
 
-    openBtn.addEventListener('click', () => {
+    padBtn.addEventListener('click', () => {
       pad.hidden = false;
-      openBtn.hidden = true;
-      typed = ''; paint(); say('');
+      typed = ''; paintSlots(); say('');
     });
+    // The lock is the way back: it drops the session rather than just hiding the
+    // switch, so re-opening it costs the code again.
+    lockBtn.addEventListener('click', () => { if(!busy) relock(); });
 
     box.querySelectorAll('[data-mc-key]').forEach(k => {
       k.addEventListener('click', () => {
         if(typed.length >= MAX) return;
-        typed += k.dataset.mcKey;
-        paint(); say('');
+        typed += k.dataset.mcKey; paintSlots(); say('');
       });
     });
     box.querySelector('[data-mc-back]').addEventListener('click', () => {
-      typed = typed.slice(0, -1); paint(); say('');
+      typed = typed.slice(0, -1); paintSlots(); say('');
     });
     box.querySelector('[data-mc-enter]').addEventListener('click', submit);
 
-    // Typing works too, but only while the pad is showing, and the keys are swallowed
-    // so they cannot also reach anything else listening on the page.
     document.addEventListener('keydown', ev => {
       if(pad.hidden || !box.isConnected) return;
-      if(ev.key >= '0' && ev.key <= '9' && typed.length < MAX){ typed += ev.key; paint(); say(''); }
-      else if(ev.key === 'Backspace'){ typed = typed.slice(0, -1); paint(); say(''); }
+      if(ev.key >= '0' && ev.key <= '9' && typed.length < MAX){ typed += ev.key; paintSlots(); say(''); }
+      else if(ev.key === 'Backspace'){ typed = typed.slice(0, -1); paintSlots(); say(''); }
       else if(ev.key === 'Enter'){ submit(); }
-      else if(ev.key === 'Escape'){ relock(); return; }
+      else if(ev.key === 'Escape'){ pad.hidden = true; typed = ''; paintSlots(); say(''); return; }
       else return;
       ev.preventDefault();
       ev.stopPropagation();
@@ -2033,23 +2034,22 @@
 
     async function submit(){
       if(busy || !typed) return;
-      busy = true;
-      say('Checking…');
+      busy = true; say('Checking\u2026');
       const r = await askVaultJson('/mc/unlock', { code: typed });
       busy = false;
       if(!r || !r.token){
-        typed = ''; paint();
-        // Deliberately vague, like every other refusal here: the gate does not say
-        // which part was wrong, or how long the right answer is.
+        typed = ''; paintSlots();
+        // Deliberately vague, like every other refusal here: it does not say which
+        // part was wrong, or how long the right answer is.
         say('That did not open it.', true);
         return;
       }
       token = r.token;
       armRelock(r.ttl);
+      typed = ''; paintSlots(); say('');
       pad.hidden = true;
-      live.hidden = false;
-      typed = ''; paint(); say('');
-      showState(r.state);
+      running = r.state ? !!r.state.running : null;
+      paintState();
       if(!r.state) refresh();
     }
 
@@ -2057,43 +2057,38 @@
       if(!token) return;
       const r = await askVaultJson('/mc/status', { token });
       if(!r){ relock(); return; }
-      if(r.ok) showState(r.state);
-      else { label.textContent = 'Switch unavailable'; setDot('busy'); fine.textContent = 'The Pi answered, but the control daemon did not.'; }
+      if(r.ok && r.state){ running = !!r.state.running; }
+      paintState();
+      if(r && !r.ok) what.textContent = 'the switch is not answering';
     }
 
-    // Starting loads a world off an SD card and stopping saves one back, so both take
-    // longer than a click feels like it should. Poll until the Pi agrees it is done.
-    async function waitFor(want, ms){
+    // Starting loads a world off an SD card and stopping saves one back, so both
+    // take longer than a click feels like it should. Poll until the Pi agrees.
+    async function waitFor(target, ms){
       const until = Date.now() + ms;
       while(Date.now() < until && token){
         await new Promise(r => setTimeout(r, 5000));
         if(!token) return;
         const r = await askVaultJson('/mc/status', { token });
-        if(r && r.ok && r.state){
-          if(r.state.running === want){ busy = false; showState(r.state); return; }
+        if(r && r.ok && r.state && r.state.running === target){
+          running = target; busy = false; paintState(); return;
         }
       }
       busy = false;
       refresh();
     }
 
-    actions.forEach(b => b.addEventListener('click', async () => {
-      if(busy || !token) return;
-      const action = b.dataset.mcAction;
-      busy = true;
-      actions.forEach(x => { x.disabled = true; });
-      setDot('busy');
-      label.textContent = action === 'start' ? 'Starting…' : 'Stopping…';
-      fine.textContent = action === 'start'
-        ? 'Loading the world. This usually takes a minute or two.'
-        : 'Saving the world first. Do not close this until it finishes.';
-      const r = await askVaultJson('/mc/' + action, { token });
+    toggle.addEventListener('click', async () => {
+      if(busy || !token || running === null) return;
+      want = !running;
+      busy = true; paintState();
+      const r = await askVaultJson('/mc/' + (want ? 'start' : 'stop'), { token });
       armRelock(600000);
-      if(!r){ busy = false; relock(); return; }
-      if(!r.ok){ busy = false; label.textContent = 'Switch unavailable'; fine.textContent = 'The control daemon on the Pi did not answer.'; return; }
-      if(r.state && r.state.running === (action === 'start')){ busy = false; showState(r.state); return; }
-      waitFor(action === 'start', 240000);
-    }));
+      if(!r){ relock(); return; }
+      if(!r.ok){ busy = false; paintState(); what.textContent = 'couldn\u2019t reach the switch \u2014 nothing changed'; return; }
+      if(r.state && r.state.running === want){ running = want; busy = false; paintState(); return; }
+      waitFor(want, 240000);
+    });
 
     relock();
   }

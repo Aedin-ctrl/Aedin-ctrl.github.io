@@ -100,54 +100,77 @@ await root.waitFor({ state: 'attached' });
 // The item is inside a <details>; open it so the controls are really visible.
 await page.locator('[data-mc-item]').evaluate(d => { d.open = true; });
 
-check('starts locked', (await page.locator('[data-mc-state]').textContent()).trim() === 'Locked');
-check('keypad hidden until asked', await page.locator('[data-mc-pad]').isHidden());
+const what   = page.locator('[data-mc-what]');
+const padBtn = page.locator('[data-mc-open]');
+const lockBtn= page.locator('[data-mc-lock]');
+const toggle = page.locator('[data-mc-toggle]');
+const pad    = page.locator('[data-mc-pad]');
 
-await page.locator('[data-mc-open]').click();
-check('keypad opens on click', await page.locator('[data-mc-pad]').isVisible());
-check('keypad shows six slots', await page.locator('.mc-slot').count() === 6, `${await page.locator('.mc-slot').count()} slots`);
+// --- locked: a keypad icon, and nothing else ---
+check('starts locked', (await what.textContent()).trim() === 'locked');
+check('keypad icon is the only control', await padBtn.isVisible());
+check('lock icon hidden while locked', await lockBtn.isHidden());
+check('switch hidden while locked', await toggle.isHidden());
+check('keypad itself hidden until asked', await pad.isHidden());
 
-const type = async digits => {
-  for (const d of digits) await page.locator(`[data-mc-key="${d}"]`).click();
-};
+await padBtn.click();
+check('keypad opens from the icon', await pad.isVisible());
+check('keypad shows six slots', await page.locator('.mc-slot').count() === 6);
+
+const type = async digits => { for (const d of digits) await page.locator(`[data-mc-key="${d}"]`).click(); };
 const filled = () => page.locator('.mc-slot[data-filled]').count();
 
 // --- a wrong code must not open it ---
 await type('999999');
-check('six digits fill six slots', await filled() === 6, `${await filled()} filled`);
+check('six digits fill six slots', await filled() === 6);
 await page.locator('[data-mc-enter]').click();
 await page.waitForTimeout(400);
-check('wrong code is refused', await page.locator('[data-mc-live]').isHidden());
-check('wrong code says so', /did not open/i.test(await page.locator('[data-mc-msg]').textContent()));
+check('wrong code is refused', await toggle.isHidden());
 check('wrong code clears the slots', await filled() === 0);
 check('wrong code does not reach the Pi state', pi.running === false && pi.token === null);
 
-// --- a prefix of the real code must not open it either ---
-await type('231');
-await page.locator('[data-mc-enter]').click();
-await page.waitForTimeout(400);
-check('short code is refused', await page.locator('[data-mc-live]').isHidden());
-
-// --- the real code, four digits of a six-slot pad ---
+// --- the real code: four digits of a six-slot pad ---
 await type(CODE);
-check('four digits fill four of six slots', await filled() === 4, `${await filled()} filled`);
+check('four digits fill four of six slots', await filled() === 4);
 await page.locator('[data-mc-enter]').click();
 await page.waitForTimeout(600);
-check('right code opens the switch', await page.locator('[data-mc-live]').isVisible());
-check('keypad closes after unlocking', await page.locator('[data-mc-pad]').isHidden());
-check('shows the server is off', (await page.locator('[data-mc-state]').textContent()).trim() === 'Off');
+check('right code reveals the switch', await toggle.isVisible());
+check('right code reveals the lock', await lockBtn.isVisible());
+check('keypad icon goes away once unlocked', await padBtn.isHidden());
+check('keypad closes after unlocking', await pad.isHidden());
+check('switch reads off', (await toggle.getAttribute('aria-checked')) === 'false');
+check('label says it is off', /off/i.test(await what.textContent()));
 
-// --- turning it on ---
-await page.locator('[data-mc-action="start"]').click();
-await page.waitForFunction(() => document.querySelector('[data-mc-state]').textContent.trim() === 'Running', null, { timeout: 15000 }).catch(() => {});
-check('turning it on reaches the Pi', pi.running === true);
-check('shows it is running', (await page.locator('[data-mc-state]').textContent()).trim() === 'Running');
-check('"turn on" disables once it is on', await page.locator('[data-mc-action="start"]').isDisabled());
+// --- flipping it on ---
+await toggle.click();
+await page.waitForFunction(() => document.querySelector('[data-mc-toggle]').getAttribute('aria-checked') === 'true'
+  && !/starting/i.test(document.querySelector('[data-mc-what]').textContent), null, { timeout: 15000 }).catch(() => {});
+check('flipping on reaches the Pi', pi.running === true);
+check('switch reads on', (await toggle.getAttribute('aria-checked')) === 'true');
+check('label says it is running', /running/i.test(await what.textContent()));
 
-// --- turning it off ---
-await page.locator('[data-mc-action="stop"]').click();
-await page.waitForFunction(() => document.querySelector('[data-mc-state]').textContent.trim() === 'Off', null, { timeout: 15000 }).catch(() => {});
-check('turning it off reaches the Pi', pi.running === false);
+// --- flipping it off ---
+await toggle.click();
+await page.waitForFunction(() => document.querySelector('[data-mc-toggle]').getAttribute('aria-checked') === 'false'
+  && !/stopping/i.test(document.querySelector('[data-mc-what]').textContent), null, { timeout: 15000 }).catch(() => {});
+check('flipping off reaches the Pi', pi.running === false);
+
+// --- the lock puts it back, and costs the code again ---
+await lockBtn.click();
+await page.waitForTimeout(200);
+check('lock re-locks it', (await what.textContent()).trim() === 'locked');
+check('lock hides the switch', await toggle.isHidden());
+check('lock brings the keypad icon back', await padBtn.isVisible());
+
+// A re-lock must drop the session, not just hide the control: opening it again
+// has to cost the code. Proven by clearing the stand-in Pi's token -- if the page
+// had kept one, the next status call would still succeed.
+pi.token = null;
+await padBtn.click();
+await type(CODE);
+await page.locator('[data-mc-enter]').click();
+await page.waitForTimeout(600);
+check('the code opens it again after locking', await toggle.isVisible());
 
 // --- no code is written down in what the browser is given ---
 const pageSrc = readFileSync(join(ROOT, 'docs/index.html'), 'utf8');
