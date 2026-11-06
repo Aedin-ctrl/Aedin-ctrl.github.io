@@ -45,6 +45,35 @@
   .sw-knob{position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%;
            background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .18s ease;}
   .sw-toggle[aria-checked="true"] .sw-knob{transform:translateX(22px);}
+
+  /* Minecraft sits behind a keypad: it is the one switch here that starts a
+     process rather than flipping a flag, and the code for it is checked on the
+     Pi, never in this page. `hidden` is only a UA display:none, so the explicit
+     display below would beat it -- hence the rule that puts it back. */
+  #mcCard [hidden]{display:none !important;}
+  .mc-controls{display:flex; align-items:center; gap:12px; flex-shrink:0;}
+  .mc-icon{display:flex; align-items:center; justify-content:center; width:38px; height:38px;
+           border-radius:10px; cursor:pointer; border:1px solid var(--line); background:transparent;
+           color:var(--muted); transition:color .15s, border-color .15s, background .15s;}
+  .mc-icon:hover{color:var(--ink); border-color:var(--line-strong);}
+  .mc-lock{border-color:transparent;}
+  .mc-lock:hover{background:var(--wash);}
+  .mc-pad{border:1px solid var(--line); border-radius:12px; padding:18px; max-width:300px; margin:0 0 16px;}
+  .mc-slots{display:flex; gap:8px; justify-content:center; margin-bottom:16px;}
+  .mc-slot{width:28px; height:36px; border:1px solid var(--line); border-radius:6px; display:flex;
+           align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif;
+           font-size:17px; color:var(--ink); background:var(--wash);}
+  .mc-slot[data-filled]{border-color:var(--line-strong); background:var(--paper);}
+  .mc-keys{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .mc-keys button{font:inherit; font-family:'Space Grotesk',sans-serif; font-size:16px; padding:12px 0;
+                  border-radius:8px; border:1px solid var(--line); background:var(--paper);
+                  color:var(--ink); cursor:pointer;}
+  .mc-keys button:hover{background:var(--wash);}
+  .mc-enter{grid-column:3; font-size:13px !important; background:var(--line-strong) !important;
+            color:var(--paper) !important; border-color:var(--line-strong) !important;}
+  .mc-aux{color:var(--muted) !important;}
+  .mc-msg{margin:14px 0 0; min-height:18px; font-size:13px; color:var(--muted); text-align:center;}
+  .mc-msg[data-bad]{color:var(--bad);}
   .dev{border:1px solid var(--line); border-radius:12px; margin-bottom:12px; overflow:hidden; transition:border-color .15s ease;}
   .dev:hover, .dev.open{border-color:var(--line-strong);}
   .dev-sum{width:100%; display:grid; grid-template-columns:auto 1fr auto auto; gap:14px; align-items:center; padding:18px 20px; text-align:left;}
@@ -110,6 +139,51 @@
       <span class="sw-knob"></span>
     </button>
   </div>
+
+  <section id="mcCard">
+    <div class="sw">
+      <div class="sw-text">
+        <div class="sw-name">Minecraft</div>
+        <div class="sw-what" id="mcWhat">locked</div>
+      </div>
+      <div class="mc-controls">
+        <button type="button" class="mc-icon" id="mcPadBtn" aria-label="Enter the code">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="3.75" y="2.75" width="16.5" height="18.5" rx="3"/>
+            <circle cx="8.5" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="8" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8" r="1.15" fill="currentColor" stroke="none"/>
+            <circle cx="8.5" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.5" cy="12" r="1.15" fill="currentColor" stroke="none"/>
+            <circle cx="8.5" cy="16" r="1.15" fill="currentColor" stroke="none"/><circle cx="12" cy="16" r="1.15" fill="currentColor" stroke="none"/><circle cx="15.5" cy="16" r="1.15" fill="currentColor" stroke="none"/>
+          </svg>
+        </button>
+        <button type="button" class="mc-icon mc-lock" id="mcLockBtn" hidden aria-label="Lock the switch again">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <rect x="4.25" y="10.5" width="15.5" height="10.25" rx="2.4"/>
+            <path d="M8.4 10.5V7.2a3.6 3.6 0 0 1 7.05-1.05"/>
+            <circle cx="12" cy="15.6" r="1.25" fill="currentColor" stroke="none"/>
+          </svg>
+        </button>
+        <button type="button" class="sw-toggle" id="mcToggle" role="switch" aria-checked="false" aria-label="Minecraft on or off" hidden>
+          <span class="sw-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mc-pad" id="mcPad" hidden>
+      <div class="mc-slots" aria-label="Code">
+        <span class="mc-slot"></span><span class="mc-slot"></span><span class="mc-slot"></span>
+        <span class="mc-slot"></span><span class="mc-slot"></span><span class="mc-slot"></span>
+      </div>
+      <div class="mc-keys">
+        <button type="button" data-mc-key="1">1</button><button type="button" data-mc-key="2">2</button><button type="button" data-mc-key="3">3</button>
+        <button type="button" data-mc-key="4">4</button><button type="button" data-mc-key="5">5</button><button type="button" data-mc-key="6">6</button>
+        <button type="button" data-mc-key="7">7</button><button type="button" data-mc-key="8">8</button><button type="button" data-mc-key="9">9</button>
+        <button type="button" class="mc-aux" id="mcBack" aria-label="Delete">&#9003;</button>
+        <button type="button" data-mc-key="0">0</button>
+        <button type="button" class="mc-enter" id="mcEnter">Enter</button>
+      </div>
+      <p class="mc-msg" id="mcMsg" role="status" aria-live="polite"></p>
+    </div>
+  </section>
 
   <div id="list" aria-live="polite"></div>
 </main>
@@ -296,6 +370,146 @@
     }
     paintSwitch();
   }
+
+  // ---- Minecraft, through the vault ----
+  // A different box with a different authority. The Worker above only reports what
+  // is running; starting and stopping a server is gated on a code the Pi checks
+  // itself, so this talks to the vault. Nothing here knows the code, and nothing
+  // here can start anything -- every digit is a round trip the Pi counts.
+  const VAULT = 'https://vault.aedinlai.com';
+  async function askVault(path, body){
+    try{
+      const r = await fetch(VAULT + path, {
+        method:'POST', headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify(body),
+      });
+      if(!r.ok) return null;
+      return await r.json();
+    }catch(e){ return null; }
+  }
+
+  const mcSlots = [...document.querySelectorAll('#mcPad .mc-slot')];
+  const MC_MAX = mcSlots.length;
+  // mcRunning is the last thing the Pi told us; mcWant is where a flip is heading.
+  // Separate, so the toggle can move on click while the label still reports truth.
+  let mcTyped = '', mcToken = null, mcRelock = null, mcBusy = false, mcRunning = null, mcWant = null;
+
+  function mcPaintSlots(){
+    mcSlots.forEach((el, i) => {
+      const on = i < mcTyped.length;
+      el.textContent = on ? '\u2022' : '';
+      if(on) el.setAttribute('data-filled', ''); else el.removeAttribute('data-filled');
+    });
+  }
+  function mcSay(text, bad){
+    $('mcMsg').textContent = text || '';
+    if(bad) $('mcMsg').setAttribute('data-bad', ''); else $('mcMsg').removeAttribute('data-bad');
+  }
+  function mcPaint(){
+    if(!mcToken){
+      $('mcPadBtn').hidden = false; $('mcLockBtn').hidden = true; $('mcToggle').hidden = true;
+      $('mcWhat').textContent = 'locked';
+      return;
+    }
+    $('mcPadBtn').hidden = true; $('mcLockBtn').hidden = false; $('mcToggle').hidden = false;
+    $('mcLockBtn').disabled = mcBusy;
+    const shown = mcBusy ? mcWant : mcRunning;
+    $('mcToggle').setAttribute('aria-checked', shown ? 'true' : 'false');
+    $('mcToggle').disabled = mcBusy || mcRunning === null;
+    $('mcWhat').textContent = mcBusy
+      ? (mcWant ? 'starting it on the Pi \u2014 the world takes a minute or two to load'
+                : 'stopping it on the Pi \u2014 saving the world first')
+      : mcRunning === null ? 'asking the Pi\u2026'
+      : mcRunning ? 'the server is up' : 'off \u2014 nothing of it is using the Pi';
+  }
+  function mcLock(){
+    mcToken = null; mcRunning = null; mcWant = null; mcBusy = false;
+    clearTimeout(mcRelock);
+    mcTyped = ''; mcPaintSlots(); mcSay('');
+    $('mcPad').hidden = true;
+    mcPaint();
+  }
+  function mcArm(ttl){
+    clearTimeout(mcRelock);
+    mcRelock = setTimeout(mcLock, Math.max(5000, ttl || 600000));
+  }
+
+  async function mcSubmit(){
+    if(mcBusy || !mcTyped) return;
+    mcBusy = true; mcSay('Checking\u2026');
+    const r = await askVault('/mc/unlock', { code: mcTyped });
+    mcBusy = false;
+    if(!r || !r.token){
+      mcTyped = ''; mcPaintSlots();
+      // Deliberately vague: it does not say which part was wrong, or how long the
+      // right answer is.
+      mcSay('That did not open it.', true);
+      return;
+    }
+    mcToken = r.token; mcArm(r.ttl);
+    mcTyped = ''; mcPaintSlots(); mcSay('');
+    $('mcPad').hidden = true;
+    mcRunning = r.state ? !!r.state.running : null;
+    mcPaint();
+    if(!r.state) mcRefresh();
+  }
+  async function mcRefresh(){
+    if(!mcToken) return;
+    const r = await askVault('/mc/status', { token: mcToken });
+    if(!r){ mcLock(); return; }
+    if(r.ok && r.state) mcRunning = !!r.state.running;
+    mcPaint();
+    if(!r.ok) $('mcWhat').textContent = 'the switch is not answering';
+  }
+  // Starting loads a world off an SD card and stopping saves one back, so both take
+  // longer than a click feels like it should. Poll until the Pi agrees.
+  async function mcWait(target, ms){
+    const until = Date.now() + ms;
+    while(Date.now() < until && mcToken){
+      await new Promise(r => setTimeout(r, 5000));
+      if(!mcToken) return;
+      const r = await askVault('/mc/status', { token: mcToken });
+      if(r && r.ok && r.state && r.state.running === target){
+        mcRunning = target; mcBusy = false; mcPaint(); return;
+      }
+    }
+    mcBusy = false; mcRefresh();
+  }
+
+  $('mcPadBtn').addEventListener('click', () => {
+    $('mcPad').hidden = false; mcTyped = ''; mcPaintSlots(); mcSay('');
+  });
+  // The lock is the way back: it drops the session rather than hiding the switch,
+  // so re-opening it costs the code again.
+  $('mcLockBtn').addEventListener('click', () => { if(!mcBusy) mcLock(); });
+  document.querySelectorAll('#mcPad [data-mc-key]').forEach(k => {
+    k.addEventListener('click', () => {
+      if(mcTyped.length >= MC_MAX) return;
+      mcTyped += k.dataset.mcKey; mcPaintSlots(); mcSay('');
+    });
+  });
+  $('mcBack').addEventListener('click', () => { mcTyped = mcTyped.slice(0, -1); mcPaintSlots(); mcSay(''); });
+  $('mcEnter').addEventListener('click', mcSubmit);
+  document.addEventListener('keydown', ev => {
+    if($('mcPad').hidden) return;
+    if(ev.key >= '0' && ev.key <= '9' && mcTyped.length < MC_MAX){ mcTyped += ev.key; mcPaintSlots(); mcSay(''); }
+    else if(ev.key === 'Backspace'){ mcTyped = mcTyped.slice(0, -1); mcPaintSlots(); mcSay(''); }
+    else if(ev.key === 'Enter'){ mcSubmit(); }
+    else if(ev.key === 'Escape'){ $('mcPad').hidden = true; mcTyped = ''; mcPaintSlots(); mcSay(''); return; }
+    else return;
+    ev.preventDefault(); ev.stopPropagation();
+  });
+  $('mcToggle').addEventListener('click', async () => {
+    if(mcBusy || !mcToken || mcRunning === null) return;
+    mcWant = !mcRunning; mcBusy = true; mcPaint();
+    const r = await askVault('/mc/' + (mcWant ? 'start' : 'stop'), { token: mcToken });
+    mcArm(600000);
+    if(!r){ mcLock(); return; }
+    if(!r.ok){ mcBusy = false; mcPaint(); $('mcWhat').textContent = 'couldn\u2019t reach the switch \u2014 nothing changed'; return; }
+    if(r.state && r.state.running === mcWant){ mcRunning = mcWant; mcBusy = false; mcPaint(); return; }
+    mcWait(mcWant, 240000);
+  });
+  mcLock();
 
   $('swToggle').addEventListener('click', flipSwitch);
   $('refresh').addEventListener('click', () => { load(); loadSwitch(); });
