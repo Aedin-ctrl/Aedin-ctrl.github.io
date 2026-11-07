@@ -48,6 +48,9 @@ function vaultReply(route, request) {
     pi.token = 'session-' + Math.random().toString(36).slice(2);
     return json({ token: pi.token, ttl: 600000, state: { running: pi.running, players: [] } });
   }
+  // Read-only: deliberately answered without a token, and with nothing in it but
+  // the boolean -- no player names, no unit state, no uptime.
+  if (url.pathname === '/mc/state') return json({ running: pi.running });
   if (!body.token || body.token !== pi.token) return route.fulfill({ status: 401, body: '' });
   if (url.pathname === '/mc/start') pi.running = true;
   if (url.pathname === '/mc/stop') pi.running = false;
@@ -78,7 +81,11 @@ check('the switch is on the Devices page', await page.locator('#mcCard').count()
 check('it sits beside the Trend Scout switch', await page.locator('#swCard').count() === 1);
 
 // --- locked: a keypad icon, and nothing else ---
-check('starts locked', (await what.textContent()).trim() === 'locked');
+// The state is readable without the code; only changing it needs one.
+await page.waitForFunction(() => /off|up/i.test(document.getElementById('mcWhat').textContent),
+  null, { timeout: 10000 }).catch(() => {});
+check('shows it is off while still locked', /off/i.test(await what.textContent()));
+check('status dot is grey while off', (await page.locator('#mcDot').getAttribute('class')) === 'dot');
 check('keypad icon is the only control', await padBtn.isVisible());
 check('lock icon hidden while locked', await lockBtn.isHidden());
 check('switch hidden while locked', await toggle.isHidden());
@@ -129,7 +136,8 @@ check('flipping off reaches the Pi', pi.running === false);
 // --- the lock puts it back, and costs the code again ---
 await lockBtn.click();
 await page.waitForTimeout(200);
-check('lock re-locks it', (await what.textContent()).trim() === 'locked');
+check('lock hides the controls again', await padBtn.isVisible());
+check('state is still readable after re-locking', /off|up|locked/i.test(await what.textContent()));
 check('lock hides the switch', await toggle.isHidden());
 check('lock brings the keypad icon back', await padBtn.isVisible());
 

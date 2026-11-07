@@ -143,7 +143,7 @@
   <section id="mcCard">
     <div class="sw">
       <div class="sw-text">
-        <div class="sw-name">Minecraft</div>
+        <div class="sw-name"><span class="dot" id="mcDot"></span> Minecraft</div>
         <div class="sw-what" id="mcWhat">locked</div>
       </div>
       <div class="mc-controls">
@@ -405,10 +405,18 @@
     $('mcMsg').textContent = text || '';
     if(bad) $('mcMsg').setAttribute('data-bad', ''); else $('mcMsg').removeAttribute('data-bad');
   }
+  function mcDotClass(){
+    return mcRunning === true ? 'dot ok' : mcRunning === false ? 'dot' : 'dot warn';
+  }
   function mcPaint(){
+    $('mcDot').className = mcDotClass();
     if(!mcToken){
       $('mcPadBtn').hidden = false; $('mcLockBtn').hidden = true; $('mcToggle').hidden = true;
-      $('mcWhat').textContent = 'locked';
+      // Whether it is up is readable without the code; only changing it needs one.
+      $('mcWhat').textContent =
+        mcRunning === true  ? 'the server is up \u2014 enter the code to change it' :
+        mcRunning === false ? 'off \u2014 enter the code to start it' :
+                              'locked';
       return;
     }
     $('mcPadBtn').hidden = true; $('mcLockBtn').hidden = false; $('mcToggle').hidden = false;
@@ -499,6 +507,15 @@
     else return;
     ev.preventDefault(); ev.stopPropagation();
   });
+  // Read-only: no session, no code, and the vault answers with a single boolean.
+  async function mcLoadState(){
+    if(mcBusy) return;                 // a flip in progress owns the display
+    const r = await askVault('/mc/state', {});
+    if(!r) return;                     // leave it as it was rather than flicker
+    mcRunning = (r.running === true || r.running === false) ? r.running : null;
+    mcPaint();
+  }
+
   $('mcToggle').addEventListener('click', async () => {
     if(mcBusy || !mcToken || mcRunning === null) return;
     mcWant = !mcRunning; mcBusy = true; mcPaint();
@@ -515,6 +532,8 @@
   $('refresh').addEventListener('click', () => { load(); loadSwitch(); });
   loadSwitch();
   setInterval(() => { if(!flipping) loadSwitch(); }, 20000);
+  mcLoadState();
+  setInterval(mcLoadState, 20000);
   load();
   setInterval(load, 20000);
   setInterval(render, 5000);
