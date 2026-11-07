@@ -146,6 +146,18 @@
   .tab-secret[hidden]{display:none;}
   .tab-btn[hidden]{display:none;}
   .tab-secret .tab-btn:last-child{margin-right:0;}
+
+    /* Quiet reminder that a calibration backup is waiting on the collector box
+       to be pulled down. Deliberately NOT a download link: the data comes over
+       ssh with a key, it is never served to the open web. */
+    .backup-tag{
+      display:inline-flex; align-items:center; gap:6px;
+      margin-left:auto; padding-left:22px; align-self:center;
+      font-size:12px; color:var(--faint); white-space:nowrap;
+    }
+    .backup-tag[hidden]{display:none;}
+    .backup-tag i{width:6px; height:6px; border-radius:50%; background:var(--ink); flex-shrink:0;}
+    .backup-tag + .tab-secret{margin-left:0;}
   .tab-btn.active{
     color:var(--ink);
     border-bottom-color:var(--ink);
@@ -721,6 +733,9 @@
              breadcrumb on purpose: when that slides out, this is pushed right
              to make room for it. -->
         <button class="tab-btn" id="bloomTab" data-tab="bloom" data-route="/trad/bloom" hidden>bloom</button>
+          <!-- Set by the backup-state fetch below; stays hidden if the
+               collector box or the Pi is unreachable. -->
+          <span class="backup-tag" id="backupTag" hidden><i></i><span id="backupTagText"></span></span>
         <!-- Shown on the right while the secret panel is unlocked. -->
         <span class="tab-secret" id="secretTabs" hidden>
           <button class="tab-btn" data-tab="secret_projects" data-route="/secret_projects">secret projects</button>
@@ -2161,6 +2176,31 @@
     addressInput.value = displayValue(path);
     highlightTab(path);
   });
+
+  /* ---- calibration backup reminder -------------------------------------
+     Reads the status the collector box publishes through the arb feed. Shows a
+     tag once it has been a week since the data was last pulled down (or if it
+     never has been and a backup is waiting). Silent on any failure -- a tag
+     that appeared because the Pi was asleep would be worse than no tag. */
+  (async function backupTag(){
+    const el = document.getElementById('backupTag');
+    const txt = document.getElementById('backupTagText');
+    if(!el || !txt) return;
+    try{
+      const res = await fetch('https://arb.aedinlai.com/backup-state.json', {cache:'no-store'});
+      if(!res.ok) return;
+      const st = await res.json();
+      if(!st || !st.backup_count) return;
+      const days = (typeof st.days_since_download === 'number') ? st.days_since_download : null;
+      const never = !st.last_download;
+      if(!never && !(days !== null && days >= 7)) return;
+      const mb = (st.total_bytes/1048576).toFixed(0);
+      txt.textContent = never
+        ? ('backup ready — ' + st.backup_count + ' waiting, ' + mb + ' MB')
+        : ('backup ready — ' + Math.floor(days) + 'd since last download');
+      el.hidden = false;
+    }catch(e){ /* offline, blocked, or malformed: show nothing */ }
+  })();
 </script>
 
 </body>
