@@ -81,10 +81,12 @@ check('the switch is on the Devices page', await page.locator('#mcCard').count()
 check('it sits beside the Trend Scout switch', await page.locator('#swCard').count() === 1);
 
 // --- locked: a keypad icon, and nothing else ---
-// The state is readable without the code; only changing it needs one.
-await page.waitForFunction(() => /off|up/i.test(document.getElementById('mcWhat').textContent),
+// The state is readable without the code; only changing it needs one. It is one
+// word, because a label that explains the keypad tells a stranger there is a door.
+await page.waitForFunction(() => /^(ON|OFF)$/.test(document.getElementById('mcWhat').textContent),
   null, { timeout: 10000 }).catch(() => {});
-check('shows it is off while still locked', /off/i.test(await what.textContent()));
+check('shows it is off while still locked', (await what.textContent()) === 'OFF');
+check('the locked label explains nothing', (await what.textContent()).split(/\s+/).length === 1);
 check('status dot is grey while off', (await page.locator('#mcDot').getAttribute('class')) === 'dot');
 check('keypad icon is the only control', await padBtn.isVisible());
 check('lock icon hidden while locked', await lockBtn.isHidden());
@@ -117,27 +119,27 @@ check('right code reveals the lock', await lockBtn.isVisible());
 check('keypad icon goes away once unlocked', await padBtn.isHidden());
 check('keypad closes after unlocking', await pad.isHidden());
 check('switch reads off', (await toggle.getAttribute('aria-checked')) === 'false');
-check('label says it is off', /off/i.test(await what.textContent()));
+check('label still says only OFF', (await what.textContent()) === 'OFF');
 
 // --- flipping it on ---
 await toggle.click();
 await page.waitForFunction(() => document.getElementById('mcToggle').getAttribute('aria-checked') === 'true'
-  && !/starting/i.test(document.getElementById('mcWhat').textContent), null, { timeout: 15000 }).catch(() => {});
+  && document.getElementById('mcWhat').textContent === 'ON', null, { timeout: 15000 }).catch(() => {});
 check('flipping on reaches the Pi', pi.running === true);
 check('switch reads on', (await toggle.getAttribute('aria-checked')) === 'true');
-check('label says the server is up', /up/i.test(await what.textContent()));
+check('label says only ON', (await what.textContent()) === 'ON');
 
 // --- flipping it off ---
 await toggle.click();
 await page.waitForFunction(() => document.getElementById('mcToggle').getAttribute('aria-checked') === 'false'
-  && !/stopping/i.test(document.getElementById('mcWhat').textContent), null, { timeout: 15000 }).catch(() => {});
+  && document.getElementById('mcWhat').textContent === 'OFF', null, { timeout: 15000 }).catch(() => {});
 check('flipping off reaches the Pi', pi.running === false);
 
 // --- the lock puts it back, and costs the code again ---
 await lockBtn.click();
 await page.waitForTimeout(200);
 check('lock hides the controls again', await padBtn.isVisible());
-check('state is still readable after re-locking', /off|up|locked/i.test(await what.textContent()));
+check('state is still readable after re-locking', /^(ON|OFF|\u2014)$/.test(await what.textContent()));
 check('lock hides the switch', await toggle.isHidden());
 check('lock brings the keypad icon back', await padBtn.isVisible());
 

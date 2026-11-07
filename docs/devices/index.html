@@ -33,11 +33,12 @@
 
   /* One row per device; click to open everything running on it. */
   /* The on/off switch. Turning it off stops the feed and the screen, and hides the Trends tab;
-     the Pi notices within a minute, so the label says so rather than looking stuck. */
+     the Pi takes up to a minute to notice, which the ellipsis stands in for. */
   .sw{display:flex; align-items:center; justify-content:space-between; gap:16px;
       border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:0 0 16px;}
   .sw-name{font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;}
-  .sw-what{font-size:13px; color:var(--muted); margin-top:1px;}
+  /* The state is a word, not a sentence: the switch does not explain itself. */
+  .sw-what{font-size:12px; color:var(--muted); margin-top:3px; letter-spacing:.09em; font-weight:600;}
   .sw-toggle{flex-shrink:0; width:52px; height:30px; border-radius:999px; background:var(--off);
              position:relative; transition:background .18s ease; cursor:pointer;}
   .sw-toggle[aria-checked="true"]{background:var(--ok);}
@@ -133,7 +134,7 @@
   <div class="sw" id="swCard" hidden>
     <div class="sw-text">
       <div class="sw-name">Trend Scout</div>
-      <div class="sw-what" id="swWhat">the news feed on the television</div>
+      <div class="sw-what" id="swWhat"></div>
     </div>
     <button type="button" class="sw-toggle" id="swToggle" role="switch" aria-checked="false" aria-label="Trend Scout on or off">
       <span class="sw-knob"></span>
@@ -144,7 +145,7 @@
     <div class="sw">
       <div class="sw-text">
         <div class="sw-name"><span class="dot" id="mcDot"></span> Minecraft</div>
-        <div class="sw-what" id="mcWhat">locked</div>
+        <div class="sw-what" id="mcWhat">—</div>
       </div>
       <div class="mc-controls">
         <button type="button" class="mc-icon" id="mcPadBtn" aria-label="Enter the code">
@@ -331,11 +332,7 @@
     $('swCard').hidden = false;
     t.setAttribute('aria-checked', switchOn ? 'true' : 'false');
     t.disabled = flipping;
-    $('swWhat').textContent = flipping
-      ? (switchOn ? 'starting it up on the Pi…' : 'stopping it on the Pi…')
-      : switchOn
-        ? 'the news feed is running on the television'
-        : 'off — the screen is blank and the Trends tab is hidden';
+    $('swWhat').textContent = flipping ? '\u2026' : switchOn ? 'ON' : 'OFF';
   }
 
   async function loadSwitch(){
@@ -366,7 +363,7 @@
       flipping = false;
       switchOn = !want;                       // it did not take; show what is really true
       paintSwitch();
-      $('swWhat').textContent = 'couldn’t reach the switch — nothing changed';
+      $('swWhat').textContent = '\u2014';
     }
     paintSwitch();
   }
@@ -408,15 +405,17 @@
   function mcDotClass(){
     return mcRunning === true ? 'dot ok' : mcRunning === false ? 'dot' : 'dot warn';
   }
+  function mcLabel(){
+    if(mcBusy) return '\u2026';
+    return mcRunning === true ? 'ON' : mcRunning === false ? 'OFF' : '\u2014';
+  }
   function mcPaint(){
     $('mcDot').className = mcDotClass();
+    // The same word whether or not it is unlocked: whether it is up is readable
+    // without the code, and the keypad never says what it is for.
+    $('mcWhat').textContent = mcLabel();
     if(!mcToken){
       $('mcPadBtn').hidden = false; $('mcLockBtn').hidden = true; $('mcToggle').hidden = true;
-      // Whether it is up is readable without the code; only changing it needs one.
-      $('mcWhat').textContent =
-        mcRunning === true  ? 'the server is up \u2014 enter the code to change it' :
-        mcRunning === false ? 'off \u2014 enter the code to start it' :
-                              'locked';
       return;
     }
     $('mcPadBtn').hidden = true; $('mcLockBtn').hidden = false; $('mcToggle').hidden = false;
@@ -424,11 +423,6 @@
     const shown = mcBusy ? mcWant : mcRunning;
     $('mcToggle').setAttribute('aria-checked', shown ? 'true' : 'false');
     $('mcToggle').disabled = mcBusy || mcRunning === null;
-    $('mcWhat').textContent = mcBusy
-      ? (mcWant ? 'starting it on the Pi \u2014 the world takes a minute or two to load'
-                : 'stopping it on the Pi \u2014 saving the world first')
-      : mcRunning === null ? 'asking the Pi\u2026'
-      : mcRunning ? 'the server is up' : 'off \u2014 nothing of it is using the Pi';
   }
   function mcLock(){
     mcToken = null; mcRunning = null; mcWant = null; mcBusy = false;
@@ -467,7 +461,7 @@
     if(!r){ mcLock(); return; }
     if(r.ok && r.state) mcRunning = !!r.state.running;
     mcPaint();
-    if(!r.ok) $('mcWhat').textContent = 'the switch is not answering';
+    if(!r.ok) $('mcWhat').textContent = '\u2014';
   }
   // Starting loads a world off an SD card and stopping saves one back, so both take
   // longer than a click feels like it should. Poll until the Pi agrees.
@@ -522,7 +516,7 @@
     const r = await askVault('/mc/' + (mcWant ? 'start' : 'stop'), { token: mcToken });
     mcArm(600000);
     if(!r){ mcLock(); return; }
-    if(!r.ok){ mcBusy = false; mcPaint(); $('mcWhat').textContent = 'couldn\u2019t reach the switch \u2014 nothing changed'; return; }
+    if(!r.ok){ mcBusy = false; mcPaint(); return; }
     if(r.state && r.state.running === mcWant){ mcRunning = mcWant; mcBusy = false; mcPaint(); return; }
     mcWait(mcWant, 240000);
   });
