@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.7 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.8 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -65,7 +65,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 47.7</span>
+    <span class="t" id="time">0.00 / 50.4</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -155,7 +155,7 @@
   <b>Checked, not eyeballed.</b> <code>checkBounds()</code>, <code>checkOverlap()</code> and
   <code>checkLegibility()</code> and <code>checkStraddle()</code> sweep every frame with a recorder on every piece of text drawn — and on
   every sprite, voxel stack and tag plate text could hide behind. They report anything leaving the client
-  area, landing on top of something else, or set below the floor. All four return <b>0</b> for this build —
+  area, landing on top of something else, or set below the floor. All four return <b>0</b> for this build, including plate-on-stack —
   including the one that catches a label lying across the group box's border, which the panel check
   structurally cannot see; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
@@ -163,7 +163,7 @@
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
   steps reads as a dropped frame, not as a style. The pixel grid is held by the ×2 nearest-neighbour
   blit, not by quantising time.<br><br>
-  <b>47.7 seconds, 35.7 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
+  <b>50.4 seconds, 35.7 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
   sentence is written to end on the word that triggers its visual, and the sentence boundaries are read
   back from the TTS — then the real end of each sentence's speech is measured off the waveform, because
   the reported boundary runs to the next sentence and so includes the pause after the last word.
@@ -254,6 +254,16 @@ function dottedArrow(pts,prog,col){let tot=0,seg=[];
   if(prog>=1){const[ex,ey]=pts[pts.length-1];
     for(let k=0;k<6;k++){const bx2=ex-dir[0]*k,by2=ey-dir[1]*k,pxx=-dir[1],pyy=dir[0];
       for(let s=-k;s<=k;s++)B.fillRect(Math.round(bx2+pxx*s*0.6),Math.round(by2+pyy*s*0.6),1,1);}}}
+// Text caret. Drawn with its own tip at (x,y) like the arrow, so the two are
+// interchangeable on the same keyframe track.
+function ibeam(x,y){if(GBOX)GBOX.push({x:x-3,y:y,w:7,h:16,k:'cursor'});
+  const rows=['XXXXXXX','XXXXXXX','..XXX..','..XXX..','..XXX..','..XXX..','..XXX..',
+              '..XXX..','..XXX..','..XXX..','..XXX..','..XXX..','..XXX..','XXXXXXX','XXXXXXX'];
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]!=='X')continue;
+    rect(x-3+i,y+j,1,1,'#000'); rect(x-3+i,y+j,1,1,'#fff');}});
+  // 1px dark outline so it reads on any background
+  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]!=='X')continue;
+    if(j===0||j===rows.length-1||r[i-1]!=='X'||r[i+1]!=='X')rect(x-3+i,y+j,1,1,'#fff');}});}
 function cursor(x,y){if(GBOX)GBOX.push({x:x,y:y,w:10,h:16,k:'cursor'});const rows=['X','XX','XOX','XOOX','XOOOX','XOOOOX','XOOOOOX','XOOOOOOX','XOOOOOOOX','XOOOOOXXXX','XOOXOOX','XOX XOOX','XX  XOOX','X    XOOX','     XOOX','      XX'];
   rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]==='X')rect(x+i,y+j,1,1,'#000');else if(r[i]==='O')rect(x+i,y+j,1,1,'#fff');}});}
 function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
@@ -463,7 +473,7 @@ function glass(ctx,W,Hh,t,boost){
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=47.7, VOHASH="a1eb4a260631";
+const DUR=50.4, VOHASH="e16701c582f5";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:0.64,z:1.978,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.64, 0.8, 1.168, 1.488, 1.752]},
@@ -521,9 +531,28 @@ function explainer(ctx,W,Hh,t){
   //     uses continuous t, not the 12fps tick: a reveal is a discrete event,
   //     not motion, and an 83ms lag against speech is audible-visible.
   const V=(n)=>VO[n];
+  // Two stacks offset along the x-y diagonal sit at the SAME height and 98px
+  // apart; offsetting in x alone put them 49px apart while each is 42px wide,
+  // and dropped the second one 35px lower so its tag landed on the cubes.
+  const B2X=7, B2Y=-7;
+  // centre-bottom of a stack's footprint, so a tag can sit clear BENEATH it
+  // (bx+f, by+f) is the stack's lowest drawn corner -- using (bx+by+f) put the
+  // tag 10px high and straight onto the cubes it was labelling.
+  const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
+  let CARET=null;      // where the pointer should be while words are printing
   const wordAt=(n,i)=>VO[n].t[i];
   const said=(n,a,b)=>{const v=VO[n];const lo=a||0,hi=(b===undefined?v.w.length:b);
     let o=[];for(let i=lo;i<hi;i++) if(t>=v.t[i]) o.push(v.w[i]);return o.join(' ');};
+  // Print a word-synced line AND leave the caret at its insertion point, so the
+  // pointer is visibly the thing doing the typing.
+  const typeLine=(n,x,y,size,col,shadow,font,a,b)=>{
+    const str=said(n,a,b); const v=VO[n];
+    const lo=a||0, hi=(b===undefined?v.w.length:b);
+    const live = t>=v.t[lo] && t<=v.z+0.25;
+    const w = str ? (shadow?pxShadow(str,x,y,size,col,shadow,null,font)
+                           :px(str,x,y,size,col,null,font)) : 0;
+    if(live) CARET={x:x+w+Math.round(size*0.35),y:y-2};
+    return w;};
   const after=(n,i)=>t>=VO[n].t[i];            // has word i been spoken yet
   const ends=(n)=>VO[n].z;
 
@@ -546,9 +575,9 @@ function explainer(ctx,W,Hh,t){
     // Three lines at 14px. Press Start 2P is ~13.7px per glyph, so the longest
     // of these is 151px inside a 336px client area -- it was 9px before, which
     // is 18px on output and under the floor for anything the story needs.
-    px(said(0,0,2),r.x+50,r.y+14,14,'#000');
-    px(said(0,2,4),r.x+50,r.y+38,14,'#000');
-    px(said(0,4),r.x+50,r.y+62,14,'#000');
+    typeLine(0,r.x+50,r.y+14,14,'#000',null,null,0,2);
+    typeLine(0,r.x+50,r.y+38,14,'#000',null,null,2,4);
+    typeLine(0,r.x+50,r.y+62,14,'#000',null,null,4);
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
   }
   zoomRect(DLG,[8,8,624,318],M,dlgOut-0.28,dlgOut);
@@ -583,32 +612,35 @@ function explainer(ctx,W,Hh,t){
       if(after(1,5)){                                                        // "keeps"
         pxShadow('KEEPS FOR',CX+246,CY+44,22,P.gold,P.ink);
         if(after(1,7))pxShadow('DECADES.',CX+246,CY+82,22,P.gold,P.ink);}
-      pxShadow(said(2),CX+246,CY+134,18,'#ffd28a',P.ink,null,'"VT323"');
-      pxShadow(said(3),CX+246,CY+164,18,'#ffd28a',P.ink,null,'"VT323"');
+      typeLine(2,CX+246,CY+134,18,'#ffd28a',P.ink,'"VT323"');
+      typeLine(3,CX+246,CY+164,18,'#ffd28a',P.ink,'"VT323"');
     }
 
     /* --- WATER: one sixth, then the two activity bars --- */
     if(T>=BEAT.WATER.sc&&T<BEAT.OSMOSIS.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'WATER ACTIVITY');
-      const Pr=proj(CX+150,CY+172);
+      const OX=CX+140, OY=CY+150, Pr=proj(OX,OY);
+      const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
       // s4 "Honey is about one sixth water." -- six cubes, one of them water
       if(after(4,0)&&T<wordAt(6,0)){
         for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09*SPD,wordAt(4,0)+(i*0.09+0.3)*SPD);
           if(k<=0)continue;
           const isWater = after(4,3)&&i===5;        // "one sixth"
-          cube(proj(CX+150,CY+150),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
-        px(said(4),CX+56,CY+212,18,'#d9d2e6',null,'"VT323"');
+          cube(proj(OX-30,OY-20),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
+        // at the TOP of the box: down at the baseline it collided with the
+        // HONEY tag during the overlap where both are on screen
+        px(said(4),CX+40,CY+26,18,'#d9d2e6',null,'"VT323"');
       }
       // s5 "...almost none of it is free." -- the honey bar drops
       const d1=mp(wordAt(5,2),wordAt(5,2)+1.00);                    // "sugar"
       const d2=mp(wordAt(8,0),wordAt(8,0)+1.04);                    // "Bacteria"
       if(after(5,2)){
         voxBar(Pr,0,0,12,P.orange,d1);
-        if(d1>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.paper,'#74432d');}
+        if(d1>0.9)blockTag(b1.x,b1.y+24,'HONEY',14,P.paper,'#74432d');}
       if(after(8,0)){
-        voxBar(Pr,7,0,18,P.ice,d2);
-        if(d2>0.9)blockTag(CX+248,CY+196,'BACTERIA',14,P.ice,'#0a0618');}
+        voxBar(Pr,B2X,B2Y,18,P.ice,d2);
+        if(d2>0.9)blockTag(b2.x,b2.y+24,'BACTERIA',14,P.ice,'#0a0618');}
       if(after(6,0))px('water activity in honey',CX+392,CY+80,18,'#d9d2e6',null,'"VT323"');
       if(after(7,0))px((0.60*H.ease.out(mp(wordAt(7,0),wordAt(7,6)))).toFixed(2),
                        CX+392,CY+30,42,P.orange,null,'"Silkscreen"');   // lands on "six"
@@ -629,20 +661,21 @@ function explainer(ctx,W,Hh,t){
         B.fillStyle=P.red;
         for(let i=0;i<26;i++){B.fillRect(CX+214+i,CY+58+i,4,4);B.fillRect(CX+239-i,CY+58+i,4,4);}
         pxShadow('OSMOSIS',CX+292,CY+56,22,P.red,P.ink);}
-      px(said(10),CX+30,CY+186,18,'#c3bad4',null,'"VT323"');
+      typeLine(10,CX+30,CY+186,18,'#c3bad4',null,'"VT323"');
     }
 
     /* --- ACID: pH 3.9 against plain water --- */
     if(T>=BEAT.ACID.sc&&T<BEAT.SEAL.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
-      const Pr=proj(CX+150,CY+172);
+      const OX=CX+140, OY=CY+150, Pr=proj(OX,OY);   // same baseline as the water chart
+      const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
       const dp=mp(wordAt(11,2),wordAt(11,2)+0.76),     // "acidic"
             dw=mp(wordAt(12,0),wordAt(12,0)+0.80);     // "Plain"
       if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
-        if(dp>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.red,'#fff4e2');}
-      if(after(12,0)){voxBar(Pr,7,0,7,'#9fcb55',dw);
-        if(dw>0.9)blockTag(CX+248,CY+196,'WATER',14,P.grass,'#0a0618');}
+        if(dp>0.9)blockTag(b1.x,b1.y+24,'HONEY',14,P.red,'#fff4e2');}
+      if(after(12,0)){voxBar(Pr,B2X,B2Y,7,'#9fcb55',dw);
+        if(dw>0.9)blockTag(b2.x,b2.y+24,'WATER',14,P.grass,'#0a0618');}
       const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
       if(after(11,8)){                                  // "nine"
         const inv=t<h8+0.72&&Math.floor((t-h8)*8)%2===0;
@@ -694,7 +727,7 @@ function explainer(ctx,W,Hh,t){
         sprite('bug',IR-92,IT+2,5);
         pxShadow('YEAST',IR-110,IT+50,18,P.grass,P.ink);}
       // the closing line lives in the strip below the box, never across it
-      px(said(16),CX+16,BY+BH+14,18,'#ffd28a',null,'"VT323"');
+      typeLine(16,CX+16,BY+BH+14,18,'#ffd28a',null,'"VT323"');
     }
 
     /* scene changes: the medium's own mosaic, peaking as the content swaps */
@@ -703,36 +736,50 @@ function explainer(ctx,W,Hh,t){
     B.restore();
 
     /* --- END: the takeaway, one line per spoken word --- */
+    const CLICK=VO[18].z+0.52, SHUT=CLICK+0.15;   // press OK, then the box closes
     zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.24,BEAT.END.sc);
-    if(done){
+    if(done&&T<SHUT){
       const m=winFrame(110,78,420,196,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
         if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
       const tx=m.x+52;
       // "Dry. Acidic. Sealed." -- one line per spoken word, at 14px not 9px
-      if(after(17,0))px('> Dry.',tx,m.y+8,14,'#000');
-      if(after(17,1))px('> Acidic.',tx,m.y+30,14,'#000');
-      if(after(17,2))px('> Sealed.',tx,m.y+52,14,'#000');
-      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+82,22,'#000080','#c0c0c0');
-      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+118,22,'#000080','#c0c0c0');
-      button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',false);
+      if(after(17,0))typeLine(17,tx,m.y+8,14,'#000',null,null,0,1);
+      if(after(17,1))typeLine(17,tx,m.y+30,14,'#000',null,null,1,2);
+      if(after(17,2))typeLine(17,tx,m.y+52,14,'#000',null,null,2);
+      if(after(18,0))typeLine(18,tx,m.y+82,22,'#000080','#c0c0c0',null,0,3);
+      if(after(18,5))typeLine(18,tx,m.y+118,22,'#000080','#c0c0c0',null,3);
+      button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
+    }
+    /* --- the end card. It started with a click, so it ends with one. --- */
+    if(T>=SHUT){
+      zoomRect([300,160,40,20],[150,120,340,96],M,SHUT,SHUT+0.22);
+      if(T>=SHUT+0.22){
+        pxShadow('GOOD TO KNOW THO',320,146,22,P.gold,P.ink,'center');
+        px('it is now safe to close this window.',320,188,16,P.bone,'center','"VT323"');
+        if(blink)rect(236,214,8,2,P.gold);}
     }
   }
 
   /* --- the cursor, always chrome. Keyframed off the beat table. --- */
   const L=0.32;                                  // lead, scaled with the speed-up
-  const CK=[[0,420,300],[BEAT.HOOK.z-0.48,322,196],[BEAT.JAR.sc,322,196],
+  // Button centres, so the POINTER TIP lands on the button rather than near it.
+  // Dialog OK: x 154+168-32=290 w64 -> centre 322; y 116+108-26=198 h20 -> 208.
+  // Message OK: x 114+206-32=288 w64 -> centre 320; y 98+172-26=244 h20 -> 254.
+  const CK=[[0,420,300],[BEAT.HOOK.z-0.48,322,208],[BEAT.JAR.sc,322,208],
             [BEAT.JAR.a+L,120,40],[BEAT.WATER.sc-L,120,40],[BEAT.WATER.a+L,300,150],
             [BEAT.OSMOSIS.sc-L,300,150],[BEAT.OSMOSIS.a+L,250,80],
             [BEAT.ACID.sc-L,250,80],[BEAT.ACID.a+L,330,60],
             [BEAT.SEAL.sc-L,330,60],[BEAT.SEAL.a+L,120,120],
             // rest on the message box's OK button, not across its text
-            [BEAT.END.sc-L,120,120],[BEAT.END.a+L,292,250],[DUR,292,250]];
+            [BEAT.END.sc-L,120,120],[VO[18].z+0.30,320,254],[DUR,320,254]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
   for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
-  cursor(cx,cy);
+  // While a line is printing the pointer IS the caret, sitting at the insertion
+  // point; the rest of the time it is the arrow travelling the keyframe track.
+  if(CARET) ibeam(CARET.x,CARET.y); else cursor(cx,cy);
 
   ctx.imageSmoothingEnabled=false;
   ctx.clearRect(0,0,W,Hh);
@@ -829,6 +876,19 @@ window.checkOverlap=function(step){
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
     BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    // a TAG PLATE on a STACK. Checking only text-vs-graphics missed this
+    // entirely: the plate is opaque, so the label on it stayed readable while
+    // the plate itself covered the cubes it was meant to label.
+    for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){
+      const A=g[i],Bq=g[j];
+      const ks=[A.k,Bq.k];
+      const isPair=(ks[0].indexOf('tag:')===0&&ks[1]==='voxbar')||
+                   (ks[1].indexOf('tag:')===0&&ks[0]==='voxbar');
+      if(!isPair) continue;
+      const o=hit(A,Bq); if(!o) continue;
+      const k='GG|'+ks.join('~'); if(seen.has(k))continue; seen.add(k);
+      hits.push({t:+tt.toFixed(2),a:A.k,b:Bq.k,overlap:o});
+    }
     // text sitting on top of a sprite, a stack, a tag or the cursor
     for(const a of r)for(const b of g){
       if(b.k==='cursor') continue;            // the pointer is allowed anywhere
@@ -929,7 +989,8 @@ function buildScore(){
   const w=(n,i)=>VO[n].t[i];
   // chrome
   add(0.05,'open'); add(VO[0].z-0.40,'snap'); add(VO[0].z,'click');
-  add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open'); add(BEAT.END.a+0.32,'snap');
+  add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open');
+  add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
   // screen: a print blip on every spoken word that appears as text on screen
   [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   VO[0].t.forEach((tt,i)=>add(tt,'blip',i));

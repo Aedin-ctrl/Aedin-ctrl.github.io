@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.7
+# CATHODE DESK — house style v1.8
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.8 (2026-11-08)** — generation rules for voxel charts and for the
+> pointer, both written as rules rather than as fixes, plus the opening and
+> closing click. See *Generation rules*.
+>
 > **v1.7 (2026-11-08)** — layout is planned against the group box rather than
 > nudged against the panel, and a sweep now polices the box border. Speed-ups
 > are done with `atempo`, not by re-reading the script.
@@ -322,6 +326,53 @@ claims in the honey sampler survived four versions before being checked:
 The corrected version is a better story than the one it replaced, which is
 usually how this goes. **A surprising-but-wrong beat is worth less than the
 true mechanism underneath it.**
+
+## Generation rules
+
+These are not style preferences. Each one is a defect that shipped, written as
+the rule that prevents it recurring. **Follow them when generating, not after.**
+
+### Voxel charts
+
+1. **Offset a second stack along the x−y diagonal, never along x alone.**
+   `voxBar(Pr, 7, -7, …)` beside `voxBar(Pr, 0, 0, …)`. Offsetting in x alone
+   also moves the stack *down* the isometric grid, so two bars end up at
+   different heights and the lower one collides with the upper one's label.
+2. **Separation ≥ 2× the footprint width.** A footprint of 3 is `6·CW = 42px`
+   wide, so centres must be ≥ 84px apart. `(7,−7)` gives 98px. The first cut
+   used 49px, which is narrower than the bars themselves.
+3. **A tag belongs under its own stack, computed — never typed in.**
+   The stack's lowest drawn corner is `(bx+f, by+f)`, i.e.
+   `y = oy + (bx + by + 2f)·CH`. Place the tag **24px below that**. Anchoring to
+   `(bx+by+f)` is 10px too high and lands the plate on the cubes.
+4. **Keep one baseline across beats.** Every chart in the piece shares an `OY`,
+   so bars in different beats are comparable and tags always clear the box.
+5. **Check plate-against-stack, not just label-against-stack.** A tag plate is
+   opaque: the text on it stays perfectly readable while the plate hides the
+   thing it is labelling. Text-vs-graphics checking cannot see this.
+
+### The pointer
+
+6. **The tip is the hotspot.** `cursor(x,y)` draws its point at exactly `(x,y)`.
+   To click a button, the keyframe must be the button's **centre**, computed from
+   the button rect — not a nearby round number.
+7. **The pointer becomes a caret while text prints**, sitting at the insertion
+   point of the line being typed, and returns to the arrow when the line is done.
+   The mouse should look like the thing operating the machine.
+8. **Open on a click, close on a click.** The piece starts with the pointer
+   pressing OK on a dialog and ends with it pressing OK on the message box; the
+   window then shuts to an **end card**. A piece that just stops feels unfinished.
+
+### Enforcement
+
+Every rule above is checked by a sweep, and all of them must return **0**:
+
+| sweep | catches |
+|---|---|
+| `checkLegibility()` | type under the floor |
+| `checkBounds()` | anything leaving the window's client area |
+| `checkStraddle()` | a label lying across the group box border |
+| `checkOverlap()` | label on label, label on graphics, **plate on stack** |
 
 ## Layout
 
