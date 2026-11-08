@@ -1,0 +1,806 @@
+{
+  "date": "2026-11-08",
+  "generated": "2026-11-08T17:47:05.076Z",
+  "articles": [
+    {
+      "id": "2026-11-08-a-cloud-breach-may-have-exposed-data-on",
+      "headline": "A cloud breach may have exposed data on 7.7 million customers of Japanese maker Iris Ohyama",
+      "summary": "Iris Ohyama says unauthorized access to a third-party cloud service used by its Iris Plaza shop may have exposed personal data on up to 7.7 million people. The company has not said who did it.",
+      "impacts": [
+        "Names, addresses, phone numbers, emails and birth dates in one place make targeted phishing easier.",
+        "Active members' passwords were stored encrypted, but the company hasn't said how, so reuse elsewhere is a risk.",
+        "A breach at a cloud vendor can reach every customer of the retailer, not just one site.",
+        "Shoppers get little warning: the shop was shut on Oct. 28 and the scale only emerged on Nov. 5."
+      ],
+      "details": [
+        "Iris Ohyama, a Japanese manufacturer that runs the Iris Plaza online shopping platform, disclosed that personal information on about 7.7 million people may have been exposed after unauthorized access to a third-party cloud service. BleepingComputer reported the figures on Nov. 8, 2026.",
+        "The timeline is short. The company found the incident in late October and suspended its online store, SIMPLE STYLE, and related systems on Oct. 28. On Oct. 29 it disclosed the incident with few details and notified Japan's Personal Information Protection Commission and the police. A Nov. 5 update said a suspicious file had been found in an external cloud service used by Iris Plaza, and that it had immediately suspended Iris Plaza and related systems and begun an investigation.",
+        "The 7.7 million figure is an upper bound for people who may be affected: up to 5.8 million registered and former members, plus 1.9 million non-members. The company says it is still working out how many records were actually exposed. The data may include full names, physical addresses, phone numbers, email addresses, gender, dates of birth and account passwords, and what was exposed varies by person. Former members have no stored passwords. Passwords for active members were stored in encrypted form, but the company did not say what scheme protected them.",
+        "Credit card information was not stored in the affected cloud service. As of Nov. 5, the company had received no reports of misuse or financial loss. It has not identified who was behind the access, and says it received no direct communication from the attacker, so no ransom demand is known. Websites of its subsidiary Iris Tech Service, which handles home-appliance subscriptions and furniture and appliance delivery, were also suspended.",
+        "Much is still unknown: the exact number of people affected, how the attacker got in, which cloud service was involved, how the suspicious file relates to the intrusion, and when the store will reopen. The practical lesson for readers is the usual one. Passwords reused across sites, and details like birth dates and phone numbers, are what make a breach like this useful to scammers, so customers should change any reused password and be wary of messages that quote their personal details."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "data breach",
+        "cloud",
+        "japan",
+        "credentials",
+        "supply chain",
+        "privacy",
+        "iris ohyama"
+      ],
+      "date": "2026-11-08",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/iris-ohyama-data-cloud-breach-exposes-info-of-77-million-customers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-an-nhs-trust-left-8-003-staff-sickness",
+      "headline": "An NHS trust left 8,003 staff sickness records online for 33 months, and its helpline strained staff",
+      "summary": "Royal Cornwall Hospitals NHS Trust left a spreadsheet with hidden sickness-absence records on its FOI page from February 2023 until November 2025. A trust review says the helpline it set up left call handlers carrying a heavy emotional burden.",
+      "impacts": [
+        "A routine records request hid personal health-related data inside a spreadsheet's pivot tables.",
+        "The trust can't say whether any of the 340 logged accesses were people rather than web crawlers.",
+        "Some callers to the helpline were potentially at risk from domestic abuse, so exposed absence data can carry real safety stakes.",
+        "Untrained staff ran the helpline within minutes of getting the script, a gap that applies to any organization's breach response."
+      ],
+      "details": [
+        "Royal Cornwall Hospitals NHS Trust set up a helpline after sickness-absence data about staff and non-trust workers was exposed online. A review published on the trust's website, reported by The Register on Nov. 7, 2026, found that callers were often distressed or angry and that call handlers faced safeguarding decisions without training or an established process.",
+        "The breach affected 8,003 people: 7,715 staff and 288 non-trust workers, plus a small number of unidentified records. In February 2023 the trust published a spreadsheet on its freedom-of-information disclosure log in answer to a request thought to come from a journalist researching NHS stress. The workbook still contained the underlying sickness-absence records, reachable through its pivot tables. A member of the public found the exposure in November 2025 and the trust reported it that month. The file was public for 33 months. Logs for the last 12 months before the alert show 340 accesses, but the trust cannot say how many reached the pivot tables, whether a human viewed the data, or how many were crawlers.",
+        "The review traces the failure to process. The request went to the e-Rostering team rather than the People Information Unit, which specialised in complex FOI datasets. The team believed it had removed sensitive data but had not. Mandatory steps were skipped, including running the file through Excel's Document Inspector, which can flag pivot caches but can't judge sensitivity. Staff did not convert the file to PDF as instructed, and investigators could not confirm that no hidden data remained. Guidance at the time did not require CSV conversion, which would have stripped the pivot cache.",
+        "The helpline was meant to run for two weeks in December 2025 but was stood down after 11 weeks, in February 2026. Staff from the clinical governance team were told a day ahead. They got a short training session, and calls started within minutes of launch; the script arrived 30 minutes before. Callers shouted or were distressed, and some were potentially at risk from domestic abuse. Many handlers learned their own data was affected while already on the phones. They could not decline the work and kept their usual duties, with some giving up weekends.",
+        "The trust has password-protected the workbook in FOI responses and added senior information-governance approval before executive sign-off. A November 2025 revision called for CSV conversion, but the review found it had not been written into the formal procedure. The Information Commissioner's Office closed its case after the trust implemented the recommendations. The findings come from the trust's own review, and the requester's identity is described only as 'thought to be' a journalist."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "nhs",
+        "data breach",
+        "privacy",
+        "foi",
+        "spreadsheet",
+        "health data",
+        "uk"
+      ],
+      "date": "2026-11-07",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/07/nhs-breach-helpline-left-staff-carrying-a-significant-emotional-burden/5308201"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-india-warns-of-an-ai-assisted-crew-crafty",
+      "headline": "India warns of an AI-assisted crew, CRAFTY FALCON, that re-hits fintechs on weekends",
+      "summary": "India's CERT-In says a group using AI-enhanced hacking tools is escalating attacks on financial firms, striking on weekends and holidays and returning to victims that only partly fixed their systems.",
+      "impacts": [
+        "Attacks timed for weekends and holidays target the hours when security teams are thinnest.",
+        "Attackers who return after a partial fix mean 'we patched it' isn't proof a breach is over.",
+        "Rapid code variants that look AI-generated make a victim's response harder even when they suspect an attack.",
+        "Rewritten apps that call payment APIs can look legitimate to defenders who assume only their own apps do."
+      ],
+      "details": [
+        "India's Computer Emergency Response Team, CERT-In, warned the financial sector of a 'significant escalation' in attacks by what it calls an 'AI-assisted financial threat actor', which it named CRAFTY FALCON. The Register reported the warning on Nov. 6, 2026. CERT-In says the actor re-targets victims after they try to remediate and times attacks for holidays, weekends and other low-monitoring periods.",
+        "CERT-In first detected the attacks in October and issued advisory CIAD-2026-0046. A Thursday update, CIAD-2026-0058, says it keeps receiving reports of successful attacks, including at organizations that tried to fix their systems after earlier incidents. The initial advisory named digital lending platforms, fintechs, payment providers and wallet operators as targets, reached through internet-facing applications, exposed APIs and privileged endpoints.",
+        "The described playbook starts with internet-exposed test or development environments. From there the attackers use shared credentials, tokens and network paths to reach production. They then rewrite victims' applications to make unauthorized API calls, which often goes unflagged because defenders assume only legitimate apps call those APIs. CERT-In also points to many functionally identical code variants appearing in quick succession, a pattern it says fits AI-generated code. The group sends test payments of about US$0.01 and, if they succeed, moves to larger ones. Against crypto exchanges it steals wallet keys and empties wallets.",
+        "CERT-In says the group uses the ARTEX pen-testing tool, the Cairn attack search engine and the CyberStrikeAI framework. The Register links those tools to users who appear to speak Chinese, citing CrowdStrike and Aviatrix reports; the article itself doesn't independently verify that attribution. CERT-In's advice is mostly basic: better event logging, real-time anomaly alerts, keeping test environments off the internet, restricting access to cloud resources the group uses to run attacks, and 24x7 monitoring.",
+        "There are limits to what's known. The advisory refers to banking, financial-services and insurance entities, but only fintech-type businesses are named as having reported incidents. The Register notes India has thousands of banks, many small, which could make the sector a 'target-rich environment' if the group expands. How much of the speed comes from AI, versus ordinary automation, is CERT-In's inference from the code patterns, not something shown publicly."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai agents",
+        "artex",
+        "india",
+        "fintech",
+        "cert-in",
+        "china",
+        "payments"
+      ],
+      "date": "2026-11-06",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/06/threat-actor-targets-indian-fintechs-on-weekends-when-defenders-arent-watching/5308000"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-iucn-says-96-of-shallow-coral-reef-systems",
+      "headline": "IUCN says 96% of shallow coral reef systems face a very high risk of collapse by 2075",
+      "summary": "The first global Red List assessment of coral reef ecosystems rates 96% of shallow-water reef systems as critically endangered, with heat stress the main driver. The Great Barrier Reef is among those rated critically endangered.",
+      "impacts": [
+        "Reefs shelter at least a quarter of marine species, so collapse would ripple through fisheries.",
+        "Hundreds of millions of people rely on reefs for food, income and storm protection.",
+        "Marine heatwaves are arriving faster than reefs can recover between events.",
+        "Local fixes like less overfishing help, but the assessment says they can't replace emissions cuts."
+      ],
+      "details": [
+        "The International Union for Conservation of Nature released its first global assessment of coral reef ecosystems under its Red List of Ecosystems on Oct. 22, 2026, at the UN biodiversity summit COP17. It rates 96% of shallow-water reef systems as critically endangered, its highest threat level, and says they face a very high risk of collapse in the next 50 years, by about 2075.",
+        "The assessment covers 127 tropical and subtropical ecoregions and about 188,362 square kilometers of reef. Systems rated critically endangered include the Great Barrier Reef, the Coral Triangle, the Mesoamerican Barrier Reef System and the Red Sea reefs. It names climate change as the 'single most consistent threat driving coral reef decline worldwide'. Lead scientist Mishal Gudka defined collapse as the loss of most living hard corals, leaving algae-covered rubble that is effectively a different ecosystem.",
+        "Context from the reporting: the fourth global bleaching event, from January 2023 to September 2025, affected more than 80% of the world's reefs in at least 83 countries and territories. Corals expel their symbiotic algae when overheated; they can recover if water cools quickly, but otherwise die. Overfishing threatens at least 63% of reef ecosystems by removing grazers like parrotfish, which lets algae smother recovering corals. Even under a moderate warming scenario, the assessment expects heatwaves within 50 years to be too frequent for most reefs to withstand.",
+        "The headline number needs care. The reporting does not explain how the 96% figure was calculated or whether it counts systems or area, and the 2075 date is a projection under stated scenarios, not a certainty. Gudka said resilient pockets may survive and called the findings 'a wake-up call rather than a cause for despair', noting reefs have shown a remarkable ability to recover from bleaching.",
+        "A related Nature study, published about a week earlier, found nearly 44% of reef-building coral species face elevated extinction risk from climate change. Experts quoted say cutting emissions has to be paired with monitoring, fisheries recovery, cleaner coastal water and restoration. A joint report found over 90% of restoration efforts happen on land versus about 2% in coastal and marine areas. Gudka said actions in the next few years will largely decide whether reefs persist in recognizable form through the century."
+      ],
+      "category": "Climate",
+      "tags": [
+        "coral reefs",
+        "iucn",
+        "climate",
+        "biodiversity",
+        "bleaching",
+        "ocean",
+        "cop17"
+      ],
+      "date": "2026-10-22",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Inside Climate News",
+          "url": "https://insideclimatenews.org/news/23102026/most-of-the-worlds-shallow-coral-reefs-could-collapse-in-the-next-50-years/"
+        },
+        {
+          "name": "ABC News (AP)",
+          "url": "https://abcnews.com/Technology/wireStory/coral-reef-ecosystems-face-risk-collapse-50-years-137472877"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-a-key-water-layer-around-antarctica-is-getting",
+      "headline": "A key water layer around Antarctica is getting saltier and denser, a first in about 130,000 years",
+      "summary": "A study led by Bishakhdatta Gayen reports that Antarctic Intermediate Water is saltening as sea ice shrinks. The authors call it a possible tipping point; effects on carbon storage and climate are uncertain.",
+      "impacts": [
+        "This layer carries heat, carbon, oxygen and nutrients toward the tropics, so changes could reach far beyond Antarctica.",
+        "A feedback loop is possible: less sea ice raises salinity, which could speed further ice loss.",
+        "How much carbon the ocean locks away could change, though the size and timing are unknown.",
+        "The comparison to 130,000 years ago rests on the authors' interpretation of past conditions."
+      ],
+      "details": [
+        "Researchers led by Bishakhdatta Gayen of the University of Melbourne and the Centre for Atmospheric and Oceanic Sciences in Bengaluru report that Antarctic Intermediate Water, or AAIW, is becoming saltier, denser and deeper. Gizmodo covered the study on Oct. 29, 2026. The authors describe the change as happening for the first time in about 130,000 years, since the end of the last interglacial period.",
+        "AAIW forms at roughly 700 to 1,200 meters depth. It acts as a barrier between warm surface water and cold deep water and carries heat, carbon, oxygen and nutrients toward the tropics. Each summer, sea-ice melt adds freshwater that keeps AAIW's salinity low. That held until about 2015: Antarctic sea ice hit a record high in 2014, then fell sharply from 2016. Less meltwater means saltier AAIW.",
+        "The measured change is small. Core salinity is rising by about 0.005 grams of salt per kilogram of water per decade, based on the Argo program's nearly 4,000 robotic floats plus satellite and atmospheric data. The article gives no figures for the rate of sea-ice loss or for any carbon or sea-level effect.",
+        "The projected impacts are speculative. The authors say changes to AAIW could affect ocean carbon storage and possibly sea level, ocean warming, storm tracks, rainfall and atmospheric circulation. They raise a feedback loop in which altered heat storage speeds sea-ice loss, which raises salinity further. Gayen said 'that transition took thousands of years, not two decades,' and that this 'could be the tipping point for the Atlantic Ocean and the AAIW current'. He also said the magnitude and timing of carbon effects are uncertain.",
+        "One thing to check: Gizmodo says the paper is in Nature, but its link uses a code usually associated with Nature Climate Change, so the journal is unclear from the coverage. Methods, uncertainty ranges and statistical details weren't in the article, so the original paper is the place to look. The feedback and tipping-point scenarios are possibilities, not established outcomes."
+      ],
+      "category": "Climate",
+      "tags": [
+        "antarctica",
+        "sea ice",
+        "ocean",
+        "tipping point",
+        "salinity",
+        "climate",
+        "argo"
+      ],
+      "date": "2026-10-29",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Gizmodo",
+          "url": "https://gizmodo.com/scientists-sound-alarm-as-antarcticas-ocean-grows-saltier-for-the-first-time-in-130000-years-2000832412"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-a-20-unit-biological-data-center-of-human",
+      "headline": "A 20-unit 'biological data center' of human neurons is running at the National University of Singapore",
+      "summary": "NUS Medicine, DayOne and Cortical Labs have set up a 20-unit prototype of CL1 biological computers, each with at least 200,000 lab-grown human neurons. No performance benchmarks have been published.",
+      "impacts": [
+        "Living human neurons are being sold as computing hardware, which raises ethics questions the field hasn't settled.",
+        "Claimed low power use is unproven against silicon AI chips; no benchmarks were shared.",
+        "The cultures need continuous nutrient and gas control, so they are a service to maintain, not a chip to plug in.",
+        "Stated uses like robotics and cybersecurity are ambitions, not demonstrated results."
+      ],
+      "details": [
+        "NUS Medicine, the data-center developer DayOne and the Australian startup Cortical Labs set up a 20-unit prototype of biological computing at the NUS Life Sciences Institute in Singapore. NUS Medicine announced the installation on Aug. 17, 2026, after a showcase on Aug. 6, and Let's Data Science reported it on Aug. 21.",
+        "Each CL1 unit contains at least 200,000 lab-grown human neurons on a silicon chip fitted with electrodes, according to The Straits Times as cited. The system has been operating since July 16. The neurons are kept alive by continuous nutrient and gas control, which makes the setup closer to a small life-support system than to a rack of servers. The partners demonstrated CL1 and Cortical Cloud units, microelectrode-array integration and real-time neural-network activity at the showcase.",
+        "The claimed uses are biomedical research, robotics and cybersecurity, where the ability to adapt with limited data could help. The reporting is careful to call these 'stated ambitions rather than demonstrated performance results'. It publishes no workload benchmarks for throughput, accuracy, latency or performance per watt compared with silicon AI hardware, and says lower power alone doesn't make the systems interchangeable.",
+        "Cortical Labs' CEO is quoted, via The Straits Times, as saying silicon is better suited to fast, precise, repeatable calculations such as those used by large language models. That is a notable limit from the company itself: this is positioned as an experimental research testbed, not a benchmarked AI infrastructure product.",
+        "Why it's unsettling: it moves 'wetware' from a lab curiosity toward an offered service, and the questions that raises, about what such cultures can experience and how they should be regulated, are not answered in the coverage. Why it shouldn't be overstated: 200,000 neurons is tiny, there are no performance numbers, and the company itself says silicon is better for LLM-style workloads. Readers should watch for published benchmarks and any ethics oversight attached to the project."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "biocomputing",
+        "neurons",
+        "cortical labs",
+        "singapore",
+        "data center",
+        "wetware",
+        "ethics"
+      ],
+      "date": "2026-08-21",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Let's Data Science",
+          "url": "https://letsdatascience.com/news/singapore-launches-neuron-powered-data-center-prototype-b7a82810"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-skipped-newborn-vitamin-k-shots-doubled-from-3",
+      "headline": "Skipped newborn vitamin K shots doubled from 3.1% to 6.8% of US births, and bleeding risk rose with them",
+      "summary": "A JAMA study of 5.2 million US infants finds refusal of the newborn vitamin K shot more than doubled from 2017 to 2025. Babies without it had a 47% higher risk of bleeding in their first six months.",
+      "impacts": [
+        "Babies who skipped the shot had more than double the risk of a brain bleed in their first six months.",
+        "Refusal is rising: 5.6% in 2024 to 6.8% in 2025.",
+        "Late vitamin K deficiency bleeding can cause permanent brain damage; the CDC says about 20% of babies with it die.",
+        "Parents cite a warning that applies to high adult IV doses, not the small dose given to newborns."
+      ],
+      "details": [
+        "Children's Hospital of Philadelphia researchers published a study in JAMA on Nov. 5, 2026, using more than 5.2 million health records from Epic Cosmos covering 2017 to 2025. Lead author Dr. Kristan Scott and neonatologist Dr. Heather Burris found that the share of babies not getting the newborn vitamin K shot rose from 3.1% in 2017 to 6.8% in 2025. Between 2024 and 2025 alone it rose from 5.6% to 6.8%.",
+        "Babies who did not get the shot had a 47% higher risk of any bleeding event in their first six months, among babies born at 35 to 43 weeks. The risk of any brain bleed more than doubled, as did the risk of death during the birth hospitalization. Bleeding rose for all babies from 2017 to 2025 but more steeply for those without the shot. A companion study in JAMA Pediatrics, as summarized by CIDRAP, saw vitamin K deficiency and related bleeding rise in a different data set of more than 11 million infants.",
+        "Babies are born with low vitamin K, which the liver needs to make clotting factors, and they don't get enough from early diet. A single injection has been recommended in the US since the early 1960s. Late deficiency bleeding, between 2 weeks and 6 months, involves brain bleeds in about half of cases, per the CDC, and about 20% of affected babies die. Doctors described long-term harm from infant brain bleeds, including cerebral palsy.",
+        "Reasons for refusal include the FDA's strongest warning on vitamin K, which concerns adults on high intravenous doses and not the much smaller intramuscular dose given to babies. Some parents worry the shot 'creates trauma' or that its preservative is harmful, which the reporting says has no scientific evidence. Vitamin K is a naturally occurring vitamin, not a vaccine. Burris compared the shot to a seatbelt.",
+        "What's uncertain: these are associations from health records, not a trial. The 47% and 'more than doubled' figures are relative increases, and the ABC article gives no absolute counts. Bleeding was measured through recorded events, and it's unclear how well the data represent all US births. The CIDRAP summary also notes bleeding rose among vaccinated infants too, which neither article explains. Doctors advise parents to talk to a pediatrician before declining."
+      ],
+      "category": "Health",
+      "tags": [
+        "vitamin k",
+        "newborns",
+        "bleeding",
+        "jama",
+        "vaccine misinformation",
+        "pediatrics",
+        "public health"
+      ],
+      "date": "2026-11-05",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "ABC News via ABC7",
+          "url": "https://abc7news.com/story/more-parents-are-declining-vitamin-shots-newborns-putting-babies-risk-bleeding-study/20018108/"
+        },
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/public-health/increased-infant-bleeding-tied-lower-acceptance-newborn-vitamin-k-dose"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-china-lays-out-its-plan-to-land-astronauts",
+      "headline": "China lays out its plan to land astronauts on the Moon by 2030, with uncrewed rehearsals first",
+      "summary": "A chief designer of China's lunar program described a two-rocket plan on Nov. 3: Long March 10 launches for the Lanyue lander and Mengzhou crew ship, meeting in lunar orbit, after a full uncrewed test.",
+      "impacts": [
+        "It sets a public schedule for a Moon race with NASA's Artemis program.",
+        "China plans a full uncrewed lunar dress rehearsal before any crew flies.",
+        "Planned base work starts in 2031, so lunar territory and resources become a near-term policy question.",
+        "Russia's role in the planned joint lunar base is unclear."
+      ],
+      "details": [
+        "Wang Xiang, deputy chief designer of China's crewed space program and chief designer of its lunar exploration program, outlined the plan on Nov. 3, 2026, in a keynote at the 7th Manned Space Symposium at Beihang University in Beijing, where more than 800 experts attended. Universe Today reported the details. The target is a crewed lunar landing by 2030.",
+        "The architecture uses two Long March 10 launches, one for the Lanyue lander and one for the Mengzhou crewed spacecraft, which rendezvous in lunar orbit. Three taikonauts fly in Mengzhou and two descend to the surface. A Long March 10A, a two-stage variant without boosters, handles near-Earth testing, while the standard three-stage Long March 10 with boosters flies lunar missions with about 27 metric tons of payload capacity.",
+        "Wang described a 'near-Earth first, then the Moon' sequence. Mengzhou flies to the Tiangong station in low Earth orbit to test the rockets, lander and capsule, including re-entry. An uncrewed Lanyue flight comes next, followed by a full uncrewed lunar profile covering launch, lunar orbit, docking, landing, surface stay, ascent and re-docking. A crewed mission follows only after that. The program now has unified system plans, technical standards and quality requirements.",
+        "The article places this in a run of tests: Lanyue's design was revealed in September 2023, a tethered lander test took place in 2025, Mengzhou passed abort tests in June 2025, and Long March 10 completed a low-altitude demonstration in early 2026. It compares China's approach to NASA's Artemis strategy and notes NASA's SLS Block 2 has been cancelled. China's International Lunar Research Station is planned to begin construction in 2031 using Long March 9 rockets, though whether it sits on the surface or in orbit is still vague.",
+        "The caveats are real. Details come from a single keynote, a CCTV interview and secondary reporting, with no independent verification of the timeline. The article gives no dates for the uncrewed Lanyue flight or the crewed landing beyond the 2030 target. Russia's role in the lunar station is unclear given the war in Ukraine, record-low launch numbers and delays to its Yenisei super-heavy rocket."
+      ],
+      "category": "Space",
+      "tags": [
+        "china",
+        "moon",
+        "lanyue",
+        "long march 10",
+        "artemis",
+        "space race",
+        "mengzhou"
+      ],
+      "date": "2026-11-03",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Universe Today",
+          "url": "https://www.universetoday.com/articles/china-unveils-their-plan-for-a-crewed-moon-landing"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-mars-gas-leaks-above-a-giant-volcano-hint",
+      "headline": "Mars gas leaks above a giant volcano hint that the planet may still be volcanically active",
+      "summary": "ESA's ExoMars orbiter found unusual hydrogen chloride gas over fresh-looking fractures on Alba Mons, which the team says could come from a dormant magma chamber. It does not prove eruptions are happening.",
+      "impacts": [
+        "A still-warm Mars interior would change how scientists judge the planet's recent history.",
+        "Warm hydrothermal pockets, if they exist, could be targets in the search for microbial life.",
+        "Volcanic activity could matter for any future crewed site selection, though that is not a finding of the study.",
+        "Scientists have never directly seen a new eruption or fresh lava flow on Mars."
+      ],
+      "details": [
+        "A team led by Alexander Trokhimovskiy, with Daniel Mège of the Space Research Centre of the Polish Academy of Sciences as co-lead, reports unusually high hydrogen chloride (HCl) gas above fractures in the Alba Mons volcanic region of Mars. The paper, published in Science Advances and distributed by ESA on Nov. 7, 2026, is titled 'Enigmatic HCl detections as a potential signature of igneous activity on Mars'.",
+        "The ExoMars Trace Gas Orbiter first detected HCl in the Martian atmosphere in 2021. It usually peaks in northern winter and drops to very low levels in summer, a pattern tied to dust and water cycles. Here it was elevated in early northern summer over the same volcanic fractures, repeatedly, which pointed to a source beyond ordinary atmospheric chemistry.",
+        "The orbiter's Atmospheric Chemistry Suite identified the gas using infrared spectrometers, and the CaSSIS camera imaged the area, showing narrow, relatively fresh fractures hundreds of meters long with unusual color changes around them. The team weighed many non-volcanic chemical pathways before attributing the gas to volcanism. The proposed mechanism: winter temperatures near minus 120 C may let ice seal the fractures, and early-summer warming sublimates that ice and reopens paths for subsurface gas, possibly from a dormant magma chamber beneath Alba Mons.",
+        "Mège said the results suggest Mars 'has retained enough internal heat to support volcanic activity until recently, and possibly still does,' and called the detection 'the smoking gun'. ESA's project scientist Colin Wilson said the findings 'may prove to be TGO's greatest success yet'. Volcanic gases like HCl may have helped thicken the early atmosphere, and magma meeting groundwater can form hydrothermal systems that offer chemical energy and shelter.",
+        "The limits are clear in the source. The findings do not establish that Mars is erupting now or that life exists there. Orbital images show eruptions within the past few million years and marsquakes show the planet is seismically active, but present-day volcanism is unresolved. The magma-chamber explanation is a proposal supported by indirect evidence. Independent confirmation, for example more detections over the same fractures, would be the next test."
+      ],
+      "category": "Space",
+      "tags": [
+        "mars",
+        "volcano",
+        "esa",
+        "exomars",
+        "hydrogen chloride",
+        "alba mons",
+        "astrobiology"
+      ],
+      "date": "2026-11-07",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (ESA)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261106174525.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-sonicwall-warns-of-an-ssl-vpn-login-bypass",
+      "headline": "SonicWall warns of an SSL-VPN login bypass that is already being exploited",
+      "summary": "SonicWall patched CVE-2026-19868, a SAML authentication bypass in SonicOS SSL-VPN, after a report of possible exploitation. CISA lists it as exploited and gave federal agencies until Nov. 20.",
+      "impacts": [
+        "An attacker with valid credentials for another authentication method can slip past SAML controls, possibly including MFA.",
+        "There are no workarounds, so patching is the only fix.",
+        "VPN appliances sit on the network edge, so a bypass can open a door into internal systems.",
+        "It is one of a string of attacks on SonicWall remote-access products this year."
+      ],
+      "details": [
+        "SonicWall published advisory SNWLID-2026-0014 on Nov. 6, 2026, covering seven vulnerabilities, and BleepingComputer reported on it. The headline flaw, CVE-2026-19868, has a CVSS score of 7.1 and is an SSL-VPN authentication bypass. An attacker who already holds valid credentials for an alternate authentication method can get past SAML authentication controls, which could include SAML-enforced multi-factor authentication. Only SonicOS SSL-VPN services configured to use SAML are affected.",
+        "Ryan Harris of The Electronic Office found and reported the flaw. SonicWall says its PSIRT investigated a report of potential exploitation and did not share details. CISA added the CVE to its Known Exploited Vulnerabilities catalog, which confirms in-the-wild use, and ordered U.S. federal civilian agencies to secure affected systems by Nov. 20, 2026.",
+        "Affected versions are SonicOS Gen7 7.3.3-7015 and earlier, fixed in 7.3.4-7013, and Gen8 8.2.2-8015 and earlier, fixed in 8.2.3-8015. SonicWall says no workarounds are available and strongly urges customers to upgrade as soon as possible.",
+        "The other six fixes include two management-interface flaws rated CVSS 8.8 that let unauthenticated attackers perform unauthorized operations under specific conditions, pre-authentication buffer overflows in the SSL-VPN and TACACS+ services that could cause denial of service, and weak password hashing on virtual appliances. The article doesn't give CVE IDs for most of these.",
+        "BleepingComputer puts this in a series of attacks on SonicWall's SMA1000 remote-access appliances: two zero-days used to deploy malware in July, two chained zero-days for remote code execution in September, and exploitation attempts in October against another flaw. It is not stated whether those are connected to the SonicOS bug. Also unknown: which alternate authentication method the attacker needs, who was targeted and how many systems were hit."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "sonicwall",
+        "vpn",
+        "mfa bypass",
+        "cisa",
+        "exploited",
+        "saml",
+        "vulnerability"
+      ],
+      "date": "2026-11-06",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/sonicwall-warns-of-new-ssl-vpn-mfa-bypass-flaw-exploited-in-attacks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-qnap-says-hackers-are-taking-over-nas-boxes",
+      "headline": "QNAP says hackers are taking over NAS boxes through a four-bug Plex flaw chain",
+      "summary": "QNAP says attackers are breaching its NAS devices through Plex2Shell in Plex Media Server and tells users to treat exposed devices as compromised. Updating alone doesn't remove what attackers have already installed.",
+      "impacts": [
+        "A home media server exposed to the internet can become a way into the NAS that holds personal files.",
+        "Patching Plex does not remove payloads already planted, so a clean OS reinstall is advised.",
+        "Forwarding port 32400 for remote access is the exposure QNAP wants users to stop.",
+        "CISA ordered federal agencies to patch within three days, so the flaws were already being exploited on Oct. 20."
+      ],
+      "details": [
+        "QNAP said on Nov. 6, 2026, that attackers are breaching NAS devices by exploiting Plex2Shell, a chain of four flaws in Plex Media Server, which runs as an app on QNAP NAS devices. The vendor said it had received reports from some users that their Plex Media Server appeared compromised. BleepingComputer reported on it and notes that the number of affected devices is not stated.",
+        "The four flaws are CVE-2026-96652, CVE-2026-96654, CVE-2026-96655 and CVE-2026-96656. Researcher Zach Main reported them to Plex on July 27, 2026. Full technical details were published Oct. 16 and exploitation began shortly after. CISA added all four to its Known Exploited Vulnerabilities catalog on Oct. 20 and told federal agencies to upgrade to Plex 1.43.3.10861 or later within three days.",
+        "QNAP's PSIRT says the vulnerabilities exist only in Plex Media Server, not in QTS, QuTS hero or its other operating systems. The fixed version is available in the QNAP App Center. QNAP's guidance is blunt: if a vulnerable Plex server was exposed to the public web, treat the NAS and all personal content as compromised, because updating does not remove payloads attackers already installed.",
+        "Recommended steps are to check for signs of compromise using QNAP's security bulletin, do a clean reinstall of the OS, reset Plex and NAS credentials, and submit logs from suspected compromises to QNAP support. If remote Plex access isn't needed, users should disable related features and stop forwarding port 32400; if it is, they should connect through a VPN.",
+        "Several things are not known from the article: how many devices were hit, who is behind the attacks, what payloads they installed, which NAS models are affected, and the CVSS scores. It also doesn't explain the mechanics of each CVE. People running Plex on any NAS should check the version they are on and whether port 32400 is open to the internet."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "qnap",
+        "plex",
+        "nas",
+        "plex2shell",
+        "cisa",
+        "exploited",
+        "remote access"
+      ],
+      "date": "2026-11-06",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/qnap-says-hackers-breaching-nas-devices-in-plex2shell-attacks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-comparitech-counts-1-020-ransomware-attacks-in-october",
+      "headline": "Comparitech counts 1,020 ransomware attacks in October, with record highs for hospitals and schools",
+      "summary": "Comparitech's October tally shows 85 attacks on healthcare providers and 47 on education, both the highest it has recorded this year or ever for the sector. Only 81 of the 1,020 attacks were confirmed by victims.",
+      "impacts": [
+        "Hospitals hit by ransomware can close clinics and divert patients, as UNM Health did.",
+        "Attacks on transportation rose 126% and on utilities 73% compared with August.",
+        "Most counts are group claims, so the real picture is partly unknown and revised later.",
+        "Suppliers matter: one attack on a Japanese cloud provider reportedly affected about 500 organizations."
+      ],
+      "details": [
+        "Comparitech's October 2026 ransomware roundup recorded 1,020 attacks, about 33 a day, the second-highest month of the year after August's 1,034. Of these, 81 were confirmed by the affected organization and 939 were unconfirmed claims by ransomware groups. The US had 442 attacks (43%), its highest monthly total this year.",
+        "Healthcare saw 85 attacks, the year's highest, of which 10 were confirmed. Education had 47, a record for the sector, with 14 confirmed. Government had 42. Transportation rose 126% from August and September, and utilities rose to 19 from 11 in August, though the report names no utility victims. Manufacturing remained the most-targeted sub-sector with 158 attacks.",
+        "Among healthcare incidents, University of New Mexico Health closed clinics and diverted patients; no ransom was paid, and the attacker offered free decryption and $2,500 to affected patients. Other cases include a claimed 2 TB theft from Green Clinic in the US and server and billing disruption at Kamalnayan Bajaj Hospital in India.",
+        "The biggest incidents were supply-chain style. GMO Internet in Japan said a vulnerability flagged two years earlier was not adequately fixed, and attackers reportedly demanded $50 million, which was not paid. An attack on Japan's IDC Frontier affected around 500 companies and local authorities. In Argentina, over 250 municipal agencies reported inoperable systems after an attack on Program Consultores. Akira claimed 945 GB from U.S.NEXT, which affected about 70 government websites. A US town, Bernalillo, approved an $82,000 payment to hackers.",
+        "Treat the totals with care. Comparitech calls an attack 'confirmed' only if the victim discloses it or acknowledges an attack matching a group's claim; claims may be false or may simply not be acknowledged, and figures are revised as claims lag by a month or more. US state disclosure laws are why many US attacks are confirmed. The Gentlemen (139 attacks) and Qilin (125) were the most prolific groups, and N0n rose about 400%, from 17 to 85."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ransomware",
+        "hospitals",
+        "healthcare",
+        "schools",
+        "comparitech",
+        "critical infrastructure",
+        "supply chain"
+      ],
+      "date": "2026-11-05",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Comparitech",
+          "url": "https://www.comparitech.com/news/ransomware-roundup-october-2026/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-palantirs-ceo-calls-the-company-a-pioneer-of",
+      "headline": "Palantir's CEO calls the company a pioneer of an 'antiwar movement' as revenue jumps 96%",
+      "summary": "In his shareholder letter and on the earnings call, Alex Karp said Palantir's weapons software deters war. The Register calls the framing self-serving; third-quarter revenue rose 96% to $2.31 billion.",
+      "impacts": [
+        "A company that profits from defense work argues that more military capability means fewer wars.",
+        "Palantir's long relationship with ICE draws criticism, which the antiwar framing doesn't address.",
+        "Stocks reacted badly: shares fell 8% after the results despite the revenue growth.",
+        "How firms describe military AI shapes how governments buy and regulate it."
+      ],
+      "details": [
+        "Palantir CEO Alex Karp used the US midterm results to present his military-software company as a leader of an antiwar movement, according to a Nov. 4, 2026 opinion piece in The Register by Lindsay Clark. In his shareholder letter Karp wrote that Palantir sees itself as 'the pioneers of a genuine and viable antiwar movement'.",
+        "On the earnings call he argued that Palantir's products deter war by making adversaries expect unacceptable costs, and build social cohesion by bringing troops home safer. He also said the company has a 'moral imperative to be the dominant player in our industry'. Third-quarter revenue rose 96% year on year to $2.31 billion, but shares fell 8% after the results were reported on Tuesday, the day voters delivered a heavy defeat to Republicans.",
+        "The article notes Karp donated $1 million in December 2024 to MAGA Inc., a super PAC backing Donald Trump, and says Trump later launched a US military operation in Venezuela and went to war with Iran. Karp did not address either on the call, per the article. He also claimed Palantir builds products that protect civil liberties while stopping terrorism, while the article points to Palantir's long relationship with ICE, whose treatment of detainees has drawn criticism from US judges.",
+        "This is an opinion piece, so it argues a position. The Register calls the framing self-serving and says Karp enjoys the controversy around the company. The article gives no contract values, specific contract names or customer lists, and does not describe the judges' specific rulings, so those claims are not backed with detail in the piece.",
+        "What to watch: whether Palantir's deterrence argument gets tested by actual policy choices, how investors price a stock that fell on strong revenue, and whether the political shift after the midterms changes scrutiny of its government work. The strongest fair reading is that the claim is a business and political argument, not a demonstrated result: nothing in the article shows that Palantir's tools have reduced the number of wars."
+      ],
+      "category": "Economy",
+      "tags": [
+        "palantir",
+        "karp",
+        "defense",
+        "ai",
+        "ice",
+        "earnings",
+        "midterms"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/offbeat/2026/11/04/palantir-ceo-says-its-pioneering-an-antiwar-movement-while-happily-accepting-defense-dollars/5307605"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-ericsson-says-ordinary-mobile-towers-can-detect-and",
+      "headline": "Ericsson says ordinary mobile towers can detect and track small drones, with pilots planned for 2027",
+      "summary": "Ericsson's ISAC system analyzes radio signals reflected off objects to spot drones, including ones not on the network, using existing 5G sites. The performance claims come from Ericsson's own tests.",
+      "impacts": [
+        "The same towers that carry phone calls could also be used as a wide-area sensing network.",
+        "Supporters see protection for stadiums, ports and power plants from low-flying drones.",
+        "A network that senses moving objects raises privacy questions, though the release doesn't discuss them.",
+        "Ericsson's own partner calls the technology 'dual-use' and says it wants to develop it responsibly."
+      ],
+      "details": [
+        "Ericsson announced its ISAC System, short for Integrated Sensing and Communication, on Nov. 2, 2026. It adds sensing to existing mobile networks to detect and track moving objects, especially low-flying drones over wide areas, including objects that are not connected to the network.",
+        "The system analyzes how radio signals reflect off objects. Transmission and reception are spread across several geographically separate mobile sites, so a target is seen from multiple angles, which Ericsson says improves accuracy and track continuity. It uses sensing-capable 5G radios, edge computing, AI and signal processing, and reuses existing towers, backhaul and spectrum. Data can be shared through standardized interfaces with authorized external systems, such as security and command-and-control platforms.",
+        "Ericsson says small, low-cost drones are increasingly used for unlawful surveillance, organized crime, sabotage and warfare, and that dedicated sensors are hard to scale across large areas. In validated tests, it says, the system reliably detected and tracked micro drones at kilometer-scale distances with precise 3D positioning. It was demonstrated with AT&T in Arlington, Texas, with Erillisverkot in Helsinki, and with Play and Asseco in Poland, where it was paired with an acoustic detection system.",
+        "Rollout is slow: small sensing-only pilots with selected customers in 2027, broader deployments in 2028, and the communications side later as the product moves toward 6G. An independent analyst, Joe Madden of Mobile Experts, is quoted saying mobile-network sensing performs better than many expect. A Swedish Armed Forces architect said it could add a useful layer of situational awareness alongside existing sensors.",
+        "The caveats matter. This is a vendor press release. It gives no detection probabilities, false-alarm rates or maximum range beyond 'kilometer-scale', and Ericsson says performance depends on the target, terrain, geometry and configuration. It does not discuss pricing, regulatory approval or performance in dense urban areas with heavy interference. Erillisverkot's CTO calls it dual-use, which is the key point: the capability that finds a drone is also a sensing layer on civilian infrastructure."
+      ],
+      "category": "Tech",
+      "tags": [
+        "ericsson",
+        "drones",
+        "5g",
+        "sensing",
+        "surveillance",
+        "isac",
+        "counter-drone"
+      ],
+      "date": "2026-11-02",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ericsson",
+          "url": "https://www.ericsson.com/en/press-releases/2026/11/ericsson-brings-drone-detection-capabilities-to-mobile-networks"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-openreach-says-the-uks-old-landline-network-shuts",
+      "headline": "Openreach says the UK's old landline network shuts on Jan. 31, 2027, with no extension",
+      "summary": "Openreach told providers that the copper phone network, PSTN, will be retired on Jan. 31, 2027. Alarms, card terminals and care devices that still depend on it are the biggest worry.",
+      "impacts": [
+        "Fire and security alarms and TeleCare personal alarms on old lines could stop working if not moved.",
+        "Business customers still on legacy lines are paying roughly double last year's rental.",
+        "Low public awareness means some households may find out only when the line goes dead.",
+        "Older and vulnerable people who don't respond to letters are the main risk, says Age UK."
+      ],
+      "details": [
+        "The Register reported on Nov. 1, 2026, that Openreach, the infrastructure arm of BT Group, sent a letter to communications providers saying the legacy public switched telephone network will be switched off on Jan. 31, 2027, and that the date will not be postponed. The headline says 100 days, but the article itself notes the real gap from Nov. 1 is about 91 days.",
+        "Households using landline handsets are affected if they are still on the old connections; households that have already gone mobile-only are not. So are businesses relying on PSTN lines, including point-of-sale terminals, and safety systems such as fire and security alarms and personal care alarms for elderly and vulnerable people, including TeleCare.",
+        "People who want to keep a landline can use Digital Voice by plugging a phone into the back of a broadband router. Openreach advises consumers to contact their provider as soon as possible. Customers with no fibre will likely be moved to SOTAP for Analog, which installs equipment at the local exchange so existing lines keep working, though the article doesn't explain cost or availability for consumers.",
+        "Openreach's James Lilley said 'the straightforward migrations have largely been completed' and that organizations that delay 'are making things harder for themselves'. Remaining business cases are complex connections underpinning critical operations. Late migrators may struggle to get engineering support before the deadline, and Openreach raised charges for legacy business lines earlier in 2026.",
+        "The concerns are about people, not technology. Analyst Paolo Pescatore says many people don't know analog services will be disconnected and wants a coordinated campaign. Age UK's Caroline Abrahams said nobody who relies on their landline or TeleCare should be left behind, and warned some people may be unwell, living with dementia or worried about scams. One caution: the deadline was delayed once before, after the government asked providers not to force vulnerable TeleCare users to switch until fixes were ready, though Openreach says this date is firm."
+      ],
+      "category": "Tech",
+      "tags": [
+        "landline",
+        "openreach",
+        "uk",
+        "telecare",
+        "infrastructure",
+        "copper",
+        "digital switchover"
+      ],
+      "date": "2026-11-01",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/networks/2026/11/01/landline-phones-will-switch-off-across-britland-in-100-days-no-extensions-openreach/5306673"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-the-un-telecom-agency-opens-an-18-day",
+      "headline": "The UN telecom agency opens an 18-day meeting with 278 proposals, and internet groups fear a state power grab",
+      "summary": "The ITU's quadrennial plenipotentiary starts Nov. 9. Internet-governance bodies worry some proposals could widen the ITU's role over internet architecture, though The Register doesn't say which of the 278 proposals do.",
+      "impacts": [
+        "Who sets internet standards decides how open or fragmented the network becomes.",
+        "States, not companies or engineers, are the ITU's members, so governments can push their priorities.",
+        "Open questions include who oversees satellite constellations and submarine cable resilience.",
+        "Most items pass by consensus, but amendments can bring a vote on significant policy changes."
+      ],
+      "details": [
+        "The International Telecommunication Union opens its quadrennial plenipotentiary on Monday, Nov. 9, 2026, and it runs for 18 days. The Register reported on Nov. 8 that internet-governance organizations worry it could become a venue for nation-states to challenge their roles. There are 278 proposals on the table.",
+        "The ITU is the UN agency for information and communication technologies and its members are nation-states. It manages radio spectrum and satellite orbits and develops technical standards, some widely used: X.509 for public key infrastructure, E.164 for telephone numbers and H.264/H.265 for video. Its work sits close to that of the IETF (protocols), ICANN (the domain name system), the regional internet registries (IP addresses) and the W3C. Those groups use a multi-stakeholder model where governments are one voice among many.",
+        "The backdrop is the 2025 WSIS+20 review, where the UN endorsed multi-stakeholder governance and decided the Internet Governance Forum should become permanent, which the article says effectively kept the ITU out of internet standards. The IGF hasn't met since, so this meeting is a test. Precedents the article cites include China's push for an ITU role in a revised 'New IP' and a 2022 candidate for ITU leader, backed by Russia and China, who favored a stronger state role and was not elected.",
+        "The Internet Society says it is 'actively challenging proposals that could affect the Internet's underlying technical architecture or increase fragmentation', and is watching AI and quantum resolutions, plus unresolved questions on who should oversee low-Earth-orbit satellite constellations, submarine cable resilience and spectrum policy. ICANN welcomed the consensus outcomes and warned proposals that expand the ITU's role over IP networks or the DNS could create overlapping mandates, without naming specific proposals.",
+        "What's uncertain is the main point: the article does not identify which of the 278 proposals raise these concerns beyond the examples given. Most ITU proposals are decided by consensus, but members can amend them during the meeting, so major changes could still reach a vote. This is a governance story with slow effects, and readers should treat 'takeover' language as the worry of the groups quoted, not a result."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "itu",
+        "internet governance",
+        "icann",
+        "ietf",
+        "china",
+        "russia",
+        "fragmentation"
+      ],
+      "date": "2026-11-08",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/networks/2026/11/08/internet-governance-about-to-get-its-quadrennial-stress-test-at-itu-meeting/5308031"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-mit-turns-immune-cells-into-cancer-killers-inside",
+      "headline": "MIT turns immune cells into cancer killers inside mice with a single nanoparticle injection",
+      "summary": "MIT researchers used lipid nanoparticles carrying CAR instructions to engineer natural killer cells inside the body. In mice, about 80% of targeted cells were modified, and some tumors were eliminated. Human safety is unknown.",
+      "impacts": [
+        "Skipping the lab step could make cell therapies simpler and cheaper if it works in people.",
+        "The design can aim at B cells, or at T cells including autoimmune ones.",
+        "Everything so far is in mice, with small groups, so human benefit and side effects are unknown.",
+        "Editing immune cells inside the body is hard to reverse, which makes long-term safety data essential."
+      ],
+      "details": [
+        "MIT researchers report engineering CAR natural killer cells directly inside the body, in a paper in Nature Biotechnology titled 'In vivo engineering of CAR natural killer cells for immunotherapy using ligand-directed lipid nanoparticles'. ScienceDaily covered it on Nov. 8, 2026. Senior author Daniel Anderson of MIT's Chemical Engineering department and Koch Institute led the work, with Robert Langer contributing.",
+        "Background: CAR T therapies have seven FDA approvals in the past decade, mainly for blood cancers, but making them means collecting blood, modifying cells at a specialized facility, growing them and reinfusing them. Natural killer cells are an alternative because engineered NK cells can target abnormal T cells without attacking each other. Making CAR NK cells outside the body is still laborious and none has FDA approval.",
+        "The team built lipid nanoparticles carrying messenger RNA that encodes a chimeric antigen receptor. The particle surfaces carry antibody fragments that bind receptors on NK cells, so instructions reach the intended cells, which then make the receptor and can recognize a chosen target. The design can be adapted to targets including CD19 on B cells and CD3 on T cells.",
+        "In mice, about 80% of targeted NK cells were modified after injection. In an aggressive melanoma model, three of five treated mice reached complete remission. In humanized mice with T cell lymphoma, five injections eliminated tumors, with results comparable to conventionally made CAR NK cells. In autoimmune hepatitis, a single injection eliminated the harmful T cells and the damaged liver healed. Anderson said 'if a patient can just get an infusion of nanoparticles, it would dramatically simplify the process and reduce costs'.",
+        "The caveats are large. All results are from mice, including humanized mice, and groups are small. The article does not describe long-term outcomes or side effects in detail. The researchers hope to extend the approach to multiple sclerosis and rheumatoid arthritis, but those are future goals. Funding came from Sanofi, the Marble Center for Cancer Nanomedicine and a National Cancer Institute core grant."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "car-t",
+        "nanoparticles",
+        "cancer",
+        "mit",
+        "immunotherapy",
+        "natural killer cells",
+        "mrna"
+      ],
+      "date": "2026-11-08",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (MIT)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104084015.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-researchers-report-heme-chemistry-in-red-blood-cells",
+      "headline": "Researchers report heme chemistry in red blood cells preserved in a 115-million-year-old dinosaur bone",
+      "summary": "A PNAS paper from Curtin University says mineralized red blood cells in a Brazilian theropod's limb bone contain heme-derived molecules. The 'blood' is chemical traces and cell shapes, not liquid blood.",
+      "impacts": [
+        "It challenges the view that hemoglobin-derived molecules can't survive millions of years.",
+        "It could give a way to study the metabolism and activity of extinct animals.",
+        "The work is on a single specimen and has not been independently replicated.",
+        "The astrobiology angle is a possibility, not a finding."
+      ],
+      "details": [
+        "A team led by Kliti Grice of Curtin University reports heme signatures in mineralized red blood cells inside the vascular canals of a 115-million-year-old dinosaur bone. The paper, in the Proceedings of the National Academy of Sciences, volume 123 issue 46, was covered by ScienceDaily on Nov. 6, 2026, based on a Curtin release. Other institutions include the Japan Agency for Marine-Earth Science and Technology, the Brazilian National Museum, the Regional University of Cariri and Johns Hopkins University.",
+        "The fossil is Aratasaurus museunacionali, a meat-eating theropod from northeastern Brazil. Researchers examined its limb bones and found numerous mineralized red blood cells in canals that once held blood vessels. Chemical analysis detected heme-derived molecules, components of hemoglobin, which the team describes as the first definitive chemical confirmation of such molecules in fossilized dinosaur red blood cells. The samples also held amino acids associated with collagen.",
+        "The proposed explanation for the preservation is that the mineral hausmannite helped stabilize the cells and their contents, acting as a natural time capsule. The team suspects the animal was buried quickly in sediment in a low-oxygen setting with abundant microbial activity, which may have slowed decay.",
+        "Grice called it a 'landmark discovery' and a 'direct molecular window' into long-extinct animals' physiology. Colleague Martin Van Kranendonk said results are changing how researchers understand molecular preservation. The authors suggest it could help study the evolution of blood, metabolism and activity levels, and link it to the search for ancient life beyond Earth.",
+        "To keep this in proportion: the article reports a single specimen, with no counts of cells, sample sizes or replication across other fossils. The role of hausmannite and the burial conditions are described with hedged language like 'appears' and 'suspect'. Claims about metabolism and astrobiology are future possibilities. The article doesn't discuss dissenting views. It's a striking result, but not yet a settled one."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "dinosaur",
+        "fossil",
+        "hemoglobin",
+        "heme",
+        "paleontology",
+        "curtin",
+        "molecular preservation"
+      ],
+      "date": "2026-11-06",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (Curtin University)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261105224542.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-a-lancet-study-puts-human-body-co2-at",
+      "headline": "A Lancet study puts human-body CO2 at about 2 billion tons a year; the authors say it is not a climate driver",
+      "summary": "University of Bath researchers modeled CO2 from human metabolism, finding it rose 74% between 1985 and 2015 to 2.05 billion metric tons, mostly due to population growth. That CO2 comes from recent plants, so it's part of the natural cycle.",
+      "impacts": [
+        "Better estimates can tighten global carbon budgets and local city measurements.",
+        "Breathing out CO2 is not the cause of climate change; fossil carbon is.",
+        "Population growth explained over 60% of the rise, per the model.",
+        "The totals depend on the model's inputs, not on a direct count."
+      ],
+      "details": [
+        "A modelling study in The Lancet Planetary Health, led by Professor Javier Gonzalez of the University of Bath, estimates global CO2 production from human metabolism between 1985 and 2015. ScienceDaily covered it on Nov. 7, 2026. The large author list includes Herman Pontzer and John Speakman.",
+        "The headline numbers: human metabolic CO2 rose from about 1.18 billion metric tons in 1985 to 2.05 billion in 2015, a 74% increase. More than 60% of that increase is attributed to population growth. Changes in how much CO2 each person produces played a much smaller role.",
+        "The team analyzed thousands of measurements from individuals across the lifespan, from infants to older adults, and combined them with worldwide population figures and body weight data. Funding came from the International Atomic Energy Agency, Taiyo Nippon Sanso and SERCON, which supported the IAEA doubly labeled water database used in the research.",
+        "Why it matters, according to the authors: more accurate estimates could improve global carbon budgets, which track where carbon comes from and where it goes. Human metabolism may also be noticeable in local carbon measurements, especially in dense cities. Gonzalez said the work adds 'one more piece of the puzzle' for understanding sources and sinks.",
+        "The important context: the CO2 people exhale mostly comes from food that plants recently absorbed from the atmosphere, so it is part of the natural carbon cycle. Fossil-fuel CO2 comes from carbon stored underground for millions of years. Gonzalez said 'we're not saying that breathing is driving climate change,' and the researchers do not recommend people change diets or activity. The numbers cover 1985 to 2015, not today, and the source is a press release."
+      ],
+      "category": "Climate",
+      "tags": [
+        "co2",
+        "carbon budget",
+        "population",
+        "metabolism",
+        "lancet",
+        "climate",
+        "emissions"
+      ],
+      "date": "2026-11-07",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Bath)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104012305.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-a-meta-analysis-of-57-brain-imaging-studies",
+      "headline": "A meta-analysis of 57 brain-imaging studies links sleep disorders to shrinkage in a key attention hub",
+      "summary": "Florida International University researchers combined 57 imaging studies and found reductions in the thalamus across several sleep disorders. The link is an association; it doesn't show which comes first.",
+      "impacts": [
+        "An estimated 50 to 70 million Americans have a sleep disorder, per the article.",
+        "Thalamus changes could help explain slower reactions and poorer decisions, though that is a possibility.",
+        "Parasomnias like sleepwalking and nightmare disorder also showed changes in a mood and decision region.",
+        "Whether poor sleep causes the brain differences, or the reverse, is unknown."
+      ],
+      "details": [
+        "Researchers at Florida International University's Center for Children and Families report that sleep disorders are linked to structural brain changes, in a meta-analysis in Scientific Reports. ScienceDaily covered it on Nov. 7, 2026. Lead author Katharine Crooks and senior author Matthew Sutherland combined findings from 57 brain-imaging studies of adults.",
+        "Rather than studying one condition at a time, the team compared several disorders to see which brain patterns were shared. They grouped them as dyssomnias, meaning insomnia and sleep apnea, and parasomnias, meaning sleepwalking, nightmare disorder and sleep terrors. The article says this cross-disorder approach is still uncommon in sleep research.",
+        "Both groups were associated with reductions in the thalamus, a deep brain structure involved in information processing and sustained attention, specifically the pulvinar, which helps direct attention and supports cognitive control. People with parasomnias also showed changes in the posterior cingulate cortex, linked to motivation, decision-making and emotional regulation. The analysis found no consistent pattern unique to dyssomnias.",
+        "The authors suggest these regions connect to networks that support concentration and decision-making, and that the differences could help explain slower reaction times, difficulty with decisions and a higher risk of errors or accidents. The article frames this as a possibility, not a demonstrated result. Sutherland said the research gives 'a clearer picture of how sleep disorders affect brain structure and function'.",
+        "The limits are plain. The study found associations only: it didn't establish whether disrupted sleep causes the brain differences, whether pre-existing differences contribute to sleep disorders, or whether both occur. Results depend on the 57 included studies, whose methods the article doesn't detail, and only adults were examined. The team plans to study individual parasomnias, including sleepwalking and REM sleep behavior disorder, hoping for better diagnostics and treatments."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "sleep",
+        "thalamus",
+        "brain imaging",
+        "insomnia",
+        "sleep apnea",
+        "attention",
+        "meta-analysis"
+      ],
+      "date": "2026-11-07",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Florida International University)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104012303.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-divers-map-a-1-56-km-coral-colony",
+      "headline": "Divers map a 1.56 km coral colony in the Pacific that may be one of the largest ever recorded",
+      "summary": "Caltech's ASTRA robot assembled a truss section in low Earth orbit. The team built only one bay of a planned 11-bay antenna truss and hit many unforeseen problems.",
+      "impacts": [
+        "Telescopes and antennas too large to launch folded may have to be built in space.",
+        "Robots that assemble structures could cut the need for crewed construction.",
+        "Only a tiny section was built, so scale-up is unproven.",
+        "Claims come from a Caltech press release and DARPA, not a peer-reviewed paper."
+      ],
+      "details": [
+        "A robotic truss builder designed and built by Caltech researchers assembled a structure in orbit without astronauts, in what Caltech calls the first time a structure has been autonomously constructed in space. Phys.org republished the Caltech release on Nov. 6, 2026. The project, Autonomous In-Space Tensioned Reflector Assembly (ASTRA), is led by Sergio Pellegrino and is part of DARPA's NOM4D program.",
+        "ASTRA launched on March 30, 2026, from Vandenberg Space Force Base on Momentus's Vigoride 7 vehicle, on SpaceX's Transporter-16 mission, one of 10 payloads. It is roughly one cubic meter. A manipulator picks struts and joints from motorized dispensers and repeatedly builds identical truss bays. The target was a 1.4-meter reflector on an 11-bay truss; the team built one bay in orbit, a third bay counting two prebuilt ones. The payload has 11 cameras and gets about seven or eight 15-minute contact windows daily.",
+        "The reflector surface is a perforated, netlike film co-invented by Caltech and the University of Pennsylvania that needs less prestress than the knitted metallic mesh typically used, allowing lighter structures. A flight spare in Pellegrino's lab was used to troubleshoot problems and test fixes before commands were relayed to the orbiting unit.",
+        "DARPA's NOM4D has three phases, and ASTRA and a University of Illinois project are the only two to reach phase 3, the small-scale orbital demonstration. DARPA's Andrew Detor said 'very large' means hundreds of meters or kilometers. Pellegrino said that once structures are too large to prebuild and unfold, 'you have to think about how to build them in space'. Applications include telescope mirrors, radio antennas and large solar arrays for space solar power.",
+        "The caveats: time limits prevented the full truss, and the article says full completion looked unlikely before the mission ends in December 2026. The team met 'many' unforeseen problems in orbit and the approach needs simplification before scaling. The approach is described as scalable, but has been shown only at very small scale. No journal publication is cited."
+      ],
+      "category": "Space",
+      "tags": [
+        "robotics",
+        "caltech",
+        "darpa",
+        "in-space assembly",
+        "astra",
+        "satellites",
+        "autonomy"
+      ],
+      "date": "2026-11-06",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Phys.org (Caltech)",
+          "url": "https://phys.org/news/2026-11-robot-successfully-space-autonomous-demo.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-08-divers-map-a-pacific-coral-colony-about-1",
+      "headline": "Divers map a Pacific coral colony about 1.56 km long that may be one of the largest ever recorded",
+      "summary": "Researchers mapped a Pachyseris rose coral on the outer reef of the Cocos (Keeling) Islands, about 100 buses long. Genetic tests will decide whether it is one organism or several fused colonies.",
+      "impacts": [
+        "It's a rare bit of good news about a reef, set against wide warnings about coral collapse.",
+        "A single huge colony would show how long some corals can live and grow.",
+        "The finding isn't peer reviewed yet, so the 'largest' claim is unconfirmed.",
+        "Remote reefs may hold large structures nobody has mapped."
+      ],
+      "details": [
+        "Researchers identified a rose coral of the genus Pachyseris on the outer reef slope of the Cocos (Keeling) Islands that may be one of the largest coral colonies ever recorded. Phys.org republished a Queensland Museum release on Nov. 8, 2026. JP Hobbs of Adelaide University led the mapping, with researchers from the Queensland Museum and James Cook University.",
+        "Local dive operator Dieter Gerhard first spotted extensive areas of the coral more than 30 years ago. It wasn't until researchers mapped the reef that they realized the sections might be connected as one colony.",
+        "The numbers: about 1.56 km long (the article's introduction says 1.5 km), roughly 100 buses end to end, spanning depths from 14 to 65 meters, with an average width of 36.5 meters and an area of about 56,940 square meters. More sections extend a further 200 to 300 meters beyond the main colony. Mapping took months and 12 dives, and Hobbs used GPS to mark his progress, since he sometimes ran out of air before reaching the end.",
+        "The open question is the core of the story. It's unresolved whether this is a single organism or several colonies that fused over time, and researchers are using genetic testing to investigate. The release asks directly whether it is 'one giant coral organism, or multiple colonies that have fused together over time'.",
+        "Caveats: the article names no peer-reviewed journal, so the findings look preliminary. It describes the colony as 'one of the largest known', not the largest, and gives no comparison with other recorded colonies. Readers should hold the size claim loosely until the genetics and a publication are out."
+      ],
+      "category": "Climate",
+      "tags": [
+        "coral",
+        "reef",
+        "cocos keeling",
+        "marine biology",
+        "genetics",
+        "ocean",
+        "discovery"
+      ],
+      "date": "2026-11-08",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Phys.org (Queensland Museum)",
+          "url": "https://phys.org/news/2026-11-buses-scientists-world-largest-coral.html"
+        }
+      ]
+    }
+  ]
+}
