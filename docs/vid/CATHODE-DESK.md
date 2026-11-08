@@ -1,14 +1,14 @@
-# CATHODE DESK — house style v1.1
+# CATHODE DESK — house style v1.2
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
-> **v1.1 (2026-11-08)** — two changes, both made because the v1.0 build was
-> measured and watched, not because the look needed softening:
-> 1. **Two ticks.** Drawn content still steps at 12fps; continuous motion moves
->    at 24fps. See *Motion* below.
-> 2. **Sound is built, not pending.** See *Sound*.
+> **v1.2 (2026-11-08)** — motion is no longer ticked at all, and the running
+> time follows the script instead of the script being squeezed into a running
+> time. See *Motion* and *Pacing*.
 >
-> Nothing else moved. The palette, the layer order, the type floors and the
+> **v1.1 (2026-11-08)** — split the single 12fps tick in two, and built the sound.
+>
+> Nothing else has moved. The palette, the layer order, the type floors and the
 > determinism rule are unchanged from v1.0.
 
 One medium, derived from four references (16-Bit Pixel Odyssey, Voxel Diorama,
@@ -99,14 +99,20 @@ inside the screen area. Chrome bevels are hard 2px, never soft.
 - **12 fps content tick** — `T = Math.floor(t*12)/12`. Everything *drawn*:
   sprites, dither, typed text, the blink, the status line, and every beat
   boundary. This is what makes it read as a drawn medium.
-- **24 fps motion tick** — `M = Math.floor(t*24)/24`. Everything that *moves
+- **Continuous motion** — `M = t`, not ticked. Everything that *moves
   continuously*: the cursor, voxel drop-in, arrow draw-on, counters settling,
   outline zooms, mosaic block size.
+
+  v1.1 ticked this at 24fps and the voxel drops still visibly stepped. **A cube
+  that steps reads as a dropped frame, not as a style.** The pixel grid is
+  preserved by the ×2 nearest-neighbour blit, not by quantising time, so there
+  is nothing to defend here — let motion run at the display's rate.
 - The glass layer may run at full rate (scanline roll, grain).
 
-Content on 2s, movement on 1s — the oldest split in hand-drawn animation. v1.0
-ran everything at 12 and the result read as a slideshow under the cursor moves.
-Do **not** raise the content tick to fix smoothness; raise the motion tick.
+Drawn content on 2s, movement free — the oldest split in hand-drawn animation,
+taken to its end. v1.0 ran everything at 12 and read as a slideshow.
+**Do not raise the content tick to fix smoothness** — that is what makes it stop
+looking drawn. Loosen the motion instead.
 
 - Positions snap to whole buffer pixels. No sub-pixel drift.
 - Voxels **drop in** from above over 0.32s, `H.ease.out`, landing ~0.22s in.
@@ -141,7 +147,22 @@ the transition into a hold on content the viewer has already finished with.
 3. **Emphasis on the key moment.** Phosphor flash (boost 1.3–1.45 for ~0.15s) + inverse video + the biggest sound.
 4. **Takeaway held ~1s.** A classic message box.
 
-Aim 12–30s. Set it in a `DURATION` constant.
+## Pacing — write the script first, then the timeline
+
+**`DURATION` is an output, not an input.** Write the narration, synthesise it,
+measure each line, choose the gaps, and let the total fall out. Deciding the
+running time first and then cramming the script into it produces exactly the
+two complaints it earns: the content is too fast and the voice cadence is wrong.
+
+- **Never speed a line up to fit its slot.** Move the slot. A `--rate=+9%` line
+  is audibly hurried and it is the first thing anyone notices.
+- **Silence is content.** Budget **≥0.6s between lines** and a real hold at the
+  end of every beat. The sampler is 45.5s for 29.5s of speech — **35% silence**,
+  and it needs all of it.
+- Trim the voice where it reads the screen aloud. If the message box already
+  says "Low water. Acid. Peroxide.", the voice says something else.
+- Place a line so the thing it names is **already on screen or arriving**, never
+  several seconds after.
 
 ---
 
@@ -198,11 +219,25 @@ a hint — felt, never followed. If you can name the tune, it is too loud.
 
 ---
 
+## Layout
+
+**Measure the glyph before placing it.** Press Start 2P is about **0.98 × size**
+per character, so a 16-character label at 14px is 220px wide — two thirds of the
+usable panel. A label placed by eye ran straight through the ✗ it was pointing at
+and into the word beyond it, in a build that had already been reviewed.
+
+When a label does not fit beside a thing, **give it its own row**. Shrinking it is
+not available: the legibility floor is a floor.
+
 ## Accuracy
 
 Draw the subject correctly. Check the science before it goes in the visuals.
 If a number is an assumption, it gets listed under the storyboard — never
 presented on screen as fact.
+
+Check comparisons as hard as numbers. "pH 3.9 — as acidic as a tomato" shipped in
+v1.0 and v1.1; a tomato is pH 4.3–4.9, so honey is the *more* acidic of the two.
+It is orange juice (3.3–4.2) that actually matches.
 
 ---
 
