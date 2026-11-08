@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.6
+# CATHODE DESK — house style v1.7
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.7 (2026-11-08)** — layout is planned against the group box rather than
+> nudged against the panel, and a sweep now polices the box border. Speed-ups
+> are done with `atempo`, not by re-reading the script.
+>
 > **v1.6 (2026-11-08)** — the legibility floor is now enforced by a sweep
 > instead of being a line in this file that the build quietly ignored, and
 > the overlap sweep checks text against graphics, not only against text.
@@ -163,6 +167,16 @@ the transition into a hold on content the viewer has already finished with.
 2. **Beats every 1–2s.** Something changes. Arrows draw on. Labels land on what they label.
 3. **Emphasis on the key moment.** Phosphor flash (boost 1.3–1.45 for ~0.15s) + inverse video + the biggest sound.
 4. **Takeaway held ~1s.** A classic message box.
+
+## Changing the speed
+
+To make a finished piece faster or slower, **time-stretch the rendered audio**
+(`atempo=1.25`) and scale every time in the timeline by the inverse. That keeps
+the performance that was approved and only changes the rate. Re-synthesising at
+`--rate=+25%` is a different read, and the uniform breaks stop being uniform.
+
+Scale the **motion durations** too — a bar that took 1.25s to drop should take
+1.00s at 1.25×, or it starts overrunning the sentence that triggered it.
 
 ## Pacing — write the script first, then the timeline
 
@@ -332,7 +346,18 @@ piece:
   titles, button labels, group-box labels, the status bar) is exempt and is
   flagged as chrome at draw time.
 
-All three must return **0** before a build ships.
+- `checkStraddle()` — any label lying **across** the group box's border, half on
+  the diagram and half off it. The panel check cannot see this, because such a
+  label is still inside the panel. v1.6 shipped with WATER FROM / THE AIR
+  straddling it.
+
+All four must return **0** before a build ships.
+
+**Lay out against the box, not the panel.** Take the group box rect, inset it
+(14px is right at this scale), and place into *that*. A caption that will not fit
+inside goes in the free strip **below** the box — never across its edge. Measure
+the line before placing it: 18 characters of Press Start 2P at 16px is 283px,
+which is half the usable width.
 
 **The floor is not advisory.** v1.5 shipped with 21 texts under it, including the
 opening question at 9px — 18px on output, against a 28px floor. Writing the rule

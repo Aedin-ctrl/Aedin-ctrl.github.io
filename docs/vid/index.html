@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.6 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.7 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -65,7 +65,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 59.6</span>
+    <span class="t" id="time">0.00 / 47.7</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -153,16 +153,17 @@
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
   so the frame-by-frame video renderer works.<br><br>
   <b>Checked, not eyeballed.</b> <code>checkBounds()</code>, <code>checkOverlap()</code> and
-  <code>checkLegibility()</code> sweep every frame with a recorder on every piece of text drawn — and on
+  <code>checkLegibility()</code> and <code>checkStraddle()</code> sweep every frame with a recorder on every piece of text drawn — and on
   every sprite, voxel stack and tag plate text could hide behind. They report anything leaving the client
-  area, landing on top of something else, or set below the floor. All three return <b>0</b> for this
-  build; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
+  area, landing on top of something else, or set below the floor. All four return <b>0</b> for this build —
+  including the one that catches a label lying across the group box's border, which the panel check
+  structurally cannot see; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
   blink. Motion isn't ticked at all: the cursor, the voxel drops, the arrows and the counters run at
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
   steps reads as a dropped frame, not as a style. The pixel grid is held by the ×2 nearest-neighbour
   blit, not by quantising time.<br><br>
-  <b>59.6 seconds, 44.6 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
+  <b>47.7 seconds, 35.7 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
   sentence is written to end on the word that triggers its visual, and the sentence boundaries are read
   back from the TTS — then the real end of each sentence's speech is measured off the waveform, because
   the reported boundary runs to the next sentence and so includes the pause after the last word.
@@ -238,6 +239,7 @@ function winFrame(x,y,w,h,title,active){
 function button(x,y,w,h,label,pressed){rect(x,y,w,h,P.face);bevel(x,y,w,h,pressed?'pressed':'button');
   INCHROME=true; px(label,x+w/2,y+h/2-3+(pressed?1:0),6,'#000','center'); INCHROME=false;}
 function groupBox(x,y,w,h,label){
+  if(GBOX)GBOX.push({x:x,y:y,w:w,h:h,k:'groupbox'});
   rect(x,y+4,w,1,P.sh);rect(x,y+5,w,1,P.hi);rect(x,y+h-2,w,1,P.sh);rect(x,y+h-1,w,1,P.hi);
   rect(x,y+4,1,h-5,P.sh);rect(x+1,y+5,1,h-6,P.hi);rect(x+w-2,y+4,1,h-5,P.sh);rect(x+w-1,y+4,1,h-4,P.hi);
   const lw=label.length*7+6;rect(x+8,y,lw,9,P.face);
@@ -461,38 +463,38 @@ function glass(ctx,W,Hh,t,boost){
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=59.6, VOHASH="dcf69a30c91a";
+const DUR=47.7, VOHASH="a1eb4a260631";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:0.8,z:2.472,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.8, 1.0, 1.46, 1.86, 2.19]},
-  {b:'JAR',a:3.672,z:6.205,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[3.672, 3.742, 4.202, 4.432, 4.582, 5.172, 5.362, 5.592]},
-  {b:'JAR',a:6.655,z:7.728,w:["It", "isn't", "preservatives."],t:[6.655, 6.755, 7.005]},
-  {b:'JAR',a:8.178,z:9.604,w:["Almost", "nothing", "can", "live", "in", "it."],t:[8.178, 8.478, 8.878, 8.948, 9.138, 9.228]},
-  {b:'WATER',a:10.804,z:12.793,w:["Honey", "is", "about", "one", "sixth", "water."],t:[10.834, 11.244, 11.374, 11.697, 12.021, 12.344]},
-  {b:'WATER',a:13.243,z:17.373,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[13.253, 13.413, 13.583, 13.873, 14.173, 14.393, 14.723, 14.923, 15.643, 15.923, 16.353, 16.633, 16.773, 16.913, 17.113]},
-  {b:'WATER',a:17.823,z:20.613,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[17.913, 18.143, 18.573, 18.713, 19.393, 19.533, 19.933]},
-  {b:'WATER',a:21.063,z:23.172,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[21.093, 21.483, 21.943, 21.993, 22.326, 22.659, 22.992]},
-  {b:'WATER',a:23.622,z:25.874,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[23.622, 24.342, 24.68, 25.018, 25.356, 25.694]},
-  {b:'OSMOSIS',a:27.074,z:30.871,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[27.104, 27.524, 27.714, 28.674, 28.724, 28.884, 29.094, 29.544, 29.834, 29.934, 30.294, 30.614, 30.714, 30.804]},
-  {b:'OSMOSIS',a:31.321,z:33.126,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[31.321, 31.441, 31.711, 31.881, 32.231, 32.371, 32.511]},
-  {b:'ACID',a:34.326,z:37.515,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[34.356, 34.766, 35.036, 35.766, 35.786, 36.226, 36.596, 36.965, 37.335]},
-  {b:'ACID',a:37.965,z:39.532,w:["Plain", "water", "is", "seven."],t:[38.045, 38.415, 38.905, 39.045]},
-  {b:'SEAL',a:40.732,z:42.578,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[40.732, 40.912, 41.212, 41.452, 41.632, 41.872, 42.052, 42.172, 42.352]},
-  {b:'SEAL',a:43.028,z:44.695,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[43.028, 43.238, 43.568, 43.958, 44.188, 44.338, 44.568]},
-  {b:'SEAL',a:45.145,z:48.607,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[45.145, 45.29, 45.435, 45.915, 46.325, 46.715, 46.985, 47.555, 47.585, 47.785, 48.115, 48.435]},
-  {b:'SEAL',a:49.057,z:52.021,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[49.057, 49.287, 49.587, 49.777, 50.137, 50.277, 50.597, 50.907, 51.057, 51.367]},
-  {b:'END',a:53.221,z:55.245,w:["Dry.", "Acidic.", "Sealed."],t:[53.221, 54.221, 55.065]},
-  {b:'END',a:55.695,z:57.973,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[55.705, 56.095, 56.305, 56.535, 56.685, 57.125, 57.415, 57.495]},
+  {b:'HOOK',a:0.64,z:1.978,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.64, 0.8, 1.168, 1.488, 1.752]},
+  {b:'JAR',a:2.938,z:4.964,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[2.938, 2.994, 3.362, 3.546, 3.666, 4.138, 4.29, 4.474]},
+  {b:'JAR',a:5.324,z:6.182,w:["It", "isn't", "preservatives."],t:[5.324, 5.404, 5.604]},
+  {b:'JAR',a:6.542,z:7.683,w:["Almost", "nothing", "can", "live", "in", "it."],t:[6.542, 6.782, 7.102, 7.158, 7.31, 7.382]},
+  {b:'WATER',a:8.643,z:10.234,w:["Honey", "is", "about", "one", "sixth", "water."],t:[8.667, 8.995, 9.099, 9.358, 9.617, 9.875]},
+  {b:'WATER',a:10.594,z:13.898,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[10.602, 10.73, 10.866, 11.098, 11.338, 11.514, 11.778, 11.938, 12.514, 12.738, 13.082, 13.306, 13.418, 13.53, 13.69]},
+  {b:'WATER',a:14.258,z:16.49,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[14.33, 14.514, 14.858, 14.97, 15.514, 15.626, 15.946]},
+  {b:'WATER',a:16.85,z:18.538,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[16.874, 17.186, 17.554, 17.594, 17.861, 18.127, 18.394]},
+  {b:'WATER',a:18.898,z:20.699,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[18.898, 19.474, 19.744, 20.014, 20.285, 20.555]},
+  {b:'OSMOSIS',a:21.659,z:24.697,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[21.683, 22.019, 22.171, 22.939, 22.979, 23.107, 23.275, 23.635, 23.867, 23.947, 24.235, 24.491, 24.571, 24.643]},
+  {b:'OSMOSIS',a:25.057,z:26.501,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[25.057, 25.153, 25.369, 25.505, 25.785, 25.897, 26.009]},
+  {b:'ACID',a:27.461,z:30.012,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[27.485, 27.813, 28.029, 28.613, 28.629, 28.981, 29.277, 29.572, 29.868]},
+  {b:'ACID',a:30.372,z:31.626,w:["Plain", "water", "is", "seven."],t:[30.436, 30.732, 31.124, 31.236]},
+  {b:'SEAL',a:32.586,z:34.062,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[32.586, 32.73, 32.97, 33.162, 33.306, 33.498, 33.642, 33.738, 33.882]},
+  {b:'SEAL',a:34.422,z:35.756,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[34.422, 34.59, 34.854, 35.166, 35.35, 35.47, 35.654]},
+  {b:'SEAL',a:36.116,z:38.886,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[36.116, 36.232, 36.348, 36.732, 37.06, 37.372, 37.588, 38.044, 38.068, 38.228, 38.492, 38.748]},
+  {b:'SEAL',a:39.246,z:41.617,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[39.246, 39.43, 39.67, 39.822, 40.11, 40.222, 40.478, 40.726, 40.846, 41.094]},
+  {b:'END',a:42.577,z:44.196,w:["Dry.", "Acidic.", "Sealed."],t:[42.577, 43.377, 44.052]},
+  {b:'END',a:44.556,z:46.378,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[44.564, 44.876, 45.044, 45.228, 45.348, 45.7, 45.932, 45.996]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  HOOK:{sc:0.0,a:0.8,z:2.472},
-  JAR:{sc:3.27,a:3.672,z:9.604},
-  WATER:{sc:10.4,a:10.804,z:25.874},
-  OSMOSIS:{sc:26.67,a:27.074,z:33.126},
-  ACID:{sc:33.93,a:34.326,z:39.532},
-  SEAL:{sc:40.33,a:40.732,z:52.021},
-  END:{sc:52.82,a:53.221,z:57.973},
+  HOOK:{sc:0.0,a:0.64,z:1.978},
+  JAR:{sc:2.616,a:2.938,z:7.683},
+  WATER:{sc:8.32,a:8.643,z:20.699},
+  OSMOSIS:{sc:21.336,a:21.659,z:26.501},
+  ACID:{sc:27.144,a:27.461,z:31.626},
+  SEAL:{sc:32.264,a:32.586,z:41.617},
+  END:{sc:42.256,a:42.577,z:46.378},
 };
 const SENT={
   HOOK:[0],
@@ -511,6 +513,7 @@ const SENT={
 function explainer(ctx,W,Hh,t){
   const T=Math.floor(t*12)/12;                 // 12fps tick: drawn content
   const M=t;                                   // motion is not ticked at all
+  const SPD=0.8;                               // 1/1.25 -- motion durations track the speed-up
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
   const blink=Math.floor(T*2.2)%2===0;
 
@@ -525,15 +528,15 @@ function explainer(ctx,W,Hh,t){
   const ends=(n)=>VO[n].z;
 
   let boost=1;
-  if(t>wordAt(10,1)&&t<wordAt(10,1)+0.22)boost=1.45;   // "dries"
-  if(t>wordAt(11,8)&&t<wordAt(11,8)+0.25)boost=1.35;   // "nine"
-  if(t>wordAt(15,9)&&t<wordAt(15,9)+0.22)boost=1.40;   // "yeast"
+  if(t>wordAt(10,1)&&t<wordAt(10,1)+0.22*SPD)boost=1.45;   // "dries"
+  if(t>wordAt(11,8)&&t<wordAt(11,8)+0.25*SPD)boost=1.35;   // "nine"
+  if(t>wordAt(15,9)&&t<wordAt(15,9)+0.22*SPD)boost=1.40;   // "yeast"
 
   rect(0,0,LW,LH,P.teal);                      // desktop
 
   /* --- HOOK: the question types itself, word by word, as it is asked --- */
   const DLG=[150,96,344,132];
-  zoomRect([4,340,54,16],DLG,M,0.05,0.42);
+  zoomRect([4,340,54,16],DLG,M,0.04,0.34);
   const dlgOut=BEAT.JAR.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
@@ -548,7 +551,7 @@ function explainer(ctx,W,Hh,t){
     px(said(0,4),r.x+50,r.y+62,14,'#000');
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
   }
-  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35,dlgOut);
+  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.28,dlgOut);
 
   if(T>=dlgOut){
     const done=T>=BEAT.END.sc;
@@ -575,7 +578,7 @@ function explainer(ctx,W,Hh,t){
       stars(CX,CY,CWd,CHd*0.5,42,7,T);
       const jy=CY+CHd-46-13*4+Math.round(Math.sin(M*2)*1);
       sprite('jar',CX+52,jy,4);
-      if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42));   // "jar"
+      if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42*SPD));   // "jar"
         if(k>0)blockTag(CX+100,jy+64,'SEALED HONEY',14,P.paper,'#74432d');}
       if(after(1,5)){                                                        // "keeps"
         pxShadow('KEEPS FOR',CX+246,CY+44,22,P.gold,P.ink);
@@ -591,15 +594,15 @@ function explainer(ctx,W,Hh,t){
       const Pr=proj(CX+150,CY+172);
       // s4 "Honey is about one sixth water." -- six cubes, one of them water
       if(after(4,0)&&T<wordAt(6,0)){
-        for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09,wordAt(4,0)+i*0.09+0.3);
+        for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09*SPD,wordAt(4,0)+(i*0.09+0.3)*SPD);
           if(k<=0)continue;
           const isWater = after(4,3)&&i===5;        // "one sixth"
           cube(proj(CX+150,CY+150),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
         px(said(4),CX+56,CY+212,18,'#d9d2e6',null,'"VT323"');
       }
       // s5 "...almost none of it is free." -- the honey bar drops
-      const d1=mp(wordAt(5,2),wordAt(5,2)+1.25);                    // "sugar"
-      const d2=mp(wordAt(8,0),wordAt(8,0)+1.30);                    // "Bacteria"
+      const d1=mp(wordAt(5,2),wordAt(5,2)+1.00);                    // "sugar"
+      const d2=mp(wordAt(8,0),wordAt(8,0)+1.04);                    // "Bacteria"
       if(after(5,2)){
         voxBar(Pr,0,0,12,P.orange,d1);
         if(d1>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.paper,'#74432d');}
@@ -620,7 +623,7 @@ function explainer(ctx,W,Hh,t){
       groupBox(CX+14,CY+12,CWd-28,150,'WHAT HAPPENS TO A MICROBE');
       sprite('bug',CX+44,CY+58,5);
       if(after(9,7)){                                   // "pulls"
-        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.75),P.cyan);
+        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.60),P.cyan);
         if(after(9,11))pxShadow('WATER PULLED OUT',CX+30,CY+116,22,P.cyan,P.ink);}  // "out"
       if(after(10,1)){                                  // "dries"
         B.fillStyle=P.red;
@@ -634,15 +637,15 @@ function explainer(ctx,W,Hh,t){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
       const Pr=proj(CX+150,CY+172);
-      const dp=mp(wordAt(11,2),wordAt(11,2)+0.95),     // "acidic"
-            dw=mp(wordAt(12,0),wordAt(12,0)+1.00);     // "Plain"
+      const dp=mp(wordAt(11,2),wordAt(11,2)+0.76),     // "acidic"
+            dw=mp(wordAt(12,0),wordAt(12,0)+0.80);     // "Plain"
       if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
         if(dp>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.red,'#fff4e2');}
       if(after(12,0)){voxBar(Pr,7,0,7,'#9fcb55',dw);
         if(dw>0.9)blockTag(CX+248,CY+196,'WATER',14,P.grass,'#0a0618');}
       const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
       if(after(11,8)){                                  // "nine"
-        const inv=t<h8+0.9&&Math.floor((t-h8)*8)%2===0;
+        const inv=t<h8+0.72&&Math.floor((t-h8)*8)%2===0;
         if(inv){rect(CX+386,CY+26,NW,NH,P.gold);px('3.9',CX+392,CY+34,NS,P.ink,null,'"Silkscreen"');}
         else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');
         px('pH - acidic as orange juice',CX+392,CY+90,18,'#d9d2e6',null,'"VT323"');}
@@ -658,40 +661,49 @@ function explainer(ctx,W,Hh,t){
     if(T>=BEAT.SEAL.sc&&T<BEAT.END.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'NOW LEAVE IT OPEN');
-      // Laid out in three columns that cannot meet: jar on the left, the
-      // climbing bar in the middle, yeast top-right. Every box below was
-      // checked against every other by window.checkBounds().
-      const jy=CY+124;
-      sprite('jaropen',CX+40,jy,4);
+      // Planned, not nudged. The group box is CX+12..CX+CWd-12 by CY+10, height
+      // CHd-74; everything below sits inside it with a 14px margin, and the
+      // closing caption goes in the free strip BELOW the box. The previous cut
+      // had 'WATER FROM / THE AIR' straddling the box border -- half on the
+      // diagram, half off it -- which checkBounds never saw, because it only
+      // ever tested the panel rect. checkStraddle() now tests the box.
+      const BX=CX+12, BY=CY+10, BW=CWd-24, BH=CHd-74;
+      const IL=BX+14, IT=BY+20, IR=BX+BW-14, IB=BY+BH-14;
+      // left: the open jar, water arriving from above
+      const jx=IL+10, jy=IT+56;
+      sprite('jaropen',jx,jy,5);
       if(after(14,1)){                                   // "pulls"
-        const k=mp(wordAt(14,1),wordAt(14,1)+0.9);
+        const k=mp(wordAt(14,1),wordAt(14,1)+0.72);
         for(let a=0;a<3;a++)
-          dottedArrow([[CX+50+a*18,CY+54],[CX+50+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
-        if(after(14,6))pxShadow('WATER FROM',CX+26,CY+192,18,P.ice,P.ink);
-        if(after(14,6))pxShadow('THE AIR',CX+26,CY+222,18,P.ice,P.ink);}
-      const Pr=proj(CX+280,CY+182), THR=CY+182-10*5;
+          dottedArrow([[jx+14+a*18,IT],[jx+14+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
+        // two lines: one line of this at 16px is 283px and reached the stack
+        if(after(14,6)){pxShadow('WATER FROM',IL,jy+68,16,P.ice,P.ink);
+                        pxShadow('THE AIR',IL,jy+92,16,P.ice,P.ink);}}
+      // centre: the stack climbing past the line it must not cross
+      const BASE=IB-20, Pr=proj(CX+330,BASE), THR=BASE-10*5;
       if(after(15,2)){                                   // "climb"
         const g=mp(wordAt(15,2),wordAt(15,8));
         const cubes=Math.max(1,Math.round(8+3*H.ease.out(g)));
         B.fillStyle=P.red;
-        for(let x=CX+228;x<CX+360;x+=6)B.fillRect(x,THR,3,1);
+        for(let x=CX+274;x<CX+392;x+=6)B.fillRect(x,THR,3,1);
         voxBar(Pr,0,0,cubes,P.gold,1);
-        px('1 PART IN 5',CX+368,THR-8,14,P.red,null,'"Silkscreen"');
-        // beside the stack, not under it -- it used to sit behind the cubes
-        px('MOISTURE',CX+338,CY+150,14,'#d9d2e6',null,'"Silkscreen"');}
+        px('1 PART IN 5',CX+400,THR-9,14,P.red,null,'"Silkscreen"');
+        px('MOISTURE',CX+400,THR+38,14,'#d9d2e6',null,'"Silkscreen"');}
+      // right: what moves in once it crosses
       if(after(15,9)){                                   // "yeast"
-        sprite('bug',CX+496,CY+44,4);
-        pxShadow('YEAST',CX+486,CY+86,18,P.grass,P.ink);}
-      px(said(16),CX+26,CY+254,18,'#ffd28a',null,'"VT323"');
+        sprite('bug',IR-92,IT+2,5);
+        pxShadow('YEAST',IR-110,IT+50,18,P.grass,P.ink);}
+      // the closing line lives in the strip below the box, never across it
+      px(said(16),CX+16,BY+BH+14,18,'#ffd28a',null,'"VT323"');
     }
 
     /* scene changes: the medium's own mosaic, peaking as the content swaps */
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
-      if(BEAT[k].sc>0&&dd<0.2)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.2*15));}
+      if(BEAT[k].sc>0&&dd<0.16)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.16*15));}
     B.restore();
 
     /* --- END: the takeaway, one line per spoken word --- */
-    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.30,BEAT.END.sc);
+    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.24,BEAT.END.sc);
     if(done){
       const m=winFrame(110,78,420,196,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
@@ -709,13 +721,14 @@ function explainer(ctx,W,Hh,t){
   }
 
   /* --- the cursor, always chrome. Keyframed off the beat table. --- */
-  const CK=[[0,420,300],[BEAT.HOOK.z-0.6,322,196],[BEAT.JAR.sc,322,196],
-            [BEAT.JAR.a+0.4,120,40],[BEAT.WATER.sc-0.4,120,40],[BEAT.WATER.a+0.4,300,150],
-            [BEAT.OSMOSIS.sc-0.4,300,150],[BEAT.OSMOSIS.a+0.4,250,80],
-            [BEAT.ACID.sc-0.4,250,80],[BEAT.ACID.a+0.4,330,60],
-            [BEAT.SEAL.sc-0.4,330,60],[BEAT.SEAL.a+0.4,150,120],
+  const L=0.32;                                  // lead, scaled with the speed-up
+  const CK=[[0,420,300],[BEAT.HOOK.z-0.48,322,196],[BEAT.JAR.sc,322,196],
+            [BEAT.JAR.a+L,120,40],[BEAT.WATER.sc-L,120,40],[BEAT.WATER.a+L,300,150],
+            [BEAT.OSMOSIS.sc-L,300,150],[BEAT.OSMOSIS.a+L,250,80],
+            [BEAT.ACID.sc-L,250,80],[BEAT.ACID.a+L,330,60],
+            [BEAT.SEAL.sc-L,330,60],[BEAT.SEAL.a+L,120,120],
             // rest on the message box's OK button, not across its text
-            [BEAT.END.sc-0.4,150,120],[BEAT.END.a+0.4,292,250],[DUR,292,250]];
+            [BEAT.END.sc-L,120,120],[BEAT.END.a+L,292,250],[DUR,292,250]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
   for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
@@ -784,6 +797,30 @@ window.checkLegibility=function(step){
   return bad;
 };
 
+/* A label can sit inside the panel and still straddle the group box's border --
+   half on the diagram, half off it. That is what the seal beat shipped with, and
+   checkBounds could not see it: it only ever tested the panel rect. A text box
+   must be wholly inside the group box or wholly outside it, never across. */
+window.checkStraddle=function(step){
+  const bad=[],seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/12)){
+    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
+    for(const a of r){
+      if(a.chrome) continue;
+      const inside = a.x>=box.x&&a.y>=box.y&&a.x+a.w<=box.x+box.w&&a.y+a.h<=box.y+box.h;
+      const outside= a.x+a.w<=box.x||a.x>=box.x+box.w||a.y+a.h<=box.y||a.y>=box.y+box.h;
+      if(!inside&&!outside){
+        const k=a.s+'|'+a.size; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),text:a.s,box:[a.x,a.y,a.x+a.w,a.y+a.h],
+                  groupbox:[box.x,box.y,box.x+box.w,box.y+box.h]});
+      }
+    }
+  }
+  return bad;
+};
+
 window.checkOverlap=function(step){
   const hits=[]; const seen=new Set();
   const hit=(a,b)=>{const ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x),
@@ -795,6 +832,9 @@ window.checkOverlap=function(step){
     // text sitting on top of a sprite, a stack, a tag or the cursor
     for(const a of r)for(const b of g){
       if(b.k==='cursor') continue;            // the pointer is allowed anywhere
+      if(b.k==='groupbox') continue;          // an outline, not a surface -- text
+                                              // inside it is the whole point, and
+                                              // checkStraddle() polices its border
       if(b.k==='tag:'+a.s) continue;          // a tag's own label sits ON its plate
       // a label printed on an opaque tag plate is readable over whatever the
       // plate covers, so it does not collide with what is behind the plate
@@ -888,20 +928,20 @@ function buildScore(){
   const E=[],add=(t,k,n)=>E.push({t:+t.toFixed(3),k,n});
   const w=(n,i)=>VO[n].t[i];
   // chrome
-  add(0.05,'open'); add(VO[0].z-0.5,'snap'); add(VO[0].z,'click');
-  add(BEAT.JAR.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open'); add(BEAT.END.a+0.4,'snap');
+  add(0.05,'open'); add(VO[0].z-0.40,'snap'); add(VO[0].z,'click');
+  add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open'); add(BEAT.END.a+0.32,'snap');
   // screen: a print blip on every spoken word that appears as text on screen
   [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   VO[0].t.forEach((tt,i)=>add(tt,'blip',i));
   [17,18].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   // objects: stacks landing. Every 3rd cube so a bar reads as a stack.
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  for(let i=0;i<6;i++)add(w(4,0)+i*0.09+0.26,'knock',i);        // the one-sixth row
-  bar(w(5,2),w(5,2)+1.25,12,3);  bar(w(8,0),w(8,0)+1.30,18,4);  // water activity
-  bar(w(11,2),w(11,2)+0.95,4,1); bar(w(12,0),w(12,0)+1.00,7,2); // pH
+  for(let i=0;i<6;i++)add(w(4,0)+(i*0.09+0.26)*0.8,'knock',i);        // the one-sixth row
+  bar(w(5,2),w(5,2)+1.00,12,3);  bar(w(8,0),w(8,0)+1.04,18,4);  // water activity
+  bar(w(11,2),w(11,2)+0.76,4,1); bar(w(12,0),w(12,0)+0.80,7,2); // pH
   bar(w(15,2),w(15,8),11,3);                                    // moisture climbing
-  add(w(5,2)+1.25,'tag'); add(w(8,0)+1.30,'tag');
-  add(w(11,2)+0.95,'tag'); add(w(12,0)+1.00,'tag');
+  add(w(5,2)+1.00,'tag'); add(w(8,0)+1.04,'tag');
+  add(w(11,2)+0.76,'tag'); add(w(12,0)+0.80,'tag');
   // arrows draw on, conclusions land on the word that says them
   add(w(9,7),'draw');  add(w(9,11),'tag');     // "pulls" -> "out"
   add(w(14,1),'draw'); add(w(14,6),'tag');     // "pulls" -> "air"
