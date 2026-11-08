@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.8 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.9 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -155,7 +155,7 @@
   <b>Checked, not eyeballed.</b> <code>checkBounds()</code>, <code>checkOverlap()</code> and
   <code>checkLegibility()</code> and <code>checkStraddle()</code> sweep every frame with a recorder on every piece of text drawn — and on
   every sprite, voxel stack and tag plate text could hide behind. They report anything leaving the client
-  area, landing on top of something else, or set below the floor. All four return <b>0</b> for this build, including plate-on-stack —
+  area, landing on top of something else, or set below the floor. All six return <b>0</b> for this build — truncation, clearance, straddle, overlap, bounds and the type floor —
   including the one that catches a label lying across the group box's border, which the panel check
   structurally cannot see; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
@@ -273,7 +273,11 @@ function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
     B.fillStyle=P.face;B.fillRect(x,y,w,2);B.fillRect(x,y+h,w,2);B.fillRect(x,y,2,h);B.fillRect(x+w,y,2,h+2);}}
 
 /* --- pixel text: rasterise a real font and threshold to hard pixels --- */
-const TC=H.layer(420,48),TX=TC.getContext('2d',{willReadFrequently:true});
+// 720 wide: the buffer is 640, so anything that fits on screen fits here.
+// At 420 an over-wide string was silently CUT at 420px and then reported a
+// 420px width, so checkBounds saw a string that fitted while the screen
+// showed one running off the edge. That is how 'SPOILS' disappeared.
+const TC=H.layer(720,64),TX=TC.getContext('2d',{willReadFrequently:true});
 const TCACHE=new Map();
 let BOUNDS=null;   // text extents
 let GBOX=null;     // extents of the things text can hide behind
@@ -283,11 +287,13 @@ function px(str,x,y,size,col,align,font){
   let g=TCACHE.get(key);
   if(!g){TX.clearRect(0,0,420,48);
     TX.font=size+'px '+(font||'"Press Start 2P"');TX.textBaseline='top';TX.fillStyle='#fff';TX.fillText(str,1,1);
-    const w=Math.min(420,Math.ceil(TX.measureText(str).width)+3),h=Math.ceil(size*1.6)+3;
+    const raw=Math.ceil(TX.measureText(str).width)+3;
+    const w=Math.min(720,raw),h=Math.min(64,Math.ceil(size*1.6)+3);
+    const cut=raw>720;
     const d=TX.getImageData(0,0,w,h).data,pts=[];
     for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(d[(j*w+i)*4+3]>120)pts.push([i,j]);
     let gh=0; for(const[,j]of pts) if(j+1>gh) gh=j+1;
-    g={pts,w,h:gh};TCACHE.set(key,g);}
+    g={pts,w,h:gh,cut:cut,full:raw};TCACHE.set(key,g);}
   let ox=Math.round(x);if(align==='center')ox=Math.round(x-g.w/2);if(align==='right')ox=Math.round(x-g.w);
   const oy=Math.round(y);
   // A string is drawn hundreds of times at the same size and colour, so the
@@ -309,7 +315,8 @@ function px(str,x,y,size,col,align,font){
                // just a large label and already clears its floor -- treating it
                // as a headline made the checker demand 22px of an 18px label.
                : (size>=22?'head':'label');
-    BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size,role:role,chrome:INCHROME});}
+    BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size,role:role,chrome:INCHROME,
+                 cut:g.cut,full:g.full});}
   if(tc) B.drawImage(tc,ox,oy);
   else { B.fillStyle=col; for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1); }
   return g.w;}
@@ -620,10 +627,12 @@ function explainer(ctx,W,Hh,t){
     if(T>=BEAT.WATER.sc&&T<BEAT.OSMOSIS.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'WATER ACTIVITY');
-      const OX=CX+140, OY=CY+150, Pr=proj(OX,OY);
+      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);
       const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
       // s4 "Honey is about one sixth water." -- six cubes, one of them water
-      if(after(4,0)&&T<wordAt(6,0)){
+      // cleared the moment the honey bar starts dropping -- it used to stay up
+      // until sentence 6, so the six-cube row sat behind the comparison
+      if(after(4,0)&&T<wordAt(5,2)){
         for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09*SPD,wordAt(4,0)+(i*0.09+0.3)*SPD);
           if(k<=0)continue;
           const isWater = after(4,3)&&i===5;        // "one sixth"
@@ -668,7 +677,7 @@ function explainer(ctx,W,Hh,t){
     if(T>=BEAT.ACID.sc&&T<BEAT.SEAL.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
-      const OX=CX+140, OY=CY+150, Pr=proj(OX,OY);   // same baseline as the water chart
+      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);   // same baseline as the water chart
       const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
       const dp=mp(wordAt(11,2),wordAt(11,2)+0.76),     // "acidic"
             dw=mp(wordAt(12,0),wordAt(12,0)+0.80);     // "Plain"
@@ -745,11 +754,14 @@ function explainer(ctx,W,Hh,t){
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
       const tx=m.x+52;
       // "Dry. Acidic. Sealed." -- one line per spoken word, at 14px not 9px
-      if(after(17,0))typeLine(17,tx,m.y+8,14,'#000',null,null,0,1);
-      if(after(17,1))typeLine(17,tx,m.y+30,14,'#000',null,null,1,2);
-      if(after(17,2))typeLine(17,tx,m.y+52,14,'#000',null,null,2);
-      if(after(18,0))typeLine(18,tx,m.y+82,22,'#000080','#c0c0c0',null,0,3);
-      if(after(18,5))typeLine(18,tx,m.y+118,22,'#000080','#c0c0c0',null,3);
+      // Fixed captions gated on the spoken word, NOT the spoken words printed
+      // raw: 'of those and it spoils.' is 497px at 22px against a 412px box, and
+      // the rasteriser quietly cut it so the sweep saw a string that fitted.
+      if(after(17,0))px('> Dry.',tx,m.y+8,14,'#000');
+      if(after(17,1))px('> Acidic.',tx,m.y+30,14,'#000');
+      if(after(17,2))px('> Sealed.',tx,m.y+52,14,'#000');
+      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+82,22,'#000080','#c0c0c0');
+      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+118,22,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
     }
     /* --- the end card. It started with a click, so it ends with one. --- */
@@ -848,6 +860,47 @@ window.checkLegibility=function(step){
    half on the diagram, half off it. That is what the seal beat shipped with, and
    checkBounds could not see it: it only ever tested the panel rect. A text box
    must be wholly inside the group box or wholly outside it, never across. */
+/* A string wider than the rasteriser used to be cut silently. It cannot be any
+   more, but a string wider than the SCREEN is still a defect, so sweep for it. */
+window.checkTruncation=function(step){
+  const bad=[],seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/6)){
+    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    for(const b of r){
+      if(!b.cut && b.x+b.w<=LW && b.x>=0) continue;
+      const k=b.s+'|'+b.size; if(seen.has(k))continue; seen.add(k);
+      bad.push({t:+tt.toFixed(2),text:b.s,size:b.size,width:b.full,
+                right:b.x+b.full,screen:LW,cut:!!b.cut});
+    }
+  }
+  return bad;
+};
+
+/* "Touching the barrier" is its own defect: a label or a stack that technically
+   sits inside the group box but with 3px of air reads as crammed against it.
+   Require real clearance from the border for anything inside. */
+window.checkClearance=function(step,minGap){
+  const G=minGap||6, bad=[],seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/12)){
+    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
+    const items=r.filter(a=>!a.chrome).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
+      .concat(g.filter(q=>q.k!=='groupbox'&&q.k!=='cursor'));
+    for(const a of items){
+      const inside = a.x>=box.x&&a.y>=box.y&&a.x+a.w<=box.x+box.w&&a.y+a.h<=box.y+box.h;
+      if(!inside) continue;
+      const gap=Math.min(a.x-box.x, a.y-box.y,
+                         (box.x+box.w)-(a.x+a.w), (box.y+box.h)-(a.y+a.h));
+      if(gap<G){
+        const k=a.k; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),item:a.k,gap:gap,need:G});
+      }
+    }
+  }
+  return bad;
+};
+
 window.checkStraddle=function(step){
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){

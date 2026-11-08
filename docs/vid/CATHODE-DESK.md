@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.8
+# CATHODE DESK — house style v1.9
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.9 (2026-11-08)** — the text rasteriser no longer hides an over-wide
+> string, clearance from the box border is enforced, and a scene must clear
+> its own props. See rules 9–11.
+>
 > **v1.8 (2026-11-08)** — generation rules for voxel charts and for the
 > pointer, both written as rules rather than as fixes, plus the opening and
 > closing click. See *Generation rules*.
@@ -363,6 +367,25 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
    pressing OK on a dialog and ends with it pressing OK on the message box; the
    window then shuts to an **end card**. A piece that just stops feels unfinished.
 
+### Text and scene hygiene
+
+9. **Never let the rasteriser cut a string.** It used to clamp at 420px and then
+   report a 420px width, so an over-wide line lost its tail *and* passed the
+   bounds sweep — "AND IT SPOILS." rendered as "AND IT SPO". The buffer is 720
+   wide now, and `checkTruncation()` reports any string wider than the screen.
+10. **Print the CAPTION, not the raw spoken words.** Word-gating a fixed caption
+    (`after(18,5) -> 'AND IT SPOILS.'`) is not the same as printing
+    `said(18, 5)`, which is the literal narration — "of those and it spoils.",
+    509px against a 412px box. Sync the caption to a word; do not retype the
+    sentence as the caption.
+11. **A scene clears its own props before the next idea starts.** The six-cube
+    "one sixth water" row stayed up until the next *sentence*, so it sat behind
+    the comparison that followed. Gate a prop on the word that replaces it, not
+    on the sentence after it.
+12. **Clearance, not just containment.** Inside a group box, keep ≥6px from the
+    border. The tags were technically inside with 1px of air and read as crammed
+    against it.
+
 ### Enforcement
 
 Every rule above is checked by a sweep, and all of them must return **0**:
@@ -373,6 +396,12 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkBounds()` | anything leaving the window's client area |
 | `checkStraddle()` | a label lying across the group box border |
 | `checkOverlap()` | label on label, label on graphics, **plate on stack** |
+| `checkTruncation()` | a string cut by the rasteriser or running off the screen |
+| `checkClearance()` | anything inside the box with under 6px of air around it |
+
+**Prove a new sweep fires before trusting it.** Put the defect back, confirm the
+sweep names it, then restore. A checker that has only ever returned 0 has not
+been tested — it has been assumed.
 
 ## Layout
 
