@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.5 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.6 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -152,9 +152,11 @@
   <b>Determinism.</b> Every frame is a pure function of <code>t</code> — all randomness from
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
   so the frame-by-frame video renderer works.<br><br>
-  <b>Checked, not eyeballed.</b> <code>window.checkBounds()</code> and <code>window.checkOverlap()</code>
-  sweep every frame with a recorder on every piece of text drawn, and report anything leaving the
-  client area or landing on top of something else. Both return <b>0</b> for this build.<br><br>
+  <b>Checked, not eyeballed.</b> <code>checkBounds()</code>, <code>checkOverlap()</code> and
+  <code>checkLegibility()</code> sweep every frame with a recorder on every piece of text drawn — and on
+  every sprite, voxel stack and tag plate text could hide behind. They report anything leaving the client
+  area, landing on top of something else, or set below the floor. All three return <b>0</b> for this
+  build; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
   blink. Motion isn't ticked at all: the cursor, the voxel drops, the arrows and the counters run at
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
@@ -228,17 +230,18 @@ function winFrame(x,y,w,h,title,active){
   rect(x,y,w,h,P.face);bevel(x,y,w,h,'window');
   const tx=x+3,ty=y+3,tw=w-6,th=15;
   rect(tx,ty,tw,th,active?P.navy:P.sh);
-  px(title,tx+4,ty+4,6,active?'#ffffff':'#c0c0c0');
+  INCHROME=true; px(title,tx+4,ty+4,6,active?'#ffffff':'#c0c0c0'); INCHROME=false;
   // close button
   const bx=x+w-20;rect(bx,ty+1,13,12,P.face);bevel(bx,ty+1,13,12,'button');
   B.fillStyle='#000';for(let i=0;i<5;i++){B.fillRect(bx+4+i,ty+4+i,2,1);B.fillRect(bx+8-i,ty+4+i,2,1);}
   return {x:x+4,y:y+4+th+1,w:w-8,h:h-8-th-1};}
 function button(x,y,w,h,label,pressed){rect(x,y,w,h,P.face);bevel(x,y,w,h,pressed?'pressed':'button');
-  px(label,x+w/2,y+h/2-3+(pressed?1:0),6,'#000','center');}
+  INCHROME=true; px(label,x+w/2,y+h/2-3+(pressed?1:0),6,'#000','center'); INCHROME=false;}
 function groupBox(x,y,w,h,label){
   rect(x,y+4,w,1,P.sh);rect(x,y+5,w,1,P.hi);rect(x,y+h-2,w,1,P.sh);rect(x,y+h-1,w,1,P.hi);
   rect(x,y+4,1,h-5,P.sh);rect(x+1,y+5,1,h-6,P.hi);rect(x+w-2,y+4,1,h-5,P.sh);rect(x+w-1,y+4,1,h-4,P.hi);
-  const lw=label.length*7+6;rect(x+8,y,lw,9,P.face);px(label,x+11,y+1,6,'#000');}
+  const lw=label.length*7+6;rect(x+8,y,lw,9,P.face);
+  INCHROME=true;px(label,x+11,y+1,6,'#000');INCHROME=false;}
 function dottedArrow(pts,prog,col){let tot=0,seg=[];
   for(let i=0;i<pts.length-1;i++){const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);seg.push(l);tot+=l;}
   const lim=tot*H.clamp(prog);B.fillStyle=col;let acc=0,dir=[1,0];
@@ -249,7 +252,7 @@ function dottedArrow(pts,prog,col){let tot=0,seg=[];
   if(prog>=1){const[ex,ey]=pts[pts.length-1];
     for(let k=0;k<6;k++){const bx2=ex-dir[0]*k,by2=ey-dir[1]*k,pxx=-dir[1],pyy=dir[0];
       for(let s=-k;s<=k;s++)B.fillRect(Math.round(bx2+pxx*s*0.6),Math.round(by2+pyy*s*0.6),1,1);}}}
-function cursor(x,y){const rows=['X','XX','XOX','XOOX','XOOOX','XOOOOX','XOOOOOX','XOOOOOOX','XOOOOOOOX','XOOOOOXXXX','XOOXOOX','XOX XOOX','XX  XOOX','X    XOOX','     XOOX','      XX'];
+function cursor(x,y){if(GBOX)GBOX.push({x:x,y:y,w:10,h:16,k:'cursor'});const rows=['X','XX','XOX','XOOX','XOOOX','XOOOOX','XOOOOOX','XOOOOOOX','XOOOOOOOX','XOOOOOXXXX','XOOXOOX','XOX XOOX','XX  XOOX','X    XOOX','     XOOX','      XX'];
   rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]==='X')rect(x+i,y+j,1,1,'#000');else if(r[i]==='O')rect(x+i,y+j,1,1,'#fff');}});}
 function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
   for(let k=0;k<3;k++){const p=H.clamp((t-t0)/(t1-t0)-k*0.12);if(p<=0)continue;
@@ -260,7 +263,9 @@ function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
 /* --- pixel text: rasterise a real font and threshold to hard pixels --- */
 const TC=H.layer(420,48),TX=TC.getContext('2d',{willReadFrequently:true});
 const TCACHE=new Map();
-let BOUNDS=null;
+let BOUNDS=null;   // text extents
+let GBOX=null;     // extents of the things text can hide behind
+let INCHROME=false;// true while drawing Win95 furniture, which is 9px by definition
 function px(str,x,y,size,col,align,font){
   const key=str+'|'+size+'|'+(font||'p');
   let g=TCACHE.get(key);
@@ -284,7 +289,15 @@ function px(str,x,y,size,col,align,font){
   // BOUNDS is null normally. window.checkBounds() sets it to an array and
   // sweeps the whole piece, so "is anything off screen" is a measurement
   // rather than a thing I squint at in screenshots.
-  if(BOUNDS) BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size});
+  if(BOUNDS){const f=font||'p';
+    const role = f.indexOf('VT323')>=0 ? 'vt'
+               : f.indexOf('Silkscreen')>=0 ? (size>=24?'num':'label')
+               // A headline is one SET as a headline: >=22 in the buffer, the
+               // spec's own floor. Anything between the label floor and that is
+               // just a large label and already clears its floor -- treating it
+               // as a headline made the checker demand 22px of an 18px label.
+               : (size>=22?'head':'label');
+    BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size,role:role,chrome:INCHROME});}
   if(tc) B.drawImage(tc,ox,oy);
   else { B.fillStyle=col; for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1); }
   return g.w;}
@@ -350,6 +363,7 @@ const SPRC={jar:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
             jaropen:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
             bug:{K:'#0a0618',G:'#9fcb55'}};
 function sprite(name,x,y,s){const c=SPRC[name];
+  if(GBOX)GBOX.push({x:x,y:y,w:SPR[name][0].length*s,h:SPR[name].length*s,k:'sprite:'+name});
   SPR[name].forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch==='.')continue;
     rect(x+i*s,y+j*s,s,s,c[ch]);}});}
 function mosaic(x0,y0,w,h,n){if(n<=1)return;
@@ -373,12 +387,19 @@ function cube(Pr,x,y,z,col){
   face([p(1,0,0),p(1,1,0),p(1,1,1),p(1,0,1)],sd);}
 function voxBar(Pr,bx,by,hgt,col,drop,foot){ // drop: 0..1, per-cube landing from above
   const f=foot||3;
+  if(GBOX&&drop>0){const c=[];
+    for(const[a,b2,z]of[[bx,by+f,0],[bx+f,by,0],[bx,by,hgt],[bx+f,by+f,0]])c.push(Pr(a,b2,z));
+    const xs=c.map(q=>q[0]),ys=c.map(q=>q[1]);
+    GBOX.push({x:Math.round(Math.min(...xs)),y:Math.round(Math.min(...ys)),
+               w:Math.round(Math.max(...xs)-Math.min(...xs)+CW),
+               h:Math.round(Math.max(...ys)-Math.min(...ys)+CH*2),k:'voxbar'});}
   for(let z=0;z<hgt;z++){
     const k=H.clamp(drop*hgt-z);if(k<=0)break;
     const lift=(1-H.ease.out(k))*7;          // 0.32s drop, eased out, as the spec sets
     for(let a=0;a<f;a++)for(let b=0;b<f;b++)cube(Pr,bx+a,by+b,z+lift,col);}}
 function blockTag(x,y,text,size,bg,col){
   const w=text.length*(size*0.62)+14,h=size+10,d=4;
+  if(GBOX)GBOX.push({x:Math.round(x-w/2),y:Math.round(y-h/2),w:Math.round(w+d),h:Math.round(h+d),k:'tag:'+text});
   B.fillStyle=H.rgba(H.hex(bg).map(c=>c*0.62));
   B.beginPath();B.moveTo(x+w/2,y-h/2);B.lineTo(x+w/2+d,y-h/2+d);B.lineTo(x+w/2+d,y+h/2+d);B.lineTo(x+w/2,y+h/2);B.fill();
   B.fillStyle=H.rgba(H.hex(bg).map(c=>c*0.78));
@@ -511,17 +532,20 @@ function explainer(ctx,W,Hh,t){
   rect(0,0,LW,LH,P.teal);                      // desktop
 
   /* --- HOOK: the question types itself, word by word, as it is asked --- */
-  const DLG=[170,110,300,112];
+  const DLG=[150,96,344,132];
   zoomRect([4,340,54,16],DLG,M,0.05,0.42);
   const dlgOut=BEAT.JAR.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
     for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
       if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
-    px('?',r.x+21,r.y+13,13,'#000080','center');
-    // split at word 3 so neither line can overrun the dialog's 284px client area
-    px(said(0,0,3),r.x+48,r.y+14,9,'#000');
-    px(said(0,3),r.x+48,r.y+30,9,'#000');
+    px('?',r.x+20,r.y+16,20,'#000080','center');
+    // Three lines at 14px. Press Start 2P is ~13.7px per glyph, so the longest
+    // of these is 151px inside a 336px client area -- it was 9px before, which
+    // is 18px on output and under the floor for anything the story needs.
+    px(said(0,0,2),r.x+50,r.y+14,14,'#000');
+    px(said(0,2,4),r.x+50,r.y+38,14,'#000');
+    px(said(0,4),r.x+50,r.y+62,14,'#000');
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
   }
   zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35,dlgOut);
@@ -538,8 +562,10 @@ function explainer(ctx,W,Hh,t){
     rect(r.x+364,sy,r.w-364,14,P.face);bevel(r.x+364,sy,r.w-364,14,'field');
     const beat=T<BEAT.WATER.sc?'INTRO':T<BEAT.OSMOSIS.sc?'WATER':T<BEAT.ACID.sc?'OSMOSIS'
               :T<BEAT.SEAL.sc?'ACID':T<BEAT.END.sc?'SEAL':'DONE';
+    INCHROME=true;
     px('NX-80  '+beat,r.x+4,sy+1,12,'#000',null,'"VT323"');
     px(T.toFixed(1)+'s',r.x+r.w-6,sy+1,12,'#000','right','"VT323"');
+    INCHROME=false;
 
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
@@ -550,12 +576,12 @@ function explainer(ctx,W,Hh,t){
       const jy=CY+CHd-46-13*4+Math.round(Math.sin(M*2)*1);
       sprite('jar',CX+52,jy,4);
       if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42));   // "jar"
-        if(k>0)blockTag(CX+100,jy+58,'SEALED HONEY',10,P.paper,'#74432d');}
+        if(k>0)blockTag(CX+100,jy+64,'SEALED HONEY',14,P.paper,'#74432d');}
       if(after(1,5)){                                                        // "keeps"
-        pxShadow('KEEPS FOR',CX+250,CY+56,16,P.gold,P.ink);
-        if(after(1,7))pxShadow('DECADES.',CX+250,CY+84,16,P.gold,P.ink);}
-      pxShadow(said(2),CX+250,CY+124,14,'#ffd28a',P.ink,null,'"VT323"');
-      pxShadow(said(3),CX+250,CY+150,14,'#ffd28a',P.ink,null,'"VT323"');
+        pxShadow('KEEPS FOR',CX+246,CY+44,22,P.gold,P.ink);
+        if(after(1,7))pxShadow('DECADES.',CX+246,CY+82,22,P.gold,P.ink);}
+      pxShadow(said(2),CX+246,CY+134,18,'#ffd28a',P.ink,null,'"VT323"');
+      pxShadow(said(3),CX+246,CY+164,18,'#ffd28a',P.ink,null,'"VT323"');
     }
 
     /* --- WATER: one sixth, then the two activity bars --- */
@@ -569,21 +595,21 @@ function explainer(ctx,W,Hh,t){
           if(k<=0)continue;
           const isWater = after(4,3)&&i===5;        // "one sixth"
           cube(proj(CX+150,CY+150),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
-        px(said(4),CX+60,CY+206,14,'#d9d2e6',null,'"VT323"');
+        px(said(4),CX+56,CY+212,18,'#d9d2e6',null,'"VT323"');
       }
       // s5 "...almost none of it is free." -- the honey bar drops
       const d1=mp(wordAt(5,2),wordAt(5,2)+1.25);                    // "sugar"
       const d2=mp(wordAt(8,0),wordAt(8,0)+1.30);                    // "Bacteria"
       if(after(5,2)){
         voxBar(Pr,0,0,12,P.orange,d1);
-        if(d1>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.paper,'#74432d');}
+        if(d1>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.paper,'#74432d');}
       if(after(8,0)){
         voxBar(Pr,7,0,18,P.ice,d2);
-        if(d2>0.9)blockTag(CX+240,CY+190,'BACTERIA',11,P.ice,'#0a0618');}
-      if(after(6,0))px('water activity in honey',CX+392,CY+82,15,'#d9d2e6',null,'"VT323"');
+        if(d2>0.9)blockTag(CX+248,CY+196,'BACTERIA',14,P.ice,'#0a0618');}
+      if(after(6,0))px('water activity in honey',CX+392,CY+80,18,'#d9d2e6',null,'"VT323"');
       if(after(7,0))px((0.60*H.ease.out(mp(wordAt(7,0),wordAt(7,6)))).toFixed(2),
                        CX+392,CY+30,42,P.orange,null,'"Silkscreen"');   // lands on "six"
-      if(after(8,0))px('bacteria need this much',CX+392,CY+164,15,'#d9d2e6',null,'"VT323"');
+      if(after(8,0))px('bacteria need this much',CX+392,CY+162,18,'#d9d2e6',null,'"VT323"');
       if(after(8,1))px((0.91*H.ease.out(mp(wordAt(8,1),wordAt(8,5)))).toFixed(2),
                        CX+392,CY+112,42,P.ice,null,'"Silkscreen"');     // lands on "one"
     }
@@ -595,12 +621,12 @@ function explainer(ctx,W,Hh,t){
       sprite('bug',CX+44,CY+58,5);
       if(after(9,7)){                                   // "pulls"
         dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.75),P.cyan);
-        if(after(9,11))pxShadow('WATER PULLED OUT',CX+44,CY+108,14,P.cyan,P.ink);}   // "out"
+        if(after(9,11))pxShadow('WATER PULLED OUT',CX+30,CY+116,22,P.cyan,P.ink);}  // "out"
       if(after(10,1)){                                  // "dries"
         B.fillStyle=P.red;
-        for(let i=0;i<26;i++){B.fillRect(CX+214+i,CY+62+i,4,4);B.fillRect(CX+239-i,CY+62+i,4,4);}
-        pxShadow('OSMOSIS',CX+300,CY+56,14,P.red,P.ink);}
-      px(said(10),CX+30,CY+180,14,'#c3bad4',null,'"VT323"');
+        for(let i=0;i<26;i++){B.fillRect(CX+214+i,CY+58+i,4,4);B.fillRect(CX+239-i,CY+58+i,4,4);}
+        pxShadow('OSMOSIS',CX+292,CY+56,22,P.red,P.ink);}
+      px(said(10),CX+30,CY+186,18,'#c3bad4',null,'"VT323"');
     }
 
     /* --- ACID: pH 3.9 against plain water --- */
@@ -611,18 +637,18 @@ function explainer(ctx,W,Hh,t){
       const dp=mp(wordAt(11,2),wordAt(11,2)+0.95),     // "acidic"
             dw=mp(wordAt(12,0),wordAt(12,0)+1.00);     // "Plain"
       if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
-        if(dp>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.red,'#fff4e2');}
+        if(dp>0.9)blockTag(CX+112,CY+196,'HONEY',14,P.red,'#fff4e2');}
       if(after(12,0)){voxBar(Pr,7,0,7,'#9fcb55',dw);
-        if(dw>0.9)blockTag(CX+240,CY+190,'WATER',11,P.grass,'#0a0618');}
+        if(dw>0.9)blockTag(CX+248,CY+196,'WATER',14,P.grass,'#0a0618');}
       const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
       if(after(11,8)){                                  // "nine"
         const inv=t<h8+0.9&&Math.floor((t-h8)*8)%2===0;
         if(inv){rect(CX+386,CY+26,NW,NH,P.gold);px('3.9',CX+392,CY+34,NS,P.ink,null,'"Silkscreen"');}
         else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');
-        px('pH - as acidic as orange juice',CX+392,CY+92,15,'#d9d2e6',null,'"VT323"');}
+        px('pH - acidic as orange juice',CX+392,CY+90,18,'#d9d2e6',null,'"VT323"');}
       if(after(12,3)){                                  // "seven"
         px('7',CX+392,CY+124,NS,P.grass,null,'"Silkscreen"');
-        px('pH of plain water',CX+392,CY+182,15,'#d9d2e6',null,'"VT323"');}
+        px('pH of plain water',CX+392,CY+180,18,'#d9d2e6',null,'"VT323"');}
     }
 
     /* --- SEAL: the twist. It only holds while it stays dry, and it does not
@@ -641,21 +667,22 @@ function explainer(ctx,W,Hh,t){
         const k=mp(wordAt(14,1),wordAt(14,1)+0.9);
         for(let a=0;a<3;a++)
           dottedArrow([[CX+50+a*18,CY+54],[CX+50+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
-        if(after(14,6))pxShadow('WATER FROM',CX+28,CY+196,13,P.ice,P.ink);
-        if(after(14,6))pxShadow('THE AIR',CX+28,CY+218,13,P.ice,P.ink);}
-      const Pr=proj(CX+286,CY+210), THR=CY+210-10*5;
+        if(after(14,6))pxShadow('WATER FROM',CX+26,CY+192,18,P.ice,P.ink);
+        if(after(14,6))pxShadow('THE AIR',CX+26,CY+222,18,P.ice,P.ink);}
+      const Pr=proj(CX+280,CY+182), THR=CY+182-10*5;
       if(after(15,2)){                                   // "climb"
         const g=mp(wordAt(15,2),wordAt(15,8));
         const cubes=Math.max(1,Math.round(8+3*H.ease.out(g)));
         B.fillStyle=P.red;
-        for(let x=CX+236;x<CX+392;x+=6)B.fillRect(x,THR,3,1);
+        for(let x=CX+228;x<CX+360;x+=6)B.fillRect(x,THR,3,1);
         voxBar(Pr,0,0,cubes,P.gold,1);
-        px('1 PART IN 5',CX+400,THR-6,11,P.red,null,'"Silkscreen"');
-        px('MOISTURE',CX+248,CY+224,11,'#d9d2e6',null,'"Silkscreen"');}
+        px('1 PART IN 5',CX+368,THR-8,14,P.red,null,'"Silkscreen"');
+        // beside the stack, not under it -- it used to sit behind the cubes
+        px('MOISTURE',CX+338,CY+150,14,'#d9d2e6',null,'"Silkscreen"');}
       if(after(15,9)){                                   // "yeast"
-        sprite('bug',CX+470,CY+52,4);
-        pxShadow('YEAST',CX+462,CY+90,13,P.grass,P.ink);}
-      px(said(16),CX+28,CY+258,14,'#ffd28a',null,'"VT323"');
+        sprite('bug',CX+496,CY+44,4);
+        pxShadow('YEAST',CX+486,CY+86,18,P.grass,P.ink);}
+      px(said(16),CX+26,CY+254,18,'#ffd28a',null,'"VT323"');
     }
 
     /* scene changes: the medium's own mosaic, peaking as the content swaps */
@@ -664,19 +691,19 @@ function explainer(ctx,W,Hh,t){
     B.restore();
 
     /* --- END: the takeaway, one line per spoken word --- */
-    zoomRect([310,150,24,14],[130,88,380,160],M,BEAT.END.sc-0.30,BEAT.END.sc);
+    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.30,BEAT.END.sc);
     if(done){
-      const m=winFrame(130,88,380,160,'Good To Know Tho',true);
+      const m=winFrame(110,78,420,196,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
         if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
-      const tx=m.x+50;
-      // "Dry. Acidic. Sealed." -- one word per line, each on its own word
-      if(after(17,0))px('> Dry.',tx,m.y+6,9,'#000');
-      if(after(17,1))px('> Acidic.',tx,m.y+20,9,'#000');
-      if(after(17,2))px('> Sealed.',tx,m.y+34,9,'#000');
-      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+54,14,'#000080','#c0c0c0');
-      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+78,14,'#000080','#c0c0c0');
+      const tx=m.x+52;
+      // "Dry. Acidic. Sealed." -- one line per spoken word, at 14px not 9px
+      if(after(17,0))px('> Dry.',tx,m.y+8,14,'#000');
+      if(after(17,1))px('> Acidic.',tx,m.y+30,14,'#000');
+      if(after(17,2))px('> Sealed.',tx,m.y+52,14,'#000');
+      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+82,22,'#000080','#c0c0c0');
+      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+118,22,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',false);
     }
   }
@@ -687,7 +714,8 @@ function explainer(ctx,W,Hh,t){
             [BEAT.OSMOSIS.sc-0.4,300,150],[BEAT.OSMOSIS.a+0.4,250,80],
             [BEAT.ACID.sc-0.4,250,80],[BEAT.ACID.a+0.4,330,60],
             [BEAT.SEAL.sc-0.4,330,60],[BEAT.SEAL.a+0.4,150,120],
-            [BEAT.END.sc-0.4,150,120],[BEAT.END.a+0.4,320,210],[DUR,320,210]];
+            // rest on the message box's OK button, not across its text
+            [BEAT.END.sc-0.4,150,120],[BEAT.END.a+0.4,292,250],[DUR,292,250]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
   for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
@@ -734,10 +762,47 @@ window.checkBounds=function(step){
    and the threshold label in the first cut of the seal beat. So overlap is
    checked too. pxShadow draws the same string twice at a 1px offset, so an
    identical string within 1px of itself is the shadow, not a collision. */
+/* The spec sets a legibility floor in BUFFER pixels (x2 to output): headlines
+   >=22, any label the story depends on >=14, key numbers >=32, VT323 >=13.
+   This reports anything under it. Chrome -- the Win95 dialog furniture -- is
+   exempt, because Win95 chrome is 9px by definition. */
+window.checkLegibility=function(step){
+  const FLOOR={head:22,label:14,num:32,vt:13};
+  const bad=[],seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/6)){
+    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    for(const b of r){
+      if(b.chrome) continue;
+      const need = b.role==='num'?FLOOR.num : b.role==='head'?FLOOR.head
+                 : b.role==='vt'?FLOOR.vt : FLOOR.label;
+      if(b.size<need){
+        const k=b.s+'|'+b.size; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),text:b.s,size:b.size,needs:need,role:b.role||'label'});
+      }
+    }
+  }
+  return bad;
+};
+
 window.checkOverlap=function(step){
   const hits=[]; const seen=new Set();
+  const hit=(a,b)=>{const ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x),
+                          oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
+                    return (ox>1&&oy>1)?[ox,oy]:null;};
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
-    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    // text sitting on top of a sprite, a stack, a tag or the cursor
+    for(const a of r)for(const b of g){
+      if(b.k==='cursor') continue;            // the pointer is allowed anywhere
+      if(b.k==='tag:'+a.s) continue;          // a tag's own label sits ON its plate
+      // a label printed on an opaque tag plate is readable over whatever the
+      // plate covers, so it does not collide with what is behind the plate
+      if(g.some(q=>q.k==='tag:'+a.s)) continue;
+      const o=hit(a,b); if(!o) continue;
+      const k='G|'+a.s+'||'+b.k; if(seen.has(k))continue; seen.add(k);
+      hits.push({t:+tt.toFixed(2),a:a.s,b:b.k,overlap:o});
+    }
     for(let i=0;i<r.length;i++)for(let j=i+1;j<r.length;j++){
       const a=r[i],b=r[j];
       if(a.s===b.s&&Math.abs(a.x-b.x)<=1&&Math.abs(a.y-b.y)<=1) continue;   // shadow

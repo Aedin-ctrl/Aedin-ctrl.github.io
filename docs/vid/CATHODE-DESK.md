@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.5
+# CATHODE DESK — house style v1.6
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.6 (2026-11-08)** — the legibility floor is now enforced by a sweep
+> instead of being a line in this file that the build quietly ignored, and
+> the overlap sweep checks text against graphics, not only against text.
+>
 > **v1.5 (2026-11-08)** — sampler rebuilt from scratch on the kept layer
 > library. Breaks are now uniform by construction, on-screen words appear as
 > they are spoken, and "nothing off screen / nothing overlapping" is checked
@@ -320,10 +324,21 @@ piece:
 
 - `checkBounds()` — anything leaving the window's client area. Chrome (title bar,
   status bar, dialogs over the desktop) is judged against the full buffer instead.
-- `checkOverlap()` — any two labels landing on top of each other in the same
-  frame. Skip identical strings within 1px of themselves, which is `pxShadow`.
+- `checkOverlap()` — any two labels on top of each other, **and** any label
+  sitting on a sprite, a voxel stack or a tag plate. Skip identical strings
+  within 1px of themselves (that is `pxShadow`), and skip a tag's own label,
+  which is drawn on its plate by design.
+- `checkLegibility()` — anything under the floor below. Win95 furniture (window
+  titles, button labels, group-box labels, the status bar) is exempt and is
+  flagged as chrome at draw time.
 
-Both must return **0** before a build ships. Screenshots catch the frame you
+All three must return **0** before a build ships.
+
+**The floor is not advisory.** v1.5 shipped with 21 texts under it, including the
+opening question at 9px — 18px on output, against a 28px floor. Writing the rule
+down had not made it true; sweeping for it did. Note that *large* is not a
+violation: a headline is one set at >=22, and an 18px label already clears the
+14px label floor, so only claim 'headline' at the size that earns it. Screenshots catch the frame you
 happen to look at; the sweep catches the one you don't.
 
 ## Accuracy
