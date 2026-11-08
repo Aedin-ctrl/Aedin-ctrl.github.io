@@ -416,6 +416,8 @@ function glass(ctx,W,Hh,t,boost){
    vo4/anchors.json, so the picture and the voice cannot disagree. */
 const TL={
   dur:56.5,
+  vo:"c541c8584d78",   // content hash of narration.mp3 -- busts the browser cache
+
   // beat 1 -- the question
   openA:0.05, openB:0.40, dlgIn:0.40, dlgOut:3.00,
   type1:0.8, type2:1.45, ok:2.47, zoomA:2.95, win:3.30,
@@ -753,7 +755,7 @@ function buildScore(){
 const SCORE=buildScore();
 // the spec asks for this: the offline renderer mixes from the same score
 window.scoreSound=(a,b)=>SCORE.filter(e=>e.t>=a&&e.t<b);
-window.AU=AU;   // so a test can assert the voice actually decoded, not just that a button exists
+window.AU=AU;window.TL_VO=TL.vo;   // so a test can assert the voice actually decoded, not just that a button exists
 
 /* ---- transport ---- */
 function auStartHum(){
@@ -820,7 +822,11 @@ async function armAudio(){
     // The effects and the bed are synthesised, so they still work voiceless.
     try{
       AU.voBuf=await Promise.race([
-        (async()=>{ const r=await fetch('narration.mp3',{cache:'force-cache'});
+        // The URL carries the track's content hash. It used to be a bare
+        // 'narration.mp3' with cache:'force-cache', which tells the browser to
+        // reuse ANY cached copy regardless of freshness -- so a reload could
+        // show a new picture driven by the previous take's voice.
+        (async()=>{ const r=await fetch('narration.mp3?v='+TL.vo);
                     if(!r.ok) throw new Error('narration '+r.status);
                     return await AU.ctx.decodeAudioData(await r.arrayBuffer()); })(),
         new Promise((_,rej)=>setTimeout(()=>rej(new Error('voice timed out')),8000))
