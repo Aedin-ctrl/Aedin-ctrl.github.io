@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.2
+# CATHODE DESK — house style v1.3
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.3 (2026-11-08)** — the picture is now hung off measured sentence
+> anchors in the narration, and one timeline table feeds the picture, the
+> effects and the voice. See *Pacing*.
+>
 > **v1.2 (2026-11-08)** — motion is no longer ticked at all, and the running
 > time follows the script instead of the script being squeezed into a running
 > time. See *Motion* and *Pacing*.
@@ -163,6 +167,32 @@ two complaints it earns: the content is too fast and the voice cadence is wrong.
   says "Low water. Acid. Peroxide.", the voice says something else.
 - Place a line so the thing it names is **already on screen or arriving**, never
   several seconds after.
+
+### Anchor the picture to the voice, not to arithmetic
+
+Placing lines by hand arithmetic is how "zero point six" ended up being spoken
+**4.3 seconds after** that number finished counting on screen. Do this instead:
+
+1. **One audio file per beat**, not per line, so the voice does its own
+   inter-sentence pacing instead of you stitching gaps between separate renders.
+   That stitching is what makes cadence sound wrong.
+2. **Write every sentence to END on the word that triggers its visual** —
+   "Honey sits at zero point six.", "Plain water is seven.", "…a trace of
+   peroxide." Then the anchor is the end of the sentence.
+3. **Read the sentence boundaries back from the TTS.** edge-tts emits
+   `SentenceBoundary` events with offsets. (It no longer emits `WordBoundary`
+   for any voice — don't plan around per-word timings.)
+4. **Measure the real speech end off the waveform.** A boundary's `duration`
+   runs to the start of the *next* sentence, so it includes the pause after the
+   last word; landing a counter on it is late by the length of that pause. Take
+   the last 10ms window above threshold inside the span instead.
+5. Feed those anchors into **one timeline table** that the picture, the effects
+   and the narration placement all read. Three separate lists of numbers is how
+   they drift apart.
+
+**Fill the gaps with picture.** A box that sits still while the voice talks is
+dead screen. Each spoken sentence should change something: a plinth lands, a
+label arrives, a number starts counting, a line prints.
 
 ---
 
