@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.4 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.5 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -65,7 +65,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 56.5</span>
+    <span class="t" id="time">0.00 / 59.6</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -99,9 +99,10 @@
   <div class="note" style="margin-top:14px">
     Everything but the voice is synthesised in the browser from the same score the picture uses, so it
     seeks instantly and stays a pure function of <code>t</code>. <code>window.scoreSound(a,b)</code> returns
-    the events in a window — that is what an offline render would mix from. The voice is one 45.5s
-    track (edge-tts, six per-beat renders placed on their beats, none of them rate-forced to fit); the
-    music is a hint, well under the voice, and it sits out the opening question and the final hold.
+    the events in a window — that is what an offline render would mix from. The voice is one 59.6s
+    track: nineteen sentences rendered separately and placed on a <b>uniform grid</b> — exactly 0.45s
+    between sentences, 1.20s between beats, zero irregular. Word onsets come from transcribing the
+    rendered audio back with whisper.cpp, so on-screen words appear as they are spoken.
   </div>
 </section>
 
@@ -134,8 +135,14 @@
       Compared on screen to orange juice (3.3&ndash;4.2), not a tomato &mdash; a tomato is
       4.3&ndash;4.9, so honey is the <i>more</i> acidic of the two.</p>
       <span class="src">1 cube = 1 pH unit</span></div>
-    <div class="card"><h3>Glucose oxidase</h3><p>Added by the bee. Produces a trace of hydrogen
-      peroxide as it breaks down glucose.</p><span class="src">third barrier</span></div>
+    <div class="card"><h3>~19% moisture</h3><p>Above roughly this, honey ferments &mdash; osmotolerant
+      yeasts (<i>Zygosaccharomyces</i>) grow down to about aw&nbsp;0.61, just above honey's 0.60.
+      And honey is hygroscopic: left open it pulls water out of the air until it gets there.</p>
+      <span class="src">why the seal matters</span></div>
+    <div class="card"><h3>Not peroxide</h3><p>Glucose oxidase is <b>inactive</b> in ripened, undiluted
+      honey and only regains activity on dilution. The peroxide story explains honey on a wound, not
+      honey in a sealed jar &mdash; it was in earlier cuts of this sampler and has been removed.</p>
+      <span class="src">corrected 2026-11-08</span></div>
   </div>
 </section>
 
@@ -145,12 +152,15 @@
   <b>Determinism.</b> Every frame is a pure function of <code>t</code> — all randomness from
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
   so the frame-by-frame video renderer works.<br><br>
+  <b>Checked, not eyeballed.</b> <code>window.checkBounds()</code> and <code>window.checkOverlap()</code>
+  sweep every frame with a recorder on every piece of text drawn, and report anything leaving the
+  client area or landing on top of something else. Both return <b>0</b> for this build.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
   blink. Motion isn't ticked at all: the cursor, the voxel drops, the arrows and the counters run at
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
   steps reads as a dropped frame, not as a style. The pixel grid is held by the ×2 nearest-neighbour
   blit, not by quantising time.<br><br>
-  <b>56.5 seconds, 48.0 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
+  <b>59.6 seconds, 44.6 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
   sentence is written to end on the word that triggers its visual, and the sentence boundaries are read
   back from the TTS — then the real end of each sentence's speech is measured off the waveform, because
   the reported boundary runs to the next sentence and so includes the pause after the last word.
@@ -250,6 +260,7 @@ function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
 /* --- pixel text: rasterise a real font and threshold to hard pixels --- */
 const TC=H.layer(420,48),TX=TC.getContext('2d',{willReadFrequently:true});
 const TCACHE=new Map();
+let BOUNDS=null;
 function px(str,x,y,size,col,align,font){
   const key=str+'|'+size+'|'+(font||'p');
   let g=TCACHE.get(key);
@@ -258,7 +269,8 @@ function px(str,x,y,size,col,align,font){
     const w=Math.min(420,Math.ceil(TX.measureText(str).width)+3),h=Math.ceil(size*1.6)+3;
     const d=TX.getImageData(0,0,w,h).data,pts=[];
     for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(d[(j*w+i)*4+3]>120)pts.push([i,j]);
-    g={pts,w};TCACHE.set(key,g);}
+    let gh=0; for(const[,j]of pts) if(j+1>gh) gh=j+1;
+    g={pts,w,h:gh};TCACHE.set(key,g);}
   let ox=Math.round(x);if(align==='center')ox=Math.round(x-g.w/2);if(align==='right')ox=Math.round(x-g.w);
   const oy=Math.round(y);
   // A string is drawn hundreds of times at the same size and colour, so the
@@ -269,6 +281,10 @@ function px(str,x,y,size,col,align,font){
   let tc=CCACHE.get(ck);
   if(tc===undefined){ tc=bakeGlyph(g,col); CCACHE.set(ck,tc);
     if(CCACHE.size>700) CCACHE.clear(); }
+  // BOUNDS is null normally. window.checkBounds() sets it to an array and
+  // sweeps the whole piece, so "is anything off screen" is a measurement
+  // rather than a thing I squint at in screenshots.
+  if(BOUNDS) BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size});
   if(tc) B.drawImage(tc,ox,oy);
   else { B.fillStyle=col; for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1); }
   return g.w;}
@@ -324,9 +340,15 @@ function stars(x0,y0,w,h,n,seed,T){const r=H.rng(seed);
 const SPR={
   jar:['..KKKKKKKK..','.KWWWWWWWWK.','.KKKKKKKKKK.','KHHHHHHHHHHK','KHHHHHHHHHHK','KHHHHHHHHHHK',
        'KHHGGGGGGHHK','KHHGGGGGGHHK','KHHGGGGGGHHK','KHHHHHHHHHHK','KHHHHHHHHHHK','KHHHHHHHHHHK','.KKKKKKKKKK.'],
+  // the same jar with the lid off -- the seal beat needs it open
+  jaropen:['KK........KK','K..........K','KHHHHHHHHHHK','KHHHHHHHHHHK',
+       'KHHGGGGGGHHK','KHHGGGGGGHHK','KHHGGGGGGHHK','KHHHHHHHHHHK','KHHHHHHHHHHK',
+       'KHHHHHHHHHHK','.KKKKKKKKKK.'],
   bug:['..K..K..','.KKKKKK.','KGGGGGGK','KGKGGKGK','KGGGGGGK','.KGGGGK.','..K..K..'],
 };
-const SPRC={jar:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},bug:{K:'#0a0618',G:'#9fcb55'}};
+const SPRC={jar:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
+            jaropen:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
+            bug:{K:'#0a0618',G:'#9fcb55'}};
 function sprite(name,x,y,s){const c=SPRC[name];
   SPR[name].forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch==='.')continue;
     rect(x+i*s,y+j*s,s,s,c[ch]);}});}
@@ -411,239 +433,324 @@ function glass(ctx,W,Hh,t,boost){
    A number therefore finishes counting on the exact frame it is spoken.
 
    Beat voice-ins: B1 0.80  B2 3.70  B3 12.15  B4 28.75  B5 37.60  B6 48.70 */
-/* Generated from the measured narration -- do not hand-edit these numbers.
-   vo4/layout2.py writes this block and the narration track together from
-   vo4/anchors.json, so the picture and the voice cannot disagree. */
-const TL={
-  dur:56.5,
-  vo:"c541c8584d78",   // content hash of narration.mp3 -- busts the browser cache
-
-  // beat 1 -- the question
-  openA:0.05, openB:0.40, dlgIn:0.40, dlgOut:3.00,
-  type1:0.8, type2:1.45, ok:2.47, zoomA:2.95, win:3.30,
-  // beat 2 -- the jar.   tag lands on "century", headline on "still good"
-  tagA:5.27, tagB:5.7, headline:6.06,
-  b2t1:7.09, b2t2:9.02,
-  // scene changes: mosaic peaks 0.4s before each beat's voice comes in
-  sc2:12.22, sc3:29.85, sc4:39.03,
-  // beat 3 -- water activity
-  plates:13.41,
-  bar1A:14.16, bar1B:15.42,
-  lab1:18.68,
-  cnt1A:22.12, cnt1B:23.85,        // 0.60 lands on "six"
-  bar2A:24.32, bar2B:25.62, lab2:24.32,
-  cnt2A:25.12, cnt2B:26.87,        // 0.91 lands on "one"
-  arr1A:27.26, arr1B:27.97, concl1:29.0,
-  // beat 4 -- osmosis
-  arr2A:33.87, arr2B:34.67, pulled:35.75,
-  xMark:36.2, b4t1:36.62, b4t2:37.32,
-  // beat 5 -- acid, then peroxide
-  bar3A:41.07, bar3B:41.97,
-  hero:43.35, heroEnd:44.23, lab3:43.65,
-  bar4A:43.82, bar4B:44.82, seven:45.32,
-  arr3A:48.02, arr3B:48.82, concl2:50.05,
-  // beat 6 -- the takeaway
-  boxZoomA:50.6, box:51.0,
-  r1:51.3, r2:52.23, r3:53.0,
-  payoff:54.04, payoff2:54.37,
-  b5Out:56.5
+/* ===== TIMELINE =====
+   Generated by v2/layout.py from the rendered audio. Do not hand-edit.
+   Every number is a measurement: sentence starts come from a uniform grid
+   (0.45s between sentences, 1.20s between beats) laid over durations taken
+   off the wav files, and word onsets come from transcribing the rendered
+   audio back with whisper.cpp. 90% of words matched a transcribed token
+   directly; the rest are interpolated between matched anchors. */
+const DUR=59.6, VOHASH="dcf69a30c91a";
+// one entry per spoken sentence: start, end, words, absolute word onsets
+const VO=[
+  {b:'HOOK',a:0.8,z:2.472,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.8, 1.0, 1.46, 1.86, 2.19]},
+  {b:'JAR',a:3.672,z:6.205,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[3.672, 3.742, 4.202, 4.432, 4.582, 5.172, 5.362, 5.592]},
+  {b:'JAR',a:6.655,z:7.728,w:["It", "isn't", "preservatives."],t:[6.655, 6.755, 7.005]},
+  {b:'JAR',a:8.178,z:9.604,w:["Almost", "nothing", "can", "live", "in", "it."],t:[8.178, 8.478, 8.878, 8.948, 9.138, 9.228]},
+  {b:'WATER',a:10.804,z:12.793,w:["Honey", "is", "about", "one", "sixth", "water."],t:[10.834, 11.244, 11.374, 11.697, 12.021, 12.344]},
+  {b:'WATER',a:13.243,z:17.373,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[13.253, 13.413, 13.583, 13.873, 14.173, 14.393, 14.723, 14.923, 15.643, 15.923, 16.353, 16.633, 16.773, 16.913, 17.113]},
+  {b:'WATER',a:17.823,z:20.613,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[17.913, 18.143, 18.573, 18.713, 19.393, 19.533, 19.933]},
+  {b:'WATER',a:21.063,z:23.172,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[21.093, 21.483, 21.943, 21.993, 22.326, 22.659, 22.992]},
+  {b:'WATER',a:23.622,z:25.874,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[23.622, 24.342, 24.68, 25.018, 25.356, 25.694]},
+  {b:'OSMOSIS',a:27.074,z:30.871,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[27.104, 27.524, 27.714, 28.674, 28.724, 28.884, 29.094, 29.544, 29.834, 29.934, 30.294, 30.614, 30.714, 30.804]},
+  {b:'OSMOSIS',a:31.321,z:33.126,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[31.321, 31.441, 31.711, 31.881, 32.231, 32.371, 32.511]},
+  {b:'ACID',a:34.326,z:37.515,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[34.356, 34.766, 35.036, 35.766, 35.786, 36.226, 36.596, 36.965, 37.335]},
+  {b:'ACID',a:37.965,z:39.532,w:["Plain", "water", "is", "seven."],t:[38.045, 38.415, 38.905, 39.045]},
+  {b:'SEAL',a:40.732,z:42.578,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[40.732, 40.912, 41.212, 41.452, 41.632, 41.872, 42.052, 42.172, 42.352]},
+  {b:'SEAL',a:43.028,z:44.695,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[43.028, 43.238, 43.568, 43.958, 44.188, 44.338, 44.568]},
+  {b:'SEAL',a:45.145,z:48.607,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[45.145, 45.29, 45.435, 45.915, 46.325, 46.715, 46.985, 47.555, 47.585, 47.785, 48.115, 48.435]},
+  {b:'SEAL',a:49.057,z:52.021,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[49.057, 49.287, 49.587, 49.777, 50.137, 50.277, 50.597, 50.907, 51.057, 51.367]},
+  {b:'END',a:53.221,z:55.245,w:["Dry.", "Acidic.", "Sealed."],t:[53.221, 54.221, 55.065]},
+  {b:'END',a:55.695,z:57.973,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[55.705, 56.095, 56.305, 56.535, 56.685, 57.125, 57.415, 57.495]},
+];
+// beat boundaries and the frame each scene changes on
+const BEAT={
+  HOOK:{sc:0.0,a:0.8,z:2.472},
+  JAR:{sc:3.27,a:3.672,z:9.604},
+  WATER:{sc:10.4,a:10.804,z:25.874},
+  OSMOSIS:{sc:26.67,a:27.074,z:33.126},
+  ACID:{sc:33.93,a:34.326,z:39.532},
+  SEAL:{sc:40.33,a:40.732,z:52.021},
+  END:{sc:52.82,a:53.221,z:57.973},
+};
+const SENT={
+  HOOK:[0],
+  JAR:[1,2,3],
+  WATER:[4,5,6,7,8],
+  OSMOSIS:[9,10],
+  ACID:[11,12],
+  SEAL:[13,14,15,16],
+  END:[17,18],
 };
 
-/* ===== THE EXPLAINER: why sealed honey does not spoil ===== */
+/* ===== THE EXPLAINER: why sealed honey does not spoil =====
+   Every beat hangs off VO[] -- the measured word onsets. Nothing in here is a
+   chosen time except the small offsets that make a drop land ON a word rather
+   than start on it. */
 function explainer(ctx,W,Hh,t){
-  const T=Math.floor(t*12)/12;                 // 12fps logic tick for the screen layer
-  // Continuous MOTION is NOT ticked at all. Drawn content still steps at 12fps
-  // -- that is the medium -- but anything that physically moves runs at the
-  // display's own rate. A 24fps tick was still visibly stepping on the voxel
-  // drops and the cursor glide, and a cube that steps reads as a dropped frame,
-  // not as a style. Smoothness wins here; the pixel grid is preserved by the
-  // x2 nearest-neighbour blit, not by quantising time.
-  const M=t;
-  const ph=(a,b)=>H.clamp((T-a)/(b-a));        // 12fps: drawn content
-  const mp=(a,b)=>H.clamp((M-a)/(b-a));        // continuous: motion
-  const typed=(s,a,cps)=>s.slice(0,Math.max(0,Math.floor((T-a)*cps)));
+  const T=Math.floor(t*12)/12;                 // 12fps tick: drawn content
+  const M=t;                                   // motion is not ticked at all
+  const mp=(a,b)=>H.clamp((M-a)/(b-a));
   const blink=Math.floor(T*2.2)%2===0;
+
+  // --- word-synced text. A word appears on the frame it is spoken, so this
+  //     uses continuous t, not the 12fps tick: a reveal is a discrete event,
+  //     not motion, and an 83ms lag against speech is audible-visible.
+  const V=(n)=>VO[n];
+  const wordAt=(n,i)=>VO[n].t[i];
+  const said=(n,a,b)=>{const v=VO[n];const lo=a||0,hi=(b===undefined?v.w.length:b);
+    let o=[];for(let i=lo;i<hi;i++) if(t>=v.t[i]) o.push(v.w[i]);return o.join(' ');};
+  const after=(n,i)=>t>=VO[n].t[i];            // has word i been spoken yet
+  const ends=(n)=>VO[n].z;
+
   let boost=1;
-  if(t>TL.xMark&&t<TL.xMark+0.22)boost=1.45;   // emphasis: the ✗ lands on "dries"
-  if(t>TL.hero&&t<TL.hero+0.25)boost=1.35;     // emphasis: pH hero number on "nine"
+  if(t>wordAt(10,1)&&t<wordAt(10,1)+0.22)boost=1.45;   // "dries"
+  if(t>wordAt(11,8)&&t<wordAt(11,8)+0.25)boost=1.35;   // "nine"
+  if(t>wordAt(15,9)&&t<wordAt(15,9)+0.22)boost=1.40;   // "yeast"
 
   rect(0,0,LW,LH,P.teal);                      // desktop
 
-  /* --- BEAT 1: the question as a Win95 help dialog --- */
+  /* --- HOOK: the question types itself, word by word, as it is asked --- */
   const DLG=[170,110,300,112];
-  zoomRect([4,340,54,16],DLG,M,TL.openA,TL.openB);
-  if(T>=TL.dlgIn&&T<TL.dlgOut){
+  zoomRect([4,340,54,16],DLG,M,0.05,0.42);
+  const dlgOut=BEAT.JAR.sc;
+  if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
-    // ? balloon
     for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
       if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
     px('?',r.x+21,r.y+13,13,'#000080','center');
-    px(typed('Why does sealed',TL.type1,26),r.x+48,r.y+14,9,'#000');
-    if(T>TL.type2)px(typed('honey never spoil?',TL.type2,26),r.x+48,r.y+30,9,'#000');
-    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',T>TL.ok);
+    // split at word 3 so neither line can overrun the dialog's 284px client area
+    px(said(0,0,3),r.x+48,r.y+14,9,'#000');
+    px(said(0,3),r.x+48,r.y+30,9,'#000');
+    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
   }
-  zoomRect(DLG,[8,8,624,318],M,TL.zoomA,TL.win);
+  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35,dlgOut);
 
-  /* --- the main window holds every later beat --- */
-  if(T>=TL.win){
-    const done=T>=TL.box;
+  if(T>=dlgOut){
+    const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,624,318,'Why does sealed honey never spoil?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
 
-    /* status bar (VT323, inverse-video style) */
+    /* status bar -- driven off BEAT so it cannot drift from the scenes */
     const sy=r.y+r.h-15;
     rect(r.x,sy,360,14,P.face);bevel(r.x,sy,360,14,'field');
     rect(r.x+364,sy,r.w-364,14,P.face);bevel(r.x+364,sy,r.w-364,14,'field');
-    // Driven off the SAME constants as the scenes, so they cannot drift apart
-    // again -- the status line once announced ACID over the water chart.
-    const beat=T<TL.sc2?'INTRO':T<TL.sc3?'WATER':T<TL.sc4?'OSMOSIS':T<TL.box?'ACID':'DONE';
+    const beat=T<BEAT.WATER.sc?'INTRO':T<BEAT.OSMOSIS.sc?'WATER':T<BEAT.ACID.sc?'OSMOSIS'
+              :T<BEAT.SEAL.sc?'ACID':T<BEAT.END.sc?'SEAL':'DONE';
     px('NX-80  '+beat,r.x+4,sy+1,12,'#000',null,'"VT323"');
     px(T.toFixed(1)+'s',r.x+r.w-6,sy+1,12,'#000','right','"VT323"');
 
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
-    /* --- BEAT 2: SCREEN layer. dusk sky + the jar --- */
-    if(T<TL.sc2){
-      skyBands(CX,CY,CWd,CHd,46);          // sky + ground in one cached blit
-      stars(CX,CY,CWd,CHd*0.5,42,7,T);     // live: they twinkle on T
+    /* --- JAR: the sealed jar. s1 names it, s2 and s3 caption it --- */
+    if(T<BEAT.WATER.sc){
+      skyBands(CX,CY,CWd,CHd,46);
+      stars(CX,CY,CWd,CHd*0.5,42,7,T);
       const jy=CY+CHd-46-13*4+Math.round(Math.sin(M*2)*1);
       sprite('jar',CX+52,jy,4);
-      if(T>TL.tagA){const k=H.ease.back(mp(TL.tagA,TL.tagB));
+      if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42));   // "jar"
         if(k>0)blockTag(CX+100,jy+58,'SEALED HONEY',10,P.paper,'#74432d');}
-      if(T>TL.headline){
-        pxShadow('IT NEVER',CX+250,CY+56,16,P.gold,P.ink);
-        pxShadow('SPOILS.',CX+250,CY+84,16,P.gold,P.ink);}
-      if(T>TL.b2t1)pxShadow(typed('Not because of preservatives.',TL.b2t1,22),CX+250,CY+122,14,'#ffd28a',P.ink);
-      if(T>TL.b2t2)pxShadow(typed('Three things make it hostile.',TL.b2t2,22),CX+250,CY+144,14,'#ffd28a',P.ink);
+      if(after(1,5)){                                                        // "keeps"
+        pxShadow('KEEPS FOR',CX+250,CY+56,16,P.gold,P.ink);
+        if(after(1,7))pxShadow('DECADES.',CX+250,CY+84,16,P.gold,P.ink);}
+      pxShadow(said(2),CX+250,CY+124,14,'#ffd28a',P.ink,null,'"VT323"');
+      pxShadow(said(3),CX+250,CY+150,14,'#ffd28a',P.ink,null,'"VT323"');
     }
 
-    /* --- BEAT 3: OBJECTS layer. voxel bars, water activity --- */
-    if(T>=TL.sc2&&T<TL.sc3){
+    /* --- WATER: one sixth, then the two activity bars --- */
+    if(T>=BEAT.WATER.sc&&T<BEAT.OSMOSIS.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      // box stops short of the panel floor so the conclusion line has clear
-      // space -- the arrow used to cut straight through the BACTERIA tag.
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'WATER ACTIVITY');
       const Pr=proj(CX+150,CY+172);
-      // Empty plinths land first, under "First. Water." They exist so the panel
-      // is not two seconds of bare box while the voice sets the scene -- the
-      // bars then visibly drop ONTO something.
-      if(T>TL.plates){const pk=mp(TL.plates,TL.plates+0.45);
-        // a dotted floor so the chart has a ground before anything stands on it
-        B.fillStyle='#463c66';
-        for(let x=CX+34;x<CX+366;x+=6)B.fillRect(x,CY+200,3,1);
-        voxBar(Pr,0,0,1,'#4e4668',pk); voxBar(Pr,7,0,1,'#4e4668',pk);}
-      const d1=mp(TL.bar1A,TL.bar1B),d2=mp(TL.bar2A,TL.bar2B);
-      // 1 cube = 0.05 aw, so the bar heights ARE the values. Honey's water
-      // activity is ~0.60; most bacteria need >= ~0.91 to grow. Comparing
-      // honey's 17% water CONTENT against a 0.91 ACTIVITY threshold, as this
-      // first did, is two different quantities on one axis.
-      voxBar(Pr,0,0,12,P.orange,d1);       // honey, aw ~0.60
-      voxBar(Pr,7,0,18,P.ice,d2);          // bacteria need aw >= ~0.91
-      if(d1>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.paper,'#74432d');
-      if(d2>0.9)blockTag(CX+240,CY+190,'BACTERIA',11,P.ice,'#0a0618');
-      // label and number are split: the label arrives with the sentence that
-      // names the idea, the number finishes counting on the word that says it.
-      if(T>TL.lab1)px('water activity in honey',CX+392,CY+82,15,'#d9d2e6',null,'"VT323"');
-      if(T>TL.cnt1A)px((0.60*H.ease.out(mp(TL.cnt1A,TL.cnt1B))).toFixed(2),
-                       CX+392,CY+30,42,P.orange,null,'"Silkscreen"');
-      if(T>TL.lab2)px('bacteria need this much',CX+392,CY+164,15,'#d9d2e6',null,'"VT323"');
-      if(T>TL.cnt2A)px((0.91*H.ease.out(mp(TL.cnt2A,TL.cnt2B))).toFixed(2),
-                       CX+392,CY+112,42,P.ice,null,'"Silkscreen"');
-      if(T>TL.arr1A){const k=mp(TL.arr1A,TL.arr1B);
-        dottedArrow([[CX+430,CY+196],[CX+430,CY+228],[CX+196,CY+228]],k,P.green);
-        if(T>=TL.concl1)pxShadow('TOO DRY TO LIVE IN',CX+184,CY+236,13,P.green,P.ink,'center');}
+      // s4 "Honey is about one sixth water." -- six cubes, one of them water
+      if(after(4,0)&&T<wordAt(6,0)){
+        for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09,wordAt(4,0)+i*0.09+0.3);
+          if(k<=0)continue;
+          const isWater = after(4,3)&&i===5;        // "one sixth"
+          cube(proj(CX+150,CY+150),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
+        px(said(4),CX+60,CY+206,14,'#d9d2e6',null,'"VT323"');
+      }
+      // s5 "...almost none of it is free." -- the honey bar drops
+      const d1=mp(wordAt(5,2),wordAt(5,2)+1.25);                    // "sugar"
+      const d2=mp(wordAt(8,0),wordAt(8,0)+1.30);                    // "Bacteria"
+      if(after(5,2)){
+        voxBar(Pr,0,0,12,P.orange,d1);
+        if(d1>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.paper,'#74432d');}
+      if(after(8,0)){
+        voxBar(Pr,7,0,18,P.ice,d2);
+        if(d2>0.9)blockTag(CX+240,CY+190,'BACTERIA',11,P.ice,'#0a0618');}
+      if(after(6,0))px('water activity in honey',CX+392,CY+82,15,'#d9d2e6',null,'"VT323"');
+      if(after(7,0))px((0.60*H.ease.out(mp(wordAt(7,0),wordAt(7,6)))).toFixed(2),
+                       CX+392,CY+30,42,P.orange,null,'"Silkscreen"');   // lands on "six"
+      if(after(8,0))px('bacteria need this much',CX+392,CY+164,15,'#d9d2e6',null,'"VT323"');
+      if(after(8,1))px((0.91*H.ease.out(mp(wordAt(8,1),wordAt(8,5)))).toFixed(2),
+                       CX+392,CY+112,42,P.ice,null,'"Silkscreen"');     // lands on "one"
     }
 
-    /* --- BEAT 4: the bug dries out. GLASS emphasis on the ✗ --- */
-    if(T>=TL.sc3&&T<TL.sc4){
+    /* --- OSMOSIS: the microbe dries out --- */
+    if(T>=BEAT.OSMOSIS.sc&&T<BEAT.ACID.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+14,CY+12,CWd-28,150,'WHAT HAPPENS TO A MICROBE');
-      // Laid out so nothing collides. Press Start 2P runs ~13.75px per glyph at
-      // 14px, so 'WATER PULLED OUT' is 220px wide -- it used to start at CX+112
-      // and run straight through the x and into OSMOSIS. It gets its own row
-      // now rather than being shrunk, because the legibility floor (>=14 in the
-      // buffer for any label the story depends on) forbids shrinking it.
       sprite('bug',CX+44,CY+58,5);
-      if(T>TL.arr2A){
-        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(TL.arr2A,TL.arr2B),P.cyan);
-        if(T>=TL.pulled)pxShadow('WATER PULLED OUT',CX+44,CY+108,14,P.cyan,P.ink);}
-      if(T>TL.xMark){
-        // the ✗
+      if(after(9,7)){                                   // "pulls"
+        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.75),P.cyan);
+        if(after(9,11))pxShadow('WATER PULLED OUT',CX+44,CY+108,14,P.cyan,P.ink);}   // "out"
+      if(after(10,1)){                                  // "dries"
         B.fillStyle=P.red;
         for(let i=0;i<26;i++){B.fillRect(CX+214+i,CY+62+i,4,4);B.fillRect(CX+239-i,CY+62+i,4,4);}
-        pxShadow('OSMOSIS',CX+300,CY+56,14,P.red,P.ink);
-        px('it dries out before it can multiply',CX+300,CY+84,14,'#d9cfe4',null,'"VT323"');}
-      if(T>TL.b4t1)px(typed('Sugar holds the water so tightly',TL.b4t1,24),CX+30,CY+176,14,'#c3bad4',null,'"VT323"');
-      if(T>TL.b4t2)px(typed('that nothing else can reach it.',TL.b4t2,24),CX+30,CY+196,14,'#c3bad4',null,'"VT323"');
+        pxShadow('OSMOSIS',CX+300,CY+56,14,P.red,P.ink);}
+      px(said(10),CX+30,CY+180,14,'#c3bad4',null,'"VT323"');
     }
 
-    /* --- BEAT 5: the acid + the enzyme. hero number, inverse video --- */
-    if(T>=TL.sc4&&T<TL.b5Out){
+    /* --- ACID: pH 3.9 against plain water --- */
+    if(T>=BEAT.ACID.sc&&T<BEAT.SEAL.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
       const Pr=proj(CX+150,CY+172);
-      const dp=mp(TL.bar3A,TL.bar3B),dw=mp(TL.bar4A,TL.bar4B);
-      voxBar(Pr,0,0,4,P.red,dp);             // honey, pH ~3.9
-      voxBar(Pr,7,0,7,'#9fcb55',dw);         // neutral water, pH 7 (1 cube = 1 pH unit)
-      if(dp>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.red,'#fff4e2');
-      if(dw>0.9)blockTag(CX+240,CY+190,'WATER',11,P.grass,'#0a0618');
-      // hero number, inverse video on the emphasis beat. The box is sized from
-      // the glyph height -- a fixed 52px box cropped the digits.
-      const NS=40,NW=150,NH=NS+18,inv=T>TL.hero&&(T>TL.heroEnd||Math.floor((T-TL.hero)*8)%2===0);
-      if(T>=TL.hero){
+      const dp=mp(wordAt(11,2),wordAt(11,2)+0.95),     // "acidic"
+            dw=mp(wordAt(12,0),wordAt(12,0)+1.00);     // "Plain"
+      if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
+        if(dp>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.red,'#fff4e2');}
+      if(after(12,0)){voxBar(Pr,7,0,7,'#9fcb55',dw);
+        if(dw>0.9)blockTag(CX+240,CY+190,'WATER',11,P.grass,'#0a0618');}
+      const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
+      if(after(11,8)){                                  // "nine"
+        const inv=t<h8+0.9&&Math.floor((t-h8)*8)%2===0;
         if(inv){rect(CX+386,CY+26,NW,NH,P.gold);px('3.9',CX+392,CY+34,NS,P.ink,null,'"Silkscreen"');}
-        else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');}
-      if(T>TL.lab3)px('pH - as acidic as orange juice',CX+392,CY+92,15,'#d9d2e6',null,'"VT323"');
-      if(T>=TL.seven){
+        else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');
+        px('pH - as acidic as orange juice',CX+392,CY+92,15,'#d9d2e6',null,'"VT323"');}
+      if(after(12,3)){                                  // "seven"
         px('7',CX+392,CY+124,NS,P.grass,null,'"Silkscreen"');
         px('pH of plain water',CX+392,CY+182,15,'#d9d2e6',null,'"VT323"');}
-      if(T>TL.arr3A){const k=mp(TL.arr3A,TL.arr3B);
-        dottedArrow([[CX+430,CY+208],[CX+430,CY+228],[CX+196,CY+228]],k,P.green);
-        if(T>=TL.concl2)pxShadow('+ BEES ADD PEROXIDE',CX+184,CY+236,13,P.green,P.ink,'center');}
     }
-    /* --- scene changes: the medium's own mosaic, peaking on the exact frame
-       the content swaps so the blocks grow on the old scene and shrink on the
-       new one. Runs last, after every beat has drawn into the buffer. --- */
-    for(const tc of [TL.sc2,TL.sc3,TL.sc4]){const dd=Math.abs(M-tc);
-      if(dd<0.2)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.2*15));}
+
+    /* --- SEAL: the twist. It only holds while it stays dry, and it does not
+       stay dry by itself. Glucose oxidase is inactive in undiluted honey, so
+       the peroxide story that used to sit here was about DILUTED honey and did
+       not belong in a beat about a sealed jar. --- */
+    if(T>=BEAT.SEAL.sc&&T<BEAT.END.sc){
+      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'NOW LEAVE IT OPEN');
+      // Laid out in three columns that cannot meet: jar on the left, the
+      // climbing bar in the middle, yeast top-right. Every box below was
+      // checked against every other by window.checkBounds().
+      const jy=CY+124;
+      sprite('jaropen',CX+40,jy,4);
+      if(after(14,1)){                                   // "pulls"
+        const k=mp(wordAt(14,1),wordAt(14,1)+0.9);
+        for(let a=0;a<3;a++)
+          dottedArrow([[CX+50+a*18,CY+54],[CX+50+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
+        if(after(14,6))pxShadow('WATER FROM',CX+28,CY+196,13,P.ice,P.ink);
+        if(after(14,6))pxShadow('THE AIR',CX+28,CY+218,13,P.ice,P.ink);}
+      const Pr=proj(CX+286,CY+210), THR=CY+210-10*5;
+      if(after(15,2)){                                   // "climb"
+        const g=mp(wordAt(15,2),wordAt(15,8));
+        const cubes=Math.max(1,Math.round(8+3*H.ease.out(g)));
+        B.fillStyle=P.red;
+        for(let x=CX+236;x<CX+392;x+=6)B.fillRect(x,THR,3,1);
+        voxBar(Pr,0,0,cubes,P.gold,1);
+        px('1 PART IN 5',CX+400,THR-6,11,P.red,null,'"Silkscreen"');
+        px('MOISTURE',CX+248,CY+224,11,'#d9d2e6',null,'"Silkscreen"');}
+      if(after(15,9)){                                   // "yeast"
+        sprite('bug',CX+470,CY+52,4);
+        pxShadow('YEAST',CX+462,CY+90,13,P.grass,P.ink);}
+      px(said(16),CX+28,CY+258,14,'#ffd28a',null,'"VT323"');
+    }
+
+    /* scene changes: the medium's own mosaic, peaking as the content swaps */
+    for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
+      if(BEAT[k].sc>0&&dd<0.2)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.2*15));}
     B.restore();
 
-    /* --- BEAT 6: the takeaway, as a message box --- */
-    // Finishes exactly when the box appears, so the outlines ARE the box
-    // arriving. Running it past that hid every frame of it behind the box.
-    zoomRect([310,150,24,14],[130,88,380,160],M,TL.boxZoomA,TL.box);
+    /* --- END: the takeaway, one line per spoken word --- */
+    zoomRect([310,150,24,14],[130,88,380,160],M,BEAT.END.sc-0.30,BEAT.END.sc);
     if(done){
-      // Bigger than it was: the old 360x124 box held one line of small text and
-      // then sat empty for the best part of three seconds waiting for the
-      // payoff. Now each reason prints as it is spoken and the box fills.
       const m=winFrame(130,88,380,160,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
         if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
       const tx=m.x+50;
-      if(T>=TL.r1)px(typed('> Low water.',TL.r1,11),tx,m.y+6,9,'#000');
-      if(T>=TL.r2)px(typed('> Acid.',TL.r2,11),tx,m.y+20,9,'#000');
-      if(T>=TL.r3)px(typed('> Peroxide.',TL.r3,11),tx,m.y+34,9,'#000');
-      if(T>=TL.payoff)pxShadow('NOTHING CAN',tx,m.y+54,14,'#000080','#c0c0c0');
-      if(T>=TL.payoff2)pxShadow('GROW IN IT.',tx,m.y+78,14,'#000080','#c0c0c0');
+      // "Dry. Acidic. Sealed." -- one word per line, each on its own word
+      if(after(17,0))px('> Dry.',tx,m.y+6,9,'#000');
+      if(after(17,1))px('> Acidic.',tx,m.y+20,9,'#000');
+      if(after(17,2))px('> Sealed.',tx,m.y+34,9,'#000');
+      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+54,14,'#000080','#c0c0c0');
+      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+78,14,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',false);
     }
   }
 
-  /* --- the cursor, always chrome --- */
-  const CK=[[0,420,300],[1.9,322,196],[3.0,322,196],[4.2,120,40],[11.92,120,40],[13.12,300,150],[29.45,300,150],[30.65,250,80],[38.63,250,80],[39.93,330,60],[50.6,330,60],[51.7,320,210],[56.5,320,210]];
+  /* --- the cursor, always chrome. Keyframed off the beat table. --- */
+  const CK=[[0,420,300],[BEAT.HOOK.z-0.6,322,196],[BEAT.JAR.sc,322,196],
+            [BEAT.JAR.a+0.4,120,40],[BEAT.WATER.sc-0.4,120,40],[BEAT.WATER.a+0.4,300,150],
+            [BEAT.OSMOSIS.sc-0.4,300,150],[BEAT.OSMOSIS.a+0.4,250,80],
+            [BEAT.ACID.sc-0.4,250,80],[BEAT.ACID.a+0.4,330,60],
+            [BEAT.SEAL.sc-0.4,330,60],[BEAT.SEAL.a+0.4,150,120],
+            [BEAT.END.sc-0.4,150,120],[BEAT.END.a+0.4,320,210],[DUR,320,210]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
   for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
   cursor(cx,cy);
 
-  /* --- blit x2, then LAYER 4 --- */
   ctx.imageSmoothingEnabled=false;
   ctx.clearRect(0,0,W,Hh);
   ctx.drawImage(BUF,0,0,LW,LH,0,0,W,Hh);
   glass(ctx,W,Hh,t,boost);
 }
+
+/* Sweep every frame with the text recorder on and report anything that would
+   fall outside the window's client area. "Nothing off screen" is then a number,
+   not an impression. */
+// exposed for the offline renderer and the test harness: a const at the top
+// level of a classic script is NOT a window property, which is why a harness
+// reading w.DUR silently got undefined.
+window.DUR=DUR; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH;
+window.checkBounds=function(step){
+  const pad=2, lo={x:12+pad,y:28+pad}, hi={x:12+616-pad,y:28+284-pad};
+  const bad=[]; const seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/12)){
+    BOUNDS=[]; explainer(ctx,1280,720,tt); const rec=BOUNDS; BOUNDS=null;
+    for(const b of rec){
+      // Chrome legitimately lives outside the client area: the title bar above
+      // it, the status bar below it, and the dialog / message box drawn over
+      // the desktop. Those are judged against the whole 640x360 buffer; only
+      // SCREEN and OBJECT layer text is held to the client rect.
+      const chrome = b.y < lo.y || b.y > 28+284-20 || tt < BEAT.JAR.sc || tt >= BEAT.END.sc;
+      const L=chrome?0:lo.x, Tp=chrome?0:lo.y, R=chrome?LW:hi.x, Bt=chrome?LH:hi.y;
+      if(b.x<L||b.y<Tp||b.x+b.w>R||b.y+b.h>Bt){
+        const k=b.s+'|'+b.size;
+        if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),text:b.s,size:b.size,
+                  box:[b.x,b.y,b.x+b.w,b.y+b.h],limit:[L,Tp,R,Bt]});
+      }
+    }
+  }
+  return bad;
+};
+
+/* Two labels can both sit inside the panel and still land on top of each other
+   -- which is what happened to WATER PULLED OUT and OSMOSIS once, and to YEAST
+   and the threshold label in the first cut of the seal beat. So overlap is
+   checked too. pxShadow draws the same string twice at a 1px offset, so an
+   identical string within 1px of itself is the shadow, not a collision. */
+window.checkOverlap=function(step){
+  const hits=[]; const seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/12)){
+    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    for(let i=0;i<r.length;i++)for(let j=i+1;j<r.length;j++){
+      const a=r[i],b=r[j];
+      if(a.s===b.s&&Math.abs(a.x-b.x)<=1&&Math.abs(a.y-b.y)<=1) continue;   // shadow
+      const ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
+      const oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
+      if(ox>1&&oy>1){
+        const k=a.s+'||'+b.s; if(seen.has(k))continue; seen.add(k);
+        hits.push({t:+tt.toFixed(2),a:a.s,b:b.s,overlap:[ox,oy]});
+      }
+    }
+  }
+  return hits;
+};
 
 /* ===== LAYER SOUND =====
    The spec's kit, one source per layer: chrome = UI snaps, screen = chip
@@ -710,52 +817,47 @@ const SFX={
     g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.start(t);o.stop(t+d+0.05);}
 };
 
-/* ---- the score: built FROM the timeline table, so an effect cannot drift
-   away from the frame it belongs to. Every time below is a TL field. ---- */
+/* ---- the score: built from the SAME word onsets the picture uses, so an
+   effect cannot land on a different frame from the thing it marks ---- */
 function buildScore(){
   const E=[],add=(t,k,n)=>E.push({t:+t.toFixed(3),k,n});
+  const w=(n,i)=>VO[n].t[i];
   // chrome
-  add(TL.openA,'open');        // the help dialog outline-zooms open
-  add(1.90,'snap');            // cursor reaches the dialog
-  add(TL.ok,'click');          // OK goes down
-  add(TL.zoomA,'open');        // zoom out into the main window
-  add(TL.boxZoomA,'open');     // the takeaway message box
-  add(49.10,'snap');           // cursor lands on its OK
-  // screen: text print blips, one per 4 characters of each typed line
-  const typed=[[TL.type1,15,26],[TL.type2,18,26],[TL.b2t1,29,22],[TL.b2t2,29,22],
-               [TL.b4t1,31,24],[TL.b4t2,30,24],
-               [TL.r1,12,11],[TL.r2,7,11],[TL.r3,11,11]];
-  typed.forEach(([t0,len,cps])=>{for(let i=0;i<len;i+=4)add(t0+i/cps,'blip',i);});
-  // objects: the stacks land. Every 3rd cube, so it reads as a stack, not a drum roll.
+  add(0.05,'open'); add(VO[0].z-0.5,'snap'); add(VO[0].z,'click');
+  add(BEAT.JAR.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open'); add(BEAT.END.a+0.4,'snap');
+  // screen: a print blip on every spoken word that appears as text on screen
+  [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  VO[0].t.forEach((tt,i)=>add(tt,'blip',i));
+  [17,18].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // objects: stacks landing. Every 3rd cube so a bar reads as a stack.
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  add(TL.plates,'knock',0); add(TL.plates+0.12,'knock',1);   // the plinths
-  bar(TL.bar1A,TL.bar1B,12,3); bar(TL.bar2A,TL.bar2B,18,4);  // beat 3
-  bar(TL.bar3A,TL.bar3B,4,1);  bar(TL.bar4A,TL.bar4B,7,2);   // beat 5
-  add(TL.bar1B,'tag'); add(TL.bar2B,'tag'); add(TL.bar3B,'tag'); add(TL.bar4B,'tag');
-  // arrows draw on; the conclusion lands on the word that says it
-  [[TL.arr1A,TL.concl1],[TL.arr2A,TL.pulled],[TL.arr3A,TL.concl2]]
-    .forEach(([a,b])=>{add(a,'draw');add(b,'tag');});
-  // the two numbers finish counting on their spoken word -- mark both
-  add(TL.cnt1B,'tag'); add(TL.cnt2B,'tag'); add(TL.seven,'tag');
-  // glass: the two emphasis frames, exactly where boost rises
-  add(TL.xMark,'zap'); add(TL.hero,'zap');
+  for(let i=0;i<6;i++)add(w(4,0)+i*0.09+0.26,'knock',i);        // the one-sixth row
+  bar(w(5,2),w(5,2)+1.25,12,3);  bar(w(8,0),w(8,0)+1.30,18,4);  // water activity
+  bar(w(11,2),w(11,2)+0.95,4,1); bar(w(12,0),w(12,0)+1.00,7,2); // pH
+  bar(w(15,2),w(15,8),11,3);                                    // moisture climbing
+  add(w(5,2)+1.25,'tag'); add(w(8,0)+1.30,'tag');
+  add(w(11,2)+0.95,'tag'); add(w(12,0)+1.00,'tag');
+  // arrows draw on, conclusions land on the word that says them
+  add(w(9,7),'draw');  add(w(9,11),'tag');     // "pulls" -> "out"
+  add(w(14,1),'draw'); add(w(14,6),'tag');     // "pulls" -> "air"
+  // numbers finish counting on their spoken word
+  add(w(7,6),'tag'); add(w(8,5),'tag'); add(w(12,3),'tag');
+  // glass: the three emphasis frames, exactly where boost rises
+  add(w(10,1),'zap'); add(w(11,8),'zap'); add(w(15,9),'zap');
   // scene changes
-  [TL.sc2,TL.sc3,TL.sc4].forEach(t=>add(t,'mos'));
-  // the payoff line
-  add(TL.payoff,'tag'); add(TL.payoff2,'tag');
-  // music: a hint only. Am-ish eighth-note figure, bass on the bar. It sits out
-  // the opening question and the final hold so both land in silence.
+  for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
+  // music: a hint. Sits out the opening question and the final hold.
   const BPM=112, E8=30/BPM, FIG=[220.00,261.63,329.63,261.63,293.66,349.23,293.66,261.63];
-  for(let i=0,t=3.60;t<TL.payoff;i++,t+=E8){
-    add(t,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
-    if(i%8===0) add(t,'bass',FIG[0]/2);
+  for(let i=0,tt=BEAT.JAR.a;tt<VO[18].t[0];i++,tt+=E8){
+    add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
+    if(i%8===0) add(tt,'bass',FIG[0]/2);
   }
   E.sort((a,b)=>a.t-b.t); return E;
 }
 const SCORE=buildScore();
 // the spec asks for this: the offline renderer mixes from the same score
 window.scoreSound=(a,b)=>SCORE.filter(e=>e.t>=a&&e.t<b);
-window.AU=AU;window.TL_VO=TL.vo;   // so a test can assert the voice actually decoded, not just that a button exists
+window.AU=AU;window.TL_VO=VOHASH;   // so a test can assert the voice actually decoded, not just that a button exists
 
 /* ---- transport ---- */
 function auStartHum(){
@@ -791,7 +893,7 @@ const ppB=document.getElementById('pp'),scrub=document.getElementById('scrub'),
       timeEl=document.getElementById('time'),loopEl=document.getElementById('loop'),
       sndB=document.getElementById('snd');
 let cur=0,playing=false,last=0;
-const DURATION=TL.dur;          // single source: the timeline table
+const DURATION=DUR;             // single source: the generated timeline
 buildGlass(1280,720);
 window.DURATION=DURATION;
 window.seek=(t)=>{cur=H.clamp(t,0,DURATION);explainer(ctx,1280,720,cur);
@@ -826,7 +928,7 @@ async function armAudio(){
         // 'narration.mp3' with cache:'force-cache', which tells the browser to
         // reuse ANY cached copy regardless of freshness -- so a reload could
         // show a new picture driven by the previous take's voice.
-        (async()=>{ const r=await fetch('narration.mp3?v='+TL.vo);
+        (async()=>{ const r=await fetch('narration.mp3?v='+VOHASH);
                     if(!r.ok) throw new Error('narration '+r.status);
                     return await AU.ctx.decodeAudioData(await r.arrayBuffer()); })(),
         new Promise((_,rej)=>setTimeout(()=>rej(new Error('voice timed out')),8000))

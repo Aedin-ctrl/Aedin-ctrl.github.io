@@ -1,7 +1,12 @@
-# CATHODE DESK — house style v1.4
+# CATHODE DESK — house style v1.5
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.5 (2026-11-08)** — sampler rebuilt from scratch on the kept layer
+> library. Breaks are now uniform by construction, on-screen words appear as
+> they are spoken, and "nothing off screen / nothing overlapping" is checked
+> by a sweep rather than by eye. See *Pacing*, *Layout* and *Research*.
+>
 > **v1.4 (2026-11-08)** — the timeline table is now GENERATED from the
 > measured narration rather than hand-written, after a trimming filter was
 > found to be silently eating the voice's own pauses. See *Pacing*.
@@ -177,15 +182,22 @@ two complaints it earns: the content is too fast and the voice cadence is wrong.
 Placing lines by hand arithmetic is how "zero point six" ended up being spoken
 **4.3 seconds after** that number finished counting on screen. Do this instead:
 
-1. **One audio file per beat**, not per line, so the voice does its own
-   inter-sentence pacing instead of you stitching gaps between separate renders.
-   That stitching is what makes cadence sound wrong.
+1. **One audio file per SENTENCE.** Then the gap between sentences is yours and
+   is identical everywhere — uniform by construction rather than whatever the
+   synth felt like. (Per-beat renders gave uneven 0.27–0.41s pauses.) Use one
+   constant within a beat and a larger one between beats, and assert at build
+   time that every measured gap equals one of the two.
 2. **Write every sentence to END on the word that triggers its visual** —
    "Honey sits at zero point six.", "Plain water is seven.", "…a trace of
    peroxide." Then the anchor is the end of the sentence.
-3. **Read the sentence boundaries back from the TTS.** edge-tts emits
-   `SentenceBoundary` events with offsets. (It no longer emits `WordBoundary`
-   for any voice — don't plan around per-word timings.)
+3. **Get word onsets by transcribing your own audio back.** edge-tts no longer
+   emits `WordBoundary` for any voice (checked across four), only
+   `SentenceBoundary`. So run the rendered wav through `whisper-cli --max-len 1
+   --split-on-word` and read the onsets off that. Match its tokens to your words
+   greedily on normalised text and interpolate across runs that don't match —
+   it writes "0.6" where the script says "zero point six", so a plain
+   token-count comparison fails on every sentence with a number in it.
+   **Report the match rate**; this build is 90%.
 4. **Measure the real speech end off the waveform.** A boundary's `duration`
    runs to the start of the *next* sentence, so it includes the pause after the
    last word; landing a counter on it is late by the length of that pause. Take
@@ -275,6 +287,24 @@ a hint — felt, never followed. If you can name the tune, it is too loud.
 
 ---
 
+## Research
+
+Check the mechanism before writing the script, not after drawing it. Three
+claims in the honey sampler survived four versions before being checked:
+
+- **"Bees add peroxide" was wrong for a sealed jar.** Glucose oxidase is
+  *inactive* in ripened, undiluted honey and only regains activity on dilution.
+  Peroxide explains honey on a wound, not honey in a jar.
+- **"Nothing can grow in it" was too strong.** Osmotolerant yeasts grow down to
+  aw ≈ 0.61; honey at 0.60 is barely under.
+- **"It never spoils" was the headline, not the fact.** Honey ferments above
+  ~19% moisture, and it is hygroscopic — left open it pulls water out of the air
+  until it gets there. The seal is doing as much work as the sugar.
+
+The corrected version is a better story than the one it replaced, which is
+usually how this goes. **A surprising-but-wrong beat is worth less than the
+true mechanism underneath it.**
+
 ## Layout
 
 **Measure the glyph before placing it.** Press Start 2P is about **0.98 × size**
@@ -284,6 +314,17 @@ and into the word beyond it, in a build that had already been reviewed.
 
 When a label does not fit beside a thing, **give it its own row**. Shrinking it is
 not available: the legibility floor is a floor.
+
+**Check it, don't eyeball it.** Record every text extent drawn and sweep the whole
+piece:
+
+- `checkBounds()` — anything leaving the window's client area. Chrome (title bar,
+  status bar, dialogs over the desktop) is judged against the full buffer instead.
+- `checkOverlap()` — any two labels landing on top of each other in the same
+  frame. Skip identical strings within 1px of themselves, which is `pxShadow`.
+
+Both must return **0** before a build ships. Screenshots catch the frame you
+happen to look at; the sweep catches the one you don't.
 
 ## Accuracy
 
