@@ -1,6 +1,15 @@
-# CATHODE DESK — house style v1.0
+# CATHODE DESK — house style v1.1
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v1.1 (2026-11-08)** — two changes, both made because the v1.0 build was
+> measured and watched, not because the look needed softening:
+> 1. **Two ticks.** Drawn content still steps at 12fps; continuous motion moves
+>    at 24fps. See *Motion* below.
+> 2. **Sound is built, not pending.** See *Sound*.
+>
+> Nothing else moved. The palette, the layer order, the type floors and the
+> determinism rule are unchanged from v1.0.
 
 One medium, derived from four references (16-Bit Pixel Odyssey, Voxel Diorama,
 Win95 Desktop, Phosphor Terminal). It is **not** four styles switched between.
@@ -85,8 +94,20 @@ inside the screen area. Chrome bevels are hard 2px, never soft.
 
 ## Motion
 
-- **12 fps logic tick** for anything in the screen layer: `T = Math.floor(t*12)/12`.
-  The glass layer may run at full rate (scanline roll, grain).
+**Two ticks, and they are not interchangeable.**
+
+- **12 fps content tick** — `T = Math.floor(t*12)/12`. Everything *drawn*:
+  sprites, dither, typed text, the blink, the status line, and every beat
+  boundary. This is what makes it read as a drawn medium.
+- **24 fps motion tick** — `M = Math.floor(t*24)/24`. Everything that *moves
+  continuously*: the cursor, voxel drop-in, arrow draw-on, counters settling,
+  outline zooms, mosaic block size.
+- The glass layer may run at full rate (scanline roll, grain).
+
+Content on 2s, movement on 1s — the oldest split in hand-drawn animation. v1.0
+ran everything at 12 and the result read as a slideshow under the cursor moves.
+Do **not** raise the content tick to fix smoothness; raise the motion tick.
+
 - Positions snap to whole buffer pixels. No sub-pixel drift.
 - Voxels **drop in** from above over 0.32s, `H.ease.out`, landing ~0.22s in.
 - Chrome opens with **outline-zoom rectangles** (3 trailing wireframes, 0.12 apart).
@@ -107,6 +128,10 @@ A new beat does **not** automatically mean a new scene. When the next idea
 builds on the last, keep it continuous — the label becomes the next heading,
 the counter grows into the chart.
 
+**A transition peaks on the frame the content swaps.** Blocks grow on the old
+scene and shrink on the new one. Peaking anywhere else turns the second half of
+the transition into a hold on content the viewer has already finished with.
+
 ---
 
 ## Structure of an explainer
@@ -120,6 +145,20 @@ Aim 12–30s. Set it in a `DURATION` constant.
 
 ---
 
+## Performance (it is part of the look)
+
+Draw cost is a style constraint, not an optimisation afterthought: a beat that
+costs 40ms a frame stutters, and stutter reads as cheap no matter how good the
+pixels are. Budget **≤4ms per frame** for the whole composite.
+
+- Anything that is a pure function of its rectangle — banded skies, dithered
+  grounds, glyphs — is **baked once** and blitted, never drawn per pixel per
+  frame. v1.0's dusk plate was ~190,000 `fillRect(1,1)` calls a frame; it
+  measured 42.8ms and ran at 23fps while the rest of the piece ran at 400+.
+- Blit into a `willReadFrequently` buffer with **`putImageData`**, not
+  `drawImage` of a cached canvas — the latter stayed at 40ms.
+- Measure per beat, not per piece. An average hides the one scene that hitches.
+
 ## Determinism (non-negotiable)
 
 Every frame is a pure function of `t`. All randomness from `H.rng(seed)` /
@@ -132,6 +171,19 @@ Expose `window.seek(t)`, `window.DURATION`, `window.scoreSound`.
 
 ## Sound
 
+**Built, in the sampler.** Everything except the voice is synthesised in the
+browser from a score that is a pure function of `t`, so it seeks instantly and
+an offline render mixes from the same data: `window.scoreSound(a, b)` returns
+the events in a window.
+
+The voice is a single pre-rendered track the length of `DURATION`, with one
+line placed on each beat, played from an offset so scrubbing stays in sync.
+Lines are written to the beat's actual length — measure the synthesised audio
+and cut words until it fits; never let a line run into the next beat.
+
+Browsers refuse to start audio without a gesture, so a sampler page plays
+**silent until a button is pressed**, and says so on the button.
+
 Full SOUND kit, unchanged. Medium-true palette only:
 - **Chrome** → real mouse-button snaps, soft UI clicks
 - **Screen** → chip blips (square/triangle), text print blips
@@ -140,6 +192,9 @@ Full SOUND kit, unchanged. Medium-true palette only:
 
 Hierarchy: effects in front, bed clearly under, **≤3 sounds at once**, and small
 silences so the big hits read. A sound starts on the exact frame its event appears.
+
+Mix, as built: voice 1.00 · effects 0.40 · music 0.085 · hum 0.030. The music is
+a hint — felt, never followed. If you can name the tune, it is too loud.
 
 ---
 

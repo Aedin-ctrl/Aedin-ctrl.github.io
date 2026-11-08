@@ -52,15 +52,18 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.0 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.1 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
-  layers in order, every time. Sampler content: why sealed honey doesn't spoil.</p>
+  layers in order, every time. Sampler content: why sealed honey doesn't spoil.
+  <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
+  without a click, so it plays silent until you do.</p>
 </header>
 
 <div class="stage">
   <canvas id="tv" width="1280" height="720"></canvas>
   <div class="bar">
     <button id="pp">PLAY</button>
+    <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
     <span class="t" id="time">0.00 / 16.0</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
@@ -78,6 +81,26 @@
       cube stacks, three-tone faces, AO in the creases.</p><span class="src">from Voxel Diorama</span></div>
     <div class="card"><h3>4 · GLASS</h3><p>Finishing pass over the whole composite. Scanlines, bloom,
       vignette, grain, slight green lift.</p><span class="src">from Phosphor Terminal</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>SOUND — ONE SOURCE PER LAYER</h2>
+  <div class="layers">
+    <div class="card"><h3>1 · CHROME</h3><p>Mouse-button snaps and soft UI clicks. The dialog opening,
+      the cursor arriving, OK going down.</p><span class="src">noise burst + square tick</span></div>
+    <div class="card"><h3>2 · SCREEN</h3><p>Chip blips. One per four characters of each typed line, so
+      text prints rather than appears.</p><span class="src">square, 28ms</span></div>
+    <div class="card"><h3>3 · OBJECTS</h3><p>Hollow plastic knocks as the stacks land — every third
+      cube, so a bar reads as a stack and not a drum roll.</p><span class="src">triangle 250→110Hz</span></div>
+    <div class="card"><h3>4 · GLASS</h3><p>Mains hum under everything, and a phosphor zap on each of
+      the two emphasis frames.</p><span class="src">60+120Hz bed · saw sweep</span></div>
+  </div>
+  <div class="note" style="margin-top:14px">
+    Everything but the voice is synthesised in the browser from the same score the picture uses, so it
+    seeks instantly and stays a pure function of <code>t</code>. <code>window.scoreSound(a,b)</code> returns
+    the events in a window — that is what an offline render would mix from. The voice is one 16s track
+    (edge-tts, six lines placed on their beats); the music is a hint, well under the voice.
   </div>
 </section>
 
@@ -119,9 +142,12 @@
   <b>Determinism.</b> Every frame is a pure function of <code>t</code> — all randomness from
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
   so the frame-by-frame video renderer works.<br><br>
-  <b>This sampler is visual only.</b> The full spec also mandates the unchanged SOUND kit (chip blips for
-  the screen layer, plastic block knocks for objects, mains hum + phosphor zap for glass). Spec:
-  <code>~/Desktop/Video/CATHODE-DESK.md</code>
+  <b>Two ticks, not one.</b> Drawn content still steps at <b>12fps</b> — sprites, dither, typed text,
+  the blink. Continuous motion runs on its own <b>24fps</b> tick — the cursor, the voxel drops, the
+  arrows, the counters. Shooting the content on 2s and the movement on 1s is why this glides without
+  turning into 60fps video.<br><br>
+  <b>Still a style demo, not a Short.</b> 1280×720 landscape. Going to 9:16 means re-composing every
+  beat, not cropping. Spec: <code>~/Desktop/Video/CATHODE-DESK.md</code>
 </div>
 </div>
 
@@ -224,17 +250,64 @@ function px(str,x,y,size,col,align,font){
     for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(d[(j*w+i)*4+3]>120)pts.push([i,j]);
     g={pts,w};TCACHE.set(key,g);}
   let ox=Math.round(x);if(align==='center')ox=Math.round(x-g.w/2);if(align==='right')ox=Math.round(x-g.w);
-  const oy=Math.round(y);B.fillStyle=col;
-  for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1);
+  const oy=Math.round(y);
+  // A string is drawn hundreds of times at the same size and colour, so the
+  // thresholded glyph is baked into a small canvas per (string,size,font,colour)
+  // and blitted. Same pixels, one drawImage instead of one fillRect per lit
+  // pixel. Falls back to the per-pixel path for any non-hex colour.
+  const ck=key+'|'+col;
+  let tc=CCACHE.get(ck);
+  if(tc===undefined){ tc=bakeGlyph(g,col); CCACHE.set(ck,tc);
+    if(CCACHE.size>700) CCACHE.clear(); }
+  if(tc) B.drawImage(tc,ox,oy);
+  else { B.fillStyle=col; for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1); }
   return g.w;}
+const CCACHE=new Map();
+function bakeGlyph(g,col){
+  if(typeof col!=='string'||col[0]!=='#') return null;   // rgba()/gradient: draw live
+  let w=1,h=1; for(const[i,j]of g.pts){if(i>=w)w=i+1;if(j>=h)h=j+1;}
+  const c=H.layer(w,h),x=c.getContext('2d',{willReadFrequently:true}),id=x.createImageData(w,h),d=id.data,[r,gg,b]=H.hex(col);
+  for(const[i,j]of g.pts){const o=(j*w+i)*4;d[o]=r;d[o+1]=gg;d[o+2]=b;d[o+3]=255;}
+  x.putImageData(id,0,0); return c;}
 function pxShadow(str,x,y,size,col,shadow,align,font){
   px(str,x+1,y+1,size,shadow,align,font);return px(str,x,y,size,col,align,font);}
 
 /* --- LAYER 2: SCREEN (16-bit) --- */
-function skyBands(x0,y0,w,h){
-  for(let y=0;y<h;y++){const f=Math.pow(H.clamp(y/h),1.2)*(P.sky.length-1);
-    const i=Math.min(P.sky.length-2,Math.floor(f)),a=H.smooth(0.55,1,f-i);
-    dline(y0+y,x0,x0+w,P.sky[i],P.sky[i+1],a);}}
+// The dusk plate (banded sky + dithered ground) is a pure function of its
+// rectangle, so it is baked ONCE into a canvas and blitted after that.
+// Drawn live it was ~190,000 1x1 fillRects per frame and measured 42.8ms --
+// beat 2 ran at 23fps while the rest of the piece ran at 400+. The dither
+// phase is taken from ABSOLUTE x,y, exactly as dline() did, so the cached
+// pixels are identical to the ones this replaces.
+const PLATE=new Map();
+// Baked ONCE as raw ImageData and written with putImageData, which is the
+// fast path into a willReadFrequently canvas. drawImage of a cached canvas
+// was tried first and stayed at 40ms/frame; putImageData is the one that
+// actually lands. Because putImageData ignores the clip, the plate is baked
+// already trimmed to the client area's clip rect (2px in on every side) --
+// the band and dither maths still use the ORIGINAL full-rect coordinates, so
+// the pixels are identical to the ones dline() drew.
+function duskPlate(x0,y0,w,h,groundH){
+  const key=x0+','+y0+','+w+','+h+','+groundH;
+  let d=PLATE.get(key); if(d) return d;
+  const iw=w-4, ih=h-4;
+  const id=B.createImageData(iw,ih), a=id.data;
+  const row=(j,c1,c2,amt)=>{const A=H.hex(c1),C=H.hex(c2),ay=y0+2+j;
+    for(let i=0;i<iw;i++){const col=(amt>bay(x0+2+i,ay))?C:A,o=(j*iw+i)*4;
+      a[o]=col[0];a[o+1]=col[1];a[o+2]=col[2];a[o+3]=255;}};
+  for(let j=0;j<ih;j++){
+    const y=j+2;                                  // y inside the ORIGINAL rect
+    let c1,c2,amt;
+    if(groundH && y>=h-groundH){ c1='#2c1658'; c2='#43206a'; amt=(y-(h-groundH))/groundH; }
+    else { const f=Math.pow(H.clamp(y/h),1.2)*(P.sky.length-1);
+           const i=Math.min(P.sky.length-2,Math.floor(f));
+           c1=P.sky[i]; c2=P.sky[i+1]; amt=H.smooth(0.55,1,f-i); }
+    row(j,c1,c2,amt);}
+  PLATE.set(key,id); return id;}
+function skyBands(x0,y0,w,h,groundH){B.putImageData(duskPlate(x0,y0,w,h,groundH||0),x0+2,y0+2);}
+// Cache occupancy, for the next time someone benchmarks this: a count that
+// climbs with the frame number means something is missing the cache.
+window.cacheSizes=()=>({plates:PLATE.size,glyphs:CCACHE.size,text:TCACHE.size});
 function stars(x0,y0,w,h,n,seed,T){const r=H.rng(seed);
   for(let s=0;s<n;s++){const x=x0+r.int(0,w-1),y=y0+r.int(0,h-1),ph=r()*6.28;
     if(Math.sin(T*3+ph)>-0.3)rect(x,y,1,1,y<y0+h*0.4?'#fff4d8':'#a88ac8');}}
@@ -317,7 +390,14 @@ function glass(ctx,W,Hh,t,boost){
 /* ===== THE EXPLAINER: why sealed honey does not spoil ===== */
 function explainer(ctx,W,Hh,t){
   const T=Math.floor(t*12)/12;                 // 12fps logic tick for the screen layer
-  const ph=(a,b)=>H.clamp((T-a)/(b-a));
+  // Continuous MOTION runs on its own 24fps tick. Shooting the drawn content
+  // on 2s and the movement on 1s is the oldest trick in hand-drawn animation,
+  // and it is why this now glides without becoming 60fps video: sprites,
+  // dither, typed text and the blink still step at 12, while the cursor, the
+  // voxel drops, the arrows and the counters interpolate at 24.
+  const M=Math.floor(t*24)/24;
+  const ph=(a,b)=>H.clamp((T-a)/(b-a));        // 12fps: content
+  const mp=(a,b)=>H.clamp((M-a)/(b-a));        // 24fps: motion
   const typed=(s,a,cps)=>s.slice(0,Math.max(0,Math.floor((T-a)*cps)));
   const blink=Math.floor(T*2.2)%2===0;
   let boost=1;
@@ -328,7 +408,7 @@ function explainer(ctx,W,Hh,t){
 
   /* --- BEAT 1 (0–2.0): the question as a Win95 help dialog --- */
   const DLG=[170,110,300,112];
-  zoomRect([4,340,54,16],DLG,T,0.05,0.32);
+  zoomRect([4,340,54,16],DLG,M,0.05,0.32);
   if(T>=0.32&&T<1.95){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
     // ? balloon
@@ -339,7 +419,7 @@ function explainer(ctx,W,Hh,t){
     if(T>1.0)px(typed('honey never spoil?',1.0,26),r.x+48,r.y+30,9,'#000');
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',T>1.75);
   }
-  zoomRect(DLG,[8,8,624,318],T,1.95,2.35);
+  zoomRect(DLG,[8,8,624,318],M,1.95,2.35);
 
   /* --- the main window holds every later beat --- */
   if(T>=2.35){
@@ -354,21 +434,19 @@ function explainer(ctx,W,Hh,t){
     rect(r.x+364,sy,r.w-364,14,P.face);bevel(r.x+364,sy,r.w-364,14,'field');
     // these MUST match the scene boundaries below -- they drifted once and the
     // status line announced ACID while the water chart was still on screen.
-    const beat=T<6.0?'INTRO':T<9.3?'WATER':T<11.9?'OSMOSIS':T<14.0?'ACID':'DONE';
+    const beat=T<5.8?'INTRO':T<9.3?'WATER':T<11.9?'OSMOSIS':T<14.0?'ACID':'DONE';
     px('NX-80  '+beat,r.x+4,sy+1,12,'#000',null,'"VT323"');
     px(T.toFixed(1)+'s',r.x+r.w-6,sy+1,12,'#000','right','"VT323"');
 
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
     /* --- BEAT 2 (2.35–5.6): SCREEN layer. dusk sky + the jar --- */
-    if(T<6.0){
-      skyBands(CX,CY,CWd,CHd);
-      stars(CX,CY,CWd,CHd*0.5,42,7,T);
-      // ground band
-      for(let y=CY+CHd-46;y<CY+CHd;y++)dline(y,CX,CX+CWd,'#2c1658','#43206a',(y-(CY+CHd-46))/46);
-      const jy=CY+CHd-46-13*4+Math.round(Math.sin(T*2)*1);
+    if(T<5.8){
+      skyBands(CX,CY,CWd,CHd,46);          // sky + ground in one cached blit
+      stars(CX,CY,CWd,CHd*0.5,42,7,T);     // live: they twinkle on T
+      const jy=CY+CHd-46-13*4+Math.round(Math.sin(M*2)*1);
       sprite('jar',CX+52,jy,4);
-      if(T>3.0){const k=H.ease.back(ph(3.0,3.3));
+      if(T>3.0){const k=H.ease.back(mp(3.0,3.3));
         if(k>0)blockTag(CX+100,jy+58,'SEALED HONEY',10,P.paper,'#74432d');}
       if(T>3.6){
         pxShadow('IT NEVER',CX+250,CY+56,16,P.gold,P.ink);
@@ -376,18 +454,16 @@ function explainer(ctx,W,Hh,t){
       if(T>4.4)pxShadow(typed('Not because of preservatives.',4.4,22),CX+250,CY+122,14,'#ffd28a',P.ink);
       if(T>5.0)pxShadow(typed('Three things make it hostile.',5.0,22),CX+250,CY+144,14,'#ffd28a',P.ink);
     }
-    /* mosaic out */
-    if(T>=5.6&&T<6.0)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-Math.abs(T-5.8)/0.2*15));
 
     /* --- BEAT 3 (6.0-9.3): OBJECTS layer. voxel bars, water content --- */
     if(T>=5.8&&T<9.3){
-      if(T>=6.0){
+      if(T>=5.8){
         rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
         // box stops short of the panel floor so the conclusion line has clear
         // space -- the arrow used to cut straight through the BACTERIA tag.
         groupBox(CX+12,CY+10,CWd-24,CHd-74,'WATER ACTIVITY');
         const Pr=proj(CX+150,CY+172);
-        const d1=ph(6.2,7.1),d2=ph(6.9,7.9);
+        const d1=mp(6.2,7.1),d2=mp(6.9,7.9);
         // 1 cube = 0.05 aw, so the bar heights ARE the values. Honey's water
         // activity is ~0.60; most bacteria need >= ~0.91 to grow. Comparing
         // honey's 17% water CONTENT against a 0.91 ACTIVITY threshold, as this
@@ -396,13 +472,13 @@ function explainer(ctx,W,Hh,t){
         voxBar(Pr,7,0,18,P.ice,d2);          // bacteria need aw >= ~0.91
         if(d1>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.paper,'#74432d');
         if(d2>0.9)blockTag(CX+240,CY+190,'BACTERIA',11,P.ice,'#0a0618');
-        if(T>6.4){const v=(0.60*H.ease.out(ph(6.4,7.1))).toFixed(2);
+        if(T>6.4){const v=(0.60*H.ease.out(mp(6.4,7.1))).toFixed(2);
           px(v,CX+392,CY+30,42,P.orange,null,'"Silkscreen"');
           px('water activity in honey',CX+392,CY+82,15,'#d9d2e6',null,'"VT323"');}
-        if(T>7.2){const v=(0.91*H.ease.out(ph(7.2,7.9))).toFixed(2);
+        if(T>7.2){const v=(0.91*H.ease.out(mp(7.2,7.9))).toFixed(2);
           px(v,CX+392,CY+112,42,P.ice,null,'"Silkscreen"');
           px('bacteria need this much',CX+392,CY+164,15,'#d9d2e6',null,'"VT323"');}
-        if(T>8.2){const k=ph(8.2,8.7);
+        if(T>8.2){const k=mp(8.2,8.7);
           dottedArrow([[CX+430,CY+196],[CX+430,CY+228],[CX+196,CY+228]],k,P.green);
           if(k>0.9)pxShadow('TOO DRY TO LIVE IN',CX+184,CY+236,13,P.green,P.ink,'center');}
       }
@@ -414,8 +490,8 @@ function explainer(ctx,W,Hh,t){
       groupBox(CX+14,CY+12,CWd-28,150,'WHAT HAPPENS TO A MICROBE');
       sprite('bug',CX+56,CY+60,5);
       if(T>9.8){
-        dottedArrow([[CX+110,CY+78],[CX+210,CY+78]],ph(9.8,10.2),P.cyan);
-        if(ph(9.8,10.2)>=1)pxShadow('water pulled OUT',CX+112,CY+52,14,P.cyan,P.ink);}
+        dottedArrow([[CX+110,CY+78],[CX+210,CY+78]],mp(9.8,10.2),P.cyan);
+        if(mp(9.8,10.2)>=1)pxShadow('water pulled OUT',CX+112,CY+52,14,P.cyan,P.ink);}
       if(T>10.4){
         // the ✗
         B.fillStyle=P.red;
@@ -431,11 +507,11 @@ function explainer(ctx,W,Hh,t){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
       const Pr=proj(CX+150,CY+172);
-      const dp=ph(12.0,12.7);
+      const dp=mp(12.0,12.7);
       voxBar(Pr,0,0,4,P.red,dp);             // honey, pH ~3.9
-      voxBar(Pr,7,0,7,'#9fcb55',ph(12.4,13.1));    // neutral water, pH 7 (1 cube = 1 pH unit)
+      voxBar(Pr,7,0,7,'#9fcb55',mp(12.4,13.1));    // neutral water, pH 7 (1 cube = 1 pH unit)
       if(dp>0.9)blockTag(CX+118,CY+190,'HONEY',11,P.red,'#fff4e2');
-      if(ph(12.4,13.1)>0.9)blockTag(CX+240,CY+190,'WATER',11,P.grass,'#0a0618');
+      if(mp(12.4,13.1)>0.9)blockTag(CX+240,CY+190,'WATER',11,P.grass,'#0a0618');
       // hero number, inverse video on the emphasis beat. The box is sized from
       // the glyph height -- a fixed 52px box cropped the digits.
       const NS=40,NW=150,NH=NS+18,inv=T>12.1&&(T>12.9||Math.floor((T-12.1)*8)%2===0);
@@ -445,13 +521,23 @@ function explainer(ctx,W,Hh,t){
       if(T>12.8){const v=(7).toFixed(0);
         px('7',CX+392,CY+124,NS,P.grass,null,'"Silkscreen"');
         px('pH of plain water',CX+392,CY+182,15,'#d9d2e6',null,'"VT323"');}
-      if(T>13.2){const k=ph(13.2,13.6);
+      if(T>13.2){const k=mp(13.2,13.6);
         dottedArrow([[CX+430,CY+208],[CX+430,CY+228],[CX+196,CY+228]],k,P.green);
         if(k>0.9)pxShadow('+ BEES ADD PEROXIDE',CX+184,CY+236,13,P.green,P.ink,'center');}
     }
+    /* --- scene changes: the medium's own mosaic, stepped on M, peaking on the
+       exact frame the content swaps so the blocks grow on the old scene and
+       shrink on the new one. 9.3 and 11.9 were hard cuts. Runs last, after
+       every beat has drawn into the buffer. --- */
+    for(const tc of [5.8,9.3,11.9]){const dd=Math.abs(M-tc);
+      if(dd<0.2)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.2*15));}
     B.restore();
 
     /* --- BEAT 6 (14.0–16): the takeaway, as a message box --- */
+    // Finishes exactly when the box appears at 14.0, so the outlines are the
+    // box arriving. Running it PAST 14.0 hid every frame of it behind the
+    // box that had already landed on top.
+    zoomRect([310,150,24,14],[140,96,360,124],M,13.80,14.00);
     if(done){
       const m=winFrame(140,96,360,124,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
@@ -468,7 +554,7 @@ function explainer(ctx,W,Hh,t){
   const CK=[[0,420,300],[1.2,322,196],[1.9,322,196],[2.5,120,40],[5.4,120,40],[6.0,300,150],[9.0,300,150],
             [9.6,250,80],[11.8,250,80],[12.4,330,60],[14.0,330,60],[14.6,320,210],[16,320,210]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
-  for(let i=0;i<CK.length-1;i++)if(T<CK[i+1][0]){const e=H.ease.inOut(H.clamp((T-CK[i][0])/(CK[i+1][0]-CK[i][0])));
+  for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
   cursor(cx,cy);
 
@@ -479,29 +565,190 @@ function explainer(ctx,W,Hh,t){
   glass(ctx,W,Hh,t,boost);
 }
 
+/* ===== LAYER SOUND =====
+   The spec's kit, one source per layer: chrome = UI snaps, screen = chip
+   blips, objects = hollow plastic knocks, glass = mains hum + phosphor zap.
+   Everything except the voice is synthesised, so it costs no bytes, seeks
+   instantly and stays a pure function of t like the picture does.
+
+   Browsers will not start audio without a user gesture, so nothing is built
+   until SOUND ON is pressed -- the picture plays silent until then, which is
+   why the button says what it says. */
+const AU={on:false,ctx:null,t0:0,i:0,vo:null,voBuf:null,hum:null,g:{}};
+
+function auBuild(){
+  const C=window.AudioContext||window.webkitAudioContext; if(!C) return false;
+  const c=new C(); AU.ctx=c;
+  const mk=(v,to)=>{const g=c.createGain();g.gain.value=v;g.connect(to||c.destination);return g;};
+  AU.g.master=mk(0.9);
+  AU.g.voice =mk(1.00,AU.g.master);   // the voice is the thing being listened to
+  AU.g.sfx   =mk(0.40,AU.g.master);   // effects in front of the bed, under the voice
+  AU.g.music =mk(0.085,AU.g.master);  // "a hint" -- felt, not followed
+  AU.g.hum   =mk(0.030,AU.g.master);  // the tube, not a note
+  // noise once, reused by every click/knock/zap
+  const n=c.createBuffer(1,c.sampleRate*0.5,c.sampleRate),d=n.getChannelData(0);
+  let seed=12345; for(let i=0;i<d.length;i++){seed=(seed*1664525+1013904223)|0;d[i]=(seed/2147483648);}
+  AU.noise=n; return true;
+}
+const env=(g,t,a,dec,peak)=>{g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+a);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+a+dec);};
+function noiseAt(t,dur,type,freq,q,peak,dest){
+  const c=AU.ctx,s=c.createBufferSource();s.buffer=AU.noise;
+  s.loop=true;s.playbackRate.value=1;
+  const f=c.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;
+  const g=c.createGain();s.connect(f);f.connect(g);g.connect(dest||AU.g.sfx);
+  env(g,t,0.002,dur,peak);s.start(t);s.stop(t+dur+0.05);
+}
+function toneAt(t,type,f0,f1,dur,peak,dest,atk){
+  const c=AU.ctx,o=c.createOscillator(),g=c.createGain();
+  o.type=type;o.frequency.setValueAtTime(f0,t);
+  if(f1!==f0)o.frequency.exponentialRampToValueAtTime(Math.max(20,f1),t+dur);
+  o.connect(g);g.connect(dest||AU.g.sfx);
+  env(g,t,atk||0.004,dur,peak);o.start(t);o.stop(t+dur+0.06);
+}
+/* one function per kit entry, so a beat's sound is named not improvised */
+const SFX={
+  click:t=>{noiseAt(t,0.022,'bandpass',2600,1.1,0.55);toneAt(t,'square',1500,900,0.016,0.10);},
+  snap: t=>{noiseAt(t,0.035,'bandpass',1700,0.9,0.42);toneAt(t,'square',900,520,0.022,0.09);},
+  open: t=>{toneAt(t,'square',320,1180,0.17,0.11);noiseAt(t+0.01,0.12,'highpass',1800,0.7,0.16);},
+  blip: (t,n)=>{toneAt(t,'square',880+((n|0)%3)*110,880+((n|0)%3)*110,0.028,0.085);},
+  knock:(t,n)=>{toneAt(t,'triangle',250-((n|0)%3)*18,110,0.085,0.42);
+                noiseAt(t,0.03,'lowpass',900,0.8,0.22);},
+  tag:  t=>{toneAt(t,'triangle',520,300,0.07,0.30);noiseAt(t,0.02,'bandpass',1200,1,0.16);},
+  draw: t=>{toneAt(t,'square',420,1250,0.26,0.055);},
+  zap:  t=>{toneAt(t,'sawtooth',1500,180,0.16,0.42);noiseAt(t,0.1,'bandpass',2400,0.6,0.3);},
+  mos:  t=>{noiseAt(t,0.17,'bandpass',800,0.5,0.34);toneAt(t,'square',200,90,0.14,0.10);},
+  note: (t,f,d)=>{const c=AU.ctx,o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=2200;o.type='square';o.frequency.value=f;
+    o.connect(lp);lp.connect(g);g.connect(AU.g.music);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.5,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.start(t);o.stop(t+d+0.05);},
+  bass: (t,f,d)=>{const c=AU.ctx,o=c.createOscillator(),g=c.createGain();
+    o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(AU.g.music);
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.75,t+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.start(t);o.stop(t+d+0.05);}
+};
+
+/* ---- the score: every entry names the frame its event appears on ---- */
+function buildScore(){
+  const E=[],add=(t,k,n)=>E.push({t:+t.toFixed(3),k,n});
+  // chrome
+  add(0.05,'open');            // the help dialog outline-zooms open
+  add(1.20,'snap');            // cursor reaches the dialog
+  add(1.75,'click');           // OK goes down
+  add(1.95,'open');            // zoom out into the main window
+  add(14.00,'open');           // the takeaway message box
+  add(14.62,'snap');           // cursor lands on its OK
+  // screen: text print blips, one per 4 characters of each typed line
+  const typed=[[0.45,15,26],[1.00,18,26],[4.40,29,22],[5.00,29,22],[11.00,31,24],[11.30,30,24]];
+  typed.forEach(([t0,len,cps])=>{for(let i=0;i<len;i+=4)add(t0+i/cps,'blip',i);});
+  // objects: the stacks land. Every 3rd cube, so it reads as a stack and not a drum roll.
+  const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
+  bar(6.20,7.10,12,3); bar(6.90,7.90,18,4);      // beat 3: water activity
+  bar(12.00,12.70,4,1); bar(12.40,13.10,7,2);    // beat 5: pH
+  add(7.10,'tag'); add(7.90,'tag'); add(12.70,'tag'); add(13.10,'tag');
+  // arrows draw on, then the conclusion lands
+  [[8.20,8.70],[9.80,10.20],[13.20,13.60]].forEach(([a,b])=>{add(a,'draw');add(b,'tag');});
+  // glass: the two emphasis frames, exactly where boost rises
+  add(9.45,'zap'); add(12.10,'zap');
+  // scene changes
+  [5.80,9.30,11.90].forEach(t=>add(t,'mos'));
+  // music: a hint only. Am-ish eighth-note figure, bass on the bar.
+  const BPM=112, E8=30/BPM, FIG=[220.00,261.63,329.63,261.63,293.66,349.23,293.66,261.63];
+  for(let i=0,t=2.30;t<15.6;i++,t+=E8){
+    add(t,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
+    if(i%8===0) add(t,'bass',FIG[0]/2);
+  }
+  E.sort((a,b)=>a.t-b.t); return E;
+}
+const SCORE=buildScore();
+// the spec asks for this: the offline renderer mixes from the same score
+window.scoreSound=(a,b)=>SCORE.filter(e=>e.t>=a&&e.t<b);
+window.AU=AU;   // so a test can assert the voice actually decoded, not just that a button exists
+
+/* ---- transport ---- */
+function auStartHum(){
+  if(AU.hum) return; const c=AU.ctx; AU.hum=[];
+  [60,120].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();
+    o.type='sine';o.frequency.value=f;g.gain.value=i?0.35:1;
+    o.connect(g);g.connect(AU.g.hum);o.start();AU.hum.push(o);});
+}
+function auSeek(t){                       // audio follows the picture, never leads
+  if(!AU.on||!AU.ctx) return;
+  AU.i=0; while(AU.i<SCORE.length&&SCORE[AU.i].t<t) AU.i++;
+  AU.t0=AU.ctx.currentTime-t;
+  if(AU.vo){try{AU.vo.stop();}catch(e){} AU.vo=null;}
+  if(AU.voBuf&&t<DURATION-0.05){
+    const s=AU.ctx.createBufferSource();s.buffer=AU.voBuf;s.connect(AU.g.voice);
+    s.start(AU.ctx.currentTime,Math.max(0,t)); AU.vo=s;}
+}
+function auStop(){ if(AU.vo){try{AU.vo.stop();}catch(e){} AU.vo=null;} }
+function auTick(t){                       // schedule a 0.25s lookahead
+  if(!AU.on||!AU.ctx) return;
+  const c=AU.ctx, until=t+0.25;
+  while(AU.i<SCORE.length&&SCORE[AU.i].t<until){
+    const e=SCORE[AU.i++], when=Math.max(c.currentTime,AU.t0+e.t);
+    try{ if(e.k==='note')SFX.note(when,e.n,0.21);
+         else if(e.k==='bass')SFX.bass(when,e.n,0.5);
+         else SFX[e.k](when,e.n); }catch(err){}
+  }
+}
+
 /* ===== player ===== */
 const cv=document.getElementById('tv'),ctx=cv.getContext('2d');
 const ppB=document.getElementById('pp'),scrub=document.getElementById('scrub'),
-      timeEl=document.getElementById('time'),loopEl=document.getElementById('loop');
+      timeEl=document.getElementById('time'),loopEl=document.getElementById('loop'),
+      sndB=document.getElementById('snd');
 let cur=0,playing=false,last=0;
 buildGlass(1280,720);
 window.DURATION=DURATION;
 window.seek=(t)=>{cur=H.clamp(t,0,DURATION);explainer(ctx,1280,720,cur);
   scrub.value=(cur/DURATION)*1000;timeEl.textContent=cur.toFixed(2)+' / '+DURATION.toFixed(1);};
 function frame(ts){if(!playing)return;
-  const dt=(ts-last)/1000;last=ts;cur+=dt;
-  if(cur>=DURATION){if(loopEl.checked)cur=0;else{cur=DURATION;setPlay(false);}}
-  window.seek(cur);requestAnimationFrame(frame);}
+  // dt is clamped: a backgrounded tab hands back a delta of seconds, which
+  // used to jump the picture past half the piece while the audio stayed put.
+  const dt=Math.min(0.1,(ts-last)/1000);last=ts;cur+=dt;
+  if(cur>=DURATION){
+    if(loopEl.checked){cur=0;auSeek(0);}else{cur=DURATION;setPlay(false);}}
+  window.seek(cur);auTick(cur);requestAnimationFrame(frame);}
 function setPlay(v){playing=v;ppB.textContent=v?'PAUSE':'PLAY';
-  if(v){last=performance.now();requestAnimationFrame(frame);}}
+  if(v){last=performance.now();auSeek(cur);requestAnimationFrame(frame);}else auStop();}
 ppB.onclick=()=>setPlay(!playing);
-scrub.oninput=()=>{window.seek((scrub.value/1000)*DURATION);};
+scrub.oninput=()=>{window.seek((scrub.value/1000)*DURATION);auSeek(cur);};
 document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();setPlay(!playing);}});
+
+/* --- audio is armed by a click, because browsers require one --- */
+async function armAudio(){
+  if(!AU.ctx && !auBuild()){sndB.textContent='NO AUDIO';return false;}
+  if(AU.ctx.state==='suspended') await AU.ctx.resume();
+  if(!AU.voBuf){
+    sndB.textContent='LOADING';
+    // Raced against a timeout: on a slow connection, or anywhere decodeAudioData
+    // never settles, the button used to sit on LOADING for ever with no way back.
+    // The effects and the bed are synthesised, so they still work voiceless.
+    try{
+      AU.voBuf=await Promise.race([
+        (async()=>{ const r=await fetch('narration.mp3',{cache:'force-cache'});
+                    if(!r.ok) throw new Error('narration '+r.status);
+                    return await AU.ctx.decodeAudioData(await r.arrayBuffer()); })(),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('voice timed out')),8000))
+      ]);
+    }catch(e){ AU.voBuf=null; console.warn('[cathode] voice unavailable:',e.message); }
+  }
+  auStartHum(); return true;
+}
+sndB.onclick=async()=>{
+  if(AU.on){AU.on=false;auStop();AU.g.master.gain.value=0;sndB.textContent='AUDIO OFF';return;}
+  if(!await armAudio()) return;
+  AU.on=true;AU.g.master.gain.value=0.9;sndB.textContent='AUDIO ON';
+  auSeek(cur);
+};
 (async()=>{
   try{await Promise.all(['8px "Press Start 2P"','16px "Press Start 2P"','10px "Silkscreen"',
     '38px "Silkscreen"','9px "VT323"'].map(f=>document.fonts.load(f,'AaZz0123456789%?')));
     await document.fonts.ready;}catch(e){}
-  TCACHE.clear();
+  TCACHE.clear();CCACHE.clear();   // both are keyed on glyphs the fallback font drew
   // ?t=6.5 jumps straight to a frame and holds it -- used for review and for
   // the frame-by-frame video render, which needs a still at an exact time.
   const q=new URLSearchParams(location.search), qt=parseFloat(q.get('t'));
