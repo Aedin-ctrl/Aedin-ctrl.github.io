@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.3 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v1.4 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -65,7 +65,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 54.0</span>
+    <span class="t" id="time">0.00 / 56.5</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -150,7 +150,7 @@
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
   steps reads as a dropped frame, not as a style. The pixel grid is held by the ×2 nearest-neighbour
   blit, not by quantising time.<br><br>
-  <b>The picture is hung off the voice, not off arithmetic.</b> Each beat is one audio file, every
+  <b>56.5 seconds, 48.0 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
   sentence is written to end on the word that triggers its visual, and the sentence boundaries are read
   back from the TTS — then the real end of each sentence's speech is measured off the waveform, because
   the reported boundary runs to the next sentence and so includes the pause after the last word.
@@ -411,38 +411,40 @@ function glass(ctx,W,Hh,t,boost){
    A number therefore finishes counting on the exact frame it is spoken.
 
    Beat voice-ins: B1 0.80  B2 3.70  B3 12.15  B4 28.75  B5 37.60  B6 48.70 */
+/* Generated from the measured narration -- do not hand-edit these numbers.
+   vo4/layout2.py writes this block and the narration track together from
+   vo4/anchors.json, so the picture and the voice cannot disagree. */
 const TL={
-  dur:54.0,
+  dur:56.5,
   // beat 1 -- the question
   openA:0.05, openB:0.40, dlgIn:0.40, dlgOut:3.00,
-  type1:0.80, type2:1.45, ok:2.55, zoomA:2.95, win:3.30,
-  // beat 2 -- the jar.      tag lands on "century", headline on "still good"
-  tagA:5.60, tagB:6.03, headline:6.04, b2t1:7.07, b2t2:9.00,
-  // scene changes (mosaic peaks, in the pause before each beat's voice)
-  sc2:11.75, sc3:28.35, sc4:37.20,
+  type1:0.8, type2:1.45, ok:2.47, zoomA:2.95, win:3.30,
+  // beat 2 -- the jar.   tag lands on "century", headline on "still good"
+  tagA:5.27, tagB:5.7, headline:6.06,
+  b2t1:7.09, b2t2:9.02,
+  // scene changes: mosaic peaks 0.4s before each beat's voice comes in
+  sc2:12.22, sc3:29.85, sc4:39.03,
   // beat 3 -- water activity
-  plates:12.94,                       // empty plinths, so the chart is not bare
-  bar1A:13.69, bar1B:15.00,           // drops under "holds its water so tightly"
-  lab1:18.30,                         // label under "measured as water activity"
-  cnt1A:21.80, cnt1B:23.69,           // 0.60 lands on "six"
-  bar2A:23.90, bar2B:25.10, lab2:23.90,
-  cnt2A:24.90, cnt2B:26.73,           // 0.91 lands on "one"
-  arr1A:26.79, arr1B:27.35, concl1:27.47,
+  plates:13.41,
+  bar1A:14.16, bar1B:15.42,
+  lab1:18.68,
+  cnt1A:22.12, cnt1B:23.85,        // 0.60 lands on "six"
+  bar2A:24.32, bar2B:25.62, lab2:24.32,
+  cnt2A:25.12, cnt2B:26.87,        // 0.91 lands on "one"
+  arr1A:27.26, arr1B:27.97, concl1:29.0,
   // beat 4 -- osmosis
-  arr2A:32.40, arr2B:33.20, pulled:34.62,   // "straight out"
-  xMark:34.70, b4t1:35.20, b4t2:35.90,      // the x lands on "dries"
+  arr2A:33.87, arr2B:34.67, pulled:35.75,
+  xMark:36.2, b4t1:36.62, b4t2:37.32,
   // beat 5 -- acid, then peroxide
-  bar3A:39.30, bar3B:40.20,
-  hero:41.82, heroEnd:42.70, lab3:42.10,    // 3.9 flashes on "nine"
-  bar4A:42.30, bar4B:43.30, seven:43.81,    // the 7 lands on "seven"
-  arr3A:45.80, arr3B:46.60, concl2:47.42,   // conclusion on "peroxide"
+  bar3A:41.07, bar3B:41.97,
+  hero:43.35, heroEnd:44.23, lab3:43.65,
+  bar4A:43.82, bar4B:44.82, seven:45.32,
+  arr3A:48.02, arr3B:48.82, concl2:50.05,
   // beat 6 -- the takeaway
-  boxZoomA:48.30, box:48.60,
-  r1:48.70, r2:49.63, r3:50.40,             // one reason per spoken sentence
-  payoff:51.44, payoff2:51.72,              // big line lands on "Nothing"
-  // the acid chart stays up BEHIND the message box to the end -- cutting it
-  // at 50.5 left the whole panel blank around the box
-  b5Out:54.0
+  boxZoomA:50.6, box:51.0,
+  r1:51.3, r2:52.23, r3:53.0,
+  payoff:54.04, payoff2:54.37,
+  b5Out:56.5
 };
 
 /* ===== THE EXPLAINER: why sealed honey does not spoil ===== */
@@ -628,8 +630,7 @@ function explainer(ctx,W,Hh,t){
   }
 
   /* --- the cursor, always chrome --- */
-  const CK=[[0,420,300],[1.9,322,196],[3.0,322,196],[4.2,120,40],[11.4,120,40],[12.6,300,150],[27.9,300,150],
-            [29.1,250,80],[36.8,250,80],[38.0,330,60],[48.0,330,60],[49.1,320,210],[54.0,320,210]];
+  const CK=[[0,420,300],[1.9,322,196],[3.0,322,196],[4.2,120,40],[11.92,120,40],[13.12,300,150],[29.45,300,150],[30.65,250,80],[38.63,250,80],[39.93,330,60],[50.6,330,60],[51.7,320,210],[56.5,320,210]];
   let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
   for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
     cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}

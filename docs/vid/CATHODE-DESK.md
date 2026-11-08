@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.3
+# CATHODE DESK — house style v1.4
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v1.4 (2026-11-08)** — the timeline table is now GENERATED from the
+> measured narration rather than hand-written, after a trimming filter was
+> found to be silently eating the voice's own pauses. See *Pacing*.
+>
 > **v1.3 (2026-11-08)** — the picture is now hung off measured sentence
 > anchors in the narration, and one timeline table feeds the picture, the
 > effects and the voice. See *Pacing*.
@@ -188,7 +192,29 @@ Placing lines by hand arithmetic is how "zero point six" ended up being spoken
    the last 10ms window above threshold inside the span instead.
 5. Feed those anchors into **one timeline table** that the picture, the effects
    and the narration placement all read. Three separate lists of numbers is how
-   they drift apart.
+   they drift apart. **Generate that table from the measurements**; the moment
+   it is hand-maintained it starts disagreeing with the audio.
+
+**Never let a filter touch the voice's internal pauses.** `silenceremove` with
+`stop_periods=-1` means "remove every period of silence *anywhere*", not "trim
+the tail". It squeezed each ~0.41s inter-sentence pause down to 0.25s, so by the
+end of a 16s beat the audio ran **1.17s ahead** of the sentence offsets the TTS
+had reported — and those offsets were what the picture was hung off. Every
+sentence after the first drifted, progressively.
+
+To trim lead and tail only, reverse the audio and trim the start twice:
+
+```
+silenceremove=start_periods=1:start_silence=0:start_threshold=-50dB,
+areverse,
+silenceremove=start_periods=1:start_silence=0:start_threshold=-50dB,
+areverse
+```
+
+**The check that catches it:** a sentence's measured length must be plausible
+for its word count. "That is far too dry to live in." measured 0.68s — seven
+words at ten words a second. Any sentence under ~2.5 words/second of audio is
+a measurement bug, not a fast reader.
 
 **Fill the gaps with picture.** A box that sits still while the voice talks is
 dead screen. Each spoken sentence should change something: a plinth lands, a
