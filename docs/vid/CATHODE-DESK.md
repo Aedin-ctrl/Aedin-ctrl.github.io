@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v1.9
+# CATHODE DESK — house style v2.0
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.0 (2026-11-08)** — the pointer is a generated track of moves and
+> clicks rather than a hand-written keyframe list, and it clicks into a line
+> before typing it. See rules 13–16.
+>
 > **v1.9 (2026-11-08)** — the text rasteriser no longer hides an over-wide
 > string, clearance from the box border is enforced, and a scene must clear
 > its own props. See rules 9–11.
@@ -385,6 +389,28 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
 12. **Clearance, not just containment.** Inside a group box, keep ≥6px from the
     border. The tags were technically inside with 1px of air and read as crammed
     against it.
+
+### The pointer, in detail
+
+13. **Click into a line before typing it.** On a real machine you click to place
+    the caret and then type. Every typed line gets a click **0.30s before its
+    first word**, at the line's insertion point; the caret takes over from there.
+    A line that just starts typing with the arrow parked elsewhere looks like
+    text appearing by itself.
+14. **The caret is sized to its line and drawn in its line's colour.** A fixed
+    15px caret sits visibly high against 18px text, and a white caret is
+    invisible on the light grey of a message box. Pass the size and the colour.
+15. **Arrive, settle, then click.** Put a track point **0.14s before** every
+    click at the same position. Clicking on the frame the pointer is still
+    moving reads as a twitch, not a press.
+16. **Generate the track; never hand-keyframe it.** Build one `PTRACK` from the
+    typed-line table plus the button centres, and let **both** the picture and
+    the score read it. Hand-written cursor keyframes drift away from the clicks
+    in the sound the moment any timing changes.
+
+**Every line that appears word by word goes through `typeLine()`** and appears
+in the pointer table. A line drawn with a bare `px()` gets no caret and no
+click, and is instantly obvious as the one that was forgotten.
 
 ### Enforcement
 

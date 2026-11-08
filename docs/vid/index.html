@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v1.9 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.0 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -254,16 +254,14 @@ function dottedArrow(pts,prog,col){let tot=0,seg=[];
   if(prog>=1){const[ex,ey]=pts[pts.length-1];
     for(let k=0;k<6;k++){const bx2=ex-dir[0]*k,by2=ey-dir[1]*k,pxx=-dir[1],pyy=dir[0];
       for(let s=-k;s<=k;s++)B.fillRect(Math.round(bx2+pxx*s*0.6),Math.round(by2+pyy*s*0.6),1,1);}}}
-// Text caret. Drawn with its own tip at (x,y) like the arrow, so the two are
-// interchangeable on the same keyframe track.
-function ibeam(x,y){if(GBOX)GBOX.push({x:x-3,y:y,w:7,h:16,k:'cursor'});
-  const rows=['XXXXXXX','XXXXXXX','..XXX..','..XXX..','..XXX..','..XXX..','..XXX..',
-              '..XXX..','..XXX..','..XXX..','..XXX..','..XXX..','..XXX..','XXXXXXX','XXXXXXX'];
-  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]!=='X')continue;
-    rect(x-3+i,y+j,1,1,'#000'); rect(x-3+i,y+j,1,1,'#fff');}});
-  // 1px dark outline so it reads on any background
-  rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]!=='X')continue;
-    if(j===0||j===rows.length-1||r[i-1]!=='X'||r[i+1]!=='X')rect(x-3+i,y+j,1,1,'#fff');}});}
+// Text caret, sized to the line it is writing and drawn in that line's own
+// colour. A fixed 15px caret sat high against 18px text -- the caret has to
+// span the glyph box, not a constant.
+function ibeam(x,y,h,col){
+  const HH=Math.max(10,h|0), c=col||'#fff';
+  if(GBOX)GBOX.push({x:x-3,y:y-2,w:7,h:HH+4,k:'cursor'});
+  for(let i=-3;i<=3;i++){rect(x+i,y-2,1,1,c);rect(x+i,y+HH+1,1,1,c);}   // serifs
+  for(let j=-1;j<=HH;j++){rect(x-1,y+j,1,1,c);rect(x,y+j,1,1,c);rect(x+1,y+j,1,1,c);}}
 function cursor(x,y){if(GBOX)GBOX.push({x:x,y:y,w:10,h:16,k:'cursor'});const rows=['X','XX','XOX','XOOX','XOOOX','XOOOOX','XOOOOOX','XOOOOOOX','XOOOOOOOX','XOOOOOXXXX','XOOXOOX','XOX XOOX','XX  XOOX','X    XOOX','     XOOX','      XX'];
   rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]==='X')rect(x+i,y+j,1,1,'#000');else if(r[i]==='O')rect(x+i,y+j,1,1,'#fff');}});}
 function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
@@ -523,6 +521,44 @@ const SENT={
   END:[17,18],
 };
 
+/* ===== THE POINTER TRACK =====
+   Where the mouse goes and when it clicks, generated rather than keyframed by
+   hand. On a real machine you CLICK into a line before you type it, so every
+   typed line gets a click 0.30s before its first word; the caret takes over
+   from there. Window coordinates are fixed (the frame never moves), so the
+   insertion points can live in one table.
+
+   Button centres are computed, not eyeballed -- the pointer's TIP is its
+   hotspot, so a keyframe is the middle of the button it is pressing. */
+const SPOTS=[
+  {n:0,  x:204, y:130, s:14},   // the dialog's question, line 1
+  {n:2,  x:258, y:162, s:18},   // jar caption 1
+  {n:3,  x:258, y:192, s:18},   // jar caption 2
+  {n:4,  x:52,  y:54,  s:18},   // the one-sixth line
+  {n:10, x:42,  y:214, s:18},   // osmosis caption
+  {n:16, x:28,  y:254, s:18},   // seal caption
+  {n:17, x:166, y:106, s:14},   // message box list
+];
+const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
+const PTRACK=(()=>{
+  const P=[{t:0,x:420,y:300}];
+  SPOTS.forEach(sp=>P.push({t:+(VO[sp.n].t[0]-0.30).toFixed(3),
+                            x:sp.x+3, y:sp.y+Math.round(sp.s*0.55), c:1}));
+  P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
+  P.push({t:+(BEAT.WATER.a+0.30).toFixed(3),   x:300, y:150});
+  P.push({t:+(BEAT.OSMOSIS.a+0.30).toFixed(3), x:250, y:86});
+  P.push({t:+(BEAT.ACID.a+0.30).toFixed(3),    x:330, y:70});
+  P.push({t:+(BEAT.SEAL.a+0.30).toFixed(3),    x:130, y:120});
+  P.push({t:+(VO[18].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
+  P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
+  // A hand arrives, settles, THEN clicks. Without this the pointer is still
+  // travelling on the frame it clicks, which reads as a twitch rather than a
+  // deliberate press. 0.14s of stillness on target before every click.
+  P.filter(q=>q.c).forEach(q=>P.push({t:+(q.t-0.14).toFixed(3),x:q.x,y:q.y}));
+  P.sort((a,b)=>a.t-b.t);
+  return P;
+})();
+
 /* ===== THE EXPLAINER: why sealed honey does not spoil =====
    Every beat hangs off VO[] -- the measured word onsets. Nothing in here is a
    chosen time except the small offsets that make a drop land ON a word rather
@@ -558,7 +594,15 @@ function explainer(ctx,W,Hh,t){
     const live = t>=v.t[lo] && t<=v.z+0.25;
     const w = str ? (shadow?pxShadow(str,x,y,size,col,shadow,null,font)
                            :px(str,x,y,size,col,null,font)) : 0;
-    if(live) CARET={x:x+w+Math.round(size*0.35),y:y-2};
+    if(live) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
+    return w;};
+  // A fixed caption revealed on a spoken word, with the caret left at its end.
+  // Fixed because printing the raw narration overflowed the box (rule 10).
+  const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
+    if(!after(n,i)) return 0;
+    const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
+                    :px(str,x,y,size,col,null,font);
+    if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
   const after=(n,i)=>t>=VO[n].t[i];            // has word i been spoken yet
   const ends=(n)=>VO[n].z;
@@ -639,7 +683,7 @@ function explainer(ctx,W,Hh,t){
           cube(proj(OX-30,OY-20),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
         // at the TOP of the box: down at the baseline it collided with the
         // HONEY tag during the overlap where both are on screen
-        px(said(4),CX+40,CY+26,18,'#d9d2e6',null,'"VT323"');
+        typeLine(4,CX+40,CY+26,18,'#d9d2e6',null,'"VT323"');
       }
       // s5 "...almost none of it is free." -- the honey bar drops
       const d1=mp(wordAt(5,2),wordAt(5,2)+1.00);                    // "sugar"
@@ -757,11 +801,11 @@ function explainer(ctx,W,Hh,t){
       // Fixed captions gated on the spoken word, NOT the spoken words printed
       // raw: 'of those and it spoils.' is 497px at 22px against a 412px box, and
       // the rasteriser quietly cut it so the sweep saw a string that fitted.
-      if(after(17,0))px('> Dry.',tx,m.y+8,14,'#000');
-      if(after(17,1))px('> Acidic.',tx,m.y+30,14,'#000');
-      if(after(17,2))px('> Sealed.',tx,m.y+52,14,'#000');
-      if(after(18,0))pxShadow('BREAK ANY ONE',tx,m.y+82,22,'#000080','#c0c0c0');
-      if(after(18,5))pxShadow('AND IT SPOILS.',tx,m.y+118,22,'#000080','#c0c0c0');
+      capLine('> Dry.',17,0,tx,m.y+8,14,'#000');
+      capLine('> Acidic.',17,1,tx,m.y+30,14,'#000');
+      capLine('> Sealed.',17,2,tx,m.y+52,14,'#000');
+      capLine('BREAK ANY ONE',18,0,tx,m.y+82,22,'#000080','#c0c0c0');
+      capLine('AND IT SPOILS.',18,5,tx,m.y+118,22,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
     }
     /* --- the end card. It started with a click, so it ends with one. --- */
@@ -775,23 +819,21 @@ function explainer(ctx,W,Hh,t){
   }
 
   /* --- the cursor, always chrome. Keyframed off the beat table. --- */
-  const L=0.32;                                  // lead, scaled with the speed-up
-  // Button centres, so the POINTER TIP lands on the button rather than near it.
-  // Dialog OK: x 154+168-32=290 w64 -> centre 322; y 116+108-26=198 h20 -> 208.
-  // Message OK: x 114+206-32=288 w64 -> centre 320; y 98+172-26=244 h20 -> 254.
-  const CK=[[0,420,300],[BEAT.HOOK.z-0.48,322,208],[BEAT.JAR.sc,322,208],
-            [BEAT.JAR.a+L,120,40],[BEAT.WATER.sc-L,120,40],[BEAT.WATER.a+L,300,150],
-            [BEAT.OSMOSIS.sc-L,300,150],[BEAT.OSMOSIS.a+L,250,80],
-            [BEAT.ACID.sc-L,250,80],[BEAT.ACID.a+L,330,60],
-            [BEAT.SEAL.sc-L,330,60],[BEAT.SEAL.a+L,120,120],
-            // rest on the message box's OK button, not across its text
-            [BEAT.END.sc-L,120,120],[VO[18].z+0.30,320,254],[DUR,320,254]];
-  let cx=CK[CK.length-1][1],cy=CK[CK.length-1][2];
-  for(let i=0;i<CK.length-1;i++)if(M<CK[i+1][0]){const e=H.ease.inOut(H.clamp((M-CK[i][0])/(CK[i+1][0]-CK[i][0])));
-    cx=Math.round(H.lerp(CK[i][1],CK[i+1][1],e));cy=Math.round(H.lerp(CK[i][2],CK[i+1][2],e));break;}
+  const K=PTRACK;
+  let cx=K[K.length-1].x, cy=K[K.length-1].y;
+  for(let i=0;i<K.length-1;i++)if(M<K[i+1].t){
+    const e=H.ease.inOut(H.clamp((M-K[i].t)/Math.max(0.001,K[i+1].t-K[i].t)));
+    cx=Math.round(H.lerp(K[i].x,K[i+1].x,e));cy=Math.round(H.lerp(K[i].y,K[i+1].y,e));break;}
   // While a line is printing the pointer IS the caret, sitting at the insertion
-  // point; the rest of the time it is the arrow travelling the keyframe track.
-  if(CARET) ibeam(CARET.x,CARET.y); else cursor(cx,cy);
+  // point; the rest of the time it is the arrow travelling the track.
+  if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col); else cursor(cx,cy);
+  // and every click reads as a click: a 0.1s ring where the tip went down
+  for(const q of K){ if(!q.c) continue; const d=M-q.t;
+    if(d<0&&d>-0.09){ cursor(q.x,q.y); }            // press frame: hold on target
+    if(d>=0&&d<0.11){ const r0=3+Math.round(d/0.11*6);
+      B.fillStyle=P.hi;
+      for(let i=-r0;i<=r0;i++){B.fillRect(q.x+i,q.y-r0,1,1);B.fillRect(q.x+i,q.y+r0,1,1);
+                               B.fillRect(q.x-r0,q.y+i,1,1);B.fillRect(q.x+r0,q.y+i,1,1);}}}
 
   ctx.imageSmoothingEnabled=false;
   ctx.clearRect(0,0,W,Hh);
@@ -1041,7 +1083,9 @@ function buildScore(){
   const E=[],add=(t,k,n)=>E.push({t:+t.toFixed(3),k,n});
   const w=(n,i)=>VO[n].t[i];
   // chrome
-  add(0.05,'open'); add(VO[0].z-0.40,'snap'); add(VO[0].z,'click');
+  add(0.05,'open');
+  // one click per pointer click, from the same track the picture uses
+  PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open');
   add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
   // screen: a print blip on every spoken word that appears as text on screen
