@@ -22,8 +22,7 @@
    conductivity means, and reads the contact temperatures off effusivity. */
 const PIECE={ no:5, slug:'metal', tags:['PHYSICS','BODY'],
               title:"why metal feels colder than wood",
-              blurb:"A steel bar and a block of wood in the same room are the same temperature. Your skin disagrees, because it was never measuring temperature in the first place.",
-              myth:"not colder" };
+              blurb:"A steel bar and a block of wood in the same room are the same temperature. Your skin disagrees, because it was never measuring temperature in the first place." };
 
 
 /* ===== TIMELINE =====
@@ -79,16 +78,29 @@ const SENT={
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
-  // THE COLD OPEN: the bar is already on the ground, the card opens above it,
-  // OK is pressed, and the thing acts out the lie -- it shivers, frosts over
-  // and steams, while being exactly as warm as the air around it.
-  open:{ ground:248,
-         bar:[[216,324],[312,376],[312,472],[216,524],[120,472],[120,376]],
-         faces:[[[216,324],[312,376],[216,428],[120,376]],
-                [[120,376],[216,428],[216,524],[120,472]],
-                [[216,428],[312,376],[312,472],[216,524]]],
+  // THE COLD OPEN: both materials are already standing there -- the metal on
+  // the left, the wood on the right. OK is pressed and the metal launches
+  // itself into the tree and puts it on the ground. The gag IS the piece: the
+  // two things the whole video compares, doing the one thing that separates
+  // them. The frosted bar it replaces was a single object acting cold, which
+  // said nothing about wood at all.
+  open:{ ground:248, pivot:[200,524], hitx:76,
+         // the whole scene sits LEFT of centre, because the tree has to have
+         // somewhere to fall: laid flat its canopy reaches ~210px past the
+         // pivot, and from the middle of the frame that is off the screen.
+         blk:[[76,430],[122,456],[122,500],[76,526],[30,500],[30,456]],
+         blkf:[[[76,430],[122,456],[76,482],[30,456]],
+               [[30,456],[76,482],[76,526],[30,500]],
+               [[76,482],[122,456],[122,500],[76,526]]],
          tone:[0.00,0.30,0.52],
-         groove:[[[128,404],[208,448]],[[128,432],[208,476]]] },
+         groove:[[[38,470],[72,490]],[[38,486],[72,506]]],
+         trunk:[[187,392],[213,392],[219,524],[181,524]],
+         can:[[199,312],[235,324],[255,352],[251,390],[221,412],
+              [177,412],[147,390],[143,352],[163,324]],
+         canf:[[[199,312],[235,324],[255,352],[143,352],[163,324]],
+               [[255,352],[251,390],[147,390],[143,352]],
+               [[251,390],[221,412],[177,412],[147,390]]],
+         ctone:[0.00,0.26,0.48] },
   // SAME -- two bars of identical height, because that is the point
   same:{ ox:PX+112, oy:MIDY+114, off:7, cubes:14,
          num:MIDY-140, lab:MIDY-94, tag:MIDY+150 },
@@ -187,7 +199,7 @@ function explainer(ctx,W2,Hh,t){
   const CLICK=VO[17].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>VO[0].z+1.30&&t<VO[0].z+1.58)boost=1.45;      // the bar shivering
+  if(t>VO[0].z+1.84&&t<VO[0].z+2.06)boost=1.55;      // the metal hitting the tree
   if(t>wordAt(9,1)&&t<wordAt(9,1)+0.25)boost=1.55;   // the x300
   if(t>wordAt(14,13)&&t<wordAt(14,13)+0.22)boost=1.40;
 
@@ -211,44 +223,64 @@ function explainer(ctx,W2,Hh,t){
        +1.27      the vapour comes off
        +2.00      it settles, and the window opens on the blackboard          */
   const dlgOut=BEAT.SAME.sc, okT=VO[0].z+0.52, bitT=okT+0.72;
+  const WIND=0.34, FLY=0.26, FALL=0.70;
+  const hitT=bitT+WIND+FLY;
   if(T<dlgOut){
-    const shv=H.clamp((M-bitT)/1.30),                 // the rattle
-          fr =H.clamp((M-bitT-0.18)/0.95),            // frost climbing
-          vap=H.clamp((M-bitT-0.55)/1.30);            // steam off the top
-    // a rattle, not a drift: it jitters hard and decays, around its own place
-    const amp=shv>0&&shv<1 ? 4*Math.sin(shv*3.1416) : 0;
-    const jx=Math.round(Math.sin(M*53.0)*amp), jy=Math.round(Math.sin(M*41.0)*amp*0.4);
-    const sh=(p)=>p.map(q=>[q[0]+jx,q[1]+jy]);
+    const wind=H.clamp((M-bitT)/WIND),
+          fly =H.clamp((M-bitT-WIND)/FLY),
+          fall=H.clamp((M-hitT)/FALL),
+          rest=H.clamp((M-hitT-FALL)/0.50);
     const lit=H.lerp(0.62,1,H.clamp((M-0.3)/2.2));
     const rim=H.rgba(H.mix(P.ink,P.paper,lit));
-    const seam=H.rgba(H.mix(P.bone,P.ink,0.80));
-    const out=sh(O.bar);
-    solidShape(O.faces.map((f,i)=>({p:sh(f),c:H.rgba(H.mix(P.bone,P.ink,O.tone[i]))})),
-               out,rim,seam);
-    O.groove.forEach(g=>linePix(sh(g),seam,2));
-    // the frost: a dithered rime climbing the silhouette, clipped to it, so it
-    // sits ON the bar instead of in a rectangle around it
-    if(fr>0){
-      B.save(); B.beginPath();
-      out.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
-      B.closePath(); B.clip();
-      const y0=324+jy, y1=524+jy;
-      for(let y=y0;y<y1;y++){
-        // strongest at the top, and only as far down as fr has reached
-        const reach=H.clamp((y1-y)/(y1-y0)/Math.max(0.05,fr));
-        if(reach>1) continue;
-        const a=(1-reach)*0.72;
-        for(let x=112+jx;x<320+jx;x++) if(a>bay(x,y)){B.fillStyle=P.paper;B.fillRect(x,y,1,1);}
-      }
-      B.restore();
+
+    /* --- the wood, drawn first so the metal passes in front of it ---
+       It topples about the foot of its own trunk. The POINTS are rotated, not
+       the canvas: the pixel grid survives a polygon rotation and does not
+       survive a bitmap one.                                               */
+    const ang=H.ease.in(fall)*1.34, co=Math.cos(ang), si=Math.sin(ang);
+    const px0=O.pivot[0], py0=O.pivot[1];
+    const tp=(p)=>p.map(q=>{const a2=q[0]-px0, b2=q[1]-py0;
+      return [Math.round(px0+a2*co-b2*si), Math.round(py0+a2*si+b2*co)];});
+    const bark=H.rgba(H.mix(P.orange,P.ink,0.58));
+    solidShape([{p:tp(O.trunk),c:bark}],tp(O.trunk),rim,null);
+    solidShape(O.canf.map((f,i)=>({p:tp(f),c:H.rgba(H.mix(P.grass,P.ink,O.ctone[i]))})),
+               tp(O.can),rim,H.rgba(H.mix(P.grass,P.ink,0.72)));
+
+    /* --- the metal: crouches, launches, and stays where it stopped --- */
+    const dx=Math.round(-14*wind*(1-fly) + (O.pivot[0]-O.hitx-46)*fly);
+    const sx=1+0.14*wind*(1-fly), sy=1-0.20*wind*(1-fly);
+    const bk=(p)=>p.map(q=>[Math.round(O.hitx+(q[0]-O.hitx)*sx+dx),
+                            Math.round(526-(526-q[1])*sy)]);
+    if(fly>0&&fly<1){            // speed lines, so a launch reads as a launch
+      B.fillStyle=H.rgba(H.hex(P.paper),0.35);
+      for(let i=0;i<5;i++) B.fillRect(O.hitx-40+dx-i*14, 444+i*14, 26, 2);
     }
-    // vapour: it steams, because that is what a cold thing does in a warm room
-    if(vap>0&&vap<1){ const rr=H.rng(23);
-      for(let i=0;i<16;i++){
-        const ph=H.clamp(vap*1.5-rr()*0.5); if(ph<=0||ph>=1) continue;
-        const x0=150+rr()*140, w0=3+Math.round(rr()*4);
-        B.fillStyle=H.rgba(H.hex(P.paper),(1-ph)*0.55);
-        B.fillRect(Math.round(x0+Math.sin(ph*4+i)*10), Math.round(336-ph*120), w0, w0);}}
+    solidShape(O.blkf.map((f,i)=>({p:bk(f),c:H.rgba(H.mix(P.bone,P.ink,O.tone[i]))})),
+               bk(O.blk),rim,H.rgba(H.mix(P.bone,P.ink,0.80)));
+    O.groove.forEach(g=>linePix(bk(g),H.rgba(H.mix(P.bone,P.ink,0.80)),2));
+
+    // the impact: a white flash at the trunk, then splinters off it
+    const imp=H.clamp((M-hitT)/0.16);
+    if(imp>0&&imp<1){
+      B.fillStyle=H.rgba(H.hex(P.paper),1-imp);
+      for(let i=0;i<10;i++){const a2=(i/10)*6.283;
+        B.fillRect(Math.round(px0-22+Math.cos(a2)*imp*40),
+                   Math.round(470+Math.sin(a2)*imp*34),4,4);}
+    }
+    const sp=H.clamp((M-hitT)/0.60);
+    if(sp>0&&sp<1){ const rr=H.rng(13);
+      for(let i=0;i<12;i++){ const vx=(rr()-0.3)*180, vy=-60-rr()*120;
+        B.fillStyle=H.rgba(H.hex(bark),0.9-sp*0.9);
+        B.fillRect(Math.round(px0-20+vx*sp), Math.round(474+vy*sp+260*sp*sp), 3, 3); } }
+
+    // it lands: dust along the ground, and leaves shaken loose
+    if(rest>0&&rest<1){ const rr=H.rng(29);
+      for(let i=0;i<22;i++){ const q=H.clamp(rest*1.4-rr()*0.4); if(q<=0||q>=1)continue;
+        B.fillStyle=H.rgba(H.hex(P.bone),(1-q)*0.40);
+        B.fillRect(Math.round(px0+rr()*150-q*20), Math.round(512-q*26), 4, 3); }
+      for(let i=0;i<9;i++){ const q=H.clamp(rest*1.2-rr()*0.5); if(q<=0||q>=1)continue;
+        B.fillStyle=H.rgba(H.hex(P.grass),(1-q)*0.8);
+        B.fillRect(Math.round(px0+40+rr()*120), Math.round(360+q*150), 3, 3); } }
   }
   zoomRect([4,LH-40,54,16],DLG,M,0.05,0.42);
   // the card shuts ON the press, so nothing stands in front of the trick
@@ -259,9 +291,10 @@ function explainer(ctx,W2,Hh,t){
     if(sq<=0){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
       winIcon(r.x+10,r.y+9,'?');
-      typeLine(0,r.x+50,r.y+16,14,'#000',null,null,0,3);
-      typeLine(0,r.x+50,r.y+44,14,'#000',null,null,3);
-      mythNote(r,t);
+      typeLine(0,r.x+50,r.y+14,14,'#000',null,null,0,3);
+      typeLine(0,r.x+50,r.y+38,14,'#000',null,null,3,5);
+      typeLine(0,r.x+50,r.y+62,14,'#000',null,null,5);
+      mythStamp(t);
       button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
     } else { INCHROME=true; winFrame(dd[0],dd[1],dd[2],dd[3],'',true); INCHROME=false; }
   }
@@ -450,7 +483,7 @@ function explainer(ctx,W2,Hh,t){
       const tx=m.x+52;
       capLine('> Same temperature.',16,0,tx,m.y+12,14,'#000');
       capLine('> Different speed.',16,2,tx,m.y+40,14,'#000');
-      capLine('YOUR SKIN READS',17,1,tx,m.y+86,20,'#000080','#c0c0c0');
+      capLine('SKIN READS',17,1,tx,m.y+86,20,'#000080','#c0c0c0');
       capLine('THE FLOW.',17,5,tx,m.y+124,20,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
@@ -527,13 +560,15 @@ function buildScore(){
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
   // the gag, scored to its own phases rather than to a word. A rattle is a
   // run of knocks; the frost is the crack bank; the steam is a wash.
-  const ok=VO[0].z+0.52, bit=ok+0.72;
+  const ok=VO[0].z+0.52, bit=ok+0.72, hit=bit+0.60;
   add(ok,'snap');
-  for(let i=0;i<9;i++) add(bit+i*0.075,'knock',i);        // the rattle
-  add(bit+0.10,'sub');
-  [0.22,0.40,0.58,0.78].forEach((d,i)=>add(bit+d,'crack',i));  // frost forming
-  [0.62,0.95].forEach((d,i)=>add(bit+d,'crumble',i));
-  add(bit+1.10,'mos');                                    // the steam
+  add(bit+0.04,'sub');                                    // it crouches
+  add(bit+0.30,'mos');                                    // and launches
+  add(hit,'crack',0); add(hit,'knock',0); add(hit+0.05,'crack',1);
+  add(hit+0.10,'knock',2);                                // the hit
+  [0.14,0.34,0.54].forEach((d,i)=>add(hit+d,'crumble',i));// the tree going over
+  add(hit+0.70,'sub'); add(hit+0.74,'crumble',3);         // it lands
+  [0.80,0.88,0.97,1.06].forEach((d,i)=>add(hit+d,'click',i)); // leaves after it
   // SAME -- the strike, then the two bars, then the hero 20
   add(w(1,1),'zap');
   bar(w(2,2), w(2,2)+1.05, 12, 3); bar(w(2,8), w(2,8)+1.05, 12, 3);

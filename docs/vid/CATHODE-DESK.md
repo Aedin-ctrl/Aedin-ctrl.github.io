@@ -1,7 +1,15 @@
-# CATHODE DESK — house style v3.7
+# CATHODE DESK — house style v3.8
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.8 (2026-11-09)** — an **eleventh sweep**, `checkChrome()`: text whose
+> origin is inside a Win95 container has to stay inside it. Every sweep until
+> now skipped `b.chrome` and `checkTruncation` only ever asked whether a string
+> was wider than the SCREEN, so #005's question ran 29px past its own card and
+> two end cards ran out through the right edge of their windows — in every
+> frame, invisible to all ten. The folk answer became a **stamp above the
+> card**, not a line inside it. #005's cold open is two objects.
+>
 > **v3.7 (2026-11-09)** — the folk answer moved onto the **question card**:
 > `PIECE.myth`, drawn by `mythNote()` as a tilted gold note on a dark marker
 > band under the question. It costs no narration, so it was fitted to the three
@@ -948,23 +956,22 @@ wrong answer is not listening to the right one, they are waiting to see whether
 you agree.
 
 **It is a declared field, not a drawing.** `PIECE.myth` is two or three words;
-`mythNote()` places it identically in every piece — under the question, above
-the OK button, arriving on the question's **last word**, so it reads as an
-annotation on a finished sentence rather than part of it.
+`mythStamp()` places it identically in every piece — a **stamp standing on its
+own above the card**, landing on the question's **last word**.
 
-- **Tilted by stepping the characters, never by rotating the canvas.** A
-  rotation resamples the baked glyphs and the pixel grid is the whole format.
-  The rise is capped at ±4px: the gap between the question and OK is 48px and
-  the note has to clear 6px of both. That is also why the question's lines moved
-  to `r.y+16` / `r.y+44` (honey, three lines: `+6` / `+28` / `+50`).
-- **Gold on a dark marker band.** Gold straight onto the Win95 face grey is
-  barely there — under the bloom the dialog reads almost white — and an
-  annotation that has to be squinted at is not an annotation.
-- **It costs no narration**, which is the point: it was fitted to #001, #003 and
-  #004 after they had shipped, with no re-synthesis and no re-timing.
-- A piece may *also* refute in the voice. #005 does, because the title itself is
-  the misconception: the card says `not colder`, and the first blackboard line
-  says *"It isn't colder."*
+- **Not inside the dialog.** The first cut wrote it under the question, where it
+  read as a second line *of* the question, which is the one thing it must not
+  be. A stamp is a separate object that was applied to the screen afterwards.
+- **Tilted by stepping integers**, both the plate's columns and the text's
+  characters — never by rotating the canvas. A rotation resamples the baked
+  glyphs and the pixel grid is the whole format.
+- **Gold on an ink plate with a gold border.** Gold straight onto the Win95 face
+  grey was barely there; under the bloom that dialog reads almost white.
+- **It costs no narration**, which is the point: #001, #003 and #004 took it
+  after they had shipped, with no re-synthesis and no re-timing.
+- **If the title already settles it, there is no stamp.** #005 asks *why does
+  metal feel colder than wood* and answers *it isn't colder* in its first spoken
+  line; stamping `NOT COLDER` over that is the same sentence twice.
 
 - When it is spoken too, it is **one short sentence**, three or four words, and
   it gets a **picture of its own**: in #005 the word `COLDER` is printed large
@@ -979,6 +986,24 @@ annotation on a finished sentence rather than part of it.
 written off the END of its own sentence (`VO[n].z`), never off a word inside the
 next one — "a" and "steel" in #005 are 70ms apart, and a 0.40s fade across that
 gap put the struck-out word inside the first voxel bar.
+
+## The eleventh sweep: text stays inside its box
+
+`checkChrome()` takes every string whose top-left corner falls inside a
+registered Win95 container — a title bar (minus the close button) or a window's
+client area — and requires the whole string to be inside it.
+
+**Nothing swept chrome before v3.8.** `checkBounds`, `checkTruncation`,
+`checkOverlap` and `checkLegibility` all begin `if(b.chrome) continue;`, and
+truncation only ever compared a string against the width of the SCREEN. So a
+question that ran 29px past the edge of its own card, and two end cards whose
+lines ran out through the right edge of the window, were present in every frame
+of a shipped piece and no sweep could see any of them. A person watching it
+found them.
+
+The rule it encodes: **a container is a measurement, not a suggestion.**
+`winFrame()` registers its own two rects, so the check costs the piece nothing
+and a new window is covered the moment it is drawn.
 
 ## Accuracy
 

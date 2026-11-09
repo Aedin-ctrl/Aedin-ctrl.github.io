@@ -142,6 +142,37 @@ window.checkBounds=function(step){
    >=22, any label the story depends on >=14, key numbers >=32, VT323 >=13.
    This reports anything under it. Chrome -- the Win95 dialog furniture -- is
    exempt, because Win95 chrome is 9px by definition. */
+/* ===== THE ELEVENTH SWEEP: text inside a Win95 box stays inside it =====
+   checkTruncation only ever asked whether a string was wider than the SCREEN,
+   and every sweep skipped `b.chrome` entirely -- so a title that ran past its
+   own title bar, and message-box lines that ran out through the window's right
+   edge, were invisible to all ten. A string whose top-left corner is inside a
+   registered frame has to be wholly inside that frame.                     */
+window.checkChrome=function(step){
+  const bad=[],seen=new Set();
+  for(let tt=0; tt<=DUR; tt+=(step||1/6)){
+    BOUNDS=[]; FRAMES=[]; explainer(ctx,OUTW,OUTH,tt);
+    const r=BOUNDS, f=FRAMES; BOUNDS=null; FRAMES=null;
+    for(const b of r){
+      // the innermost frame whose box contains the string's origin
+      let best=null;
+      for(const q of f){
+        if(b.x>=q.x-1 && b.x<q.x+q.w && b.y>=q.y-1 && b.y<q.y+q.h)
+          if(!best || q.w*q.h < best.w*best.h) best=q;
+      }
+      if(!best) continue;
+      const over=Math.round((b.x+b.w)-(best.x+best.w)),
+            under=Math.round((b.y+b.h)-(best.y+best.h));
+      if(over>1||under>1){
+        const k=b.s+'|'+best.k; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),text:b.s,box:best.k,
+                  overflowX:over>1?over:0, overflowY:under>1?under:0});
+      }
+    }
+  }
+  return bad;
+};
+
 window.checkLegibility=function(step){
   const FLOOR={head:22,label:14,num:32,vt:13};
   const bad=[],seen=new Set();

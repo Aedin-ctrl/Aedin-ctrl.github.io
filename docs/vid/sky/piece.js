@@ -209,9 +209,9 @@ function explainer(ctx,W2,Hh,t){
     if(sq<=0){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
       winIcon(r.x+10,r.y+9,'?');
-      typeLine(0,r.x+50,r.y+16,14,'#000',null,null,0,3);
-      typeLine(0,r.x+50,r.y+44,14,'#000',null,null,3);
-      mythNote(r,t);
+      typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,3);
+      typeLine(0,r.x+50,r.y+56,14,'#000',null,null,3);
+      mythStamp(t);
       button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
     } else { INCHROME=true;
       winFrame(DLG[0]+Math.round(sq*DLG[2]*0.42),DLG[1]+Math.round(sq*DLG[3]*0.42),
@@ -371,7 +371,7 @@ function explainer(ctx,W2,Hh,t){
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
-      capLine('> Short waves scatter.',14,0,tx,m.y+12,14,'#000');
+      capLine('> Short waves go.',14,0,tx,m.y+12,14,'#000');
       capLine('> Long waves carry.',14,3,tx,m.y+40,14,'#000');
       capLine('THE SKY AND',15,4,tx,m.y+86,20,'#000080','#c0c0c0');
       capLine('THE SUNSET.',15,7,tx,m.y+124,20,'#000080','#c0c0c0');

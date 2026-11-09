@@ -101,6 +101,10 @@ function winFrame(x,y,w,h,title,active){
   rect(x,y,w,h,P.face);bevel(x,y,w,h,'window');
   const tx=x+3,ty=y+3,tw=w-6,th=15;
   rect(tx,ty,tw,th,active?P.navy:P.sh);
+  // the usable title strip stops short of the close button, which is the line
+  // the title has to stay behind
+  if(FRAMES){ FRAMES.push({x:tx+4,y:ty+2,w:(x+w-20)-(tx+4)-2,h:th,k:'titlebar'});
+              FRAMES.push({x:x+4,y:y+4+th+1,w:w-8,h:h-8-th-1,k:'client'}); }
   INCHROME=true; px(title,tx+4,ty+4,6,active?'#ffffff':'#c0c0c0'); INCHROME=false;
   // close button
   const bx=x+w-20;rect(bx,ty+1,13,12,P.face);bevel(bx,ty+1,13,12,'button');
@@ -152,6 +156,11 @@ function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
 const TC=H.layer(720,64),TX=TC.getContext('2d',{willReadFrequently:true});
 const TCACHE=new Map();
 let BOUNDS=null;   // text extents
+/* Every Win95 container that text can overflow: the title bar (minus the close
+   button) and the client area of each window. checkChrome() uses these. Until
+   v3.8 nothing swept chrome at all, and #005's title ran off the end of its own
+   title bar in every single frame of the piece. */
+let FRAMES=null;
 let GBOX=null;     // extents of the things text can hide behind
 let INCHROME=false;
 let OVERLAY=false; // true while drawing a window that FLOATS OVER the panel// true while drawing Win95 furniture, which is 9px by definition
@@ -472,38 +481,37 @@ function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
    so there is black on both sides of the rim and it holds against any
    background -- a single white pass vanished wherever the shape crossed the
    bright band at the horizon. */
-/* ===== THE FOLK ANSWER, ANNOTATED ONTO THE CARD =====
-   The wrong explanation everyone already holds, written under the question in
-   the dialog and marked off before the piece starts -- so a viewer who arrived
-   with it is not spending the first mechanism waiting to see whether we agree.
+/* ===== THE FOLK ANSWER, STAMPED =====
+   The wrong explanation everyone already holds, marked off before the piece
+   starts -- so a viewer who arrived with it is not spending the first mechanism
+   waiting to see whether we agree.
 
-   Tilted by STEPPING each character, never by rotating the canvas: a rotation
-   resamples the baked glyphs and the pixel grid is the whole format. The rise
-   is capped at +/-4px because the gap between the question and the OK button
-   is 48px and the note has to clear 6px of both.                            */
-function tiltNote(str,cx,y,size,col,shadow,font){
-  const f=font||'"VT323"', cs=str.split('');
-  const ws=cs.map(c=>glyph(c===' '?' ':c,size,f).w);
-  const total=ws.reduce((a,b)=>a+b,0);
-  const rise=Math.min(1, 8/Math.max(1,cs.length-1));
-  const yAt=i=>Math.round(y-rise*(i-(cs.length-1)/2));
-  // A dark marker band behind it, stepped the same way. Gold on the Win95
-  // face grey is barely there -- the dialog is almost white under the bloom --
-  // and an annotation that has to be squinted at is not an annotation.
-  let x=Math.round(cx-total/2);
-  cs.forEach((c,i)=>{ B.fillStyle=shadow||P.ink;
-    B.fillRect(x-1,yAt(i)-3,Math.ceil(ws[i])+2,size+5); x+=ws[i]; });
-  x=Math.round(cx-total/2);
-  cs.forEach((c,i)=>{ if(c.trim()) px(c,x,yAt(i),size,col,null,f); x+=ws[i]; });
-  return total;
-}
-/* One call, so every piece places it identically: under the question, above
-   the OK button, arriving on the question's last word. */
-function mythNote(r,t){
+   It is a STAMP, standing on its own above the card, not a line inside it: in
+   the dialog it read as part of the question, which is the one thing it must
+   not be. Tilted by stepping each COLUMN of the plate and each character of the
+   text by an integer, never by rotating the canvas -- a rotation resamples the
+   baked glyphs and the pixel grid is the whole format.                      */
+function mythStamp(t){
   if(!PIECE.myth) return;
-  const v=VO[0];
-  if(t < v.t[v.w.length-1]) return;
-  tiltNote(PIECE.myth, r.x+r.w/2, r.y+74, 20, P.gold, P.ink);
+  const v=VO[0]; if(t < v.t[v.w.length-1]) return;     // lands on the last word
+  const f='"Silkscreen"', size=20, pad=11, bd=3, slope=-0.10;
+  const cs=PIECE.myth.toUpperCase().split('');
+  const ws=cs.map(c=>glyph(c,size,f).w);
+  const tw=Math.round(ws.reduce((a,b)=>a+b,0));
+  const W=tw+pad*2, Hh=size+pad*2;
+  const x0=Math.round(LW/2-W/2), top=DLG[1]-Hh-26, mid=x0+W/2;
+  const yAt=(x)=>Math.round(top+slope*(x-mid));
+  for(let i=0;i<W;i++){
+    const x=x0+i, y=yAt(x);
+    B.fillStyle=P.ink; B.fillRect(x,y,1,Hh);
+    B.fillStyle=P.gold;
+    if(i<bd||i>=W-bd) B.fillRect(x,y,1,Hh);
+    else { B.fillRect(x,y,1,bd); B.fillRect(x,y+Hh-bd,1,bd); }
+  }
+  // a *box key: the stamp's own text sits on its own plate by design
+  if(GBOX)GBOX.push({x:x0,y:yAt(x0+W)-2,w:W,h:Hh+Math.round(Math.abs(slope*W))+4,k:'stampbox'});
+  let xx=x0+pad;
+  cs.forEach((c,i)=>{ if(c.trim()) px(c,Math.round(xx),yAt(xx)+pad,size,P.gold,null,f); xx+=ws[i]; });
 }
 
 function strokePoly(pts,col,th,open){
