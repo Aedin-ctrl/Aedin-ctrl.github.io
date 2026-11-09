@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v2.7
+# CATHODE DESK — house style v2.8
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.8 (2026-11-09)** — **the palette rotates**, tags come from a **closed
+> vocabulary**, and the overview panel always lands on a **wiped stage**. A
+> tenth sweep, `checkPiece()`. See *One format, many pieces*.
+>
 > **v2.7 (2026-11-09)** — the style is now a **shared runtime**, not a shape to
 > copy. Three files: `cathode-lib.js` → `piece.js` → `cathode-run.js`. Plus the
 > **library** at `/vid`, the **number and tags** every piece carries, and
@@ -635,6 +639,50 @@ const PIECE={ no:2, slug:'halloumi', tags:['FOOD','CHEM'],
 - **Two tags maximum.** A third is a sign the piece is about two things.
 - The library page reads this same block. The number, the tags, the blurb and
   the running time are never typed twice.
+
+**The palette rotates.** Win95 chrome is Win95 chrome — those seven colours
+never move. Everything else is a **slot**, and each piece fills the slots from
+one of four palettes picked by its number: `DUSK`, `EMBER`, `DEEP`, `VIOLET`.
+Two videos in a row must not look like the same video.
+
+- The slot **names** never change, so **no drawing code knows which palette it
+  is in**. `P.ice` is "the cool accent", not "light blue".
+- `usePalette()` mutates `P` in place, after the piece has declared its number
+  and before anything is drawn. Anything that caches a colour must therefore
+  resolve it through `P` **at draw time** — which is why the sprite sheet
+  stores slot names and not hex.
+- The horizon's ground colours are part of the palette too. Left hard-coded,
+  the ember sky met a purple shore.
+
+**Tags come from a closed set**, like the palette:
+
+```
+FOOD BIOLOGY CHEMISTRY PHYSICS SPACE EARTH WEATHER
+NATURE WILDLIFE BODY TECH HISTORY MONEY NEWS
+```
+
+Full words, not abbreviations — `CHEM` was something nobody would file anything
+under. **At most two**, and `checkPiece()` rejects a tag typed freehand, a
+missing blurb, and a running time outside 65–78s. A library stops being
+browsable the moment one video invents its own vocabulary.
+
+**The overview panel always lands on a wiped stage** — `wipeStage()`, in every
+piece, with the last content beat ending at `BEAT.END.sc`. Honey cleared the
+client area by accident (its last beat simply stopped drawing) while halloumi
+left the whey vat and the hero number sitting behind the panel. Same style, two
+different endings, and nothing in either file said which was right.
+
+**Address `VO` positionally, never by index.** `VO[17]` was the OK click on the
+message box. Honey has 19 sentences, halloumi 18, ice 16 — on the third piece
+it took the whole runtime down before a single frame was drawn, and the error
+it reported was a TDZ on `ctx`. It is `VO[VO.length-1]` now. Same rule as the
+sweeps addressing beats by position.
+
+**A `*box` key is a container, not a surface.** The group box, a lake
+cross-section, a plot area. Text inside one is the point, and the pointer
+resting inside one is not standing in front of anything — so `checkOverlap()`
+and `checkPointerIdle()` both exempt any key ending in `box`. Everything else
+you register is a *thing*, and the rules apply.
 
 **The library is `/vid`.** A short description of the style, one card per
 piece (thumbnail, number, title, blurb, tags, length), and the format notes.

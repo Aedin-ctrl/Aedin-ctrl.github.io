@@ -1,3 +1,9 @@
+/* The palette is chosen HERE, after the piece has declared its number and
+   before anything is drawn: slot values only, so no drawing code knows which
+   palette it is in. Rotating it is the point -- two videos in a row should not
+   look like the same video. */
+usePalette(PIECE.no); paintSwatches();
+
 /* ===== CATHODE DESK -- the shared runtime, part 2 of 2 =====
    Loaded AFTER the piece, because the pointer track is built from the
    piece's own SPOTS and ACTS, and the sweeps measure its explainer.  */
@@ -25,7 +31,11 @@ const PTRACK=(()=>{
          x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
   });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
-  P.push({t:+(VO[17].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
+  // LAST sentence, not sentence 17: honey has 19, halloumi 18, ice 16. A
+  // hard-coded index is how the sweeps used to break on the next script, and
+  // here it took the whole runtime down before a single frame was drawn.
+  const LASTV=VO[VO.length-1];
+  P.push({t:+(LASTV.z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
   P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
   P.sort((a,b)=>a.t-b.t);
   const SPEED=620, SETTLE=0.14, MINTIME=0.26;
@@ -67,6 +77,22 @@ const PTRACK=(()=>{
 })();
 
 
+/* The piece's own declaration, checked rather than trusted: a number, a title,
+   a blurb, and at most two tags FROM THE CLOSED SET. A tag typed freehand is
+   how a library stops being browsable. */
+window.checkPiece=function(){
+  const bad=[];
+  if(!(PIECE.no>0)) bad.push({field:'no',got:PIECE.no});
+  if(!PIECE.slug) bad.push({field:'slug',got:PIECE.slug});
+  if(!PIECE.title||PIECE.title.length<8) bad.push({field:'title',got:PIECE.title});
+  if(!PIECE.blurb||PIECE.blurb.length<40) bad.push({field:'blurb',got:PIECE.blurb});
+  if(!Array.isArray(PIECE.tags)||!PIECE.tags.length||PIECE.tags.length>2)
+    bad.push({field:'tags',got:PIECE.tags,need:'1 or 2'});
+  else for(const t of PIECE.tags)
+    if(TAGS.indexOf(t)<0) bad.push({field:'tag',got:t,need:'one of '+TAGS.join(',')});
+  if(DUR<65||DUR>78) bad.push({field:'DUR',got:DUR,need:'65-78s'});
+  return bad;
+};
 window.DUR=DUR; window.LW=LW; window.LH=LH; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
 // Beat names differ per piece, so the sweeps address them positionally: the
 // first CONTENT beat (after the hook) and the LAST beat. Hard-coding JAR/END
@@ -193,8 +219,10 @@ window.checkPointerIdle=function(step){
     prev=p;
     if(p.caret || stillFor < SIT) continue;
     const c={x:p.x,y:p.y,w:10,h:16};
+    // a *box key is a CONTAINER -- the group box, the lake, the plot area.
+    // Standing inside one is not standing in front of anything.
     const items=r.filter(a=>!a.chrome&&!a.overlay).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
-                 .concat(g.filter(q=>q.k!=='cursor'&&q.k!=='groupbox'));
+                 .concat(g.filter(q=>q.k!=='cursor'&&q.k.slice(-3)!=='box'));
     for(const a of items){
       const ox=Math.min(c.x+c.w,a.x+a.w)-Math.max(c.x,a.x);
       const oy=Math.min(c.y+c.h,a.y+a.h)-Math.max(c.y,a.y);
@@ -313,7 +341,7 @@ window.checkOverlap=function(step){
       if(a.overlay!==b.overlay && (a.overlay||anyOverlay)) continue;
       if(a.chrome) continue;                  // title bars sit on their own chrome
       if(b.k==='cursor') continue;            // the pointer is allowed anywhere
-      if(b.k==='groupbox') continue;          // an outline, not a surface -- text
+      if(b.k.slice(-3)==='box') continue;     // an outline, not a surface -- text
                                               // inside it is the whole point, and
                                               // checkStraddle() polices its border
       if(b.k==='tag:'+a.s) continue;          // a tag's own label sits ON its plate

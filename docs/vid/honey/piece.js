@@ -1,5 +1,5 @@
 /* ===== WHICH VIDEO THIS IS ===== */
-const PIECE={ no:1, slug:'honey', tags:['FOOD','BIO'],
+const PIECE={ no:1, slug:'honey', tags:['FOOD','BIOLOGY'],
               title:"why sealed honey doesn't spoil",
               blurb:"A sealed jar keeps for decades with no preservative in it. Two things do the work — almost no free water, and acid — and the seal is what holds both." };
 
@@ -78,8 +78,10 @@ const L={
   aw:{ ox:PX+108, oy:MIDY+94, off:7, num:MIDY-156, lab:MIDY-106,
        rx:PX+88, ry:MIDY-26 },
   // OSMOSIS -- microbe, arrow, the cross, then the two labels
-  osm:{ bx:PX+58, by:MIDY-156, s:8, ax:PX+130, ay:MIDY-130, xx:PX+288,
-        pull:MIDY+14, lab:MIDY+134 },
+  // the labels hug the diagram: 26px under the row, not 74. The row is bigger
+  // to pay for it -- moving a band up does not fix a band that is too thin.
+  osm:{ bx:PX+48, by:MIDY-94, s:12, ax:PX+168, ay:MIDY-52, xx:PX+280, xs:64,
+        pull:MIDY+16, lab:MIDY+72 },
   // ACID -- the same chart geometry as WATER, so the two beats rhyme
   acid:{ ox:PX+108, oy:MIDY+94, off:7, num:MIDY-156, lab:MIDY-106 },
   // SEAL -- open jar under falling water, the bar climbing past the line
@@ -120,7 +122,7 @@ const ACTS=(()=>{
                                 [PX+320,MIDY+20]);
   // OSMOSIS -- pull the arrow out of the microbe, then strike it out
   drag(W(9,7), W(9,7)+0.75*SPD, [O.ax, O.ay], [O.ax+130, O.ay]);
-  tap (W(10,1)+0.02, [O.xx+20, O.by+20]);
+  tap (W(10,1)+0.02, [O.xx+32, O.by+42]);
   // ACID -- the same haul, shorter stacks
   drag(W(11,2), W(11,2)+0.95*SPD, [AC.ox, AC.oy], [AC.ox, stackTop(AC.oy,8)],
                                   [PX+330,MIDY-40]);
@@ -258,12 +260,12 @@ function explainer(ctx,W2,Hh,t){
       const O=L.osm;
       sprite('bug',O.bx,O.by,O.s);
       if(after(9,7)){
-        dottedArrow([[O.ax,O.ay],[O.ax+130,O.ay]],mp(wordAt(9,7),wordAt(9,7)+0.75*SPD),P.cyan);
+        dottedArrow([[O.ax,O.ay],[O.ax+100,O.ay]],mp(wordAt(9,7),wordAt(9,7)+0.75*SPD),P.cyan);
         if(after(9,11))pxShadow('WATER PULLED OUT',IL,O.pull,22,P.cyan,P.ink);}
       if(after(10,1)){
         B.fillStyle=P.red;
-        for(let i=0;i<40;i++){B.fillRect(O.xx+i,O.by+i,4,4);B.fillRect(O.xx+39-i,O.by+i,4,4);}
-        if(GBOX)GBOX.push({x:O.xx,y:O.by,w:44,h:44,k:'cross'});
+        for(let i=0;i<O.xs;i++){B.fillRect(O.xx+i,O.by+10+i,5,5);B.fillRect(O.xx+O.xs-1-i,O.by+10+i,5,5);}
+        if(GBOX)GBOX.push({x:O.xx,y:O.by+10,w:O.xs+5,h:O.xs+5,k:'cross'});
         pxShadow('OSMOSIS',IL,O.lab,22,P.red,P.ink);}
       typeWrap(10,PX+26,CAPY,CAPSZ,'#c3bad4',null,'"VT323"',CAPCH);
     }
@@ -328,6 +330,7 @@ function explainer(ctx,W2,Hh,t){
       if(BEAT[k].sc>0&&dd<0.20)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.20*15));}
     B.restore();
 
+    if(done) wipeStage(CX,CY,CWd,CHd);   // the overview always lands on a clear stage
     zoomRect([LW/2-20,LH/2-10,40,20],BOX,M,BEAT.END.sc-0.30,BEAT.END.sc);
     if(done){
       OVERLAY=true;

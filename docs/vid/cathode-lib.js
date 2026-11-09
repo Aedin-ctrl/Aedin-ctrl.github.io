@@ -37,15 +37,43 @@ H.mix=(c1,c2,t)=>{const a=Array.isArray(c1)?c1:H.hex(c1),b=Array.isArray(c2)?c2:
 H.layer=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
 
 /* ===== palette: the closed set ===== */
+/* Win95 chrome is Win95 chrome -- those seven never move. Everything else is
+   a SLOT, and each piece fills the slots from one of the palettes below, so
+   two videos in a row do not look like the same video. The slot NAMES stay
+   put, so no drawing code knows which palette it is in.
+   P is mutated in place by usePalette(); anything that caches a colour must
+   resolve it through P at draw time, which is why the sprite sheet stores slot
+   names and not hex. */
 const P={
   face:'#c0c0c0',hi:'#ffffff',lt:'#dfdfdf',sh:'#808080',dk:'#000000',navy:'#000080',teal:'#008080',
-  sky:['#140c34','#1e1146','#2c1658','#43206a','#632a78','#8c357c','#b8457a','#e05c72','#f6806a','#ffaa6e','#ffd28a'],
-  paper:'#fff4e2',bone:'#e3d6c0',earth:'#74432d',orange:'#ff8a3d',grass:'#9fcb55',ice:'#7fc8e8',
-  cyan:'#7ff9ff',green:'#6aff8a',red:'#ff5a4f',gold:'#ffd27a',ink:'#0a0618'};
-(function(){const put=(id,arr)=>{const e=document.getElementById(id); if(!e)return;   // the player pages carry no swatches
+  sky:[],paper:'',bone:'',earth:'',orange:'',grass:'',ice:'',cyan:'',green:'',red:'',gold:'',ink:''};
+const PALETTES=[
+  { name:'DUSK',                                   // #001 -- the original
+    sky:['#140c34','#1e1146','#2c1658','#43206a','#632a78','#8c357c','#b8457a','#e05c72','#f6806a','#ffaa6e','#ffd28a'],
+    paper:'#fff4e2',bone:'#e3d6c0',earth:'#74432d',orange:'#ff8a3d',grass:'#9fcb55',
+    ice:'#7fc8e8',cyan:'#7ff9ff',green:'#6aff8a',red:'#ff5a4f',gold:'#ffd27a',ink:'#0a0618' , ground:['#2c1658','#43206a'] },
+  { name:'EMBER',                                  // hot coals into a bleached sky
+    sky:['#1a0a12','#2b0f1a','#431423','#5e1a26','#7d2426','#9c3222','#bd4a1e','#d96a22','#ee8f3a','#f8b563','#ffd9a0'],
+    paper:'#fff0d8',bone:'#ddc9a6',earth:'#5c3320',orange:'#ff7a2f',grass:'#c8d46a',
+    ice:'#63d6c7',cyan:'#7ff0e2',green:'#b9e36a',red:'#ff4d4d',gold:'#ffc247',ink:'#120608' , ground:['#2a1410','#3d1d16'] },
+  { name:'DEEP',                                   // cold water, green phosphor
+    sky:['#04121c','#061c2b','#07283c','#07354e','#06445e','#0a566b','#157079','#2a8d84','#55ab8d','#8cc79c','#c9e4b7'],
+    paper:'#eaf7ff',bone:'#b9d4dd',earth:'#20414e',orange:'#5fd0ff',grass:'#7ae6b0',
+    ice:'#bfeaff',cyan:'#6ff2ff',green:'#6affb4',red:'#ff6b7a',gold:'#ffe08a',ink:'#030c14' , ground:['#041019','#082230'] },
+  { name:'VIOLET',                                 // indigo night, acid highlights
+    sky:['#0c0820','#141033','#1e1548','#2b1c5e','#3b246f','#50307c','#6a3d87','#8a4e8f','#ad6294','#cc7f9e','#e6a7b4'],
+    paper:'#f4ecff',bone:'#cbbcdd',earth:'#3b2a55',orange:'#ff9ad5',grass:'#a8f06a',
+    ice:'#a6c8ff',cyan:'#8affe8',green:'#9cff7a',red:'#ff5f8d',gold:'#ffd66b',ink:'#070418' , ground:['#160e2c','#241640'] },
+];
+function usePalette(n){
+  const q=PALETTES[((n|0)-1+PALETTES.length*4)%PALETTES.length];
+  for(const k in q) if(k!=='name') P[k]=q[k];
+  P.paletteName=q.name; return q.name;
+}
+function paintSwatches(){const put=(id,arr)=>{const e=document.getElementById(id); if(!e)return;   // the player pages carry no swatches
   arr.forEach(c=>{const i=document.createElement('i');i.style.background=c;i.title=c;e.appendChild(i);});};
  put('pc',[P.face,P.hi,P.lt,P.sh,P.dk,P.navy,P.teal]);put('ps',P.sky);
- put('pv',[P.paper,P.bone,P.earth,P.orange,P.grass,P.ice]);put('pp2',[P.cyan,P.green,P.red,P.gold,P.ink]);})();
+ put('pv',[P.paper,P.bone,P.earth,P.orange,P.grass,P.ice]);put('pp2',[P.cyan,P.green,P.red,P.gold,P.ink]);}
 
 /* ===== buffer: everything draws at 640x360, blits x2 ===== */
 // VERTICAL 9:16 -- this is made for phones, so the frame is the phone's.
@@ -197,7 +225,7 @@ function duskPlate(x0,y0,w,h,groundH){
   for(let j=0;j<ih;j++){
     const y=j+2;                                  // y inside the ORIGINAL rect
     let c1,c2,amt;
-    if(groundH && y>=h-groundH){ c1='#2c1658'; c2='#43206a'; amt=(y-(h-groundH))/groundH; }
+    if(groundH && y>=h-groundH){ c1=P.ground[0]; c2=P.ground[1]; amt=(y-(h-groundH))/groundH; }
     // The sky gradient is mapped over the sky's OWN height, not the whole
     // rect. Mapped over the rect, a tall ground swallowed the warm end of the
     // palette and a "dusk sky" came out uniformly purple.
@@ -222,11 +250,16 @@ const SPR={
        'KHHGGGGGGHHK','KHHGGGGGGHHK','KHHGGGGGGHHK','KHHHHHHHHHHK','KHHHHHHHHHHK',
        'KHHHHHHHHHHK','.KKKKKKKKKK.'],
   bug:['..K..K..','.KKKKKK.','KGGGGGGK','KGKGGKGK','KGGGGGGK','.KGGGGK.','..K..K..'],
+  // the lake beat needs something alive under the lid. First attempt was a
+  // symmetrical blob -- no tail, no eye, and it read as a lozenge.
+  fish:['...KKKK.....','..KGGGGKK..K','.KGKGGGGGKKK','KGGGGGGGGGGK','.KGGGGGGGKKK','..KGGGGKK..K','...KKKK.....'],
 };
-const SPRC={jar:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
-            jaropen:{K:'#0a0618',W:'#c0c0c0',H:'#ff8a3d',G:'#ffd27a'},
-            bug:{K:'#0a0618',G:'#9fcb55'}};
-function sprite(name,x,y,s){const c=SPRC[name];
+// slot names, not hex: the palette is swapped per piece after this file loads
+const SPRC={jar:{K:'ink',W:'face',H:'orange',G:'gold'},
+            jaropen:{K:'ink',W:'face',H:'orange',G:'gold'},
+            bug:{K:'ink',G:'grass'},
+            fish:{K:'ink',G:'grass',W:'hi'}};
+function sprite(name,x,y,s){const m=SPRC[name],c={};for(const k in m)c[k]=P[m[k]];
   if(GBOX)GBOX.push({x:x,y:y,w:SPR[name][0].length*s,h:SPR[name].length*s,k:'sprite:'+name});
   SPR[name].forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch==='.')continue;
     rect(x+i*s,y+j*s,s,s,c[ch]);}});}
@@ -339,6 +372,10 @@ const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
    Every video says which number it is and what it is filed under, in the
    status bar at the bottom of the frame and again on the end card. Two tags
    maximum -- a third is a sign the piece is about two things.  */
+// A closed set, like the palette. "CHEM" was an abbreviation nobody files
+// anything under; these are the words a person would actually browse by.
+const TAGS=['FOOD','BIOLOGY','CHEMISTRY','PHYSICS','SPACE','EARTH','WEATHER',
+            'NATURE','WILDLIFE','BODY','TECH','HISTORY','MONEY','NEWS'];
 const pieceTag=()=>'#'+String(PIECE.no).padStart(3,'0')+'  '+PIECE.tags.slice(0,2).join(' / ');
 function statusBar(r,T,beat){
   const sy=r.y+r.h-15, w1=150, w2=126, x3=r.x+w1+4+w2+4;
@@ -356,5 +393,11 @@ function statusBar(r,T,beat){
    LAST thing anyone sees should not look like homework, so the desktop is a
    dusk sky and the opening beat gets one inside the window too. */
 function deskSky(T){ skyBands(0,0,LW,LH,300); stars(0,0,LW,LH*0.46,46,11,T); }
+
+/* The overview panel always lands on a WIPED stage. Honey cleared the client
+   area because its last beat simply stopped drawing; halloumi left the whey
+   vat and the hero number sitting behind the panel. Same style, two different
+   endings -- so it is one call now and every piece makes it. */
+function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
 function introSky(CX,CY,CWd,CHd,T,groundH){ const g=(groundH===undefined)?400:groundH;
   skyBands(CX,CY,CWd,CHd,g); stars(CX,CY,CWd,(CHd-g)*0.9,34,7,T); }

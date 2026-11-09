@@ -1,7 +1,7 @@
 /* ===== WHICH VIDEO THIS IS =====
    Shown in the status bar at the bottom of every frame and on the end card.
    Two tags at most; the library page reads the same block.  */
-const PIECE={ no:2, slug:'halloumi', tags:['FOOD','CHEM'],
+const PIECE={ no:2, slug:'halloumi', tags:['FOOD','CHEMISTRY'],
               title:"why halloumi doesn't melt",
               blurb:"Every other cheese melts. This one browns, squeaks and holds its shape — because of when the acid arrives and how hot the whey gets." };
 
@@ -332,7 +332,7 @@ function explainer(ctx,W2,Hh,t){
     }
 
     /* --- COOKED --- */
-    if(T>=BEAT.COOKED.sc){
+    if(T>=BEAT.COOKED.sc&&T<BEAT.END.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(BX,BY,BW,BH,'BEFORE YOU EVER BUY IT');
       const K=L.cook;
@@ -357,6 +357,7 @@ function explainer(ctx,W2,Hh,t){
       if(BEAT[k].sc>0&&dd<0.20)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.20*15));}
     B.restore();
 
+    if(done) wipeStage(CX,CY,CWd,CHd);   // the overview always lands on a clear stage
     zoomRect([LW/2-20,LH/2-10,40,20],BOX,M,BEAT.END.sc-0.30,BEAT.END.sc);
     if(done){
       OVERLAY=true;
