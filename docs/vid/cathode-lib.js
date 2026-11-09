@@ -64,6 +64,10 @@ const PALETTES=[
     sky:['#0c0820','#141033','#1e1548','#2b1c5e','#3b246f','#50307c','#6a3d87','#8a4e8f','#ad6294','#cc7f9e','#e6a7b4'],
     paper:'#f4ecff',bone:'#cbbcdd',earth:'#3b2a55',orange:'#ff9ad5',grass:'#a8f06a',
     ice:'#a6c8ff',cyan:'#8affe8',green:'#9cff7a',red:'#ff5f8d',gold:'#ffd66b',ink:'#070418' , ground:['#160e2c','#241640'] },
+  { name:'STORM',                                  // slate weather into a sulphur horizon
+    sky:['#0a1014','#101a22','#162330','#1d2d3d','#26384a','#324557','#425462','#59656a','#78796b','#a08f68','#cbb06c'],
+    paper:'#f2f6f4',bone:'#c5cfc8',earth:'#2c3a36',orange:'#ffa83d',grass:'#9fd96a',
+    ice:'#9fd8ff',cyan:'#72f0ff',green:'#7affa0',red:'#ff6050',gold:'#ffd05a',ink:'#05090c' , ground:['#0e171b','#1b2a2e'] },
 ];
 function usePalette(n){
   const q=PALETTES[((n|0)-1+PALETTES.length*4)%PALETTES.length];

@@ -1,7 +1,13 @@
-# CATHODE DESK — house style v3.5
+# CATHODE DESK — house style v3.6
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.6 (2026-11-09)** — #005. A fifth palette, `STORM`, so the rotation does
+> not come back round to #001's look on the fifth piece. **Kill the common
+> belief in the first spoken line** (see *Refute the folk answer*). The library
+> page builder discovers pieces instead of listing them — a hard-coded list had
+> silently left #004 off the page it generates.
+>
 > **v3.5 (2026-11-09)** — #004 built straight from this file, first time. The
 > palette rotation has now been round once: DUSK, EMBER, DEEP, VIOLET.
 >
@@ -667,7 +673,9 @@ const PIECE={ no:2, slug:'halloumi', tags:['FOOD','CHEM'],
 
 **The palette rotates.** Win95 chrome is Win95 chrome — those seven colours
 never move. Everything else is a **slot**, and each piece fills the slots from
-one of four palettes picked by its number: `DUSK`, `EMBER`, `DEEP`, `VIOLET`.
+one of five palettes picked by its number: `DUSK`, `EMBER`, `DEEP`, `VIOLET`,
+`STORM`. Add one rather than let the rotation wrap: #005 would otherwise have
+been #001 again.
 Two videos in a row must not look like the same video.
 
 - The slot **names** never change, so **no drawing code knows which palette it
@@ -924,6 +932,29 @@ content is skipped entirely while an overlay is up.
 below the line it just typed" — open space while the caption was one line, the
 *second* caption line the moment the strip grew. Rests near content must be
 constants tied to the layout, not offsets from the last thing touched.
+
+## Refute the folk answer
+
+**If there is a well-known wrong explanation, kill it in the first spoken line
+of the first blackboard beat** — before any mechanism, while the question is
+still the only thing in the viewer's head. Ice floats *because there is air in
+it*; metal *is colder than wood*. Someone who arrives holding the wrong answer
+is not listening to the right one, they are waiting to see whether you agree.
+
+- It is **one short sentence**, three or four words. `It isn't colder.`
+- It gets a **picture of its own**: in #005 the word `COLDER` is printed large
+  and the pointer strikes it out, and it is gone before the first bar lands.
+  The refutation is a beat, not an aside.
+- The piece does not then argue with the folk answer. It states that it is
+  wrong, once, and spends the rest of the time on what is actually true.
+- **If there is no common wrong answer, skip it.** Inventing a misconception to
+  knock down is worse than not having one: it tells the viewer that something
+  they never believed is now their problem.
+
+**The word must clear before the thing that replaces it arrives.** The fade is
+written off the END of its own sentence (`VO[n].z`), never off a word inside the
+next one — "a" and "steel" in #005 are 70ms apart, and a 0.40s fade across that
+gap put the struck-out word inside the first voxel bar.
 
 ## Accuracy
 
