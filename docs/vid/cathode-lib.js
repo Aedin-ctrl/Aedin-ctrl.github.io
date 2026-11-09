@@ -151,7 +151,11 @@ let BOUNDS=null;   // text extents
 let GBOX=null;     // extents of the things text can hide behind
 let INCHROME=false;
 let OVERLAY=false; // true while drawing a window that FLOATS OVER the panel// true while drawing Win95 furniture, which is 9px by definition
-function px(str,x,y,size,col,align,font){
+/* The glyph cache, split out of px() so a caller can MEASURE before placing.
+   g.w is the advance width plus slop and g.h is the last lit row; neither is
+   the ink box, which is what you need to centre something inside a circle.
+   ix0..iy1 are that box. */
+function glyph(str,size,font){
   const key=str+'|'+size+'|'+(font||'p');
   let g=TCACHE.get(key);
   if(!g){TX.clearRect(0,0,420,48);
@@ -161,8 +165,15 @@ function px(str,x,y,size,col,align,font){
     const cut=raw>720;
     const d=TX.getImageData(0,0,w,h).data,pts=[];
     for(let j=0;j<h;j++)for(let i=0;i<w;i++)if(d[(j*w+i)*4+3]>120)pts.push([i,j]);
-    let gh=0; for(const[,j]of pts) if(j+1>gh) gh=j+1;
-    g={pts,w,h:gh,cut:cut,full:raw};TCACHE.set(key,g);}
+    let gh=0,ix0=1e9,ix1=-1e9,iy0=1e9,iy1=-1e9;
+    for(const[i,j]of pts){ if(j+1>gh) gh=j+1;
+      if(i<ix0)ix0=i; if(i>ix1)ix1=i; if(j<iy0)iy0=j; if(j>iy1)iy1=j; }
+    if(!pts.length){ix0=iy0=0;ix1=iy1=-1;}
+    g={pts,w,h:gh,cut:cut,full:raw,ix0,ix1,iy0,iy1};TCACHE.set(key,g);}
+  return g;}
+function px(str,x,y,size,col,align,font){
+  const g=glyph(str,size,font);
+  const key=str+'|'+size+'|'+(font||'p');
   let ox=Math.round(x);if(align==='center')ox=Math.round(x-g.w/2);if(align==='right')ox=Math.round(x-g.w);
   const oy=Math.round(y);
   // A string is drawn hundreds of times at the same size and colour, so the
@@ -377,6 +388,35 @@ const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
 const TAGS=['FOOD','BIOLOGY','CHEMISTRY','PHYSICS','SPACE','EARTH','WEATHER',
             'NATURE','WILDLIFE','BODY','TECH','HISTORY','MONEY','NEWS'];
 const pieceTag=()=>'#'+String(PIECE.no).padStart(3,'0')+'  '+PIECE.tags.slice(0,2).join(' / ');
+/* Put a glyph's INK centre on a point, both axes. px() places a top-left (or
+   a centred advance width, which is not the same thing), so the ? inside the
+   help icon was placed by eye in every piece: 3px left and 6px low, in all
+   three, because nobody ever computed where the circle's middle was. */
+function pxMid(str,cx,cy,size,col,font){
+  const g=glyph(str,size,font);
+  if(g.ix1<g.ix0) return 0;
+  return px(str, Math.round(cx-(g.ix0+g.ix1+1)/2), Math.round(cy-(g.iy0+g.iy1+1)/2),
+            size, col, null, font);
+}
+
+/* The Win95 info/help icon: one circle, one glyph, centred in it by
+   construction. Drawn from the CENTRE out, so the circle is symmetrical and
+   the thing inside it lands on the same point. kind is '?' or 'i'. */
+function winIcon(x,y,kind){
+  const R=12, cx=x+R, cy=y+R, navy='#000080';
+  // a CIRCLE, not the 26x22 ellipse this used to be
+  for(let j=-R;j<=R;j++)for(let i=-R;i<=R;i++){
+    const d=Math.hypot(i,j)/R;
+    if(d<0.93) rect(cx+i,cy+j,1,1,'#fff');
+    else if(d<1.0) rect(cx+i,cy+j,1,1,'#000');
+  }
+  // 15px, not 20: at 20 the ? inked 18x18 inside a 21px disc and pushed out
+  // through the top and bottom of its own circle
+  if(kind==='?') pxMid('?',cx,cy,15,navy);
+  else { rect(cx-1,cy-7,3,3,navy); rect(cx-1,cy-1,3,9,navy); }   // dot + stem: 15 rows, cy-7..cy+7
+  return {cx:cx,cy:cy,r:R};
+}
+
 function statusBar(r,T,beat){
   const sy=r.y+r.h-15, w1=150, w2=126, x3=r.x+w1+4+w2+4;
   const seg=(x,w)=>{rect(x,sy,w,14,P.face);bevel(x,sy,w,14,'field');};
@@ -399,5 +439,36 @@ function deskSky(T){ skyBands(0,0,LW,LH,300); stars(0,0,LW,LH*0.46,46,11,T); }
    vat and the hero number sitting behind the panel. Same style, two different
    endings -- so it is one call now and every piece makes it. */
 function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
+
+/* The vibrant beat is a QUESTION, and nothing else. Big type on the dusk sky,
+   TYPED across the beat's own speech, then the piece wipes to the blackboard.
+   No diagram on it: a voxel chart on a sunset was competing with its own
+   background, and the contrast between a title card and a dark field is the
+   whole reason the sky is there. Left-aligned, because typing reads from a
+   margin and a caret on the end of a centred line wanders.
+   Returns where the caret belongs, for the caller to hand to CARET. */
+function questionCard(lines,t,t0,t1,y,size,gap,until){
+  const sz=size||26, gp=gap||44, x=IL+8;
+  const total=lines.reduce((a,l)=>a+l.length+1,0)-1;
+  let n=Math.round(H.clamp((t-t0)/Math.max(0.001,t1-t0))*total);
+  let caret=null;
+  for(let i=0;i<lines.length;i++){
+    const L=lines[i], yy=y+i*gp;
+    if(n<=0) break;
+    const cut=L.slice(0,Math.min(L.length,n));
+    // paper, not gold: gold on the ember sky was two warm colours fighting.
+    // Near-white carries on every palette, which is the point of a slot.
+    const w=cut?pxShadow(cut,x,yy,sz,P.paper,P.ink):0;
+    caret={x:x+w+Math.round(sz*0.35),y:yy,h:sz,col:P.paper};
+    n-=L.length+1;
+  }
+  // The caret stays until the scene changes. Letting it go the moment the
+  // question finished left the pointer parked on the second line for the rest
+  // of the beat -- the exact thing checkPointerIdle() is for.
+  // ...and one CONTENT frame past that: the beat is gated on T (12fps) while
+  // the caret is gated on t, so for up to 1/12s the card is still on screen
+  // with nothing typing on it. That one frame is a pointer-idle hit.
+  return (t < (until===undefined?t1+0.45:until+1/12)) ? caret : null;
+}
 function introSky(CX,CY,CWd,CHd,T,groundH){ const g=(groundH===undefined)?400:groundH;
   skyBands(CX,CY,CWd,CHd,g); stars(CX,CY,CWd,(CHd-g)*0.9,34,7,T); }

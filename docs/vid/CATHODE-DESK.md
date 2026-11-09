@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v2.8
+# CATHODE DESK — house style v2.9
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.9 (2026-11-09)** — the vibrant beat is a **typed question card and
+> nothing else**, fixed captions **type** instead of appearing, and the Win95
+> icon is drawn from its own centre. See *Vibrant at the edges*.
+>
 > **v2.8 (2026-11-09)** — **the palette rotates**, tags come from a **closed
 > vocabulary**, and the overview panel always lands on a **wiped stage**. A
 > tenth sweep, `checkPiece()`. See *One format, many pieces*.
@@ -692,11 +696,56 @@ screenshot at the buffer size *is* the frame — there is no cropping step to ge
 wrong. Downscale to 216×384 for the card; a full-size frame of CRT grain is
 ~580KB and does not compress.
 
-**Vibrant at the edges, dark in the middle.** The teaching beats are a dark
-field because that is what you read numbers off. The **desktop, the opening
-beat and the end card are a dusk sky** — the first and last thing anyone sees
-should not look like homework. Anything set over the sky gets a shadow; bone
-text on the pale band at the horizon is unreadable without one.
+## Vibrant at the edges
+
+The teaching beats are a dark field because that is what you read numbers off.
+The **desktop, the opening beat and the end card are a dusk sky** — the first
+and last thing anyone sees should not look like homework.
+
+**Nothing but words goes on the sky.** The opening beat is a **question card**:
+three lines of 26px type, left-aligned, near-white with an ink shadow, and
+nothing else — no chart, no sprite, no tag. A voxel diagram on a sunset was
+competing with its own background, and the contrast between a title card and a
+blackboard is the entire reason the sky is there. The end card obeys the same
+rule, which it already did.
+
+**The card asks the question the dark beats answer**, and it **types**:
+
+```js
+questionCard(['SO WHY DOES','WATER','EXPAND?'], t,
+             wordAt(1,0), VO[2].z, MIDY-57, 26, 44, BEAT.CAGE.sc);
+```
+
+from the beat's first word onset to the end of its speech, with the caret at
+the end of the last visible line — then the piece wipes to the blackboard.
+
+- **Near-white, not gold.** Gold on the ember sky was two warm colours
+  fighting. `P.paper` carries on every palette, which is what a slot is for.
+- **Hold the caret until the scene changes, plus one content frame.** The beat
+  is gated on `T` (12fps) and the caret on `t`, so for up to 1/12s the card is
+  on screen with nothing typing on it — one frame, and `checkPointerIdle()`
+  sees it.
+- A title card is deliberately sparse, so `checkComposition()` checks the
+  **first content beat for centring only**, never for fill.
+
+**If it looks typed, it has to BE typed.** `capLine()` printed its whole string
+the instant its word was spoken, which reads as text *appearing*. It types now,
+character by character across a span derived from the string's own length, with
+the caret following. Tag plates and axis labels still arrive whole — those are
+objects and furniture, not someone at a keyboard.
+
+**Reachability must see typing sessions, not just actions.** The gate measured
+from the last committed *action*, so a session sitting between two actions was
+invisible: the hand could be parked on a caption at 12.43 and expected at a
+chart 337px away at 12.78 — a 107px teleport in one frame. It takes whichever
+came last now, the action or the session point.
+
+**The Win95 icon is drawn from its centre.** One function, one circle, one
+glyph centred in it by construction — it was a 26×22 ellipse with the `?`
+hand-placed 3px left and 6px low, in all three pieces, because nobody had ever
+computed where the middle of the circle was. `pxMid()` centres on the glyph's
+**ink** box, not on its advance width, and the `?` is set at 15px: at 20 it
+inked 18×18 inside a 21px disc and pushed out through the top.
 
 **Map the sky gradient over the sky's own height**, not over the whole rect. A
 tall ground swallowed the warm end of the palette and a "dusk sky" came out

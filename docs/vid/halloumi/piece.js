@@ -77,7 +77,8 @@ const SENT={
 // and nothing in the source showed it. Written this way the band each beat
 // occupies is readable, and checkComposition() holds it to +/-56px.
 const L={
-  pan:{ oyL:MIDY-5, oxL:PX+96, oxR:PX+256, surf:MIDY+15, cubes:10, foot:4 },
+  // PAN -- the vibrant one. A typed question on the sky and nothing else.
+  pan:{ q:['SO WHY DOES','IT HOLD','ITS SHAPE?'], y:MIDY-57, horizon:MIDY+240 },
   net:{ x:PX+46, y:MIDY-172, gx:72, gy:84, cols:5, rows:4,
         lab:MIDY+127, frag:MIDY+125 },
   win:{ ox:PX+78, oy:MIDY+107, n1:[PX+40,MIDY-189], n2:[PX+196,MIDY-189] },
@@ -93,7 +94,7 @@ const SPOTS=[
   // click just LEFT of where the line starts: when there is no time to step
   // away before the next action, the pointer rests here, and resting ON the
   // first character of the line you just typed counts as sitting on content.
-  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:1,  x:IL-6, y:L.pan.y, s:26},
   {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:6,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:10, x:L.side.x-16, y:L.side.good, s:22},
@@ -118,10 +119,7 @@ const ACTS=(()=>{
   };
   const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r||near(b),k:'drag'});
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
-  // PAN -- push the cheddar down as it slumps, then point at the one that doesn't
-  drag(W(1,6), W(1,6)+1.30*SPD, [L.pan.oxL, stackTop(L.pan.oyL,L.pan.cubes)],
-                                [L.pan.oxL, L.pan.surf-6]);
-  tap (W(2,1), [L.pan.oxR, stackTop(L.pan.oyL,L.pan.cubes)+10]);
+  // PAN is a title card -- the only thing the hand does on it is type.
   // NET -- lay the lattice, tap a calcium bridge, then pull it open
   drag(W(4,3), W(4,3)+1.10*SPD, [L.net.x, L.net.y],
        [L.net.x+(L.net.cols-1)*L.net.gx, L.net.y+(L.net.rows-1)*L.net.gy]);
@@ -182,17 +180,22 @@ function explainer(ctx,W2,Hh,t){
     rows.slice(0,3).forEach((rw,k)=>
       typeLine(n,x,y+k*Math.round(size*1.5),size,col,shadow,font,rw[0],rw[rw.length-1]+1));
   };
-  const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
+  // A fixed caption that TYPES. It used to print the whole string the instant
+  // its word was spoken, which reads as text APPEARING. If a line looks typed
+  // it has to be typed -- that is the whole conceit of the medium.
+  const capLine=(str,n,i,x,y,size,col,shadow,font,span)=>{
     if(!after(n,i)) return 0;
-    const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
-                    :px(str,x,y,size,col,null,font);
-    if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
+    const t0=VO[n].t[i], t1=t0+(span||Math.max(0.45,str.length*0.042));
+    const cut=str.slice(0,Math.max(1,Math.round(H.clamp((t-t0)/(t1-t0))*str.length)));
+    const w = shadow?pxShadow(cut,x,y,size,col,shadow,null,font)
+                    :px(cut,x,y,size,col,null,font);
+    if(t<t1+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
   const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
   const CLICK=VO[17].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>wordAt(1,8)&&t<wordAt(1,8)+0.22)boost=1.35;
+  if(t>VO[3].z&&t<VO[3].z+0.22)boost=1.35;          // the question completing
   if(t>wordAt(10,4)&&t<wordAt(10,4)+0.25)boost=1.45;
   if(t>wordAt(13,13)&&t<wordAt(13,13)+0.22)boost=1.40;
 
@@ -203,9 +206,7 @@ function explainer(ctx,W2,Hh,t){
   const dlgOut=BEAT.PAN.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
-    for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-      if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
-    px('?',r.x+20,r.y+16,20,'#000080','center');
+    winIcon(r.x+10,r.y+9,'?');
     typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,2);
     typeLine(0,r.x+50,r.y+56,14,'#000',null,null,2);
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=VO[0].z);
@@ -226,33 +227,11 @@ function explainer(ctx,W2,Hh,t){
 
     /* --- PAN --- */
     if(T<BEAT.NET.sc){
-      introSky(CX,CY,CWd,CHd,T);
-      groupBox(BX,BY,BW,BH,'THE SAME HOT PAN');
-      const PL=proj(L.pan.oxL,L.pan.oyL), PR=proj(L.pan.oxR,L.pan.oyL);
-      // The pan was a 2px dotted line: in a 9:16 frame a hairline reads as
-      // nothing, and it was invisible to every sweep besides. It is a slab now,
-      // and it is registered (rule 31).
-      const psY=L.pan.surf, psH=18, PF=L.pan.foot;
-      B.fillStyle='#2b231c'; B.fillRect(IL,psY,IR-IL,psH);
-      B.fillStyle='#4a3b2e'; for(let x=IL;x<IR;x+=4)B.fillRect(x,psY,3,2);
-      B.fillStyle='#6b5340'; B.fillRect(IL,psY+psH-2,IR-IL,2);
-      if(GBOX)GBOX.push({x:IL,y:psY,w:IR-IL,h:psH,k:'pan'});
-      const melt=mp(wordAt(1,6),wordAt(1,6)+1.30);
-      if(after(1,1)){
-        const NC=L.pan.cubes;
-        const h=Math.max(1,Math.round(NC-(NC-1)*H.ease.inOut(melt)));
-        voxBar(PL,0,0,h,'#ffd27a',1,PF);
-        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,PF+2);
-        if(after(1,8)){const b=barBase(L.pan.oxL,L.pan.oyL,0,0,PF);
-          blockTag(b.x,b.y+36,'CHEDDAR',14,P.paper,'#74432d');}
-      }
-      if(after(2,0)){
-        const brown=mp(wordAt(2,1),wordAt(2,1)+1.10);
-        voxBar(PR,0,0,L.pan.cubes,H.mix('#fff4e2','#c97b3c',H.ease.out(brown)),1,PF);
-        if(after(2,2)){const b=barBase(L.pan.oxR,L.pan.oyL,0,0,PF);
-          blockTag(b.x,b.y+36,'HALLOUMI',14,P.ice,'#0a0618');}
-      }
-      typeWrap(3,PX+26,CAPY,CAPSZ,'#ffd28a',P.ink,'"VT323"',CAPCH);   // shadowed: the intro caption sits on the sky
+      const Q=L.pan;
+      introSky(CX,CY,CWd,CHd,T,CHd-(Q.horizon-CY));
+      groupBox(BX,BY,BW,BH,'THE QUESTION');
+      const q=questionCard(Q.q,t,wordAt(1,0),VO[3].z,Q.y,26,44,BEAT.NET.sc);
+      if(q) CARET=q;
     }
 
     /* --- NET --- */
@@ -362,9 +341,7 @@ function explainer(ctx,W2,Hh,t){
     if(done){
       OVERLAY=true;
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
-      for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-        if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
-      rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
+      winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
       capLine('> Not acidic enough.',16,1,tx,m.y+12,14,'#000');
       capLine('> Already cooked.',16,4,tx,m.y+40,14,'#000');
@@ -446,11 +423,9 @@ function buildScore(){
   RINGS.forEach(q=>add(q.t,'click'));
   add(BEAT.PAN.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   // text printing
-  [0,3,5,6,10,11,15,16,17].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // the question card types across sentences 1-3, so every word of them blips
+  [0,1,2,3,5,6,10,11,15,16,17].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  // the cheddar collapsing, and the one that does not
-  bar(w(1,6), w(1,6)+1.30, 6, 1);
-  add(w(1,8),'tag'); add(w(2,1),'tag');
   // the lattice building, then loosening
   bar(w(4,3), w(4,3)+1.10, 20, 4);
   add(w(4,9),'tag');  add(w(5,1),'draw'); add(w(5,5),'draw');
@@ -463,7 +438,7 @@ function buildScore(){
   add(w(9,5),'draw'); add(w(10,4),'zap'); add(w(11,0),'draw');
   // the vat
   add(w(13,6),'knock',0); add(w(13,13),'zap'); add(w(14,2),'tag');
-  add(w(1,8),'zap');
+  add(VO[3].z,'zap');                     // the question lands, then the wipe
   const BPM=112, E8=30/BPM, FIG=[220.00,261.63,329.63,261.63,293.66,349.23,293.66,261.63];
   for(let i=0,tt=BEAT.PAN.a;tt<VO[17].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));

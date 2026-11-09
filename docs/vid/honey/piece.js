@@ -71,9 +71,8 @@ const SENT={
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
-  // JAR -- a centred column on a sunset: the claim, the jar, its tag
-  jar:{ big1:MIDY-116, big2:MIDY-76, x:PX+162, y:MIDY-6, s:7, tag:MIDY+110,
-        ground:MIDY+85 },
+  // JAR -- the vibrant one. A typed question on the sky and nothing else.
+  jar:{ q:['SO WHY CAN','NOTHING LIVE','IN IT?'], y:MIDY-57, horizon:MIDY+240 },
   // WATER -- two stacks offset along x-y so they stand level and 140px apart
   aw:{ ox:PX+108, oy:MIDY+94, off:7, num:MIDY-156, lab:MIDY-106,
        rx:PX+88, ry:MIDY-26 },
@@ -92,8 +91,7 @@ const L={
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14},
-  {n:2,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:1,  x:IL-6, y:L.jar.y, s:26},
   {n:4,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:10, x:PX+10, y:CAPY, s:CAPSZ},
   {n:16, x:PX+10, y:CAPY, s:CAPSZ},
@@ -110,8 +108,7 @@ const ACTS=(()=>{
   const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r||near(b),k:'drag'});
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const J=L.jar, AW=L.aw, O=L.osm, AC=L.acid, S=L.seal;
-  // JAR -- carry the SEALED HONEY tag down onto the jar
-  drag(W(1,2)-0.30, W(1,2)+0.50, [J.x+42, J.y-80], [J.x+42, J.tag], [PX+330,MIDY-120]);
+  // JAR is a title card -- the only thing the hand does on it is type.
   // WATER -- sweep the six cubes into place, one ring each, then haul the stacks
   drag(W(4,0)+0.25, W(4,0)+(5*0.11+0.26), [AW.rx, AW.ry+10], [AW.rx+108, AW.ry+10]);
   for(let i=0;i<6;i++) A.push({t0:+(W(4,0)+(i*0.11+0.26)).toFixed(3),k:'ring',
@@ -165,11 +162,16 @@ function explainer(ctx,W2,Hh,t){
     rows.slice(0,3).forEach((rw,k)=>
       typeLine(n,x,y+k*Math.round(size*1.5),size,col,shadow,font,rw[0],rw[rw.length-1]+1));
   };
-  const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
+  // A fixed caption that TYPES. It used to print the whole string the instant
+  // its word was spoken, which reads as text APPEARING. If a line looks typed
+  // it has to be typed -- that is the whole conceit of the medium.
+  const capLine=(str,n,i,x,y,size,col,shadow,font,span)=>{
     if(!after(n,i)) return 0;
-    const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
-                    :px(str,x,y,size,col,null,font);
-    if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
+    const t0=VO[n].t[i], t1=t0+(span||Math.max(0.45,str.length*0.042));
+    const cut=str.slice(0,Math.max(1,Math.round(H.clamp((t-t0)/(t1-t0))*str.length)));
+    const w = shadow?pxShadow(cut,x,y,size,col,shadow,null,font)
+                    :px(cut,x,y,size,col,null,font);
+    if(t<t1+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
   const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
   const CLICK=VO[18].z+0.52, SHUT=CLICK+0.15;
@@ -186,9 +188,7 @@ function explainer(ctx,W2,Hh,t){
   const dlgOut=BEAT.JAR.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
-    for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-      if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
-    px('?',r.x+20,r.y+16,20,'#000080','center');
+    winIcon(r.x+10,r.y+9,'?');
     typeLine(0,r.x+50,r.y+14,14,'#000',null,null,0,2);
     typeLine(0,r.x+50,r.y+38,14,'#000',null,null,2,4);
     typeLine(0,r.x+50,r.y+62,14,'#000',null,null,4);
@@ -211,17 +211,10 @@ function explainer(ctx,W2,Hh,t){
        look like homework. --- */
     if(T<BEAT.WATER.sc){
       const J=L.jar;
-      introSky(CX,CY,CWd,CHd,T,CHd-(J.ground-CY));
-      groupBox(BX,BY,BW,BH,'A SEALED JAR');
-      const jy=J.y+Math.round(Math.sin(M*2));
-      sprite('jar',J.x,jy,J.s);
-      if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42));
-        if(k>0)blockTag(J.x+42,J.tag,'SEALED HONEY',14,P.paper,'#74432d');}
-      if(after(1,5)){
-        pxShadow('KEEPS FOR',(IL+IR)/2,J.big1,22,P.gold,P.ink,'center');
-        if(after(1,7))pxShadow('DECADES.',(IL+IR)/2,J.big2,22,P.gold,P.ink,'center');}
-      typeWrap(2,PX+26,CAPY,CAPSZ,'#ffd28a',P.ink,'"VT323"',CAPCH);
-      typeWrap(3,PX+26,CAPY+30,CAPSZ,'#ffd28a',P.ink,'"VT323"',CAPCH);
+      introSky(CX,CY,CWd,CHd,T,CHd-(J.horizon-CY));
+      groupBox(BX,BY,BW,BH,'THE QUESTION');
+      const q=questionCard(J.q,t,wordAt(1,0),VO[3].z,J.y,26,44,BEAT.WATER.sc);
+      if(q) CARET=q;
     }
 
     /* --- WATER --- */
@@ -335,9 +328,7 @@ function explainer(ctx,W2,Hh,t){
     if(done){
       OVERLAY=true;
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
-      for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-        if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
-      rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
+      winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
       capLine('> Dry.',17,0,tx,m.y+8,14,'#000');
       capLine('> Acidic.',17,1,tx,m.y+30,14,'#000');
@@ -418,7 +409,8 @@ function buildScore(){
   add(BEAT.JAR.sc-0.35*SPD,'open'); add(BEAT.END.sc-0.30*SPD,'open');
   add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
   // screen: a print blip on every spoken word that appears as text on screen
-  [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // the question card types across sentences 1-3, so every word of them blips
+  [1,2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   VO[0].t.forEach((tt,i)=>add(tt,'blip',i));
   [17,18].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   // objects: stacks landing. Every 3rd cube so a bar reads as a stack.

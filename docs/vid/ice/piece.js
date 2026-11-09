@@ -53,8 +53,10 @@ const SENT={
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
-  // SHRINK -- the vibrant one: a floe on a cold dusk, 8% of it in the air
-  shr:{ big:MIDY-150, sea:MIDY+60, ox:PX+180, cubes:12, foot:4 },
+  // SHRINK -- the vibrant one. A typed question on the sky and nothing else:
+  // no diagram competes with the sunset, and the blackboard beats land harder
+  // for having a title card in front of them.
+  shr:{ q:['SO WHY DOES','WATER','EXPAND?'], y:MIDY-57, horizon:MIDY+240 },
   // CAGE -- the same 20 molecules, crowded then locked open
   cage:{ x:PX+68, y:MIDY-170, gx:86, gy:72, cols:4, rows:5, tag:MIDY+174 },
   // WEIGH -- 1 cube = 50 grams per litre, so 1000 is 20 cubes and 917 is 18
@@ -69,7 +71,7 @@ const L={
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14},
-  {n:1,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:1,  x:IL-6, y:L.shr.y, s:26},
   {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:10, x:PX+10, y:CAPY, s:CAPSZ},
@@ -87,8 +89,7 @@ const ACTS=(()=>{
   const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r||near(b),k:'drag'});
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const S=L.shr, C=L.cage, G=L.wg, F=L.four, K=L.lake;
-  // SHRINK -- the floe is pushed UP until it sits where it floats
-  drag(W(2,1), W(2,1)+1.00*SPD, [S.ox, S.sea+120], [S.ox, S.sea-22], [PX+90,MIDY-60]);
+  // SHRINK is a title card -- the only thing the hand does on it is type.
   // CAGE -- pull the crowd apart into the lattice, then tap one bond
   drag(W(4,0), W(4,0)+1.20*SPD, [PX+200, MIDY+20], [C.x+(C.cols-1)*C.gx, C.y+(C.rows-1)*C.gy],
        [PX+70, MIDY+190]);
@@ -138,17 +139,22 @@ function explainer(ctx,W2,Hh,t){
     rows.slice(0,3).forEach((rw,k)=>
       typeLine(n,x,y+k*Math.round(size*1.5),size,col,shadow,font,rw[0],rw[rw.length-1]+1));
   };
-  const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
+  // A fixed caption that TYPES. It used to print the whole string the instant
+  // its word was spoken, which reads as text APPEARING. If a line looks typed
+  // it has to be typed -- that is the whole conceit of the medium.
+  const capLine=(str,n,i,x,y,size,col,shadow,font,span)=>{
     if(!after(n,i)) return 0;
-    const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
-                    :px(str,x,y,size,col,null,font);
-    if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
+    const t0=VO[n].t[i], t1=t0+(span||Math.max(0.45,str.length*0.042));
+    const cut=str.slice(0,Math.max(1,Math.round(H.clamp((t-t0)/(t1-t0))*str.length)));
+    const w = shadow?pxShadow(cut,x,y,size,col,shadow,null,font)
+                    :px(cut,x,y,size,col,null,font);
+    if(t<t1+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
   const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
   const CLICK=VO[15].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>wordAt(2,1)&&t<wordAt(2,1)+0.22)boost=1.40;
+  if(t>VO[2].z&&t<VO[2].z+0.22)boost=1.40;         // the question completing
   if(t>wordAt(8,0)&&t<wordAt(8,0)+0.25)boost=1.45;
   if(t>wordAt(12,13)&&t<wordAt(12,13)+0.22)boost=1.35;
 
@@ -159,9 +165,7 @@ function explainer(ctx,W2,Hh,t){
   const dlgOut=BEAT.SHRINK.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
-    for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-      if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
-    px('?',r.x+20,r.y+16,20,'#000080','center');
+    winIcon(r.x+10,r.y+9,'?');
     typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,2);
     typeLine(0,r.x+50,r.y+56,14,'#000',null,null,2);
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
@@ -183,22 +187,10 @@ function explainer(ctx,W2,Hh,t){
        and the whole first half of the piece in one picture. --- */
     if(T<BEAT.CAGE.sc){
       const S=L.shr;
-      introSky(CX,CY,CWd,CHd,T,CHd-(S.sea-CY));
-      groupBox(BX,BY,BW,BH,'ALMOST NOTHING ELSE DOES THIS');
-      B.fillStyle=P.ice;
-      for(let x=IL;x<IR;x+=4)B.fillRect(x,S.sea+Math.round(Math.sin(M*2.2+x*0.07)*2),3,2);
-      if(GBOX)GBOX.push({x:IL,y:S.sea-2,w:IR-IL,h:6,k:'sea'});
-      if(after(2,0)){
-        const up=mp(wordAt(2,1),wordAt(2,1)+1.00*SPD);
-        // starts fully submerged and rises to where it floats, with 8% of its
-        // height left in the air. The number itself is the next beat's job.
-        const sunk=S.sea+S.cubes*CZ+34;
-        const flo=S.sea+S.cubes*CZ-Math.round(S.cubes*CZ*0.083);
-        const oy=Math.round(H.lerp(sunk,flo,H.ease.out(up)));
-        voxBar(proj(S.ox,oy),0,0,S.cubes,P.ice,1,S.foot);
-      }
-      if(after(2,1))pxShadow('WATER EXPANDS.',(IL+IR)/2,S.big,22,P.gold,P.ink,'center');
-      typeWrap(1,PX+26,CAPY,CAPSZ,'#ffd28a',P.ink,'"VT323"',CAPCH);
+      introSky(CX,CY,CWd,CHd,T,CHd-(S.horizon-CY));
+      groupBox(BX,BY,BW,BH,'THE QUESTION');
+      const q=questionCard(S.q,t,wordAt(1,0),VO[2].z,S.y,26,44,BEAT.CAGE.sc);
+      if(q) CARET=q;
     }
 
     /* --- CAGE --- */
@@ -337,9 +329,7 @@ function explainer(ctx,W2,Hh,t){
     if(done){
       OVERLAY=true;
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
-      for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
-        if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
-      rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
+      winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
       capLine('> Open cage.',14,0,tx,m.y+12,14,'#000');
       capLine('> Heaviest at four.',14,2,tx,m.y+40,14,'#000');
@@ -415,10 +405,10 @@ function buildScore(){
   RINGS.forEach(q=>add(q.t,'click'));
   add(BEAT.SHRINK.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   add(VO[15].z+0.30,'snap'); add(VO[15].z+0.52,'click'); add(VO[15].z+0.67,'open');
-  [0,1,5,8,10,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // the question card types across sentences 1-2, so every word of them blips
+  [0,1,2,5,8,10,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  bar(w(2,1), w(2,1)+1.00, 12, 3);                 // the floe rising
-  add(w(2,1)+1.00,'tag');
+  add(VO[2].z,'zap');                              // the question lands, then the wipe
   bar(w(4,0), w(4,0)+1.20, 20, 4);                 // the cage locking
   add(w(4,5),'draw'); add(w(4,13),'tag');
   bar(w(6,6), w(6,6)+1.15, 20, 4);                 // the two litres

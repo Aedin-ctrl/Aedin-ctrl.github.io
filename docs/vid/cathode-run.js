@@ -44,10 +44,18 @@ const PTRACK=(()=>{
   const commit=q=>{P.push(q); lastT=q.t; lastP=[q.x,q.y];};
   const fixed=P.slice().sort((a,b)=>a.t-b.t);
   const taken=(t)=>fixed.find(f=>Math.abs(f.t-t)<0.30);
+  /* Reachability was measured from the last committed ACTION only, so a
+     typing session sitting between two actions was invisible to it: the hand
+     could be parked on a caption at 12.43 and expected at a chart 337px away
+     at 12.78. Take whichever came last, the action or the session point. */
+  const prevPoint=(t)=>{ let b={t:lastT,x:lastP[0],y:lastP[1]};
+    for(const f of fixed) if(f.t<=t && f.t>b.t) b=f;
+    return b; };
   ACTS.slice().sort((a,b)=>a.t0-b.t0).forEach(A=>{
     if(A.k==='ring'){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
     if(taken(A.t0)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
-    if(!reach(lastP,A.a,A.t0-lastT)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
+    const pv=prevPoint(A.t0);
+    if(!reach([pv.x,pv.y],A.a,A.t0-pv.t)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
     if(A.k==='click'){
       commit({t:+(A.t0-SETTLE).toFixed(3),x:A.a[0],y:A.a[1]});
       commit({t:A.t0,x:A.a[0],y:A.a[1],c:1});
@@ -278,7 +286,10 @@ window.checkComposition=function(tol,minFill){
     }
     if(n<2) continue;
     const off=(y0+y1)/2-(bt+box.h/2), fill=(y1-y0)/box.h;
-    const why=(off>T?'low':off<-T?'high':'')+(fill<MF?(off>T||off<-T?'+':'')+'thin':'');
+    // The first content beat is a TITLE CARD -- a typed question on the sky,
+    // deliberately sparse. Centring still applies to it; filling does not.
+    const card = i===0;
+    const why=(off>T?'low':off<-T?'high':'')+((!card&&fill<MF)?(off>T||off<-T?'+':'')+'thin':'');
     if(!why) continue;
     bad.push({beat:ks[i],t:+tt.toFixed(2),band:[y0,y1],
               off:Math.round(off),tol:T,fill:+fill.toFixed(2),why:why});
