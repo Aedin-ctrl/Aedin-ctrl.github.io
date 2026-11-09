@@ -472,6 +472,40 @@ function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
    so there is black on both sides of the rim and it holds against any
    background -- a single white pass vanished wherever the shape crossed the
    bright band at the horizon. */
+/* ===== THE FOLK ANSWER, ANNOTATED ONTO THE CARD =====
+   The wrong explanation everyone already holds, written under the question in
+   the dialog and marked off before the piece starts -- so a viewer who arrived
+   with it is not spending the first mechanism waiting to see whether we agree.
+
+   Tilted by STEPPING each character, never by rotating the canvas: a rotation
+   resamples the baked glyphs and the pixel grid is the whole format. The rise
+   is capped at +/-4px because the gap between the question and the OK button
+   is 48px and the note has to clear 6px of both.                            */
+function tiltNote(str,cx,y,size,col,shadow,font){
+  const f=font||'"VT323"', cs=str.split('');
+  const ws=cs.map(c=>glyph(c===' '?' ':c,size,f).w);
+  const total=ws.reduce((a,b)=>a+b,0);
+  const rise=Math.min(1, 8/Math.max(1,cs.length-1));
+  const yAt=i=>Math.round(y-rise*(i-(cs.length-1)/2));
+  // A dark marker band behind it, stepped the same way. Gold on the Win95
+  // face grey is barely there -- the dialog is almost white under the bloom --
+  // and an annotation that has to be squinted at is not an annotation.
+  let x=Math.round(cx-total/2);
+  cs.forEach((c,i)=>{ B.fillStyle=shadow||P.ink;
+    B.fillRect(x-1,yAt(i)-3,Math.ceil(ws[i])+2,size+5); x+=ws[i]; });
+  x=Math.round(cx-total/2);
+  cs.forEach((c,i)=>{ if(c.trim()) px(c,x,yAt(i),size,col,null,f); x+=ws[i]; });
+  return total;
+}
+/* One call, so every piece places it identically: under the question, above
+   the OK button, arriving on the question's last word. */
+function mythNote(r,t){
+  if(!PIECE.myth) return;
+  const v=VO[0];
+  if(t < v.t[v.w.length-1]) return;
+  tiltNote(PIECE.myth, r.x+r.w/2, r.y+74, 20, P.gold, P.ink);
+}
+
 function strokePoly(pts,col,th,open){
   if(!col) return;
   B.fillStyle=col; const h=th>>1, n0=open?pts.length-1:pts.length;

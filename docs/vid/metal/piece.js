@@ -22,7 +22,8 @@
    conductivity means, and reads the contact temperatures off effusivity. */
 const PIECE={ no:5, slug:'metal', tags:['PHYSICS','BODY'],
               title:"why metal feels colder than wood",
-              blurb:"A steel bar and a block of wood in the same room are the same temperature. Your skin disagrees, because it was never measuring temperature in the first place." };
+              blurb:"A steel bar and a block of wood in the same room are the same temperature. Your skin disagrees, because it was never measuring temperature in the first place.",
+              myth:"not colder" };
 
 
 /* ===== TIMELINE =====
@@ -258,8 +259,9 @@ function explainer(ctx,W2,Hh,t){
     if(sq<=0){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
       winIcon(r.x+10,r.y+9,'?');
-      typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,3);
-      typeLine(0,r.x+50,r.y+56,14,'#000',null,null,3);
+      typeLine(0,r.x+50,r.y+16,14,'#000',null,null,0,3);
+      typeLine(0,r.x+50,r.y+44,14,'#000',null,null,3);
+      mythNote(r,t);
       button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
     } else { INCHROME=true; winFrame(dd[0],dd[1],dd[2],dd[3],'',true); INCHROME=false; }
   }

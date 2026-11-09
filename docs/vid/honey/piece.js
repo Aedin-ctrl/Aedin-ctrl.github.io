@@ -1,7 +1,8 @@
 /* ===== WHICH VIDEO THIS IS ===== */
 const PIECE={ no:1, slug:'honey', tags:['FOOD','BIOLOGY'],
               title:"why sealed honey doesn't spoil",
-              blurb:"A sealed jar keeps for decades with no preservative in it. Two things do the work — almost no free water, and acid — and the seal is what holds both." };
+              blurb:"A sealed jar keeps for decades with no preservative in it. Two things do the work — almost no free water, and acid — and the seal is what holds both.",
+              myth:"not preservatives" };
 
 /* ===== THE TIMELINE =====
    ONE table. The picture, the sound effects and the narration all read from
@@ -235,9 +236,10 @@ function explainer(ctx,W2,Hh,t){
     if(sq<=0){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
       winIcon(r.x+10,r.y+9,'?');
-      typeLine(0,r.x+50,r.y+14,14,'#000',null,null,0,2);
-      typeLine(0,r.x+50,r.y+38,14,'#000',null,null,2,4);
-      typeLine(0,r.x+50,r.y+62,14,'#000',null,null,4);
+      typeLine(0,r.x+50,r.y+6,14,'#000',null,null,0,2);
+      typeLine(0,r.x+50,r.y+28,14,'#000',null,null,2,4);
+      typeLine(0,r.x+50,r.y+50,14,'#000',null,null,4);
+      mythNote(r,t);
       button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
     } else { INCHROME=true;
       winFrame(DLG[0]+Math.round(sq*DLG[2]*0.42),DLG[1]+Math.round(sq*DLG[3]*0.42),

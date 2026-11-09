@@ -1,7 +1,12 @@
-# CATHODE DESK — house style v3.6
+# CATHODE DESK — house style v3.7
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.7 (2026-11-09)** — the folk answer moved onto the **question card**:
+> `PIECE.myth`, drawn by `mythNote()` as a tilted gold note on a dark marker
+> band under the question. It costs no narration, so it was fitted to the three
+> pieces that were already shipped. #002 has none and gets none.
+>
 > **v3.6 (2026-11-09)** — #005. A fifth palette, `STORM`, so the rotation does
 > not come back round to #001's look on the fifth piece. **Kill the common
 > belief in the first spoken line** (see *Refute the folk answer*). The library
@@ -935,16 +940,35 @@ constants tied to the layout, not offsets from the last thing touched.
 
 ## Refute the folk answer
 
-**If there is a well-known wrong explanation, kill it in the first spoken line
-of the first blackboard beat** — before any mechanism, while the question is
-still the only thing in the viewer's head. Ice floats *because there is air in
-it*; metal *is colder than wood*. Someone who arrives holding the wrong answer
-is not listening to the right one, they are waiting to see whether you agree.
+**If there is a well-known wrong explanation, kill it on the question card** —
+before any mechanism, while the question is still the only thing in the viewer's
+head. Ice floats *because there is air in it*; the sky is blue *because it
+reflects the sea*; metal *is colder than wood*. Someone who arrives holding the
+wrong answer is not listening to the right one, they are waiting to see whether
+you agree.
 
-- It is **one short sentence**, three or four words. `It isn't colder.`
-- It gets a **picture of its own**: in #005 the word `COLDER` is printed large
+**It is a declared field, not a drawing.** `PIECE.myth` is two or three words;
+`mythNote()` places it identically in every piece — under the question, above
+the OK button, arriving on the question's **last word**, so it reads as an
+annotation on a finished sentence rather than part of it.
+
+- **Tilted by stepping the characters, never by rotating the canvas.** A
+  rotation resamples the baked glyphs and the pixel grid is the whole format.
+  The rise is capped at ±4px: the gap between the question and OK is 48px and
+  the note has to clear 6px of both. That is also why the question's lines moved
+  to `r.y+16` / `r.y+44` (honey, three lines: `+6` / `+28` / `+50`).
+- **Gold on a dark marker band.** Gold straight onto the Win95 face grey is
+  barely there — under the bloom the dialog reads almost white — and an
+  annotation that has to be squinted at is not an annotation.
+- **It costs no narration**, which is the point: it was fitted to #001, #003 and
+  #004 after they had shipped, with no re-synthesis and no re-timing.
+- A piece may *also* refute in the voice. #005 does, because the title itself is
+  the misconception: the card says `not colder`, and the first blackboard line
+  says *"It isn't colder."*
+
+- When it is spoken too, it is **one short sentence**, three or four words, and
+  it gets a **picture of its own**: in #005 the word `COLDER` is printed large
   and the pointer strikes it out, and it is gone before the first bar lands.
-  The refutation is a beat, not an aside.
 - The piece does not then argue with the folk answer. It states that it is
   wrong, once, and spends the rest of the time on what is actually true.
 - **If there is no common wrong answer, skip it.** Inventing a misconception to
