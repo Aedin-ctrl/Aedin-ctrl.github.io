@@ -1,7 +1,12 @@
-# CATHODE DESK — house style v2.6
+# CATHODE DESK — house style v2.7
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.7 (2026-11-09)** — the style is now a **shared runtime**, not a shape to
+> copy. Three files: `cathode-lib.js` → `piece.js` → `cathode-run.js`. Plus the
+> **library** at `/vid`, the **number and tags** every piece carries, and
+> **vibrant at the edges, dark in the middle**. See *One format, many pieces*.
+>
 > **v2.6 (2026-11-08)** — **vertical composition**. A ninth sweep,
 > `checkComposition()`, and the rule it enforces: every beat's content band is
 > centred on the group box, and the bottom of the panel belongs to the caption.
@@ -595,6 +600,59 @@ down had not made it true; sweeping for it did. Note that *large* is not a
 violation: a headline is one set at >=22, and an 18px label already clears the
 14px label floor, so only claim 'headline' at the size that earns it. Screenshots catch the frame you
 happen to look at; the sweep catches the one you don't.
+
+## One format, many pieces
+
+A house style that lives as "a shape you copy into the next file" is not a
+format, it is a habit. Honey and halloumi had already drifted to **different
+buffer sizes and different cube units** while both claiming to be this style.
+So the runtime is shared and the piece is the only thing that varies.
+
+**Three files, loaded in this order.** A top-level `const` in a classic script
+is shared with every later script (it is not a window property), so the three
+share one lexical scope and no piece needs a namespace.
+
+| file | holds |
+|---|---|
+| `cathode-lib.js` | the FORMAT: buffer, four layers, window geometry, caption strip, `MIDY`, the status bar, the sky helpers |
+| `<piece>/piece.js` | the PIECE: `PIECE` metadata, the timeline, `L`, `SPOTS`, `ACTS`, `explainer()`, `buildScore()` |
+| `cathode-run.js` | what needs both: the pointer track, the nine sweeps, the sound engine, the player |
+
+**`buildScore()` belongs to the piece, not the format.** It addresses that
+piece's own beats and word indices. Left in the shared file it referenced
+`BEAT.PAN`, which only halloumi has, and the entire runtime threw on load —
+with the first symptom being a TDZ error about `ctx`, three hundred lines away.
+
+**Every piece declares itself:**
+
+```js
+const PIECE={ no:2, slug:'halloumi', tags:['FOOD','CHEM'],
+              title:"why halloumi doesn't melt", blurb:"..." };
+```
+
+- `no` and `tags` print in the **status bar at the bottom of every frame** and
+  again on the end card, as `#002  FOOD / CHEM`.
+- **Two tags maximum.** A third is a sign the piece is about two things.
+- The library page reads this same block. The number, the tags, the blurb and
+  the running time are never typed twice.
+
+**The library is `/vid`.** A short description of the style, one card per
+piece (thumbnail, number, title, blurb, tags, length), and the format notes.
+Each piece is its own page at `/vid/<slug>/`. Thumbnails are cut with
+**`?bare=1`**, which strips the page to the frame at 1:1 so a headless
+screenshot at the buffer size *is* the frame — there is no cropping step to get
+wrong. Downscale to 216×384 for the card; a full-size frame of CRT grain is
+~580KB and does not compress.
+
+**Vibrant at the edges, dark in the middle.** The teaching beats are a dark
+field because that is what you read numbers off. The **desktop, the opening
+beat and the end card are a dusk sky** — the first and last thing anyone sees
+should not look like homework. Anything set over the sky gets a shadow; bone
+text on the pale band at the horizon is unreadable without one.
+
+**Map the sky gradient over the sky's own height**, not over the whole rect. A
+tall ground swallowed the warm end of the palette and a "dusk sky" came out
+uniformly purple.
 
 ## Vertical composition
 
