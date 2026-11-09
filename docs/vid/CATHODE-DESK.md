@@ -1,8 +1,13 @@
-# CATHODE DESK — house style v3.1
+# CATHODE DESK — house style v3.2
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
-> **v3.1 (2026-11-09)** — **there is no question in the intro.** It is a title
+> **v3.2 (2026-11-09)** — **the cold open**: the object is already there, the
+> question card opens above it, OK is pressed, the object does one trick, and
+> then the window opens onto the blackboard. No headline over the sky.
+> See *The cold open*.
+>
+> **v3.1 (2026-11-09)** — there is no question written over the intro. It is a title
 > card: a vibrant sky, one solid drawn object, and the narration itself as the
 > headline. Then the blackboard. v2.9 put a written question over the voice and
 > v3.0 put the question into the voice; both were more intro than the intro is
@@ -708,37 +713,48 @@ The teaching beats are a dark field because that is what you read numbers off.
 The **desktop, the opening beat and the end card are a dusk sky** — the first
 and last thing anyone sees should not look like homework.
 
-### The intro format
+### The cold open
 
-**The opening beat is a title card, and that is all it is**: a vibrant sky,
-**one** solid drawn object, and the **narration itself** as the headline. Then
-the sun goes down and it cuts to the blackboard. No question, no card, nothing
-written over the voice.
+**Full frame on the desktop, before the program window exists.** Four moves,
+in this order, and nothing else:
 
-Two versions of a question were tried and both came back wrong, for the same
-underlying reason — the intro was carrying more than an intro is worth:
+1. **The object is already there.** Not introduced, not drawn on — present
+   from the first frame, on the vibrant sky, with the sea line across it.
+2. **The question card opens above it.** The Win95 dialog carries the piece's
+   title question and types it out. It sits in the top half; the object owns
+   the bottom half. That is why `DLG` is at y=150.
+3. **OK is pressed, and the card closes on the press** — nothing stands in
+   front of what happens next.
+4. **The object does one trick, and the trick is a joke.** The iceberg cracks
+   and sinks. The honey jar gets carried off by a bee. The halloumi turns into
+   a cow and walks away. **A little bit**: under a second, one gesture, with a
+   sound.
 
-- **v2.9** wrote a question on screen and typed it slowly across the beat. It
-  spelled out `SO WHY DOES WATER EXPAND?` for four seconds while the narrator
-  was saying *"Almost everything shrinks when it freezes."* Two unrelated texts
-  at once, in a piece whose whole rule is that the screen says what the voice
-  is saying.
+Then the window opens on the blackboard and the piece is a program from there
+to the end card. **No headline, no caption, no question text over the sky** —
+the only words in the whole cold open are the ones inside the dialog.
+
+**The water hides what goes under it.** The sink needs a clip line that sweeps
+up to the waterline over the first fifth of the gag; without it the berg just
+translated down the screen and sat there, perfectly visible, on top of the
+sea. The submerged mass goes with it, which is the point of the clip sweeping
+rather than snapping.
+
+**This replaces two earlier attempts at an intro**, both of which asked the
+opening to do more than an opening is worth:
+
+- **v2.9** wrote a question on the sky and typed it slowly across the beat —
+  spelling out `SO WHY DOES WATER EXPAND?` for four seconds while the narrator
+  was saying *"Almost everything shrinks when it freezes."* Two unrelated
+  texts at once, in a piece whose whole rule is that the screen says what the
+  voice is saying.
 - **v3.0** fixed the sync by putting the question *into the narration* as a
-  third spoken line. It synced perfectly and it was still too much: the beat
-  now had a statement, an exception, a question and an object to get through
-  before anything had been explained.
+  third spoken line. It synced perfectly and was still too much: a statement,
+  an exception, a question and an object, all before anything was explained.
 
-**What it is instead:**
-
-- The beat's sentences are **word-gated at 34px VT323** on their measured
-  onsets, one at a time, with the caret. The narration IS the headline, so
-  every word on screen is the word being spoken on that frame.
-- **Near-white, not gold.** Gold on the ember sky was two warm colours
-  fighting. `P.paper` carries on every palette, which is what a slot is for.
-- **The sun goes down across the last sentence**, so by the scene change the
-  frame already *is* the dark field it cuts to. The wipe stops being a cut.
-- `checkComposition()` checks the **first content beat for centring only**,
-  never for fill.
+The narration is **unchanged** by any of this. The cold open plays over the
+piece's existing first line, and the beat that used to be the title card is a
+normal blackboard beat with a diagram like every other one.
 
 ### One object, drawn solid
 

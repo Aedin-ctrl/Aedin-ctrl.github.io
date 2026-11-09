@@ -53,11 +53,11 @@ const SENT={
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
-  // SHRINK -- the title card: a vibrant sky, one drawn object, and the
-  // narration itself as the headline, every word landing on the frame it is
-  // spoken. No question, no card written over the voice -- the beat says its
-  // two lines, the sun goes down, and it cuts to the blackboard.
-  shr:{ hy:MIDY-226, wl:MIDY+174, rest:[PX+326,MIDY-6],
+  // THE COLD OPEN, full frame on the desktop: the object is already there,
+  // the question card opens ABOVE it, OK is pressed, and the thing does its
+  // one trick. Then the window opens and everything after it is blackboard.
+  // No headline over the sky -- the only words are the ones in the dialog.
+  open:{ wl:500, ground:268,
         berg:[[100,500],[138,448],[166,396],[192,430],[216,356],[244,412],
               [268,392],[296,448],[332,500],[356,544],[330,572],[256,586],
               [176,580],[124,546]],
@@ -69,7 +69,12 @@ const L={
                [[216,500],[332,500],[356,544],[330,572],[256,586],[228,586]]],
         tone:[0.20,0.00,0.36,0.58,0.74,0.86],
         lip:[[139,454],[166,402],[192,436],[216,362],[244,418],[268,398],[295,452]],
-        deep:[[[138,538],[322,538]],[[170,566],[298,566]],[[204,578],[276,578]]] },
+        deep:[[[138,538],[322,538]],[[170,566],[298,566]],[[204,578],[276,578]]],
+        crack:[[216,356],[208,412],[224,452],[212,500],[226,548],[218,586]],
+        left:[0,1,4], right:[2,3,5] },
+  // SHRINK is a blackboard beat now: the same stack twice, against a dotted
+  // line at the volume it started from, so shrink and grow both read.
+  shr:{ ox:PX+108, oy:MIDY+60, off:7, start:12, cold:9, ice:15 },
   // CAGE -- the same 20 molecules, crowded then locked open
   cage:{ x:PX+68, y:MIDY-170, gx:86, gy:72, cols:4, rows:5, tag:MIDY+174 },
   // WEIGH -- 1 cube = 50 grams per litre, so 1000 is 20 cubes and 917 is 18
@@ -84,7 +89,7 @@ const L={
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14},
-  {n:1,  x:IL+2, y:L.shr.hy, s:34, r:L.shr.rest},
+  {n:1,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:10, x:PX+10, y:CAPY, s:CAPSZ},
@@ -167,21 +172,56 @@ function explainer(ctx,W2,Hh,t){
   const CLICK=VO[15].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>VO[2].z&&t<VO[2].z+0.26)boost=1.45;         // the last line landing
+  if(t>VO[0].z+0.52&&t<VO[0].z+0.78)boost=1.55;    // the berg going under
   if(t>wordAt(8,0)&&t<wordAt(8,0)+0.25)boost=1.45;
   if(t>wordAt(12,13)&&t<wordAt(12,13)+0.22)boost=1.35;
 
-  deskSky(T);
+  const O=L.open;
+  deskSky(T,O.ground);
 
-  /* --- HOOK --- */
+  /* --- THE COLD OPEN: the object, the card, the press, the trick ---
+     Two phases off one press: the crack draws in 0.18s, then the halves part
+     and go under in 0.78. The water HIDES what goes under it -- the clip line
+     sweeps up to the waterline over the first fifth so the submerged mass
+     slides out of sight instead of popping. Without it the berg simply moved
+     down the screen and stayed perfectly visible on top of the sea. */
+  const dlgOut=BEAT.SHRINK.sc, okT=VO[0].z+0.52;
+  if(T<dlgOut){
+    const c=H.clamp((M-okT)/0.18), k=H.clamp((M-okT-0.18)/0.78), e=H.ease.in(k);
+    const lit=H.lerp(0.55,1,H.clamp((M-0.3)/2.2))*(1-H.clamp((k-0.35)/0.65));
+    const rim=H.rgba(H.mix(P.ink,P.paper,Math.max(0,lit)));
+    const seam=H.rgba(H.mix(P.ice,P.ink,0.88));
+    const move=(p,L2)=>p.map(q=>[q[0]+Math.round((L2?-18:18)*e),
+                                 q[1]+Math.round(252*e*(L2?1:1.15))]);
+    B.save();
+    if(k>0){ B.beginPath();
+      B.rect(0,0,LW,Math.round(H.lerp(LH,O.wl,H.clamp(k/0.20)))); B.clip(); }
+    const outer=k>0?O.berg.map(q=>[q[0]+Math.round((q[0]<220?-18:18)*e),
+                                   q[1]+Math.round(252*e*(q[0]<220?1:1.15))]):O.berg;
+    solidShape(O.faces.map((f,i)=>({p:k>0?move(f,O.left.indexOf(i)>=0):f,
+                                    c:H.rgba(H.mix(H.mix(P.ice,P.ink,O.tone[i]),P.ink,e*0.8))})),
+               outer,rim,seam);
+    if(k<=0){ O.deep.forEach(f=>linePix(f,H.rgba(H.mix(P.ice,P.ink,0.58)),2));
+              linePix(O.lip,rim,2); }
+    if(c>0&&k<=0) linePix(O.crack.slice(0,1+Math.round(c*(O.crack.length-1))),
+                          H.rgba(H.mix(P.ink,P.paper,0.92)),3);
+    B.restore();
+    B.fillStyle=P.ice;
+    for(let x=0;x<LW;x+=4)B.fillRect(x,O.wl+Math.round(Math.sin(M*2.1+x*0.06)*2),3,2);
+    if(k>0.05&&k<0.70){ const sp=H.clamp((k-0.05)/0.62), rr=H.rng(9);
+      B.fillStyle=H.rgba(H.hex(P.paper),1-sp);
+      for(let i=0;i<30;i++){const an=rr()*3.14, d=rr()*72*sp;
+        B.fillRect(Math.round(216+Math.cos(an)*d*2.2),
+                   Math.round(O.wl-Math.sin(an)*d*0.9+sp*sp*58),2,2);} }
+  }
   zoomRect([4,LH-40,54,16],DLG,M,0.05,0.42);
-  const dlgOut=BEAT.SHRINK.sc;
-  if(T>=0.42&&T<dlgOut){
+  // the card closes ON the press, so nothing is standing in front of the trick
+  if(T>=0.42&&T<okT+0.16){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
     winIcon(r.x+10,r.y+9,'?');
     typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,2);
     typeLine(0,r.x+50,r.y+56,14,'#000',null,null,2);
-    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
+    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
   }
   zoomRect(DLG,[8,8,PW+8,PH+34],M,dlgOut-0.35,dlgOut);
 
@@ -190,7 +230,7 @@ function explainer(ctx,W2,Hh,t){
     const r=winFrame(8,8,PW+8,PH+34,'Why does ice float?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
-    const beat=T<BEAT.CAGE.sc?'FLOE':T<BEAT.WEIGH.sc?'LATTICE':T<BEAT.FOUR.sc?'DENSITY'
+    const beat=T<BEAT.CAGE.sc?'VOLUME':T<BEAT.WEIGH.sc?'LATTICE':T<BEAT.FOUR.sc?'DENSITY'
               :T<BEAT.LAKE.sc?'4 DEGREES':T<BEAT.END.sc?'LAKE':'DONE';
     statusBar(r,T,beat);
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
@@ -199,33 +239,24 @@ function explainer(ctx,W2,Hh,t){
        which is also exactly how much lighter it is -- the same number twice,
        and the whole first half of the piece in one picture. --- */
     if(T<BEAT.CAGE.sc){
-      const S=L.shr;
-      introSky(CX,CY,CWd,CHd,T,CHd-(S.wl-CY));
-      groupBox(BX,BY,BW,BH,'THE ONE THAT DOES NOT');
-      // the berg: a solid, faceted OBJECT. Opaque, so it contrasts with the
-      // sky instead of going grey against it; six faces in five tones with
-      // seams between them; a black-ringed rim that holds on any background;
-      // striations through the mass below the water, nine tenths of it.
-      const lit=H.lerp(0.46,1,H.clamp((M-BEAT.SHRINK.sc)/3.2));
-      const rim=H.rgba(H.mix(P.ink,P.paper,lit));
-      const seam=H.rgba(H.mix(P.ice,P.ink,0.88));
-      const bb=solidShape(S.faces.map((f,i)=>({p:f,c:H.rgba(H.mix(P.ice,P.ink,S.tone[i]))})),
-                          S.berg,rim,seam);
-      S.deep.forEach(f=>linePix(f,H.rgba(H.mix(P.ice,P.ink,0.58)),2));
-      linePix(S.lip,H.rgba(H.mix(P.ink,P.paper,lit)),2);
-      if(GBOX)GBOX.push({x:bb.x,y:bb.y,w:bb.w,h:bb.h,k:'berg'});
-      // the sea goes over the top of it, so the waterline reads as a cut
-      B.fillStyle=P.ice;
-      for(let x=IL;x<IR;x+=4)B.fillRect(x,S.wl+Math.round(Math.sin(M*2.1+x*0.06)*2),3,2);
-      // the sun goes down ACROSS the last sentence, so by the scene change the
-      // frame already is the dark field it cuts to. The wipe stops being a cut.
-      const dim=H.clamp((M-VO[2].a)/(BEAT.CAGE.sc-VO[2].a))*0.80;
-      if(dim>0){B.fillStyle=H.rgba(H.hex(P.ink),dim);B.fillRect(CX+2,CY+2,CWd-4,CHd-4);}
-      // the narration IS the headline: one sentence at a time, word-gated on
-      // its measured onsets, with the caret. 34px VT323 fits 20 characters
-      // across, which is what sets the wrap.
-      if(t<VO[2].t[0]) typeWrap(1,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
-      else             typeWrap(2,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
+      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
+      groupBox(BX,BY,BW,BH,'WHAT FREEZING DOES TO VOLUME');
+      const S=L.shr, Pr=proj(S.ox,S.oy);
+      const b1=barBase(S.ox,S.oy,0,0,3), b2=barBase(S.ox,S.oy,S.off,-S.off,3);
+      // the line each one started from, so shrinking and growing both read
+      B.fillStyle=P.sh;
+      for(let x=IL;x<IR;x+=6)B.fillRect(x,stackTop(S.oy,S.start),3,1);
+      if(GBOX)GBOX.push({x:IL,y:stackTop(S.oy,S.start),w:IR-IL,h:2,k:'startline'});
+      const d1=mp(wordAt(1,2),wordAt(1,2)+0.85*SPD),
+            d2=mp(wordAt(2,1),wordAt(2,1)+0.85*SPD);
+      const n1=Math.round(H.lerp(S.start,S.cold,H.ease.out(d1)));
+      const n2=Math.round(H.lerp(S.start,S.ice ,H.ease.out(d2)));
+      voxBar(Pr,0,0,after(1,2)?n1:S.start,P.cyan,1);
+      blockTag(b1.x,b1.y+36,'EVERYTHING ELSE',14,P.cyan,P.ink);
+      if(after(2,0)){ voxBar(Pr,S.off,-S.off,after(2,1)?n2:S.start,P.ice,1);
+        blockTag(b2.x,b2.y+36,'WATER',14,P.ice,P.ink); }
+      typeWrap(1,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
+      typeWrap(2,PX+26,CAPY+60,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- CAGE --- */
@@ -440,10 +471,11 @@ function buildScore(){
   RINGS.forEach(q=>add(q.t,'click'));
   add(BEAT.SHRINK.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   add(VO[15].z+0.30,'snap'); add(VO[15].z+0.52,'click'); add(VO[15].z+0.67,'open');
-  // the whole intro is typed on screen, so every word of it blips
+  // the dialog and the captions are typed, so their words blip
   [0,1,2,5,8,10,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  add(VO[2].z,'zap');                              // the last line landing
+  add(VO[0].z+0.52,'zap'); add(VO[0].z+0.60,'knock',0);   // the crack
+  add(VO[0].z+0.78,'bass',70); add(VO[0].z+1.05,'mos');   // and under it goes
   bar(w(4,0), w(4,0)+1.20, 20, 4);                 // the cage locking
   add(w(4,5),'draw'); add(w(4,13),'tag');
   bar(w(6,6), w(6,6)+1.15, 20, 4);                 // the two litres

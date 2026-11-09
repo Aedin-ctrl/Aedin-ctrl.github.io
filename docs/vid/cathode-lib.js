@@ -366,7 +366,7 @@ const CAPSZ=20, CAPCH=39;                        // 20px VT323 fits 39 chars acr
 // a band that sits 60px low reads as "bottom-weighted" even when nothing is
 // off screen, and no bounds sweep can see it. checkComposition() does.
 const MIDY=BY+BH/2;
-const DLG=[46,306,340,156];
+const DLG=[46,150,340,156];   // above the object, which owns the lower half
 const DLG_OK={x:DLG[0]+4+(DLG[2]-8)/2, y:DLG[1]+4+15+1+(DLG[3]-8-15-1)-26+10};
 const BOX=[36,272,360,224];
 const BOX_OK={x:BOX[0]+4+(BOX[2]-8)/2, y:BOX[1]+4+15+1+(BOX[3]-8-15-1)-26+10};
@@ -432,7 +432,8 @@ function statusBar(r,T,beat){
    purpose -- you read numbers off a blackboard -- but the FIRST thing and the
    LAST thing anyone sees should not look like homework, so the desktop is a
    dusk sky and the opening beat gets one inside the window too. */
-function deskSky(T){ skyBands(0,0,LW,LH,300); stars(0,0,LW,LH*0.46,46,11,T); }
+function deskSky(T,groundH){ const g=(groundH===undefined)?300:groundH;
+  skyBands(0,0,LW,LH,g); stars(0,0,LW,(LH-g)*0.92,46,11,T); }
 
 /* The overview panel always lands on a WIPED stage. Honey cleared the client
    area because its last beat simply stopped drawing; halloumi left the whey
