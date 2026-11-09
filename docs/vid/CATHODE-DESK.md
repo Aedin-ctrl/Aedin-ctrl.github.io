@@ -1,7 +1,10 @@
-# CATHODE DESK — house style v3.4
+# CATHODE DESK — house style v3.5
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.5 (2026-11-09)** — #004 built straight from this file, first time. The
+> palette rotation has now been round once: DUSK, EMBER, DEEP, VIOLET.
+>
 > **v3.4 (2026-11-09)** — **all three pieces open this way.** The gag bank and
 > the object bank are part of the format now.
 >
@@ -776,6 +779,11 @@ it closing.
 | 001 honey | a jar on a shelf: amber body in three tones, metal lid, fill line | a bee flies in, hooks the lid and takes the whole thing up and out, leaving a couple of drips | `buzz` under it, `tag`+`knock` as it takes the weight |
 | 002 halloumi | a block on the board: one isometric cuboid, three faces, rind line | it squashes once, pops, and walks off as the cow it came from, kicking dust | `knock` ×2, `mos`+`zap` on the pop, `moo`, hoofbeats |
 | 003 ice | a berg in the sea: six faces, lit lip, striations below the water | it cracks, the halves tip apart and go under, rings spread | `crack` ×4, `crumble` ×4, `sub`, `splash` ×2 |
+| 004 sky | a cloud: body, lit lobe, scalloped underside | it leans, darkens, rains on nothing in particular and slopes off left | `sub`, nine `click`s for the shower, `mos` |
+
+**The card owns the top half.** Every object has to sit clear of `DLG`, which
+ends at y=306. The cloud was drawn at the height a cloud goes and spent the
+whole cold open behind the dialog.
 
 **A trick is two frames minimum.** `bee`/`bee2` and `cow`/`cow2` are a wingbeat
 and a walk cycle; a single frame translating across the screen is a prop being
@@ -918,6 +926,12 @@ below the line it just typed" — open space while the caption was one line, the
 constants tied to the layout, not offsets from the last thing touched.
 
 ## Accuracy
+
+**Say so when the geometry cannot be to scale.** The density curve in #003 and
+the two light paths in #004 are both caricatures — an exaggerated peak and a
+40:1 ratio drawn at about 1.4:1 — and both carry `not to scale` on the frame.
+A diagram that implies a measurement it is not making is the same fault as a
+wrong number.
 
 Draw the subject correctly. Check the science before it goes in the visuals.
 If a number is an assumption, it gets listed under the storyboard — never

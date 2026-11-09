@@ -316,7 +316,7 @@ function explainer(ctx,W2,Hh,t){
     /* --- CAGE --- */
     if(T>=BEAT.CAGE.sc&&T<BEAT.WEIGH.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(BX,BY,BW,BH,'WHAT FREEZING DOES');
+      groupBox(BX,BY,BW,BH,'INSIDE THE ICE');
       const C=L.cage, n=C.cols*C.rows;
       const lock=mp(wordAt(4,0),wordAt(4,0)+1.20*SPD);
       const e=H.ease.inOut(lock);
@@ -398,7 +398,7 @@ function explainer(ctx,W2,Hh,t){
       if(after(9,5)){
         px('4',mid,F.hero,40,P.gold,'center','"Silkscreen"');
         pxShadow('HEAVIEST HERE',mid,F.head,22,P.gold,P.ink,'center');}
-      if(after(10,5))px('degrees C - curve not to scale',(IL+IR)/2,F.note,CAPSZ,
+      if(after(10,5))px('degrees C, curve not to scale',(IL+IR)/2,F.note,CAPSZ,
                         '#d9d2e6','center','"VT323"');
       typeWrap(10,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
@@ -431,8 +431,8 @@ function explainer(ctx,W2,Hh,t){
         if(GBOX)GBOX.push({x:K.x+1,y:K.y+1,w:K.w-2,h:hh,k:'tag:ICE'});
         if(l>=1)px('ICE',K.x+12,K.y+8,14,P.ink,null,'"Silkscreen"');}
       INCHROME=true;
-      px('0 C',K.x+12,K.y+K.lid+14,20,P.ice,null,'"VT323"');
-      px('4 C',K.x+12,K.y+K.h-30,20,P.ice,null,'"VT323"');
+      px('0\u00b0C',K.x+12,K.y+K.lid+14,20,P.ice,null,'"VT323"');
+      px('4\u00b0C',K.x+12,K.y+K.h-30,20,P.ice,null,'"VT323"');
       INCHROME=false;
       if(after(13,1)){
         sprite('fish',K.x+K.w-110,K.y+K.h-96,7);

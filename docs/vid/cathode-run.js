@@ -578,7 +578,7 @@ sndB.onclick=async()=>{
 };
 (async()=>{
   try{await Promise.all(['8px "Press Start 2P"','16px "Press Start 2P"','10px "Silkscreen"',
-    '38px "Silkscreen"','9px "VT323"'].map(f=>document.fonts.load(f,'AaZz0123456789%?')));
+    '38px "Silkscreen"','9px "VT323"'].map(f=>document.fonts.load(f,'AaZz0123456789%?°')));
     await document.fonts.ready;}catch(e){}
   TCACHE.clear();CCACHE.clear();   // both are keyed on glyphs the fallback font drew
   // ?t=6.5 jumps straight to a frame and holds it -- used for review and for
