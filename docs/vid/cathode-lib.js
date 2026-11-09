@@ -471,6 +471,18 @@ function outlineShape(pts,fill,rim,a){
           w:Math.max(...xs)-Math.min(...xs)+3,h:Math.max(...ys)-Math.min(...ys)+3};
 }
 
+/* An open polyline in hard pixels -- facets, ridges, striations. outlineShape
+   closes its path, so detail INSIDE a silhouette needs its own primitive. */
+function linePix(pts,col,w){
+  const th=w||2; B.fillStyle=col;
+  for(let i=0;i<pts.length-1;i++){
+    const a0=pts[i], b0=pts[i+1];
+    const n=Math.max(1,Math.round(Math.hypot(b0[0]-a0[0],b0[1]-a0[1])));
+    for(let k=0;k<=n;k++)B.fillRect(Math.round(a0[0]+(b0[0]-a0[0])*k/n)-(th>>1),
+                                   Math.round(a0[1]+(b0[1]-a0[1])*k/n)-(th>>1),th,th);
+  }
+}
+
 function questionCard(lines,t,t0,t1,y,size,gap,until){
   const sz=size||26, gp=gap||44, x=IL+8;
   const total=lines.reduce((a,l)=>a+l.length+1,0)-1;

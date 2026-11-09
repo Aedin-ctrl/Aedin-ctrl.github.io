@@ -10,57 +10,64 @@ const PIECE={ no:3, slug:'ice', tags:['NATURE','PHYSICS'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 87% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=71.8, VOHASH="2361a9a8986d";
+const DUR=74.0, VOHASH="e58b7d68c732";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:0.8,z:1.626,w:["Why", "does", "ice", "float?"],t:[0.81, 0.97, 1.19, 1.37]},
-  {b:'SHRINK',a:3.476,z:5.962,w:["Almost", "everything", "shrinks", "when", "it", "freezes."],t:[3.476, 3.886, 4.576, 5.076, 5.396, 5.446]},
-  {b:'SHRINK',a:6.712,z:7.678,w:["Water", "expands."],t:[6.712, 7.498]},
-  {b:'CAGE',a:9.528,z:13.835,w:["In", "liquid", "water", "the", "molecules", "tumble", "and", "crowd", "in", "close."],t:[9.528, 9.688, 10.178, 10.778, 11.058, 11.928, 12.528, 12.778, 13.217, 13.655]},
-  {b:'CAGE',a:14.585,z:19.711,w:["Freezing", "locks", "each", "one", "to", "four", "neighbours,", "in", "a", "cage", "that", "holds", "them", "apart."],t:[14.695, 15.395, 15.865, 16.235, 16.565, 16.825, 17.425, 18.025, 18.255, 18.295, 18.665, 18.915, 19.095, 19.305]},
-  {b:'CAGE',a:20.461,z:23.427,w:["That", "cage", "has", "more", "empty", "space", "in", "it", "than", "the", "liquid", "did."],t:[20.471, 20.741, 21.041, 21.231, 21.511, 21.921, 22.251, 22.681, 22.701, 22.831, 22.941, 23.191]},
-  {b:'WEIGH',a:25.277,z:28.188,w:["A", "litre", "of", "water", "weighs", "a", "thousand", "grams."],t:[25.277, 25.507, 25.737, 25.887, 26.417, 26.884, 27.35, 27.817]},
-  {b:'WEIGH',a:28.938,z:31.976,w:["A", "litre", "of", "ice", "weighs", "nine", "hundred", "and", "seventeen."],t:[28.938, 29.328, 29.718, 29.938, 30.268, 30.65, 31.032, 31.414, 31.796]},
-  {b:'WEIGH',a:32.726,z:36.879,w:["Eight", "per", "cent", "lighter,", "which", "is", "exactly", "how", "much", "of", "it", "sits", "above", "the", "surface."],t:[32.726, 32.879, 33.033, 33.186, 34.276, 34.526, 34.636, 35.046, 35.256, 35.536, 35.606, 35.686, 35.966, 36.176, 36.326]},
-  {b:'FOUR',a:38.729,z:42.515,w:["And", "water", "is", "heaviest", "at", "four", "degrees,", "not", "at", "zero."],t:[38.729, 38.999, 39.449, 39.659, 40.104, 40.549, 40.909, 41.769, 42.009, 42.169]},
-  {b:'FOUR',a:43.265,z:46.059,w:["Below", "four,", "cold", "water", "gets", "lighter", "again."],t:[43.265, 43.615, 43.965, 44.275, 44.625, 44.915, 45.425]},
-  {b:'LAKE',a:47.909,z:52.626,w:["So", "a", "cooling", "lake", "drops", "its", "cold", "water", "to", "the", "bottom", "until", "the", "whole", "lake", "is", "four."],t:[47.949, 48.069, 48.309, 48.699, 49.029, 49.399, 49.679, 49.949, 50.409, 50.529, 50.739, 51.189, 51.509, 51.679, 51.989, 52.309, 52.359]},
-  {b:'LAKE',a:53.376,z:57.452,w:["After", "that", "the", "coldest", "water", "stays", "on", "top,", "and", "that", "is", "where", "the", "ice", "forms."],t:[53.376, 53.766, 54.076, 54.306, 54.896, 55.226, 55.676, 56.056, 56.076, 56.246, 56.456, 56.596, 56.856, 57.026, 57.196]},
-  {b:'LAKE',a:58.202,z:60.511,w:["The", "lid", "keeps", "everything", "underneath", "it", "liquid."],t:[58.202, 58.362, 58.522, 58.792, 59.332, 59.872, 59.972]},
-  {b:'END',a:62.361,z:64.388,w:["Open", "cage.", "Heaviest", "at", "four."],t:[62.361, 62.801, 63.27, 63.739, 64.208]},
-  {b:'END',a:65.138,z:67.229,w:["That", "is", "why", "a", "lake", "freezes", "from", "the", "top", "down."],t:[65.138, 65.368, 65.478, 65.648, 65.698, 66.048, 66.338, 66.568, 66.738, 66.908]},
+  {b:'SHRINK',a:3.476,z:5.964,w:["Almost", "everything", "shrinks", "when", "it", "freezes."],t:[3.476, 3.886, 4.576, 5.076, 5.396, 5.446]},
+  {b:'SHRINK',a:6.714,z:7.678,w:["Water", "expands."],t:[6.714, 7.498]},
+  {b:'SHRINK',a:8.428,z:9.823,w:["So", "why", "does", "water", "expand?"],t:[8.478, 8.558, 8.758, 9.028, 9.368]},
+  {b:'CAGE',a:11.673,z:15.98,w:["In", "liquid", "water", "the", "molecules", "tumble", "and", "crowd", "in", "close."],t:[11.673, 11.833, 12.323, 12.923, 13.203, 14.073, 14.673, 14.923, 15.362, 15.8]},
+  {b:'CAGE',a:16.73,z:21.856,w:["Freezing", "locks", "each", "one", "to", "four", "neighbours,", "in", "a", "cage", "that", "holds", "them", "apart."],t:[16.84, 17.54, 18.01, 18.38, 18.71, 18.97, 19.57, 20.17, 20.4, 20.44, 20.81, 21.06, 21.24, 21.45]},
+  {b:'CAGE',a:22.606,z:25.572,w:["That", "cage", "has", "more", "empty", "space", "in", "it", "than", "the", "liquid", "did."],t:[22.616, 22.886, 23.186, 23.376, 23.656, 24.066, 24.396, 24.826, 24.846, 24.976, 25.086, 25.336]},
+  {b:'WEIGH',a:27.422,z:30.333,w:["A", "litre", "of", "water", "weighs", "a", "thousand", "grams."],t:[27.422, 27.652, 27.882, 28.032, 28.562, 29.029, 29.495, 29.962]},
+  {b:'WEIGH',a:31.083,z:34.121,w:["A", "litre", "of", "ice", "weighs", "nine", "hundred", "and", "seventeen."],t:[31.083, 31.473, 31.863, 32.083, 32.413, 32.795, 33.177, 33.559, 33.941]},
+  {b:'WEIGH',a:34.871,z:39.024,w:["Eight", "per", "cent", "lighter,", "which", "is", "exactly", "how", "much", "of", "it", "sits", "above", "the", "surface."],t:[34.871, 35.024, 35.178, 35.331, 36.421, 36.671, 36.781, 37.191, 37.401, 37.681, 37.751, 37.831, 38.111, 38.321, 38.391]},
+  {b:'FOUR',a:40.874,z:44.66,w:["And", "water", "is", "heaviest", "at", "four", "degrees,", "not", "at", "zero."],t:[40.874, 41.144, 41.594, 41.804, 42.249, 42.694, 43.054, 43.914, 44.154, 44.314]},
+  {b:'FOUR',a:45.41,z:48.204,w:["Below", "four,", "cold", "water", "gets", "lighter", "again."],t:[45.41, 45.76, 46.11, 46.42, 46.77, 47.06, 47.57]},
+  {b:'LAKE',a:50.054,z:54.771,w:["So", "a", "cooling", "lake", "drops", "its", "cold", "water", "to", "the", "bottom", "until", "the", "whole", "lake", "is", "four."],t:[50.094, 50.214, 50.454, 50.844, 51.174, 51.544, 51.824, 52.094, 52.554, 52.674, 52.884, 53.334, 53.654, 53.824, 54.134, 54.454, 54.504]},
+  {b:'LAKE',a:55.521,z:59.597,w:["After", "that", "the", "coldest", "water", "stays", "on", "top,", "and", "that", "is", "where", "the", "ice", "forms."],t:[55.521, 55.901, 56.221, 56.451, 57.041, 57.371, 57.821, 58.201, 58.221, 58.391, 58.601, 58.741, 59.001, 59.171, 59.341]},
+  {b:'LAKE',a:60.347,z:62.656,w:["The", "lid", "keeps", "everything", "underneath", "it", "liquid."],t:[60.347, 60.507, 60.667, 60.937, 61.477, 62.017, 62.117]},
+  {b:'END',a:64.506,z:66.533,w:["Open", "cage.", "Heaviest", "at", "four."],t:[64.506, 64.936, 65.408, 65.881, 66.353]},
+  {b:'END',a:67.283,z:69.374,w:["That", "is", "why", "a", "lake", "freezes", "from", "the", "top", "down."],t:[67.283, 67.513, 67.623, 67.793, 67.843, 68.193, 68.483, 68.713, 68.883, 69.053]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:0.8,z:1.626},
-  SHRINK:{sc:3.08,a:3.476,z:7.678},
-  CAGE:{sc:9.13,a:9.528,z:23.427},
-  WEIGH:{sc:24.88,a:25.277,z:36.879},
-  FOUR:{sc:38.33,a:38.729,z:46.059},
-  LAKE:{sc:47.51,a:47.909,z:60.511},
-  END:{sc:61.96,a:62.361,z:67.229},
+  SHRINK:{sc:3.08,a:3.476,z:9.823},
+  CAGE:{sc:11.27,a:11.673,z:25.572},
+  WEIGH:{sc:27.02,a:27.422,z:39.024},
+  FOUR:{sc:40.47,a:40.874,z:48.204},
+  LAKE:{sc:49.65,a:50.054,z:62.656},
+  END:{sc:64.11,a:64.506,z:69.374},
 };
 const SENT={
   HOOK:[0],
-  SHRINK:[1,2],
-  CAGE:[3,4,5],
-  WEIGH:[6,7,8],
-  FOUR:[9,10],
-  LAKE:[11,12,13],
-  END:[14,15],
+  SHRINK:[1,2,3],
+  CAGE:[4,5,6],
+  WEIGH:[7,8,9],
+  FOUR:[10,11],
+  LAKE:[12,13,14],
+  END:[15,16],
 };
+
 
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
   // SHRINK -- the vibrant one. THE NARRATION IS THE HEADLINE: every word on
-  // screen is the word being spoken on that frame, which is the rule the rest
-  // of the piece runs on and the one a pre-written title card broke. The
-  // question is not typed at all -- it SNAPS, in the gap after the speech.
-  shr:{ q:['SO WHY DOES','WATER','EXPAND?'], hy:MIDY-176, wl:MIDY+174,
-        rest:[PX+318,MIDY+14],
-        berg:[[150,500],[176,452],[196,414],[216,444],[240,424],[266,468],
-              [284,500],[310,544],[286,578],[228,594],[162,584],[122,546]] },
+  // screen is the word being spoken on that frame. And the question is SPOKEN
+  // now -- it is the beat's third line -- so it can be typed key by key
+  // against the voice saying it instead of crawling over a different sentence.
+  shr:{ q:['SO WHY DOES','WATER','EXPAND?'], hy:MIDY-226, wl:MIDY+174,
+        rest:[PX+326,MIDY-6],
+        berg:[[100,500],[138,448],[166,396],[192,430],[216,356],[244,412],
+              [268,392],[296,448],[332,500],[356,544],[330,572],[256,586],
+              [176,580],[124,546]],
+        ridge:[[138,448],[166,396],[192,430],[216,356],[244,412],[268,392],[296,448]],
+        facet:[[[192,430],[200,500]],[[216,356],[231,500]],[[268,392],[259,500]],
+               [[166,396],[158,500]]],
+        deep:[[[136,536],[324,536]],[[168,566],[300,566]],[[200,578],[280,578]]] },
   // CAGE -- the same 20 molecules, crowded then locked open
   cage:{ x:PX+68, y:MIDY-170, gx:86, gy:72, cols:4, rows:5, tag:MIDY+174 },
   // WEIGH -- 1 cube = 50 grams per litre, so 1000 is 20 cubes and 917 is 18
@@ -76,11 +83,12 @@ const L={
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14},
   {n:1,  x:IL+2, y:L.shr.hy, s:34, r:L.shr.rest},
-  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:10, x:PX+10, y:CAPY, s:CAPSZ},
-  {n:13, x:PX+10, y:CAPY, s:CAPSZ},
-  {n:14, x:BOX[0]+56, y:BOX[1]+30, s:14},
+  {n:3,  x:IL+2, y:L.shr.hy, s:26, r:L.shr.rest},
+  {n:6,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:9,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:11, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:14, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:15, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
 const ACTS=(()=>{
   const A=[];
@@ -95,22 +103,22 @@ const ACTS=(()=>{
   const S=L.shr, C=L.cage, G=L.wg, F=L.four, K=L.lake;
   // SHRINK is a title card -- the only thing the hand does on it is type.
   // CAGE -- pull the crowd apart into the lattice, then tap one bond
-  drag(W(4,0), W(4,0)+1.20*SPD, [PX+200, MIDY+20], [C.x+(C.cols-1)*C.gx, C.y+(C.rows-1)*C.gy],
+  drag(W(5,0), W(5,0)+1.20*SPD, [PX+200, MIDY+20], [C.x+(C.cols-1)*C.gx, C.y+(C.rows-1)*C.gy],
        [PX+70, MIDY+190]);
-  tap (W(4,5), [C.x+C.gx+43, C.y+2*C.gy+6]);
+  tap (W(5,5), [C.x+C.gx+43, C.y+2*C.gy+6]);
   // WEIGH -- haul each litre up, then drop the waterline across the ice
-  drag(W(6,6), W(6,6)+1.15*SPD, [G.ox, G.oy], [G.ox, stackTop(G.oy,20)]);
-  drag(W(7,3), W(7,3)+1.15*SPD, [stackMid(G.ox,G.off,-G.off), G.oy],
+  drag(W(7,6), W(7,6)+1.15*SPD, [G.ox, G.oy], [G.ox, stackTop(G.oy,20)]);
+  drag(W(8,3), W(8,3)+1.15*SPD, [stackMid(G.ox,G.off,-G.off), G.oy],
                                 [stackMid(G.ox,G.off,-G.off), stackTop(G.oy,18)],
                                 [PX+60, MIDY-30]);
-  tap (W(8,0), [G.mark, stackTop(G.oy,18)+13]);
+  tap (W(9,0), [G.mark, stackTop(G.oy,18)+13]);
   // FOUR -- run the finger up the curve to the top of it
-  drag(W(9,3), W(9,5)+0.30*SPD, [F.x0+16, F.base-14], [(F.x0+F.x1)/2, F.base-F.amp],
+  drag(W(10,3), W(10,5)+0.30*SPD, [F.x0+16, F.base-14], [(F.x0+F.x1)/2, F.base-F.amp],
        [PX+320, MIDY+40]);
   // LAKE -- push the cold water to the bottom, then lay the lid on
-  drag(W(11,4), W(11,4)+1.20*SPD, [K.x+K.w/2, K.y+K.lid+30], [K.x+K.w/2, K.y+K.h-40],
+  drag(W(12,4), W(12,4)+1.20*SPD, [K.x+K.w/2, K.y+K.lid+30], [K.x+K.w/2, K.y+K.h-40],
        [PX+70, MIDY-30]);
-  tap (W(12,13), [K.x+K.w/2, K.y+K.lid/2]);
+  tap (W(13,13), [K.x+K.w/2, K.y+K.lid/2]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 
@@ -155,12 +163,12 @@ function explainer(ctx,W2,Hh,t){
     if(t<t1+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
   const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
-  const CLICK=VO[15].z+0.52, SHUT=CLICK+0.15;
+  const CLICK=VO[16].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>VO[2].z+0.25&&t<VO[2].z+0.47)boost=1.55;    // the question snapping in
-  if(t>wordAt(8,0)&&t<wordAt(8,0)+0.25)boost=1.45;
-  if(t>wordAt(12,13)&&t<wordAt(12,13)+0.22)boost=1.35;
+  if(t>VO[3].z&&t<VO[3].z+0.26)boost=1.55;         // the question completing
+  if(t>wordAt(9,0)&&t<wordAt(9,0)+0.25)boost=1.45;
+  if(t>wordAt(13,13)&&t<wordAt(13,13)+0.22)boost=1.35;
 
   deskSky(T);
 
@@ -193,28 +201,48 @@ function explainer(ctx,W2,Hh,t){
       const S=L.shr;
       introSky(CX,CY,CWd,CHd,T,CHd-(S.wl-CY));
       groupBox(BX,BY,BW,BH,'THE ONE THAT DOES NOT');
-      // the sea, and the thing sitting in it. An outline, not a chart: no
-      // axis, no tag, no number -- a shape you recognise in a quarter second.
+      // the berg: a drawn OBJECT, not a chart. Body, a ridge along the lit
+      // faces, crevasses running down to the waterline, striations through the
+      // mass below it -- nine tenths of which is under water, which an ice
+      // piece may as well have for free.
+      const lit=H.lerp(0.42,1,H.clamp((M-BEAT.SHRINK.sc)/3.2));
+      const rim=H.rgba(H.hex(P.paper),lit);
+      const bb=outlineShape(S.berg,P.ink,rim,0.52);
+      S.facet.forEach(f=>linePix(f,H.rgba(H.hex(P.paper),lit*0.42),2));
+      S.deep.forEach(f=>linePix(f,H.rgba(H.hex(P.ice),lit*0.30),2));
+      linePix(S.ridge,rim,3);
+      if(GBOX)GBOX.push({x:bb.x,y:bb.y,w:bb.w,h:bb.h,k:'berg'});
+      // the sea goes over the top of it, so the waterline reads as a cut
       B.fillStyle=P.ice;
       for(let x=IL;x<IR;x+=4)B.fillRect(x,S.wl+Math.round(Math.sin(M*2.1+x*0.06)*2),3,2);
-      const lit=H.lerp(0.40,1,H.clamp((M-BEAT.SHRINK.sc)/3.4));
-      const bb=outlineShape(S.berg,P.ink,H.rgba(H.hex(P.paper),lit),0.55);
-      if(GBOX)GBOX.push({x:bb.x,y:bb.y,w:bb.w,h:bb.h,k:'berg'});
-      // the sun goes down ACROSS the last sentence, so by the scene change the
-      // frame already is the dark field it cuts to. The wipe stops being a cut.
-      const dim=H.clamp((M-VO[2].a)/(BEAT.CAGE.sc-VO[2].a))*0.78;
+      // the sun goes down ACROSS the question, so by the scene change the frame
+      // already is the dark field it cuts to. The wipe stops being a cut.
+      const dim=H.clamp((M-VO[3].a)/(BEAT.CAGE.sc-VO[3].a))*0.80;
       if(dim>0){B.fillStyle=H.rgba(H.hex(P.ink),dim);B.fillRect(CX+2,CY+2,CWd-4,CHd-4);}
-      const qAt=VO[2].z+0.25;
-      if(t<qAt){
-        // one sentence at a time, word-gated on its MEASURED onsets, with the
-        // caret. 34px VT323 fits 20 characters across, which is what sets the wrap.
+      if(t<VO[3].t[0]){
         if(t<VO[2].t[0]) typeWrap(1,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
         else             typeWrap(2,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
       } else {
-        // the question SNAPS, inverse video, in the 1.4s of silence before the
-        // wipe. Nothing slow, and never on screen against a different sentence.
-        rect(IL,S.hy-10,IR-IL,S.q.length*44+14,P.paper);
-        S.q.forEach((ln,i)=>px(ln,IL+10,S.hy+i*44,26,P.ink));
+        // the question is SPOKEN, so it types KEY BY KEY against the voice
+        // saying it: characters interpolated between the measured word onsets,
+        // which is as close to one keystroke per sound as the data goes.
+        const V=VO[3], lens=[]; let acc=0;
+        V.w.forEach(wd=>{acc+=wd.length+1; lens.push(acc);});
+        let n=0;
+        for(let i=0;i<V.w.length;i++){
+          const a0=V.t[i], b0=(i+1<V.w.length)?V.t[i+1]:V.z;
+          if(t>=b0){ n=lens[i]; continue; }
+          if(t>=a0){ const p0=i?lens[i-1]:0;
+                     n=Math.round(p0+(lens[i]-p0)*H.clamp((t-a0)/(b0-a0))); }
+          break;
+        }
+        let used=0;
+        for(let i=0;i<S.q.length;i++){
+          const ln=S.q[i], cut=ln.slice(0,Math.max(0,Math.min(ln.length,n-used)));
+          if(cut){ const w2=pxShadow(cut,IL+6,S.hy+i*44,26,P.paper,P.ink);
+                   CARET={x:IL+6+w2+9,y:S.hy+i*44,h:26,col:P.paper}; }
+          used+=ln.length+1;
+        }
       }
     }
 
@@ -223,7 +251,7 @@ function explainer(ctx,W2,Hh,t){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(BX,BY,BW,BH,'WHAT FREEZING DOES');
       const C=L.cage, n=C.cols*C.rows;
-      const lock=mp(wordAt(4,0),wordAt(4,0)+1.20*SPD);
+      const lock=mp(wordAt(5,0),wordAt(5,0)+1.20*SPD);
       const e=H.ease.inOut(lock);
       const rnd=H.rng(31);
       const cxm=C.x+(C.cols-1)*C.gx/2, cym=C.y+(C.rows-1)*C.gy/2;
@@ -249,9 +277,9 @@ function explainer(ctx,W2,Hh,t){
       for(let k=0;k<n;k++){const p=pos[k];
         rect(p[0],p[1],12,12,P.paper); rect(p[0]+1,p[1]+1,10,10,P.bone);
         if(GBOX)GBOX.push({x:p[0],y:p[1],w:12,h:12,k:'node'});}
-      if(after(4,13)) blockTag((IL+IR)/2,C.tag,e>0.6?'LOCKED APART':'CROWDED IN',
+      if(after(5,13)) blockTag((IL+IR)/2,C.tag,e>0.6?'LOCKED APART':'CROWDED IN',
                                14,P.ice,P.ink);
-      typeWrap(5,PX+26,CAPY,CAPSZ,'#d9d2e6',null,'"VT323"',CAPCH);
+      typeWrap(6,PX+26,CAPY,CAPSZ,'#d9d2e6',null,'"VT323"',CAPCH);
     }
 
     /* --- WEIGH --- */
@@ -260,25 +288,25 @@ function explainer(ctx,W2,Hh,t){
       groupBox(BX,BY,BW,BH,'ONE LITRE OF EACH');
       const G=L.wg, Pr=proj(G.ox,G.oy);
       const b1=barBase(G.ox,G.oy,0,0,3), b2=barBase(G.ox,G.oy,G.off,-G.off,3);
-      const d1=mp(wordAt(6,6),wordAt(6,6)+1.15*SPD),
-            d2=mp(wordAt(7,3),wordAt(7,3)+1.15*SPD);
-      if(after(6,6)){voxBar(Pr,0,0,20,P.cyan,d1);          // 1 cube = 50 g/litre
+      const d1=mp(wordAt(7,6),wordAt(7,6)+1.15*SPD),
+            d2=mp(wordAt(8,3),wordAt(8,3)+1.15*SPD);
+      if(after(7,6)){voxBar(Pr,0,0,20,P.cyan,d1);          // 1 cube = 50 g/litre
         if(d1>=1)blockTag(b1.x,b1.y+36,'WATER',14,P.cyan,P.ink);}
-      if(after(7,3)){voxBar(Pr,G.off,-G.off,18,P.ice,d2);
+      if(after(8,3)){voxBar(Pr,G.off,-G.off,18,P.ice,d2);
         if(d2>=1)blockTag(b2.x,b2.y+36,'ICE',14,P.ice,P.ink);}
-      if(after(6,6))px(Math.round(1000*H.ease.out(mp(wordAt(6,6),wordAt(6,7)))) +'',
+      if(after(7,6))px(Math.round(1000*H.ease.out(mp(wordAt(7,6),wordAt(7,7)))) +'',
                        G.ox,G.num,40,P.cyan,'center','"Silkscreen"');
-      if(after(7,4))px(Math.round(917*H.ease.out(mp(wordAt(7,5),wordAt(7,8)))) +'',
+      if(after(8,4))px(Math.round(917*H.ease.out(mp(wordAt(8,5),wordAt(8,8)))) +'',
                        stackMid(G.ox,G.off,-G.off),G.num,40,P.ice,'center','"Silkscreen"');
-      if(after(6,7))px('grams per litre',(IL+IR)/2,G.lab,CAPSZ,'#d9d2e6','center','"VT323"');
+      if(after(7,7))px('grams per litre',(IL+IR)/2,G.lab,CAPSZ,'#d9d2e6','center','"VT323"');
       // the same 8% twice: how much lighter, and how much stands out of the water
-      if(after(8,0)){
+      if(after(9,0)){
         const top=stackTop(G.oy,18), line=top+Math.round(18*CZ*0.083);
         B.fillStyle=P.gold;
         for(let x=G.ox+90;x<IR;x+=6)B.fillRect(x,line,3,1);
         if(GBOX)GBOX.push({x:G.ox+90,y:line,w:IR-(G.ox+90),h:2,k:'sea'});
-        if(after(8,3))px('8% ABOVE',IR,line-22,14,P.gold,'right','"Silkscreen"');}
-      typeWrap(8,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
+        if(after(9,3))px('8% ABOVE',IR,line-22,14,P.gold,'right','"Silkscreen"');}
+      typeWrap(9,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- FOUR --- */
@@ -286,7 +314,7 @@ function explainer(ctx,W2,Hh,t){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
       groupBox(BX,BY,BW,BH,'WHERE WATER IS HEAVIEST');
       const F=L.four, mid=(F.x0+F.x1)/2, half=(F.x1-F.x0)/2;
-      const g=mp(wordAt(9,3),wordAt(9,5)+0.30*SPD);
+      const g=mp(wordAt(10,3),wordAt(10,5)+0.30*SPD);
       const yOf=(x)=>F.base-F.amp*(1-Math.pow((x-mid)/half,2));
       B.fillStyle=P.cyan;
       for(let x=F.x0;x<=F.x1;x+=5){
@@ -300,12 +328,12 @@ function explainer(ctx,W2,Hh,t){
       px('4',mid,F.tick,14,'#8d85a0','center','"Silkscreen"');
       px('8',F.x1,F.tick,14,'#8d85a0','right','"Silkscreen"');
       INCHROME=false;
-      if(after(9,5)){
+      if(after(10,5)){
         px('4',mid,F.hero,40,P.gold,'center','"Silkscreen"');
         pxShadow('HEAVIEST HERE',mid,F.head,22,P.gold,P.ink,'center');}
-      if(after(10,5))px('degrees C - curve not to scale',(IL+IR)/2,F.note,CAPSZ,
+      if(after(11,5))px('degrees C - curve not to scale',(IL+IR)/2,F.note,CAPSZ,
                         '#d9d2e6','center','"VT323"');
-      typeWrap(10,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
+      typeWrap(11,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- LAKE --- */
@@ -322,13 +350,13 @@ function explainer(ctx,W2,Hh,t){
       B.fillRect(K.x,K.y,K.w,1);B.fillRect(K.x,K.y+K.h-1,K.w,1);
       B.fillRect(K.x,K.y,1,K.h);B.fillRect(K.x+K.w-1,K.y,1,K.h);
       if(GBOX)GBOX.push({x:K.x,y:K.y,w:K.w,h:K.h,k:'lakebox'});
-      if(after(11,4)){
-        const s=mp(wordAt(11,4),wordAt(11,4)+1.20*SPD);
+      if(after(12,4)){
+        const s=mp(wordAt(12,4),wordAt(12,4)+1.20*SPD);
         for(let a=0;a<3;a++)
           dottedArrow([[K.x+60+a*96,K.y+K.lid+16],[K.x+60+a*96,K.y+K.h-52]],
                       H.clamp(s*1.4-a*0.18),P.cyan);}
-      if(after(12,13)){
-        const l=mp(wordAt(12,13),wordAt(12,13)+0.60*SPD);
+      if(after(13,13)){
+        const l=mp(wordAt(13,13),wordAt(13,13)+0.60*SPD);
         const hh=Math.max(2,Math.round(K.lid*H.ease.out(l)));
         rect(K.x+1,K.y+1,K.w-2,hh,P.bone);
         rect(K.x+1,K.y+1,K.w-2,2,P.hi);
@@ -339,10 +367,10 @@ function explainer(ctx,W2,Hh,t){
       px('0 C',K.x+12,K.y+K.lid+14,20,P.ice,null,'"VT323"');
       px('4 C',K.x+12,K.y+K.h-30,20,P.ice,null,'"VT323"');
       INCHROME=false;
-      if(after(13,1)){
+      if(after(14,1)){
         sprite('fish',K.x+K.w-110,K.y+K.h-96,7);
         pxShadow('STILL LIQUID',K.x+K.w-12,K.y+K.h-40,18,P.green,P.ink,'right');}
-      typeWrap(13,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
+      typeWrap(14,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
@@ -356,10 +384,10 @@ function explainer(ctx,W2,Hh,t){
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
-      capLine('> Open cage.',14,0,tx,m.y+12,14,'#000');
-      capLine('> Heaviest at four.',14,2,tx,m.y+40,14,'#000');
-      capLine('FREEZES FROM',15,5,tx,m.y+86,20,'#000080','#c0c0c0');
-      capLine('THE TOP DOWN.',15,8,tx,m.y+124,20,'#000080','#c0c0c0');
+      capLine('> Open cage.',15,0,tx,m.y+12,14,'#000');
+      capLine('> Heaviest at four.',15,2,tx,m.y+40,14,'#000');
+      capLine('FREEZES FROM',16,5,tx,m.y+86,20,'#000080','#c0c0c0');
+      capLine('THE TOP DOWN.',16,8,tx,m.y+124,20,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
     }
@@ -429,22 +457,22 @@ function buildScore(){
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
   add(BEAT.SHRINK.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
-  add(VO[15].z+0.30,'snap'); add(VO[15].z+0.52,'click'); add(VO[15].z+0.67,'open');
-  // the question card types across sentences 1-2, so every word of them blips
-  [0,1,2,5,8,10,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  add(VO[16].z+0.30,'snap'); add(VO[16].z+0.52,'click'); add(VO[16].z+0.67,'open');
+  // every word of the intro is typed on screen, so every one of them blips
+  [0,1,2,3,6,9,11,14,15,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  add(VO[2].z+0.25,'zap'); add(VO[2].z+0.25,'mos'); // the question snapping in
-  bar(w(4,0), w(4,0)+1.20, 20, 4);                 // the cage locking
-  add(w(4,5),'draw'); add(w(4,13),'tag');
-  bar(w(6,6), w(6,6)+1.15, 20, 4);                 // the two litres
-  bar(w(7,3), w(7,3)+1.15, 18, 4);
-  add(w(6,7),'tag'); add(w(7,8),'tag');
-  add(w(8,0),'zap'); add(w(8,3),'draw');           // the 8% line
-  add(w(9,3),'draw'); add(w(9,5),'tag');           // the curve, the hero 4
-  add(w(11,4),'draw'); add(w(12,13),'zap'); add(w(13,1),'tag');
+  add(VO[3].z,'zap');                              // the question completing
+  bar(w(5,0), w(5,0)+1.20, 20, 4);                 // the cage locking
+  add(w(5,5),'draw'); add(w(5,13),'tag');
+  bar(w(7,6), w(7,6)+1.15, 20, 4);                 // the two litres
+  bar(w(8,3), w(8,3)+1.15, 18, 4);
+  add(w(7,7),'tag'); add(w(8,8),'tag');
+  add(w(9,0),'zap'); add(w(9,3),'draw');           // the 8% line
+  add(w(10,3),'draw'); add(w(10,5),'tag');           // the curve, the hero 4
+  add(w(12,4),'draw'); add(w(13,13),'zap'); add(w(14,1),'tag');
   for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
   const BPM=112, E8=30/BPM, FIG=[220.00,261.63,329.63,261.63,293.66,349.23,293.66,261.63];
-  for(let i=0,tt=BEAT.SHRINK.a;tt<VO[14].t[0];i++,tt+=E8){
+  for(let i=0,tt=BEAT.SHRINK.a;tt<VO[15].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
     if(i%8===0) add(tt,'bass',FIG[0]/2);
   }
