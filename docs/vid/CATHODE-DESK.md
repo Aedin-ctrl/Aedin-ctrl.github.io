@@ -1,7 +1,10 @@
-# CATHODE DESK — house style v2.2
+# CATHODE DESK — house style v2.3
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.3 (2026-11-08)** — the pointer now LEADS what it moves, and steps off
+> it afterwards. See rules 25–28.
+>
 > **v2.2 (2026-11-08)** — the pointer stops parking and starts operating the
 > machine: it drags every stack up, sweeps the cubes in, pulls the arrows and
 > clicks each label out. See rules 21–24.
@@ -451,6 +454,24 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
     apart is a *sweep* with a ring on each cube, not six separate taps — the
     gaps are shorter than the time it takes to move.
 
+25. **The pointer LEADS by 0.20s.** Grab and pull *ahead* of the element's own
+    animation so the thing trails the hand. Run them together and the eye sees
+    the effect start first and reads the mouse as following it — which is what
+    it looked like before this, even though the two were perfectly simultaneous.
+    **Simultaneous reads as following. Only leading reads as causing.**
+26. **Step off afterwards, and only just off.** A short move — 40–80px into
+    clear space beside the thing — not a trip to a corner. A far rest fails the
+    reachability check and gets dropped, which leaves the pointer sitting on the
+    thing it just moved: the worst of both.
+27. **The caret holds for the whole typing session**, not per line. In the gaps
+    between lines the arrow was reappearing on top of the text it had just
+    typed.
+28. **It may rest on something briefly; it may not SIT there.** Judge by dwell:
+    stationary, on content, for over **0.8s** is the fault. Resting on a thing
+    for a moment after acting on it is what a hand does. (Fixed exclusion
+    windows were tried first and had to be so wide they covered most of the
+    timeline, which made the check mean nothing.)
+
 **Every line that appears word by word goes through `typeLine()`** and appears
 in the pointer table. A line drawn with a bare `px()` gets no caret and no
 click, and is instantly obvious as the one that was forgotten.
@@ -468,6 +489,7 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkTruncation()` | a string cut by the rasteriser or running off the screen |
 | `checkClearance()` | anything inside the box with under 6px of air around it |
 | `checkPointerJumps()` | the pointer moving more than 95px in one frame |
+| `checkPointerIdle()` | the pointer sitting still on top of content for over 0.8s |
 
 **Prove a new sweep fires before trusting it.** Put the defect back, confirm the
 sweep names it, then restore. A checker that has only ever returned 0 has not

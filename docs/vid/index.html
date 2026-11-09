@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v2.2 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.3 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -544,6 +544,7 @@ const SPOTS=[
   {n:17, x:166, y:106, s:14},   // message box list
 ];
 const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
+const SESSION_SPANS=[];   // the caret lives here for a whole typing session
 const SESSION_GAP=2.0;           // lines closer in TIME than this may share a session
 const SESSION_NEAR=80;           // ...but only if the insertion point barely moved
 
@@ -558,42 +559,52 @@ const SESSION_NEAR=80;           // ...but only if the insertion point barely mo
    instead of wandering near it. Coordinates are buffer pixels; the window
    never moves, so they can live in one table. */
 const W=(n,i)=>VO[n].t[i];
+/* LEAD is why this reads as the mouse doing the work. The pointer grabs and
+   pulls 0.20s AHEAD of the element's own animation, so the thing trails the
+   hand. Run them together and the eye sees the effect start first and reads
+   the mouse as following it. */
+const LEAD=0.20;
+/* And when an action is finished the pointer gets OFF the thing it moved, to
+   open space nearby -- not a fixed corner, just somewhere it is not standing
+   in front of anything. checkPointerIdle() verifies each of these is clear. */
 const ACTS=(()=>{
   const A=[];
-  const drag=(t0,t1,a,b)=>A.push({t0:+t0.toFixed(3),t1:+t1.toFixed(3),a:a,b:b,k:'drag'});
-  const tap =(t,a)=>A.push({t0:+t.toFixed(3),t1:+t.toFixed(3),a:a,b:a,k:'click'});
+  const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),
+                                    a:a,b:b,r:r,k:'drag'});
+  const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),
+                              a:a,b:a,r:r,k:'click'});
   // JAR -- drag the SEALED HONEY tag onto the jar
-  drag(W(1,2)-0.30, W(1,2)+0.40, [214,232], [112,268]);
+  drag(W(1,2)-0.30, W(1,2)+0.40, [214,232], [112,268], [176,244]);
   // WATER -- sweep across the row placing cubes. Six separate taps 0.072s apart
   // asked the pointer to teleport between them; it is one gesture with a ring
   // per cube instead.
-  drag(W(4,0)+0.20, W(4,0)+(5*0.09+0.26)*0.8, [125,150], [160,168]);
+  drag(W(4,0)+0.20, W(4,0)+(5*0.09+0.26)*0.8, [125,150], [160,168], [198,198]);
   for(let i=0;i<6;i++) A.push({t0:+(W(4,0)+(i*0.09+0.26)*0.8).toFixed(3),k:'ring',a:[125+i*7,Math.round(150+i*3.5)]});
   // WATER -- haul both stacks up out of the baseline
-  drag(W(5,2), W(5,2)+1.00, [152,186], [152,114]);
-  drag(W(8,0), W(8,0)+1.04, [250,186], [250, 84]);
+  drag(W(5,2), W(5,2)+1.00, [152,186], [152,114], [102, 96]);
+  drag(W(8,0), W(8,0)+1.04, [250,186], [250, 84], [308, 72]);
   // OSMOSIS -- drag the arrow out of the microbe, then click the x
-  drag(W(9,7), W(9,7)+0.60, [108,104], [208,104]);
-  tap (W(10,1)+0.02, [239,99]);
+  drag(W(9,7), W(9,7)+0.60, [108,104], [208,104], [300,150]);
+  tap (W(10,1)+0.02, [239,99], [300,150]);
   // ACID -- the same haul, shorter stacks
-  drag(W(11,2), W(11,2)+0.76, [152,186], [152,166]);
-  drag(W(12,0), W(12,0)+0.80, [250,186], [250,151]);
+  drag(W(11,2), W(11,2)+0.76, [152,186], [152,166], [102,148]);
+  drag(W(12,0), W(12,0)+0.80, [250,186], [250,151], [308,138]);
   // SEAL -- pull the water down out of the air, raise the moisture, drop the yeast in
-  drag(W(14,1), W(14,1)+0.72, [62,58], [62,106]);
-  drag(W(15,2), W(15,8),      [342,206], [342,151]);
-  tap (W(15,9)+0.05, [520,74]);
+  drag(W(14,1), W(14,1)+0.72, [62,58], [62,106], [152, 86]);
+  drag(W(15,2), W(15,8),      [342,206], [342,151], [292, 96]);
+  tap (W(15,9)+0.05, [520,74], [462,122]);
   // ...and a click to POP each label out once the thing it names is in place.
   // Offsets keep every tap clear of the drag that precedes it -- two track
   // points at the same instant in different places is a one-frame jump.
-  tap (W(5,2)+1.45,  [152,217]);   // HONEY plate, after its stack lands
-  tap (W(8,0)+1.50,  [250,217]);   // BACTERIA plate
-  tap (W(6,0),       [404,108]);   // 'water activity in honey'
-  tap (W(11,2)+1.20, [152,217]);   // HONEY plate, acid chart
-  tap (W(12,0)+1.25, [250,217]);   // WATER plate
-  tap (W(11,8),      [404, 62]);   // the 3.9 pops on "nine"
-  tap (W(12,3),      [404,152]);   // the 7 pops on "seven"
-  tap (W(9,11),      [ 42,144]);   // WATER PULLED OUT
-  tap (W(15,8)+0.12, [412,147]);   // 1 PART IN 5
+  tap (W(5,2)+1.45,  [152,217], [198,248]);   // HONEY plate, after its stack lands
+  tap (W(8,0)+1.50,  [250,217], [310,248]);   // BACTERIA plate
+  tap (W(6,0),       [404,108], [588, 88]);   // 'water activity in honey'
+  tap (W(11,2)+1.20, [152,217], [198,248]);   // HONEY plate, acid chart
+  tap (W(12,0)+1.25, [250,217], [310,248]);   // WATER plate
+  tap (W(11,8),      [404, 62], [588, 88]);   // the 3.9 pops on "nine"
+  tap (W(12,3),      [404,152], [588,178]);   // the 7 pops on "seven"
+  tap (W(9,11),      [ 42,144], [300,150]);   // WATER PULLED OUT
+  tap (W(15,8)+0.12, [412,147], [292, 96]);   // 1 PART IN 5
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 
@@ -617,9 +628,19 @@ const PTRACK=(()=>{
   });
   // start already near the dialog: from (380,286) the opening move was 250px
   // in the 0.2s before the first click, which peaks at ~100px per frame
+  const pending=[];               // rest points, gated in a second pass below
   const P=[{t:0,x:250,y:196}];
-  sess.forEach(S=>P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
-                          x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1}));
+  sess.forEach(S=>{
+    P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
+            x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
+    // The caret belongs at the insertion point for the WHOLE session. In the
+    // gaps BETWEEN lines the arrow was reappearing on top of the text it had
+    // just typed, which is where four of the idle hits came from.
+    SESSION_SPANS.push({a:VO[S.first.n].t[0], z:VO[S.lastN].z+0.45,
+                        x:S.first.x, y:S.first.y, s:S.first.s});
+    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3),
+                  x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
+  });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   P.push({t:+(VO[18].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
   P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
@@ -647,6 +668,25 @@ const PTRACK=(()=>{
       commit({t:A.t0,x:A.a[0],y:A.a[1],g:1});
       commit({t:A.t1,x:A.b[0],y:A.b[1],d:1});
     }
+    // two candidate moments to step off: if the first is too soon to reach the
+    // rest, try a slightly later one before giving up and standing still
+    if(A.r){ pending.push({t:+(A.t1+0.42).toFixed(3),x:A.r[0],y:A.r[1],alt:1});
+             pending.push({t:+(A.t1+0.70).toFixed(3),x:A.r[0],y:A.r[1],alt:2}); }
+  });
+  // Second pass for the rests. A rest only goes in if the pointer can get
+  // there AND still reach whatever comes next -- otherwise stepping aside
+  // costs a teleport, which is worse than standing still for a moment.
+  P.sort((a,b)=>a.t-b.t);
+  const placed=new Set();
+  pending.forEach(q=>{
+    const key=q.x+','+q.y+','+(q.alt||0);
+    if(q.alt===2 && placed.has(q.x+','+q.y+',1')) return;   // first candidate took
+    const before=[...P].reverse().find(r=>r.t<=q.t);
+    const after =P.find(r=>r.t>q.t);
+    if(!before) return;
+    if(!reach([before.x,before.y],[q.x,q.y],q.t-before.t)) return;
+    if(after && !reach([q.x,q.y],[after.x,after.y],after.t-q.t)) return;
+    P.push(q); placed.add(key); P.sort((a,b)=>a.t-b.t);
   });
   // arrive, settle, THEN click, for the typing and OK clicks too
   P.filter(q=>q.c&&!q.s2).forEach(q=>{ if(!P.some(r=>Math.abs(r.t-(q.t-SETTLE))<0.01))
@@ -941,6 +981,8 @@ function explainer(ctx,W,Hh,t){
   // point; the rest of the time it is the arrow travelling the track.
   // exposed so a harness can measure how much the pointer actually moves
   window.pointerPos=()=>({x:cx,y:cy,caret:!!CARET});
+  if(!CARET){ const S=SESSION_SPANS.find(q=>M>=q.a&&M<=q.z);
+    if(S) CARET={x:S.x,y:S.y,h:S.s,col:'#ffffff'}; }
   if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col);
   else if(dragging){
     // a dotted trail back to where it picked the thing up
@@ -1071,6 +1113,42 @@ window.checkClearance=function(step,minGap){
 /* The pointer can only be in one place. Two track points at nearly the same
    instant in different places make it teleport, which is what happened the
    first time every label got its own click: 21 jumps over 50 seconds. */
+/* When the pointer is NOT working -- no caret, not dragging, not on a click --
+   it must not be standing in front of anything. "Open space" is otherwise just
+   a coordinate I guessed; this checks it against what is actually on screen. */
+window.checkPointerIdle=function(step){
+  // Resting on a thing for a moment after acting on it is what a hand does.
+  // SITTING on it is the fault. So the rule is dwell-based: flagged only once
+  // the pointer has been stationary on content for longer than SIT seconds.
+  // Widening fixed exclusion windows instead would have covered most of the
+  // timeline and made the check mean nothing.
+  const bad=[],seen=new Set(), dt=step||1/12, SIT=0.80;
+  let prev=null, stillFor=0;
+  for(let tt=0; tt<=DUR; tt+=dt){
+    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    const p=window.pointerPos();
+    // In transit it will inevitably cross things; the rule is about where it
+    // COMES TO REST. And a button it has just pressed is a fine place to be.
+    const moved = !prev || Math.hypot(p.x-prev.x,p.y-prev.y)>1.5;
+    stillFor = moved ? 0 : stillFor+dt;
+    prev=p;
+    if(p.caret || stillFor < SIT) continue;
+    const c={x:p.x,y:p.y,w:10,h:16};
+    const items=r.filter(a=>!a.chrome).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
+                 .concat(g.filter(q=>q.k!=='cursor'&&q.k!=='groupbox'));
+    for(const a of items){
+      const ox=Math.min(c.x+c.w,a.x+a.w)-Math.max(c.x,a.x);
+      const oy=Math.min(c.y+c.h,a.y+a.h)-Math.max(c.y,a.y);
+      if(ox>0&&oy>0){
+        const k=a.k; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),over:a.k,at:[p.x,p.y],sat:+stillFor.toFixed(2)});
+      }
+    }
+  }
+  return bad;
+};
+
 window.checkPointerJumps=function(step,maxPx){
   const LIM=maxPx||95, dt=step||1/24, bad=[];
   let prev=null;
