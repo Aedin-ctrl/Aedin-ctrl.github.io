@@ -58,10 +58,10 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
 <body>
 <div class="wrap">
   <h1>VOICE</h1>
-  <p class="sub">My actual voice, cloned from about two minutes of recorded reference and
-  pitched down a little. Type anything and press play &mdash; it is generated
-  <b>live, on my Mac</b>, so it takes roughly seven seconds of compute per second of speech.
-  A paragraph starts playing as soon as its first sentence is ready.</p>
+  <p class="sub">My actual voice, cloned from about two minutes of recorded reference.
+  The two random buttons play <b>instantly</b> &mdash; those lines are already rendered.
+  Anything you type yourself is generated <b>live, on my Mac</b>, which takes roughly
+  seven seconds of compute per second of speech.</p>
 
   <div class="panel">
     <div class="screen">
@@ -76,8 +76,8 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
       <button id="clear">CLEAR</button>
       <span class="spacer"></span>
       <label class="depth">DEPTH
-        <input type="range" id="depth" min="-5" max="0" step="0.5" value="-2.5">
-        <span class="v" id="depthV">-2.5</span>
+        <input type="range" id="depth" min="-4" max="2" step="0.5" value="0">
+        <span class="v" id="depthV">0</span>
       </label>
     </div>
 
@@ -88,10 +88,11 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
     </div>
   </div>
 
-  <p class="note"><b>If it says the machine is asleep</b>, the Mac that runs the model
-  is off or the tunnel is down &mdash; this is a live service, not a library of
-  pre-recorded clips, so nothing can play while it is unreachable.
-  Repeating a line you have already heard is instant, because it is cached.</p>
+  <p class="note"><b>The two random buttons always work</b>, machine or no machine &mdash;
+  those lines are already rendered and served with the page. <b>If it says the machine
+  is asleep</b>, only the typed box is affected: the Mac that runs the model is off or
+  the tunnel is down. Repeating a line you have already typed is instant, because it
+  is cached.</p>
 </div>
 
 <script src="corpus.js"></script>
@@ -153,6 +154,7 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
   var ctx = null, nextAt = 0, sources = [], playing = false;
 
   function stopAll(){
+    try { el.pause(); } catch(e){}
     sources.forEach(function(s){ try{ s.stop(); }catch(e){} });
     sources = []; playing = false; nextAt = 0;
     playBtn.innerHTML = '&#9654; PLAY';
@@ -171,7 +173,7 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
   function say(text, d){
     return fetch(api + '/say', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text:text, depth:d, formant: 1 + 0.02*d })
+      body: JSON.stringify({ text:text, depth:d, formant: 0.98 + 0.015*d })
     }).then(function(r){
       if(r.status === 429) throw new Error('Rate limited - give it a minute.');
       if(r.status === 413) throw new Error('That sentence is too long.');
@@ -227,7 +229,35 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
     else run();
   });
 
+  // Pre-rendered clips. These play with no wait at all; the typed box is the
+  // only thing that needs the machine. CLIPS replaces the text-only corpus
+  // once it loads, so a random pick always has audio to go with it.
   var C = window.VOICE_CORPUS || {sentences:[],paragraphs:[]};
+  var CLIPS = null, el = new Audio();
+  fetch('clips.json?t=' + Date.now())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){ if(j && j.sentences && j.sentences.length) CLIPS = j; })
+    .catch(function(){});
+
+  function playClip(item){
+    stopAll();
+    txt.value = item.text;
+    el.pause(); el.src = item.file; el.currentTime = 0;
+    setStatus('busy','Playing (pre-rendered).');
+    el.play().then(function(){
+      setStatus('ok','Playing (pre-rendered).');
+    }).catch(function(){
+      setStatus('err','Your browser blocked playback - press play.');
+    });
+    el.onended = function(){ setStatus('ok','Done.'); };
+  }
+  var lastClip = null;
+  function pickItem(a){
+    if(!a || !a.length) return null;
+    var v, guard = 0;
+    do { v = a[Math.floor(Math.random()*a.length)]; } while(a.length>1 && v===lastClip && ++guard<8);
+    lastClip = v; return v;
+  }
   function pick(a, cur){
     if(!a.length) return '';
     var v, guard = 0;
@@ -235,9 +265,11 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
     return v;
   }
   document.getElementById('rndS').addEventListener('click', function(){
+    if(CLIPS) return playClip(pickItem(CLIPS.sentences));
     txt.value = pick(C.sentences, txt.value); txt.focus();
   });
   document.getElementById('rndP').addEventListener('click', function(){
+    if(CLIPS) return playClip(pickItem(CLIPS.paragraphs));
     txt.value = pick(C.paragraphs, txt.value); txt.focus();
   });
   document.getElementById('clear').addEventListener('click', function(){
