@@ -435,6 +435,18 @@ const SFX={
   draw: t=>{toneAt(t,'square',420,1250,0.26,0.055);},
   zap:  t=>{toneAt(t,'sawtooth',1500,180,0.16,0.42);noiseAt(t,0.1,'bandpass',2400,0.6,0.3);},
   mos:  t=>{noiseAt(t,0.17,'bandpass',800,0.5,0.34);toneAt(t,'square',200,90,0.14,0.10);},
+  /* the cold open's gag bank. A snap, a wash and a thump are three different
+     sounds and a gag needs all three: the crack is the event, the crumble is
+     the consequence, the sub is the weight of it going under. */
+  crack:(t,n)=>{noiseAt(t,0.05,'highpass',3200,0.8,0.52);
+                toneAt(t,'square',2300-((n|0)%3)*320,420,0.055,0.26);
+                noiseAt(t+0.012,0.10,'bandpass',1500,1.6,0.24);},
+  crumble:(t,n)=>{noiseAt(t,0.44,'bandpass',720-((n|0)%4)*95,0.5,0.30);
+                  toneAt(t,'triangle',155,62,0.34,0.20);},
+  splash:t=>{noiseAt(t,0.30,'lowpass',2600,0.4,0.44);
+             noiseAt(t+0.05,0.40,'highpass',900,0.5,0.20);
+             toneAt(t,'sine',300,90,0.22,0.18);},
+  sub:  t=>{toneAt(t,'sine',92,36,0.72,0.55);noiseAt(t,0.5,'lowpass',260,0.7,0.26);},
   note: (t,f,d)=>{const c=AU.ctx,o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
     lp.type='lowpass';lp.frequency.value=2200;o.type='square';o.frequency.value=f;
     o.connect(lp);lp.connect(g);g.connect(AU.g.music);

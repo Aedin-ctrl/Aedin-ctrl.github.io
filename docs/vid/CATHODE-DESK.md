@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v3.2
+# CATHODE DESK — house style v3.3
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.3 (2026-11-09)** — **the gag gets its own silence**: a beat may claim a
+> longer run-up than the uniform gap, and the cold open's trick is scored in
+> four phases with its own sound bank. See *The cold open*.
+>
 > **v3.2 (2026-11-09)** — **the cold open**: the object is already there, the
 > question card opens above it, OK is pressed, the object does one trick, and
 > then the window opens onto the blackboard. No headline over the sky.
@@ -727,8 +731,36 @@ in this order, and nothing else:
    front of what happens next.
 4. **The object does one trick, and the trick is a joke.** The iceberg cracks
    and sinks. The honey jar gets carried off by a bee. The halloumi turns into
-   a cow and walks away. **A little bit**: under a second, one gesture, with a
-   sound.
+   a cow and walks away.
+
+**The gag gets its own silence.** A beat may claim a longer run-up than the
+uniform `gap_beat` by declaring `gap_before` in `script.json` — the cold open
+takes **3.50s** instead of 1.85. Squeezing press, card-close, pause and trick
+into the standard gap read as a glitch rather than a joke. The run-up is a
+timeline decision, made before anything is synthesised; never speed the trick
+up to fit a gap.
+
+**Phases, off one press:**
+
+```
+okT        press; the card starts closing (it shrinks toward its own centre)
+okT+0.22   card gone
+okT+0.72   the trick starts -- half a second of nothing first
+  +0.42    the crack has drawn
+  +0.42..  the object comes apart and goes
+  +1.05    it lands
+  +1.70    the last of it fades, and the window opens on the blackboard
+```
+
+**Score it in four voices, not one.** A snap, a wash and a thump are different
+sounds and a gag needs all of them: `crack` is the event (three or four of
+them, 0.13s apart, detuned), `crumble` is the consequence (overlapping washes),
+`sub` is the weight, `splash` is the landing. One `knock` where all that should
+be is why the first cut of this read as a glitch.
+
+**Two objects, not one, once it breaks.** Intact it is one silhouette with
+seams between its faces; split it is two, each with its own black-and-rim ring.
+Stroking every *face* instead turns it into stained glass.
 
 Then the window opens on the blackboard and the piece is a program from there
 to the end card. **No headline, no caption, no question text over the sky** —
