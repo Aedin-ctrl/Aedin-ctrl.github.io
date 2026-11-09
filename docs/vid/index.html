@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>WHY HALLOUMI<br>DOESN'T MELT</h1>
-  <p class="sub">House style v2.5 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.6 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Second piece, same locked style. Content: why halloumi doesn't melt.
   <br><br>Previous piece, locked and unchanged:
@@ -154,18 +154,20 @@
   <b>Determinism.</b> Every frame is a pure function of <code>t</code> — all randomness from
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
   so the frame-by-frame video renderer works.<br><br>
-  <b>Checked, not eyeballed.</b> <code>checkBounds()</code>, <code>checkOverlap()</code> and
-  <code>checkLegibility()</code> and <code>checkStraddle()</code> sweep every frame with a recorder on every piece of text drawn — and on
-  every sprite, voxel stack and tag plate text could hide behind. They report anything leaving the client
-  area, landing on top of something else, or set below the floor. All six return <b>0</b> for this build — truncation, clearance, straddle, overlap, bounds and the type floor —
-  including the one that catches a label lying across the group box's border, which the panel check
-  structurally cannot see; the previous one had <b>21</b> texts under the floor, including the opening question at 9px.<br><br>
+  <b>Checked, not eyeballed.</b> Nine sweeps run over every frame with a recorder on every piece of text
+  drawn — and on every sprite, voxel stack, tag plate and slab that text could hide behind. They report
+  anything leaving the client area, landing on top of something else, set below the floor, cut off,
+  crammed against the group box border, lying across it, or with the pointer parked on it. All nine return
+  <b>0</b> for this build. The ninth, <code>checkComposition()</code>, is the one a bounds check
+  structurally cannot do: it measures the band of the frame each beat actually occupies and holds its
+  centre to the middle of the group box. Nothing was off screen in the build before this one — the
+  pictures just sat high, with a lake of dead air under them, and only a person watching it could say so.<br><br>
   <b>Two ticks, not one.</b> Drawn content steps at <b>12fps</b> — sprites, dither, typed text, the
   blink. Motion isn't ticked at all: the cursor, the voxel drops, the arrows and the counters run at
   the display's own rate. A 24fps tick was tried first and the cubes still stepped — and a cube that
   steps reads as a dropped frame, not as a style. The pixel grid is held by the ×2 nearest-neighbour
   blit, not by quantising time.<br><br>
-  <b>50.4 seconds, 35.7 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
+  <b>67.8 seconds, 42.8 of it speech.</b> The picture is hung off the voice, not off arithmetic. Each beat is one audio file, every
   sentence is written to end on the word that triggers its visual, and the sentence boundaries are read
   back from the TTS — then the real end of each sentence's speech is measured off the waveform, because
   the reported boundary runs to the next sentence and so includes the pause after the last word.
@@ -401,10 +403,10 @@ function mosaic(x0,y0,w,h,n){if(n<=1)return;
   B.putImageData(img,x0,y0);}
 
 /* --- LAYER 3: OBJECTS (voxel, isometric, three-tone) --- */
-const CW=10,CH=5,CZ=7;   // bigger unit: a 5px cube left a 9:16 frame mostly air
+const CW=10,CH=5,CZ=9;   // bigger unit: a 5px cube left a 9:16 frame mostly air
 const proj=(ox,oy)=>(x,y,z)=>[ox+(x-y)*CW,oy+(x+y)*CH-z*CZ];
 function cube(Pr,x,y,z,col){
-  const c=H.hex(col),top=c.map((v,i)=>v*1.00*[1.0,0.98,0.93][i]),
+  const c=Array.isArray(col)?col:H.hex(col),top=c.map((v,i)=>v*1.00*[1.0,0.98,0.93][i]),
         fr=c.map((v,i)=>v*0.80*[0.97,0.95,1.0][i]), sd=c.map((v,i)=>v*0.64*[0.92,0.92,1.04][i]);
   const p=(a,b,cc)=>Pr(x+a,y+b,z+cc);
   const face=(pts,col2)=>{B.fillStyle=H.rgba(col2);B.beginPath();pts.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));B.closePath();B.fill();};
@@ -535,22 +537,37 @@ const SENT={
    to carry their own copies of the same coordinates, which is exactly why the
    drags stopped landing on anything the moment a chart moved 22px. */
 const PX=12, PY=28, PW=408, PH=710;              // the client panel, 9:16
-const BX=PX+12, BY=PY+10, BW=PW-24, BH=PH-74;    // the group box inside it
+// The box used to run to PH-74 and the caption was crammed into the 45px left
+// under it. The bottom 100px of the panel now BELONG to the caption: three
+// 20px lines with air under them, and the diagram gets what is left.
+const BX=PX+12, BY=PY+10, BW=PW-24, BH=PH-134;   // the group box inside it
 const IL=BX+16, IT=BY+24, IR=BX+BW-16, IB=BY+BH-16;
-const CAPY=BY+BH+4;   // two wrapped lines must still clear the status bar                              // caption strip, below the box
-const DLG=[46,268,340,156];
+const CAPY=BY+BH+14;                             // caption strip, below the box
+const CAPSZ=20, CAPCH=39;                        // 20px VT323 fits 39 chars across
+// Every beat's content band is centred on this line. Vertical is unforgiving:
+// a band that sits 60px low reads as "bottom-weighted" even when nothing is
+// off screen, and no bounds sweep can see it. checkComposition() does.
+const MIDY=BY+BH/2;
+const DLG=[46,306,340,156];
 const DLG_OK={x:DLG[0]+4+(DLG[2]-8)/2, y:DLG[1]+4+15+1+(DLG[3]-8-15-1)-26+10};
-const BOX=[36,244,360,252];
+const BOX=[36,272,360,224];
 const BOX_OK={x:BOX[0]+4+(BOX[2]-8)/2, y:BOX[1]+4+15+1+(BOX[3]-8-15-1)-26+10};
 
 /* every element's anchor, named once and shared with the pointer */
-// Tall frame: the diagram lives in the upper half, the numbers under it.
+// Every vertical anchor is written as a distance from MIDY, not as a distance
+// from the top of the panel. Written the old way the five beats drifted to
+// five different heights -- NET sat 55px above centre, COOKED 163px below it --
+// and nothing in the source showed it. Written this way the band each beat
+// occupies is readable, and checkComposition() holds it to +/-56px.
 const L={
-  pan:{ oyL:PY+360, oxL:PX+96, oxR:PX+256, surf:PY+388 },
-  net:{ x:PX+40, y:PY+160, gx:72, gy:66, cols:5, rows:4 },
-  win:{ ox:PX+72, oy:PY+520, n1:[PX+40,PY+86], n2:[PX+196,PY+86] },
-  side:{ x:PX+34, bad:PY+150, good:PY+250, good2:PY+292, lock:PY+430 },
-  cook:{ vx:PX+96, vy:PY+150, vw:200, vh:150, num:[PX+110,PY+400], set:PY+560 },
+  pan:{ oyL:MIDY-5, oxL:PX+96, oxR:PX+256, surf:MIDY+15, cubes:10, foot:4 },
+  net:{ x:PX+46, y:MIDY-172, gx:72, gy:84, cols:5, rows:4,
+        lab:MIDY+127, frag:MIDY+125 },
+  win:{ ox:PX+78, oy:MIDY+107, n1:[PX+40,MIDY-189], n2:[PX+196,MIDY-189] },
+  side:{ x:PX+40, step:60, bad:MIDY-176, good:MIDY-56, good2:MIDY-14,
+         lock:MIDY+124 },
+  cook:{ vx:PX+94, vy:MIDY-171, vw:220, vh:180,
+         num:[PX+110,MIDY+39], set:MIDY+149 },
 };
 
 /* ===== THE POINTER TRACK ===== */
@@ -559,18 +576,24 @@ const SPOTS=[
   // click just LEFT of where the line starts: when there is no time to step
   // away before the next action, the pointer rests here, and resting ON the
   // first character of the line you just typed counts as sitting on content.
-  {n:3,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
-  {n:5,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
-  {n:6,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
-  {n:10, x:L.side.x-16, y:L.side.good, s:22, r:[PX+170,CAPY-84]},
-  {n:15, x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
+  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:6,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:10, x:L.side.x-16, y:L.side.good, s:22},
+  {n:15, x:PX+10, y:CAPY, s:CAPSZ},
   {n:16, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
+// Where the hand goes after typing a caption. It used to be "one line below
+// the line it just typed", which was open space while the caption was a single
+// 18px line crammed under the box -- and became the SECOND caption line the
+// moment the strip grew. It is a named spot now: the dead band inside the
+// bottom of the group box, which every beat leaves clear.
+const CAPREST=[PX+300, BY+BH-42];
 const OK_DIALOG=DLG_OK, OK_BOX=BOX_OK;
 const SESSION_SPANS=[]; const SESSION_GAP=2.0; const SESSION_NEAR=80;
 const SPD=1.0, LEAD=0.20;
 const W=(n,i)=>VO[n].t[i];
-const CWv=10, CHv=5, CZv=7;                      // mirrors CW/CH/CZ in the voxel layer
+const CWv=10, CHv=5, CZv=9;                      // mirrors CW/CH/CZ in the voxel layer
 const stackTop=(oy,cubes)=>oy-cubes*CZv;
 const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
 const ACTS=(()=>{
@@ -587,9 +610,9 @@ const ACTS=(()=>{
   const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r||near(b),k:'drag'});
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   // PAN -- push the cheddar down as it slumps, then point at the one that doesn't
-  drag(W(1,6), W(1,6)+1.30*SPD, [L.pan.oxL, stackTop(L.pan.oyL,6)],
+  drag(W(1,6), W(1,6)+1.30*SPD, [L.pan.oxL, stackTop(L.pan.oyL,L.pan.cubes)],
                                 [L.pan.oxL, L.pan.surf-6]);
-  tap (W(2,1), [L.pan.oxR, stackTop(L.pan.oyL,6)+10]);
+  tap (W(2,1), [L.pan.oxR, stackTop(L.pan.oyL,L.pan.cubes)+10]);
   // NET -- lay the lattice, tap a calcium bridge, then pull it open
   drag(W(4,3), W(4,3)+1.10*SPD, [L.net.x, L.net.y],
        [L.net.x+(L.net.cols-1)*L.net.gx, L.net.y+(L.net.rows-1)*L.net.gy]);
@@ -601,21 +624,21 @@ const ACTS=(()=>{
        [stackMid(L.win.ox,0,0), stackTop(L.win.oy,12)]);
   tap (W(7,6),  [L.win.n1[0]+34, L.win.n1[1]+18]);
   tap (W(7,10), [L.win.n2[0]+34, L.win.n2[1]+18]);
-  drag(W(8,2), W(8,2)+0.80*SPD, [stackMid(L.win.ox,5,-5), L.win.oy],
-       [stackMid(L.win.ox,5,-5), stackTop(L.win.oy,6)]);
+  drag(W(8,2), W(8,2)+0.50*SPD, [stackMid(L.win.ox,5,-5), L.win.oy],
+       [stackMid(L.win.ox,5,-5), stackTop(L.win.oy,6)], [PX+348,MIDY+94]);
   drag(W(8,5), W(8,5)+0.90*SPD, [stackMid(L.win.ox,10,-10), L.win.oy],
-       [stackMid(L.win.ox,10,-10), stackTop(L.win.oy,22)]);
+       [stackMid(L.win.ox,10,-10), stackTop(L.win.oy,22)], [PX+348,MIDY+94]);
   // SIDE -- strike the wrong answer out, then light the bridges
   tap (W(9,5), [L.side.x+120, L.side.bad+16]);
   // explicit rest: the computed step-off landed this one on "ENOUGH."
   drag(W(11,0), W(11,0)+1.00*SPD, [L.side.x+6, L.side.lock+6],
-                                  [L.side.x+4*44+6, L.side.lock+6], [PX+310,PY+372]);
+                                  [L.side.x+4*L.side.step+6, L.side.lock+6], [PX+310,MIDY+74]);
   // COOKED -- drop the curd in, run the temperature up
   drag(W(13,6), W(13,6)+1.10*SPD, [L.cook.vx+86, L.cook.vy-34],
-                                  [L.cook.vx+86, L.cook.vy+56]);
+                                  [L.cook.vx+86, L.cook.vy+96]);
   drag(W(13,13), W(13,14)+0.30*SPD, [L.cook.num[0]+34, L.cook.num[1]+56],
                                     [L.cook.num[0]+34, L.cook.num[1]+16]);
-  tap (W(14,2), [L.cook.vx+86, L.cook.vy+56]);
+  tap (W(14,2), [L.cook.vx+86, L.cook.vy+96]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 
@@ -636,8 +659,10 @@ const PTRACK=(()=>{
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
     SESSION_SPANS.push({a:VO[S.first.n].t[0], z:VO[S.lastN].z+0.45,
                         x:S.first.x, y:S.first.y, s:S.first.s});
-    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3),
-                  x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
+    pending.push(S.first.y>=CAPY
+      ? {t:+(VO[S.lastN].z+0.55).toFixed(3), x:CAPREST[0], y:CAPREST[1]}
+      : {t:+(VO[S.lastN].z+0.55).toFixed(3),
+         x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
   });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   P.push({t:+(VO[17].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
@@ -764,23 +789,30 @@ function explainer(ctx,W2,Hh,t){
     if(T<BEAT.NET.sc){
       groupBox(BX,BY,BW,BH,'THE SAME HOT PAN');
       const PL=proj(L.pan.oxL,L.pan.oyL), PR=proj(L.pan.oxR,L.pan.oyL);
-      B.fillStyle='#4a3b2e';
-      for(let x=IL;x<IR;x+=4)B.fillRect(x,L.pan.surf,3,2);
+      // The pan was a 2px dotted line: in a 9:16 frame a hairline reads as
+      // nothing, and it was invisible to every sweep besides. It is a slab now,
+      // and it is registered (rule 31).
+      const psY=L.pan.surf, psH=18, PF=L.pan.foot;
+      B.fillStyle='#2b231c'; B.fillRect(IL,psY,IR-IL,psH);
+      B.fillStyle='#4a3b2e'; for(let x=IL;x<IR;x+=4)B.fillRect(x,psY,3,2);
+      B.fillStyle='#6b5340'; B.fillRect(IL,psY+psH-2,IR-IL,2);
+      if(GBOX)GBOX.push({x:IL,y:psY,w:IR-IL,h:psH,k:'pan'});
       const melt=mp(wordAt(1,6),wordAt(1,6)+1.30);
       if(after(1,1)){
-        const h=Math.max(1,Math.round(6-5*H.ease.inOut(melt)));
-        voxBar(PL,0,0,h,'#ffd27a',1);
-        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,5);
-        if(after(1,8)){const b=barBase(L.pan.oxL,L.pan.oyL,0,0,3);
+        const NC=L.pan.cubes;
+        const h=Math.max(1,Math.round(NC-(NC-1)*H.ease.inOut(melt)));
+        voxBar(PL,0,0,h,'#ffd27a',1,PF);
+        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,PF+2);
+        if(after(1,8)){const b=barBase(L.pan.oxL,L.pan.oyL,0,0,PF);
           blockTag(b.x,b.y+36,'CHEDDAR',14,P.paper,'#74432d');}
       }
       if(after(2,0)){
         const brown=mp(wordAt(2,1),wordAt(2,1)+1.10);
-        voxBar(PR,0,0,6,H.rgba(H.mix('#fff4e2','#c97b3c',H.ease.out(brown))),1);
-        if(after(2,2)){const b=barBase(L.pan.oxR,L.pan.oyL,0,0,3);
+        voxBar(PR,0,0,L.pan.cubes,H.mix('#fff4e2','#c97b3c',H.ease.out(brown)),1,PF);
+        if(after(2,2)){const b=barBase(L.pan.oxR,L.pan.oyL,0,0,PF);
           blockTag(b.x,b.y+36,'HALLOUMI',14,P.ice,'#0a0618');}
       }
-      typeWrap(3,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
+      typeWrap(3,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- NET --- */
@@ -800,12 +832,15 @@ function explainer(ctx,W2,Hh,t){
           B.fillStyle=H.rgba(P.sh,1-open*0.8);
           for(let q=14;q<y2-y;q+=6)B.fillRect(x+5,y+q,2,3);}
         rect(x,y,12,12,P.paper); rect(x+1,y+1,10,10,'#e3d6c0');
+        // each node registered separately: a lattice is mostly air, and one
+        // box round the whole grid would forbid labelling inside it
+        if(GBOX)GBOX.push({x:x,y:y,w:12,h:12,k:'node'});
       }
-      if(after(4,9)) px('calcium',N.x,PY+300,18,P.cyan,null,'"VT323"');
+      if(after(4,9)) px('calcium',N.x,N.lab,CAPSZ,P.cyan,null,'"VT323"');
       if(after(5,5)){const fr=mp(wordAt(5,5),wordAt(5,5)+1.20);
-        for(let d=0;d<5;d++){const fy=PY+320+Math.round(H.ease.in(H.clamp(fr*2-d*0.18))*58);
-          if(fy>PY+320)rect(N.x+40+d*78,fy,6,8,P.gold);}}
-      typeWrap(5,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
+        for(let d=0;d<5;d++){const fy=N.frag+Math.round(H.ease.in(H.clamp(fr*2-d*0.18))*54);
+          if(fy>N.frag)rect(N.x+156+d*44,fy,6,8,P.gold);}}
+      typeWrap(5,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- WINDOW --- */
@@ -830,8 +865,8 @@ function explainer(ctx,W2,Hh,t){
         if(d3>=1){const b=barBase(OX,OY,10,-10,3);blockTag(b.x,b.y+36,'HALLOUMI',14,P.ice,'#0a0618');}}
       if(after(7,6)) px('5.0',L.win.n1[0],L.win.n1[1],40,P.green,null,'"Silkscreen"');
       if(after(7,10))px('5.4',L.win.n2[0],L.win.n2[1],40,P.green,null,'"Silkscreen"');
-      if(after(7,10))px('cheese melts only here',L.win.n1[0],L.win.n1[1]+56,18,'#d9d2e6',null,'"VT323"');
-      typeWrap(6,PX+26,CAPY,18,'#d9d2e6',null,'"VT323"',44);
+      if(after(7,10))px('cheese melts only here',L.win.n1[0],L.win.n1[1]+56,CAPSZ,'#d9d2e6',null,'"VT323"');
+      typeWrap(6,PX+26,CAPY,CAPSZ,'#d9d2e6',null,'"VT323"',CAPCH);
     }
 
     /* --- SIDE --- */
@@ -840,7 +875,7 @@ function explainer(ctx,W2,Hh,t){
       groupBox(BX,BY,BW,BH,'WHICH WAY IS WRONG');
       const S=L.side;
       if(after(9,1))pxShadow('TOO ACIDIC',S.x,S.bad,22,P.sh,P.ink);
-      if(after(9,5)){B.fillStyle=P.red;
+      if(after(9,5)){B.fillStyle=P.red;   // strike: ON the words by design, so not registered
         for(let i=0;i<230;i+=5)B.fillRect(S.x-4+i,S.bad+12,4,3);}
       if(after(10,4)){
         pxShadow('NOT ACIDIC',S.x,S.good,22,P.gold,P.ink);
@@ -848,11 +883,12 @@ function explainer(ctx,W2,Hh,t){
       if(after(11,0)){
         const lock=mp(wordAt(11,0),wordAt(11,0)+1.00);
         for(let i=0;i<5;i++){const k=H.clamp(lock*5-i); if(k<=0)continue;
-          const x=S.x+i*44;
+          const x=S.x+i*S.step;
           rect(x,S.lock,12,12,P.paper);
-          if(i<4){B.fillStyle=P.cyan;for(let q=14;q<44;q+=5)B.fillRect(x+q,S.lock+5,3,2);}}
-        if(lock>0.9)px('calcium holding',S.x,S.lock+34,18,P.cyan,null,'"VT323"');}
-      typeWrap(11,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
+          if(GBOX)GBOX.push({x:x,y:S.lock,w:12,h:12,k:'bridge'});
+          if(i<4){B.fillStyle=P.cyan;for(let q=14;q<S.step;q+=5)B.fillRect(x+q,S.lock+5,3,2);}}
+        if(lock>0.9)px('calcium holding',S.x,S.lock+34,CAPSZ,P.cyan,null,'"VT323"');}
+      typeWrap(11,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     /* --- COOKED --- */
@@ -861,19 +897,20 @@ function explainer(ctx,W2,Hh,t){
       groupBox(BX,BY,BW,BH,'BEFORE YOU EVER BUY IT');
       const K=L.cook;
       rect(K.vx,K.vy,K.vw,K.vh,'#1d2436'); bevel(K.vx,K.vy,K.vw,K.vh,'field');
+      if(GBOX)GBOX.push({x:K.vx,y:K.vy,w:K.vw,h:K.vh,k:'vat'});
       const drop=mp(wordAt(13,6),wordAt(13,6)+1.10);
-      if(after(13,6)){const cy2=K.vy-40+Math.round(H.ease.in(drop)*96);
-        rect(K.vx+84,Math.min(cy2,K.vy+62),52,36,'#fff4e2');
-        rect(K.vx+86,Math.min(cy2,K.vy+62)+2,48,32,'#e3d6c0');}
+      if(after(13,6)){const cy2=K.vy-40+Math.round(H.ease.in(drop)*136);
+        rect(K.vx+84,Math.min(cy2,K.vy+96),52,36,'#fff4e2');
+        rect(K.vx+86,Math.min(cy2,K.vy+96)+2,48,32,'#e3d6c0');}
       B.fillStyle=P.ice;
-      for(let x=0;x<K.vw-8;x+=4)B.fillRect(K.vx+4+x,K.vy+40+Math.round(Math.sin(M*3+x*0.12)*2),3,2);
+      for(let x=0;x<K.vw-8;x+=4)B.fillRect(K.vx+4+x,K.vy+48+Math.round(Math.sin(M*3+x*0.12)*2),3,2);
       if(after(13,10))for(let i=0;i<5;i++){const sy2=K.vy-6-((M*26+i*17)%46);
         rect(K.vx+30+i*38,Math.round(sy2),3,6,H.rgba(P.hi,0.35));}
       if(after(13,13)){const hot=mp(wordAt(13,13),wordAt(13,14)+0.30);
         px(Math.round(20+70*H.ease.out(hot))+'',K.num[0],K.num[1],40,P.red,null,'"Silkscreen"');
-        px('degrees, in whey',K.num[0],K.num[1]+56,18,'#d9d2e6',null,'"VT323"');}
+        px('degrees, in whey',K.num[0],K.num[1]+56,CAPSZ,'#d9d2e6',null,'"VT323"');}
       if(after(14,2)&&T<BEAT.END.sc)pxShadow('THE NET IS SET',PX+54,K.set,22,P.gold,P.ink);
-      if(T<BEAT.END.sc)typeWrap(15,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
+      if(T<BEAT.END.sc)typeWrap(15,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }
 
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
@@ -899,13 +936,14 @@ function explainer(ctx,W2,Hh,t){
 
   /* --- the end card, on the bare desktop. The window is gone by now. --- */
   if(T>=SHUT){
-    zoomRect([LW/2-20,LH/2-10,40,20],[46,282,340,186],M,SHUT,SHUT+0.22);
+    const EC=LH/2-84;   // the card's own centre line, not a panel offset
+    zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
     if(T>=SHUT+0.22){
-      pxShadow('GOOD TO',LW/2,PY+300,22,P.gold,P.ink,'center');
-      pxShadow('KNOW THO',LW/2,PY+340,22,P.gold,P.ink,'center');
-      px('it is now safe to',LW/2,PY+392,16,P.bone,'center','"VT323"');
-      px('close this window.',LW/2,PY+416,16,P.bone,'center','"VT323"');
-      if(blink)rect(LW/2-60,PY+446,8,2,P.gold);}
+      pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
+      pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
+      px('it is now safe to',LW/2,EC+94,18,P.bone,'center','"VT323"');
+      px('close this window.',LW/2,EC+120,18,P.bone,'center','"VT323"');
+      if(blink)rect(LW/2-60,EC+152,8,2,P.gold);}
   }
 
   /* --- the pointer --- */
@@ -1109,6 +1147,42 @@ window.checkPointerJumps=function(step,maxPx){
   return bad;
 };
 
+/* The ninth sweep, and the one that would have caught what every screenshot
+   showed and no check did: a beat whose content is all crammed into one end of
+   the group box. Nothing is off screen, nothing overlaps, nothing is too small
+   -- it just sits low. So measure the band the beat actually occupies and hold
+   its centre to the middle of the box. A band narrower than a third of the box
+   is reported too: that is dead air, not composition. */
+window.checkComposition=function(tol,minFill){
+  const T=tol||56, MF=minFill||0.30, bad=[];
+  // Measure each beat ONCE, on its SETTLED frame -- half a second before it
+  // hands over. Sweeping every frame measured half-built pictures and reported
+  // a beat as "high" because only the first of twenty lattice nodes had landed.
+  const ks=BKEYS.filter(k=>BEAT[k].sc>=FIRST_CONTENT&&BEAT[k].sc<LAST_BEAT);
+  for(let i=0;i<ks.length;i++){
+    const next = (i+1<ks.length) ? BEAT[ks[i+1]].sc : LAST_BEAT;
+    const tt = next-0.60;
+    BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
+    const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
+    const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
+    const bt=box.y, bb=box.y+box.h;
+    const items=r.filter(a=>!a.chrome&&!a.overlay).map(a=>({y:a.y,h:a.h}))
+      .concat(g.filter(q=>q.k!=='groupbox'&&q.k!=='cursor'));
+    let y0=1e9,y1=-1e9,n=0;
+    for(const a of items){
+      if(a.y+a.h<=bt || a.y>=bb) continue;     // the caption lives below the box
+      y0=Math.min(y0,a.y); y1=Math.max(y1,a.y+a.h); n++;
+    }
+    if(n<2) continue;
+    const off=(y0+y1)/2-(bt+box.h/2), fill=(y1-y0)/box.h;
+    const why=(off>T?'low':off<-T?'high':'')+(fill<MF?(off>T||off<-T?'+':'')+'thin':'');
+    if(!why) continue;
+    bad.push({beat:ks[i],t:+tt.toFixed(2),band:[y0,y1],
+              off:Math.round(off),tol:T,fill:+fill.toFixed(2),why:why});
+  }
+  return bad;
+};
+
 window.checkStraddle=function(step){
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
@@ -1154,7 +1228,15 @@ window.checkOverlap=function(step){
       hits.push({t:+tt.toFixed(2),a:A.k,b:Bq.k,overlap:o});
     }
     // text sitting on top of a sprite, a stack, a tag or the cursor
+    const anyOverlay=r.some(a=>a.overlay);
     for(const a of r)for(const b of g){
+      // A message box drawn OVER the panel is opaque: its own text does not
+      // collide with the vat or the hero number underneath, and the covered
+      // text underneath is not visible to collide with anything. Registering
+      // the vat is what first surfaced this -- five "overlaps" that are a
+      // window sitting on top of a picture, which is what a window is for.
+      if(a.overlay!==b.overlay && (a.overlay||anyOverlay)) continue;
+      if(a.chrome) continue;                  // title bars sit on their own chrome
       if(b.k==='cursor') continue;            // the pointer is allowed anywhere
       if(b.k==='groupbox') continue;          // an outline, not a surface -- text
                                               // inside it is the whole point, and
@@ -1169,6 +1251,7 @@ window.checkOverlap=function(step){
     }
     for(let i=0;i<r.length;i++)for(let j=i+1;j<r.length;j++){
       const a=r[i],b=r[j];
+      if(a.overlay!==b.overlay) continue;     // one of them is behind a window
       if(a.s===b.s&&Math.abs(a.x-b.x)<=1&&Math.abs(a.y-b.y)<=1) continue;   // shadow
       const ox=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x);
       const oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);

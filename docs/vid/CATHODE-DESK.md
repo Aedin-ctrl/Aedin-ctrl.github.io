@@ -1,7 +1,12 @@
-# CATHODE DESK — house style v2.5
+# CATHODE DESK — house style v2.6
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.6 (2026-11-08)** — **vertical composition**. A ninth sweep,
+> `checkComposition()`, and the rule it enforces: every beat's content band is
+> centred on the group box, and the bottom of the panel belongs to the caption.
+> See *Vertical composition*.
+>
 > **v2.5 (2026-11-08)** — lessons from the SECOND piece (halloumi), the first
 > built on this style rather than alongside it. See *Reusing the style*.
 >
@@ -542,6 +547,7 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkClearance()` | anything inside the box with under 6px of air around it |
 | `checkPointerJumps()` | the pointer moving more than 95px in one frame |
 | `checkPointerIdle()` | the pointer sitting still on top of content for over 0.8s |
+| `checkComposition()` | a beat's content sitting off-centre in the box, or filling too little of it |
 
 **Prove a new sweep fires before trusting it.** Put the defect back, confirm the
 sweep names it, then restore. A checker that has only ever returned 0 has not
@@ -575,7 +581,7 @@ piece:
   label is still inside the panel. v1.6 shipped with WATER FROM / THE AIR
   straddling it.
 
-All four must return **0** before a build ships.
+All nine must return **0** before a build ships.
 
 **Lay out against the box, not the panel.** Take the group box rect, inset it
 (14px is right at this scale), and place into *that*. A caption that will not fit
@@ -589,6 +595,73 @@ down had not made it true; sweeping for it did. Note that *large* is not a
 violation: a headline is one set at >=22, and an 18px label already clears the
 14px label floor, so only claim 'headline' at the size that earns it. Screenshots catch the frame you
 happen to look at; the sweep catches the one you don't.
+
+## Vertical composition
+
+A 9:16 frame is mostly height, and height is the one thing no bounds check can
+police. Nothing is off screen, nothing overlaps, nothing is under the floor —
+and the picture still sits in the top third with a lake of dead air under it.
+That shipped, and it took a person watching it to say so.
+
+**1. The bottom of the panel belongs to the caption.** Reserve it in the
+geometry, not by eye: the group box stops **100px short** of the panel's bottom
+and the caption strip starts 14px below it. At 432×768 that is a **576px box**
+and room for **three 20px lines** with air under them. The caption was 18px
+crammed into the 45px left over; it is 20px with its own strip now. More room
+at the bottom is not a nicety on a phone — it is where the words are.
+
+**2. Every vertical anchor is written as a distance from the box's centre
+line**, never as a distance from the top of the panel:
+
+```js
+const MIDY = BY + BH/2;
+const L = { cook:{ vy:MIDY-171, num:[PX+110,MIDY+39], set:MIDY+149 }, ... };
+```
+
+Written as `PY+150` the five beats drifted to five different heights — NET sat
+55px above centre, COOKED 163px below it — and **nothing in the source showed
+it**, because each beat's numbers only ever got read next to each other inside
+their own `if` block. Written against `MIDY`, "is this beat centred" is
+arithmetic you can do by looking.
+
+**3. `checkComposition()` measures the band and holds it.** For each beat it
+takes the **settled frame** — 0.6s before the handover, when the picture has
+finished arriving — unions every registered extent that falls inside the group
+box, and reports:
+
+- `low` / `high` — the band's centre more than **56px** from the box's centre;
+- `thin` — the band shorter than **30%** of the box. That is dead air, and it
+  is the half of the complaint that centring alone does not fix.
+
+Sweep every frame instead and it reports half-built pictures: one lattice node
+had landed, so the beat read as 166px "high". The settled frame is the one the
+rule is about.
+
+**4. A thin band is content, not layout.** The pan beat failed `thin` at 0.27
+and no amount of moving it helped. The fix was to make the thing bigger: a 2px
+dotted line became an 18px slab, and the cheese went from a 3×3×6 stack to
+4×4×10. The cube height went **7px → 9px** across the piece at the same time.
+Reach for the unit before reaching for the spacing.
+
+**5. Register raw geometry or it does not exist.** Rule 31 again, and it bit
+again: the pan, the lattice nodes, the vat and the calcium bridges were all raw
+`fillRect` and therefore invisible to every sweep — including the new one, which
+would have measured a band with the vat missing from it. Push a `GBOX` entry for
+anything that occupies space. Register a lattice **node by node**, not as one
+box round the grid: a lattice is mostly air, and a solid box forbids labelling
+inside it. Do *not* register a mark that is **meant** to sit on text, such as a
+strikethrough.
+
+**6. An opaque window covers what is behind it.** The moment the vat was
+registered, `checkOverlap()` reported five collisions between the end card's
+text and the picture underneath it. They are not collisions — that is what a
+window is. Overlay text is compared only with overlay text, and underlying
+content is skipped entirely while an overlay is up.
+
+**7. Park the pointer somewhere named.** The post-typing rest was "one line
+below the line it just typed" — open space while the caption was one line, the
+*second* caption line the moment the strip grew. Rests near content must be
+constants tied to the layout, not offsets from the last thing touched.
 
 ## Accuracy
 
