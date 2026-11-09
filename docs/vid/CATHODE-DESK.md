@@ -1,7 +1,10 @@
-# CATHODE DESK — house style v2.3
+# CATHODE DESK — house style v2.4
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.4 (2026-11-08)** — target running time is **65–75s**, at the voice's
+> own pace. The 1.25x speed-up is removed. See *Running time*.
+>
 > **v2.3 (2026-11-08)** — the pointer now LEADS what it moves, and steps off
 > it afterwards. See rules 25–28.
 >
@@ -190,6 +193,21 @@ the transition into a hold on content the viewer has already finished with.
 2. **Beats every 1–2s.** Something changes. Arrows draw on. Labels land on what they label.
 3. **Emphasis on the key moment.** Phosphor flash (boost 1.3–1.45 for ~0.15s) + inverse video + the biggest sound.
 4. **Takeaway held ~1s.** A classic message box.
+
+## Running time
+
+**Target 65–75 seconds, or longer. Never shorter.**
+
+**Get there with breath, not with padding.** At natural pace this script is
+44.6s of speech; the length comes from the gaps. Widening them from 0.45/1.20
+to **0.75s between sentences and 1.85s between beats** took it from 59.6s to
+70.1s and improved the pacing — padding the tail would have added the same
+seconds as dead air.
+
+**`SPD` is the one speed knob**, at module scope so the picture and the score
+read the same value. Every motion duration is written at **natural rate** and
+multiplied by it. Set `SPD=1.0` and the piece runs at the voice's pace; the
+0.8 that lived here during the 1.25x experiment is gone.
 
 ## Changing the speed
 

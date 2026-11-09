@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v2.3 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.4 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -65,7 +65,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 50.4</span>
+    <span class="t" id="time">0.00 / 70.1</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -482,38 +482,38 @@ function glass(ctx,W,Hh,t,boost){
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=50.4, VOHASH="e16701c582f5";
+const DUR=70.1, VOHASH="218f640ab7ba";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:0.64,z:1.978,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.64, 0.8, 1.168, 1.488, 1.752]},
-  {b:'JAR',a:2.938,z:4.964,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[2.938, 2.994, 3.362, 3.546, 3.666, 4.138, 4.29, 4.474]},
-  {b:'JAR',a:5.324,z:6.182,w:["It", "isn't", "preservatives."],t:[5.324, 5.404, 5.604]},
-  {b:'JAR',a:6.542,z:7.683,w:["Almost", "nothing", "can", "live", "in", "it."],t:[6.542, 6.782, 7.102, 7.158, 7.31, 7.382]},
-  {b:'WATER',a:8.643,z:10.234,w:["Honey", "is", "about", "one", "sixth", "water."],t:[8.667, 8.995, 9.099, 9.358, 9.617, 9.875]},
-  {b:'WATER',a:10.594,z:13.898,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[10.602, 10.73, 10.866, 11.098, 11.338, 11.514, 11.778, 11.938, 12.514, 12.738, 13.082, 13.306, 13.418, 13.53, 13.69]},
-  {b:'WATER',a:14.258,z:16.49,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[14.33, 14.514, 14.858, 14.97, 15.514, 15.626, 15.946]},
-  {b:'WATER',a:16.85,z:18.538,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[16.874, 17.186, 17.554, 17.594, 17.861, 18.127, 18.394]},
-  {b:'WATER',a:18.898,z:20.699,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[18.898, 19.474, 19.744, 20.014, 20.285, 20.555]},
-  {b:'OSMOSIS',a:21.659,z:24.697,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[21.683, 22.019, 22.171, 22.939, 22.979, 23.107, 23.275, 23.635, 23.867, 23.947, 24.235, 24.491, 24.571, 24.643]},
-  {b:'OSMOSIS',a:25.057,z:26.501,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[25.057, 25.153, 25.369, 25.505, 25.785, 25.897, 26.009]},
-  {b:'ACID',a:27.461,z:30.012,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[27.485, 27.813, 28.029, 28.613, 28.629, 28.981, 29.277, 29.572, 29.868]},
-  {b:'ACID',a:30.372,z:31.626,w:["Plain", "water", "is", "seven."],t:[30.436, 30.732, 31.124, 31.236]},
-  {b:'SEAL',a:32.586,z:34.062,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[32.586, 32.73, 32.97, 33.162, 33.306, 33.498, 33.642, 33.738, 33.882]},
-  {b:'SEAL',a:34.422,z:35.756,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[34.422, 34.59, 34.854, 35.166, 35.35, 35.47, 35.654]},
-  {b:'SEAL',a:36.116,z:38.886,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[36.116, 36.232, 36.348, 36.732, 37.06, 37.372, 37.588, 38.044, 38.068, 38.228, 38.492, 38.748]},
-  {b:'SEAL',a:39.246,z:41.617,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[39.246, 39.43, 39.67, 39.822, 40.11, 40.222, 40.478, 40.726, 40.846, 41.094]},
-  {b:'END',a:42.577,z:44.196,w:["Dry.", "Acidic.", "Sealed."],t:[42.577, 43.377, 44.052]},
-  {b:'END',a:44.556,z:46.378,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[44.564, 44.876, 45.044, 45.228, 45.348, 45.7, 45.932, 45.996]},
+  {b:'HOOK',a:0.8,z:2.472,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.8, 1.0, 1.46, 1.86, 2.19]},
+  {b:'JAR',a:4.322,z:6.855,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[4.322, 4.392, 4.852, 5.082, 5.232, 5.822, 6.012, 6.242]},
+  {b:'JAR',a:7.605,z:8.678,w:["It", "isn't", "preservatives."],t:[7.605, 7.705, 7.955]},
+  {b:'JAR',a:9.428,z:10.854,w:["Almost", "nothing", "can", "live", "in", "it."],t:[9.428, 9.728, 10.128, 10.198, 10.388, 10.478]},
+  {b:'WATER',a:12.704,z:14.693,w:["Honey", "is", "about", "one", "sixth", "water."],t:[12.734, 13.144, 13.274, 13.597, 13.921, 14.244]},
+  {b:'WATER',a:15.443,z:19.573,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[15.453, 15.613, 15.783, 16.073, 16.373, 16.593, 16.923, 17.123, 17.843, 18.123, 18.553, 18.833, 18.973, 19.113, 19.313]},
+  {b:'WATER',a:20.323,z:23.113,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[20.413, 20.643, 21.073, 21.213, 21.893, 22.033, 22.433]},
+  {b:'WATER',a:23.863,z:25.972,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[23.893, 24.283, 24.743, 24.793, 25.126, 25.459, 25.792]},
+  {b:'WATER',a:26.722,z:28.974,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[26.722, 27.442, 27.78, 28.118, 28.456, 28.794]},
+  {b:'OSMOSIS',a:30.824,z:34.621,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[30.854, 31.274, 31.464, 32.424, 32.474, 32.634, 32.844, 33.294, 33.584, 33.684, 34.044, 34.364, 34.464, 34.554]},
+  {b:'OSMOSIS',a:35.371,z:37.176,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[35.371, 35.491, 35.761, 35.931, 36.281, 36.421, 36.561]},
+  {b:'ACID',a:39.026,z:42.215,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[39.056, 39.466, 39.736, 40.466, 40.486, 40.926, 41.296, 41.665, 42.035]},
+  {b:'ACID',a:42.965,z:44.532,w:["Plain", "water", "is", "seven."],t:[43.045, 43.415, 43.905, 44.045]},
+  {b:'SEAL',a:46.382,z:48.228,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[46.382, 46.562, 46.862, 47.102, 47.282, 47.522, 47.702, 47.822, 48.002]},
+  {b:'SEAL',a:48.978,z:50.645,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[48.978, 49.188, 49.518, 49.908, 50.138, 50.288, 50.518]},
+  {b:'SEAL',a:51.395,z:54.857,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[51.395, 51.54, 51.685, 52.165, 52.575, 52.965, 53.235, 53.805, 53.835, 54.035, 54.365, 54.685]},
+  {b:'SEAL',a:55.607,z:58.571,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[55.607, 55.837, 56.137, 56.327, 56.687, 56.827, 57.147, 57.457, 57.607, 57.917]},
+  {b:'END',a:60.421,z:62.445,w:["Dry.", "Acidic.", "Sealed."],t:[60.421, 61.421, 62.265]},
+  {b:'END',a:63.195,z:65.473,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[63.205, 63.595, 63.805, 64.035, 64.185, 64.625, 64.915, 64.995]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  HOOK:{sc:0.0,a:0.64,z:1.978},
-  JAR:{sc:2.616,a:2.938,z:7.683},
-  WATER:{sc:8.32,a:8.643,z:20.699},
-  OSMOSIS:{sc:21.336,a:21.659,z:26.501},
-  ACID:{sc:27.144,a:27.461,z:31.626},
-  SEAL:{sc:32.264,a:32.586,z:41.617},
-  END:{sc:42.256,a:42.577,z:46.378},
+  HOOK:{sc:0.0,a:0.8,z:2.472},
+  JAR:{sc:3.92,a:4.322,z:10.854},
+  WATER:{sc:12.3,a:12.704,z:28.974},
+  OSMOSIS:{sc:30.42,a:30.824,z:37.176},
+  ACID:{sc:38.63,a:39.026,z:44.532},
+  SEAL:{sc:45.98,a:46.382,z:58.571},
+  END:{sc:60.02,a:60.421,z:65.473},
 };
 const SENT={
   HOOK:[0],
@@ -525,29 +525,6 @@ const SENT={
   END:[17,18],
 };
 
-/* ===== THE POINTER TRACK =====
-   Where the mouse goes and when it clicks, generated rather than keyframed by
-   hand. On a real machine you CLICK into a line before you type it, so every
-   typed line gets a click 0.30s before its first word; the caret takes over
-   from there. Window coordinates are fixed (the frame never moves), so the
-   insertion points can live in one table.
-
-   Button centres are computed, not eyeballed -- the pointer's TIP is its
-   hotspot, so a keyframe is the middle of the button it is pressing. */
-const SPOTS=[
-  {n:0,  x:204, y:130, s:14},   // the dialog's question, line 1
-  {n:2,  x:258, y:162, s:18},   // jar caption 1
-  {n:3,  x:258, y:192, s:18},   // jar caption 2
-  {n:4,  x:52,  y:54,  s:18},   // the one-sixth line
-  {n:10, x:42,  y:214, s:18},   // osmosis caption
-  {n:16, x:28,  y:254, s:18},   // seal caption
-  {n:17, x:166, y:106, s:14},   // message box list
-];
-const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
-const SESSION_SPANS=[];   // the caret lives here for a whole typing session
-const SESSION_GAP=2.0;           // lines closer in TIME than this may share a session
-const SESSION_NEAR=80;           // ...but only if the insertion point barely moved
-
 /* ===== WHAT THE POINTER DOES =====
    It does not park. Every element in the piece is put there BY the mouse:
    the tag is dragged onto the jar, each cube of the one-sixth row is clicked
@@ -558,6 +535,9 @@ const SESSION_NEAR=80;           // ...but only if the insertion point barely mo
    anchors the picture uses -- so the pointer leads the thing it is moving
    instead of wandering near it. Coordinates are buffer pixels; the window
    never moves, so they can live in one table. */
+// 1.0 = the voice's own pace. It was 0.8 while the track was sped up 1.25x;
+// every motion duration below is written at natural rate and scaled by this.
+const SPD=1.0;
 const W=(n,i)=>VO[n].t[i];
 /* LEAD is why this reads as the mouse doing the work. The pointer grabs and
    pulls 0.20s AHEAD of the element's own animation, so the thing trails the
@@ -578,35 +558,58 @@ const ACTS=(()=>{
   // WATER -- sweep across the row placing cubes. Six separate taps 0.072s apart
   // asked the pointer to teleport between them; it is one gesture with a ring
   // per cube instead.
-  drag(W(4,0)+0.20, W(4,0)+(5*0.09+0.26)*0.8, [125,150], [160,168], [198,198]);
+  drag(W(4,0)+0.25*SPD, W(4,0)+(5*0.09+0.26)*SPD, [125,150], [160,168], [198,198]);
   for(let i=0;i<6;i++) A.push({t0:+(W(4,0)+(i*0.09+0.26)*0.8).toFixed(3),k:'ring',a:[125+i*7,Math.round(150+i*3.5)]});
   // WATER -- haul both stacks up out of the baseline
-  drag(W(5,2), W(5,2)+1.00, [152,186], [152,114], [102, 96]);
-  drag(W(8,0), W(8,0)+1.04, [250,186], [250, 84], [308, 72]);
+  drag(W(5,2), W(5,2)+1.25*SPD, [152,186], [152,114], [102, 96]);
+  drag(W(8,0), W(8,0)+1.30*SPD, [250,186], [250, 84], [308, 72]);
   // OSMOSIS -- drag the arrow out of the microbe, then click the x
-  drag(W(9,7), W(9,7)+0.60, [108,104], [208,104], [300,150]);
+  drag(W(9,7), W(9,7)+0.75*SPD, [108,104], [208,104], [300,150]);
   tap (W(10,1)+0.02, [239,99], [300,150]);
   // ACID -- the same haul, shorter stacks
-  drag(W(11,2), W(11,2)+0.76, [152,186], [152,166], [102,148]);
-  drag(W(12,0), W(12,0)+0.80, [250,186], [250,151], [308,138]);
+  drag(W(11,2), W(11,2)+0.95*SPD, [152,186], [152,166], [102,148]);
+  drag(W(12,0), W(12,0)+1.00*SPD, [250,186], [250,151], [308,138]);
   // SEAL -- pull the water down out of the air, raise the moisture, drop the yeast in
-  drag(W(14,1), W(14,1)+0.72, [62,58], [62,106], [152, 86]);
+  drag(W(14,1), W(14,1)+0.90*SPD, [62,58], [62,106], [152, 86]);
   drag(W(15,2), W(15,8),      [342,206], [342,151], [292, 96]);
   tap (W(15,9)+0.05, [520,74], [462,122]);
   // ...and a click to POP each label out once the thing it names is in place.
   // Offsets keep every tap clear of the drag that precedes it -- two track
   // points at the same instant in different places is a one-frame jump.
-  tap (W(5,2)+1.45,  [152,217], [198,248]);   // HONEY plate, after its stack lands
-  tap (W(8,0)+1.50,  [250,217], [310,248]);   // BACTERIA plate
+  tap (W(5,2)+1.70*SPD,  [152,217], [198,248]);   // HONEY plate, after its stack lands
+  tap (W(8,0)+1.80*SPD,  [250,217], [310,248]);   // BACTERIA plate
   tap (W(6,0),       [404,108], [588, 88]);   // 'water activity in honey'
-  tap (W(11,2)+1.20, [152,217], [198,248]);   // HONEY plate, acid chart
-  tap (W(12,0)+1.25, [250,217], [310,248]);   // WATER plate
+  tap (W(11,2)+1.45*SPD, [152,217], [198,248]);   // HONEY plate, acid chart
+  tap (W(12,0)+1.50*SPD, [250,217], [310,248]);   // WATER plate
   tap (W(11,8),      [404, 62], [588, 88]);   // the 3.9 pops on "nine"
   tap (W(12,3),      [404,152], [588,178]);   // the 7 pops on "seven"
   tap (W(9,11),      [ 42,144], [300,150]);   // WATER PULLED OUT
   tap (W(15,8)+0.12, [412,147], [292, 96]);   // 1 PART IN 5
   return A.sort((x,y)=>x.t0-y.t0);
 })();
+
+/* ===== THE POINTER TRACK =====
+   Where the mouse goes and when it clicks, generated rather than keyframed by
+   hand. On a real machine you CLICK into a line before you type it, so each
+   typing SESSION gets a click 0.30s before its first word and the caret takes
+   over from there. Window coordinates are fixed (the frame never moves), so
+   the insertion points live in one table.
+
+   Button centres are computed, not eyeballed: the pointer's TIP is its
+   hotspot, so a keyframe is the middle of the button it is pressing. */
+const SPOTS=[
+  {n:0,  x:204, y:130, s:14},   // the dialog's question, line 1
+  {n:2,  x:258, y:162, s:18},   // jar caption 1
+  {n:3,  x:258, y:192, s:18},   // jar caption 2
+  {n:4,  x:52,  y:54,  s:18},   // the one-sixth line
+  {n:10, x:42,  y:214, s:18},   // osmosis caption
+  {n:16, x:28,  y:254, s:18},   // seal caption
+  {n:17, x:166, y:106, s:14},   // message box list
+];
+const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
+const SESSION_SPANS=[];   // the caret lives here for a whole typing session
+const SESSION_GAP=2.0;    // lines closer in TIME than this may share a session
+const SESSION_NEAR=80;    // ...but only if the insertion point barely moved
 
 const RINGS=[];
 const PTRACK=(()=>{
@@ -702,7 +705,6 @@ const PTRACK=(()=>{
 function explainer(ctx,W,Hh,t){
   const T=Math.floor(t*12)/12;                 // 12fps tick: drawn content
   const M=t;                                   // motion is not ticked at all
-  const SPD=0.8;                               // 1/1.25 -- motion durations track the speed-up
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
   const blink=Math.floor(T*2.2)%2===0;
 
@@ -752,7 +754,7 @@ function explainer(ctx,W,Hh,t){
 
   /* --- HOOK: the question types itself, word by word, as it is asked --- */
   const DLG=[150,96,344,132];
-  zoomRect([4,340,54,16],DLG,M,0.04,0.34);
+  zoomRect([4,340,54,16],DLG,M,0.05,0.42);
   const dlgOut=BEAT.JAR.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
@@ -767,7 +769,7 @@ function explainer(ctx,W,Hh,t){
     typeLine(0,r.x+50,r.y+62,14,'#000',null,null,4);
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
   }
-  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.28,dlgOut);
+  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35*SPD,dlgOut);
 
   if(T>=dlgOut){
     const done=T>=BEAT.END.sc;
@@ -822,8 +824,8 @@ function explainer(ctx,W,Hh,t){
         typeLine(4,CX+40,CY+26,18,'#d9d2e6',null,'"VT323"');
       }
       // s5 "...almost none of it is free." -- the honey bar drops
-      const d1=mp(wordAt(5,2),wordAt(5,2)+1.00);                    // "sugar"
-      const d2=mp(wordAt(8,0),wordAt(8,0)+1.04);                    // "Bacteria"
+      const d1=mp(wordAt(5,2),wordAt(5,2)+1.25*SPD);                    // "sugar"
+      const d2=mp(wordAt(8,0),wordAt(8,0)+1.30*SPD);                    // "Bacteria"
       if(after(5,2)){
         voxBar(Pr,0,0,12,P.orange,d1);
         if(d1>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.paper,'#74432d');}
@@ -844,7 +846,7 @@ function explainer(ctx,W,Hh,t){
       groupBox(CX+14,CY+12,CWd-28,150,'WHAT HAPPENS TO A MICROBE');
       sprite('bug',CX+44,CY+58,5);
       if(after(9,7)){                                   // "pulls"
-        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.60),P.cyan);
+        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.75*SPD),P.cyan);
         if(after(9,11))pxShadow('WATER PULLED OUT',CX+30,CY+116,22,P.cyan,P.ink);}  // "out"
       if(after(10,1)){                                  // "dries"
         B.fillStyle=P.red;
@@ -859,15 +861,15 @@ function explainer(ctx,W,Hh,t){
       groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
       const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);   // same baseline as the water chart
       const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
-      const dp=mp(wordAt(11,2),wordAt(11,2)+0.76),     // "acidic"
-            dw=mp(wordAt(12,0),wordAt(12,0)+0.80);     // "Plain"
+      const dp=mp(wordAt(11,2),wordAt(11,2)+0.95*SPD),     // "acidic"
+            dw=mp(wordAt(12,0),wordAt(12,0)+1.00*SPD);     // "Plain"
       if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
         if(dp>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.red,'#fff4e2');}
       if(after(12,0)){voxBar(Pr,B2X,B2Y,7,'#9fcb55',dw);
         if(dw>=1)blockTag(b2.x,b2.y+24,'WATER',14,P.grass,'#0a0618');}
       const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
       if(after(11,8)){                                  // "nine"
-        const inv=t<h8+0.72&&Math.floor((t-h8)*8)%2===0;
+        const inv=t<h8+0.90*SPD&&Math.floor((t-h8)*8)%2===0;
         if(inv){rect(CX+386,CY+26,NW,NH,P.gold);px('3.9',CX+392,CY+34,NS,P.ink,null,'"Silkscreen"');}
         else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');
         px('pH - acidic as orange juice',CX+392,CY+90,18,'#d9d2e6',null,'"VT323"');}
@@ -895,7 +897,7 @@ function explainer(ctx,W,Hh,t){
       const jx=IL+10, jy=IT+56;
       sprite('jaropen',jx,jy,5);
       if(after(14,1)){                                   // "pulls"
-        const k=mp(wordAt(14,1),wordAt(14,1)+0.72);
+        const k=mp(wordAt(14,1),wordAt(14,1)+0.90*SPD);
         for(let a=0;a<3;a++)
           dottedArrow([[jx+14+a*18,IT],[jx+14+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
         // two lines: one line of this at 16px is 283px and reached the stack
@@ -921,12 +923,12 @@ function explainer(ctx,W,Hh,t){
 
     /* scene changes: the medium's own mosaic, peaking as the content swaps */
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
-      if(BEAT[k].sc>0&&dd<0.16)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.16*15));}
+      if(BEAT[k].sc>0&&dd<0.20*SPD)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/(0.20*SPD)*15));}
     B.restore();
 
     /* --- END: the takeaway, one line per spoken word --- */
     const CLICK=VO[18].z+0.52, SHUT=CLICK+0.15;   // press OK, then the box closes
-    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.24,BEAT.END.sc);
+    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.30*SPD,BEAT.END.sc);
     if(done&&T<SHUT){
       const m=winFrame(110,78,420,196,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
@@ -1308,7 +1310,7 @@ function buildScore(){
   // one click per pointer click, from the same track the picture uses
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
-  add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open');
+  add(BEAT.JAR.sc-0.35*SPD,'open'); add(BEAT.END.sc-0.30*SPD,'open');
   add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
   // screen: a print blip on every spoken word that appears as text on screen
   [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
@@ -1316,12 +1318,12 @@ function buildScore(){
   [17,18].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   // objects: stacks landing. Every 3rd cube so a bar reads as a stack.
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  for(let i=0;i<6;i++)add(w(4,0)+(i*0.09+0.26)*0.8,'knock',i);        // the one-sixth row
-  bar(w(5,2),w(5,2)+1.00,12,3);  bar(w(8,0),w(8,0)+1.04,18,4);  // water activity
-  bar(w(11,2),w(11,2)+0.76,4,1); bar(w(12,0),w(12,0)+0.80,7,2); // pH
+  for(let i=0;i<6;i++)add(w(4,0)+(i*0.09+0.26)*SPD,'knock',i);        // the one-sixth row
+  bar(w(5,2),w(5,2)+1.25*SPD,12,3);  bar(w(8,0),w(8,0)+1.30*SPD,18,4);  // water activity
+  bar(w(11,2),w(11,2)+0.95*SPD,4,1); bar(w(12,0),w(12,0)+1.00*SPD,7,2); // pH
   bar(w(15,2),w(15,8),11,3);                                    // moisture climbing
-  add(w(5,2)+1.00,'tag'); add(w(8,0)+1.04,'tag');
-  add(w(11,2)+0.76,'tag'); add(w(12,0)+0.80,'tag');
+  add(w(5,2)+1.25*SPD,'tag'); add(w(8,0)+1.30*SPD,'tag');
+  add(w(11,2)+0.95*SPD,'tag'); add(w(12,0)+1.00*SPD,'tag');
   // arrows draw on, conclusions land on the word that says them
   add(w(9,7),'draw');  add(w(9,11),'tag');     // "pulls" -> "out"
   add(w(14,1),'draw'); add(w(14,6),'tag');     // "pulls" -> "air"
