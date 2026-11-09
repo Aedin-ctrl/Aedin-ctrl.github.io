@@ -1,11 +1,12 @@
-# CATHODE DESK — house style v3.0
+# CATHODE DESK — house style v3.1
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
-> **v3.0 (2026-11-09)** — **the intro format**: three spoken lines, the third
-> being the question, over one solid drawn object. The question is in the
-> narration, so it types in time with the voice saying it. See *Vibrant at the
-> edges*.
+> **v3.1 (2026-11-09)** — **there is no question in the intro.** It is a title
+> card: a vibrant sky, one solid drawn object, and the narration itself as the
+> headline. Then the blackboard. v2.9 put a written question over the voice and
+> v3.0 put the question into the voice; both were more intro than the intro is
+> worth. See *Vibrant at the edges*.
 >
 > **v2.9 (2026-11-09)** — the vibrant beat is a typed question card, fixed
 > captions **type** instead of appearing, and the Win95 icon is drawn from its
@@ -709,37 +710,33 @@ and last thing anyone sees should not look like homework.
 
 ### The intro format
 
-**The opening beat is three spoken lines, and the third is the question.**
+**The opening beat is a title card, and that is all it is**: a vibrant sky,
+**one** solid drawn object, and the **narration itself** as the headline. Then
+the sun goes down and it cuts to the blackboard. No question, no card, nothing
+written over the voice.
 
-```
-1.  Almost everything shrinks when it freezes.     statement
-2.  Except water. It expands.                      the exception
-3.  So why does water expand?                      the question
-```
+Two versions of a question were tried and both came back wrong, for the same
+underlying reason — the intro was carrying more than an intro is worth:
 
-That shape is the format. Write the beat this way in `script.json` before any
-of it is synthesised — **the question has to be in the narration**, which is
-the whole point: it is then in your ear while it is on the screen, and typing
-it is *sync* rather than a crawl over a sentence it has nothing to do with.
-The first cut had a pre-written card spelling out `SO WHY DOES WATER EXPAND?`
-for four seconds while the narrator talked about shrinking, and it read as
-exactly what it was.
+- **v2.9** wrote a question on screen and typed it slowly across the beat. It
+  spelled out `SO WHY DOES WATER EXPAND?` for four seconds while the narrator
+  was saying *"Almost everything shrinks when it freezes."* Two unrelated texts
+  at once, in a piece whose whole rule is that the screen says what the voice
+  is saying.
+- **v3.0** fixed the sync by putting the question *into the narration* as a
+  third spoken line. It synced perfectly and it was still too much: the beat
+  now had a statement, an exception, a question and an object to get through
+  before anything had been explained.
 
-**On screen:**
+**What it is instead:**
 
-- Lines 1 and 2 are **word-gated at 34px VT323** on their measured onsets, one
-  sentence at a time, with the caret.
-- Line 3 types **key by key** at 26px Press Start 2P — characters interpolated
-  between the word onsets, which is as close to one keystroke per sound as the
-  data goes.
+- The beat's sentences are **word-gated at 34px VT323** on their measured
+  onsets, one at a time, with the caret. The narration IS the headline, so
+  every word on screen is the word being spoken on that frame.
 - **Near-white, not gold.** Gold on the ember sky was two warm colours
   fighting. `P.paper` carries on every palette, which is what a slot is for.
-- **The sun goes down across line 3**, so by the scene change the frame already
-  *is* the dark field it cuts to. The wipe stops being a cut.
-- **Hold the caret until the scene changes, plus one content frame.** The beat
-  is gated on `T` (12fps) and the caret on `t`, so for 1/12s the card would
-  otherwise sit there with nothing typing on it, which `checkPointerIdle()`
-  sees.
+- **The sun goes down across the last sentence**, so by the scene change the
+  frame already *is* the dark field it cuts to. The wipe stops being a cut.
 - `checkComposition()` checks the **first content beat for centring only**,
   never for fill.
 
