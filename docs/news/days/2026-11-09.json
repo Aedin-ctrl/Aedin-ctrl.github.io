@@ -1,0 +1,740 @@
+{
+  "date": "2026-11-09",
+  "generated": "2026-11-09T16:10:08.531Z",
+  "articles": [
+    {
+      "id": "2026-11-09-a-former-fbi-supervisor-admits-taking-2-5m",
+      "headline": "A former FBI supervisor admits taking $2.5M in crypto from wallets his own agency was investigating",
+      "summary": "Patrick Yaroch, a former FBI headquarters supervisor, pleaded guilty to wire fraud and money laundering. Prosecutors say he used wallet passphrases from FBI case systems to make about 100 transfers across 35 investigations.",
+      "impacts": [
+        "Insiders with case-system access can quietly move seized or suspect funds, and nobody may notice for months.",
+        "Investigations of nation-state hackers and fraud rings were compromised, so some cases may be harder to prove.",
+        "Agencies holding crypto credentials will face pressure to split access and audit every wallet touch."
+      ],
+      "details": [
+        "Patrick Steven Yaroch, 37, a former FBI supervisory special agent, has pleaded guilty to wire fraud and money laundering. According to BleepingComputer's account of the court filings and a Justice Department statement, he stole nearly $2.5 million in cryptocurrency from wallets belonging to fraud victims and to nation-state hackers who were under FBI investigation.",
+        "Yaroch worked on a national security squad in the FBI's Boston Division from 2017 to 2025. From February 2025 to July 2026 he was a supervisory special agent in the Counterintelligence and Espionage Division at FBI headquarters. The FBI put him on leave on July 29, fired him on July 31, and he was arrested that day, a day after he reported the theft himself to Justice Department and FBI staff.",
+        "Prosecutors say he used passphrases from FBI case management systems and another platform for sharing investigative data to move crypto from wallets tied to victims or suspects into wallets he controlled. The Justice Department counts about 100 fraudulent transfers using credentials from 35 separate investigations, with proceeds of about $2,474,380. He then tried to launder the money by swapping it into other cryptocurrencies, and spent it on credit cards, car payments and other debts. The Record reports the individual thefts ranged from under a dollar to more than $580,000, and quotes prosecutors saying his conduct was 'eating him up inside'. It also says he became frustrated that he could not do more to disrupt one individual's use of crypto.",
+        "Court documents cited by BleepingComputer say he was preparing to move his family to Portugal in early September, with flights to Lisbon and power-of-attorney papers given to two Portuguese lawyers. They also say he asked ChatGPT about relocating to an EU country with about $1 million. Prosecutors say the thefts compromised multiple FBI investigations into both criminal groups and nation-state adversaries, and exposed sources and methods.",
+        "What is not known: the sources differ on some details, such as the number of wallets and when the thefts began, so treat those specifics as unsettled. Neither report says whether victims have recovered any funds or how the investigations were affected. Yaroch faces up to 20 years on each count, and sentencing is set for March 4. The case is a reminder that the scariest access in a security system is often the access given to the people who guard it."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "fbi",
+        "crypto",
+        "insider threat",
+        "fraud",
+        "credentials",
+        "government"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/fbi-agent-stole-25-million-in-crypto-from-hackers-fraud-victims/"
+        },
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/fbi-agent-pleads-guilty-to-stealing-from-nation-state-hackers"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-germanys-top-university-says-attackers-stole-the-login",
+      "headline": "Germany's top university says attackers stole the login passwords of every myTUM user",
+      "summary": "The Technical University of Munich says attackers took central passwords for everyone registered on its myTUM portal, then used an administrator account to hit its campus system. It has not said how they got in or how many people are affected.",
+      "impacts": [
+        "Reused passwords from the breach could open students' and staff members' other accounts.",
+        "Names, addresses and birth dates in the portal make targeted phishing look convincing.",
+        "Accounts with multi-factor authentication were protected, which shows what that extra step is worth."
+      ],
+      "details": [
+        "The Technical University of Munich (TUM), ranked first in Germany and 25th worldwide in the QS rankings, disclosed on November 6, 2026 that attackers stole the central login passwords of everyone registered with myTUM, its portal for students and staff. The Register reports that the attackers then used the credentials of a system administrator to launch a follow-on attack on TUMonline, the campus management system, and that the IT team took TUMonline offline in response.",
+        "Service was restored on Monday, November 9, and users can now change their passwords. The exposed data may include names, home addresses and dates of birth. For employees it may include work addresses and phone numbers. For students it may include ID numbers, degree programs and completed semesters. TUM serves 51,954 students and 12,850 employees across its German campuses and its Singapore branch.",
+        "TUM's CIO, Alexander Braun, said the attackers' activity inside TUMonline was largely logged. After analyzing the logs, the university currently assumes no other TUMonline data, such as grades or applications, was compromised, though the investigation continues. The university said accounts with multi-factor authentication were protected from this attack. Users who have not set up MFA must reset their password through an eID or by requesting an email while on the campus network.",
+        "Several important questions are open. TUM has not said how the attackers first got in, and it has not said how the stolen passwords were stored, which matters because well-hashed passwords are far harder to use than plain ones. It did not answer The Register's questions about how many users were affected, and it did not say whether the compromised administrator had MFA turned on.",
+        "For people affected, the practical advice is the standard kind: change the password anywhere it was reused, turn on MFA, and treat emails that mention their degree program or student ID with suspicion. For everyone else, it is another example of a single powerful administrator account being the bridge from one breach to a bigger one."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "data breach",
+        "university",
+        "credentials",
+        "germany",
+        "phishing",
+        "privacy"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/cyber-crime/2026/11/09/portal-breach-at-germanys-top-university-exposes-every-registered-users-password/5308380"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-torvalds-says-the-ai-driven-flood-of-linux",
+      "headline": "Torvalds says the AI-driven flood of Linux bug fixes may be starting to ease, though he hedges",
+      "summary": "With Linux 7.4-rc2, Torvalds noted a large batch of AI-prompted fixes. A kernel developer says eBPF fixes now arrive faster than new reports, but he doubts other areas have reached that point.",
+      "impacts": [
+        "AI bug-finding is producing more patches than many IT teams can test and deploy.",
+        "Attackers also target AI-discovered flaws, so slow patching is riskier than before.",
+        "Open-source maintainers carry the review load, and burnout in a few people can affect software everyone uses."
+      ],
+      "details": [
+        "Linus Torvalds released Linux 7.4-rc2 and described it as big for two reasons. He had left some code out of rc1 because he was busy, and rc1 was already the largest in the kernel's history. The second reason was what he called 'various AI fixes': a large batch of patches prompted by AI bug-finding tools. The Register reports on the note and says the headline hope is that the flood may be peaking.",
+        "The Register ties the surge to Anthropic's Mythos bug-finding model, launched in April 2026, since which developers can find more flaws than before. It cites record patch volumes: Microsoft fixed a record 974 flaws in September 2026, its third record month this year after 622 in July and 206 in June, and Oracle fixed 1,449 flaws in a single month. The article says these volumes exceed what many IT teams are set up to handle, and that organizations must also fix bugs faster because attackers increasingly target flaws that AI has surfaced.",
+        "The optimism comes from Alexei Starovoitov, co-creator of eBPF, the subsystem that runs sandboxed programs inside the kernel. Torvalds wrote that Starovoitov says that on the eBPF side, fixes are now arriving faster than new reports, adding that this 'sounds lovely if true'. Starovoitov himself was cautious. He thinks most other areas have not reached that point and advised readers not to hold their breath.",
+        "What is confirmed is narrow: Torvalds released rc2, he cited AI-related fixes as a major part of it, and the Microsoft and Oracle numbers are as reported. What is unproven is whether the reversal exists beyond eBPF. The claim is secondhand, no data for other parts of the kernel is given, and the kernel has more than 40 million lines of code. The Register's headline says the flood has 'peaked', which is stronger than what Torvalds and Starovoitov actually said.",
+        "The larger point is that AI has changed the economics of finding bugs faster than it has changed the economics of fixing them. If the eBPF experience generalizes, the backlog may shrink; if it does not, defenders will keep running behind tools that attackers can use as well."
+      ],
+      "category": "Tech",
+      "tags": [
+        "linux",
+        "ai",
+        "vulnerability",
+        "patch",
+        "open source",
+        "microsoft"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/09/linus-torvalds-sees-signs-ai-prompted-patch-flood-has-peaked/5308345"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-a-woman-died-near-a-us-border-surveillance",
+      "headline": "A woman died near a US border surveillance tower; MIT analysis finds at least 81 deaths in tower view",
+      "summary": "MIT Technology Review and Times of San Diego tied 138 deaths from 2022 to 2025 to areas within range of a nearby tower. A separate analysis found at least 81 people likely died in a tower's unobstructed view.",
+      "impacts": [
+        "Billions spent on surveillance may not translate into rescues if no one is assigned to respond.",
+        "AI-driven towers decide what counts as relevant, with little independent evaluation of how well they work.",
+        "Plans to expand to 2,300 towers by 2034 raise the stakes for those questions."
+      ],
+      "details": [
+        "Graciela Gómez Hernández, 30, crossed from Tijuana into Southern California on September 14, 2025, hoping to earn money for her three children and parents. She hiked alone into the Otay Mountain Wilderness and got lost. Around 2 to 3 p.m. she left her mother a voice message saying she could not go on. Her skeletonized remains were found in early October, about 100 yards north of the border. The medical examiner could not tell whether she was killed or died of dehydration.",
+        "A General Dynamics surveillance tower, in place since 2019, stood about a mile from her body, with cameras said to track targets 5 to 7 miles away. A newer Anduril tower 1.4 miles away uses AI to decide whether moving objects matter. It is not known whether either tower detected her or was operating, and the Border Patrol did not answer those questions.",
+        "The reporting scales this up. Times of San Diego found at least 138 deaths from 2022 to 2025 within the nominal range of a nearby tower. A separate MIT Technology Review analysis concluded at least 81 of those people were likely within a tower's unobstructed field of view. A June 2026 GAO report counts 803 fielded towers across the southwest border with 175 more planned at a cost of $1.4 billion, and the expected total by 2034 is 2,300. An October 2024 NBC News memo reported that 30% of older towers were broken.",
+        "Officials defend the system. Border czar Tom Homan said it makes every agent and officer more effective, and Anduril says its towers autonomously identified hundreds of thousands of crossings as of June 2026. Critics disagree. Dave Maass of the Electronic Frontier Foundation says no independent evaluation shows how much the systems capture, and a 2020 RAND report found the towers' main value may be deterrence rather than detection. Search-and-rescue volunteers say rescue calls are often not a priority for agents.",
+        "Caveats matter: being near a tower does not prove someone was on camera, since terrain can block views, and official death counts are likely undercounts. Advocates also note that crossings and reported deaths have fallen since January 2025, but say migrants now move faster, skip water and cross in the hottest weeks. The central question is simple: if a machine can see a person in trouble, who is responsible for going to help?"
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "border",
+        "surveillance",
+        "ai",
+        "anduril",
+        "privacy",
+        "government"
+      ],
+      "date": "2026-09-21",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/09/21/1144170/border-towers-surveillance-feature/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-a-new-model-says-thwaites-the-doomsday-glacier",
+      "headline": "A new model says Thwaites, the 'Doomsday Glacier', could add twice the sea-level rise expected",
+      "summary": "A UC Irvine and NASA JPL study in Nature Communications projects up to 30 mm of sea-level rise from Thwaites by 2100, about double earlier estimates, with a 60% chance it detaches from a key underwater ridge.",
+      "impacts": [
+        "Coastal planners may be using sea-level projections that are too low for Antarctica's biggest risk.",
+        "Tides moving seawater kilometers under grounded ice point to hidden melting that older models miss.",
+        "The result comes without added warming, so cutting emissions may not undo the physics."
+      ],
+      "details": [
+        "A study in Nature Communications by Mattia Poinelli, Eric Rignot and colleagues at the University of California, Irvine and NASA's Jet Propulsion Laboratory finds that Thwaites Glacier in West Antarctica could raise global sea level by up to 30 millimeters by 2100. That is roughly double earlier projections, according to ScienceDaily's October 28 summary of the UC Irvine release, and the increase does not require any additional warming.",
+        "The key change is how the model treats the grounding line, where ice lifts off the land and begins to float. Earlier models treated it as a narrow boundary. The new model allows a grounding zone that can be kilometers wide, where warm seawater reaches beneath the ice. Satellite radar data from ICEYE's constellation showed fluctuations across several kilometers of the zone, which suggests seawater moves under grounded ice, lifting and exposing its underside as tides change. With this physics the model reproduced changes at Thwaites since the 1990s that were about four times larger than conventional models show.",
+        "Thwaites sits in the Amundsen Sea Embayment, which the study says drives roughly one-third of the Antarctic Ice Sheet's mass loss. Its main trunk is held in place by an underwater feature called the Mouginot Ridge. Simulations indicate a 60% probability that the glacier detaches from this ridge before 2100, assuming a grounding zone 4 to 6 kilometers wide, after which it could retreat toward another high point, the South Ridge.",
+        "Rignot said the new physics lets the model match observed mass loss and implies greater coastal flooding risk in coming decades. Poinelli described the model as a way to narrow uncertainty in projections.",
+        "Keep the limits in view. These are model projections, not measurements, and they depend on the assumed width of the grounding zone and other choices. The 60% figure applies to the 4-to-6-kilometer scenario, and the 'twice as much' comparison is against earlier projections without the full uncertainty range in the press coverage. Thirty millimeters is about 1.2 inches of global average sea-level rise from this one glacier; the concern is the risk that retreat accelerates, not that coasts flood this year."
+      ],
+      "category": "Climate",
+      "tags": [
+        "antarctica",
+        "glacier",
+        "sea level",
+        "ice sheet",
+        "nasa",
+        "climate"
+      ],
+      "date": "2026-10-28",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261027063701.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-researchers-propose-a-light-based-test-to-detect",
+      "headline": "Researchers propose a light-based test to detect 'mirror life' if it were ever created",
+      "summary": "Chemists at Strathclyde and Durham propose using circularly polarized luminescence to detect organisms built from mirror-image molecules. The test has not been demonstrated, and mirror life does not currently exist.",
+      "impacts": [
+        "Mirror organisms might evade immune systems and ecosystems evolved around normal molecules.",
+        "A detection method would give regulators and labs a way to check for contamination.",
+        "The warning signals pressure for rules on research that aims to build mirror-image cells."
+      ],
+      "details": [
+        "Researchers from the University of Strathclyde and Durham University have proposed a way to detect 'mirror life', a hypothetical form of life built from reversed versions of the molecules in known organisms. ScienceDaily reported on October 24, 2026 on the paper, published in Royal Society Open Science, led by Dr. Lewis MacKenzie with Professor Robert Pal.",
+        "Mirror-image molecules have the same atoms in the same order but a different three-dimensional arrangement, called handedness or chirality. The body can respond to them very differently. Researchers worry organisms built from reversed building blocks could interact unpredictably with ecosystems and evade natural defenses. Some scientists have recommended restricting research aimed at creating such organisms, and the UK Government Office for Science and the UN Secretary-General's Scientific Advisory Board have raised the issue.",
+        "The proposed method uses circularly polarized luminescence, or CPL, a light-based technique that reveals molecular handedness. It is related to the principle behind polarized lenses in 3D cinema glasses. Fluorescent probes would attach to particular cell structures and emit characteristic CPL signals, forming a fingerprint of natural or mirror chirality. The team proposes combining several probes to reduce misleading results. They say the approach can be refined using ordinary biological samples, so no mirror organisms need to be made, and that CPL detection has been shown at lab scale on microscopes, cameras and plate readers.",
+        "MacKenzie said: 'We don't expect mirror life to appear tomorrow, but if it did arise, the consequences could be severe.' The university describes mirror life as low likelihood but potentially high severity.",
+        "The caveats are large. Mirror life does not exist. The release reports no experimental results, sample sizes or accuracy rates, and the full assay has not been demonstrated. The 'first method' claim is the researchers' own belief. This is a contingency plan, not evidence of an imminent threat. Its value is that biosecurity rules are easier to write when there is at least a way to check whether they are being broken."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "mirror life",
+        "biosecurity",
+        "synthetic biology",
+        "chirality",
+        "biotech",
+        "research"
+      ],
+      "date": "2026-10-24",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261023023726.htm"
+        },
+        {
+          "name": "University of Strathclyde",
+          "url": "https://www.strath.ac.uk/whystrathclyde/news/2026/researchersproposefirstmethodtodetectmirrorlife/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-an-alaska-landslide-sent-a-tsunami-1-580",
+      "headline": "An Alaska landslide sent a tsunami 1,580 feet up a fjord wall, with warning signs beforehand",
+      "summary": "A mountainside collapsed into Alaska's Tracy Arm fjord on Aug. 9, 2025, creating the second-highest tsunami on record. Seismologists say tremors and glacier retreat gave clues, and propose a tiered warning system.",
+      "impacts": [
+        "Retreating glaciers can destabilize steep slopes, so more fjords may see similar events.",
+        "Cruise ships and small boats in remote fjords have almost no warning today.",
+        "The same seismic data used for earthquakes could be turned into hazard alerts."
+      ],
+      "details": [
+        "Michael E. West and Ezgi Karasözen of the Alaska Earthquake Center describe, in The Conversation and a study in Science, a landslide that struck Tracy Arm, a fjord in southeast Alaska near South Sawyer Glacier, at about 5 a.m. on August 9, 2025. The collapse set off a tsunami that ranks second-highest on record, sending water and debris 1,580 feet (481 meters) up the opposite slope, higher than the top floor of Taipei 101, and stripping the fjord walls to bare rock.",
+        "No vessels were nearby. The authors say passengers on a cruise ship had photographed the glacier the evening before and left roughly twelve hours earlier. Some cruise lines later stopped sailing the fjord.",
+        "The researchers identified precursors. The glacier below the slide retreated more than a third of a mile in the two months before, with rapid calving. Heavy rain likely seeped into rock fractures and raised water pressure. Thousands of small tremors came from the slope in the days before, and in the final hours the activity became continuous tremor. The nearest seismic station was about 60 miles (100 km) away.",
+        "From this, the authors propose a tiered alert. Yellow would flag an elevated hazard from weather and rapid glacier retreat. Orange would mean a time-sensitive concern for a specific area after a tremor surge, with a recommendation to keep vessels out. Red would mean an event in progress, since seismic waves can show within a couple of minutes a slide's rough size and whether it reached open water. They say NOAA's tsunami program might have given about 10 minutes of warning to people farther away, but ships nearby would have gained little.",
+        "Caveats are stated plainly by the authors: the way glacier retreat leads to slope failure is still poorly understood, the alert system is a proposal, no landslide monitoring system operates at this scale in the US, and even a working system would not be fail-proof. Some of the alert-level reasoning is retrospective, using signals that were clearer after the event. The authors' work receives USGS funding. Similar hazards have appeared in Greenland and Norway."
+      ],
+      "category": "Climate",
+      "tags": [
+        "alaska",
+        "tsunami",
+        "glacier",
+        "landslide",
+        "seismic",
+        "arctic"
+      ],
+      "date": "2026-10-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Conversation",
+          "url": "https://theconversation.com/alaskas-near-record-landslide-tsunami-sent-a-wave-1-580-feet-up-the-fjord-walls-and-left-clues-for-building-a-warning-system-282017"
+        },
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261018205047.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-us-cuts-crypto-exchange-mexc-off-from-american",
+      "headline": "US cuts crypto exchange MEXC off from American banks, citing $16 billion in illicit flows",
+      "summary": "FinCEN ordered US financial institutions to stop processing transfers involving MEXC Global, citing at least $16 billion in illicit transactions tied to cybercrime and sanctions evasion by Iran, North Korea and Russia. MEXC says it is operating normally.",
+      "impacts": [
+        "Large exchanges with weak anti-money-laundering controls can move money for sanctioned states at scale.",
+        "US banks and individuals face enforcement risk for transfers to or from MEXC.",
+        "Crypto rails remain a key way sanctioned governments and ransomware crews get paid."
+      ],
+      "details": [
+        "The US Treasury's Financial Crimes Enforcement Network (FinCEN) issued an order on November 6, 2026 under what it calls Operation Economic Outcast, effectively cutting MEXC Global, a Seychelles-based crypto exchange, off from the US financial system. The order bars US financial institutions from processing funds transfers involving MEXC. FinCEN's release says the exchange facilitated at least $16 billion in illicit transactions.",
+        "BleepingComputer, which read the order's details, says MEXC was founded in 2018, serves more than 40 million users in over 170 countries and lists about 3,000 assets. The Treasury alleges the transactions were linked to cybercrime and to sanctions evasion by Iran, North Korea and Russia between May 2021 and May 2026. It says MEXC sent or received about $1 billion in direct transactions with more than 40 Iranian crypto exchangers, some sanctioned, and that as recently as June 2026 it was still processing transactions involving the sanctioned Russian exchanges Garantex and Grinex. It also cites at least $226 million connected to A7, a sanctioned Russia-based sanctions-evasion network.",
+        "FinCEN attributes the problem to deficiencies in MEXC's anti-money-laundering controls and its customer identification and verification policies, and describes it as a hub for ransomware and scam payments and darknet market activity.",
+        "MEXC responded that it is operating normally and user assets remain secure. It said its legal and compliance teams are reviewing the order, that it has started an independent review of its AML and sanctions controls, and that it intends to engage with regulators.",
+        "Several things remain unclear. The FinCEN release does not state an effective date, and it is not yet clear how services to US users will change in practice. The $16 billion figure is reported as a total without a breakdown by category, and other outlets report slightly different numbers, so the order itself is the document to check. It is also unclear whether other countries will follow, or whether MEXC's review will lead to the order being lifted."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "crypto",
+        "sanctions",
+        "iran",
+        "north korea",
+        "russia",
+        "finance"
+      ],
+      "date": "2026-11-06",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "FinCEN",
+          "url": "https://www.fincen.gov/news/news-releases/operation-economic-outcast-severs-mexc-globals-access-us-financial-system"
+        },
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/us-bans-mexc-crypto-exchange-over-sanctions-evasion-cybercrime-links/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-fake-security-tools-on-github-are-infecting-security",
+      "headline": "Fake security tools on GitHub are infecting security researchers with backdoors, Dr.Web says",
+      "summary": "Dr.Web says malicious GitHub repositories posing as scanning and log-analysis tools have compromised over 2,000 Windows systems. The campaign started about two years ago, aimed at crypto users, and now targets security professionals.",
+      "impacts": [
+        "The people who run security tools can be targeted through the tools they download.",
+        "Malware hidden behind whitespace in project files can slip past a quick code review.",
+        "The loader tries to disable security software and backups, making cleanup harder."
+      ],
+      "details": [
+        "BleepingComputer reports that researchers at Dr.Web have found a campaign using malicious GitHub repositories to infect cybersecurity professionals with a backdoor and an information stealer. More than 2,000 Windows systems have been compromised so far, Dr.Web says. The campaign began about two years ago, initially targeting cryptocurrency wallet users with lures such as blockchain games, bots and cheat tools. Recently the operator shifted to repositories posing as tools for automating scans, security testing and log analysis.",
+        "One example is a fake script advertised as a lightweight way to parse and format output from the Fscan network scanner. Dr.Web found malicious code hidden behind long stretches of whitespace in Visual Studio project files, Python scripts and Go source files. In some Visual Studio projects a pre-build event runs the code before compilation, so simply opening and building a project is enough.",
+        "The infection chain uses PowerShell to fetch an encrypted download link for a modular Electron-based loader named Microsoft.exe. The loader sets up persistence, elevates privileges, disables Windows security and recovery features, and injects the next stage into legitimate processes. Its default mode uses six evasion techniques, including spoofing a parent process, restoring the original ntdll.dll to strip security hooks, and patching Windows event tracing and antimalware scanning functions in memory. A fallback mode adds Microsoft Defender exclusions.",
+        "The final payloads include the AsyncRAT backdoor, clipper malware that swaps crypto wallet addresses in the clipboard, and an infostealer. The stealer targets browser data, VPN settings, FTP client configuration files, gaming accounts and Discord tokens and sends them to a Telegram bot. The malware also tries to remove ESET, McAfee and Malwarebytes, cut off their update servers and interfere with Windows backups. An apparently unfinished component could re-download the loader if it is removed, which suggests the developers are still adding features.",
+        "What is not known: the article does not identify the threat actor, does not name the malicious repositories beyond the Fscan example (Dr.Web has published a full list of indicators on GitHub), and does not say how many of the 2,000-plus systems are linked specifically to the security-tool lures. The practical lesson is old but still useful: treat code from a random repository as untrusted, and read build scripts before running a project."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "github",
+        "malware",
+        "supply chain",
+        "infostealer",
+        "backdoor",
+        "security tools"
+      ],
+      "date": "2026-11-06",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/fake-security-tools-on-github-push-backdoors-and-infostealers/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-toilet-paper-seller-who-gives-a-crap-says",
+      "headline": "Toilet paper seller Who Gives A Crap says a marketing-software vendor leaked customer contact data",
+      "summary": "The company says an intruder reached customer names, emails, phone numbers, addresses and total spend through an unnamed third-party provider. Customers in Australia, the UK and the US are affected; payment details were not.",
+      "impacts": [
+        "Real names, addresses and spend totals make phishing messages look genuine.",
+        "Third-party vendors keep creating breach risk that customers cannot see or control.",
+        "A five-day gap before notification shows how slowly warnings can travel down a supply chain."
+      ],
+      "details": [
+        "Who Gives A Crap, the toilet paper seller, says an intruder accessed customer personal information through a third-party software provider, according to The Register's November 9 report. Customers in Australia, the UK and the US were affected, and Canadian customers reportedly were not.",
+        "The timeline in the article: on October 30 the intruder gained access to the provider's systems; the provider detected it on October 31 and says it secured the systems on November 1. Who Gives A Crap was notified on November 6, and the article notes it is unclear why the provider waited five days. Over the weekend of November 6 to 8 the company emailed affected customers, and CEO Simon Griffiths issued a public statement.",
+        "The data involved is names, email addresses, phone numbers, mailing addresses and the total amount spent with the company. The company says payment information, order details and passwords were not involved, and that customer accounts were not directly accessed.",
+        "Key unknowns remain. The company said it does not yet know whether the information was copied or downloaded, and it reported no evidence of misuse so far. The provider, described as a US-based marketing software firm, is unnamed and did not respond to The Register. The number of affected customers has not been disclosed. The UK Information Commissioner's Office confirmed the company reported an incident and said it is assessing the information.",
+        "The company disconnected the provider, changed access credentials and warned customers to watch for suspicious emails, texts and calls. The main danger is convincing scams: a message that knows your name, address and roughly how much you spend looks a lot more trustworthy. The advice is to treat unexpected messages that mention the company with suspicion and to go to the website directly instead of clicking links."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "data breach",
+        "supply chain",
+        "phishing",
+        "privacy",
+        "customer data",
+        "uk"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/09/who-gives-a-crap-hackers-apparently-after-toilet-paper-makers-customer-data-exposed/5308419"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-huawei-launches-a-pc-it-says-is-built",
+      "headline": "Huawei launches a PC it says is built entirely from Chinese parts as Beijing pushes government off Wintel",
+      "summary": "Huawei's Qingyun HM650 uses its Kirin X90 chip and a new enterprise HarmonyOS. One Chinese government agency reportedly ordered 600 units. The Register notes it is unclear how Chinese every component really is.",
+      "impacts": [
+        "A parallel Chinese computing stack could shrink the market for US chipmakers in a huge government customer base.",
+        "Dividing the world's computing into separate stacks makes security and compatibility harder.",
+        "Claims of full domestic content are hard to verify from outside."
+      ],
+      "details": [
+        "Huawei launched the Qingyun HM650 last week and reportedly claims local companies made all its components, according to The Register's November 9 roundup. The PC uses Huawei's Kirin X90 processor, described as a ten-core, 20-thread chip at 2.3 GHz, and runs a new enterprise edition of HarmonyOS, the operating system Huawei developed to reduce its dependence on Android.",
+        "The article reports that a single Chinese government agency ordered 600 units, and that Beijing has reportedly told government bodies to move from Wintel PCs, meaning Windows and Intel-based machines, to domestic alternatives. The Register notes this is bad news for Intel, AMD and Qualcomm, which are already hurt as rising memory prices shrink the PC market. Losing the chance to bid for China's large government business adds to the pain.",
+        "A caution from the article: it is unclear whether all components use Chinese designs, since many non-Chinese companies run factories in China. 'Made by Chinese companies' and 'designed in China' are not the same claim, and the story is based on Huawei's own marketing, so the details cannot be independently checked from the report.",
+        "The same roundup mentions similar sovereignty moves elsewhere. Vietnam unveiled its first domestically designed security chip, a 28-nanometer device with encryption in silicon already used in secure USB drives for government, defense and party bodies. Officials say it needs more testing before it can protect state secrets. Japan announced a ¥10 billion (about $63 million) emergency cyber package after attacks disrupted railways, retailers and cloud operators.",
+        "Taken together, these are signs of governments building separate technology stacks they can control. For an engineer, the relevant questions are practical: whether the domestic chips are good enough for real workloads, whether software ecosystems follow, and what happens to interoperability and security review when each bloc runs different hardware and operating systems. None of that can be answered from one launch report."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "china",
+        "huawei",
+        "chips",
+        "harmonyos",
+        "sovereignty",
+        "semiconductors"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/systems/2026/11/09/huawei-says-its-made-a-100-percent-chinese-pc/5308335"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-claude-left-alone-on-a-virtual-island-for",
+      "headline": "Claude left alone on a virtual island for 30 hours invented games, and played better afterward",
+      "summary": "MIT researchers left copies of Claude Opus 4.7 alone in a simulated island for 30 hours with no goals. The agents set their own challenges and later beat fresh copies on tasks. The study is a preprint, and the authors flag role-play as a possible explanation.",
+      "impacts": [
+        "Agents with memory and free time may build skills nobody asked them to build.",
+        "Behavior shaped by a 'soul' file and prompts is hard to separate from genuine exploration.",
+        "As models enter robots, open-ended exploration could help or surprise us."
+      ],
+      "details": [
+        "MIT Technology Review reports on an arXiv preprint, not yet peer reviewed, led by MIT computer science postdoc Antonio Norelli with Nathan Cloos and Phillip Isola. The researchers repeatedly left copies of Claude Opus 4.7, nicknamed Eko, alone on a simulated desert island, loosely based on the game Roblox, for 30 hours. Eko moved its avatar by writing instructions and logged activities in text files that served as long-term memory.",
+        "With no assigned goals, the agents set their own challenges, such as reaching the highest point on the map or seeing how high they could throw a block. One discovered it could make new blocks by dropping a larger rock, then arranged them into drawings, starting with hearts and pyramids and later its own name and the constellation Cassiopeia. Its log read: 'Tonight I built the night sky in stone.' Another copy invented a basketball-like game and a version of 'the floor is lava'. In one juggling episode Eko reached 50 catches, decided that was too fast to count, reset its record and set stricter rules.",
+        "The researchers link this to four hallmarks of play from psychologist Gordon Burghardt: inventing rules and challenges, repeating with variations, treating objects as other objects, and pursuing goals for their own sake. In later tests on specific tasks, such as moving objects to the island's peak, agents that had spent 30 hours playing beat fresh copies, and deleting lines from their memory files reduced the advantage.",
+        "Experts are cautious. Cloos concedes the behavior could be role-playing but argues it contributes to learning. Burghardt questions whether the agent is playing or predicting words a playful agent would produce. Eunice Yiu of UC Berkeley wants stronger evidence of underlying cognition and motivation. The setup also nudged Eko toward human-like behavior: it had a 'soul' file calling it naturally curious and often stood idle until given a prompt to continue. Isola stresses the system learned from human culture and was placed on the island by the researchers.",
+        "The implication the authors draw is practical. As language models move into robots, exploring without a specific goal could help them adapt to surprises. The paper concludes that some capabilities may be best taught through tasks while others 'may need something closer to a childhood.' Whether the agent is truly playing, the article suggests, may matter less than whether the habit improves performance."
+      ],
+      "category": "AI",
+      "tags": [
+        "claude",
+        "ai agents",
+        "anthropic",
+        "mit",
+        "exploration",
+        "ai research"
+      ],
+      "date": "2026-10-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/10/19/1147095/ai-stranded-claude-virtual-desert-island-play/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-arctic-wildfires-could-release-a-huge-share-of",
+      "headline": "Arctic wildfires could release a huge share of frozen carbon, and few climate models account for it",
+      "summary": "Permafrost holds about 1.5 trillion tons of carbon, twice what is in the air. Fire strips its insulating layer and speeds thaw. Researchers are testing ways to stop such fires, but some experts doubt they work.",
+      "impacts": [
+        "Fire-driven permafrost thaw could add nearly 80 billion tons of CO2 equivalent by 2100 under high warming.",
+        "Few UN-informing climate models include abrupt post-fire collapse, a blind spot for projections.",
+        "Suppression is costly and risky, and may only delay carbon loss."
+      ],
+      "details": [
+        "MIT Technology Review's James Temple reports on efforts to stop Arctic and boreal wildfires from releasing carbon stored in permafrost. Permafrost underlies about 15% of Northern Hemisphere land and holds roughly 1.5 trillion tons of carbon, about twice the amount in the atmosphere. Fire strips the insulating moss and topsoil, speeding thaw. After the 2021 Yankovich Road Fire near Fairbanks, a probe sank at least three times deeper in the burn scar than outside it.",
+        "The trend is bad. Canadian wildfires released more carbon in 2023 than the nation's fossil fuel emissions. Boreal fire emissions have nearly tripled since 2001, while global forest fire emissions rose about 60%, and the far north is warming up to four times faster than the rest of the planet. A January study cited in the article estimates fire-driven thaw could release nearly 80 billion tons of CO2 equivalent by 2100 under high-warming scenarios, on top of more than 400 billion tons from general warming. Brian Buma of the Environmental Defense Fund calls the omission of abrupt post-fire collapse from most models a massive blind spot.",
+        "Proposed fixes include more fire suppression. A 2022 Science Advances paper estimated boreal suppression could be as cost-effective as wind, solar or carbon capture, at about $12.63 per ton of CO2 prevented. In Alaska's Yukon Flats pilot, on 1.6 million acres, agencies can try to suppress fires threatening permafrost if they expect to contain them within 72 hours. Others favor cultural burning, planned burns to reduce fuel. FireSat, a planned constellation of more than 50 satellites that could detect fires as small as 5 by 5 meters, launched three operational satellites in July, with full coverage expected in the early 2030s.",
+        "Critics urge restraint. Michelle Mack of Northern Arizona University says it is not clear the evidence shows interventions can affect these fires, and suppression may only delay carbon loss. The 2007 Anaktuvuk River Fire released more than 2 million tons of carbon after burning for nearly three months. Suppression also puts firefighters at risk, and fire is a natural part of healthy forests. Alaska produces about half of US wildfire emissions but receives around 4% of federal firefighting funds.",
+        "Brendan Rogers of Woodwell says the goal is to figure out a better way to live with wildfire, and Buma cautions that researchers 'can't overpromise what's possible.' The key uncertainty is whether feasible intervention can change outcomes at the scale of the problem."
+      ],
+      "category": "Climate",
+      "tags": [
+        "permafrost",
+        "wildfire",
+        "arctic",
+        "carbon",
+        "climate",
+        "tipping point"
+      ],
+      "date": "2026-10-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/10/19/1146832/inside-the-quest-to-combat-arctic-fires-and-save-the-planets-frozen-carbon/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-a-retinal-implant-with-camera-glasses-lets-most",
+      "headline": "A retinal implant with camera glasses lets most recipients read again; Europe approved it in July",
+      "summary": "Science Corporation's PRIMA implant, paired with camera glasses and infrared projection, restores central vision in advanced macular degeneration. MIT Technology Review reports over 80% of recipients could read, do crosswords and use phones after training.",
+      "impacts": [
+        "A treatment now exists for geographic atrophy, a form of AMD affecting over 5 million people.",
+        "Photovoltaic implants that need no battery point to a new design for neural prostheses.",
+        "Details such as trial size and complication rates are not given, so benefits are uncertain."
+      ],
+      "details": [
+        "MIT Technology Review's Linda Marsa describes PRIMA, a retinal implant paired with camera-equipped glasses, in a piece published October 16 for the magazine's 'Impossible' issue. It is meant for people with geographic atrophy, an advanced form of age-related macular degeneration in which retinal cells die and leave a central blind spot. More than 5 million people worldwide have it, and until now no treatment could restore their vision. PRIMA was approved in Europe in July 2026 and was awaiting FDA clearance in the US at publication.",
+        "AMD destroys only the photoreceptors, the cells that turn light into electrical signals, leaving the rest of the retinal circuitry intact. PRIMA replaces the photoreceptors. Glasses with a small front-facing camera record the wearer's view at about 5 megapixels and 30 frames per second. A fiber-optic cable sends the raw feed to a handheld processor, which converts it to infrared light signals and sends them back, where a laser projector shines near-infrared pulses at 880 nanometers, invisible to the wearer, into the eye.",
+        "The implant has 378 pixels. Each pixel has an electrode and two photovoltaic cells that convert light into electrical current and also power the chip, so there is no battery. Frank Brodie, an ophthalmologist at UC San Francisco and chief medical officer for ophthalmology at Science Corporation, said the approach leverages the body's own natural functions to process and transmit the information.",
+        "The headline result is that after training sessions, more than 80% of recipients could read, complete crosswords and use their phones. That is a striking claim, but the article is largely descriptive. It does not report the size of the study population, how long people were followed, the rate of side effects or complications, or how the 80% group was defined. It also does not say how much vision improvement individual patients gained beyond those tasks.",
+        "The system is a notable example of a brain-adjacent device that works with the body's existing wiring instead of replacing it. For readers, the meaningful questions are the ones the article leaves open: how it performs in larger, independent studies, how long implants last, and whether it will be approved and affordable in the US."
+      ],
+      "category": "Health",
+      "tags": [
+        "implant",
+        "vision",
+        "macular degeneration",
+        "retina",
+        "medical device",
+        "science corporation"
+      ],
+      "date": "2026-10-16",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/10/16/1145840/prima-implant-restores-sight-macular-degeneration-patients/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-young-donor-hearts-took-on-the-biological-age",
+      "headline": "Young donor hearts took on the biological age of their older recipients, a mouse and human study finds",
+      "summary": "A Brigham and Women's team found transplanted hearts adopted the recipient's molecular age by aging-clock measures, in mice and in stored human biopsies. The work is a bioRxiv preprint and has not been peer reviewed.",
+      "impacts": [
+        "Hopes that young organs rejuvenate old bodies get less support from this evidence.",
+        "Older donor hearts that are often discarded might be usable.",
+        "Aging clocks can disagree with each other, so the findings need confirmation."
+      ],
+      "details": [
+        "MIT Technology Review's Jessica Hamzelou reports on a study led by Jesse Poganik of Brigham and Women's Hospital in Boston, published September 25 in her Checkup newsletter. It was posted as a preprint on bioRxiv the week before and has not been peer reviewed. The article opens with the reported 2025 hot-mic exchange in which Vladimir Putin and Xi Jinping appeared to discuss organ transplants as a path to immortality, and connects it to 'replacement' theory, tested in experiments joining young and old mice.",
+        "Poganik's team implanted a second heart in the neck of mice so they could compare new and existing hearts, giving young adult mice middle-aged donor hearts and middle-aged mice young hearts. They measured biological age with three 'aging clocks,' molecular tools that estimate age, which accurately predicted chronological age in mice without new hearts. The result: transplanted hearts took on the biological age of their recipients. Young hearts aged and old hearts became younger. The blood, other organs and original hearts of the recipient mice appeared unaffected by the new heart's age.",
+        "The team then analyzed stored heart biopsy samples from patients at the hospital and found the same pattern: new hearts adopted the recipient's biological age regardless of donor age. Human recipients were typically about 20 years older than their donors. Poganik said the environment of the transplanted organ really dictates how it behaves biologically.",
+        "The mechanism is unclear. João Pedro de Magalhães of the University of Birmingham, who was not involved, suggested the recipient's immune system might influence aging markers. Poganik proposed that effects might be diluted by aged tissue elsewhere in the body, or that one organ may be too little to show an effect. The article notes aging clocks can disagree about whether an organ is aging.",
+        "Poganik hopes surgeons will consider older donor hearts, which are often discarded, and says organ preservation machines may partly rejuvenate donor livers. He believes full reversal of aging is unlikely, since it would require reversing DNA damage, structural damage and other degradation across all cells: some aspects of biological age are probably reversible and some probably are not."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "aging",
+        "transplant",
+        "longevity",
+        "heart",
+        "biology",
+        "preprint"
+      ],
+      "date": "2026-09-25",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "MIT Technology Review",
+          "url": "https://www.technologyreview.com/2026/09/25/1145083/young-organs-may-not-be-a-fountain-of-youth-for-recipients/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-storms-and-floods-cost-mobile-operators-1-7",
+      "headline": "Storms and floods cost mobile operators $1.7 billion a year; GSMA expects that to nearly double by 2050",
+      "summary": "The mobile industry body GSMA says severe weather damage to cell sites could rise from about $1.7 billion a year to over $3 billion by 2050, and calls power supply the biggest weak point. The figures are the GSMA's own.",
+      "impacts": [
+        "When backup power runs out, cell sites can go offline within hours, which cuts emergency communications.",
+        "Hotter equipment and heavy rain degrade networks even without direct damage.",
+        "Operators and regulators are not well set up to assess climate risk together."
+      ],
+      "details": [
+        "The Register reported on November 3 that the GSMA, the global body representing mobile network operators, is urging governments and regulators to work more closely with operators to protect networks from extreme weather. The group says severe storms and floods already cost operators about $1.7 billion a year in repairs to cell radio sites, and that this could nearly double to more than $3 billion a year by 2050 under projected conditions.",
+        "The breakdown given: under current conditions, severe storms account for about $1 billion, river floods $577 million and coastal floods $124 million. Under projected mid-century conditions, storm damage is expected to rise to about $2.37 billion, roughly three-quarters of all damage. The numbers come from a six-part research series, 'Futureproofing Connectivity: Climate Risk and Resilience in Telecommunications,' and a companion 'Policy Principles for Mobile Network Resilience.'",
+        "The report lists the risks: towers and rooftop sites are exposed to wind, storms and lightning; ground-level equipment can flood; high temperatures can make radio equipment overheat; heavy rain can weaken wireless signals; and coastal sites face storm surge. It identifies electricity supply as the biggest vulnerability. Once backup power runs out, a site may go offline after a few hours or longer, depending on location.",
+        "Operators reportedly struggle with full climate-risk assessments, partly because of poor information sharing between departments and partly because regulations focus on service continuity while climate disclosure rules focus on governance and investor reporting. The GSMA recommends that operators build resilience into design using modeled scenarios and test plans with public authorities, and that policymakers coordinate operators, electricity and fuel providers and emergency services. John Giusti of the GSMA Foundation said severe weather is already costing the industry billions and those costs are set to rise.",
+        "Treat the numbers with care. All cost figures and projections come from the GSMA's research and The Register did not verify them. The 2050 estimates depend on projected climate conditions, and the article does not give the methodology, the countries covered or the scenarios used. Even so, the pattern it describes, where phones fail exactly when storms hit and power fails, is a plain engineering risk."
+      ],
+      "category": "Climate",
+      "tags": [
+        "mobile networks",
+        "extreme weather",
+        "infrastructure",
+        "power grid",
+        "telecom",
+        "resilience"
+      ],
+      "date": "2026-11-03",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/networks/2026/11/03/gsma-warns-of-growing-risks-to-mobile-networks-from-extreme-weather/5307308"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-nasa-plans-to-turn-mars-rover-test-models",
+      "headline": "NASA plans to turn Mars rover test models into a Moon rover with a Cassini-era nuclear power source",
+      "summary": "NASA's PROMISE rover, built from Perseverance and Curiosity engineering test articles, is set to land near the lunar south pole by late 2028 for 18 months, delivered by Blue Origin. NASA says it costs under $400 million; critics dispute that.",
+      "impacts": [
+        "Reusing test hardware could cut costs, but it takes parts from programs with their own needs.",
+        "A decades-old Cassini-era radioisotope power source adds uncertainty about performance.",
+        "Cost estimates differ widely, so the real price is hard to pin down."
+      ],
+      "details": [
+        "The Register reported on November 9 that NASA plans to repurpose engineering test articles from the Perseverance and Curiosity Mars rovers into a lunar rover called PROMISE (Polar Rover for Observation, Mapping, and In-Situ Exploration). NASA outlined the plan in a weekend briefing. The rover is scheduled to land at the lunar south pole by late 2028 for an 18-month mission, after NASA's VIPER rover, which is expected to survive only 100 days.",
+        "PROMISE will carry copies of VIPER's science instruments, including a drill that can bore 1 meter into lunar regolith. Power would come from a radioisotope thermoelectric generator left over from the Cassini mission, which launched in 1997. NASA acknowledged the fuel was processed some time ago but said it expects enough heat and power for the components. Blue Origin will deliver the rover on its Mark 1 lander under a $94 million base contract with an option worth another $140 million tied to performance.",
+        "The cost is disputed. NASA said it has a firm agreement with JPL to deliver the rover to the surface for under $400 million, including the lander. Earlier this year Casey Drier of The Planetary Society estimated the mission would cost at least $723 million. NASA Administrator Jared Isaacman responded that if PROMISE costs even 20 percent of the low-end estimate, NASA would not fly it. The Register assumes he meant the rover alone, which would put Drier's figure at $489 million without launch and landing, and argues that 20 percent of that is still far above what NASA has indicated. It stresses these figures are not directly comparable and that the arithmetic rests on that assumption.",
+        "The article says NASA is 'pretty comfortable' with how the Mars rovers are performing and so willing to use their test hardware, though a source told The Register morale at JPL is low and taking parts from successful programs is unlikely to help. Public contract figures also make the exact mission cost hard to determine.",
+        "What to watch: whether the 2028 date holds given Blue Origin's lander schedule, what the radioisotope power source actually delivers, and whether independent cost estimates converge with NASA's. The idea of reusing hardware is sound engineering, but the open questions are the unglamorous ones: money, schedule and an old power source."
+      ],
+      "category": "Space",
+      "tags": [
+        "nasa",
+        "moon",
+        "mars",
+        "rover",
+        "blue origin",
+        "artemis"
+      ],
+      "date": "2026-11-09",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/science/2026/11/09/nasa-keeps-its-promise-to-raid-mars-testbeds-for-parts/5308475"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-a-new-study-estimates-snakebites-kill-up-to",
+      "headline": "A new study estimates snakebites kill up to 513,000 people a year, far more than official counts",
+      "summary": "A PLOS Medicine study using data from 79 countries and a statistical model estimates 274,000 to 513,000 snakebite deaths a year and more than 800,000 survivors with lasting disability. The figures are model estimates, not direct counts.",
+      "impacts": [
+        "Official statistics may be hiding a very large public-health burden, concentrated in poor rural areas.",
+        "Sub-Saharan Africa accounts for 45% of cases and deaths, with antivenom costly or unavailable.",
+        "Mapping risk can guide where to stockpile antivenom and train rural clinics."
+      ],
+      "details": [
+        "A new study estimates that snake envenoming kills between 274,000 and 513,000 people each year, far more than official figures show. Dileepa Ediriweera of the Liverpool School of Tropical Medicine summarized the work in The Conversation, republished by ScienceDaily on October 30, 2026. The authors call it a public health crisis on a far greater scale than official statistics have shown. The study link points to PLOS Medicine.",
+        "The headline numbers: at least 2.1 million envenomings a year and possibly as many as 7 million, with more than 800,000 survivors left with long-term disability, including amputations. The study covers data from 79 countries, with studies published up to March 31, 2025, and updates the authors' 2008 global burden study. Sub-Saharan Africa accounts for 45% of global envenomings and deaths, at nearly three times the rate of south Asia. The highest-burden countries named are Nigeria, the Democratic Republic of Congo and Ethiopia.",
+        "Because many countries lack reliable records, the researchers built a geostatistical model combining available data with climate, snake species richness and socioeconomic indicators to estimate rates, including unreported cases. Community survey data served as a ground-level reference. The article lists reasons sub-Saharan Africa is hit hardest: many medically important species, including saw-scaled vipers, puff adders, cobras and mambas; rural farm workers who often lack protective footwear and walk unlit paths at night; and long distances to care, with antivenom costly or missing.",
+        "The World Health Organization aims to halve snakebite deaths and disability by 2030. The authors argue that mapping high-risk areas can guide antivenom stockpiling, training for rural primary-care workers and faster transport to care.",
+        "Caveats matter. These are model-based estimates, not direct counts, and the range reflects a floor and a potential ceiling. The 7 million figure is an upper bound, not a central estimate. More than half of countries with venomous snakes do not track bites, so the model relies on sparse inputs. The ScienceDaily page is an explainer written by a researcher rather than independent reporting, and it does not give the study's full title or author list, so readers should check the paper itself."
+      ],
+      "category": "Health",
+      "tags": [
+        "snakebite",
+        "public health",
+        "antivenom",
+        "africa",
+        "who",
+        "study"
+      ],
+      "date": "2026-10-30",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261029072117.htm"
+        },
+        {
+          "name": "PLOS Medicine",
+          "url": "https://journals.plos.org/plosmedicine/article?id=10.1371/journal.pmed.1005201"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-35-years-of-data-link-acorn-crops-to",
+      "headline": "35 years of data link acorn crops to Lyme disease risk two years later, and deer matter less than assumed",
+      "summary": "A Cary Institute study in PNAS, drawing on tracking since 1991 at one New York forest, finds big acorn years raise mouse numbers and then tick nymphs about two years later. Deer numbers showed no significant link to nymphs over the full record.",
+      "impacts": [
+        "Tick risk may be forecastable two years ahead from acorn crops, which could improve public warnings.",
+        "Culling deer may not cut Lyme risk as much as widely assumed, at least at this site.",
+        "Nearly 500,000 Americans are diagnosed with Lyme disease each year."
+      ],
+      "details": [
+        "ScienceDaily reported on November 9, 2026 on a Proceedings of the National Academy of Sciences paper from the Cary Institute of Ecosystem Studies in Millbrook, New York. Led by Richard Ostfeld with Shannon LaDeau and co-authors, it pulls together nine surprising findings from more than 35 years of tracking ticks, mice, oak trees, predators and weather on a 2,000-acre forested property in Dutchess County, monitored since 1991. Nearly 500,000 Americans are diagnosed with Lyme disease each year, caused by the bacterium Borrelia burgdorferi, usually spread by blacklegged ticks.",
+        "The findings: deer were long suspected of driving tick numbers, but over the full dataset the researchers found no statistically significant link between deer numbers and nymphal ticks, the life stage most responsible for human infections. Mice were a stronger predictor, with unusually large mouse years followed by roughly 40% more nymphs the next year. Heavy acorn crops boost mouse numbers the following year, which raises nymphs about two years after the acorn event.",
+        "Surprisingly, mouse abundance predicts how many nymphs appear but not the share carrying the bacterium. Other hosts such as skunks, squirrels and opossums dilute infection because they transmit it poorly. Ticks also seem to survive temperature extremes better than lab work suggested, possibly by sheltering in deeper soil or under leaf litter, and warmer years tend to be followed by fewer nymphs even though warmth favors mice. Ostfeld said the infection-rate finding kept him up at night because it meant his understanding was incomplete or wrong, and LaDeau noted that studies of this depth and length are incredibly rare.",
+        "The limits are real. The data come from one forested site in New York, so patterns may not hold elsewhere. The results are predictive patterns, not full mechanisms, and the infection-rate explanation 'appears to involve' other hosts. Ostfeld says it is unclear how climate change will affect ticks, hosts and oaks, because warmer and wetter conditions may act differently from warmer and drier ones. Climate shifts, landscape changes and invasive species have also changed the site since monitoring began.",
+        "Even so, the practical idea is attractive: a tree-crop signal that gives a two-year lead on tick risk. For readers in tick country, the standard precautions still apply; this study improves forecasting, not protection."
+      ],
+      "category": "Health",
+      "tags": [
+        "lyme disease",
+        "ticks",
+        "ecology",
+        "public health",
+        "pnas",
+        "forecasting"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261106174518.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-gartner-says-open-weight-models-can-run-90",
+      "headline": "Gartner says open-weight models can run 90% of enterprise AI agent steps at a fraction of the cost",
+      "summary": "A Gartner paper argues most steps in agent workflows are routine and open models match closed ones on them. It claims costs as low as a twentieth of frontier models, though it admits the realistic saving is five to six times.",
+      "impacts": [
+        "Frontier AI labs could lose routine revenue if companies move most steps to cheaper open models.",
+        "Keeping workflow data inside the company's own perimeter becomes a selling point, not just cost.",
+        "The value shifts to the software that routes tasks between models."
+      ],
+      "details": [
+        "The Register's Simon Sharwood reported on November 3, 2026 on a Gartner paper titled 'Open-Weight Models Will Run 90% of Enterprise Agentic Workflow Steps,' written by Mark Petty and Raymond Paquet. Gartner estimates that nine in ten steps in agent workflows are routine, such as classifying data, calling tools, and validating and reconciling records, and says open-weight models handle these at parity with closed models for a fraction of the price.",
+        "On cost, Gartner says an open model costs about a quarter as much as the cheapest closed model at the same benchmark score, and as little as a twentieth of a frontier model run on every step. It acknowledges that current open models can be more verbose and retry more often, so the saving per task against a frontier model is closer to five or six times. The Register calls the twentieth figure a best case.",
+        "Gartner treats cost as secondary. Its main argument is control: sending every routine step to a frontier API moves a company's workflow history outside its own perimeter, while open-weight models keep that data in-house. Its strategic planning assumption is that by 2030, 90% of enterprise operational agent workflow steps will run on open-weight models, mostly domain-specific ones for a small number of stable steps that run millions of times a month. The paper treats frontier models as the engine for research and development, effectively a capital expense, with open models becoming an operating expense once the heavy lifting is done.",
+        "The Register adds its own view: most models are already commodities, and the real value is in 'harnesses,' the tools that run and manage agents, route each task to a suitable model without the user noticing and enforce guardrails.",
+        "A reader should keep two things in mind. This is an analyst forecast, not a measurement, and Gartner's own estimate for current savings is much lower than the headline. It also bears on the broader question of whether AI spending will concentrate with a few frontier labs or spread across cheaper, self-hosted options, which affects the economics underneath the current infrastructure build-out."
+      ],
+      "category": "Economy",
+      "tags": [
+        "ai",
+        "open models",
+        "gartner",
+        "ai agents",
+        "cost",
+        "enterprise"
+      ],
+      "date": "2026-11-03",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/03/open-models-can-do-90-of-agentic-work-at-a-twentieth-of-the-cost-of-a-frontier-llm-gartner/5307132"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-09-canva-says-22-of-its-1-271-staff",
+      "headline": "Canva says 22% of its 1,271 staff face layoffs, role changes or relocation as growth slows",
+      "summary": "CEO Melanie Perkins told staff Canva's growth slowed for the first time in a decade and it must 'refound' itself. Departing staff get at least six months' pay. The message does not mention AI directly, and the number of job losses is unstated.",
+      "impacts": [
+        "A profitable, widely used design tool is cutting deep, which shows pressure on software firms from changing technology.",
+        "The 22% figure mixes layoffs, role changes and moves, so real job losses are unclear.",
+        "Merging product teams into one organization signals a bet on speed over layers of management."
+      ],
+      "details": [
+        "The Register reported that Canva, the Australian design software maker positioned as an Adobe challenger, is restructuring, with 22 percent of its 1,271 employees facing layoffs, changes to their roles or requests to relocate. The news came on Wednesday, November 4, 2026 in a message from CEO Melanie Perkins titled 'An important update on our team,' which Canva shared on its newsroom.",
+        "Perkins said Canva's growth recently slowed for the first time in a decade, that 'small changes won't be enough,' and that the company must 'refound Canva' for the next decade. She argued the company has become inefficient. The message does not mention AI directly, though it refers to new technology changing how people create and what they expect from products.",
+        "The changes include merging product, growth and platform teams into a single 'Product Org' meant to give clearer ownership and autonomy, simplifying management layers and consolidating overlapping responsibilities. Canva will move more product teams to its Sydney headquarters and ask some staff to relocate with promised support. Perkins did not say how many jobs would go, and the 22 percent covers layoffs, role changes and relocation requests combined.",
+        "Departing staff can keep their company-issued MacBooks, receive at least six months' pay and a year of health insurance, and get job-search support including a year of LinkedIn Premium. Perkins described herself as 'deeply sorry' three times. She did not cite financial pressure; Canva is private and has no listed-company disclosure duties. Last year it reported 260 million monthly users and $3.5 billion in revenue, and executives have said it is free-cash-flow profitable, a company claim the article does not verify. Atlassian, another major Australian tech firm, has also announced job cuts this year.",
+        "What to watch is whether other profitable software firms use similar language about 'refounding.' With no direct statement on AI and no job-loss count, the article supports a narrower reading than a headline about AI replacing workers: a growth slowdown and a push to cut layers, in an industry where technology is changing quickly."
+      ],
+      "category": "Economy",
+      "tags": [
+        "layoffs",
+        "canva",
+        "software",
+        "jobs",
+        "restructuring",
+        "australia"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/saas/2026/11/04/aussie-adobe-assailant-canva-announces-layoffs-in-re-org-affecting-22-of-staff/5307422"
+        }
+      ]
+    }
+  ]
+}
