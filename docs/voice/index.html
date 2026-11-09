@@ -34,9 +34,6 @@ button:active:not(:disabled){box-shadow:inset 1px 1px 0 var(--dk),inset -1px -1p
 button:disabled{color:var(--sh);text-shadow:1px 1px 0 var(--hi);cursor:not-allowed;}
 button.go{min-width:92px;}
 .spacer{flex:1;}
-.depth{display:flex;align-items:center;gap:7px;font-family:'Press Start 2P',monospace;font-size:8px;color:#000;}
-.depth input{width:92px;accent-color:#000080;}
-.depth .v{font-family:'Silkscreen',monospace;font-size:12px;min-width:46px;text-align:right;}
 
 .status{display:flex;align-items:center;gap:9px;padding:11px 14px;border-top:1px solid var(--line);
   font-family:'VT323',monospace;font-size:17px;color:#8d85a0;min-height:44px;}
@@ -58,7 +55,8 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
 <body>
 <div class="wrap">
   <h1>VOICE</h1>
-  <p class="sub">My actual voice, cloned from about two minutes of recorded reference.
+  <p class="sub">My actual voice, cloned from about two minutes of recorded reference &mdash;
+  unprocessed, no pitch or formant shifting.
   The two random buttons play <b>instantly</b> &mdash; those lines are already rendered.
   Anything you type yourself is generated <b>live, on my Mac</b>, which takes roughly
   seven seconds of compute per second of speech.</p>
@@ -75,10 +73,6 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
       <button id="rndP">RANDOM PARA</button>
       <button id="clear">CLEAR</button>
       <span class="spacer"></span>
-      <label class="depth">DEPTH
-        <input type="range" id="depth" min="-4" max="2" step="0.5" value="0">
-        <span class="v" id="depthV">0</span>
-      </label>
     </div>
 
     <div class="status" id="status">
@@ -105,8 +99,7 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
 
   var txt=document.getElementById('txt'), msg=document.getElementById('msg'),
       bar=document.getElementById('bar'), statusEl=document.getElementById('status'),
-      playBtn=document.getElementById('play'), depth=document.getElementById('depth'),
-      depthV=document.getElementById('depthV');
+      playBtn=document.getElementById('play');
 
   function setStatus(cls, text, pct){
     statusEl.className = 'status' + (cls ? ' ' + cls : '');
@@ -170,10 +163,10 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
     return at + buf.duration;
   }
 
-  function say(text, d){
+  function say(text){
     return fetch(api + '/say', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text:text, depth:d, formant: 0.98 + 0.015*d })
+      body: JSON.stringify({ text:text })
     }).then(function(r){
       if(r.status === 429) throw new Error('Rate limited - give it a minute.');
       if(r.status === 413) throw new Error('That sentence is too long.');
@@ -212,7 +205,7 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
           : 'Generating (about ' + est + 's)...',
         Math.round(i / parts.length * 100));
 
-      say(parts[i], parseFloat(depth.value)).then(function(buf){
+      say(parts[i]).then(function(buf){
         if(!playing) return;
         lastEnd = schedule(buf);
         i++; next();
@@ -275,7 +268,6 @@ code{font-family:'VT323',monospace;font-size:16px;color:var(--green);}
   document.getElementById('clear').addEventListener('click', function(){
     stopAll(); txt.value = ''; setStatus('', 'Cleared.'); txt.focus();
   });
-  depth.addEventListener('input', function(){ depthV.textContent = depth.value; });
 
   // cmd/ctrl + enter plays
   txt.addEventListener('keydown', function(e){
