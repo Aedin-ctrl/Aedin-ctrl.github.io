@@ -1,7 +1,10 @@
-# CATHODE DESK — house style v2.4
+# CATHODE DESK — house style v2.5
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.5 (2026-11-08)** — lessons from the SECOND piece (halloumi), the first
+> built on this style rather than alongside it. See *Reusing the style*.
+>
 > **v2.4 (2026-11-08)** — target running time is **65–75s**, at the voice's
 > own pace. The 1.25x speed-up is removed. See *Running time*.
 >
@@ -193,6 +196,37 @@ the transition into a hold on content the viewer has already finished with.
 2. **Beats every 1–2s.** Something changes. Arrows draw on. Labels land on what they label.
 3. **Emphasis on the key moment.** Phosphor flash (boost 1.3–1.45 for ~0.15s) + inverse video + the biggest sound.
 4. **Takeaway held ~1s.** A classic message box.
+
+## Reusing the style
+
+The honey build and the halloumi build share the whole four-layer library, all
+eight sweeps, the sound engine and the player. Only the timeline, the explainer
+and the score are per-piece. **Lift, don't retype.**
+
+The splice is: everything **up to** `/* ===== TIMELINE */`, then this piece's
+timeline + explainer, then everything **from** `/* ===== LAYER SOUND */`.
+**The eight sweeps live between the explainer and the sound engine** — a splice
+on those two markers alone silently drops them, and the first symptom is a
+`createLinearGradient` error from a NaN duration, because `window.DUR` went with
+them.
+
+29. **Sweeps address beats positionally, never by name.** `BEAT.JAR.sc` worked
+    for one script and threw `undefined` on the next. Use the first content beat
+    and the last beat: `Object.keys(BEAT)[1]` and `[length-1]`.
+30. **An overlay window is not content inside the panel.** Flag it (`OVERLAY`)
+    while drawing it, and have the clearance and idle sweeps skip it — otherwise
+    the end card's own text reads as crammed against a group box it is floating
+    over.
+31. **A raw `fillRect` is invisible to the sweeps.** Register any decorative
+    geometry that text could collide with (`GBOX.push({…, k:'band'})`). The pH
+    band ran straight through the 5.4 and every sweep returned 0, exactly as the
+    tag plates once did.
+32. **Beat count and architecture carry over; content does not.** Halloumi uses
+    the same 7-beat shape — hook, concrete object, mechanism, chart, the turn,
+    second cause, takeaway — with an entirely different subject and three new
+    scene types (a melting stack, a protein lattice, a whey vat). If a new topic
+    will not fit that shape, the shape is not the problem; the topic needs a
+    different turn.
 
 ## Running time
 

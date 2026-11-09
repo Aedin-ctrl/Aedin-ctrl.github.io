@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cathode Desk</title>
+<title>Cathode Desk — Halloumi</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&family=VT323&family=Inter:wght@400;600;800&display=block">
 <style>
   :root{
@@ -51,10 +51,12 @@
 <body>
 <div class="wrap">
 <header>
-  <h1>CATHODE DESK</h1>
-  <p class="sub">House style v2.4 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <h1>WHY HALLOUMI<br>DOESN'T MELT</h1>
+  <p class="sub">House style v2.5 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
-  layers in order, every time. Sampler content: why sealed honey doesn't spoil.
+  layers in order, every time. Second piece, same locked style. Content: why halloumi doesn't melt.
+  <br><br>Previous piece, locked and unchanged:
+  <a href="honey/">why sealed honey doesn't spoil</a>.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
   without a click, so it plays silent until you do.</p>
 </header>
@@ -65,7 +67,7 @@
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
     <input id="scrub" type="range" min="0" max="1000" value="0">
-    <span class="t" id="time">0.00 / 70.1</span>
+    <span class="t" id="time">0.00 / 67.8</span>
     <label><input type="checkbox" id="loop" checked> LOOP</label>
   </div>
 </div>
@@ -283,7 +285,8 @@ const TC=H.layer(720,64),TX=TC.getContext('2d',{willReadFrequently:true});
 const TCACHE=new Map();
 let BOUNDS=null;   // text extents
 let GBOX=null;     // extents of the things text can hide behind
-let INCHROME=false;// true while drawing Win95 furniture, which is 9px by definition
+let INCHROME=false;
+let OVERLAY=false; // true while drawing a window that FLOATS OVER the panel// true while drawing Win95 furniture, which is 9px by definition
 function px(str,x,y,size,col,align,font){
   const key=str+'|'+size+'|'+(font||'p');
   let g=TCACHE.get(key);
@@ -317,7 +320,7 @@ function px(str,x,y,size,col,align,font){
                // just a large label and already clears its floor -- treating it
                // as a headline made the checker demand 22px of an 18px label.
                : (size>=22?'head':'label');
-    BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size,role:role,chrome:INCHROME,
+    BOUNDS.push({x:ox,y:oy,w:g.w,h:g.h,s:str,size:size,role:role,chrome:INCHROME,overlay:OVERLAY,
                  cut:g.cut,full:g.full});}
   if(tc) B.drawImage(tc,ox,oy);
   else { B.fillStyle=col; for(const[i,j]of g.pts)B.fillRect(ox+i,oy+j,1,1); }
@@ -482,184 +485,126 @@ function glass(ctx,W,Hh,t,boost){
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=70.1, VOHASH="218f640ab7ba";
+const DUR=67.8, VOHASH="11f578f02283";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:0.8,z:2.472,w:["Why", "doesn't", "sealed", "honey", "spoil?"],t:[0.8, 1.0, 1.46, 1.86, 2.19]},
-  {b:'JAR',a:4.322,z:6.855,w:["A", "sealed", "jar", "of", "honey", "keeps", "for", "decades."],t:[4.322, 4.392, 4.852, 5.082, 5.232, 5.822, 6.012, 6.242]},
-  {b:'JAR',a:7.605,z:8.678,w:["It", "isn't", "preservatives."],t:[7.605, 7.705, 7.955]},
-  {b:'JAR',a:9.428,z:10.854,w:["Almost", "nothing", "can", "live", "in", "it."],t:[9.428, 9.728, 10.128, 10.198, 10.388, 10.478]},
-  {b:'WATER',a:12.704,z:14.693,w:["Honey", "is", "about", "one", "sixth", "water."],t:[12.734, 13.144, 13.274, 13.597, 13.921, 14.244]},
-  {b:'WATER',a:15.443,z:19.573,w:["But", "the", "sugar", "holds", "that", "water", "so", "tightly", "that", "almost", "none", "of", "it", "is", "free."],t:[15.453, 15.613, 15.783, 16.073, 16.373, 16.593, 16.923, 17.123, 17.843, 18.123, 18.553, 18.833, 18.973, 19.113, 19.313]},
-  {b:'WATER',a:20.323,z:23.113,w:["Free", "water", "is", "measured", "as", "water", "activity."],t:[20.413, 20.643, 21.073, 21.213, 21.893, 22.033, 22.433]},
-  {b:'WATER',a:23.863,z:25.972,w:["Honey", "sits", "at", "about", "zero", "point", "six."],t:[23.893, 24.283, 24.743, 24.793, 25.126, 25.459, 25.792]},
-  {b:'WATER',a:26.722,z:28.974,w:["Bacteria", "need", "zero", "point", "nine", "one."],t:[26.722, 27.442, 27.78, 28.118, 28.456, 28.794]},
-  {b:'OSMOSIS',a:30.824,z:34.621,w:["Drop", "a", "microbe", "in,", "and", "the", "sugar", "pulls", "the", "water", "straight", "out", "of", "it."],t:[30.854, 31.274, 31.464, 32.424, 32.474, 32.634, 32.844, 33.294, 33.584, 33.684, 34.044, 34.364, 34.464, 34.554]},
-  {b:'OSMOSIS',a:35.371,z:37.176,w:["It", "dries", "out", "before", "it", "can", "multiply."],t:[35.371, 35.491, 35.761, 35.931, 36.281, 36.421, 36.561]},
-  {b:'ACID',a:39.026,z:42.215,w:["Honey", "is", "acidic", "too.", "About", "pH", "three", "point", "nine."],t:[39.056, 39.466, 39.736, 40.466, 40.486, 40.926, 41.296, 41.665, 42.035]},
-  {b:'ACID',a:42.965,z:44.532,w:["Plain", "water", "is", "seven."],t:[43.045, 43.415, 43.905, 44.045]},
-  {b:'SEAL',a:46.382,z:48.228,w:["But", "honey", "does", "not", "stay", "dry", "on", "its", "own."],t:[46.382, 46.562, 46.862, 47.102, 47.282, 47.522, 47.702, 47.822, 48.002]},
-  {b:'SEAL',a:48.978,z:50.645,w:["It", "pulls", "water", "out", "of", "the", "air."],t:[48.978, 49.188, 49.518, 49.908, 50.138, 50.288, 50.518]},
-  {b:'SEAL',a:51.395,z:54.857,w:["Let", "it", "climb", "past", "one", "part", "in", "five,", "and", "yeast", "moves", "in."],t:[51.395, 51.54, 51.685, 52.165, 52.575, 52.965, 53.235, 53.805, 53.835, 54.035, 54.365, 54.685]},
-  {b:'SEAL',a:55.607,z:58.571,w:["The", "seal", "is", "doing", "as", "much", "work", "as", "the", "sugar."],t:[55.607, 55.837, 56.137, 56.327, 56.687, 56.827, 57.147, 57.457, 57.607, 57.917]},
-  {b:'END',a:60.421,z:62.445,w:["Dry.", "Acidic.", "Sealed."],t:[60.421, 61.421, 62.265]},
-  {b:'END',a:63.195,z:65.473,w:["Break", "any", "one", "of", "those", "and", "it", "spoils."],t:[63.205, 63.595, 63.805, 64.035, 64.185, 64.625, 64.915, 64.995]},
+  {b:'HOOK',a:0.8,z:1.756,w:["Why", "doesn't", "halloumi", "melt?"],t:[0.8, 1.059, 1.317, 1.576]},
+  {b:'PAN',a:3.606,z:5.933,w:["Put", "cheddar", "in", "a", "hot", "pan", "and", "it", "collapses."],t:[3.636, 3.836, 4.466, 4.506, 4.576, 4.796, 5.066, 5.246, 5.366]},
+  {b:'PAN',a:6.683,z:8.004,w:["Halloumi", "browns", "instead."],t:[6.683, 7.073, 7.483]},
+  {b:'PAN',a:8.754,z:12.315,w:["It", "holds", "its", "shape", "at", "temperatures", "that", "turn", "other", "cheese", "to", "liquid."],t:[8.754, 8.854, 9.104, 9.254, 9.439, 9.624, 10.254, 10.394, 10.754, 10.984, 11.834, 11.924]},
+  {b:'NET',a:14.165,z:17.714,w:["Cheese", "is", "a", "net", "of", "protein,", "held", "together", "by", "calcium."],t:[14.185, 14.815, 15.025, 15.125, 15.445, 15.685, 16.475, 16.685, 17.165, 17.285]},
+  {b:'NET',a:18.464,z:21.833,w:["Heat", "loosens", "the", "net,", "the", "fat", "runs,", "and", "the", "cheese", "flows."],t:[18.524, 18.694, 19.044, 19.204, 19.504, 19.874, 20.244, 20.744, 20.904, 21.064, 21.394]},
+  {b:'WINDOW',a:23.683,z:26.764,w:["But", "that", "only", "works", "inside", "a", "narrow", "band", "of", "acidity."],t:[23.693, 23.903, 24.173, 24.453, 24.803, 25.223, 25.293, 25.713, 25.993, 26.133]},
+  {b:'WINDOW',a:27.514,z:31.471,w:["Cheese", "melts", "between", "pH", "five", "point", "zero", "and", "five", "point", "four."],t:[27.534, 28.104, 28.574, 29.304, 29.567, 29.829, 30.091, 30.354, 30.666, 30.979, 31.291]},
+  {b:'WINDOW',a:32.221,z:34.497,w:["Below", "it,", "paneer.", "Above", "it,", "halloumi."],t:[32.221, 32.671, 33.086, 33.501, 33.971, 34.317]},
+  {b:'SIDE',a:36.347,z:38.025,w:["So", "halloumi", "is", "not", "too", "acidic."],t:[36.407, 36.627, 36.847, 36.967, 37.157, 37.347]},
+  {b:'SIDE',a:38.775,z:39.985,w:["It", "is", "not", "acidic", "enough."],t:[38.775, 38.825, 38.895, 39.075, 39.435]},
+  {b:'SIDE',a:40.735,z:43.445,w:["Calcium", "still", "bridges", "every", "strand", "of", "the", "net."],t:[40.795, 41.205, 41.545, 42.015, 42.355, 42.805, 42.895, 43.085]},
+  {b:'COOKED',a:45.295,z:46.421,w:["And", "there", "is", "a", "second", "reason."],t:[45.295, 45.545, 45.795, 46.045, 46.125, 46.415]},
+  {b:'COOKED',a:47.171,z:52.121,w:["Before", "it", "is", "ever", "sold,", "the", "curd", "is", "cooked", "in", "hot", "whey,", "at", "ninety", "degrees."],t:[47.181, 47.901, 47.931, 48.121, 48.491, 49.001, 49.151, 49.371, 49.481, 49.811, 49.891, 50.411, 50.931, 51.206, 51.481]},
+  {b:'COOKED',a:52.871,z:54.381,w:["That", "heat", "sets", "the", "net", "for", "good."],t:[52.871, 53.101, 53.331, 53.641, 53.731, 53.901, 54.071]},
+  {b:'COOKED',a:55.131,z:57.193,w:["Your", "pan", "is", "not", "the", "first", "thing", "to", "cook", "it."],t:[55.131, 55.361, 55.541, 55.661, 55.841, 56.021, 56.441, 56.601, 56.721, 56.951]},
+  {b:'END',a:59.043,z:61.065,w:["Not", "acidic", "enough.", "Already", "cooked."],t:[59.043, 59.273, 59.723, 60.443, 60.713]},
+  {b:'END',a:61.815,z:63.175,w:["There", "is", "nothing", "left", "to", "melt."],t:[61.815, 62.045, 62.135, 62.455, 62.635, 62.775]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  HOOK:{sc:0.0,a:0.8,z:2.472},
-  JAR:{sc:3.92,a:4.322,z:10.854},
-  WATER:{sc:12.3,a:12.704,z:28.974},
-  OSMOSIS:{sc:30.42,a:30.824,z:37.176},
-  ACID:{sc:38.63,a:39.026,z:44.532},
-  SEAL:{sc:45.98,a:46.382,z:58.571},
-  END:{sc:60.02,a:60.421,z:65.473},
+  HOOK:{sc:0.0,a:0.8,z:1.756},
+  PAN:{sc:3.21,a:3.606,z:12.315},
+  NET:{sc:13.76,a:14.165,z:21.833},
+  WINDOW:{sc:23.28,a:23.683,z:34.497},
+  SIDE:{sc:35.95,a:36.347,z:43.445},
+  COOKED:{sc:44.9,a:45.295,z:57.193},
+  END:{sc:58.64,a:59.043,z:63.175},
 };
 const SENT={
   HOOK:[0],
-  JAR:[1,2,3],
-  WATER:[4,5,6,7,8],
-  OSMOSIS:[9,10],
-  ACID:[11,12],
-  SEAL:[13,14,15,16],
-  END:[17,18],
+  PAN:[1,2,3],
+  NET:[4,5],
+  WINDOW:[6,7,8],
+  SIDE:[9,10,11],
+  COOKED:[12,13,14,15],
+  END:[16,17],
 };
 
-/* ===== WHAT THE POINTER DOES =====
-   It does not park. Every element in the piece is put there BY the mouse:
-   the tag is dragged onto the jar, each cube of the one-sixth row is clicked
-   into place, every stack is hauled up out of the baseline, the arrows are
-   dragged along their path, the x is clicked, the yeast is dropped in.
-
-   Each action's window is the element's OWN animation window -- the same word
-   anchors the picture uses -- so the pointer leads the thing it is moving
-   instead of wandering near it. Coordinates are buffer pixels; the window
-   never moves, so they can live in one table. */
-// 1.0 = the voice's own pace. It was 0.8 while the track was sped up 1.25x;
-// every motion duration below is written at natural rate and scaled by this.
-const SPD=1.0;
-const W=(n,i)=>VO[n].t[i];
-/* LEAD is why this reads as the mouse doing the work. The pointer grabs and
-   pulls 0.20s AHEAD of the element's own animation, so the thing trails the
-   hand. Run them together and the eye sees the effect start first and reads
-   the mouse as following it. */
-const LEAD=0.20;
-/* And when an action is finished the pointer gets OFF the thing it moved, to
-   open space nearby -- not a fixed corner, just somewhere it is not standing
-   in front of anything. checkPointerIdle() verifies each of these is clear. */
-const ACTS=(()=>{
-  const A=[];
-  const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),
-                                    a:a,b:b,r:r,k:'drag'});
-  const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),
-                              a:a,b:a,r:r,k:'click'});
-  // JAR -- drag the SEALED HONEY tag onto the jar
-  drag(W(1,2)-0.30, W(1,2)+0.40, [214,232], [112,268], [176,244]);
-  // WATER -- sweep across the row placing cubes. Six separate taps 0.072s apart
-  // asked the pointer to teleport between them; it is one gesture with a ring
-  // per cube instead.
-  drag(W(4,0)+0.25*SPD, W(4,0)+(5*0.09+0.26)*SPD, [125,150], [160,168], [198,198]);
-  for(let i=0;i<6;i++) A.push({t0:+(W(4,0)+(i*0.09+0.26)*0.8).toFixed(3),k:'ring',a:[125+i*7,Math.round(150+i*3.5)]});
-  // WATER -- haul both stacks up out of the baseline
-  drag(W(5,2), W(5,2)+1.25*SPD, [152,186], [152,114], [102, 96]);
-  drag(W(8,0), W(8,0)+1.30*SPD, [250,186], [250, 84], [308, 72]);
-  // OSMOSIS -- drag the arrow out of the microbe, then click the x
-  drag(W(9,7), W(9,7)+0.75*SPD, [108,104], [208,104], [300,150]);
-  tap (W(10,1)+0.02, [239,99], [300,150]);
-  // ACID -- the same haul, shorter stacks
-  drag(W(11,2), W(11,2)+0.95*SPD, [152,186], [152,166], [102,148]);
-  drag(W(12,0), W(12,0)+1.00*SPD, [250,186], [250,151], [308,138]);
-  // SEAL -- pull the water down out of the air, raise the moisture, drop the yeast in
-  drag(W(14,1), W(14,1)+0.90*SPD, [62,58], [62,106], [152, 86]);
-  drag(W(15,2), W(15,8),      [342,206], [342,151], [292, 96]);
-  tap (W(15,9)+0.05, [520,74], [462,122]);
-  // ...and a click to POP each label out once the thing it names is in place.
-  // Offsets keep every tap clear of the drag that precedes it -- two track
-  // points at the same instant in different places is a one-frame jump.
-  tap (W(5,2)+1.70*SPD,  [152,217], [198,248]);   // HONEY plate, after its stack lands
-  tap (W(8,0)+1.80*SPD,  [250,217], [310,248]);   // BACTERIA plate
-  tap (W(6,0),       [404,108], [588, 88]);   // 'water activity in honey'
-  tap (W(11,2)+1.45*SPD, [152,217], [198,248]);   // HONEY plate, acid chart
-  tap (W(12,0)+1.50*SPD, [250,217], [310,248]);   // WATER plate
-  tap (W(11,8),      [404, 62], [588, 88]);   // the 3.9 pops on "nine"
-  tap (W(12,3),      [404,152], [588,178]);   // the 7 pops on "seven"
-  tap (W(9,11),      [ 42,144], [300,150]);   // WATER PULLED OUT
-  tap (W(15,8)+0.12, [412,147], [292, 96]);   // 1 PART IN 5
-  return A.sort((x,y)=>x.t0-y.t0);
-})();
-
-/* ===== THE POINTER TRACK =====
-   Where the mouse goes and when it clicks, generated rather than keyframed by
-   hand. On a real machine you CLICK into a line before you type it, so each
-   typing SESSION gets a click 0.30s before its first word and the caret takes
-   over from there. Window coordinates are fixed (the frame never moves), so
-   the insertion points live in one table.
-
-   Button centres are computed, not eyeballed: the pointer's TIP is its
-   hotspot, so a keyframe is the middle of the button it is pressing. */
+/* ===== THE POINTER TRACK ===== */
 const SPOTS=[
-  {n:0,  x:204, y:130, s:14},   // the dialog's question, line 1
-  {n:2,  x:258, y:162, s:18},   // jar caption 1
-  {n:3,  x:258, y:192, s:18},   // jar caption 2
-  {n:4,  x:52,  y:54,  s:18},   // the one-sixth line
-  {n:10, x:42,  y:214, s:18},   // osmosis caption
-  {n:16, x:28,  y:254, s:18},   // seal caption
-  {n:17, x:166, y:106, s:14},   // message box list
+  {n:0,  x:204, y:130, s:14},   // the dialog's question
+  {n:3,  x:30,  y:256, s:18, r:[300,206]},   // pan caption
+  {n:5,  x:30,  y:256, s:18, r:[470,210]},   // net caption
+  {n:6,  x:30,  y:256, s:18, r:[520,196]},   // window intro
+  {n:10, x:250, y:92,  s:22, r:[150,220]},   // the turn, set large
+  {n:15, x:30,  y:256, s:18, r:[520,250]},   // cooked caption
+  {n:16, x:166, y:106, s:14},   // message box
 ];
 const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
-const SESSION_SPANS=[];   // the caret lives here for a whole typing session
-const SESSION_GAP=2.0;    // lines closer in TIME than this may share a session
-const SESSION_NEAR=80;    // ...but only if the insertion point barely moved
+const SESSION_SPANS=[];
+const SESSION_GAP=2.0;
+const SESSION_NEAR=80;
 
+const SPD=1.0;
+const W=(n,i)=>VO[n].t[i];
+const LEAD=0.20;
+const ACTS=(()=>{
+  const A=[];
+  const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r,k:'drag'});
+  const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r,k:'click'});
+  // PAN -- shove the cheddar into the pan, then watch it go
+  drag(W(1,1), W(1,1)+1.10*SPD, [150,96], [150,150], [120,86]);
+  tap (W(1,8), [150,170], [120,86]);                    // "collapses."
+  tap (W(2,1), [300,150], [370,110]);                   // "browns"
+  // NET -- lay the lattice down, then pull a strand out of it
+  drag(W(4,3), W(4,3)+1.00*SPD, [120,80], [240,150], [430,96]);
+  tap (W(4,9), [300,120], [430,96]);                    // "calcium."
+  drag(W(5,1), W(5,1)+0.90*SPD, [240,150], [330,196], [430,96]);
+  // WINDOW -- raise the three stacks, then pull the band across
+  drag(W(7,1), W(7,1)+1.10*SPD, [152,196], [152,150], [100,98]);
+  tap (W(7,6), [404, 62], [500,100]);                   // "zero"  -> 5.0
+  tap (W(7,10),[404,124], [500,160]);                   // "four." -> 5.4
+  drag(W(8,2), W(8,2)+0.80*SPD, [250,196], [250,168], [310,250]);  // paneer
+  drag(W(8,5), W(8,5)+0.90*SPD, [348,196], [348,120], [410,250]);  // halloumi
+  // SIDE -- strike out the wrong answer, then light the calcium
+  tap (W(9,5), [250,150], [300,220]);                   // "acidic."
+  tap (W(10,4),[250,96],  [300,220]);                   // "enough."
+  drag(W(11,0), W(11,0)+1.00*SPD, [120,170], [330,170], [300,220]);
+  // COOKED -- drop the curd in the whey, then run the temperature up
+  drag(W(13,6), W(13,6)+1.00*SPD, [180,70], [180,140], [120,220]);
+  drag(W(13,13), W(13,14)+0.30*SPD, [404,190], [404,110], [500,220]);
+  tap (W(14,2), [180,140], [500,220]);                  // "sets"
+  return A.sort((x,y)=>x.t0-y.t0);
+})();
 const RINGS=[];
 const PTRACK=(()=>{
-  // ONE click per typing SESSION, not per line. Back-to-back lines are one
-  // session: you click once to put the caret in, then keep typing. The caret
-  // moving to the next line is the visual cue that something changed.
   const sp=SPOTS.slice().sort((a,b)=>VO[a.n].t[0]-VO[b.n].t[0]);
   const sess=[];
   sp.forEach(x=>{
     const last=sess[sess.length-1];
-    // Time alone is not enough. Grouping on time merged the seal caption with
-    // the message box -- 0.96s apart but in a different window at the other end
-    // of the screen, so the box got typed with no click at all. The caret has
-    // to still be roughly where you left it for the session to continue.
     const near = last && Math.hypot(x.x-last.prev.x, x.y-last.prev.y) < SESSION_NEAR;
-    if(last && near && VO[x.n].t[0]-VO[last.lastN].z < SESSION_GAP){
-      last.lastN=x.n; last.prev=x; }
+    if(last && near && VO[x.n].t[0]-VO[last.lastN].z < SESSION_GAP){ last.lastN=x.n; last.prev=x; }
     else sess.push({first:x, lastN:x.n, prev:x});
   });
-  // start already near the dialog: from (380,286) the opening move was 250px
-  // in the 0.2s before the first click, which peaks at ~100px per frame
-  const pending=[];               // rest points, gated in a second pass below
+  const pending=[];
   const P=[{t:0,x:250,y:196}];
   sess.forEach(S=>{
     P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
-    // The caret belongs at the insertion point for the WHOLE session. In the
-    // gaps BETWEEN lines the arrow was reappearing on top of the text it had
-    // just typed, which is where four of the idle hits came from.
     SESSION_SPANS.push({a:VO[S.first.n].t[0], z:VO[S.lastN].z+0.45,
                         x:S.first.x, y:S.first.y, s:S.first.s});
-    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3),
-                  x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
+    // a chosen rest where the line has one, otherwise just below where it typed
+    const R=S.first.r||[S.first.x+8, S.first.y+Math.round(S.first.s)+28];
+    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3), x:R[0], y:R[1], alt:1});
+    pending.push({t:+(VO[S.lastN].z+0.85).toFixed(3), x:R[0], y:R[1], alt:2});
   });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
-  P.push({t:+(VO[18].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
+  P.push({t:+(VO[17].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
   P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
   P.sort((a,b)=>a.t-b.t);
-  // Actions become track points, but ONLY if the pointer can physically get
-  // there. It can be in one place at a time: an event too soon after the last
-  // one still rings and still sounds, it just does not drag the pointer across
-  // the screen to meet it. That teleporting is what 21 detected jumps were.
   const SPEED=620, SETTLE=0.14, MINTIME=0.26;
   const reach=(from,to,dt)=>dt >= MINTIME + Math.hypot(to[0]-from[0],to[1]-from[1])/SPEED;
   let lastT=P[0].t, lastP=[P[0].x,P[0].y];
   const commit=q=>{P.push(q); lastT=q.t; lastP=[q.x,q.y];};
-  P.slice(1).forEach(q=>{ lastT=q.t; lastP=[q.x,q.y]; });   // typing + OK clicks are fixed
   const fixed=P.slice().sort((a,b)=>a.t-b.t);
   const taken=(t)=>fixed.find(f=>Math.abs(f.t-t)<0.30);
-  lastT=P[0].t; lastP=[P[0].x,P[0].y];
   ACTS.slice().sort((a,b)=>a.t0-b.t0).forEach(A=>{
     if(A.k==='ring'){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
     if(taken(A.t0)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
@@ -671,19 +616,14 @@ const PTRACK=(()=>{
       commit({t:A.t0,x:A.a[0],y:A.a[1],g:1});
       commit({t:A.t1,x:A.b[0],y:A.b[1],d:1});
     }
-    // two candidate moments to step off: if the first is too soon to reach the
-    // rest, try a slightly later one before giving up and standing still
     if(A.r){ pending.push({t:+(A.t1+0.42).toFixed(3),x:A.r[0],y:A.r[1],alt:1});
              pending.push({t:+(A.t1+0.70).toFixed(3),x:A.r[0],y:A.r[1],alt:2}); }
   });
-  // Second pass for the rests. A rest only goes in if the pointer can get
-  // there AND still reach whatever comes next -- otherwise stepping aside
-  // costs a teleport, which is worse than standing still for a moment.
   P.sort((a,b)=>a.t-b.t);
   const placed=new Set();
   pending.forEach(q=>{
     const key=q.x+','+q.y+','+(q.alt||0);
-    if(q.alt===2 && placed.has(q.x+','+q.y+',1')) return;   // first candidate took
+    if(q.alt===2 && placed.has(q.x+','+q.y+',1')) return;
     const before=[...P].reverse().find(r=>r.t<=q.t);
     const after =P.find(r=>r.t>q.t);
     if(!before) return;
@@ -691,41 +631,23 @@ const PTRACK=(()=>{
     if(after && !reach([q.x,q.y],[after.x,after.y],after.t-q.t)) return;
     P.push(q); placed.add(key); P.sort((a,b)=>a.t-b.t);
   });
-  // arrive, settle, THEN click, for the typing and OK clicks too
   P.filter(q=>q.c&&!q.s2).forEach(q=>{ if(!P.some(r=>Math.abs(r.t-(q.t-SETTLE))<0.01))
     P.push({t:+(q.t-SETTLE).toFixed(3),x:q.x,y:q.y,s2:1}); });
   P.sort((a,b)=>a.t-b.t);
   return P;
 })();
 
-/* ===== THE EXPLAINER: why sealed honey does not spoil =====
-   Every beat hangs off VO[] -- the measured word onsets. Nothing in here is a
-   chosen time except the small offsets that make a drop land ON a word rather
-   than start on it. */
-function explainer(ctx,W,Hh,t){
-  const T=Math.floor(t*12)/12;                 // 12fps tick: drawn content
-  const M=t;                                   // motion is not ticked at all
+/* ===== THE EXPLAINER: why halloumi does not melt ===== */
+function explainer(ctx,W2,Hh,t){
+  const T=Math.floor(t*12)/12;
+  const M=t;
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
   const blink=Math.floor(T*2.2)%2===0;
-
-  // --- word-synced text. A word appears on the frame it is spoken, so this
-  //     uses continuous t, not the 12fps tick: a reveal is a discrete event,
-  //     not motion, and an 83ms lag against speech is audible-visible.
-  const V=(n)=>VO[n];
-  // Two stacks offset along the x-y diagonal sit at the SAME height and 98px
-  // apart; offsetting in x alone put them 49px apart while each is 42px wide,
-  // and dropped the second one 35px lower so its tag landed on the cubes.
-  const B2X=7, B2Y=-7;
-  // centre-bottom of a stack's footprint, so a tag can sit clear BENEATH it
-  // (bx+f, by+f) is the stack's lowest drawn corner -- using (bx+by+f) put the
-  // tag 10px high and straight onto the cubes it was labelling.
-  const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
-  let CARET=null;      // where the pointer should be while words are printing
   const wordAt=(n,i)=>VO[n].t[i];
   const said=(n,a,b)=>{const v=VO[n];const lo=a||0,hi=(b===undefined?v.w.length:b);
     let o=[];for(let i=lo;i<hi;i++) if(t>=v.t[i]) o.push(v.w[i]);return o.join(' ');};
-  // Print a word-synced line AND leave the caret at its insertion point, so the
-  // pointer is visibly the thing doing the typing.
+  const after=(n,i)=>t>=VO[n].t[i];
+  let CARET=null;
   const typeLine=(n,x,y,size,col,shadow,font,a,b)=>{
     const str=said(n,a,b); const v=VO[n];
     const lo=a||0, hi=(b===undefined?v.w.length:b);
@@ -734,219 +656,219 @@ function explainer(ctx,W,Hh,t){
                            :px(str,x,y,size,col,null,font)) : 0;
     if(live) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
-  // A fixed caption revealed on a spoken word, with the caret left at its end.
-  // Fixed because printing the raw narration overflowed the box (rule 10).
   const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
     if(!after(n,i)) return 0;
     const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
                     :px(str,x,y,size,col,null,font);
     if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
-  const after=(n,i)=>t>=VO[n].t[i];            // has word i been spoken yet
-  const ends=(n)=>VO[n].z;
+  const B2X=7, B2Y=-7, B3X=14, B3Y=-14;
+  const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
 
   let boost=1;
-  if(t>wordAt(10,1)&&t<wordAt(10,1)+0.22*SPD)boost=1.45;   // "dries"
-  if(t>wordAt(11,8)&&t<wordAt(11,8)+0.25*SPD)boost=1.35;   // "nine"
-  if(t>wordAt(15,9)&&t<wordAt(15,9)+0.22*SPD)boost=1.40;   // "yeast"
+  if(t>wordAt(1,8)&&t<wordAt(1,8)+0.22*SPD)boost=1.35;    // "collapses"
+  if(t>wordAt(10,4)&&t<wordAt(10,4)+0.25*SPD)boost=1.45;  // "enough" -- the turn
+  if(t>wordAt(13,13)&&t<wordAt(13,13)+0.22*SPD)boost=1.40;// "ninety"
 
-  rect(0,0,LW,LH,P.teal);                      // desktop
+  rect(0,0,LW,LH,P.teal);
 
-  /* --- HOOK: the question types itself, word by word, as it is asked --- */
+  /* --- HOOK --- */
   const DLG=[150,96,344,132];
   zoomRect([4,340,54,16],DLG,M,0.05,0.42);
-  const dlgOut=BEAT.JAR.sc;
+  const dlgOut=BEAT.PAN.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
     for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
       if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
     px('?',r.x+20,r.y+16,20,'#000080','center');
-    // Three lines at 14px. Press Start 2P is ~13.7px per glyph, so the longest
-    // of these is 151px inside a 336px client area -- it was 9px before, which
-    // is 18px on output and under the floor for anything the story needs.
-    typeLine(0,r.x+50,r.y+14,14,'#000',null,null,0,2);
-    typeLine(0,r.x+50,r.y+38,14,'#000',null,null,2,4);
-    typeLine(0,r.x+50,r.y+62,14,'#000',null,null,4);
-    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>ends(0));
+    typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,2);
+    typeLine(0,r.x+50,r.y+50,14,'#000',null,null,2);
+    button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=VO[0].z);
   }
   zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35*SPD,dlgOut);
 
   if(T>=dlgOut){
     const done=T>=BEAT.END.sc;
-    const r=winFrame(8,8,624,318,'Why does sealed honey never spoil?',!done);
+    const r=winFrame(8,8,624,318,'Why does halloumi never melt?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
-
-    /* status bar -- driven off BEAT so it cannot drift from the scenes */
     const sy=r.y+r.h-15;
     rect(r.x,sy,360,14,P.face);bevel(r.x,sy,360,14,'field');
     rect(r.x+364,sy,r.w-364,14,P.face);bevel(r.x+364,sy,r.w-364,14,'field');
-    const beat=T<BEAT.WATER.sc?'INTRO':T<BEAT.OSMOSIS.sc?'WATER':T<BEAT.ACID.sc?'OSMOSIS'
-              :T<BEAT.SEAL.sc?'ACID':T<BEAT.END.sc?'SEAL':'DONE';
+    const beat=T<BEAT.NET.sc?'PAN':T<BEAT.WINDOW.sc?'NETWORK':T<BEAT.SIDE.sc?'pH WINDOW'
+              :T<BEAT.COOKED.sc?'ACIDITY':T<BEAT.END.sc?'WHEY':'DONE';
     INCHROME=true;
     px('NX-80  '+beat,r.x+4,sy+1,12,'#000',null,'"VT323"');
     px(T.toFixed(1)+'s',r.x+r.w-6,sy+1,12,'#000','right','"VT323"');
     INCHROME=false;
-
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
-    /* --- JAR: the sealed jar. s1 names it, s2 and s3 caption it --- */
-    if(T<BEAT.WATER.sc){
-      skyBands(CX,CY,CWd,CHd,46);
-      stars(CX,CY,CWd,CHd*0.5,42,7,T);
-      const jy=CY+CHd-46-13*4+Math.round(Math.sin(M*2)*1);
-      sprite('jar',CX+52,jy,4);
-      if(after(1,2)){const k=H.ease.back(mp(wordAt(1,2),wordAt(1,2)+0.42*SPD));   // "jar"
-        if(k>0)blockTag(CX+100,jy+64,'SEALED HONEY',14,P.paper,'#74432d');}
-      if(after(1,5)){                                                        // "keeps"
-        pxShadow('KEEPS FOR',CX+246,CY+44,22,P.gold,P.ink);
-        if(after(1,7))pxShadow('DECADES.',CX+246,CY+82,22,P.gold,P.ink);}
-      typeLine(2,CX+246,CY+134,18,'#ffd28a',P.ink,'"VT323"');
-      typeLine(3,CX+246,CY+164,18,'#ffd28a',P.ink,'"VT323"');
-    }
-
-    /* --- WATER: one sixth, then the two activity bars --- */
-    if(T>=BEAT.WATER.sc&&T<BEAT.OSMOSIS.sc){
-      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'WATER ACTIVITY');
-      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);
-      const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
-      // s4 "Honey is about one sixth water." -- six cubes, one of them water
-      // cleared the moment the honey bar starts dropping -- it used to stay up
-      // until sentence 6, so the six-cube row sat behind the comparison
-      if(after(4,0)&&T<wordAt(5,2)){
-        for(let i=0;i<6;i++){const k=mp(wordAt(4,0)+i*0.09*SPD,wordAt(4,0)+(i*0.09+0.3)*SPD);
-          if(k<=0)continue;
-          const isWater = after(4,3)&&i===5;        // "one sixth"
-          cube(proj(OX-30,OY-20),i,0,(1-H.ease.out(k))*6,isWater?P.ice:P.orange);}
-        // at the TOP of the box: down at the baseline it collided with the
-        // HONEY tag during the overlap where both are on screen
-        typeLine(4,CX+40,CY+26,18,'#d9d2e6',null,'"VT323"');
+    /* --- PAN: one collapses, one browns --- */
+    if(T<BEAT.NET.sc){
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'THE SAME HOT PAN');
+      const PL=proj(CX+140,CY+128), PR=proj(CX+360,CY+128);
+      // the hot surface both sit on
+      B.fillStyle='#4a3b2e';
+      for(let x=CX+60;x<CX+520;x+=4)B.fillRect(x,CY+150,3,2);
+      const melt=mp(wordAt(1,6),wordAt(1,6)+1.30*SPD);
+      if(after(1,1)){
+        const h=Math.max(1,Math.round(6-5*H.ease.inOut(melt)));
+        voxBar(PL,0,0,h,'#ffd27a',1);
+        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,5);      // the puddle it becomes
+        if(after(1,8)){const b1=barBase(CX+140,CY+128,0,0,3);
+          blockTag(b1.x,b1.y+26,'CHEDDAR',14,P.paper,'#74432d');}
       }
-      // s5 "...almost none of it is free." -- the honey bar drops
-      const d1=mp(wordAt(5,2),wordAt(5,2)+1.25*SPD);                    // "sugar"
-      const d2=mp(wordAt(8,0),wordAt(8,0)+1.30*SPD);                    // "Bacteria"
-      if(after(5,2)){
-        voxBar(Pr,0,0,12,P.orange,d1);
-        if(d1>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.paper,'#74432d');}
-      if(after(8,0)){
-        voxBar(Pr,B2X,B2Y,18,P.ice,d2);
-        if(d2>=1)blockTag(b2.x,b2.y+24,'BACTERIA',14,P.ice,'#0a0618');}
-      if(after(6,0))px('water activity in honey',CX+392,CY+80,18,'#d9d2e6',null,'"VT323"');
-      if(after(7,0))px((0.60*H.ease.out(mp(wordAt(7,0),wordAt(7,6)))).toFixed(2),
-                       CX+392,CY+30,42,P.orange,null,'"Silkscreen"');   // lands on "six"
-      if(after(8,0))px('bacteria need this much',CX+392,CY+162,18,'#d9d2e6',null,'"VT323"');
-      if(after(8,1))px((0.91*H.ease.out(mp(wordAt(8,1),wordAt(8,5)))).toFixed(2),
-                       CX+392,CY+112,42,P.ice,null,'"Silkscreen"');     // lands on "one"
+      if(after(2,0)){
+        const brown=mp(wordAt(2,1),wordAt(2,1)+1.10*SPD);
+        const col=H.rgba(H.mix('#fff4e2','#c97b3c',H.ease.out(brown)));
+        voxBar(PR,0,0,6,col,1);
+        if(after(2,2)){const b2=barBase(CX+360,CY+128,0,0,3);
+          blockTag(b2.x,b2.y+26,'HALLOUMI',14,P.ice,'#0a0618');}
+      }
+      typeLine(3,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
     }
 
-    /* --- OSMOSIS: the microbe dries out --- */
-    if(T>=BEAT.OSMOSIS.sc&&T<BEAT.ACID.sc){
+    /* --- NET: the protein lattice, and heat loosening it --- */
+    if(T>=BEAT.NET.sc&&T<BEAT.WINDOW.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+14,CY+12,CWd-28,150,'WHAT HAPPENS TO A MICROBE');
-      sprite('bug',CX+44,CY+58,5);
-      if(after(9,7)){                                   // "pulls"
-        dottedArrow([[CX+96,CY+76],[CX+196,CY+76]],mp(wordAt(9,7),wordAt(9,7)+0.75*SPD),P.cyan);
-        if(after(9,11))pxShadow('WATER PULLED OUT',CX+30,CY+116,22,P.cyan,P.ink);}  // "out"
-      if(after(10,1)){                                  // "dries"
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'WHAT CHEESE IS');
+      const NX=CX+70,NY=CY+56,GX=74,GY=40,COLS=5,ROWS=4;
+      const open=mp(wordAt(5,1),wordAt(5,1)+1.10*SPD);   // "loosens"
+      const build=mp(wordAt(4,3),wordAt(4,3)+1.10*SPD);  // "net"
+      const spread=H.ease.inOut(open)*9;
+      for(let j=0;j<ROWS;j++)for(let i=0;i<COLS;i++){
+        const k=H.clamp(build*COLS*ROWS-(j*COLS+i));
+        if(k<=0)continue;
+        const x=NX+i*GX+Math.round((i-2)*spread), y=NY+j*GY+Math.round((j-1.5)*spread);
+        // links first, so the nodes sit on top of them
+        if(i<COLS-1){const x2=NX+(i+1)*GX+Math.round((i-1)*spread);
+          B.fillStyle=H.rgba(P.sh,1-open*0.8);
+          for(let q=12;q<x2-x;q+=5)B.fillRect(x+q,y+5,3,2);
+          if(after(4,9)&&open<0.6){rect(Math.round((x+x2)/2),y+2,4,4,P.cyan);} }
+        if(j<ROWS-1){const y2=NY+(j+1)*GY+Math.round((j-0.5)*spread);
+          B.fillStyle=H.rgba(P.sh,1-open*0.8);
+          for(let q=12;q<y2-y;q+=5)B.fillRect(x+5,y+q,2,3); }
+        rect(x,y,12,12,P.paper); rect(x+1,y+1,10,10,'#e3d6c0');
+      }
+      if(after(4,9)) px('calcium',CX+70,CY+188,18,P.cyan,null,'"VT323"');
+      if(after(5,5)){            // "fat"
+        const fr=mp(wordAt(5,5),wordAt(5,5)+1.20*SPD);
+        for(let d=0;d<6;d++){const fy=CY+140+Math.round(H.ease.in(H.clamp(fr*2-d*0.18))*70);
+          if(fy>CY+140)rect(CX+180+d*46,fy,6,8,P.gold);}
+      }
+      typeLine(5,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
+    }
+
+    /* --- WINDOW: the pH band, and three cheeses against it --- */
+    if(T>=BEAT.WINDOW.sc&&T<BEAT.SIDE.sc){
+      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'THE ONLY pH THAT MELTS');
+      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);
+      // 1 cube = 0.2 pH above a 4.0 floor: 5.0 is cube 5, 5.4 is cube 7
+      const band=(c)=>OY-c*CZ;
+      if(after(7,3)){
+        // stops short of the number column: at CX+470 it ran straight through
+        // the 5.4. And it REGISTERS itself, so the sweep can see it -- a raw
+        // fillRect is invisible to checkOverlap, which is how it got through.
+        B.fillStyle=P.green;
+        for(let x=CX+96;x<CX+384;x+=6){B.fillRect(x,band(5),3,1);B.fillRect(x,band(7),3,1);}
+        if(GBOX)GBOX.push({x:CX+96,y:band(7),w:288,h:band(5)-band(7)+2,k:'band'});
+      }
+      const d1=mp(wordAt(7,1),wordAt(7,1)+1.10*SPD),
+            d2=mp(wordAt(8,2),wordAt(8,2)+0.80*SPD),
+            d3=mp(wordAt(8,5),wordAt(8,5)+0.90*SPD);
+      if(after(7,1)){voxBar(Pr,0,0,6,P.gold,d1);        // cheddar  5.2
+        if(d1>=1){const b=barBase(OX,OY,0,0,3);blockTag(b.x,b.y+24,'CHEDDAR',14,P.paper,'#74432d');}}
+      if(after(8,2)){voxBar(Pr,B2X,B2Y,3,P.red,d2);     // paneer   4.6
+        if(d2>=1){const b=barBase(OX,OY,B2X,B2Y,3);blockTag(b.x,b.y+24,'PANEER',14,P.red,'#fff4e2');}}
+      if(after(8,5)){voxBar(Pr,B3X,B3Y,11,P.ice,d3);    // halloumi above 6
+        if(d3>=1){const b=barBase(OX,OY,B3X,B3Y,3);blockTag(b.x,b.y+24,'HALLOUMI',14,P.ice,'#0a0618');}}
+      if(after(7,6)) px('5.0',CX+404,CY+30,40,P.green,null,'"Silkscreen"');
+      if(after(7,10))px('5.4',CX+404,CY+92,40,P.green,null,'"Silkscreen"');
+      if(after(7,10))px('cheese melts only here',CX+404,CY+150,18,'#d9d2e6',null,'"VT323"');
+      typeLine(6,CX+30,CY+256,18,'#d9d2e6',null,'"VT323"');
+    }
+
+    /* --- SIDE: the turn. Not too acidic -- not acidic enough. --- */
+    if(T>=BEAT.SIDE.sc&&T<BEAT.COOKED.sc){
+      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'WHICH WAY IS WRONG');
+      if(after(9,1))pxShadow('TOO ACIDIC',CX+40,CY+56,22,P.sh,P.ink);
+      if(after(9,5)){            // struck through on "acidic."
         B.fillStyle=P.red;
-        for(let i=0;i<26;i++){B.fillRect(CX+214+i,CY+58+i,4,4);B.fillRect(CX+239-i,CY+58+i,4,4);}
-        pxShadow('OSMOSIS',CX+292,CY+56,22,P.red,P.ink);}
-      typeLine(10,CX+30,CY+186,18,'#c3bad4',null,'"VT323"');
+        for(let i=0;i<230;i+=5)B.fillRect(CX+36+i,CY+68,4,3);
+      }
+      if(after(10,4)){           // "enough." -- the turn
+        pxShadow('NOT ACIDIC',CX+40,CY+110,22,P.gold,P.ink);
+        pxShadow('ENOUGH.',CX+40,CY+146,22,P.gold,P.ink);
+      }
+      if(after(11,0)){           // calcium still bridging
+        const lock=mp(wordAt(11,0),wordAt(11,0)+1.10*SPD);
+        for(let i=0;i<5;i++){
+          const k=H.clamp(lock*5-i); if(k<=0)continue;
+          const x=CX+330+i*44;
+          rect(x,CY+120,12,12,P.paper);
+          if(i<4){B.fillStyle=P.cyan;for(let q=14;q<44;q+=5)B.fillRect(x+q,CY+125,3,2);}
+        }
+        if(lock>0.9)px('calcium holding',CX+330,CY+152,18,P.cyan,null,'"VT323"');
+      }
+      typeLine(11,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
     }
 
-    /* --- ACID: pH 3.9 against plain water --- */
-    if(T>=BEAT.ACID.sc&&T<BEAT.SEAL.sc){
+    /* --- COOKED: the whey pot, and the heat that set it first --- */
+    if(T>=BEAT.COOKED.sc){   // stays up behind the box, so the panel is never blank
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'AND IT IS ACIDIC');
-      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);   // same baseline as the water chart
-      const b1=barBase(OX,OY,0,0,3), b2=barBase(OX,OY,B2X,B2Y,3);
-      const dp=mp(wordAt(11,2),wordAt(11,2)+0.95*SPD),     // "acidic"
-            dw=mp(wordAt(12,0),wordAt(12,0)+1.00*SPD);     // "Plain"
-      if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
-        if(dp>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.red,'#fff4e2');}
-      if(after(12,0)){voxBar(Pr,B2X,B2Y,7,'#9fcb55',dw);
-        if(dw>=1)blockTag(b2.x,b2.y+24,'WATER',14,P.grass,'#0a0618');}
-      const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
-      if(after(11,8)){                                  // "nine"
-        const inv=t<h8+0.90*SPD&&Math.floor((t-h8)*8)%2===0;
-        if(inv){rect(CX+386,CY+26,NW,NH,P.gold);px('3.9',CX+392,CY+34,NS,P.ink,null,'"Silkscreen"');}
-        else px('3.9',CX+392,CY+34,NS,P.gold,null,'"Silkscreen"');
-        px('pH - acidic as orange juice',CX+392,CY+90,18,'#d9d2e6',null,'"VT323"');}
-      if(after(12,3)){                                  // "seven"
-        px('7',CX+392,CY+124,NS,P.grass,null,'"Silkscreen"');
-        px('pH of plain water',CX+392,CY+180,18,'#d9d2e6',null,'"VT323"');}
+      groupBox(CX+12,CY+10,CWd-24,CHd-74,'BEFORE YOU EVER BUY IT');
+      // the vat
+      const VX=CX+96,VY=CY+92,VW=190,VH=104;
+      rect(VX,VY,VW,VH,'#1d2436'); bevel(VX,VY,VW,VH,'field');
+      const drop=mp(wordAt(13,6),wordAt(13,6)+1.10*SPD);   // "curd"
+      if(after(13,6)){
+        const cy2=VY-40+Math.round(H.ease.in(drop)*96);
+        rect(VX+70,Math.min(cy2,VY+56),48,34,'#fff4e2');
+        rect(VX+72,Math.min(cy2,VY+56)+2,44,30,'#e3d6c0');
+      }
+      // whey surface, wobbling
+      B.fillStyle=P.ice;
+      for(let x=0;x<VW-8;x+=4)B.fillRect(VX+4+x,VY+34+Math.round(Math.sin(M*3+x*0.12)*2),3,2);
+      if(after(13,10)){                                     // "hot" -- steam
+        for(let i=0;i<5;i++){const sy2=VY-6-((M*26+i*17)%46);
+          rect(VX+28+i*34,Math.round(sy2),3,6,H.rgba(P.hi,0.35));}
+      }
+      if(after(13,13)){                                     // "ninety"
+        const hot=mp(wordAt(13,13),wordAt(13,14)+0.30*SPD);
+        px(Math.round(20+70*H.ease.out(hot))+'',CX+404,CY+40,40,P.red,null,'"Silkscreen"');
+        px('degrees, in whey',CX+404,CY+98,18,'#d9d2e6',null,'"VT323"');
+      }
+      // both of these stop when the message box opens over them: the box is
+      // opaque so it looked fine, but text under a window is still text on text
+      if(after(14,2)&&T<BEAT.END.sc){
+        pxShadow('THE NET IS SET',CX+96,CY+216,22,P.gold,P.ink);
+      }
+      if(T<BEAT.END.sc) typeLine(15,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
     }
 
-    /* --- SEAL: the twist. It only holds while it stays dry, and it does not
-       stay dry by itself. Glucose oxidase is inactive in undiluted honey, so
-       the peroxide story that used to sit here was about DILUTED honey and did
-       not belong in a beat about a sealed jar. --- */
-    if(T>=BEAT.SEAL.sc&&T<BEAT.END.sc){
-      rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'NOW LEAVE IT OPEN');
-      // Planned, not nudged. The group box is CX+12..CX+CWd-12 by CY+10, height
-      // CHd-74; everything below sits inside it with a 14px margin, and the
-      // closing caption goes in the free strip BELOW the box. The previous cut
-      // had 'WATER FROM / THE AIR' straddling the box border -- half on the
-      // diagram, half off it -- which checkBounds never saw, because it only
-      // ever tested the panel rect. checkStraddle() now tests the box.
-      const BX=CX+12, BY=CY+10, BW=CWd-24, BH=CHd-74;
-      const IL=BX+14, IT=BY+20, IR=BX+BW-14, IB=BY+BH-14;
-      // left: the open jar, water arriving from above
-      const jx=IL+10, jy=IT+56;
-      sprite('jaropen',jx,jy,5);
-      if(after(14,1)){                                   // "pulls"
-        const k=mp(wordAt(14,1),wordAt(14,1)+0.90*SPD);
-        for(let a=0;a<3;a++)
-          dottedArrow([[jx+14+a*18,IT],[jx+14+a*18,jy-8]],H.clamp(k*1.4-a*0.18),P.ice);
-        // two lines: one line of this at 16px is 283px and reached the stack
-        if(after(14,6)){pxShadow('WATER FROM',IL,jy+68,16,P.ice,P.ink);
-                        pxShadow('THE AIR',IL,jy+92,16,P.ice,P.ink);}}
-      // centre: the stack climbing past the line it must not cross
-      const BASE=IB-20, Pr=proj(CX+330,BASE), THR=BASE-10*5;
-      if(after(15,2)){                                   // "climb"
-        const g=mp(wordAt(15,2),wordAt(15,8));
-        const cubes=Math.max(1,Math.round(8+3*H.ease.out(g)));
-        B.fillStyle=P.red;
-        for(let x=CX+274;x<CX+392;x+=6)B.fillRect(x,THR,3,1);
-        voxBar(Pr,0,0,cubes,P.gold,1);
-        px('1 PART IN 5',CX+400,THR-9,14,P.red,null,'"Silkscreen"');
-        px('MOISTURE',CX+400,THR+38,14,'#d9d2e6',null,'"Silkscreen"');}
-      // right: what moves in once it crosses
-      if(after(15,9)){                                   // "yeast"
-        sprite('bug',IR-92,IT+2,5);
-        pxShadow('YEAST',IR-110,IT+50,18,P.grass,P.ink);}
-      // the closing line lives in the strip below the box, never across it
-      typeLine(16,CX+16,BY+BH+14,18,'#ffd28a',null,'"VT323"');
-    }
-
-    /* scene changes: the medium's own mosaic, peaking as the content swaps */
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
       if(BEAT[k].sc>0&&dd<0.20*SPD)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/(0.20*SPD)*15));}
     B.restore();
 
-    /* --- END: the takeaway, one line per spoken word --- */
-    const CLICK=VO[18].z+0.52, SHUT=CLICK+0.15;   // press OK, then the box closes
+    /* --- END --- */
+    const CLICK=VO[17].z+0.52, SHUT=CLICK+0.15;
     zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.30*SPD,BEAT.END.sc);
     if(done&&T<SHUT){
+      OVERLAY=true;    // a window on top of the panel, not content inside it
       const m=winFrame(110,78,420,196,'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
         if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
       const tx=m.x+52;
-      // "Dry. Acidic. Sealed." -- one line per spoken word, at 14px not 9px
-      // Fixed captions gated on the spoken word, NOT the spoken words printed
-      // raw: 'of those and it spoils.' is 497px at 22px against a 412px box, and
-      // the rasteriser quietly cut it so the sweep saw a string that fitted.
-      capLine('> Dry.',17,0,tx,m.y+8,14,'#000');
-      capLine('> Acidic.',17,1,tx,m.y+30,14,'#000');
-      capLine('> Sealed.',17,2,tx,m.y+52,14,'#000');
-      capLine('BREAK ANY ONE',18,0,tx,m.y+82,22,'#000080','#c0c0c0');
-      capLine('AND IT SPOILS.',18,5,tx,m.y+118,22,'#000080','#c0c0c0');
+      capLine('> Not acidic enough.',16,1,tx,m.y+10,14,'#000');
+      capLine('> Already cooked.',16,4,tx,m.y+36,14,'#000');
+      capLine('NOTHING LEFT',17,2,tx,m.y+82,22,'#000080','#c0c0c0');
+      capLine('TO MELT.',17,5,tx,m.y+118,22,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
+      OVERLAY=false;
     }
-    /* --- the end card. It started with a click, so it ends with one. --- */
     if(T>=SHUT){
       zoomRect([300,160,40,20],[150,120,340,96],M,SHUT,SHUT+0.22);
       if(T>=SHUT+0.22){
@@ -956,18 +878,13 @@ function explainer(ctx,W,Hh,t){
     }
   }
 
-  /* --- the cursor, always chrome. Keyframed off the beat table. --- */
-  // HOLD, then move. Interpolating across the whole gap meant the pointer was
-  // permanently in slow transit across the middle of the diagram -- which is
-  // what made it feel like it was in the way. It now sits still and makes one
-  // decisive move in the last APPROACH seconds before it is needed.
+  /* --- the pointer --- */
   const K=PTRACK, APPROACH=0.55;
   let cx=K[K.length-1].x, cy=K[K.length-1].y, still=true, dragging=false, from=null;
   for(let i=0;i<K.length-1;i++)if(M<K[i+1].t){
     const seg=K[i+1].t-K[i].t;
-    if(K[i+1].d){                              // a DRAG: traverse the whole window,
-      still=false; dragging=true; from=K[i];    // because the pointer is carrying the
-      const e=H.ease.inOut(H.clamp((M-K[i].t)/Math.max(0.001,seg)));  // thing it moves
+    if(K[i+1].d){ still=false; dragging=true; from=K[i];
+      const e=H.ease.inOut(H.clamp((M-K[i].t)/Math.max(0.001,seg)));
       cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e));
     } else {
       const go=K[i+1].t-Math.min(APPROACH,seg);
@@ -977,17 +894,12 @@ function explainer(ctx,W,Hh,t){
         cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e)); }
     }
     break;}
-  // a resting hand is not a frozen bitmap: 1px of breath while it waits
   if(still){ cx+=Math.round(Math.sin(M*1.07)); cy+=Math.round(Math.sin(M*0.73+1.3)); }
-  // While a line is printing the pointer IS the caret, sitting at the insertion
-  // point; the rest of the time it is the arrow travelling the track.
-  // exposed so a harness can measure how much the pointer actually moves
   window.pointerPos=()=>({x:cx,y:cy,caret:!!CARET});
   if(!CARET){ const S=SESSION_SPANS.find(q=>M>=q.a&&M<=q.z);
     if(S) CARET={x:S.x,y:S.y,h:S.s,col:'#ffffff'}; }
   if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col);
   else if(dragging){
-    // a dotted trail back to where it picked the thing up
     B.fillStyle=H.rgba(P.hi,0.5);
     const dx=cx-from.x, dy=cy-from.y, L2=Math.hypot(dx,dy);
     for(let d2=6; d2<L2; d2+=6) B.fillRect(Math.round(from.x+dx*d2/L2),
@@ -995,28 +907,29 @@ function explainer(ctx,W,Hh,t){
     dragCursor(cx,cy);
   }
   else cursor(cx,cy);
-  // and every click reads as a click: a 0.1s ring where the tip went down
   const ALLCLICKS=K.filter(q=>q.c).concat(RINGS);
   for(const q of ALLCLICKS){ const d=M-q.t;
-    if(d<0&&d>-0.09){ cursor(q.x,q.y); }            // press frame: hold on target
+    if(d<0&&d>-0.09){ cursor(q.x,q.y); }
     if(d>=0&&d<0.11){ const r0=3+Math.round(d/0.11*6);
       B.fillStyle=P.hi;
       for(let i=-r0;i<=r0;i++){B.fillRect(q.x+i,q.y-r0,1,1);B.fillRect(q.x+i,q.y+r0,1,1);
                                B.fillRect(q.x-r0,q.y+i,1,1);B.fillRect(q.x+r0,q.y+i,1,1);}}}
 
   ctx.imageSmoothingEnabled=false;
-  ctx.clearRect(0,0,W,Hh);
-  ctx.drawImage(BUF,0,0,LW,LH,0,0,W,Hh);
-  glass(ctx,W,Hh,t,boost);
+  ctx.clearRect(0,0,W2,Hh);
+  ctx.drawImage(BUF,0,0,LW,LH,0,0,W2,Hh);
+  glass(ctx,W2,Hh,t,boost);
 }
 
-/* Sweep every frame with the text recorder on and report anything that would
-   fall outside the window's client area. "Nothing off screen" is then a number,
-   not an impression. */
 // exposed for the offline renderer and the test harness: a const at the top
 // level of a classic script is NOT a window property, which is why a harness
 // reading w.DUR silently got undefined.
 window.DUR=DUR; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
+// Beat names differ per piece, so the sweeps address them positionally: the
+// first CONTENT beat (after the hook) and the LAST beat. Hard-coding JAR/END
+// worked for one script and threw on the next.
+const BKEYS=Object.keys(BEAT);
+const FIRST_CONTENT=BEAT[BKEYS[1]].sc, LAST_BEAT=BEAT[BKEYS[BKEYS.length-1]].sc;
 window.checkBounds=function(step){
   const pad=2, lo={x:12+pad,y:28+pad}, hi={x:12+616-pad,y:28+284-pad};
   const bad=[]; const seen=new Set();
@@ -1027,7 +940,7 @@ window.checkBounds=function(step){
       // it, the status bar below it, and the dialog / message box drawn over
       // the desktop. Those are judged against the whole 640x360 buffer; only
       // SCREEN and OBJECT layer text is held to the client rect.
-      const chrome = b.y < lo.y || b.y > 28+284-20 || tt < BEAT.JAR.sc || tt >= BEAT.END.sc;
+      const chrome = b.y < lo.y || b.y > 28+284-20 || tt < FIRST_CONTENT || tt >= LAST_BEAT;
       const L=chrome?0:lo.x, Tp=chrome?0:lo.y, R=chrome?LW:hi.x, Bt=chrome?LH:hi.y;
       if(b.x<L||b.y<Tp||b.x+b.w>R||b.y+b.h>Bt){
         const k=b.s+'|'+b.size;
@@ -1096,7 +1009,7 @@ window.checkClearance=function(step,minGap){
     BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
-    const items=r.filter(a=>!a.chrome).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
+    const items=r.filter(a=>!a.chrome&&!a.overlay).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
       .concat(g.filter(q=>q.k!=='groupbox'&&q.k!=='cursor'));
     for(const a of items){
       const inside = a.x>=box.x&&a.y>=box.y&&a.x+a.w<=box.x+box.w&&a.y+a.h<=box.y+box.h;
@@ -1137,7 +1050,7 @@ window.checkPointerIdle=function(step){
     prev=p;
     if(p.caret || stillFor < SIT) continue;
     const c={x:p.x,y:p.y,w:10,h:16};
-    const items=r.filter(a=>!a.chrome).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
+    const items=r.filter(a=>!a.chrome&&!a.overlay).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
                  .concat(g.filter(q=>q.k!=='cursor'&&q.k!=='groupbox'));
     for(const a of items){
       const ox=Math.min(c.x+c.w,a.x+a.w)-Math.max(c.x,a.x);
@@ -1172,8 +1085,11 @@ window.checkStraddle=function(step){
     BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
-    for(const a of r){
-      if(a.chrome) continue;
+    const subjects=r.filter(a=>!a.chrome&&!a.overlay)
+      .map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,s:a.s,size:a.size}))
+      .concat(g.filter(q=>q.k!=='groupbox'&&q.k!=='cursor')
+               .map(q=>({x:q.x,y:q.y,w:q.w,h:q.h,s:q.k,size:0})));
+    for(const a of subjects){
       const inside = a.x>=box.x&&a.y>=box.y&&a.x+a.w<=box.x+box.w&&a.y+a.h<=box.y+box.h;
       const outside= a.x+a.w<=box.x||a.x>=box.x+box.w||a.y+a.h<=box.y||a.y>=box.y+box.h;
       if(!inside&&!outside){
@@ -1300,42 +1216,35 @@ const SFX={
     g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.start(t);o.stop(t+d+0.05);}
 };
 
-/* ---- the score: built from the SAME word onsets the picture uses, so an
-   effect cannot land on a different frame from the thing it marks ---- */
+/* ---- the score: built from the same word onsets the picture uses ---- */
 function buildScore(){
   const E=[],add=(t,k,n)=>E.push({t:+t.toFixed(3),k,n});
   const w=(n,i)=>VO[n].t[i];
-  // chrome
   add(0.05,'open');
-  // one click per pointer click, from the same track the picture uses
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
-  add(BEAT.JAR.sc-0.35*SPD,'open'); add(BEAT.END.sc-0.30*SPD,'open');
-  add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
-  // screen: a print blip on every spoken word that appears as text on screen
-  [2,3,10,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
-  VO[0].t.forEach((tt,i)=>add(tt,'blip',i));
-  [17,18].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
-  // objects: stacks landing. Every 3rd cube so a bar reads as a stack.
+  add(BEAT.PAN.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
+  // text printing
+  [0,3,5,6,10,11,15,16,17].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  for(let i=0;i<6;i++)add(w(4,0)+(i*0.09+0.26)*SPD,'knock',i);        // the one-sixth row
-  bar(w(5,2),w(5,2)+1.25*SPD,12,3);  bar(w(8,0),w(8,0)+1.30*SPD,18,4);  // water activity
-  bar(w(11,2),w(11,2)+0.95*SPD,4,1); bar(w(12,0),w(12,0)+1.00*SPD,7,2); // pH
-  bar(w(15,2),w(15,8),11,3);                                    // moisture climbing
-  add(w(5,2)+1.25*SPD,'tag'); add(w(8,0)+1.30*SPD,'tag');
-  add(w(11,2)+0.95*SPD,'tag'); add(w(12,0)+1.00*SPD,'tag');
-  // arrows draw on, conclusions land on the word that says them
-  add(w(9,7),'draw');  add(w(9,11),'tag');     // "pulls" -> "out"
-  add(w(14,1),'draw'); add(w(14,6),'tag');     // "pulls" -> "air"
-  // numbers finish counting on their spoken word
-  add(w(7,6),'tag'); add(w(8,5),'tag'); add(w(12,3),'tag');
-  // glass: the three emphasis frames, exactly where boost rises
-  add(w(10,1),'zap'); add(w(11,8),'zap'); add(w(15,9),'zap');
-  // scene changes
-  for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
-  // music: a hint. Sits out the opening question and the final hold.
+  // the cheddar collapsing, and the one that does not
+  bar(w(1,6), w(1,6)+1.30, 6, 1);
+  add(w(1,8),'tag'); add(w(2,1),'tag');
+  // the lattice building, then loosening
+  bar(w(4,3), w(4,3)+1.10, 20, 4);
+  add(w(4,9),'tag');  add(w(5,1),'draw'); add(w(5,5),'draw');
+  // the three pH stacks
+  bar(w(7,1), w(7,1)+1.10, 6, 2);
+  bar(w(8,2), w(8,2)+0.80, 3, 1);
+  bar(w(8,5), w(8,5)+0.90, 11, 3);
+  add(w(7,6),'tag'); add(w(7,10),'tag');
+  // the turn, and the calcium locking
+  add(w(9,5),'draw'); add(w(10,4),'zap'); add(w(11,0),'draw');
+  // the vat
+  add(w(13,6),'knock',0); add(w(13,13),'zap'); add(w(14,2),'tag');
+  add(w(1,8),'zap');
   const BPM=112, E8=30/BPM, FIG=[220.00,261.63,329.63,261.63,293.66,349.23,293.66,261.63];
-  for(let i=0,tt=BEAT.JAR.a;tt<VO[18].t[0];i++,tt+=E8){
+  for(let i=0,tt=BEAT.PAN.a;tt<VO[17].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
     if(i%8===0) add(tt,'bass',FIG[0]/2);
   }
