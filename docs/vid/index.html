@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v2.0 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.1 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -540,20 +540,45 @@ const SPOTS=[
   {n:17, x:166, y:106, s:14},   // message box list
 ];
 const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
+const PARK={x:600,y:296};        // bottom-right of the panel, clear of everything
+const SESSION_GAP=2.0;           // lines closer in TIME than this may share a session
+const SESSION_NEAR=80;           // ...but only if the insertion point barely moved
+const PARK_IF_IDLE=3.0;          // only get out of the way if there is time to
+
 const PTRACK=(()=>{
-  const P=[{t:0,x:420,y:300}];
-  SPOTS.forEach(sp=>P.push({t:+(VO[sp.n].t[0]-0.30).toFixed(3),
-                            x:sp.x+3, y:sp.y+Math.round(sp.s*0.55), c:1}));
+  // ONE click per typing SESSION, not per line. Back-to-back lines are one
+  // session: you click once to put the caret in, then keep typing. The caret
+  // moving to the next line is the visual cue that something changed.
+  const sp=SPOTS.slice().sort((a,b)=>VO[a.n].t[0]-VO[b.n].t[0]);
+  const sess=[];
+  sp.forEach(x=>{
+    const last=sess[sess.length-1];
+    // Time alone is not enough. Grouping on time merged the seal caption with
+    // the message box -- 0.96s apart but in a different window at the other end
+    // of the screen, so the box got typed with no click at all. The caret has
+    // to still be roughly where you left it for the session to continue.
+    const near = last && Math.hypot(x.x-last.prev.x, x.y-last.prev.y) < SESSION_NEAR;
+    if(last && near && VO[x.n].t[0]-VO[last.lastN].z < SESSION_GAP){
+      last.lastN=x.n; last.prev=x; }
+    else sess.push({first:x, lastN:x.n, prev:x});
+  });
+  const P=[{t:0,x:PARK.x,y:PARK.y}];
+  sess.forEach(S=>P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
+                          x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1}));
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
-  P.push({t:+(BEAT.WATER.a+0.30).toFixed(3),   x:300, y:150});
-  P.push({t:+(BEAT.OSMOSIS.a+0.30).toFixed(3), x:250, y:86});
-  P.push({t:+(BEAT.ACID.a+0.30).toFixed(3),    x:330, y:70});
-  P.push({t:+(BEAT.SEAL.a+0.30).toFixed(3),    x:130, y:120});
   P.push({t:+(VO[18].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
   P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
-  // A hand arrives, settles, THEN clicks. Without this the pointer is still
-  // travelling on the frame it clicks, which reads as a twitch rather than a
-  // deliberate press. 0.14s of stillness on target before every click.
+  P.sort((a,b)=>a.t-b.t);
+  // Park between sessions, but only when there is room -- otherwise it would
+  // travel away and straight back, which is more movement, not less.
+  const parked=[];
+  sess.forEach(S=>{
+    const end=VO[S.lastN].z+0.45;
+    const next=P.find(q=>q.t>end);
+    if(next && next.t-end>PARK_IF_IDLE) parked.push({t:+end.toFixed(3),x:PARK.x,y:PARK.y});
+  });
+  parked.forEach(q=>P.push(q));
+  // arrive, settle, THEN click: 0.14s of stillness on target first
   P.filter(q=>q.c).forEach(q=>P.push({t:+(q.t-0.14).toFixed(3),x:q.x,y:q.y}));
   P.sort((a,b)=>a.t-b.t);
   return P;
@@ -819,13 +844,25 @@ function explainer(ctx,W,Hh,t){
   }
 
   /* --- the cursor, always chrome. Keyframed off the beat table. --- */
-  const K=PTRACK;
-  let cx=K[K.length-1].x, cy=K[K.length-1].y;
+  // HOLD, then move. Interpolating across the whole gap meant the pointer was
+  // permanently in slow transit across the middle of the diagram -- which is
+  // what made it feel like it was in the way. It now sits still and makes one
+  // decisive move in the last APPROACH seconds before it is needed.
+  const K=PTRACK, APPROACH=0.55;
+  let cx=K[K.length-1].x, cy=K[K.length-1].y, still=true;
   for(let i=0;i<K.length-1;i++)if(M<K[i+1].t){
-    const e=H.ease.inOut(H.clamp((M-K[i].t)/Math.max(0.001,K[i+1].t-K[i].t)));
-    cx=Math.round(H.lerp(K[i].x,K[i+1].x,e));cy=Math.round(H.lerp(K[i].y,K[i+1].y,e));break;}
+    const seg=K[i+1].t-K[i].t, go=K[i+1].t-Math.min(APPROACH,seg);
+    if(M<=go){ cx=K[i].x; cy=K[i].y; }
+    else { still=false;
+      const e=H.ease.inOut(H.clamp((M-go)/Math.max(0.001,K[i+1].t-go)));
+      cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e)); }
+    break;}
+  // a resting hand is not a frozen bitmap: 1px of breath while it waits
+  if(still){ cx+=Math.round(Math.sin(M*1.07)); cy+=Math.round(Math.sin(M*0.73+1.3)); }
   // While a line is printing the pointer IS the caret, sitting at the insertion
   // point; the rest of the time it is the arrow travelling the track.
+  // exposed so a harness can measure how much the pointer actually moves
+  window.pointerPos=()=>({x:cx,y:cy,caret:!!CARET});
   if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col); else cursor(cx,cy);
   // and every click reads as a click: a 0.1s ring where the tip went down
   for(const q of K){ if(!q.c) continue; const d=M-q.t;
@@ -847,7 +884,7 @@ function explainer(ctx,W,Hh,t){
 // exposed for the offline renderer and the test harness: a const at the top
 // level of a classic script is NOT a window property, which is why a harness
 // reading w.DUR silently got undefined.
-window.DUR=DUR; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH;
+window.DUR=DUR; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
 window.checkBounds=function(step){
   const pad=2, lo={x:12+pad,y:28+pad}, hi={x:12+616-pad,y:28+284-pad};
   const bad=[]; const seen=new Set();

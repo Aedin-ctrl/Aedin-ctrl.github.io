@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v2.0
+# CATHODE DESK — house style v2.1
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.1 (2026-11-08)** — the pointer holds still instead of drifting, breathes
+> while it waits, parks out of the way, and clicks once per typing session
+> rather than once per line. See rules 17–20.
+>
 > **v2.0 (2026-11-08)** — the pointer is a generated track of moves and
 > clicks rather than a hand-written keyframe list, and it clicks into a line
 > before typing it. See rules 13–16.
@@ -407,6 +411,24 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
     typed-line table plus the button centres, and let **both** the picture and
     the score read it. Hand-written cursor keyframes drift away from the clicks
     in the sound the moment any timing changes.
+
+17. **Hold, then move.** Interpolating across the whole gap between keyframes
+    leaves the pointer permanently in slow transit across the middle of the
+    diagram, which is what makes it feel like it is in the way. Sit still, then
+    make one decisive move in the last **0.55s** before it is needed.
+    Target: **moving on under 10% of frames.** This build is 5%.
+18. **A resting hand is not a frozen bitmap.** While holding, drift ±1px on two
+    slow out-of-phase sines. It reads as alive without drawing the eye.
+19. **Park out of the way between sessions** — bottom-right of the panel, clear
+    of the content — but **only when there is time**. If the next event is under
+    3s away, parking means travelling away and straight back, which is more
+    movement, not less.
+20. **One click per typing SESSION, not per line.** Back-to-back lines are one
+    session: you click once to put the caret in and keep typing, and the caret
+    moving to the next line is the visual cue. A session continues only if the
+    next line is **both** within 2s **and** within 80px of the last insertion
+    point. Time alone merged a caption with a message box in a different window
+    at the other end of the screen, and the box got typed with no click at all.
 
 **Every line that appears word by word goes through `typeLine()`** and appears
 in the pointer table. A line drawn with a bare `px()` gets no caret and no
