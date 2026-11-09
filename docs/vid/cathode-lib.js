@@ -447,31 +447,40 @@ function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
    whole reason the sky is there. Left-aligned, because typing reads from a
    margin and a caret on the end of a centred line wanders.
    Returns where the caret belongs, for the caller to hand to CARET. */
-/* An outlined silhouette: a shape, not a chart. Filled dark so the sky reads
-   through it, with a hard 2px rim drawn as pixel runs -- a canvas stroke
-   antialiases, and nothing else in this medium does. Returns its bounding box
-   so the caller can register it. */
-function outlineShape(pts,fill,rim,a){
-  B.fillStyle=H.rgba(H.hex(fill),a===undefined?0.58:a);
-  B.beginPath(); pts.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
-  B.closePath(); B.fill();
-  // Two passes, like pxShadow: a dark halo then the rim. One pass vanished
-  // wherever the shape crossed the bright band at the horizon.
-  [[1,'#0a0618'],[0,null]].forEach(([o,c])=>{
-    B.fillStyle=c||rim;
-    for(let i=0;i<pts.length;i++){
-      const a0=pts[i], b0=pts[(i+1)%pts.length];
-      const n=Math.max(1,Math.round(Math.hypot(b0[0]-a0[0],b0[1]-a0[1])));
-      for(let k=0;k<=n;k++)B.fillRect(Math.round(a0[0]+(b0[0]-a0[0])*k/n)-1+o,
-                                     Math.round(a0[1]+(b0[1]-a0[1])*k/n)-1+o,2,2);
-    }
-  });
-  const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
-  return {x:Math.min(...xs)-1,y:Math.min(...ys)-1,
-          w:Math.max(...xs)-Math.min(...xs)+3,h:Math.max(...ys)-Math.min(...ys)+3};
+/* A SOLID object with a ringed outline.
+
+   Opaque, because a translucent silhouette on a bright sky was neither a
+   shape nor a window -- it just went grey where it mattered. Faceted, in
+   three tones with seams between them, so it models the way the voxel layer
+   does instead of reading as a flat cut-out.
+
+   The outline is a RING: black first at 7px, then the rim at 3px inside it,
+   so there is black on both sides of the rim and it holds against any
+   background -- a single white pass vanished wherever the shape crossed the
+   bright band at the horizon. */
+function strokePoly(pts,col,th,open){
+  if(!col) return;
+  B.fillStyle=col; const h=th>>1, n0=open?pts.length-1:pts.length;
+  for(let i=0;i<n0;i++){
+    const a0=pts[i], b0=pts[(i+1)%pts.length];
+    const n=Math.max(1,Math.round(Math.hypot(b0[0]-a0[0],b0[1]-a0[1])));
+    for(let k=0;k<=n;k++)B.fillRect(Math.round(a0[0]+(b0[0]-a0[0])*k/n)-h,
+                                   Math.round(a0[1]+(b0[1]-a0[1])*k/n)-h,th,th);
+  }
+}
+function solidShape(facets,outer,rim,seam){
+  facets.forEach(f=>{ B.fillStyle=f.c;
+    B.beginPath(); f.p.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
+    B.closePath(); B.fill(); });
+  if(seam) facets.forEach(f=>strokePoly(f.p,seam,2));
+  strokePoly(outer,'#000000',9);   // 3px of black either side of the rim
+  strokePoly(outer,rim,3);
+  const xs=outer.map(q=>q[0]), ys=outer.map(q=>q[1]);
+  return {x:Math.min(...xs)-4,y:Math.min(...ys)-4,
+          w:Math.max(...xs)-Math.min(...xs)+8,h:Math.max(...ys)-Math.min(...ys)+8};
 }
 
-/* An open polyline in hard pixels -- facets, ridges, striations. outlineShape
+/* An open polyline in hard pixels -- ridges, striations, crevasses. solidShape
    closes its path, so detail INSIDE a silhouette needs its own primitive. */
 function linePix(pts,col,w){
   const th=w||2; B.fillStyle=col;

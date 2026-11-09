@@ -1,10 +1,15 @@
-# CATHODE DESK — house style v2.9
+# CATHODE DESK — house style v3.0
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
-> **v2.9 (2026-11-09)** — the vibrant beat is a **typed question card and
-> nothing else**, fixed captions **type** instead of appearing, and the Win95
-> icon is drawn from its own centre. See *Vibrant at the edges*.
+> **v3.0 (2026-11-09)** — **the intro format**: three spoken lines, the third
+> being the question, over one solid drawn object. The question is in the
+> narration, so it types in time with the voice saying it. See *Vibrant at the
+> edges*.
+>
+> **v2.9 (2026-11-09)** — the vibrant beat is a typed question card, fixed
+> captions **type** instead of appearing, and the Win95 icon is drawn from its
+> own centre.
 >
 > **v2.8 (2026-11-09)** — **the palette rotates**, tags come from a **closed
 > vocabulary**, and the overview panel always lands on a **wiped stage**. A
@@ -702,31 +707,61 @@ The teaching beats are a dark field because that is what you read numbers off.
 The **desktop, the opening beat and the end card are a dusk sky** — the first
 and last thing anyone sees should not look like homework.
 
-**Nothing but words goes on the sky.** The opening beat is a **question card**:
-three lines of 26px type, left-aligned, near-white with an ink shadow, and
-nothing else — no chart, no sprite, no tag. A voxel diagram on a sunset was
-competing with its own background, and the contrast between a title card and a
-blackboard is the entire reason the sky is there. The end card obeys the same
-rule, which it already did.
+### The intro format
 
-**The card asks the question the dark beats answer**, and it **types**:
+**The opening beat is three spoken lines, and the third is the question.**
 
-```js
-questionCard(['SO WHY DOES','WATER','EXPAND?'], t,
-             wordAt(1,0), VO[2].z, MIDY-57, 26, 44, BEAT.CAGE.sc);
+```
+1.  Almost everything shrinks when it freezes.     statement
+2.  Except water. It expands.                      the exception
+3.  So why does water expand?                      the question
 ```
 
-from the beat's first word onset to the end of its speech, with the caret at
-the end of the last visible line — then the piece wipes to the blackboard.
+That shape is the format. Write the beat this way in `script.json` before any
+of it is synthesised — **the question has to be in the narration**, which is
+the whole point: it is then in your ear while it is on the screen, and typing
+it is *sync* rather than a crawl over a sentence it has nothing to do with.
+The first cut had a pre-written card spelling out `SO WHY DOES WATER EXPAND?`
+for four seconds while the narrator talked about shrinking, and it read as
+exactly what it was.
 
+**On screen:**
+
+- Lines 1 and 2 are **word-gated at 34px VT323** on their measured onsets, one
+  sentence at a time, with the caret.
+- Line 3 types **key by key** at 26px Press Start 2P — characters interpolated
+  between the word onsets, which is as close to one keystroke per sound as the
+  data goes.
 - **Near-white, not gold.** Gold on the ember sky was two warm colours
   fighting. `P.paper` carries on every palette, which is what a slot is for.
+- **The sun goes down across line 3**, so by the scene change the frame already
+  *is* the dark field it cuts to. The wipe stops being a cut.
 - **Hold the caret until the scene changes, plus one content frame.** The beat
-  is gated on `T` (12fps) and the caret on `t`, so for up to 1/12s the card is
-  on screen with nothing typing on it — one frame, and `checkPointerIdle()`
-  sees it.
-- A title card is deliberately sparse, so `checkComposition()` checks the
-  **first content beat for centring only**, never for fill.
+  is gated on `T` (12fps) and the caret on `t`, so for 1/12s the card would
+  otherwise sit there with nothing typing on it, which `checkPointerIdle()`
+  sees.
+- `checkComposition()` checks the **first content beat for centring only**,
+  never for fill.
+
+### One object, drawn solid
+
+The intro carries **exactly one drawn thing**, and it is an object, not a
+chart: no axis, no tag, no number. An iceberg, a jar, a pan — a shape you
+recognise in a quarter second.
+
+- **Opaque.** A translucent silhouette on a bright sky is neither a shape nor
+  a window; it just goes grey where it matters.
+- **Faceted**, in four or five tones mixed from one palette slot toward `ink`,
+  with thin seams between the faces, so it models the way the voxel layer does
+  instead of reading as a flat cut-out. Give two adjacent faces the same tone
+  and you have drawn one face.
+- **A ringed outline: 9px of black, then a 3px rim inside it.** Black on both
+  sides of the rim is what makes it hold against any background — a single
+  white pass vanished wherever the shape crossed the bright band at the
+  horizon.
+- `solidShape(faces, outline, rim, seam)` and `strokePoly()`; `linePix()` for
+  the open polylines on top of it (a lit lip along the ridge, striations
+  through the submerged mass).
 
 **If it looks typed, it has to BE typed.** `capLine()` printed its whole string
 the instant its word was spoken, which reads as text *appearing*. It types now,

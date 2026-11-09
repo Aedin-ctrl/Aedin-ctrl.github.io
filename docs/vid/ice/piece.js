@@ -8,38 +8,38 @@ const PIECE={ no:3, slug:'ice', tags:['NATURE','PHYSICS'],
    Every number is a measurement: sentence starts come from a uniform grid
    (0.75s between sentences, 1.85s between beats) laid over durations taken
    off the wav files, and word onsets come from transcribing the rendered
-   audio back with whisper.cpp. 87% of words matched a transcribed token
+   audio back with whisper.cpp. 88% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=74.0, VOHASH="e58b7d68c732";
+const DUR=75.1, VOHASH="081603c3c482";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:0.8,z:1.626,w:["Why", "does", "ice", "float?"],t:[0.81, 0.97, 1.19, 1.37]},
-  {b:'SHRINK',a:3.476,z:5.964,w:["Almost", "everything", "shrinks", "when", "it", "freezes."],t:[3.476, 3.886, 4.576, 5.076, 5.396, 5.446]},
-  {b:'SHRINK',a:6.714,z:7.678,w:["Water", "expands."],t:[6.714, 7.498]},
-  {b:'SHRINK',a:8.428,z:9.823,w:["So", "why", "does", "water", "expand?"],t:[8.478, 8.558, 8.758, 9.028, 9.368]},
-  {b:'CAGE',a:11.673,z:15.98,w:["In", "liquid", "water", "the", "molecules", "tumble", "and", "crowd", "in", "close."],t:[11.673, 11.833, 12.323, 12.923, 13.203, 14.073, 14.673, 14.923, 15.362, 15.8]},
-  {b:'CAGE',a:16.73,z:21.856,w:["Freezing", "locks", "each", "one", "to", "four", "neighbours,", "in", "a", "cage", "that", "holds", "them", "apart."],t:[16.84, 17.54, 18.01, 18.38, 18.71, 18.97, 19.57, 20.17, 20.4, 20.44, 20.81, 21.06, 21.24, 21.45]},
-  {b:'CAGE',a:22.606,z:25.572,w:["That", "cage", "has", "more", "empty", "space", "in", "it", "than", "the", "liquid", "did."],t:[22.616, 22.886, 23.186, 23.376, 23.656, 24.066, 24.396, 24.826, 24.846, 24.976, 25.086, 25.336]},
-  {b:'WEIGH',a:27.422,z:30.333,w:["A", "litre", "of", "water", "weighs", "a", "thousand", "grams."],t:[27.422, 27.652, 27.882, 28.032, 28.562, 29.029, 29.495, 29.962]},
-  {b:'WEIGH',a:31.083,z:34.121,w:["A", "litre", "of", "ice", "weighs", "nine", "hundred", "and", "seventeen."],t:[31.083, 31.473, 31.863, 32.083, 32.413, 32.795, 33.177, 33.559, 33.941]},
-  {b:'WEIGH',a:34.871,z:39.024,w:["Eight", "per", "cent", "lighter,", "which", "is", "exactly", "how", "much", "of", "it", "sits", "above", "the", "surface."],t:[34.871, 35.024, 35.178, 35.331, 36.421, 36.671, 36.781, 37.191, 37.401, 37.681, 37.751, 37.831, 38.111, 38.321, 38.391]},
-  {b:'FOUR',a:40.874,z:44.66,w:["And", "water", "is", "heaviest", "at", "four", "degrees,", "not", "at", "zero."],t:[40.874, 41.144, 41.594, 41.804, 42.249, 42.694, 43.054, 43.914, 44.154, 44.314]},
-  {b:'FOUR',a:45.41,z:48.204,w:["Below", "four,", "cold", "water", "gets", "lighter", "again."],t:[45.41, 45.76, 46.11, 46.42, 46.77, 47.06, 47.57]},
-  {b:'LAKE',a:50.054,z:54.771,w:["So", "a", "cooling", "lake", "drops", "its", "cold", "water", "to", "the", "bottom", "until", "the", "whole", "lake", "is", "four."],t:[50.094, 50.214, 50.454, 50.844, 51.174, 51.544, 51.824, 52.094, 52.554, 52.674, 52.884, 53.334, 53.654, 53.824, 54.134, 54.454, 54.504]},
-  {b:'LAKE',a:55.521,z:59.597,w:["After", "that", "the", "coldest", "water", "stays", "on", "top,", "and", "that", "is", "where", "the", "ice", "forms."],t:[55.521, 55.901, 56.221, 56.451, 57.041, 57.371, 57.821, 58.201, 58.221, 58.391, 58.601, 58.741, 59.001, 59.171, 59.341]},
-  {b:'LAKE',a:60.347,z:62.656,w:["The", "lid", "keeps", "everything", "underneath", "it", "liquid."],t:[60.347, 60.507, 60.667, 60.937, 61.477, 62.017, 62.117]},
-  {b:'END',a:64.506,z:66.533,w:["Open", "cage.", "Heaviest", "at", "four."],t:[64.506, 64.936, 65.408, 65.881, 66.353]},
-  {b:'END',a:67.283,z:69.374,w:["That", "is", "why", "a", "lake", "freezes", "from", "the", "top", "down."],t:[67.283, 67.513, 67.623, 67.793, 67.843, 68.193, 68.483, 68.713, 68.883, 69.053]},
+  {b:'SHRINK',a:3.476,z:5.962,w:["Almost", "everything", "shrinks", "when", "it", "freezes."],t:[3.476, 3.886, 4.576, 5.076, 5.396, 5.446]},
+  {b:'SHRINK',a:6.712,z:8.778,w:["Except", "water.", "It", "expands."],t:[6.712, 7.372, 7.972, 8.142]},
+  {b:'SHRINK',a:9.528,z:10.923,w:["So", "why", "does", "water", "expand?"],t:[9.578, 9.658, 9.858, 10.128, 10.468]},
+  {b:'CAGE',a:12.773,z:17.08,w:["In", "liquid", "water", "the", "molecules", "tumble", "and", "crowd", "in", "close."],t:[12.773, 12.933, 13.423, 14.023, 14.303, 15.173, 15.773, 16.023, 16.462, 16.9]},
+  {b:'CAGE',a:17.83,z:22.956,w:["Freezing", "locks", "each", "one", "to", "four", "neighbours,", "in", "a", "cage", "that", "holds", "them", "apart."],t:[17.94, 18.64, 19.11, 19.48, 19.81, 20.07, 20.67, 21.27, 21.5, 21.54, 21.91, 22.16, 22.34, 22.55]},
+  {b:'CAGE',a:23.706,z:26.672,w:["That", "cage", "has", "more", "empty", "space", "in", "it", "than", "the", "liquid", "did."],t:[23.716, 23.986, 24.286, 24.476, 24.756, 25.166, 25.496, 25.926, 25.946, 26.076, 26.186, 26.436]},
+  {b:'WEIGH',a:28.522,z:31.433,w:["A", "litre", "of", "water", "weighs", "a", "thousand", "grams."],t:[28.522, 28.752, 28.982, 29.132, 29.662, 30.129, 30.595, 31.062]},
+  {b:'WEIGH',a:32.183,z:35.221,w:["A", "litre", "of", "ice", "weighs", "nine", "hundred", "and", "seventeen."],t:[32.183, 32.573, 32.963, 33.183, 33.513, 33.895, 34.277, 34.659, 35.041]},
+  {b:'WEIGH',a:35.971,z:40.124,w:["Eight", "per", "cent", "lighter,", "which", "is", "exactly", "how", "much", "of", "it", "sits", "above", "the", "surface."],t:[35.971, 36.124, 36.278, 36.431, 37.521, 37.771, 37.881, 38.291, 38.501, 38.781, 38.851, 38.931, 39.211, 39.421, 39.491]},
+  {b:'FOUR',a:41.974,z:45.76,w:["And", "water", "is", "heaviest", "at", "four", "degrees,", "not", "at", "zero."],t:[41.974, 42.244, 42.694, 42.904, 43.349, 43.794, 44.154, 45.014, 45.254, 45.414]},
+  {b:'FOUR',a:46.51,z:49.304,w:["Below", "four,", "cold", "water", "gets", "lighter", "again."],t:[46.51, 46.86, 47.21, 47.52, 47.87, 48.16, 48.67]},
+  {b:'LAKE',a:51.154,z:55.871,w:["So", "a", "cooling", "lake", "drops", "its", "cold", "water", "to", "the", "bottom", "until", "the", "whole", "lake", "is", "four."],t:[51.194, 51.314, 51.554, 51.944, 52.274, 52.644, 52.924, 53.194, 53.654, 53.774, 53.984, 54.434, 54.754, 54.924, 55.234, 55.554, 55.604]},
+  {b:'LAKE',a:56.621,z:60.697,w:["After", "that", "the", "coldest", "water", "stays", "on", "top,", "and", "that", "is", "where", "the", "ice", "forms."],t:[56.621, 57.001, 57.321, 57.551, 58.141, 58.471, 58.921, 59.301, 59.321, 59.491, 59.701, 59.841, 60.101, 60.271, 60.441]},
+  {b:'LAKE',a:61.447,z:63.756,w:["The", "lid", "keeps", "everything", "underneath", "it", "liquid."],t:[61.447, 61.607, 61.767, 62.037, 62.577, 63.117, 63.217]},
+  {b:'END',a:65.606,z:67.633,w:["Open", "cage.", "Heaviest", "at", "four."],t:[65.606, 66.036, 66.508, 66.981, 67.453]},
+  {b:'END',a:68.383,z:70.474,w:["That", "is", "why", "a", "lake", "freezes", "from", "the", "top", "down."],t:[68.383, 68.613, 68.723, 68.893, 68.943, 69.293, 69.583, 69.813, 69.983, 70.153]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:0.8,z:1.626},
-  SHRINK:{sc:3.08,a:3.476,z:9.823},
-  CAGE:{sc:11.27,a:11.673,z:25.572},
-  WEIGH:{sc:27.02,a:27.422,z:39.024},
-  FOUR:{sc:40.47,a:40.874,z:48.204},
-  LAKE:{sc:49.65,a:50.054,z:62.656},
-  END:{sc:64.11,a:64.506,z:69.374},
+  SHRINK:{sc:3.08,a:3.476,z:10.923},
+  CAGE:{sc:12.37,a:12.773,z:26.672},
+  WEIGH:{sc:28.12,a:28.522,z:40.124},
+  FOUR:{sc:41.57,a:41.974,z:49.304},
+  LAKE:{sc:50.75,a:51.154,z:63.756},
+  END:{sc:65.21,a:65.606,z:70.474},
 };
 const SENT={
   HOOK:[0],
@@ -52,6 +52,7 @@ const SENT={
 };
 
 
+
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
@@ -61,13 +62,20 @@ const L={
   // against the voice saying it instead of crawling over a different sentence.
   shr:{ q:['SO WHY DOES','WATER','EXPAND?'], hy:MIDY-226, wl:MIDY+174,
         rest:[PX+326,MIDY-6],
+        // the berg, as facets rather than a flat cut-out: the outline is the
+        // silhouette, the faces carry the tones, the lip is the lit edge.
         berg:[[100,500],[138,448],[166,396],[192,430],[216,356],[244,412],
               [268,392],[296,448],[332,500],[356,544],[330,572],[256,586],
               [176,580],[124,546]],
-        ridge:[[138,448],[166,396],[192,430],[216,356],[244,412],[268,392],[296,448]],
-        facet:[[[192,430],[200,500]],[[216,356],[231,500]],[[268,392],[259,500]],
-               [[166,396],[158,500]]],
-        deep:[[[136,536],[324,536]],[[168,566],[300,566]],[[200,578],[280,578]]] },
+        faces:[[[100,500],[138,448],[166,396],[192,430],[200,500]],
+               [[192,430],[216,356],[231,500],[200,500]],
+               [[216,356],[244,412],[259,500],[231,500]],
+               [[244,412],[268,392],[296,448],[332,500],[259,500]],
+               [[100,500],[216,500],[228,586],[176,580],[124,546]],
+               [[216,500],[332,500],[356,544],[330,572],[256,586],[228,586]]],
+        tone:[0.20,0.00,0.36,0.58,0.74,0.86],
+        lip:[[139,454],[166,402],[192,436],[216,362],[244,418],[268,398],[295,452]],
+        deep:[[[138,538],[322,538]],[[170,566],[298,566]],[[204,578],[276,578]]] },
   // CAGE -- the same 20 molecules, crowded then locked open
   cage:{ x:PX+68, y:MIDY-170, gx:86, gy:72, cols:4, rows:5, tag:MIDY+174 },
   // WEIGH -- 1 cube = 50 grams per litre, so 1000 is 20 cubes and 917 is 18
@@ -201,16 +209,17 @@ function explainer(ctx,W2,Hh,t){
       const S=L.shr;
       introSky(CX,CY,CWd,CHd,T,CHd-(S.wl-CY));
       groupBox(BX,BY,BW,BH,'THE ONE THAT DOES NOT');
-      // the berg: a drawn OBJECT, not a chart. Body, a ridge along the lit
-      // faces, crevasses running down to the waterline, striations through the
-      // mass below it -- nine tenths of which is under water, which an ice
-      // piece may as well have for free.
-      const lit=H.lerp(0.42,1,H.clamp((M-BEAT.SHRINK.sc)/3.2));
-      const rim=H.rgba(H.hex(P.paper),lit);
-      const bb=outlineShape(S.berg,P.ink,rim,0.52);
-      S.facet.forEach(f=>linePix(f,H.rgba(H.hex(P.paper),lit*0.42),2));
-      S.deep.forEach(f=>linePix(f,H.rgba(H.hex(P.ice),lit*0.30),2));
-      linePix(S.ridge,rim,3);
+      // the berg: a solid, faceted OBJECT. Opaque, so it contrasts with the
+      // sky instead of going grey against it; six faces in five tones; a lit
+      // lip along the top edge; striations through the mass below the water,
+      // nine tenths of it, which an ice piece may as well have for free.
+      const lit=H.lerp(0.46,1,H.clamp((M-BEAT.SHRINK.sc)/3.2));
+      const rim=H.rgba(H.mix(P.ink,P.paper,lit));
+      const seam=H.rgba(H.mix(P.ice,P.ink,0.88));
+      const bb=solidShape(S.faces.map((f,i)=>({p:f,c:H.rgba(H.mix(P.ice,P.ink,S.tone[i]))})),
+                          S.berg,rim,seam);
+      S.deep.forEach(f=>linePix(f,H.rgba(H.mix(P.ice,P.ink,0.58)),2));
+      linePix(S.lip,H.rgba(H.mix(P.ink,P.paper,lit)),2);
       if(GBOX)GBOX.push({x:bb.x,y:bb.y,w:bb.w,h:bb.h,k:'berg'});
       // the sea goes over the top of it, so the waterline reads as a cut
       B.fillStyle=P.ice;
