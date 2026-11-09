@@ -447,6 +447,30 @@ function wipeStage(CX,CY,CWd,CHd){ rect(CX+2,CY+2,CWd-4,CHd-4,P.ink); }
    whole reason the sky is there. Left-aligned, because typing reads from a
    margin and a caret on the end of a centred line wanders.
    Returns where the caret belongs, for the caller to hand to CARET. */
+/* An outlined silhouette: a shape, not a chart. Filled dark so the sky reads
+   through it, with a hard 2px rim drawn as pixel runs -- a canvas stroke
+   antialiases, and nothing else in this medium does. Returns its bounding box
+   so the caller can register it. */
+function outlineShape(pts,fill,rim,a){
+  B.fillStyle=H.rgba(H.hex(fill),a===undefined?0.58:a);
+  B.beginPath(); pts.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
+  B.closePath(); B.fill();
+  // Two passes, like pxShadow: a dark halo then the rim. One pass vanished
+  // wherever the shape crossed the bright band at the horizon.
+  [[1,'#0a0618'],[0,null]].forEach(([o,c])=>{
+    B.fillStyle=c||rim;
+    for(let i=0;i<pts.length;i++){
+      const a0=pts[i], b0=pts[(i+1)%pts.length];
+      const n=Math.max(1,Math.round(Math.hypot(b0[0]-a0[0],b0[1]-a0[1])));
+      for(let k=0;k<=n;k++)B.fillRect(Math.round(a0[0]+(b0[0]-a0[0])*k/n)-1+o,
+                                     Math.round(a0[1]+(b0[1]-a0[1])*k/n)-1+o,2,2);
+    }
+  });
+  const xs=pts.map(q=>q[0]), ys=pts.map(q=>q[1]);
+  return {x:Math.min(...xs)-1,y:Math.min(...ys)-1,
+          w:Math.max(...xs)-Math.min(...xs)+3,h:Math.max(...ys)-Math.min(...ys)+3};
+}
+
 function questionCard(lines,t,t0,t1,y,size,gap,until){
   const sz=size||26, gp=gap||44, x=IL+8;
   const total=lines.reduce((a,l)=>a+l.length+1,0)-1;

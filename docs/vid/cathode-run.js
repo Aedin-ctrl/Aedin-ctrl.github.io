@@ -25,10 +25,13 @@ const PTRACK=(()=>{
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
     SESSION_SPANS.push({a:VO[S.first.n].t[0], z:VO[S.lastN].z+0.45,
                         x:S.first.x, y:S.first.y, s:S.first.s});
-    pending.push(S.first.y>=CAPY
-      ? {t:+(VO[S.lastN].z+0.55).toFixed(3), x:CAPREST[0], y:CAPREST[1]}
-      : {t:+(VO[S.lastN].z+0.55).toFixed(3),
-         x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
+    // a SPOT may name its own rest. The field was documented and then ignored,
+    // so "one line below what it just typed" was the only option -- which is
+    // the next line of whatever it just typed.
+    const rt=+(VO[S.lastN].z+0.55).toFixed(3);
+    pending.push(S.first.r ? {t:rt, x:S.first.r[0], y:S.first.r[1]}
+      : S.first.y>=CAPY ? {t:rt, x:CAPREST[0], y:CAPREST[1]}
+      : {t:rt, x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
   });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   // LAST sentence, not sentence 17: honey has 19, halloumi 18, ice 16. A

@@ -53,10 +53,14 @@ const SENT={
 /* every element's anchor, named once and shared with the pointer.
    Written against MIDY -- see CATHODE-DESK.md, "Vertical composition". */
 const L={
-  // SHRINK -- the vibrant one. A typed question on the sky and nothing else:
-  // no diagram competes with the sunset, and the blackboard beats land harder
-  // for having a title card in front of them.
-  shr:{ q:['SO WHY DOES','WATER','EXPAND?'], y:MIDY-57, horizon:MIDY+240 },
+  // SHRINK -- the vibrant one. THE NARRATION IS THE HEADLINE: every word on
+  // screen is the word being spoken on that frame, which is the rule the rest
+  // of the piece runs on and the one a pre-written title card broke. The
+  // question is not typed at all -- it SNAPS, in the gap after the speech.
+  shr:{ q:['SO WHY DOES','WATER','EXPAND?'], hy:MIDY-176, wl:MIDY+174,
+        rest:[PX+318,MIDY+14],
+        berg:[[150,500],[176,452],[196,414],[216,444],[240,424],[266,468],
+              [284,500],[310,544],[286,578],[228,594],[162,584],[122,546]] },
   // CAGE -- the same 20 molecules, crowded then locked open
   cage:{ x:PX+68, y:MIDY-170, gx:86, gy:72, cols:4, rows:5, tag:MIDY+174 },
   // WEIGH -- 1 cube = 50 grams per litre, so 1000 is 20 cubes and 917 is 18
@@ -71,7 +75,7 @@ const L={
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14},
-  {n:1,  x:IL-6, y:L.shr.y, s:26},
+  {n:1,  x:IL+2, y:L.shr.hy, s:34, r:L.shr.rest},
   {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
   {n:10, x:PX+10, y:CAPY, s:CAPSZ},
@@ -154,7 +158,7 @@ function explainer(ctx,W2,Hh,t){
   const CLICK=VO[15].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>VO[2].z&&t<VO[2].z+0.22)boost=1.40;         // the question completing
+  if(t>VO[2].z+0.25&&t<VO[2].z+0.47)boost=1.55;    // the question snapping in
   if(t>wordAt(8,0)&&t<wordAt(8,0)+0.25)boost=1.45;
   if(t>wordAt(12,13)&&t<wordAt(12,13)+0.22)boost=1.35;
 
@@ -187,10 +191,31 @@ function explainer(ctx,W2,Hh,t){
        and the whole first half of the piece in one picture. --- */
     if(T<BEAT.CAGE.sc){
       const S=L.shr;
-      introSky(CX,CY,CWd,CHd,T,CHd-(S.horizon-CY));
-      groupBox(BX,BY,BW,BH,'THE QUESTION');
-      const q=questionCard(S.q,t,wordAt(1,0),VO[2].z,S.y,26,44,BEAT.CAGE.sc);
-      if(q) CARET=q;
+      introSky(CX,CY,CWd,CHd,T,CHd-(S.wl-CY));
+      groupBox(BX,BY,BW,BH,'THE ONE THAT DOES NOT');
+      // the sea, and the thing sitting in it. An outline, not a chart: no
+      // axis, no tag, no number -- a shape you recognise in a quarter second.
+      B.fillStyle=P.ice;
+      for(let x=IL;x<IR;x+=4)B.fillRect(x,S.wl+Math.round(Math.sin(M*2.1+x*0.06)*2),3,2);
+      const lit=H.lerp(0.40,1,H.clamp((M-BEAT.SHRINK.sc)/3.4));
+      const bb=outlineShape(S.berg,P.ink,H.rgba(H.hex(P.paper),lit),0.55);
+      if(GBOX)GBOX.push({x:bb.x,y:bb.y,w:bb.w,h:bb.h,k:'berg'});
+      // the sun goes down ACROSS the last sentence, so by the scene change the
+      // frame already is the dark field it cuts to. The wipe stops being a cut.
+      const dim=H.clamp((M-VO[2].a)/(BEAT.CAGE.sc-VO[2].a))*0.78;
+      if(dim>0){B.fillStyle=H.rgba(H.hex(P.ink),dim);B.fillRect(CX+2,CY+2,CWd-4,CHd-4);}
+      const qAt=VO[2].z+0.25;
+      if(t<qAt){
+        // one sentence at a time, word-gated on its MEASURED onsets, with the
+        // caret. 34px VT323 fits 20 characters across, which is what sets the wrap.
+        if(t<VO[2].t[0]) typeWrap(1,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
+        else             typeWrap(2,IL+6,S.hy,34,P.paper,P.ink,'"VT323"',20);
+      } else {
+        // the question SNAPS, inverse video, in the 1.4s of silence before the
+        // wipe. Nothing slow, and never on screen against a different sentence.
+        rect(IL,S.hy-10,IR-IL,S.q.length*44+14,P.paper);
+        S.q.forEach((ln,i)=>px(ln,IL+10,S.hy+i*44,26,P.ink));
+      }
     }
 
     /* --- CAGE --- */
@@ -408,7 +433,7 @@ function buildScore(){
   // the question card types across sentences 1-2, so every word of them blips
   [0,1,2,5,8,10,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   const bar=(t0,t1,cubes,step)=>{for(let i=0;i<cubes;i+=step)add(t0+(i/cubes)*(t1-t0),'knock',i);};
-  add(VO[2].z,'zap');                              // the question lands, then the wipe
+  add(VO[2].z+0.25,'zap'); add(VO[2].z+0.25,'mos'); // the question snapping in
   bar(w(4,0), w(4,0)+1.20, 20, 4);                 // the cage locking
   add(w(4,5),'draw'); add(w(4,13),'tag');
   bar(w(6,6), w(6,6)+1.15, 20, 4);                 // the two litres
