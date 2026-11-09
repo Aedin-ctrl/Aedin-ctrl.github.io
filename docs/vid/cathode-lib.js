@@ -264,12 +264,21 @@ const SPR={
   // the lake beat needs something alive under the lid. First attempt was a
   // symmetrical blob -- no tail, no eye, and it read as a lozenge.
   fish:['...KKKK.....','..KGGGGKK..K','.KGKGGGGGKKK','KGGGGGGGGGGK','.KGGGGGGGKKK','..KGGGGKK..K','...KKKK.....'],
+  // the cold-open gags. Two frames each, because a walk cycle and a wingbeat
+  // are the whole difference between a prop and a thing that is alive.
+  bee: ['...WW.WW..','..KKKKKKK.','.KYYDDYYDK','.KYYDDYYDK','.KYYDDYYDK','..KKKKKKK.','...K...K..'],
+  bee2:['..W.W.W.W.','..KKKKKKK.','.KYYDDYYDK','.KYYDDYYDK','.KYYDDYYDK','..KKKKKKK.','...K...K..'],
+  cow: ['..............K.','...KKKKKKKKKKKKK','..KWWKKWWWWKWWWK','..KWKKKWWWWKWWWK','..KWWWWWWWWKKWKK','..KWWKKKWWWWWWK.','..KKWWWWWWWWKK..','...K.K...K.K....','...K.K...K.K....','...KKK...KKK....'],
+  cow2:['..............K.','...KKKKKKKKKKKKK','..KWWKKWWWWKWWWK','..KWKKKWWWWKWWWK','..KWWWWWWWWKKWKK','..KWWKKKWWWWWWK.','..KKWWWWWWWWKK..','....K.K...K.K...','....K.K...K.K...','....KKK...KKK...'],
 };
 // slot names, not hex: the palette is swapped per piece after this file loads
 const SPRC={jar:{K:'ink',W:'face',H:'orange',G:'gold'},
             jaropen:{K:'ink',W:'face',H:'orange',G:'gold'},
             bug:{K:'ink',G:'grass'},
-            fish:{K:'ink',G:'grass',W:'hi'}};
+            fish:{K:'ink',G:'grass',W:'hi'},
+            bee:{K:'ink',Y:'gold',D:'earth',W:'paper'},
+            bee2:{K:'ink',Y:'gold',D:'earth',W:'paper'},
+            cow:{K:'ink',W:'paper'}, cow2:{K:'ink',W:'paper'}};
 function sprite(name,x,y,s){const m=SPRC[name],c={};for(const k in m)c[k]=P[m[k]];
   if(GBOX)GBOX.push({x:x,y:y,w:SPR[name][0].length*s,h:SPR[name].length*s,k:'sprite:'+name});
   SPR[name].forEach((row,j)=>{for(let i=0;i<row.length;i++){const ch=row[i];if(ch==='.')continue;

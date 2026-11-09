@@ -447,6 +447,31 @@ const SFX={
              noiseAt(t+0.05,0.40,'highpass',900,0.5,0.20);
              toneAt(t,'sine',300,90,0.22,0.18);},
   sub:  t=>{toneAt(t,'sine',92,36,0.72,0.55);noiseAt(t,0.5,'lowpass',260,0.7,0.26);},
+  /* two detuned saws through a bandpass with an LFO on the cutoff -- a bee is
+     a beating filter, not a pitch. */
+  buzz: (t,d)=>{const c=AU.ctx, dd=d||1.0, g=c.createGain(), bp=c.createBiquadFilter();
+    bp.type='bandpass'; bp.frequency.value=880; bp.Q.value=3.2;
+    const lfo=c.createOscillator(), lg=c.createGain();
+    lfo.type='sine'; lfo.frequency.value=23; lg.gain.value=340;
+    lfo.connect(lg); lg.connect(bp.frequency);
+    [196,204].forEach(f=>{const o=c.createOscillator();o.type='sawtooth';
+      o.frequency.value=f;o.connect(bp);o.start(t);o.stop(t+dd+0.05);});
+    bp.connect(g); g.connect(AU.g.sfx);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.26,t+0.09);
+    g.gain.setValueAtTime(0.26,t+dd*0.72);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dd);
+    lfo.start(t); lfo.stop(t+dd+0.05);},
+  moo:  t=>{const c=AU.ctx,o=c.createOscillator(),g=c.createGain(),bp=c.createBiquadFilter();
+    bp.type='bandpass'; bp.Q.value=4.5;
+    bp.frequency.setValueAtTime(620,t); bp.frequency.linearRampToValueAtTime(360,t+0.78);
+    o.type='sawtooth'; o.frequency.setValueAtTime(148,t);
+    o.frequency.linearRampToValueAtTime(188,t+0.22);
+    o.frequency.linearRampToValueAtTime(116,t+0.80);
+    o.connect(bp); bp.connect(g); g.connect(AU.g.sfx);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.40,t+0.07);
+    g.gain.setValueAtTime(0.40,t+0.55);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.86);
+    o.start(t); o.stop(t+0.92);},
   note: (t,f,d)=>{const c=AU.ctx,o=c.createOscillator(),g=c.createGain(),lp=c.createBiquadFilter();
     lp.type='lowpass';lp.frequency.value=2200;o.type='square';o.frequency.value=f;
     o.connect(lp);lp.connect(g);g.connect(AU.g.music);

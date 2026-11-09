@@ -263,7 +263,10 @@ function explainer(ctx,W2,Hh,t){
   zoomRect([4,LH-40,54,16],DLG,M,0.05,0.42);
   // the card shuts ON the press, so nothing stands in front of the trick
   if(T>=0.42&&T<okT+0.22){
-    const sq=H.clamp((M-okT)/0.22);
+    // the card holds its contents for the first third of the close, then the
+    // empty frame shrinks. Shrinking a BLANK full-size card from frame one
+    // read as the dialog blinking out, not as it closing.
+    const sq=H.clamp((H.clamp((M-okT)/0.22)-0.30)/0.70);
     const dd=[DLG[0]+Math.round(sq*DLG[2]*0.42), DLG[1]+Math.round(sq*DLG[3]*0.42),
               Math.max(8,Math.round(DLG[2]*(1-sq*0.84))), Math.max(8,Math.round(DLG[3]*(1-sq*0.84)))];
     if(sq<=0){

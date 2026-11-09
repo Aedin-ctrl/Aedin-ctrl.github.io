@@ -1,7 +1,10 @@
-# CATHODE DESK — house style v3.3
+# CATHODE DESK — house style v3.4
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.4 (2026-11-09)** — **all three pieces open this way.** The gag bank and
+> the object bank are part of the format now.
+>
 > **v3.3 (2026-11-09)** — **the gag gets its own silence**: a beat may claim a
 > longer run-up than the uniform gap, and the cold open's trick is scored in
 > four phases with its own sound bank. See *The cold open*.
@@ -761,6 +764,22 @@ be is why the first cut of this read as a glitch.
 **Two objects, not one, once it breaks.** Intact it is one silhouette with
 seams between its faces; split it is two, each with its own black-and-rim ring.
 Stroking every *face* instead turns it into stained glass.
+
+**The card holds its contents for the first third of the close.** Shrinking a
+blank full-size card from frame one reads as the dialog blinking out, not as
+it closing.
+
+**What the three have:**
+
+| # | object | trick | sound |
+|---|---|---|---|
+| 001 honey | a jar on a shelf: amber body in three tones, metal lid, fill line | a bee flies in, hooks the lid and takes the whole thing up and out, leaving a couple of drips | `buzz` under it, `tag`+`knock` as it takes the weight |
+| 002 halloumi | a block on the board: one isometric cuboid, three faces, rind line | it squashes once, pops, and walks off as the cow it came from, kicking dust | `knock` ×2, `mos`+`zap` on the pop, `moo`, hoofbeats |
+| 003 ice | a berg in the sea: six faces, lit lip, striations below the water | it cracks, the halves tip apart and go under, rings spread | `crack` ×4, `crumble` ×4, `sub`, `splash` ×2 |
+
+**A trick is two frames minimum.** `bee`/`bee2` and `cow`/`cow2` are a wingbeat
+and a walk cycle; a single frame translating across the screen is a prop being
+dragged, not a thing that is alive.
 
 Then the window opens on the blackboard and the piece is a program from there
 to the end card. **No headline, no caption, no question text over the sky** —
