@@ -20,7 +20,7 @@
   .sub{color:#a9a2b5;font-size:14px;max-width:70ch;}
   .sub b{color:var(--cyan);font-weight:600;}
   .stage{background:#000;border:2px solid var(--sh);box-shadow:0 0 0 2px var(--dk),0 18px 50px rgba(0,0,0,.6);
-         margin:20px 0 0;position:relative;}
+         margin:20px auto 0;position:relative;max-width:430px;}
   canvas#tv{display:block;width:100%;height:auto;image-rendering:pixelated;}
   .bar{display:flex;align-items:center;gap:10px;background:var(--face);border-top:2px solid var(--hi);padding:7px 9px;}
   .bar button{font-family:'Press Start 2P',monospace;font-size:9px;background:var(--face);color:#000;cursor:pointer;
@@ -62,7 +62,7 @@
 </header>
 
 <div class="stage">
-  <canvas id="tv" width="1280" height="720"></canvas>
+  <canvas id="tv" width="864" height="1536"></canvas>
   <div class="bar">
     <button id="pp">PLAY</button>
     <button id="snd" title="Browsers will not start audio without a click">AUDIO OFF</button>
@@ -149,7 +149,7 @@
 </section>
 
 <div class="note">
-  <b>Legibility floor.</b> Video gets watched on a phone. At 1280×720: headlines ≥44px, any label the
+  <b>Legibility floor.</b> Video gets watched on a phone. At 864×1536: headlines ≥44px, any label the
   story depends on ≥28px, key numbers ≥64px. In the 640×360 buffer that is ≥22, ≥14, ≥32.<br><br>
   <b>Determinism.</b> Every frame is a pure function of <code>t</code> — all randomness from
   <code>H.rng(seed)</code> inside the draw, never <code>Math.random</code>. Same <code>t</code>, same pixels,
@@ -171,8 +171,8 @@
   the reported boundary runs to the next sentence and so includes the pause after the last word.
   <b>0.60 finishes counting on the word “six”; 0.91 on “one”; the 7 on “seven”.</b> One timeline table
   feeds the picture, the effects and the narration placement, so they cannot drift apart.<br><br>
-  <b>Still a style demo, not a Short.</b> 1280×720 landscape. Going to 9:16 means re-composing every
-  beat, not cropping. Spec: <code>~/Desktop/Video/CATHODE-DESK.md</code>
+  <b>Vertical 9:16.</b> 432×768 buffer, 864×1536 out. Built for a phone, not cropped to one — the layout
+  block is declared once and every scene, every caption wrap and the pointer's whole action table read it. Spec: <code>~/Desktop/Video/CATHODE-DESK.md</code>
 </div>
 </div>
 
@@ -214,7 +214,9 @@ const P={
  put('pv',[P.paper,P.bone,P.earth,P.orange,P.grass,P.ice]);put('pp2',[P.cyan,P.green,P.red,P.gold,P.ink]);})();
 
 /* ===== buffer: everything draws at 640x360, blits x2 ===== */
-const LW=640,LH=360;
+// VERTICAL 9:16 -- this is made for phones, so the frame is the phone's.
+// OUT is the output size; LW/LH is the buffer everything is drawn in, blitted x2.
+const LW=432,LH=768, OUTW=864, OUTH=1536;
 const BUF=H.layer(LW,LH), B=BUF.getContext('2d',{willReadFrequently:true});
 const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+0.5)/16);
 const bay=(x,y)=>BAYER[(y&3)*4+(x&3)];
@@ -399,7 +401,7 @@ function mosaic(x0,y0,w,h,n){if(n<=1)return;
   B.putImageData(img,x0,y0);}
 
 /* --- LAYER 3: OBJECTS (voxel, isometric, three-tone) --- */
-const CW=7,CH=3.5,CZ=5;
+const CW=10,CH=5,CZ=7;   // bigger unit: a 5px cube left a 9:16 frame mostly air
 const proj=(ox,oy)=>(x,y,z)=>[ox+(x-y)*CW,oy+(x+y)*CH-z*CZ];
 function cube(Pr,x,y,z,col){
   const c=H.hex(col),top=c.map((v,i)=>v*1.00*[1.0,0.98,0.93][i]),
@@ -446,10 +448,10 @@ function buildGlass(W,Hh){
   const rg=v.createRadialGradient(W/2,Hh/2,Math.min(W,Hh)*0.30,W/2,Hh/2,Math.hypot(W,Hh)*0.56);
   rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(0,0,0,0.60)');
   v.fillStyle=rg;v.fillRect(0,0,W,Hh);}
-const BLOOM=H.layer(320,180),BL=BLOOM.getContext('2d');
+const BLOOM=H.layer(216,384),BL=BLOOM.getContext('2d');
 function glass(ctx,W,Hh,t,boost){
   // bloom: downscale, blur, add back
-  BL.clearRect(0,0,320,180);BL.filter='blur(2.4px)';BL.drawImage(BUF,0,0,320,180);BL.filter='none';
+  BL.clearRect(0,0,216,384);BL.filter='blur(2.4px)';BL.drawImage(BUF,0,0,216,384);BL.filter='none';
   ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=0.34*boost;
   ctx.imageSmoothingEnabled=true;ctx.drawImage(BLOOM,0,0,W,Hh);ctx.restore();
   ctx.drawImage(SCAN,0,0);
@@ -527,52 +529,96 @@ const SENT={
   END:[16,17],
 };
 
+/* ===== LAYOUT =====
+   The window never moves, so its geometry is a constant -- and it is declared
+   ONCE here. The drawing and the pointer's action table both read it. They used
+   to carry their own copies of the same coordinates, which is exactly why the
+   drags stopped landing on anything the moment a chart moved 22px. */
+const PX=12, PY=28, PW=408, PH=710;              // the client panel, 9:16
+const BX=PX+12, BY=PY+10, BW=PW-24, BH=PH-74;    // the group box inside it
+const IL=BX+16, IT=BY+24, IR=BX+BW-16, IB=BY+BH-16;
+const CAPY=BY+BH+4;   // two wrapped lines must still clear the status bar                              // caption strip, below the box
+const DLG=[46,268,340,156];
+const DLG_OK={x:DLG[0]+4+(DLG[2]-8)/2, y:DLG[1]+4+15+1+(DLG[3]-8-15-1)-26+10};
+const BOX=[36,244,360,252];
+const BOX_OK={x:BOX[0]+4+(BOX[2]-8)/2, y:BOX[1]+4+15+1+(BOX[3]-8-15-1)-26+10};
+
+/* every element's anchor, named once and shared with the pointer */
+// Tall frame: the diagram lives in the upper half, the numbers under it.
+const L={
+  pan:{ oyL:PY+360, oxL:PX+96, oxR:PX+256, surf:PY+388 },
+  net:{ x:PX+40, y:PY+160, gx:72, gy:66, cols:5, rows:4 },
+  win:{ ox:PX+72, oy:PY+520, n1:[PX+40,PY+86], n2:[PX+196,PY+86] },
+  side:{ x:PX+34, bad:PY+150, good:PY+250, good2:PY+292, lock:PY+430 },
+  cook:{ vx:PX+96, vy:PY+150, vw:200, vh:150, num:[PX+110,PY+400], set:PY+560 },
+};
+
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
-  {n:0,  x:204, y:130, s:14},   // the dialog's question
-  {n:3,  x:30,  y:256, s:18, r:[300,206]},   // pan caption
-  {n:5,  x:30,  y:256, s:18, r:[470,210]},   // net caption
-  {n:6,  x:30,  y:256, s:18, r:[520,196]},   // window intro
-  {n:10, x:250, y:92,  s:22, r:[150,220]},   // the turn, set large
-  {n:15, x:30,  y:256, s:18, r:[520,250]},   // cooked caption
-  {n:16, x:166, y:106, s:14},   // message box
+  {n:0,  x:DLG[0]+54, y:DLG[1]+40,  s:14},
+  // click just LEFT of where the line starts: when there is no time to step
+  // away before the next action, the pointer rests here, and resting ON the
+  // first character of the line you just typed counts as sitting on content.
+  {n:3,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
+  {n:5,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
+  {n:6,  x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
+  {n:10, x:L.side.x-16, y:L.side.good, s:22, r:[PX+170,CAPY-84]},
+  {n:15, x:PX+10, y:CAPY, s:18, r:[PX+170,CAPY-84]},
+  {n:16, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
-const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
-const SESSION_SPANS=[];
-const SESSION_GAP=2.0;
-const SESSION_NEAR=80;
-
-const SPD=1.0;
+const OK_DIALOG=DLG_OK, OK_BOX=BOX_OK;
+const SESSION_SPANS=[]; const SESSION_GAP=2.0; const SESSION_NEAR=80;
+const SPD=1.0, LEAD=0.20;
 const W=(n,i)=>VO[n].t[i];
-const LEAD=0.20;
+const CWv=10, CHv=5, CZv=7;                      // mirrors CW/CH/CZ in the voxel layer
+const stackTop=(oy,cubes)=>oy-cubes*CZv;
+const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
 const ACTS=(()=>{
   const A=[];
-  const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r,k:'drag'});
-  const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r,k:'click'});
-  // PAN -- shove the cheddar into the pan, then watch it go
-  drag(W(1,1), W(1,1)+1.10*SPD, [150,96], [150,150], [120,86]);
-  tap (W(1,8), [150,170], [120,86]);                    // "collapses."
-  tap (W(2,1), [300,150], [370,110]);                   // "browns"
-  // NET -- lay the lattice down, then pull a strand out of it
-  drag(W(4,3), W(4,3)+1.00*SPD, [120,80], [240,150], [430,96]);
-  tap (W(4,9), [300,120], [430,96]);                    // "calcium."
-  drag(W(5,1), W(5,1)+0.90*SPD, [240,150], [330,196], [430,96]);
-  // WINDOW -- raise the three stacks, then pull the band across
-  drag(W(7,1), W(7,1)+1.10*SPD, [152,196], [152,150], [100,98]);
-  tap (W(7,6), [404, 62], [500,100]);                   // "zero"  -> 5.0
-  tap (W(7,10),[404,124], [500,160]);                   // "four." -> 5.4
-  drag(W(8,2), W(8,2)+0.80*SPD, [250,196], [250,168], [310,250]);  // paneer
-  drag(W(8,5), W(8,5)+0.90*SPD, [348,196], [348,120], [410,250]);  // halloumi
-  // SIDE -- strike out the wrong answer, then light the calcium
-  tap (W(9,5), [250,150], [300,220]);                   // "acidic."
-  tap (W(10,4),[250,96],  [300,220]);                   // "enough."
-  drag(W(11,0), W(11,0)+1.00*SPD, [120,170], [330,170], [300,220]);
-  // COOKED -- drop the curd in the whey, then run the temperature up
-  drag(W(13,6), W(13,6)+1.00*SPD, [180,70], [180,140], [120,220]);
-  drag(W(13,13), W(13,14)+0.30*SPD, [404,190], [404,110], [500,220]);
-  tap (W(14,2), [180,140], [500,220]);                  // "sets"
+  // A rest is a 60-80px step off whatever was just moved, picked on whichever
+  // side has room inside the box. Far-corner rests get refused as unreachable
+  // and leave the pointer standing on the thing it moved (rule 26).
+  const near=(b)=>{
+    const dx = (b[0] < (IL+IR)/2) ? 112 : -112;
+    const dy = (b[1] < (IT+IB)/2) ? 132 : -132;
+    return [Math.max(IL, Math.min(IR-16, b[0]+dx)),
+            Math.max(IT, Math.min(IB-20, b[1]+dy))];
+  };
+  const drag=(t0,t1,a,b,r)=>A.push({t0:+(t0-LEAD).toFixed(3),t1:+(t1-LEAD).toFixed(3),a:a,b:b,r:r||near(b),k:'drag'});
+  const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
+  // PAN -- push the cheddar down as it slumps, then point at the one that doesn't
+  drag(W(1,6), W(1,6)+1.30*SPD, [L.pan.oxL, stackTop(L.pan.oyL,6)],
+                                [L.pan.oxL, L.pan.surf-6]);
+  tap (W(2,1), [L.pan.oxR, stackTop(L.pan.oyL,6)+10]);
+  // NET -- lay the lattice, tap a calcium bridge, then pull it open
+  drag(W(4,3), W(4,3)+1.10*SPD, [L.net.x, L.net.y],
+       [L.net.x+(L.net.cols-1)*L.net.gx, L.net.y+(L.net.rows-1)*L.net.gy]);
+  tap (W(4,9), [L.net.x+L.net.gx+40, L.net.y+L.net.gy+5]);
+  drag(W(5,1), W(5,1)+0.90*SPD, [L.net.x+2*L.net.gx, L.net.y+L.net.gy],
+                                [L.net.x+2*L.net.gx+34, L.net.y+L.net.gy+30]);
+  // WINDOW -- haul each stack up to its own pH, tap each number out
+  drag(W(7,1), W(7,1)+1.10*SPD, [stackMid(L.win.ox,0,0), L.win.oy],
+       [stackMid(L.win.ox,0,0), stackTop(L.win.oy,12)]);
+  tap (W(7,6),  [L.win.n1[0]+34, L.win.n1[1]+18]);
+  tap (W(7,10), [L.win.n2[0]+34, L.win.n2[1]+18]);
+  drag(W(8,2), W(8,2)+0.80*SPD, [stackMid(L.win.ox,5,-5), L.win.oy],
+       [stackMid(L.win.ox,5,-5), stackTop(L.win.oy,6)]);
+  drag(W(8,5), W(8,5)+0.90*SPD, [stackMid(L.win.ox,10,-10), L.win.oy],
+       [stackMid(L.win.ox,10,-10), stackTop(L.win.oy,22)]);
+  // SIDE -- strike the wrong answer out, then light the bridges
+  tap (W(9,5), [L.side.x+120, L.side.bad+16]);
+  // explicit rest: the computed step-off landed this one on "ENOUGH."
+  drag(W(11,0), W(11,0)+1.00*SPD, [L.side.x+6, L.side.lock+6],
+                                  [L.side.x+4*44+6, L.side.lock+6], [PX+310,PY+372]);
+  // COOKED -- drop the curd in, run the temperature up
+  drag(W(13,6), W(13,6)+1.10*SPD, [L.cook.vx+86, L.cook.vy-34],
+                                  [L.cook.vx+86, L.cook.vy+56]);
+  drag(W(13,13), W(13,14)+0.30*SPD, [L.cook.num[0]+34, L.cook.num[1]+56],
+                                    [L.cook.num[0]+34, L.cook.num[1]+16]);
+  tap (W(14,2), [L.cook.vx+86, L.cook.vy+56]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
+
 const RINGS=[];
 const PTRACK=(()=>{
   const sp=SPOTS.slice().sort((a,b)=>VO[a.n].t[0]-VO[b.n].t[0]);
@@ -590,10 +636,8 @@ const PTRACK=(()=>{
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
     SESSION_SPANS.push({a:VO[S.first.n].t[0], z:VO[S.lastN].z+0.45,
                         x:S.first.x, y:S.first.y, s:S.first.s});
-    // a chosen rest where the line has one, otherwise just below where it typed
-    const R=S.first.r||[S.first.x+8, S.first.y+Math.round(S.first.s)+28];
-    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3), x:R[0], y:R[1], alt:1});
-    pending.push({t:+(VO[S.lastN].z+0.85).toFixed(3), x:R[0], y:R[1], alt:2});
+    pending.push({t:+(VO[S.lastN].z+0.55).toFixed(3),
+                  x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
   });
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   P.push({t:+(VO[17].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
@@ -637,10 +681,10 @@ const PTRACK=(()=>{
   return P;
 })();
 
-/* ===== THE EXPLAINER: why halloumi does not melt ===== */
+
+/* ===== THE EXPLAINER: why halloumi does not melt (square) ===== */
 function explainer(ctx,W2,Hh,t){
-  const T=Math.floor(t*12)/12;
-  const M=t;
+  const T=Math.floor(t*12)/12, M=t;
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
   const blink=Math.floor(T*2.2)%2===0;
   const wordAt=(n,i)=>VO[n].t[i];
@@ -656,25 +700,36 @@ function explainer(ctx,W2,Hh,t){
                            :px(str,x,y,size,col,null,font)) : 0;
     if(live) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
+  // Vertical is narrower, so a caption wraps. The split is computed from the
+  // FULL sentence, not from what has been spoken, so words do not jump lines
+  // as they appear.
+  const typeWrap=(n,x,y,size,col,shadow,font,perLine)=>{
+    const ws=VO[n].w, lim=perLine||44;
+    const rows=[]; let cur=[], len=0;
+    ws.forEach((wd,i)=>{ if(len+wd.length+1>lim && cur.length){rows.push(cur);cur=[];len=0;}
+                         cur.push(i); len+=wd.length+1; });
+    if(cur.length)rows.push(cur);
+    rows.slice(0,3).forEach((rw,k)=>
+      typeLine(n,x,y+k*Math.round(size*1.5),size,col,shadow,font,rw[0],rw[rw.length-1]+1));
+  };
   const capLine=(str,n,i,x,y,size,col,shadow,font)=>{
     if(!after(n,i)) return 0;
     const w = shadow?pxShadow(str,x,y,size,col,shadow,null,font)
                     :px(str,x,y,size,col,null,font);
     if(t<VO[n].z+0.30) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
-  const B2X=7, B2Y=-7, B3X=14, B3Y=-14;
   const barBase=(ox,oy,bx,by,f)=>({x:ox+(bx-by)*CW, y:oy+(bx+by+2*f)*CH});
+  const CLICK=VO[17].z+0.52, SHUT=CLICK+0.15;
 
   let boost=1;
-  if(t>wordAt(1,8)&&t<wordAt(1,8)+0.22*SPD)boost=1.35;    // "collapses"
-  if(t>wordAt(10,4)&&t<wordAt(10,4)+0.25*SPD)boost=1.45;  // "enough" -- the turn
-  if(t>wordAt(13,13)&&t<wordAt(13,13)+0.22*SPD)boost=1.40;// "ninety"
+  if(t>wordAt(1,8)&&t<wordAt(1,8)+0.22)boost=1.35;
+  if(t>wordAt(10,4)&&t<wordAt(10,4)+0.25)boost=1.45;
+  if(t>wordAt(13,13)&&t<wordAt(13,13)+0.22)boost=1.40;
 
   rect(0,0,LW,LH,P.teal);
 
   /* --- HOOK --- */
-  const DLG=[150,96,344,132];
-  zoomRect([4,340,54,16],DLG,M,0.05,0.42);
+  zoomRect([4,LH-40,54,16],DLG,M,0.05,0.42);
   const dlgOut=BEAT.PAN.sc;
   if(T>=0.42&&T<dlgOut){
     const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
@@ -682,19 +737,21 @@ function explainer(ctx,W2,Hh,t){
       if(d<0.92)rect(r.x+10+i,r.y+10+j,1,1,'#fff');else if(d<1.0)rect(r.x+10+i,r.y+10+j,1,1,'#000');}
     px('?',r.x+20,r.y+16,20,'#000080','center');
     typeLine(0,r.x+50,r.y+22,14,'#000',null,null,0,2);
-    typeLine(0,r.x+50,r.y+50,14,'#000',null,null,2);
+    typeLine(0,r.x+50,r.y+56,14,'#000',null,null,2);
     button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=VO[0].z);
   }
-  zoomRect(DLG,[8,8,624,318],M,dlgOut-0.35*SPD,dlgOut);
+  zoomRect(DLG,[8,8,PW+8,PH+34],M,dlgOut-0.35,dlgOut);
 
-  if(T>=dlgOut){
+  /* The window CLOSES when the end card appears. Leaving it up meant the whey
+     vat, the 90 and the group box were all still on screen behind the card. */
+  if(T>=dlgOut&&T<SHUT){
     const done=T>=BEAT.END.sc;
-    const r=winFrame(8,8,624,318,'Why does halloumi never melt?',!done);
+    const r=winFrame(8,8,PW+8,PH+34,'Why does halloumi never melt?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     const sy=r.y+r.h-15;
-    rect(r.x,sy,360,14,P.face);bevel(r.x,sy,360,14,'field');
-    rect(r.x+364,sy,r.w-364,14,P.face);bevel(r.x+364,sy,r.w-364,14,'field');
+    rect(r.x,sy,250,14,P.face);bevel(r.x,sy,250,14,'field');
+    rect(r.x+254,sy,r.w-254,14,P.face);bevel(r.x+254,sy,r.w-254,14,'field');
     const beat=T<BEAT.NET.sc?'PAN':T<BEAT.WINDOW.sc?'NETWORK':T<BEAT.SIDE.sc?'pH WINDOW'
               :T<BEAT.COOKED.sc?'ACIDITY':T<BEAT.END.sc?'WHEY':'DONE';
     INCHROME=true;
@@ -703,183 +760,156 @@ function explainer(ctx,W2,Hh,t){
     INCHROME=false;
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
-    /* --- PAN: one collapses, one browns --- */
+    /* --- PAN --- */
     if(T<BEAT.NET.sc){
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'THE SAME HOT PAN');
-      const PL=proj(CX+140,CY+128), PR=proj(CX+360,CY+128);
-      // the hot surface both sit on
+      groupBox(BX,BY,BW,BH,'THE SAME HOT PAN');
+      const PL=proj(L.pan.oxL,L.pan.oyL), PR=proj(L.pan.oxR,L.pan.oyL);
       B.fillStyle='#4a3b2e';
-      for(let x=CX+60;x<CX+520;x+=4)B.fillRect(x,CY+150,3,2);
-      const melt=mp(wordAt(1,6),wordAt(1,6)+1.30*SPD);
+      for(let x=IL;x<IR;x+=4)B.fillRect(x,L.pan.surf,3,2);
+      const melt=mp(wordAt(1,6),wordAt(1,6)+1.30);
       if(after(1,1)){
         const h=Math.max(1,Math.round(6-5*H.ease.inOut(melt)));
         voxBar(PL,0,0,h,'#ffd27a',1);
-        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,5);      // the puddle it becomes
-        if(after(1,8)){const b1=barBase(CX+140,CY+128,0,0,3);
-          blockTag(b1.x,b1.y+26,'CHEDDAR',14,P.paper,'#74432d');}
+        if(melt>0.45)voxBar(PL,-1,-1,1,'#e3b85c',1,5);
+        if(after(1,8)){const b=barBase(L.pan.oxL,L.pan.oyL,0,0,3);
+          blockTag(b.x,b.y+36,'CHEDDAR',14,P.paper,'#74432d');}
       }
       if(after(2,0)){
-        const brown=mp(wordAt(2,1),wordAt(2,1)+1.10*SPD);
-        const col=H.rgba(H.mix('#fff4e2','#c97b3c',H.ease.out(brown)));
-        voxBar(PR,0,0,6,col,1);
-        if(after(2,2)){const b2=barBase(CX+360,CY+128,0,0,3);
-          blockTag(b2.x,b2.y+26,'HALLOUMI',14,P.ice,'#0a0618');}
+        const brown=mp(wordAt(2,1),wordAt(2,1)+1.10);
+        voxBar(PR,0,0,6,H.rgba(H.mix('#fff4e2','#c97b3c',H.ease.out(brown))),1);
+        if(after(2,2)){const b=barBase(L.pan.oxR,L.pan.oyL,0,0,3);
+          blockTag(b.x,b.y+36,'HALLOUMI',14,P.ice,'#0a0618');}
       }
-      typeLine(3,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
+      typeWrap(3,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
     }
 
-    /* --- NET: the protein lattice, and heat loosening it --- */
+    /* --- NET --- */
     if(T>=BEAT.NET.sc&&T<BEAT.WINDOW.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'WHAT CHEESE IS');
-      const NX=CX+70,NY=CY+56,GX=74,GY=40,COLS=5,ROWS=4;
-      const open=mp(wordAt(5,1),wordAt(5,1)+1.10*SPD);   // "loosens"
-      const build=mp(wordAt(4,3),wordAt(4,3)+1.10*SPD);  // "net"
-      const spread=H.ease.inOut(open)*9;
-      for(let j=0;j<ROWS;j++)for(let i=0;i<COLS;i++){
-        const k=H.clamp(build*COLS*ROWS-(j*COLS+i));
-        if(k<=0)continue;
-        const x=NX+i*GX+Math.round((i-2)*spread), y=NY+j*GY+Math.round((j-1.5)*spread);
-        // links first, so the nodes sit on top of them
-        if(i<COLS-1){const x2=NX+(i+1)*GX+Math.round((i-1)*spread);
+      groupBox(BX,BY,BW,BH,'WHAT CHEESE IS');
+      const N=L.net, open=mp(wordAt(5,1),wordAt(5,1)+1.10), build=mp(wordAt(4,3),wordAt(4,3)+1.10);
+      const sp=H.ease.inOut(open)*10;
+      for(let j=0;j<N.rows;j++)for(let i=0;i<N.cols;i++){
+        const k=H.clamp(build*N.cols*N.rows-(j*N.cols+i)); if(k<=0)continue;
+        const x=N.x+i*N.gx+Math.round((i-2)*sp), y=N.y+j*N.gy+Math.round((j-1.5)*sp);
+        if(i<N.cols-1){const x2=N.x+(i+1)*N.gx+Math.round((i-1)*sp);
           B.fillStyle=H.rgba(P.sh,1-open*0.8);
-          for(let q=12;q<x2-x;q+=5)B.fillRect(x+q,y+5,3,2);
-          if(after(4,9)&&open<0.6){rect(Math.round((x+x2)/2),y+2,4,4,P.cyan);} }
-        if(j<ROWS-1){const y2=NY+(j+1)*GY+Math.round((j-0.5)*spread);
+          for(let q=14;q<x2-x;q+=6)B.fillRect(x+q,y+5,3,2);
+          if(after(4,9)&&open<0.6)rect(Math.round((x+x2)/2),y+2,5,5,P.cyan);}
+        if(j<N.rows-1){const y2=N.y+(j+1)*N.gy+Math.round((j-0.5)*sp);
           B.fillStyle=H.rgba(P.sh,1-open*0.8);
-          for(let q=12;q<y2-y;q+=5)B.fillRect(x+5,y+q,2,3); }
+          for(let q=14;q<y2-y;q+=6)B.fillRect(x+5,y+q,2,3);}
         rect(x,y,12,12,P.paper); rect(x+1,y+1,10,10,'#e3d6c0');
       }
-      if(after(4,9)) px('calcium',CX+70,CY+188,18,P.cyan,null,'"VT323"');
-      if(after(5,5)){            // "fat"
-        const fr=mp(wordAt(5,5),wordAt(5,5)+1.20*SPD);
-        for(let d=0;d<6;d++){const fy=CY+140+Math.round(H.ease.in(H.clamp(fr*2-d*0.18))*70);
-          if(fy>CY+140)rect(CX+180+d*46,fy,6,8,P.gold);}
-      }
-      typeLine(5,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
+      if(after(4,9)) px('calcium',N.x,PY+300,18,P.cyan,null,'"VT323"');
+      if(after(5,5)){const fr=mp(wordAt(5,5),wordAt(5,5)+1.20);
+        for(let d=0;d<5;d++){const fy=PY+320+Math.round(H.ease.in(H.clamp(fr*2-d*0.18))*58);
+          if(fy>PY+320)rect(N.x+40+d*78,fy,6,8,P.gold);}}
+      typeWrap(5,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
     }
 
-    /* --- WINDOW: the pH band, and three cheeses against it --- */
+    /* --- WINDOW --- */
     if(T>=BEAT.WINDOW.sc&&T<BEAT.SIDE.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'THE ONLY pH THAT MELTS');
-      const OX=CX+140, OY=CY+144, Pr=proj(OX,OY);
-      // 1 cube = 0.2 pH above a 4.0 floor: 5.0 is cube 5, 5.4 is cube 7
+      groupBox(BX,BY,BW,BH,'THE ONLY pH THAT MELTS');
+      const OX=L.win.ox, OY=L.win.oy, Pr=proj(OX,OY);
       const band=(c)=>OY-c*CZ;
       if(after(7,3)){
-        // stops short of the number column: at CX+470 it ran straight through
-        // the 5.4. And it REGISTERS itself, so the sweep can see it -- a raw
-        // fillRect is invisible to checkOverlap, which is how it got through.
         B.fillStyle=P.green;
-        for(let x=CX+96;x<CX+384;x+=6){B.fillRect(x,band(5),3,1);B.fillRect(x,band(7),3,1);}
-        if(GBOX)GBOX.push({x:CX+96,y:band(7),w:288,h:band(5)-band(7)+2,k:'band'});
+        for(let x=IL;x<IL+340;x+=6){B.fillRect(x,band(10),3,1);B.fillRect(x,band(14),3,1);}
+        if(GBOX)GBOX.push({x:IL,y:band(14),w:340,h:band(10)-band(14)+2,k:'band'});
       }
-      const d1=mp(wordAt(7,1),wordAt(7,1)+1.10*SPD),
-            d2=mp(wordAt(8,2),wordAt(8,2)+0.80*SPD),
-            d3=mp(wordAt(8,5),wordAt(8,5)+0.90*SPD);
-      if(after(7,1)){voxBar(Pr,0,0,6,P.gold,d1);        // cheddar  5.2
-        if(d1>=1){const b=barBase(OX,OY,0,0,3);blockTag(b.x,b.y+24,'CHEDDAR',14,P.paper,'#74432d');}}
-      if(after(8,2)){voxBar(Pr,B2X,B2Y,3,P.red,d2);     // paneer   4.6
-        if(d2>=1){const b=barBase(OX,OY,B2X,B2Y,3);blockTag(b.x,b.y+24,'PANEER',14,P.red,'#fff4e2');}}
-      if(after(8,5)){voxBar(Pr,B3X,B3Y,11,P.ice,d3);    // halloumi above 6
-        if(d3>=1){const b=barBase(OX,OY,B3X,B3Y,3);blockTag(b.x,b.y+24,'HALLOUMI',14,P.ice,'#0a0618');}}
-      if(after(7,6)) px('5.0',CX+404,CY+30,40,P.green,null,'"Silkscreen"');
-      if(after(7,10))px('5.4',CX+404,CY+92,40,P.green,null,'"Silkscreen"');
-      if(after(7,10))px('cheese melts only here',CX+404,CY+150,18,'#d9d2e6',null,'"VT323"');
-      typeLine(6,CX+30,CY+256,18,'#d9d2e6',null,'"VT323"');
+      const d1=mp(wordAt(7,1),wordAt(7,1)+1.10),
+            d2=mp(wordAt(8,2),wordAt(8,2)+0.80),
+            d3=mp(wordAt(8,5),wordAt(8,5)+0.90);
+      if(after(7,1)){voxBar(Pr,0,0,12,P.gold,d1);    // 1 cube = 0.1 pH: cheddar 5.2
+        if(d1>=1){const b=barBase(OX,OY,0,0,3);blockTag(b.x,b.y+36,'CHEDDAR',14,P.paper,'#74432d');}}
+      if(after(8,2)){voxBar(Pr,5,-5,6,P.red,d2);     // paneer 4.6
+        if(d2>=1){const b=barBase(OX,OY,5,-5,3);blockTag(b.x,b.y+36,'PANEER',14,P.red,'#fff4e2');}}
+      if(after(8,5)){voxBar(Pr,10,-10,22,P.ice,d3);  // halloumi, above the window
+        if(d3>=1){const b=barBase(OX,OY,10,-10,3);blockTag(b.x,b.y+36,'HALLOUMI',14,P.ice,'#0a0618');}}
+      if(after(7,6)) px('5.0',L.win.n1[0],L.win.n1[1],40,P.green,null,'"Silkscreen"');
+      if(after(7,10))px('5.4',L.win.n2[0],L.win.n2[1],40,P.green,null,'"Silkscreen"');
+      if(after(7,10))px('cheese melts only here',L.win.n1[0],L.win.n1[1]+56,18,'#d9d2e6',null,'"VT323"');
+      typeWrap(6,PX+26,CAPY,18,'#d9d2e6',null,'"VT323"',44);
     }
 
-    /* --- SIDE: the turn. Not too acidic -- not acidic enough. --- */
+    /* --- SIDE --- */
     if(T>=BEAT.SIDE.sc&&T<BEAT.COOKED.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'WHICH WAY IS WRONG');
-      if(after(9,1))pxShadow('TOO ACIDIC',CX+40,CY+56,22,P.sh,P.ink);
-      if(after(9,5)){            // struck through on "acidic."
-        B.fillStyle=P.red;
-        for(let i=0;i<230;i+=5)B.fillRect(CX+36+i,CY+68,4,3);
-      }
-      if(after(10,4)){           // "enough." -- the turn
-        pxShadow('NOT ACIDIC',CX+40,CY+110,22,P.gold,P.ink);
-        pxShadow('ENOUGH.',CX+40,CY+146,22,P.gold,P.ink);
-      }
-      if(after(11,0)){           // calcium still bridging
-        const lock=mp(wordAt(11,0),wordAt(11,0)+1.10*SPD);
-        for(let i=0;i<5;i++){
-          const k=H.clamp(lock*5-i); if(k<=0)continue;
-          const x=CX+330+i*44;
-          rect(x,CY+120,12,12,P.paper);
-          if(i<4){B.fillStyle=P.cyan;for(let q=14;q<44;q+=5)B.fillRect(x+q,CY+125,3,2);}
-        }
-        if(lock>0.9)px('calcium holding',CX+330,CY+152,18,P.cyan,null,'"VT323"');
-      }
-      typeLine(11,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
+      groupBox(BX,BY,BW,BH,'WHICH WAY IS WRONG');
+      const S=L.side;
+      if(after(9,1))pxShadow('TOO ACIDIC',S.x,S.bad,22,P.sh,P.ink);
+      if(after(9,5)){B.fillStyle=P.red;
+        for(let i=0;i<230;i+=5)B.fillRect(S.x-4+i,S.bad+12,4,3);}
+      if(after(10,4)){
+        pxShadow('NOT ACIDIC',S.x,S.good,22,P.gold,P.ink);
+        pxShadow('ENOUGH.',S.x,S.good2,22,P.gold,P.ink);}
+      if(after(11,0)){
+        const lock=mp(wordAt(11,0),wordAt(11,0)+1.00);
+        for(let i=0;i<5;i++){const k=H.clamp(lock*5-i); if(k<=0)continue;
+          const x=S.x+i*44;
+          rect(x,S.lock,12,12,P.paper);
+          if(i<4){B.fillStyle=P.cyan;for(let q=14;q<44;q+=5)B.fillRect(x+q,S.lock+5,3,2);}}
+        if(lock>0.9)px('calcium holding',S.x,S.lock+34,18,P.cyan,null,'"VT323"');}
+      typeWrap(11,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
     }
 
-    /* --- COOKED: the whey pot, and the heat that set it first --- */
-    if(T>=BEAT.COOKED.sc){   // stays up behind the box, so the panel is never blank
+    /* --- COOKED --- */
+    if(T>=BEAT.COOKED.sc){
       rect(CX+2,CY+2,CWd-4,CHd-4,'#14101f');
-      groupBox(CX+12,CY+10,CWd-24,CHd-74,'BEFORE YOU EVER BUY IT');
-      // the vat
-      const VX=CX+96,VY=CY+92,VW=190,VH=104;
-      rect(VX,VY,VW,VH,'#1d2436'); bevel(VX,VY,VW,VH,'field');
-      const drop=mp(wordAt(13,6),wordAt(13,6)+1.10*SPD);   // "curd"
-      if(after(13,6)){
-        const cy2=VY-40+Math.round(H.ease.in(drop)*96);
-        rect(VX+70,Math.min(cy2,VY+56),48,34,'#fff4e2');
-        rect(VX+72,Math.min(cy2,VY+56)+2,44,30,'#e3d6c0');
-      }
-      // whey surface, wobbling
+      groupBox(BX,BY,BW,BH,'BEFORE YOU EVER BUY IT');
+      const K=L.cook;
+      rect(K.vx,K.vy,K.vw,K.vh,'#1d2436'); bevel(K.vx,K.vy,K.vw,K.vh,'field');
+      const drop=mp(wordAt(13,6),wordAt(13,6)+1.10);
+      if(after(13,6)){const cy2=K.vy-40+Math.round(H.ease.in(drop)*96);
+        rect(K.vx+84,Math.min(cy2,K.vy+62),52,36,'#fff4e2');
+        rect(K.vx+86,Math.min(cy2,K.vy+62)+2,48,32,'#e3d6c0');}
       B.fillStyle=P.ice;
-      for(let x=0;x<VW-8;x+=4)B.fillRect(VX+4+x,VY+34+Math.round(Math.sin(M*3+x*0.12)*2),3,2);
-      if(after(13,10)){                                     // "hot" -- steam
-        for(let i=0;i<5;i++){const sy2=VY-6-((M*26+i*17)%46);
-          rect(VX+28+i*34,Math.round(sy2),3,6,H.rgba(P.hi,0.35));}
-      }
-      if(after(13,13)){                                     // "ninety"
-        const hot=mp(wordAt(13,13),wordAt(13,14)+0.30*SPD);
-        px(Math.round(20+70*H.ease.out(hot))+'',CX+404,CY+40,40,P.red,null,'"Silkscreen"');
-        px('degrees, in whey',CX+404,CY+98,18,'#d9d2e6',null,'"VT323"');
-      }
-      // both of these stop when the message box opens over them: the box is
-      // opaque so it looked fine, but text under a window is still text on text
-      if(after(14,2)&&T<BEAT.END.sc){
-        pxShadow('THE NET IS SET',CX+96,CY+216,22,P.gold,P.ink);
-      }
-      if(T<BEAT.END.sc) typeLine(15,CX+30,CY+256,18,'#ffd28a',null,'"VT323"');
+      for(let x=0;x<K.vw-8;x+=4)B.fillRect(K.vx+4+x,K.vy+40+Math.round(Math.sin(M*3+x*0.12)*2),3,2);
+      if(after(13,10))for(let i=0;i<5;i++){const sy2=K.vy-6-((M*26+i*17)%46);
+        rect(K.vx+30+i*38,Math.round(sy2),3,6,H.rgba(P.hi,0.35));}
+      if(after(13,13)){const hot=mp(wordAt(13,13),wordAt(13,14)+0.30);
+        px(Math.round(20+70*H.ease.out(hot))+'',K.num[0],K.num[1],40,P.red,null,'"Silkscreen"');
+        px('degrees, in whey',K.num[0],K.num[1]+56,18,'#d9d2e6',null,'"VT323"');}
+      if(after(14,2)&&T<BEAT.END.sc)pxShadow('THE NET IS SET',PX+54,K.set,22,P.gold,P.ink);
+      if(T<BEAT.END.sc)typeWrap(15,PX+26,CAPY,18,'#ffd28a',null,'"VT323"',44);
     }
 
     for(const k in BEAT){const dd=Math.abs(M-BEAT[k].sc);
-      if(BEAT[k].sc>0&&dd<0.20*SPD)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/(0.20*SPD)*15));}
+      if(BEAT[k].sc>0&&dd<0.20)mosaic(CX+2,CY+2,CWd-4,CHd-4,Math.round(16-dd/0.20*15));}
     B.restore();
 
-    /* --- END --- */
-    const CLICK=VO[17].z+0.52, SHUT=CLICK+0.15;
-    zoomRect([310,150,24,14],[110,78,420,196],M,BEAT.END.sc-0.30*SPD,BEAT.END.sc);
-    if(done&&T<SHUT){
-      OVERLAY=true;    // a window on top of the panel, not content inside it
-      const m=winFrame(110,78,420,196,'Good To Know Tho',true);
+    zoomRect([LW/2-20,LH/2-10,40,20],BOX,M,BEAT.END.sc-0.30,BEAT.END.sc);
+    if(done){
+      OVERLAY=true;
+      const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       for(let j=0;j<22;j++)for(let i=0;i<26;i++){const d=Math.hypot((i-13)/13,(j-10)/10);
         if(d<0.92)rect(m.x+10+i,m.y+12+j,1,1,'#fff');else if(d<1.0)rect(m.x+10+i,m.y+12+j,1,1,'#000');}
       rect(m.x+21,m.y+17,4,3,'#000080');rect(m.x+21,m.y+23,4,10,'#000080');
       const tx=m.x+52;
-      capLine('> Not acidic enough.',16,1,tx,m.y+10,14,'#000');
-      capLine('> Already cooked.',16,4,tx,m.y+36,14,'#000');
-      capLine('NOTHING LEFT',17,2,tx,m.y+82,22,'#000080','#c0c0c0');
-      capLine('TO MELT.',17,5,tx,m.y+118,22,'#000080','#c0c0c0');
+      capLine('> Not acidic enough.',16,1,tx,m.y+12,14,'#000');
+      capLine('> Already cooked.',16,4,tx,m.y+40,14,'#000');
+      capLine('NOTHING LEFT',17,2,tx,m.y+86,22,'#000080','#c0c0c0');
+      capLine('TO MELT.',17,5,tx,m.y+124,22,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
     }
-    if(T>=SHUT){
-      zoomRect([300,160,40,20],[150,120,340,96],M,SHUT,SHUT+0.22);
-      if(T>=SHUT+0.22){
-        pxShadow('GOOD TO KNOW THO',320,146,22,P.gold,P.ink,'center');
-        px('it is now safe to close this window.',320,188,16,P.bone,'center','"VT323"');
-        if(blink)rect(236,214,8,2,P.gold);}
-    }
+  }
+
+  /* --- the end card, on the bare desktop. The window is gone by now. --- */
+  if(T>=SHUT){
+    zoomRect([LW/2-20,LH/2-10,40,20],[46,282,340,186],M,SHUT,SHUT+0.22);
+    if(T>=SHUT+0.22){
+      pxShadow('GOOD TO',LW/2,PY+300,22,P.gold,P.ink,'center');
+      pxShadow('KNOW THO',LW/2,PY+340,22,P.gold,P.ink,'center');
+      px('it is now safe to',LW/2,PY+392,16,P.bone,'center','"VT323"');
+      px('close this window.',LW/2,PY+416,16,P.bone,'center','"VT323"');
+      if(blink)rect(LW/2-60,PY+446,8,2,P.gold);}
   }
 
   /* --- the pointer --- */
-  const K=PTRACK, APPROACH=0.55;
+  const K=PTRACK, APPROACH=0.70;   // longer approach: a narrow frame makes any move look abrupt
   let cx=K[K.length-1].x, cy=K[K.length-1].y, still=true, dragging=false, from=null;
   for(let i=0;i<K.length-1;i++)if(M<K[i+1].t){
     const seg=K[i+1].t-K[i].t;
@@ -924,23 +954,23 @@ function explainer(ctx,W2,Hh,t){
 // exposed for the offline renderer and the test harness: a const at the top
 // level of a classic script is NOT a window property, which is why a harness
 // reading w.DUR silently got undefined.
-window.DUR=DUR; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
+window.DUR=DUR; window.LW=LW; window.LH=LH; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
 // Beat names differ per piece, so the sweeps address them positionally: the
 // first CONTENT beat (after the hook) and the LAST beat. Hard-coding JAR/END
 // worked for one script and threw on the next.
 const BKEYS=Object.keys(BEAT);
 const FIRST_CONTENT=BEAT[BKEYS[1]].sc, LAST_BEAT=BEAT[BKEYS[BKEYS.length-1]].sc;
 window.checkBounds=function(step){
-  const pad=2, lo={x:12+pad,y:28+pad}, hi={x:12+616-pad,y:28+284-pad};
+  const pad=2, lo={x:PX+pad,y:PY+pad}, hi={x:PX+PW-pad,y:PY+PH-pad};
   const bad=[]; const seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
-    BOUNDS=[]; explainer(ctx,1280,720,tt); const rec=BOUNDS; BOUNDS=null;
+    BOUNDS=[]; explainer(ctx,OUTW,OUTH,tt); const rec=BOUNDS; BOUNDS=null;
     for(const b of rec){
       // Chrome legitimately lives outside the client area: the title bar above
       // it, the status bar below it, and the dialog / message box drawn over
       // the desktop. Those are judged against the whole 640x360 buffer; only
       // SCREEN and OBJECT layer text is held to the client rect.
-      const chrome = b.y < lo.y || b.y > 28+284-20 || tt < FIRST_CONTENT || tt >= LAST_BEAT;
+      const chrome = b.y < lo.y || b.y > PY+PH-20 || tt < FIRST_CONTENT || tt >= LAST_BEAT;
       const L=chrome?0:lo.x, Tp=chrome?0:lo.y, R=chrome?LW:hi.x, Bt=chrome?LH:hi.y;
       if(b.x<L||b.y<Tp||b.x+b.w>R||b.y+b.h>Bt){
         const k=b.s+'|'+b.size;
@@ -966,7 +996,7 @@ window.checkLegibility=function(step){
   const FLOOR={head:22,label:14,num:32,vt:13};
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/6)){
-    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    BOUNDS=[]; explainer(ctx,OUTW,OUTH,tt); const r=BOUNDS; BOUNDS=null;
     for(const b of r){
       if(b.chrome) continue;
       const need = b.role==='num'?FLOOR.num : b.role==='head'?FLOOR.head
@@ -989,7 +1019,7 @@ window.checkLegibility=function(step){
 window.checkTruncation=function(step){
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/6)){
-    BOUNDS=[]; explainer(ctx,1280,720,tt); const r=BOUNDS; BOUNDS=null;
+    BOUNDS=[]; explainer(ctx,OUTW,OUTH,tt); const r=BOUNDS; BOUNDS=null;
     for(const b of r){
       if(!b.cut && b.x+b.w<=LW && b.x>=0) continue;
       const k=b.s+'|'+b.size; if(seen.has(k))continue; seen.add(k);
@@ -1006,7 +1036,7 @@ window.checkTruncation=function(step){
 window.checkClearance=function(step,minGap){
   const G=minGap||6, bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
-    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
     const items=r.filter(a=>!a.chrome&&!a.overlay).map(a=>({x:a.x,y:a.y,w:a.w,h:a.h,k:'"'+a.s+'"'}))
@@ -1040,7 +1070,7 @@ window.checkPointerIdle=function(step){
   const bad=[],seen=new Set(), dt=step||1/12, SIT=0.80;
   let prev=null, stillFor=0;
   for(let tt=0; tt<=DUR; tt+=dt){
-    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     const p=window.pointerPos();
     // In transit it will inevitably cross things; the rule is about where it
@@ -1068,7 +1098,7 @@ window.checkPointerJumps=function(step,maxPx){
   const LIM=maxPx||95, dt=step||1/24, bad=[];
   let prev=null;
   for(let tt=0; tt<=DUR; tt+=dt){
-    explainer(ctx,1280,720,tt);
+    explainer(ctx,OUTW,OUTH,tt);
     const p=window.pointerPos();
     if(prev && !p.caret && !prev.caret){
       const d=Math.hypot(p.x-prev.x,p.y-prev.y);
@@ -1082,7 +1112,7 @@ window.checkPointerJumps=function(step,maxPx){
 window.checkStraddle=function(step){
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
-    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     const box=g.find(q=>q.k==='groupbox'); if(!box) continue;
     const subjects=r.filter(a=>!a.chrome&&!a.overlay)
@@ -1108,7 +1138,7 @@ window.checkOverlap=function(step){
                           oy=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
                     return (ox>1&&oy>1)?[ox,oy]:null;};
   for(let tt=0; tt<=DUR; tt+=(step||1/12)){
-    BOUNDS=[]; GBOX=[]; explainer(ctx,1280,720,tt);
+    BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
     const r=BOUNDS, g=GBOX; BOUNDS=null; GBOX=null;
     // a TAG PLATE on a STACK. Checking only text-vs-graphics missed this
     // entirely: the plate is opaque, so the label on it stayed readable while
@@ -1290,9 +1320,9 @@ const ppB=document.getElementById('pp'),scrub=document.getElementById('scrub'),
       sndB=document.getElementById('snd');
 let cur=0,playing=false,last=0;
 const DURATION=DUR;             // single source: the generated timeline
-buildGlass(1280,720);
+buildGlass(OUTW,OUTH);
 window.DURATION=DURATION;
-window.seek=(t)=>{cur=H.clamp(t,0,DURATION);explainer(ctx,1280,720,cur);
+window.seek=(t)=>{cur=H.clamp(t,0,DURATION);explainer(ctx,OUTW,OUTH,cur);
   scrub.value=(cur/DURATION)*1000;timeEl.textContent=cur.toFixed(2)+' / '+DURATION.toFixed(1);};
 function frame(ts){if(!playing)return;
   // dt is clamped: a backgrounded tab hands back a delta of seconds, which
