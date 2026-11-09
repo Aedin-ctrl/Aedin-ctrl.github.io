@@ -1,7 +1,11 @@
-# CATHODE DESK — house style v2.1
+# CATHODE DESK — house style v2.2
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v2.2 (2026-11-08)** — the pointer stops parking and starts operating the
+> machine: it drags every stack up, sweeps the cubes in, pulls the arrows and
+> clicks each label out. See rules 21–24.
+>
 > **v2.1 (2026-11-08)** — the pointer holds still instead of drifting, breathes
 > while it waits, parks out of the way, and clicks once per typing session
 > rather than once per line. See rules 17–20.
@@ -430,6 +434,23 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
     point. Time alone merged a caption with a message box in a different window
     at the other end of the screen, and the box got typed with no click at all.
 
+21. **The pointer does not park — it operates the machine.** Nothing should
+    appear by itself. The tag is *dragged* onto the jar, each stack is *hauled*
+    up out of the baseline, the arrows are *pulled* along their path, every
+    label is *clicked* out. Parking it in a corner between beats is the tell
+    that the animation is happening without it. (This supersedes rule 19.)
+22. **An action's window is the element's own animation window** — the same word
+    anchor the picture uses. Then the pointer leads the thing it is moving
+    instead of arriving near it afterwards.
+23. **The pointer can only be in one place.** Before committing an action to the
+    track, check it is *reachable*: `dt ≥ 0.26s + distance/620px·s⁻¹`. An event
+    that is too soon still **rings and still sounds** — it just does not drag
+    the pointer across the screen to meet it. Skipping this check produced 21
+    teleports in 50 seconds, because every label wanted its own click.
+24. **One gesture per burst, not one tap per element.** Six cubes landing 0.072s
+    apart is a *sweep* with a ring on each cube, not six separate taps — the
+    gaps are shorter than the time it takes to move.
+
 **Every line that appears word by word goes through `typeLine()`** and appears
 in the pointer table. A line drawn with a bare `px()` gets no caret and no
 click, and is instantly obvious as the one that was forgotten.
@@ -446,6 +467,7 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkOverlap()` | label on label, label on graphics, **plate on stack** |
 | `checkTruncation()` | a string cut by the rasteriser or running off the screen |
 | `checkClearance()` | anything inside the box with under 6px of air around it |
+| `checkPointerJumps()` | the pointer moving more than 95px in one frame |
 
 **Prove a new sweep fires before trusting it.** Put the defect back, confirm the
 sweep names it, then restore. A checker that has only ever returned 0 has not

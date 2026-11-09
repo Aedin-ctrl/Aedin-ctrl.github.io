@@ -52,7 +52,7 @@
 <div class="wrap">
 <header>
   <h1>CATHODE DESK</h1>
-  <p class="sub">House style v2.1 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
+  <p class="sub">House style v2.2 — one medium, not four. <b>A 16-bit program, running in a Win95 window,
   drawing voxel diagrams, photographed off a green-tinted CRT.</b> Every frame passes through all four
   layers in order, every time. Sampler content: why sealed honey doesn't spoil.
   <br><br>Press <b>AUDIO ON</b> for the voice, the effects and the bed — browsers will not start sound
@@ -262,6 +262,10 @@ function ibeam(x,y,h,col){
   if(GBOX)GBOX.push({x:x-3,y:y-2,w:7,h:HH+4,k:'cursor'});
   for(let i=-3;i<=3;i++){rect(x+i,y-2,1,1,c);rect(x+i,y+HH+1,1,1,c);}   // serifs
   for(let j=-1;j<=HH;j++){rect(x-1,y+j,1,1,c);rect(x,y+j,1,1,c);rect(x+1,y+j,1,1,c);}}
+// the arrow mid-drag: same pointer, button down, with a grabbed-edge marker
+function dragCursor(x,y){ cursor(x,y);
+  B.fillStyle=P.hi; for(let i=0;i<5;i++){B.fillRect(x+3+i,y+13,1,1);B.fillRect(x+3+i,y+17,1,1);}
+  B.fillRect(x+3,y+14,1,3); B.fillRect(x+7,y+14,1,3); }
 function cursor(x,y){if(GBOX)GBOX.push({x:x,y:y,w:10,h:16,k:'cursor'});const rows=['X','XX','XOX','XOOX','XOOOX','XOOOOX','XOOOOOX','XOOOOOOX','XOOOOOOOX','XOOOOOXXXX','XOOXOOX','XOX XOOX','XX  XOOX','X    XOOX','     XOOX','      XX'];
   rows.forEach((r,j)=>{for(let i=0;i<r.length;i++){if(r[i]==='X')rect(x+i,y+j,1,1,'#000');else if(r[i]==='O')rect(x+i,y+j,1,1,'#fff');}});}
 function zoomRect(from,to,t,t0,t1){if(t<t0||t>=t1)return;
@@ -540,11 +544,60 @@ const SPOTS=[
   {n:17, x:166, y:106, s:14},   // message box list
 ];
 const OK_DIALOG={x:322,y:208}, OK_BOX={x:320,y:254};
-const PARK={x:600,y:296};        // bottom-right of the panel, clear of everything
 const SESSION_GAP=2.0;           // lines closer in TIME than this may share a session
 const SESSION_NEAR=80;           // ...but only if the insertion point barely moved
-const PARK_IF_IDLE=3.0;          // only get out of the way if there is time to
 
+/* ===== WHAT THE POINTER DOES =====
+   It does not park. Every element in the piece is put there BY the mouse:
+   the tag is dragged onto the jar, each cube of the one-sixth row is clicked
+   into place, every stack is hauled up out of the baseline, the arrows are
+   dragged along their path, the x is clicked, the yeast is dropped in.
+
+   Each action's window is the element's OWN animation window -- the same word
+   anchors the picture uses -- so the pointer leads the thing it is moving
+   instead of wandering near it. Coordinates are buffer pixels; the window
+   never moves, so they can live in one table. */
+const W=(n,i)=>VO[n].t[i];
+const ACTS=(()=>{
+  const A=[];
+  const drag=(t0,t1,a,b)=>A.push({t0:+t0.toFixed(3),t1:+t1.toFixed(3),a:a,b:b,k:'drag'});
+  const tap =(t,a)=>A.push({t0:+t.toFixed(3),t1:+t.toFixed(3),a:a,b:a,k:'click'});
+  // JAR -- drag the SEALED HONEY tag onto the jar
+  drag(W(1,2)-0.30, W(1,2)+0.40, [214,232], [112,268]);
+  // WATER -- sweep across the row placing cubes. Six separate taps 0.072s apart
+  // asked the pointer to teleport between them; it is one gesture with a ring
+  // per cube instead.
+  drag(W(4,0)+0.20, W(4,0)+(5*0.09+0.26)*0.8, [125,150], [160,168]);
+  for(let i=0;i<6;i++) A.push({t0:+(W(4,0)+(i*0.09+0.26)*0.8).toFixed(3),k:'ring',a:[125+i*7,Math.round(150+i*3.5)]});
+  // WATER -- haul both stacks up out of the baseline
+  drag(W(5,2), W(5,2)+1.00, [152,186], [152,114]);
+  drag(W(8,0), W(8,0)+1.04, [250,186], [250, 84]);
+  // OSMOSIS -- drag the arrow out of the microbe, then click the x
+  drag(W(9,7), W(9,7)+0.60, [108,104], [208,104]);
+  tap (W(10,1)+0.02, [239,99]);
+  // ACID -- the same haul, shorter stacks
+  drag(W(11,2), W(11,2)+0.76, [152,186], [152,166]);
+  drag(W(12,0), W(12,0)+0.80, [250,186], [250,151]);
+  // SEAL -- pull the water down out of the air, raise the moisture, drop the yeast in
+  drag(W(14,1), W(14,1)+0.72, [62,58], [62,106]);
+  drag(W(15,2), W(15,8),      [342,206], [342,151]);
+  tap (W(15,9)+0.05, [520,74]);
+  // ...and a click to POP each label out once the thing it names is in place.
+  // Offsets keep every tap clear of the drag that precedes it -- two track
+  // points at the same instant in different places is a one-frame jump.
+  tap (W(5,2)+1.45,  [152,217]);   // HONEY plate, after its stack lands
+  tap (W(8,0)+1.50,  [250,217]);   // BACTERIA plate
+  tap (W(6,0),       [404,108]);   // 'water activity in honey'
+  tap (W(11,2)+1.20, [152,217]);   // HONEY plate, acid chart
+  tap (W(12,0)+1.25, [250,217]);   // WATER plate
+  tap (W(11,8),      [404, 62]);   // the 3.9 pops on "nine"
+  tap (W(12,3),      [404,152]);   // the 7 pops on "seven"
+  tap (W(9,11),      [ 42,144]);   // WATER PULLED OUT
+  tap (W(15,8)+0.12, [412,147]);   // 1 PART IN 5
+  return A.sort((x,y)=>x.t0-y.t0);
+})();
+
+const RINGS=[];
 const PTRACK=(()=>{
   // ONE click per typing SESSION, not per line. Back-to-back lines are one
   // session: you click once to put the caret in, then keep typing. The caret
@@ -562,24 +615,42 @@ const PTRACK=(()=>{
       last.lastN=x.n; last.prev=x; }
     else sess.push({first:x, lastN:x.n, prev:x});
   });
-  const P=[{t:0,x:PARK.x,y:PARK.y}];
+  // start already near the dialog: from (380,286) the opening move was 250px
+  // in the 0.2s before the first click, which peaks at ~100px per frame
+  const P=[{t:0,x:250,y:196}];
   sess.forEach(S=>P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
                           x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1}));
   P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   P.push({t:+(VO[18].z+0.52).toFixed(3), x:OK_BOX.x, y:OK_BOX.y, c:1});
   P.push({t:DUR, x:OK_BOX.x, y:OK_BOX.y});
   P.sort((a,b)=>a.t-b.t);
-  // Park between sessions, but only when there is room -- otherwise it would
-  // travel away and straight back, which is more movement, not less.
-  const parked=[];
-  sess.forEach(S=>{
-    const end=VO[S.lastN].z+0.45;
-    const next=P.find(q=>q.t>end);
-    if(next && next.t-end>PARK_IF_IDLE) parked.push({t:+end.toFixed(3),x:PARK.x,y:PARK.y});
+  // Actions become track points, but ONLY if the pointer can physically get
+  // there. It can be in one place at a time: an event too soon after the last
+  // one still rings and still sounds, it just does not drag the pointer across
+  // the screen to meet it. That teleporting is what 21 detected jumps were.
+  const SPEED=620, SETTLE=0.14, MINTIME=0.26;
+  const reach=(from,to,dt)=>dt >= MINTIME + Math.hypot(to[0]-from[0],to[1]-from[1])/SPEED;
+  let lastT=P[0].t, lastP=[P[0].x,P[0].y];
+  const commit=q=>{P.push(q); lastT=q.t; lastP=[q.x,q.y];};
+  P.slice(1).forEach(q=>{ lastT=q.t; lastP=[q.x,q.y]; });   // typing + OK clicks are fixed
+  const fixed=P.slice().sort((a,b)=>a.t-b.t);
+  const taken=(t)=>fixed.find(f=>Math.abs(f.t-t)<0.30);
+  lastT=P[0].t; lastP=[P[0].x,P[0].y];
+  ACTS.slice().sort((a,b)=>a.t0-b.t0).forEach(A=>{
+    if(A.k==='ring'){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
+    if(taken(A.t0)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
+    if(!reach(lastP,A.a,A.t0-lastT)){ RINGS.push({t:A.t0,x:A.a[0],y:A.a[1]}); return; }
+    if(A.k==='click'){
+      commit({t:+(A.t0-SETTLE).toFixed(3),x:A.a[0],y:A.a[1]});
+      commit({t:A.t0,x:A.a[0],y:A.a[1],c:1});
+    } else {
+      commit({t:A.t0,x:A.a[0],y:A.a[1],g:1});
+      commit({t:A.t1,x:A.b[0],y:A.b[1],d:1});
+    }
   });
-  parked.forEach(q=>P.push(q));
-  // arrive, settle, THEN click: 0.14s of stillness on target first
-  P.filter(q=>q.c).forEach(q=>P.push({t:+(q.t-0.14).toFixed(3),x:q.x,y:q.y}));
+  // arrive, settle, THEN click, for the typing and OK clicks too
+  P.filter(q=>q.c&&!q.s2).forEach(q=>{ if(!P.some(r=>Math.abs(r.t-(q.t-SETTLE))<0.01))
+    P.push({t:+(q.t-SETTLE).toFixed(3),x:q.x,y:q.y,s2:1}); });
   P.sort((a,b)=>a.t-b.t);
   return P;
 })();
@@ -715,10 +786,10 @@ function explainer(ctx,W,Hh,t){
       const d2=mp(wordAt(8,0),wordAt(8,0)+1.04);                    // "Bacteria"
       if(after(5,2)){
         voxBar(Pr,0,0,12,P.orange,d1);
-        if(d1>0.9)blockTag(b1.x,b1.y+24,'HONEY',14,P.paper,'#74432d');}
+        if(d1>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.paper,'#74432d');}
       if(after(8,0)){
         voxBar(Pr,B2X,B2Y,18,P.ice,d2);
-        if(d2>0.9)blockTag(b2.x,b2.y+24,'BACTERIA',14,P.ice,'#0a0618');}
+        if(d2>=1)blockTag(b2.x,b2.y+24,'BACTERIA',14,P.ice,'#0a0618');}
       if(after(6,0))px('water activity in honey',CX+392,CY+80,18,'#d9d2e6',null,'"VT323"');
       if(after(7,0))px((0.60*H.ease.out(mp(wordAt(7,0),wordAt(7,6)))).toFixed(2),
                        CX+392,CY+30,42,P.orange,null,'"Silkscreen"');   // lands on "six"
@@ -751,9 +822,9 @@ function explainer(ctx,W,Hh,t){
       const dp=mp(wordAt(11,2),wordAt(11,2)+0.76),     // "acidic"
             dw=mp(wordAt(12,0),wordAt(12,0)+0.80);     // "Plain"
       if(after(11,2)){voxBar(Pr,0,0,4,P.red,dp);
-        if(dp>0.9)blockTag(b1.x,b1.y+24,'HONEY',14,P.red,'#fff4e2');}
+        if(dp>=1)blockTag(b1.x,b1.y+24,'HONEY',14,P.red,'#fff4e2');}
       if(after(12,0)){voxBar(Pr,B2X,B2Y,7,'#9fcb55',dw);
-        if(dw>0.9)blockTag(b2.x,b2.y+24,'WATER',14,P.grass,'#0a0618');}
+        if(dw>=1)blockTag(b2.x,b2.y+24,'WATER',14,P.grass,'#0a0618');}
       const NS=40,NW=150,NH=NS+18,h8=wordAt(11,8);
       if(after(11,8)){                                  // "nine"
         const inv=t<h8+0.72&&Math.floor((t-h8)*8)%2===0;
@@ -849,13 +920,20 @@ function explainer(ctx,W,Hh,t){
   // what made it feel like it was in the way. It now sits still and makes one
   // decisive move in the last APPROACH seconds before it is needed.
   const K=PTRACK, APPROACH=0.55;
-  let cx=K[K.length-1].x, cy=K[K.length-1].y, still=true;
+  let cx=K[K.length-1].x, cy=K[K.length-1].y, still=true, dragging=false, from=null;
   for(let i=0;i<K.length-1;i++)if(M<K[i+1].t){
-    const seg=K[i+1].t-K[i].t, go=K[i+1].t-Math.min(APPROACH,seg);
-    if(M<=go){ cx=K[i].x; cy=K[i].y; }
-    else { still=false;
-      const e=H.ease.inOut(H.clamp((M-go)/Math.max(0.001,K[i+1].t-go)));
-      cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e)); }
+    const seg=K[i+1].t-K[i].t;
+    if(K[i+1].d){                              // a DRAG: traverse the whole window,
+      still=false; dragging=true; from=K[i];    // because the pointer is carrying the
+      const e=H.ease.inOut(H.clamp((M-K[i].t)/Math.max(0.001,seg)));  // thing it moves
+      cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e));
+    } else {
+      const go=K[i+1].t-Math.min(APPROACH,seg);
+      if(M<=go){ cx=K[i].x; cy=K[i].y; }
+      else { still=false;
+        const e=H.ease.inOut(H.clamp((M-go)/Math.max(0.001,K[i+1].t-go)));
+        cx=Math.round(H.lerp(K[i].x,K[i+1].x,e)); cy=Math.round(H.lerp(K[i].y,K[i+1].y,e)); }
+    }
     break;}
   // a resting hand is not a frozen bitmap: 1px of breath while it waits
   if(still){ cx+=Math.round(Math.sin(M*1.07)); cy+=Math.round(Math.sin(M*0.73+1.3)); }
@@ -863,9 +941,19 @@ function explainer(ctx,W,Hh,t){
   // point; the rest of the time it is the arrow travelling the track.
   // exposed so a harness can measure how much the pointer actually moves
   window.pointerPos=()=>({x:cx,y:cy,caret:!!CARET});
-  if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col); else cursor(cx,cy);
+  if(CARET) ibeam(CARET.x,CARET.y,CARET.h,CARET.col);
+  else if(dragging){
+    // a dotted trail back to where it picked the thing up
+    B.fillStyle=H.rgba(P.hi,0.5);
+    const dx=cx-from.x, dy=cy-from.y, L2=Math.hypot(dx,dy);
+    for(let d2=6; d2<L2; d2+=6) B.fillRect(Math.round(from.x+dx*d2/L2),
+                                           Math.round(from.y+dy*d2/L2),1,1);
+    dragCursor(cx,cy);
+  }
+  else cursor(cx,cy);
   // and every click reads as a click: a 0.1s ring where the tip went down
-  for(const q of K){ if(!q.c) continue; const d=M-q.t;
+  const ALLCLICKS=K.filter(q=>q.c).concat(RINGS);
+  for(const q of ALLCLICKS){ const d=M-q.t;
     if(d<0&&d>-0.09){ cursor(q.x,q.y); }            // press frame: hold on target
     if(d>=0&&d<0.11){ const r0=3+Math.round(d/0.11*6);
       B.fillStyle=P.hi;
@@ -976,6 +1064,24 @@ window.checkClearance=function(step,minGap){
         bad.push({t:+tt.toFixed(2),item:a.k,gap:gap,need:G});
       }
     }
+  }
+  return bad;
+};
+
+/* The pointer can only be in one place. Two track points at nearly the same
+   instant in different places make it teleport, which is what happened the
+   first time every label got its own click: 21 jumps over 50 seconds. */
+window.checkPointerJumps=function(step,maxPx){
+  const LIM=maxPx||95, dt=step||1/24, bad=[];
+  let prev=null;
+  for(let tt=0; tt<=DUR; tt+=dt){
+    explainer(ctx,1280,720,tt);
+    const p=window.pointerPos();
+    if(prev && !p.caret && !prev.caret){
+      const d=Math.hypot(p.x-prev.x,p.y-prev.y);
+      if(d>LIM) bad.push({t:+tt.toFixed(2),px:Math.round(d),limit:LIM});
+    }
+    prev=p;
   }
   return bad;
 };
@@ -1123,6 +1229,7 @@ function buildScore(){
   add(0.05,'open');
   // one click per pointer click, from the same track the picture uses
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
+  RINGS.forEach(q=>add(q.t,'click'));
   add(BEAT.JAR.sc-0.28,'open'); add(BEAT.END.sc-0.24,'open');
   add(VO[18].z+0.30,'snap'); add(VO[18].z+0.52,'click'); add(VO[18].z+0.67,'open');
   // screen: a print blip on every spoken word that appears as text on screen
