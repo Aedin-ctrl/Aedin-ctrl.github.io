@@ -389,8 +389,10 @@ function explainer(ctx,W2,Hh,t){
           const yy=Math.round(y0+dir*i*(span/7));
           B.fillStyle=H.rgba(H.hex(col),0.30+0.70*q);
           for(let j=0;j<=10;j++){
-            B.fillRect(Math.round(x-j*2.4),Math.round(yy+dir*j*1.1),3,3);
-            B.fillRect(Math.round(x+j*2.4),Math.round(yy+dir*j*1.1),3,3);
+            // the ARMS go against dir, so the apex points the way the stack
+            // travels: bacteria down the axis, your defence up it
+            B.fillRect(Math.round(x-j*2.4),Math.round(yy-dir*j*1.1),3,3);
+            B.fillRect(Math.round(x+j*2.4),Math.round(yy-dir*j*1.1),3,3);
           }
         }
         if(a>=1) blockTag(x,Y.tag,nm,14,col,P.ink);
