@@ -189,7 +189,7 @@ function explainer(ctx,W2,Hh,t){
     const dark=0.18+0.34*H.clamp(rain*1.6)*(1-go);
     solidShape([{p:sl(O.cloud),c:H.rgba(H.mix(P.paper,P.ink,0.22+dark))},
                 {p:sl(O.lobe), c:H.rgba(H.mix(P.paper,P.ink,0.02+dark))}],
-               sl(O.cloud),rim,seam);
+               sl(O.cloud),rim,seam,'cloudexit');   // -exit: it is MEANT to leave
     linePix(sl(O.scall),seam,2);
     if(rain>0&&rain<1.18&&go<0.7){           // the shower
       const rr=H.rng(23);

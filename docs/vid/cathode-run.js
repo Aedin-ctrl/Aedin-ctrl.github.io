@@ -2,7 +2,9 @@
    before anything is drawn: slot values only, so no drawing code knows which
    palette it is in. Rotating it is the point -- two videos in a row should not
    look like the same video. */
-usePalette(PIECE.no); paintSwatches();
+// A series keeps ONE palette: the rotation is by piece number, so part two of
+// a trilogy would otherwise arrive in a different colour from part one.
+usePalette(PIECE.part?PIECE.part.first:PIECE.no); paintSwatches();
 
 /* ===== CATHODE DESK -- the shared runtime, part 2 of 2 =====
    Loaded AFTER the piece, because the pointer track is built from the
@@ -102,6 +104,16 @@ window.checkPiece=function(){
   else for(const t of PIECE.tags)
     if(TAGS.indexOf(t)<0) bad.push({field:'tag',got:t,need:'one of '+TAGS.join(',')});
   if(DUR<65||DUR>78) bad.push({field:'DUR',got:DUR,need:'65-78s'});
+  if(PIECE.part){
+    const q=PIECE.part;
+    if(!(q.of>=2&&q.of<=4)) bad.push({field:'part.of',got:q.of,need:'2-4'});
+    if(!(q.n>=1&&q.n<=q.of)) bad.push({field:'part.n',got:q.n,need:'1..of'});
+    if(q.first!==PIECE.no-(q.n-1)) bad.push({field:'part.first',got:q.first,
+                                             need:PIECE.no-(q.n-1)});
+    if(!q.series||q.series.length<4) bad.push({field:'part.series',got:q.series});
+    if(!Array.isArray(q.titles)||q.titles.length!==q.of)
+      bad.push({field:'part.titles',got:q.titles,need:q.of+' titles'});
+  }
   return bad;
 };
 window.DUR=DUR; window.LW=LW; window.LH=LH; window.VO=VO; window.BEAT=BEAT; window.VOHASH=VOHASH; window.PTRACKDBG=PTRACK;
@@ -142,6 +154,48 @@ window.checkBounds=function(step){
    >=22, any label the story depends on >=14, key numbers >=32, VT323 >=13.
    This reports anything under it. Chrome -- the Win95 dialog furniture -- is
    exempt, because Win95 chrome is 9px by definition. */
+/* ===== THE TWELFTH SWEEP: a scene at rest is centred =====
+   The cold open is the only scene with no group box, so checkComposition has
+   nothing to measure a band against and skips it entirely -- and solidShape
+   used to register nothing, so the props were invisible to every other sweep
+   too. #005 went out with its block and its tree 74px left of frame centre.
+
+   Two rules, different on purpose. A prop in MOTION only has to stay inside
+   the client panel; it is allowed to fly. But the moment the scene STOPS
+   MOVING -- three identical frames -- the combined span of everything in it
+   has to be centred on the frame, because that still is the shot a viewer
+   actually reads. A gag that ends off to one side is a framing error even
+   though every pixel of it is on screen.                                   */
+window.checkFraming=function(tol,step){
+  const T=tol||26, st=step||1/12, bad=[], seen=new Set();
+  let prev=null, still=0;
+  for(let tt=0; tt<=DUR; tt+=st){
+    SCENE=[]; explainer(ctx,OUTW,OUTH,tt);
+    /* A key ending in `exit` is a prop that is MEANT to leave -- #004's cloud
+       slopes off to the left on purpose. Same idea as the `*box` suffix that
+       marks a container: the name carries the exemption, so the sweep does not
+       need a list of special cases and a new piece gets it for free. */
+    const s=SCENE.filter(b=>!/exit$/.test(b.k)); SCENE=null;
+    if(!s.length){ prev=null; still=0; continue; }
+    for(const b of s){
+      if(b.x>=PX-1 && b.x+b.w<=PX+PW+1) continue;
+      const k='escape|'+b.k; if(seen.has(k))continue; seen.add(k);
+      bad.push({t:+tt.toFixed(2), what:b.k, why:'escapes the client panel',
+                x:[Math.round(b.x),Math.round(b.x+b.w)], panel:[PX,PX+PW]});
+    }
+    const x0=Math.min(...s.map(b=>b.x)), x1=Math.max(...s.map(b=>b.x+b.w));
+    const key=Math.round(x0)+','+Math.round(x1);
+    still=(key===prev)?still+1:0; prev=key;
+    if(still!==3) continue;          // three frames unchanged: it has settled
+    const off=Math.round((x0+x1)/2-LW/2);
+    if(Math.abs(off)<=T) continue;
+    const k='off|'+key; if(seen.has(k))continue; seen.add(k);
+    bad.push({t:+tt.toFixed(2), what:'scene at rest', why:'off centre',
+              off:off, tol:T, span:[Math.round(x0),Math.round(x1)]});
+  }
+  return bad;
+};
+
 /* ===== THE ELEVENTH SWEEP: text inside a Win95 box stays inside it =====
    checkTruncation only ever asked whether a string was wider than the SCREEN,
    and every sweep skipped `b.chrome` entirely -- so a title that ran past its

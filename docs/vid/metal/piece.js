@@ -84,22 +84,30 @@ const L={
   // two things the whole video compares, doing the one thing that separates
   // them. The frosted bar it replaces was a single object acting cold, which
   // said nothing about wood at all.
-  open:{ ground:248, pivot:[200,524], hitx:76,
-         // the whole scene sits LEFT of centre, because the tree has to have
-         // somewhere to fall: laid flat its canopy reaches ~210px past the
-         // pivot, and from the middle of the frame that is off the screen.
-         blk:[[76,430],[122,456],[122,500],[76,526],[30,500],[30,456]],
-         blkf:[[[76,430],[122,456],[76,482],[30,456]],
-               [[30,456],[76,482],[76,526],[30,500]],
-               [[76,482],[122,456],[122,500],[76,526]]],
+  open:{ ground:248, pivot:[262,524], hitx:167, rest:63, kick:20,
+         /* The pair is CENTRED as a pair, standing and fallen both -- 125..307
+            before, 132..289 after, against a 432 frame. checkFraming() holds
+            both, which is new: the cold open has no group box, so until the
+            twelfth sweep nothing in the format could see that these two sat
+            74px left of the middle.
+
+            The tree falls LEFT, back over the metal. That is not a liberty:
+            kick the FOOT out of a standing pole and the top comes down towards
+            you. It is also the only direction that fits -- felled to the right
+            from a centred pivot the canopy leaves the frame, and no amount of
+            shrinking the tree fixes that without turning it into a shrub. */
+         blk:[[167,447],[205,468],[205,505],[167,526],[129,505],[129,468]],
+         blkf:[[[167,447],[205,468],[167,490],[129,468]],
+               [[129,468],[167,490],[167,526],[129,505]],
+               [[167,490],[205,468],[205,505],[167,526]]],
          tone:[0.00,0.30,0.52],
-         groove:[[[38,470],[72,490]],[[38,486],[72,506]]],
-         trunk:[[187,392],[213,392],[219,524],[181,524]],
-         can:[[199,312],[235,324],[255,352],[251,390],[221,412],
-              [177,412],[147,390],[143,352],[163,324]],
-         canf:[[[199,312],[235,324],[255,352],[143,352],[163,324]],
-               [[255,352],[251,390],[147,390],[143,352]],
-               [[251,390],[221,412],[177,412],[147,390]]],
+         groove:[[[136,480],[164,496]],[[136,493],[164,510]]],
+         trunk:[[252,430],[272,430],[276,524],[248,524]],
+         can:[[261,374],[288,382],[303,402],[300,429],[278,445],
+              [245,445],[222,429],[219,402],[234,382]],
+         canf:[[[261,374],[288,382],[303,402],[219,402],[234,382]],
+               [[303,402],[300,429],[222,429],[219,402]],
+               [[300,429],[278,445],[245,445],[222,429]]],
          ctone:[0.00,0.26,0.48] },
   // SAME -- two bars of identical height, because that is the point
   same:{ ox:PX+112, oy:MIDY+114, off:7, cubes:14,
@@ -233,54 +241,56 @@ function explainer(ctx,W2,Hh,t){
     const lit=H.lerp(0.62,1,H.clamp((M-0.3)/2.2));
     const rim=H.rgba(H.mix(P.ink,P.paper,lit));
 
-    /* --- the wood, drawn first so the metal passes in front of it ---
-       It topples about the foot of its own trunk. The POINTS are rotated, not
-       the canvas: the pixel grid survives a polygon rotation and does not
-       survive a bitmap one.                                               */
-    const ang=H.ease.in(fall)*1.34, co=Math.cos(ang), si=Math.sin(ang);
-    const px0=O.pivot[0], py0=O.pivot[1];
-    const tp=(p)=>p.map(q=>{const a2=q[0]-px0, b2=q[1]-py0;
-      return [Math.round(px0+a2*co-b2*si), Math.round(py0+a2*si+b2*co)];});
-    const bark=H.rgba(H.mix(P.orange,P.ink,0.58));
-    solidShape([{p:tp(O.trunk),c:bark}],tp(O.trunk),rim,null);
-    solidShape(O.canf.map((f,i)=>({p:tp(f),c:H.rgba(H.mix(P.grass,P.ink,O.ctone[i]))})),
-               tp(O.can),rim,H.rgba(H.mix(P.grass,P.ink,0.72)));
-
-    /* --- the metal: crouches, launches, and stays where it stopped --- */
-    const dx=Math.round(-14*wind*(1-fly) + (O.pivot[0]-O.hitx-46)*fly);
+    /* --- the metal, drawn FIRST, because the tree comes down on top of it ---
+       It crouches, launches, and stays where it stopped, hard against the
+       foot of the trunk.                                                   */
+    const dx=Math.round(-14*wind*(1-fly) + O.rest*fly);
     const sx=1+0.14*wind*(1-fly), sy=1-0.20*wind*(1-fly);
     const bk=(p)=>p.map(q=>[Math.round(O.hitx+(q[0]-O.hitx)*sx+dx),
                             Math.round(526-(526-q[1])*sy)]);
     if(fly>0&&fly<1){            // speed lines, so a launch reads as a launch
       B.fillStyle=H.rgba(H.hex(P.paper),0.35);
-      for(let i=0;i<5;i++) B.fillRect(O.hitx-40+dx-i*14, 444+i*14, 26, 2);
+      for(let i=0;i<5;i++) B.fillRect(O.hitx-62+dx-i*14, 452+i*12, 26, 2);
     }
     solidShape(O.blkf.map((f,i)=>({p:bk(f),c:H.rgba(H.mix(P.bone,P.ink,O.tone[i]))})),
-               bk(O.blk),rim,H.rgba(H.mix(P.bone,P.ink,0.80)));
+               bk(O.blk),rim,H.rgba(H.mix(P.bone,P.ink,0.80)),'metal');
     O.groove.forEach(g=>linePix(bk(g),H.rgba(H.mix(P.bone,P.ink,0.80)),2));
 
-    // the impact: a white flash at the trunk, then splinters off it
+    /* --- the wood: its foot is kicked out and it comes over backwards ---
+       The POINTS are rotated, not the canvas: the pixel grid survives a
+       polygon rotation and does not survive a bitmap one. The pivot TRAVELS
+       as it turns, because the base is what got hit.                       */
+    const ang=-H.ease.in(fall)*1.34, co=Math.cos(ang), si=Math.sin(ang);
+    const px0=O.pivot[0]+Math.round(O.kick*H.ease.out(fall)), py0=O.pivot[1];
+    const tp=(p)=>p.map(q=>{const a2=q[0]-O.pivot[0], b2=q[1]-py0;
+      return [Math.round(px0+a2*co-b2*si), Math.round(py0+a2*si+b2*co)];});
+    const bark=H.rgba(H.mix(P.orange,P.ink,0.58));
+    solidShape([{p:tp(O.trunk),c:bark}],tp(O.trunk),rim,null,'trunk');
+    solidShape(O.canf.map((f,i)=>({p:tp(f),c:H.rgba(H.mix(P.grass,P.ink,O.ctone[i]))})),
+               tp(O.can),rim,H.rgba(H.mix(P.grass,P.ink,0.72)),'canopy');
+
+    // the impact: a white flash on the struck side of the trunk, then splinters
     const imp=H.clamp((M-hitT)/0.16);
     if(imp>0&&imp<1){
       B.fillStyle=H.rgba(H.hex(P.paper),1-imp);
       for(let i=0;i<10;i++){const a2=(i/10)*6.283;
-        B.fillRect(Math.round(px0-22+Math.cos(a2)*imp*40),
-                   Math.round(470+Math.sin(a2)*imp*34),4,4);}
+        B.fillRect(Math.round(O.pivot[0]-16+Math.cos(a2)*imp*40),
+                   Math.round(490+Math.sin(a2)*imp*30),4,4);}
     }
     const sp=H.clamp((M-hitT)/0.60);
     if(sp>0&&sp<1){ const rr=H.rng(13);
-      for(let i=0;i<12;i++){ const vx=(rr()-0.3)*180, vy=-60-rr()*120;
+      for(let i=0;i<12;i++){ const vx=(rr()-0.3)*150, vy=-60-rr()*110;
         B.fillStyle=H.rgba(H.hex(bark),0.9-sp*0.9);
-        B.fillRect(Math.round(px0-20+vx*sp), Math.round(474+vy*sp+260*sp*sp), 3, 3); } }
+        B.fillRect(Math.round(O.pivot[0]-14+vx*sp), Math.round(492+vy*sp+250*sp*sp), 3, 3); } }
 
-    // it lands: dust along the ground, and leaves shaken loose
+    // it lands: dust along the ground UNDER the fallen trunk, and leaves after
     if(rest>0&&rest<1){ const rr=H.rng(29);
       for(let i=0;i<22;i++){ const q=H.clamp(rest*1.4-rr()*0.4); if(q<=0||q>=1)continue;
         B.fillStyle=H.rgba(H.hex(P.bone),(1-q)*0.40);
-        B.fillRect(Math.round(px0+rr()*150-q*20), Math.round(512-q*26), 4, 3); }
+        B.fillRect(Math.round(O.pivot[0]-20-rr()*140+q*18), Math.round(512-q*26), 4, 3); }
       for(let i=0;i<9;i++){ const q=H.clamp(rest*1.2-rr()*0.5); if(q<=0||q>=1)continue;
         B.fillStyle=H.rgba(H.hex(P.grass),(1-q)*0.8);
-        B.fillRect(Math.round(px0+40+rr()*120), Math.round(360+q*150), 3, 3); } }
+        B.fillRect(Math.round(O.pivot[0]-150+rr()*110), Math.round(396+q*96), 3, 3); } }
   }
   zoomRect([4,LH-40,54,16],DLG,M,0.05,0.42);
   // the card shuts ON the press, so nothing stands in front of the trick

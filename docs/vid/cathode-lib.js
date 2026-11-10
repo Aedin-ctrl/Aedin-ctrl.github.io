@@ -162,6 +162,14 @@ let BOUNDS=null;   // text extents
    title bar in every single frame of the piece. */
 let FRAMES=null;
 let GBOX=null;     // extents of the things text can hide behind
+/* Every free-standing object in the cold open. The cold open is the one scene
+   with NO group box behind it, so checkComposition -- which measures a band
+   against that box -- is structurally blind to it, and solidShape registered
+   nothing anywhere, so no other sweep could see a prop either. #005 shipped
+   with its two props sitting 74px left of frame centre and twelve sweeps
+   between them had nothing to say. solidShape files itself here now, the way
+   winFrame files its own containers. checkFraming() reads it. */
+let SCENE=null;
 let INCHROME=false;
 let OVERLAY=false; // true while drawing a window that FLOATS OVER the panel// true while drawing Win95 furniture, which is 9px by definition
 /* The glyph cache, split out of px() so a caller can MEASURE before placing.
@@ -410,6 +418,12 @@ const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
 const TAGS=['FOOD','BIOLOGY','CHEMISTRY','PHYSICS','SPACE','EARTH','WEATHER',
             'NATURE','WILDLIFE','BODY','TECH','HISTORY','MONEY','NEWS'];
 const pieceTag=()=>'#'+String(PIECE.no).padStart(3,'0')+'  '+PIECE.tags.slice(0,2).join(' / ');
+/* A SERIES is three pieces that answer one question between them. Each part is
+   still a complete video -- you can watch #008 cold -- but it is numbered, so
+   PIECE.part={n,of,first,series}. `first` is there because the palette rotates
+   by piece number and a series must not change colour halfway through: all
+   three parts take the palette of part one. */
+const partTag=()=>PIECE.part?('PART '+PIECE.part.n+'/'+PIECE.part.of):'';
 /* Put a glyph's INK centre on a point, both axes. px() places a top-left (or
    a centred advance width, which is not the same thing), so the ? inside the
    help icon was placed by eye in every piece: 3px left and 6px low, in all
@@ -440,12 +454,16 @@ function winIcon(x,y,kind){
 }
 
 function statusBar(r,T,beat){
-  const sy=r.y+r.h-15, w1=150, w2=126, x3=r.x+w1+4+w2+4;
-  const seg=(x,w)=>{rect(x,sy,w,14,P.face);bevel(x,sy,w,14,'field');};
-  seg(r.x,w1); seg(r.x+w1+4,w2); seg(x3,r.x+r.w-x3);
+  const sy=r.y+r.h-15, w1=150, w2=126, x3=r.x+w1+4+w2+4, w3=r.x+r.w-x3;
+  const seg=(x,w)=>{rect(x,sy,w,14,P.face);bevel(x,sy,w,14,'field');
+    // the segments are CONTAINERS, so checkChrome holds their text inside them.
+    // Nothing swept the status bar until a series needed a fourth thing in it.
+    if(FRAMES)FRAMES.push({x:x+3,y:sy+1,w:w-7,h:13,k:'status'});};
+  seg(r.x,w1); seg(r.x+w1+4,w2); seg(x3,w3);
   INCHROME=true;
   px(pieceTag(),r.x+4,sy+1,12,'#000',null,'"VT323"');
   px(beat,r.x+w1+8,sy+1,12,'#000',null,'"VT323"');
+  if(PIECE.part) px(partTag(),x3+4,sy+1,12,'#000',null,'"VT323"');
   px(T.toFixed(1)+'s',r.x+r.w-6,sy+1,12,'#000','right','"VT323"');
   INCHROME=false;
   return sy;}
@@ -524,7 +542,7 @@ function strokePoly(pts,col,th,open){
                                    Math.round(a0[1]+(b0[1]-a0[1])*k/n)-h,th,th);
   }
 }
-function solidShape(facets,outer,rim,seam){
+function solidShape(facets,outer,rim,seam,key){
   facets.forEach(f=>{ B.fillStyle=f.c;
     B.beginPath(); f.p.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
     B.closePath(); B.fill(); });
@@ -532,8 +550,10 @@ function solidShape(facets,outer,rim,seam){
   strokePoly(outer,'#000000',9);   // 3px of black either side of the rim
   strokePoly(outer,rim,3);
   const xs=outer.map(q=>q[0]), ys=outer.map(q=>q[1]);
-  return {x:Math.min(...xs)-4,y:Math.min(...ys)-4,
-          w:Math.max(...xs)-Math.min(...xs)+8,h:Math.max(...ys)-Math.min(...ys)+8};
+  const bx={x:Math.min(...xs)-4,y:Math.min(...ys)-4,
+            w:Math.max(...xs)-Math.min(...xs)+8,h:Math.max(...ys)-Math.min(...ys)+8};
+  if(SCENE)SCENE.push({x:bx.x,y:bx.y,w:bx.w,h:bx.h,k:key||'solid'});
+  return bx;
 }
 
 /* An open polyline in hard pixels -- ridges, striations, crevasses. solidShape

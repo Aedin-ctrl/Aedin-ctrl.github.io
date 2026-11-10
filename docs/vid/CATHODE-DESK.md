@@ -1,7 +1,19 @@
-# CATHODE DESK — house style v3.8
+# CATHODE DESK — house style v3.9
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v3.9 (2026-11-09)** — a **twelfth sweep**, `checkFraming()`: a cold-open
+> prop that has come to REST has to be centred on the frame. The cold open is
+> the one scene with no group box, so `checkComposition` — which measures a
+> band against that box — is structurally blind to it, and `solidShape()`
+> registered nothing anywhere, so no other sweep could see a prop either. #005
+> shipped with its block and its tree sitting 74px left of the middle and
+> twelve sweeps between them had nothing to say. `solidShape()` now files its
+> own extent, a key ending in `exit` marks a prop that is MEANT to leave, and
+> the status bar registers its own segments. Also **series**: `PIECE.part`
+> ({n, of, first, series, titles}) makes a numbered multi-parter, all parts
+> sharing the palette of part one. #006–#008 are the first one.
+>
 > **v3.8 (2026-11-09)** — an **eleventh sweep**, `checkChrome()`: text whose
 > origin is inside a Win95 container has to stay inside it. Every sweep until
 > now skipped `b.chrome` and `checkTruncation` only ever asked whether a string
@@ -1004,6 +1016,66 @@ found them.
 The rule it encodes: **a container is a measurement, not a suggestion.**
 `winFrame()` registers its own two rects, so the check costs the piece nothing
 and a new window is covered the moment it is drawn.
+
+## The twelfth sweep: a scene at rest is centred
+
+`checkFraming()` sweeps the props — everything `solidShape()` drew — and holds
+two different rules on purpose:
+
+* a prop **in motion** only has to stay inside the client panel. It is allowed
+  to fly, crouch, launch and topple.
+* the moment the scene **stops moving** — three sampled frames with an
+  unchanged span — the combined left-to-right extent of everything in it has to
+  be centred on the frame, within 26px.
+
+**The cold open had never been measured at all.** `checkComposition` works
+against the group box, and the cold open does not have one; `solidShape()`
+returned a bounding box to its caller and registered it nowhere. So #005 went
+out with its two props 74px left of centre, and nothing in a format with eleven
+sweeps could say so. A person watching it said so.
+
+Two conventions carry it, and both are names rather than special cases:
+
+* **`solidShape(..., key)` files its own extent** in `SCENE`, the way
+  `winFrame()` files its own containers. A new prop is measured the moment it
+  is drawn.
+* **a key ending in `exit` is exempt.** #004's cloud slopes off to the left on
+  purpose, so it is `'cloudexit'`. Same idea as the `*box` suffix that marks a
+  container — the name carries the exemption and a new piece gets it free.
+
+The rule it encodes: **a still is a composition.** A gag that ends off to one
+side is a framing error even though every pixel of it is on screen. Where a
+centred BEFORE and a centred AFTER cannot both fit, that is the geometry
+telling you the gag is wrong — #005's tree had to fall back over the metal
+instead of away from it, which is also what kicking the foot out of a standing
+pole actually does.
+
+## Series: three pieces, one question
+
+The standing rule is **one-offs**. A **series** is the exception, and it is
+declared rather than implied:
+
+```js
+part:{ n:1, of:3, first:6, series:'YOUR THERMOSTAT',
+       titles:['why you shiver','why sweating cools you',
+               'why a fever makes you cold'] }
+```
+
+* **Every part is a complete video.** You can watch part three cold. The series
+  is an invitation, not a prerequisite, and the site's strip links the parts
+  without ordering anyone around.
+* **`first` exists because the palette rotates by piece number.** Part two of a
+  trilogy would otherwise arrive in a different colour from part one, so all
+  parts take `usePalette(PIECE.part.first)`. A series is deliberately one look.
+* **The status bar's third segment carries `PART n/of`**, and the segments are
+  registered in `FRAMES`, so `checkChrome()` holds that text inside them. The
+  status bar was unswept until a series needed a fourth thing in it.
+* **`checkPiece()` validates the shape**: `of` in 2..4, `n` in 1..of, `first`
+  equal to `no - (n-1)`, a series name, and exactly `of` titles. A part that
+  disagrees with its own number cannot ship.
+* **Make the parts interlock.** #008's chill is #006 and its sweat is #007; its
+  cold open reuses #006's figure at the same coordinates, shifted to make room
+  for the dial. The rhyme is the argument, not decoration.
 
 ## Accuracy
 
