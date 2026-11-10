@@ -28,42 +28,47 @@ const PIECE={ no:12, slug:'fab', tags:['TECH','MONEY'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=84.0, VOHASH="4ee8892d647c";
+const DUR=92.3, VOHASH="7d4f63b573a5";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:5.6,z:8.383,w:["The", "wafer", "is", "finished.", "You", "still", "do", "not", "have", "a", "chip."],t:[5.6, 5.84, 6.24, 6.4, 7.24, 7.39, 7.65, 7.75, 7.89, 8.11, 8.17]},
-  {b:'SHEET',a:11.883,z:16.597,w:["What", "you", "have", "is", "one", "disc", "carrying", "hundreds", "of", "identical", "copies,", "still", "joined", "together."],t:[11.893, 12.153, 12.353, 12.623, 12.753, 12.953, 13.313, 13.853, 14.303, 14.363, 14.803, 15.693, 15.873, 16.163]},
-  {b:'SHEET',a:17.347,z:24.68,w:["Before", "anything", "is", "cut,", "every", "copy", "is", "tested", "where", "it", "lies,", "by", "pressing", "fine", "needles", "onto", "its", "contacts", "and", "running", "it."],t:[17.387, 17.937, 18.757, 19.037, 19.067, 19.547, 19.947, 20.157, 20.587, 21.037, 21.217, 21.587, 21.787, 22.247, 22.507, 23.277, 23.307, 23.547, 24.187, 24.337, 24.66]},
-  {b:'DUST',a:26.53,z:32.348,w:["Some", "of", "them", "are", "dead.", "A", "single", "dust", "particle", "in", "the", "wrong", "place", "kills", "whichever", "copy", "it", "landed", "on."],t:[26.61, 26.73, 26.83, 27.02, 27.17, 27.53, 27.59, 28.0, 28.6, 28.82, 28.95, 29.17, 29.49, 29.89, 30.27, 31.16, 31.57, 31.71, 32.14]},
-  {b:'DUST',a:33.098,z:39.838,w:["That", "is", "why", "large", "chips", "cost", "so", "much", "more", "than", "small", "ones.", "The", "same", "dust", "takes", "out", "a", "bigger", "share", "of", "a", "bigger", "die."],t:[33.098, 33.388, 33.528, 33.738, 34.118, 34.458, 34.818, 34.928, 35.238, 35.538, 35.858, 36.248, 36.838, 37.038, 37.308, 37.618, 37.948, 38.118, 38.178, 38.588, 38.928, 39.088, 39.118, 39.518]},
-  {b:'CUT',a:41.688,z:47.68,w:["Then", "the", "disc", "is", "cut", "along", "the", "empty", "lanes", "between", "the", "copies,", "wired", "out,", "lidded,", "and", "tested", "again."],t:[41.698, 41.938, 42.108, 42.348, 42.468, 42.648, 42.968, 43.138, 43.428, 43.838, 44.208, 44.498, 45.308, 46.058, 46.268, 46.928, 47.048, 47.288]},
-  {b:'CUT',a:48.43,z:53.399,w:["The", "ones", "that", "only", "partly", "pass", "are", "not", "scrapped.", "They", "are", "sold", "as", "the", "slower", "product."],t:[48.43, 48.62, 48.86, 49.12, 49.37, 49.75, 50.03, 50.25, 50.47, 51.31, 51.59, 51.81, 52.11, 52.24, 52.44, 52.88]},
-  {b:'CHOKE',a:55.249,z:61.451,w:["Every", "leading", "edge", "factory", "on", "earth", "needs", "the", "same", "machine,", "and", "one", "company", "in", "the", "Netherlands", "builds", "it."],t:[55.249, 55.689, 56.299, 56.659, 57.299, 57.449, 57.929, 58.309, 58.479, 58.709, 59.589, 59.729, 59.889, 60.239, 60.389, 60.489, 61.049, 61.349]},
-  {b:'CHOKE',a:62.201,z:66.669,w:["Each", "one", "costs", "around", "two", "hundred", "million", "dollars", "and", "arrives", "in", "hundreds", "of", "crates."],t:[62.201, 62.431, 62.631, 62.891, 63.181, 63.471, 63.761, 64.191, 64.921, 65.091, 65.531, 65.651, 66.201, 66.271]},
-  {b:'CHOKE',a:67.419,z:71.832,w:["Roughly", "eighty", "per", "cent", "of", "the", "world's", "capacity", "for", "this", "sits", "on", "a", "single", "island."],t:[67.419, 67.674, 67.929, 68.184, 68.439, 68.579, 68.799, 69.329, 69.969, 70.089, 70.299, 70.859, 70.959, 71.019, 71.409]},
-  {b:'END',a:73.682,z:75.395,w:["The", "hard", "part", "was", "never", "the", "silicon."],t:[73.692, 73.852, 74.102, 74.312, 74.482, 74.772, 74.942]},
-  {b:'END',a:76.145,z:79.376,w:["It", "is", "that", "only", "a", "handful", "of", "buildings", "on", "earth", "can", "do", "this", "at", "all."],t:[76.145, 76.195, 76.265, 76.515, 76.765, 76.915, 77.265, 77.375, 77.965, 78.115, 78.525, 78.695, 78.735, 78.925, 79.015]},
+  {b:'RECAP',a:11.883,z:18.406,w:["In", "the", "last", "video,", "ultraviolet", "light", "printed", "that", "circuit.", "Now", "we", "cut", "the", "wafer", "up", "and", "find", "out", "what", "it", "is", "worth."],t:[11.883, 12.053, 12.313, 12.663, 13.283, 14.033, 14.403, 14.863, 15.103, 15.763, 15.963, 16.093, 16.293, 16.493, 17.003, 17.113, 17.203, 17.463, 17.663, 17.788, 17.913, 18.283]},
+  {b:'SHEET',a:20.256,z:24.97,w:["What", "you", "have", "is", "one", "disc", "carrying", "hundreds", "of", "identical", "copies,", "still", "joined", "together."],t:[20.266, 20.526, 20.726, 20.996, 21.126, 21.326, 21.686, 22.226, 22.676, 22.736, 23.176, 24.066, 24.246, 24.536]},
+  {b:'SHEET',a:25.72,z:33.053,w:["Before", "anything", "is", "cut,", "every", "copy", "is", "tested", "where", "it", "lies,", "by", "pressing", "fine", "needles", "onto", "its", "contacts", "and", "running", "it."],t:[25.76, 26.31, 27.13, 27.41, 27.44, 27.92, 28.32, 28.53, 28.96, 29.41, 29.59, 29.96, 30.16, 30.62, 30.88, 31.65, 31.68, 31.92, 32.56, 32.71, 33.033]},
+  {b:'DUST',a:34.903,z:40.721,w:["Some", "of", "them", "are", "dead.", "A", "single", "dust", "particle", "in", "the", "wrong", "place", "kills", "whichever", "copy", "it", "landed", "on."],t:[34.983, 35.103, 35.203, 35.393, 35.543, 35.903, 35.963, 36.373, 36.973, 37.193, 37.323, 37.543, 37.863, 38.263, 38.643, 39.583, 40.003, 40.133, 40.513]},
+  {b:'DUST',a:41.471,z:48.211,w:["That", "is", "why", "large", "chips", "cost", "so", "much", "more", "than", "small", "ones.", "The", "same", "dust", "takes", "out", "a", "bigger", "share", "of", "a", "bigger", "die."],t:[41.471, 41.761, 41.901, 42.111, 42.481, 42.831, 43.191, 43.301, 43.611, 43.911, 44.231, 44.621, 45.211, 45.411, 45.681, 45.991, 46.321, 46.491, 46.551, 46.961, 47.301, 47.461, 47.491, 47.891]},
+  {b:'CUT',a:50.061,z:56.053,w:["Then", "the", "disc", "is", "cut", "along", "the", "empty", "lanes", "between", "the", "copies,", "wired", "out,", "lidded,", "and", "tested", "again."],t:[50.071, 50.311, 50.481, 50.721, 50.841, 51.021, 51.341, 51.511, 51.801, 52.211, 52.581, 52.871, 53.681, 54.431, 54.641, 55.301, 55.421, 55.661]},
+  {b:'CUT',a:56.803,z:61.772,w:["The", "ones", "that", "only", "partly", "pass", "are", "not", "scrapped.", "They", "are", "sold", "as", "the", "slower", "product."],t:[56.803, 57.013, 57.293, 57.603, 57.893, 58.273, 58.553, 58.803, 58.973, 59.683, 59.993, 60.233, 60.703, 60.773, 60.963, 61.323]},
+  {b:'CHOKE',a:63.622,z:69.824,w:["Every", "leading", "edge", "factory", "on", "earth", "needs", "the", "same", "machine,", "and", "one", "company", "in", "the", "Netherlands", "builds", "it."],t:[63.622, 64.062, 64.672, 65.032, 65.672, 65.822, 66.302, 66.732, 66.982, 67.322, 67.942, 68.102, 68.252, 68.742, 68.752, 68.912, 69.512, 69.804]},
+  {b:'CHOKE',a:70.574,z:75.042,w:["Each", "one", "costs", "around", "two", "hundred", "million", "dollars", "and", "arrives", "in", "hundreds", "of", "crates."],t:[70.574, 70.804, 71.004, 71.264, 71.554, 71.844, 72.134, 72.564, 73.294, 73.464, 73.904, 74.024, 74.574, 74.644]},
+  {b:'CHOKE',a:75.792,z:80.205,w:["Roughly", "eighty", "per", "cent", "of", "the", "world's", "capacity", "for", "this", "sits", "on", "a", "single", "island."],t:[75.792, 76.047, 76.302, 76.557, 76.812, 76.952, 77.172, 77.702, 78.342, 78.462, 78.672, 79.232, 79.332, 79.392, 79.782]},
+  {b:'END',a:82.055,z:83.768,w:["The", "hard", "part", "was", "never", "the", "silicon."],t:[82.065, 82.225, 82.475, 82.685, 82.855, 83.145, 83.315]},
+  {b:'END',a:84.518,z:87.749,w:["It", "is", "that", "only", "a", "handful", "of", "buildings", "on", "earth", "can", "do", "this", "at", "all."],t:[84.518, 84.568, 84.638, 84.888, 85.138, 85.288, 85.638, 85.748, 86.338, 86.488, 86.898, 87.068, 87.108, 87.298, 87.388]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:5.6,z:8.383},
-  SHEET:{sc:11.48,a:11.883,z:24.68},
-  DUST:{sc:26.13,a:26.53,z:39.838},
-  CUT:{sc:41.29,a:41.688,z:53.399},
-  CHOKE:{sc:54.85,a:55.249,z:71.832},
-  END:{sc:73.28,a:73.682,z:79.376},
+  RECAP:{sc:11.48,a:11.883,z:18.406},
+  SHEET:{sc:19.86,a:20.256,z:33.053},
+  DUST:{sc:34.5,a:34.903,z:48.211},
+  CUT:{sc:49.66,a:50.061,z:61.772},
+  CHOKE:{sc:63.22,a:63.622,z:80.205},
+  END:{sc:81.66,a:82.055,z:87.749},
 };
 const SENT={
   HOOK:[0],
-  SHEET:[1,2],
-  DUST:[3,4],
-  CUT:[5,6],
-  CHOKE:[7,8,9],
-  END:[10,11],
+  RECAP:[1],
+  SHEET:[2,3],
+  DUST:[4,5],
+  CUT:[6,7],
+  CHOKE:[8,9,10],
+  END:[11,12],
 };
 
 /* ===== THE SCENES ===== */
 const L={
+  // RECAP -- the handover, first thing on the blackboard
+  recap:{ hero:MIDY-190, chain:MIDY-100, to:MIDY+112 },
   /* THE COLD OPEN: a printed wafer and an empty chip package, side by side.
      Press, and a gold arrow runs from one to the other -- and stops dead in
      the middle, because everything this part is about lives in that gap. */
@@ -94,11 +99,11 @@ const L={
 const SPOTS=[
   // r: the hook card's OK button lands in the middle of the wafer map
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14, r:[216,386]},
-  {n:2,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:4,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:6,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:9,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:11, x:BOX[0]+56, y:BOX[1]+30, s:14},
+  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:7,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:10,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:12, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
 const ACTS=(()=>{
   const A=[];
@@ -112,15 +117,15 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const S=L.sheet, D=L.dust, C=L.cut, K=L.choke;
   // SHEET -- bring the probe down onto a die
-  drag(W(2,8), W(2,8)+1.20*SPD, [S.cx+46, S.cy-96], [S.cx+46, S.cy-30],
+  drag(W(3,8), W(3,8)+1.20*SPD, [S.cx+46, S.cy-96], [S.cx+46, S.cy-30],
        [IL+40, MIDY+184]);
   // DUST -- tap the speck
-  tap (W(3,5), [D.x2+54, D.top+40], [IL+38, MIDY-178]);
+  tap (W(4,5), [D.x2+54, D.top+40], [IL+38, MIDY-178]);
   // CUT -- draw the saw down one lane
-  drag(W(5,6), W(5,6)+1.15*SPD, [C.cx-14, C.cy-C.r-24], [C.cx-14, C.cy+C.r+20],
+  drag(W(6,6), W(6,6)+1.15*SPD, [C.cx-14, C.cy-C.r-24], [C.cx-14, C.cy+C.r+20],
        [IR-28, MIDY+186]);
   // CHOKE -- tap beside the one machine everything waits on
-  tap (W(7,10), [K.cx-104, K.isle-10], [IR-26, MIDY-180]);
+  tap (W(8,10), [K.cx-104, K.isle-10], [IR-26, MIDY-180]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 /* ===== THE EXPLAINER: testing, cutting, geopolitics ===== */
@@ -165,8 +170,8 @@ function explainer(ctx,W2,Hh,t){
 
   let boost=1;
   if(t>VO[0].z+1.74&&t<VO[0].z+2.02)boost=1.45;      // the arrow stopping dead
-  if(t>wordAt(3,5)&&t<wordAt(3,5)+0.24)boost=1.45;   // the speck landing
-  if(t>wordAt(5,6)&&t<wordAt(5,6)+0.22)boost=1.42;   // the saw
+  if(t>wordAt(4,5)&&t<wordAt(4,5)+0.24)boost=1.45;   // the speck landing
+  if(t>wordAt(6,6)&&t<wordAt(6,6)+0.22)boost=1.42;   // the saw
 
   const O=L.open;
   deskSky(T,O.ground);
@@ -232,20 +237,57 @@ function explainer(ctx,W2,Hh,t){
   }
 
   /* --- the program window. Third part, same program. --- */
-  if(T>=BEAT.SHEET.sc-0.30&&T<SHUT){
+  if(T>=BEAT.RECAP.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,PIECE.part.series,!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
-    const beat=T<BEAT.DUST.sc?'STILL ONE SHEET':T<BEAT.CUT.sc?'ONE SPECK OF DUST'
+    const beat=T<BEAT.SHEET.sc?'WHERE WE GOT TO':T<BEAT.DUST.sc?'STILL ONE SHEET':T<BEAT.CUT.sc?'ONE SPECK OF DUST'
               :T<BEAT.CHOKE.sc?'CUT AND SORTED':T<BEAT.END.sc?'THE CHOKEPOINT':'DONE';
     statusBar(r,T,beat);
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
     /* --- SHEET: hundreds of copies, tested where they lie --- */
-    if(T<BEAT.DUST.sc){
+    /* --- RECAP: where the last part got to, and where this one picks it up.
+       It is the FIRST thing on the blackboard and it is NARRATED, because a
+       viewer starting here needs the handover more than they need anything on
+       a dialog box. The chain is what the earlier parts already produced;
+       the arrow is what this one turns it into. --- */
+    if(T<BEAT.SHEET.sc){
+      const R=L.recap;
+      groupBox(BX,BY,BW,BH,'WHERE WE GOT TO');
+      const v1=VO[1];
+      const step=H.clamp((M-v1.t[0])/1.70);
+      const hand=H.clamp((M-v1.t[Math.min(8,v1.w.length-1)])/1.10);
+      pxShadow('WHERE WE GOT TO',216,R.hero,22,P.gold,P.ink,'center','"Silkscreen"');
+      if(GBOX)GBOX.push({x:IL+8,y:R.chain-30,w:IR-IL-16,h:(R.to+54)-(R.chain-30),k:'recapbox'});
+      const FROM=['A BLANK WAFER', 'EUV AT 13.5 nm', 'THE CIRCUIT PRINTED'];
+      FROM.forEach((f,i)=>{
+        const q=H.clamp(step*1.6-i*0.24); if(q<=0)return;
+        const yy=R.chain+i*34;
+        B.globalAlpha=q;
+        /* A TICK, and only where one is true. Part one's list is the PLAN, not
+           a history, so ticking it would claim work that has not happened; it
+           carries its own numbers instead. The first attempt drew the tick as
+           a four-step zigzag and it read as a squiggle, not a mark. */
+        if(PIECE.part.n>1){
+          B.fillStyle=H.rgba(H.mix(P.ice,P.bone,0.30));
+          for(let k=0;k<3;k++) B.fillRect(IL+28+k*2,yy+5+k*2,3,3);   // short arm, down
+          for(let k=0;k<5;k++) B.fillRect(IL+34+k*2,yy+9-k*2,3,3);   // long arm, up
+        }
+        px(f,IL+58,yy,14,H.mix(P.ice,P.bone,0.46),null,'"Silkscreen"');
+        B.globalAlpha=1; });
+      if(hand>0){
+        B.globalAlpha=hand;
+        dottedArrow([[216,R.to-44],[216,R.to-12]],hand,P.gold);
+        B.globalAlpha=1;
+        blockTag(216,R.to+16,'NEXT: CUT AND SOLD',14,P.gold,P.ink); }
+      typeWrap(1,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+    }
+
+    else if(T<BEAT.DUST.sc){
       const S=L.sheet, g=groupBox(BX,BY,BW,BH,'ONE DISC, HUNDREDS OF COPIES');
-      const fill=H.clamp((M-wordAt(1,4))/1.40), probe=H.clamp((M-wordAt(2,8))/1.20);
+      const fill=H.clamp((M-wordAt(2,4))/1.40), probe=H.clamp((M-wordAt(3,8))/1.20);
       pxShadow('NOT CHIPS YET',216,S.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('TESTED WHERE THEY LIE',216,S.lab,14,P.bone,'center');
       if(GBOX)GBOX.push({x:S.cx-S.r-8,y:S.cy-S.r-8,w:2*(S.r+8),h:2*(S.r+8),k:'wafermapbox'});
@@ -279,13 +321,13 @@ function explainer(ctx,W2,Hh,t){
           B.fillRect(S.cx+32,py2+12,28,3); }
       }
       if(after(2,16)) blockTag(216,S.tag,'NEEDLES, ON THE WAFER',14,P.gold,P.ink);
-      typeWrap(2,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(3,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- DUST: one speck, two die sizes. The cost is the AREA it takes out. --- */
     else if(T<BEAT.CUT.sc){
       const D=L.dust, g=groupBox(BX,BY,BW,BH,'WHY BIG CHIPS COST SO MUCH MORE');
-      const land=H.clamp((M-wordAt(3,5))/0.70), show=H.clamp((M-wordAt(4,10))/1.30);
+      const land=H.clamp((M-wordAt(4,5))/0.70), show=H.clamp((M-wordAt(5,10))/1.30);
       pxShadow('ONE SPECK',216,D.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('SAME DUST, EITHER WAY',216,D.lab,14,P.bone,'center');
       if(GBOX)GBOX.push({x:IL+8,y:D.top-16,w:IR-IL-16,h:(D.pct+24)-(D.top-16),k:'diebox'});
@@ -311,13 +353,13 @@ function explainer(ctx,W2,Hh,t){
           B.fillRect(cx-3,yy-3,7,7); });
       }
       if(after(4,20)) blockTag(216,D.tag,'A BIGGER DIE IS A BIGGER TARGET',14,P.gold,P.ink);
-      typeWrap(4,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(5,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     /* --- CUT: the lanes, and the bin the slow ones are sold in --- */
     else if(T<BEAT.CHOKE.sc){
       const C=L.cut, g=groupBox(BX,BY,BW,BH,'CUT, WIRED, AND SORTED');
-      const saw=H.clamp((M-wordAt(5,6))/1.15), bin=H.clamp((M-wordAt(6,8))/1.40);
+      const saw=H.clamp((M-wordAt(6,6))/1.15), bin=H.clamp((M-wordAt(7,8))/1.40);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('CUT ALONG THE LANES',216,C.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       if(GBOX)GBOX.push({x:C.cx-C.r-8,y:C.cy-C.r-8,w:2*(C.r+8),h:2*(C.r+8),k:'cutmapbox'});
@@ -346,22 +388,28 @@ function explainer(ctx,W2,Hh,t){
         B.fillRect(Math.round(x+ox*k/10)+3,Math.round(y+oy*k/10)+3,C.cell-10,2); }
       // two bins: the ones that passed, and the ones that nearly did
       if(bin>0){
+        /* Both bins land TOGETHER. Staggered by 0.30 they were 0.28s apart,
+           which is longer than the three identical frames checkFraming needs
+           to call a scene settled -- and it was right to: for a third of a
+           second the shot was one box on the left and nothing else. The
+           LABELS keep the stagger; text is not scene geometry. */
         [[IL+74,'FULL SPEED',P.cyan],[IR-74,'SOLD SLOWER',P.gold]].forEach(([bx,lab,col],k)=>{
-          const q=H.clamp(bin*1.5-k*0.30); if(q<=0)return;
+          const q=H.clamp(bin*1.5); if(q<=0)return;
           B.globalAlpha=q;
           // 26x30, not 30x22: at 30x22 isoBox clamps to a 4px-sided diamond
           isoSolid(isoBox(bx,C.lane,26,30),H.mix(col,P.ink,0.42),rim,'bin'+k);
-          blockTag(bx,C.lane+44,lab,14,col,P.ink);
-          B.globalAlpha=1; });
+          B.globalAlpha=1;
+          const lq=H.clamp(bin*1.5-k*0.30); if(lq<=0)return;
+          B.globalAlpha=lq; blockTag(bx,C.lane+44,lab,14,col,P.ink); B.globalAlpha=1; });
       }
       if(after(6,14)) blockTag(216,C.tag,'SAME SILICON, TWO PRODUCTS',14,P.gold,P.ink);
-      typeWrap(6,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(7,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- CHOKE: one supplier, one island, one price --- */
     else if(T<BEAT.END.sc){
       const K=L.choke, g=groupBox(BX,BY,BW,BH,'WHY ONLY A FEW PLACES CAN');
-      const one=H.clamp((M-wordAt(7,10))/1.10), isle=H.clamp((M-wordAt(9,2))/1.40);
+      const one=H.clamp((M-wordAt(8,10))/1.10), isle=H.clamp((M-wordAt(10,2))/1.40);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('$'+PRICE+'m',216,K.num,44,P.gold,P.ink,'center');
       px('EACH, FROM ONE SUPPLIER',216,K.lab,14,P.bone,'center');
@@ -385,7 +433,7 @@ function explainer(ctx,W2,Hh,t){
         if(isle>0.8) px(TW_PCT+'% ON ONE ISLAND',216,K.isle+122,14,P.gold,'center');
       }
       if(after(9,14)) blockTag(216,K.tag,'THAT IS THE CHOKEPOINT',14,P.gold,P.ink);
-      typeWrap(9,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(10,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     B.restore();
@@ -397,10 +445,10 @@ function explainer(ctx,W2,Hh,t){
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
-      capLine('> Sand was easy.',10,0,tx,m.y+12,14,'#000');
-      capLine('> Order was not.',10,3,tx,m.y+40,14,'#000');
-      capLine('A HANDFUL OF',11,0,tx,m.y+86,20,'#000080','#c0c0c0');
-      capLine('BUILDINGS.',11,9,tx,m.y+124,20,'#000080','#c0c0c0');
+      capLine('> Sand was easy.',11,0,tx,m.y+12,14,'#000');
+      capLine('> Order was not.',11,3,tx,m.y+40,14,'#000');
+      capLine('A HANDFUL OF',12,0,tx,m.y+86,20,'#000080','#c0c0c0');
+      capLine('BUILDINGS.',12,9,tx,m.y+124,20,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
     }
@@ -459,24 +507,26 @@ function buildScore(){
   add(0.05,'open'); add(PIECE.part.shut,'click'); add(PIECE.part.shut+0.24,'open');
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
-  add(BEAT.SHEET.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
+  add(BEAT.RECAP.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   const LAST=VO.length-1;
   add(VO[LAST].z+0.30,'snap'); add(VO[LAST].z+0.52,'click'); add(VO[LAST].z+0.67,'open');
-  [0,2,4,6,9,10,11].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  [0,1,3,5,7,10,11,12].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // RECAP -- the chain ticking in, then the handover
+  add(w(1,0),'draw'); add(w(1,Math.min(8,VO[1].w.length-1)),'tag');
   // the cold open: press, the arrow runs, the arrow stops
   const ok=VO[0].z+0.52, bit=ok+0.74, st=bit+0.56;
   add(ok,'snap'); add(bit,'draw'); add(st,'sub'); add(st+0.34,'zap');
   // SHEET -- the dies land, the probe comes down
-  add(w(1,4),'draw'); add(w(2,8),'draw'); add(w(2,16),'tag');
+  add(w(2,4),'draw'); add(w(3,8),'draw'); add(w(3,16),'tag');
   // DUST -- the speck
-  add(w(3,5),'zap'); add(w(4,10),'draw'); add(w(4,20),'tag');
+  add(w(4,5),'zap'); add(w(5,10),'draw'); add(w(5,20),'tag');
   // CUT -- the saw, then the bins
-  add(w(5,6),'draw'); add(w(6,8),'draw'); add(w(6,14),'tag');
+  add(w(6,6),'draw'); add(w(7,8),'draw'); add(w(7,14),'tag');
   // CHOKE -- the one machine, the island
-  add(w(7,10),'zap'); add(w(9,2),'draw'); add(w(9,14),'tag');
+  add(w(8,10),'zap'); add(w(10,2),'draw'); add(w(10,14),'tag');
   for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
   const BPM=108, E8=30/BPM, FIG=[174.61,220.00,261.63,220.00,233.08,293.66,233.08,220.00];
-  for(let i=0,tt=BEAT.SHEET.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
+  for(let i=0,tt=BEAT.RECAP.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
     if(i%8===0) add(tt,'bass',FIG[0]/2);
   }

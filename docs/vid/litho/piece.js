@@ -29,44 +29,49 @@ const PIECE={ no:11, slug:'litho', tags:['TECH','PHYSICS'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=96.3, VOHASH="db0cd4d74966";
+const DUR=104.2, VOHASH="2378095d50db";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:5.6,z:9.213,w:["A", "chip", "holds", "billions", "of", "transistors.", "Nobody", "draws", "them."],t:[5.6, 5.69, 6.06, 6.58, 7.03, 7.19, 8.32, 8.79, 8.98]},
-  {b:'PRINT',a:12.713,z:15.667,w:["They", "are", "printed,", "all", "at", "once,", "like", "a", "photograph."],t:[12.713, 12.993, 13.273, 13.833, 14.073, 14.233, 14.553, 14.873, 15.033]},
-  {b:'PRINT',a:16.417,z:24.109,w:["The", "wafer", "is", "coated", "in", "a", "light", "sensitive", "film,", "light", "is", "shone", "through", "a", "mask,", "and", "wherever", "the", "light", "lands", "the", "film", "changes."],t:[16.427, 16.617, 16.947, 17.077, 17.487, 17.617, 17.677, 18.027, 18.617, 19.177, 19.717, 20.117, 20.517, 21.227, 21.347, 21.817, 21.977, 22.477, 22.567, 22.827, 23.217, 23.427, 23.767]},
-  {b:'PRINT',a:24.859,z:29.772,w:["Develop,", "etch,", "strip,", "repeat.", "A", "modern", "chip", "takes", "dozens", "of", "passes."],t:[24.859, 25.569, 26.169, 26.469, 27.399, 27.479, 27.884, 28.289, 28.709, 29.179, 29.339]},
-  {b:'LIMIT',a:31.622,z:36.681,w:["There", "is", "a", "hard", "limit.", "You", "cannot", "print", "a", "feature", "much", "smaller", "than", "the", "wavelength", "you", "print", "it", "with."],t:[31.622, 31.842, 32.062, 32.112, 32.322, 32.922, 33.122, 33.522, 33.912, 34.202, 34.402, 34.772, 35.422, 35.702, 35.792, 36.492, 36.601, 36.631, 36.661]},
-  {b:'LIMIT',a:37.431,z:44.131,w:["For", "years", "that", "was", "deep", "ultraviolet,", "at", "a", "hundred", "and", "ninety", "three", "nanometres.", "Today", "it", "is", "thirteen", "point", "five."],t:[37.491, 37.701, 38.151, 38.731, 38.781, 39.141, 40.171, 40.494, 40.817, 41.14, 41.462, 41.785, 42.108, 42.431, 42.661, 42.891, 43.244, 43.598, 43.951]},
-  {b:'ABSORB',a:45.981,z:51.978,w:["Light", "that", "short", "has", "a", "problem.", "Almost", "everything", "absorbs", "it,", "including", "air,", "and", "including", "glass."],t:[45.981, 46.331, 46.611, 46.971, 47.171, 47.241, 47.801, 48.201, 48.901, 49.541, 49.721, 50.541, 50.821, 51.081, 51.651]},
-  {b:'ABSORB',a:52.728,z:59.537,w:["So", "there", "are", "no", "lenses.", "The", "machine", "is", "a", "vacuum,", "and", "the", "light", "is", "bounced", "off", "mirrors", "stacked", "a", "hundred", "layers", "deep."],t:[52.788, 52.878, 53.248, 53.448, 53.608, 54.308, 54.578, 55.208, 55.398, 55.888, 56.068, 56.268, 56.468, 56.788, 56.928, 57.618, 57.658, 58.148, 58.565, 58.981, 59.398, 59.448]},
-  {b:'TIN',a:61.387,z:63.396,w:["And", "nothing", "makes", "that", "light", "by", "glowing."],t:[61.387, 61.567, 61.997, 62.287, 62.707, 62.827, 62.947]},
-  {b:'TIN',a:64.146,z:69.593,w:["A", "drop", "of", "molten", "tin,", "thirty", "micrometres", "across,", "is", "fired", "through", "the", "vacuum."],t:[64.146, 64.246, 64.666, 64.876, 65.506, 66.019, 66.533, 67.046, 68.046, 68.176, 68.516, 69.056, 69.196]},
-  {b:'TIN',a:70.343,z:78.014,w:["A", "laser", "hits", "it", "twice.", "Once", "to", "flatten", "it", "into", "a", "sheet,", "once", "to", "blow", "it", "into", "plasma", "at", "two", "hundred", "thousand", "degrees."],t:[70.343, 70.433, 70.933, 71.263, 71.423, 71.923, 72.423, 72.613, 72.983, 73.063, 73.543, 73.663, 74.158, 74.653, 74.793, 75.123, 75.213, 75.493, 76.053, 76.408, 76.763, 77.118, 77.473]},
-  {b:'TIN',a:78.764,z:82.997,w:["That", "flash", "is", "the", "light,", "and", "it", "happens", "fifty", "thousand", "times", "a", "second."],t:[78.764, 79.204, 79.764, 79.974, 80.304, 80.954, 81.094, 81.234, 81.604, 81.974, 82.344, 82.604, 82.644]},
-  {b:'END',a:84.847,z:87.291,w:["The", "circuit", "is", "not", "drawn", "onto", "the", "chip."],t:[84.847, 85.057, 85.557, 85.697, 85.907, 86.257, 86.617, 86.777]},
-  {b:'END',a:88.041,z:91.669,w:["It", "is", "a", "photograph", "of", "a", "mask,", "taken", "by", "exploding", "tin."],t:[88.041, 88.091, 88.371, 88.381, 89.461, 89.681, 90.231, 90.261, 90.611, 90.761, 91.431]},
+  {b:'RECAP',a:12.713,z:18.768,w:["In", "the", "last", "video,", "sand", "became", "a", "mirror", "flat", "wafer", "of", "pure", "silicon.", "Now", "we", "put", "a", "circuit", "on", "it."],t:[12.713, 12.883, 13.193, 13.493, 13.913, 14.333, 14.773, 14.843, 15.353, 15.673, 16.393, 16.563, 16.913, 17.793, 17.953, 18.053, 18.263, 18.273, 18.623, 18.733]},
+  {b:'PRINT',a:20.618,z:23.572,w:["They", "are", "printed,", "all", "at", "once,", "like", "a", "photograph."],t:[20.618, 20.898, 21.178, 21.738, 21.978, 22.138, 22.458, 22.778, 22.938]},
+  {b:'PRINT',a:24.322,z:32.014,w:["The", "wafer", "is", "coated", "in", "a", "light", "sensitive", "film,", "light", "is", "shone", "through", "a", "mask,", "and", "wherever", "the", "light", "lands", "the", "film", "changes."],t:[24.332, 24.522, 24.852, 24.982, 25.392, 25.522, 25.582, 25.932, 26.522, 27.082, 27.622, 28.022, 28.422, 29.132, 29.252, 29.722, 29.882, 30.382, 30.472, 30.732, 31.122, 31.332, 31.672]},
+  {b:'PRINT',a:32.764,z:37.677,w:["Develop,", "etch,", "strip,", "repeat.", "A", "modern", "chip", "takes", "dozens", "of", "passes."],t:[32.764, 33.474, 34.074, 34.374, 35.304, 35.384, 35.789, 36.194, 36.614, 37.084, 37.244]},
+  {b:'LIMIT',a:39.527,z:44.586,w:["There", "is", "a", "hard", "limit.", "You", "cannot", "print", "a", "feature", "much", "smaller", "than", "the", "wavelength", "you", "print", "it", "with."],t:[39.527, 39.747, 39.967, 40.017, 40.237, 40.827, 41.027, 41.427, 41.817, 42.107, 42.307, 42.677, 43.327, 43.607, 43.727, 44.427, 44.506, 44.536, 44.566]},
+  {b:'LIMIT',a:45.336,z:52.036,w:["For", "years", "that", "was", "deep", "ultraviolet,", "at", "a", "hundred", "and", "ninety", "three", "nanometres.", "Today", "it", "is", "thirteen", "point", "five."],t:[45.396, 45.606, 46.056, 46.636, 46.686, 47.046, 48.076, 48.399, 48.722, 49.045, 49.367, 49.69, 50.013, 50.336, 50.566, 50.796, 51.149, 51.503, 51.856]},
+  {b:'ABSORB',a:53.886,z:59.883,w:["Light", "that", "short", "has", "a", "problem.", "Almost", "everything", "absorbs", "it,", "including", "air,", "and", "including", "glass."],t:[53.886, 54.236, 54.516, 54.876, 55.076, 55.146, 55.706, 56.106, 56.806, 57.446, 57.496, 58.406, 58.726, 58.986, 59.556]},
+  {b:'ABSORB',a:60.633,z:67.442,w:["So", "there", "are", "no", "lenses.", "The", "machine", "is", "a", "vacuum,", "and", "the", "light", "is", "bounced", "off", "mirrors", "stacked", "a", "hundred", "layers", "deep."],t:[60.693, 60.803, 61.223, 61.463, 61.643, 62.213, 62.483, 63.113, 63.303, 63.803, 63.973, 64.173, 64.373, 64.693, 64.833, 65.523, 65.563, 66.053, 66.47, 66.886, 67.303, 67.313]},
+  {b:'TIN',a:69.292,z:71.3,w:["And", "nothing", "makes", "that", "light", "by", "glowing."],t:[69.292, 69.472, 69.902, 70.192, 70.612, 70.732, 70.852]},
+  {b:'TIN',a:72.05,z:77.497,w:["A", "drop", "of", "molten", "tin,", "thirty", "micrometres", "across,", "is", "fired", "through", "the", "vacuum."],t:[72.05, 72.15, 72.57, 72.78, 73.41, 73.923, 74.437, 74.95, 75.95, 76.08, 76.42, 76.96, 77.1]},
+  {b:'TIN',a:78.247,z:85.918,w:["A", "laser", "hits", "it", "twice.", "Once", "to", "flatten", "it", "into", "a", "sheet,", "once", "to", "blow", "it", "into", "plasma", "at", "two", "hundred", "thousand", "degrees."],t:[78.247, 78.337, 78.837, 79.167, 79.327, 79.827, 80.327, 80.517, 80.887, 80.967, 81.447, 81.567, 82.062, 82.557, 82.697, 83.027, 83.117, 83.397, 83.957, 84.312, 84.667, 85.022, 85.377]},
+  {b:'TIN',a:86.668,z:90.901,w:["That", "flash", "is", "the", "light,", "and", "it", "happens", "fifty", "thousand", "times", "a", "second."],t:[86.668, 87.108, 87.668, 87.878, 88.208, 88.858, 88.998, 89.138, 89.508, 89.878, 90.248, 90.508, 90.548]},
+  {b:'END',a:92.751,z:95.195,w:["The", "circuit", "is", "not", "drawn", "onto", "the", "chip."],t:[92.751, 92.961, 93.461, 93.601, 93.811, 94.171, 94.521, 94.681]},
+  {b:'END',a:95.945,z:99.573,w:["It", "is", "a", "photograph", "of", "a", "mask,", "taken", "by", "exploding", "tin."],t:[95.945, 95.995, 96.275, 96.285, 97.365, 97.585, 98.135, 98.165, 98.515, 98.665, 99.335]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:5.6,z:9.213},
-  PRINT:{sc:12.31,a:12.713,z:29.772},
-  LIMIT:{sc:31.22,a:31.622,z:44.131},
-  ABSORB:{sc:45.58,a:45.981,z:59.537},
-  TIN:{sc:60.99,a:61.387,z:82.997},
-  END:{sc:84.45,a:84.847,z:91.669},
+  RECAP:{sc:12.31,a:12.713,z:18.768},
+  PRINT:{sc:20.22,a:20.618,z:37.677},
+  LIMIT:{sc:39.13,a:39.527,z:52.036},
+  ABSORB:{sc:53.49,a:53.886,z:67.442},
+  TIN:{sc:68.89,a:69.292,z:90.901},
+  END:{sc:92.35,a:92.751,z:99.573},
 };
 const SENT={
   HOOK:[0],
-  PRINT:[1,2,3],
-  LIMIT:[4,5],
-  ABSORB:[6,7],
-  TIN:[8,9,10,11],
-  END:[12,13],
+  RECAP:[1],
+  PRINT:[2,3,4],
+  LIMIT:[5,6],
+  ABSORB:[7,8],
+  TIN:[9,10,11,12],
+  END:[13,14],
 };
 
 /* ===== THE SCENES ===== */
 const L={
+  // RECAP -- the handover, first thing on the blackboard
+  recap:{ hero:MIDY-190, chain:MIDY-100, to:MIDY+112 },
   /* THE COLD OPEN: a stylus and a wafer. Press, and the pen draws its one
      careful line -- and the line is the width of a hundred thousand
      transistors. The gag is the scale, stated as a count. */
@@ -98,11 +103,11 @@ const L={
 const SPOTS=[
   // r: the hook card's OK button lands in the middle of the mask diagram
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14, r:[216,386]},
-  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:7,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:11, x:PX+10, y:CAPY, s:CAPSZ},
-  {n:13, x:BOX[0]+56, y:BOX[1]+30, s:14},
+  {n:4,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:6,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:12, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:14, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
 const ACTS=(()=>{
   const A=[];
@@ -116,17 +121,17 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const R=L.print, I=L.limit, S=L.absorb, N=L.tin;
   // PRINT -- slide the mask into place over the wafer
-  drag(W(2,8), W(2,8)+1.20*SPD, [R.cx-R.span-34, R.mask], [R.cx-R.span+6, R.mask],
+  drag(W(3,8), W(3,8)+1.20*SPD, [R.cx-R.span-34, R.mask], [R.cx-R.span+6, R.mask],
        [IL+40, MIDY+172]);
   // LIMIT -- tap beside the short wave
-  tap (W(5,12), [I.x2+52, I.wav], [IL+38, MIDY+176]);
+  tap (W(6,12), [I.x2+52, I.wav], [IL+38, MIDY+176]);
   // ABSORB -- tap beside the lens that stops it
-  tap (W(6,6), [S.x1-54, S.mid], [IR-26, MIDY-178]);
+  tap (W(7,6), [S.x1-54, S.mid], [IR-26, MIDY-178]);
   // TIN -- pull the laser in onto the droplet. The one drag that IS the beat.
-  drag(W(10,2), W(10,2)+1.25*SPD, [N.x0+28, N.lane-74], [N.cx-54, N.lane-24],
+  drag(W(11,2), W(11,2)+1.25*SPD, [N.x0+28, N.lane-74], [N.cx-54, N.lane-24],
        [IR-28, MIDY+188]);
   // and send the flash out
-  tap (W(11,8), [N.cx+78, N.lane-62], [IL+40, MIDY+190]);
+  tap (W(12,8), [N.cx+78, N.lane-62], [IL+40, MIDY+190]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 /* ===== THE EXPLAINER: printing circuits with light ===== */
@@ -173,8 +178,8 @@ function explainer(ctx,W2,Hh,t){
 
   let boost=1;
   if(t>VO[0].z+1.70&&t<VO[0].z+2.00)boost=1.45;      // the pen scrapes
-  if(t>wordAt(9,9)&&t<wordAt(9,9)+0.22)boost=1.45;   // the first pulse
-  if(t>wordAt(10,14)&&t<wordAt(10,14)+0.28)boost=1.60;// and the plasma
+  if(t>wordAt(10,9)&&t<wordAt(10,9)+0.22)boost=1.45;   // the first pulse
+  if(t>wordAt(11,14)&&t<wordAt(11,14)+0.28)boost=1.60;// and the plasma
 
   const O=L.open;
   deskSky(T,O.ground);
@@ -238,22 +243,59 @@ function explainer(ctx,W2,Hh,t){
   }
 
   /* --- the program window. Same title as part one: it is the same program. --- */
-  if(T>=BEAT.PRINT.sc-0.30&&T<SHUT){
+  if(T>=BEAT.RECAP.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,PIECE.part.series,!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
-    const beat=T<BEAT.LIMIT.sc?'PRINTED, NOT DRAWN':T<BEAT.ABSORB.sc?'THE HARD LIMIT'
+    const beat=T<BEAT.PRINT.sc?'WHERE WE GOT TO':T<BEAT.LIMIT.sc?'PRINTED, NOT DRAWN':T<BEAT.ABSORB.sc?'THE HARD LIMIT'
               :T<BEAT.TIN.sc?'NO LENSES':T<BEAT.END.sc?'THE LIGHT SOURCE':'DONE';
     statusBar(r,T,beat);
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
     /* --- PRINT: a mask, a flash, and the whole layer at once --- */
-    if(T<BEAT.LIMIT.sc){
+    /* --- RECAP: where the last part got to, and where this one picks it up.
+       It is the FIRST thing on the blackboard and it is NARRATED, because a
+       viewer starting here needs the handover more than they need anything on
+       a dialog box. The chain is what the earlier parts already produced;
+       the arrow is what this one turns it into. --- */
+    if(T<BEAT.PRINT.sc){
+      const R=L.recap;
+      groupBox(BX,BY,BW,BH,'WHERE WE GOT TO');
+      const v1=VO[1];
+      const step=H.clamp((M-v1.t[0])/1.70);
+      const hand=H.clamp((M-v1.t[Math.min(8,v1.w.length-1)])/1.10);
+      pxShadow('WHERE WE GOT TO',216,R.hero,22,P.gold,P.ink,'center','"Silkscreen"');
+      if(GBOX)GBOX.push({x:IL+8,y:R.chain-30,w:IR-IL-16,h:(R.to+54)-(R.chain-30),k:'recapbox'});
+      const FROM=['SAND, NOT SILICON', 'NINE NINES PURE', 'ONE CRYSTAL, SAWN FLAT'];
+      FROM.forEach((f,i)=>{
+        const q=H.clamp(step*1.6-i*0.24); if(q<=0)return;
+        const yy=R.chain+i*34;
+        B.globalAlpha=q;
+        /* A TICK, and only where one is true. Part one's list is the PLAN, not
+           a history, so ticking it would claim work that has not happened; it
+           carries its own numbers instead. The first attempt drew the tick as
+           a four-step zigzag and it read as a squiggle, not a mark. */
+        if(PIECE.part.n>1){
+          B.fillStyle=H.rgba(H.mix(P.ice,P.bone,0.30));
+          for(let k=0;k<3;k++) B.fillRect(IL+28+k*2,yy+5+k*2,3,3);   // short arm, down
+          for(let k=0;k<5;k++) B.fillRect(IL+34+k*2,yy+9-k*2,3,3);   // long arm, up
+        }
+        px(f,IL+58,yy,14,H.mix(P.ice,P.bone,0.46),null,'"Silkscreen"');
+        B.globalAlpha=1; });
+      if(hand>0){
+        B.globalAlpha=hand;
+        dottedArrow([[216,R.to-44],[216,R.to-12]],hand,P.gold);
+        B.globalAlpha=1;
+        blockTag(216,R.to+16,'NEXT: THE CIRCUIT',14,P.gold,P.ink); }
+      typeWrap(1,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+    }
+
+    else if(T<BEAT.LIMIT.sc){
       const R=L.print, g=groupBox(BX,BY,BW,BH,'ONE FLASH, ONE WHOLE LAYER');
-      const slide=H.clamp((M-wordAt(2,8))/1.20);
-      const flash=H.clamp((M-wordAt(2,14))/0.50);
-      const cyc  =H.clamp((M-wordAt(3,0))/1.60);
+      const slide=H.clamp((M-wordAt(3,8))/1.20);
+      const flash=H.clamp((M-wordAt(3,14))/0.50);
+      const cyc  =H.clamp((M-wordAt(4,0))/1.60);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('LIKE A PHOTOGRAPH',R.cx,R.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('MASK, LIGHT, RESIST',R.cx,R.lab,14,P.bone,'center');
@@ -289,13 +331,13 @@ function explainer(ctx,W2,Hh,t){
           B.globalAlpha=q; blockTag(IL+64+i*108,R.waf+62,s2,14,P.bone,P.ink); B.globalAlpha=1; });
         if(cyc>0.85) blockTag(R.cx,R.tag,'AND AGAIN, DOZENS OF TIMES',14,P.gold,P.ink);
       }
-      typeWrap(3,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(4,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- LIMIT: you cannot print finer than the light you print with --- */
     else if(T<BEAT.ABSORB.sc){
       const I=L.limit, g=groupBox(BX,BY,BW,BH,'THE WAVELENGTH IS THE LIMIT');
-      const w1=H.clamp((M-wordAt(4,8))/1.10), w2=H.clamp((M-wordAt(5,12))/1.10);
+      const w1=H.clamp((M-wordAt(5,8))/1.10), w2=H.clamp((M-wordAt(6,12))/1.10);
       /* The unit goes ONCE, in the middle. Printed under both numbers it was
          'NANOMETRES NANOMETRES' with 26px between the two, which does not
          overlap and so reads as one continuous line. */
@@ -323,13 +365,13 @@ function explainer(ctx,W2,Hh,t){
       if(w2>0.6){ B.fillStyle=H.rgba(P.cyan);
         B.fillRect(I.x2-3,I.bar,6,10); px('FINE',I.x2,I.bar+22,14,P.cyan,'center'); }
       if(after(5,16)) blockTag(216,I.tag,SHRINK+' TIMES SHORTER',14,P.gold,P.ink);
-      typeWrap(5,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(6,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     /* --- ABSORB: nothing is transparent to it, so nothing may be in the way --- */
     else if(T<BEAT.TIN.sc){
       const S=L.absorb, g=groupBox(BX,BY,BW,BH,'WHY THERE ARE NO LENSES');
-      const hit=H.clamp((M-wordAt(6,6))/1.00), bou=H.clamp((M-wordAt(7,8))/1.30);
+      const hit=H.clamp((M-wordAt(7,6))/1.00), bou=H.clamp((M-wordAt(8,8))/1.30);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('ABSORBED BY ALL OF IT',216,S.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('AIR, AND GLASS',216,S.lab,14,P.bone,'center');
@@ -370,16 +412,16 @@ function explainer(ctx,W2,Hh,t){
       }
       px(LAYERS+' LAYERS',S.x2,S.mid+92,14,P.cyan,'center');
       if(after(7,20)) blockTag(216,S.tag,'A VACUUM, AND MIRRORS',14,P.gold,P.ink);
-      typeWrap(7,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(8,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- TIN: the droplet, two pulses, the flash. The hero shot. --- */
     else if(T<BEAT.END.sc){
       const N=L.tin, g=groupBox(BX,BY,BW,BH,'A DROP OF TIN, FIFTY THOUSAND TIMES A SECOND');
-      const fall =H.clamp((M-wordAt(9,4))/1.10);
-      const pulse=H.clamp((M-wordAt(10,2))/1.25);
-      const blow =H.clamp((M-wordAt(10,14))/0.60);
-      const out  =H.clamp((M-wordAt(11,2))/1.10);
+      const fall =H.clamp((M-wordAt(10,4))/1.10);
+      const pulse=H.clamp((M-wordAt(11,2))/1.25);
+      const blow =H.clamp((M-wordAt(11,14))/0.60);
+      const out  =H.clamp((M-wordAt(12,2))/1.10);
       pxShadow(PLASMA.toLocaleString('en-US'),216,N.hero,44,P.orange,P.ink,'center');
       px('DEGREES C',216,N.lab,14,P.bone,'center');
       if(GBOX)GBOX.push({x:N.x0-6,y:N.lane-104,w:(N.x1-N.x0)+12,h:188,k:'tinbox'});
@@ -427,7 +469,7 @@ function explainer(ctx,W2,Hh,t){
       }
       if(after(11,6)) px(RATE.toLocaleString('en-US')+' TIMES A SECOND',216,N.rate,14,P.gold,'center');
       if(after(11,11)) blockTag(216,N.tag,'THAT FLASH IS THE LIGHT',14,P.gold,P.ink);
-      typeWrap(11,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(12,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     B.restore();
@@ -439,10 +481,10 @@ function explainer(ctx,W2,Hh,t){
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
-      capLine('> Not written.',12,0,tx,m.y+12,14,'#000');
-      capLine('> Photographed.',12,4,tx,m.y+40,14,'#000');
-      capLine('IN EXPLODING',13,0,tx,m.y+86,20,'#000080','#c0c0c0');
-      capLine('TIN.',13,7,tx,m.y+124,20,'#000080','#c0c0c0');
+      capLine('> Not written.',13,0,tx,m.y+12,14,'#000');
+      capLine('> Photographed.',13,4,tx,m.y+40,14,'#000');
+      capLine('IN EXPLODING',14,0,tx,m.y+86,20,'#000080','#c0c0c0');
+      capLine('TIN.',14,7,tx,m.y+124,20,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
     }
@@ -501,27 +543,29 @@ function buildScore(){
   add(0.05,'open'); add(3.60,'click'); add(3.84,'open');
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
-  add(BEAT.PRINT.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
+  add(BEAT.RECAP.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   const LAST=VO.length-1;
   add(VO[LAST].z+0.30,'snap'); add(VO[LAST].z+0.52,'click'); add(VO[LAST].z+0.67,'open');
-  [0,3,5,7,11,12,13].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  [0,1,4,6,8,12,13,14].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // RECAP -- the chain ticking in, then the handover
+  add(w(1,0),'draw'); add(w(1,Math.min(8,VO[1].w.length-1)),'tag');
   // the cold open: press, the pen scrapes its one line, the count lands
   const ok=VO[0].z+0.52, bit=ok+0.74, sc=bit+0.62;
   add(ok,'snap');
   for(let i=0;i<8;i++) add(bit+0.04+i*0.075,'knock',i%4);
   add(sc,'sub'); add(sc+0.40,'zap');
   // PRINT -- the mask slides, the flash, the cycle
-  add(w(2,8),'draw'); add(w(2,14),'zap'); add(w(3,0),'draw'); add(w(3,8),'tag');
+  add(w(3,8),'draw'); add(w(3,14),'zap'); add(w(4,0),'draw'); add(w(4,8),'tag');
   // LIMIT -- two waves
-  add(w(4,8),'draw'); add(w(5,12),'draw'); add(w(5,16),'tag');
+  add(w(5,8),'draw'); add(w(6,12),'draw'); add(w(6,16),'tag');
   // ABSORB -- stopped dead, then bounced
-  add(w(6,6),'zap'); add(w(7,8),'draw'); add(w(7,20),'tag');
+  add(w(7,6),'zap'); add(w(8,8),'draw'); add(w(8,20),'tag');
   // TIN -- fall, two pulses, the blow, the light out
-  add(w(9,4),'draw'); add(w(10,2),'zap'); add(w(10,9),'click');
-  add(w(10,14),'sub'); add(w(11,2),'draw'); add(w(11,11),'tag');
+  add(w(10,4),'draw'); add(w(11,2),'zap'); add(w(11,9),'click');
+  add(w(11,14),'sub'); add(w(12,2),'draw'); add(w(12,11),'tag');
   for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
   const BPM=108, E8=30/BPM, FIG=[174.61,220.00,261.63,220.00,233.08,293.66,233.08,220.00];
-  for(let i=0,tt=BEAT.PRINT.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
+  for(let i=0,tt=BEAT.RECAP.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
     if(i%8===0) add(tt,'bass',FIG[0]/2);
   }

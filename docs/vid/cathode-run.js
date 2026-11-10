@@ -112,7 +112,9 @@ window.checkPiece=function(){
   /* A standalone is 65-78s. A part of a series is allowed to be longer, and has
      to be: it spends its first four seconds on the part card and its recap, and
      it is carrying a third of an argument rather than a whole one. */
-  const LO=PIECE.part?78:65, HI=PIECE.part?100:78;
+  // A part carries the part card AND a spoken recap before it starts teaching,
+  // so both ends of its range sit above a standalone's.
+  const LO=PIECE.part?82:65, HI=PIECE.part?112:78;
   if(DUR<LO||DUR>HI) bad.push({field:'DUR',got:DUR,need:LO+'-'+HI+'s'});
   if(PIECE.part){
     const q=PIECE.part;
@@ -123,20 +125,22 @@ window.checkPiece=function(){
     if(!q.series||q.series.length<4) bad.push({field:'part.series',got:q.series});
     if(!Array.isArray(q.titles)||q.titles.length!==q.of)
       bad.push({field:'part.titles',got:q.titles,need:q.of+' titles'});
-    /* The recap is what makes the numbering mean anything. Part two of the first
-       attempt at a series opened exactly like a standalone and the PART 2/3 in
-       the status bar was the only thing distinguishing it, which is how three
-       videos came to claim they were a series without being one. */
-    if(!q.recap||q.recap.length<16) bad.push({field:'part.recap',got:q.recap,
-                                              need:'a sentence of catch-up'});
+    /* The recap is what makes the numbering mean anything, and it is a SPOKEN
+       BEAT, not a field. It lived as three rows of small print on the part card
+       and that was the wrong place: a dialog box is furniture, and the one thing
+       a viewer actually needs -- where the last part got to -- was set in the
+       smallest type in the piece and gone in two seconds. It is the first thing
+       on the blackboard now, narrated like everything else that matters. */
+    if(!BEAT.RECAP) bad.push({field:'BEAT.RECAP',got:Object.keys(BEAT).join(','),
+                              need:'a spoken RECAP beat, first on the blackboard'});
+    else if(!VO.some(v=>v.b==='RECAP'))
+      bad.push({field:'RECAP',got:'no sentences',need:'at least one spoken line'});
     /* The card's own close time. It lives in PIECE because TWO things need it:
        the piece, to stop drawing the card, and PTRACK, to put the hand on the
        button. Held in the piece alone they drifted apart and the card shut on
        its own while the hand was elsewhere. */
     if(!(q.shut>=1.6&&q.shut<=VO[0].a-0.6))
       bad.push({field:'part.shut',got:q.shut,need:'1.6 .. lead_in-0.6'});
-    if(q.recap&&q.recap.length>110) bad.push({field:'part.recap',got:q.recap.length,
-                                              need:'<=110 chars (3 rows of 34)'});
     // the lead_in has to be long enough for the card to open, be read and shut
     if(VO[0].a<4.0) bad.push({field:'lead_in',got:VO[0].a,
                               need:'>=4.0s -- the part card goes first'});

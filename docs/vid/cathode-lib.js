@@ -459,35 +459,55 @@ const partTag=()=>PIECE.part?('PART '+PIECE.part.n+'/'+PIECE.part.of):'';
    then it shuts and gets out of the way. PIECE.part.recap is that sentence.
    It is the FIRST thing a part draws, which is why the script's lead_in is long
    enough to hold it: the voice does not start until the card has gone.         */
-// 196 tall, not 180: at 180 the third row of a three-row recap ran under the
-// OK button. The recap is capped at 110 characters, so three rows is the case
-// the card has to fit, not the exception.
-const PART_DLG=[46,108,340,196];
+/* The card is a PAIR of windows: the title above, the part number in its own
+   small one below it. The title reads the same on all three parts -- that is
+   the point of it -- and the number is the only thing that changes, which is
+   why it gets a frame of its own rather than a line inside the first. It says
+   "PART 2", not "PART 2 OF 3": how many there are is not what you need to know
+   when you are about to watch one. */
+const PART_DLG=[46,168,340,120];
+const PART_NUM=[136,308,160,50];
 const PART_OK={x:PART_DLG[0]+4+(PART_DLG[2]-8)/2,
                y:PART_DLG[1]+4+15+1+(PART_DLG[3]-8-15-1)-26+10};
 function partCard(T,M,shut,t){
   if(!PIECE.part) return;
-  const q=PIECE.part, D=PART_DLG;
+  const q=PIECE.part, D=PART_DLG, N=PART_NUM;
   zoomRect([4,LH-40,54,16],D,M,0.05,0.40);
   if(T<0.40||T>=shut+0.24) return;
-  // it shuts the same way every other dialog in the format shuts
+  // both windows shut together, the way every other dialog in the format shuts
   const sq=H.clamp((H.clamp((M-shut)/0.24)-0.30)/0.70);
-  if(sq>0){ const dd=[D[0]+Math.round(sq*D[2]*0.42), D[1]+Math.round(sq*D[3]*0.42),
-                      Math.max(8,Math.round(D[2]*(1-sq*0.84))),
-                      Math.max(8,Math.round(D[3]*(1-sq*0.84)))];
-    INCHROME=true; winFrame(dd[0],dd[1],dd[2],dd[3],'',true); INCHROME=false; return; }
+  if(sq>0){ const sh=(R)=>[R[0]+Math.round(sq*R[2]*0.42), R[1]+Math.round(sq*R[3]*0.42),
+                           Math.max(8,Math.round(R[2]*(1-sq*0.84))),
+                           Math.max(8,Math.round(R[3]*(1-sq*0.84)))];
+    INCHROME=true;
+    const a=sh(D), b=sh(N);
+    winFrame(a[0],a[1],a[2],a[3],'',true); winFrame(b[0],b[1],b[2],b[3],'',true);
+    INCHROME=false; return; }
+
   const r=winFrame(D[0],D[1],D[2],D[3],q.series,true);
-  winIcon(r.x+10,r.y+11,'i');
-  px('PART '+q.n+' OF '+q.of,r.x+52,r.y+10,14,'#000080');
-  px(q.titles[q.n-1],r.x+14,r.y+44,14,'#000',null,'"Silkscreen"');
-  rect(r.x+14,r.y+68,r.w-28,1,'#808080');
-  // 34 chars of 14px Silkscreen is 294px and the card's client is 332 wide
-  const rows=[]; let cur='';
-  for(const w of String(q.recap||'').split(' ')){
-    if((cur+' '+w).trim().length>34){rows.push(cur);cur=w;} else cur=(cur?cur+' ':'')+w; }
-  if(cur)rows.push(cur);
-  rows.slice(0,3).forEach((L,i)=>px(L,r.x+14,r.y+76+i*21,14,'#000',null,'"Silkscreen"'));
+  /* The title, over two lines, split where the two come out most even. A greedy
+     wrap fills the first line and breaks "HOW A MICROCHIP IS / MADE", which is
+     a worse read than "HOW A MICROCHIP / IS MADE" for no reason. */
+  const words=String(q.series).toUpperCase().split(' '), lim=r.w-28;
+  let best=null;
+  for(let k=1;k<words.length;k++){
+    const a=words.slice(0,k).join(' '), b=words.slice(k).join(' ');
+    const wa=glyph(a,22,'"Silkscreen"').w, wb=glyph(b,22,'"Silkscreen"').w;
+    if(wa>lim||wb>lim) continue;
+    const d=Math.abs(wa-wb); if(!best||d<best.d) best={a:a,b:b,d:d};
+  }
+  const hero = best?[best.a,best.b]:[String(q.series).toUpperCase()];
+  hero.forEach((L,i)=>px(L,r.x+14,r.y+10+i*26,22,'#000080',null,'"Silkscreen"'));
+  /* The catch-up is NOT here. It used to be three rows of small print on this
+     card, which is the wrong place for it: a dialog box is furniture, and the
+     thing a viewer actually needs -- where the last part got to -- was set in
+     the smallest type in the piece and gone in two seconds. It is a spoken beat
+     on the blackboard now, the first one, like everything else that matters. */
   button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=shut);
+
+  // ...and the part number, in its own window underneath
+  const n=winFrame(N[0],N[1],N[2],N[3],'',true);
+  pxMid('PART '+q.n,n.x+n.w/2,n.y+n.h/2,20,'#000080');
 }
 /* Put a glyph's INK centre on a point, both axes. px() places a top-left (or
    a centred advance width, which is not the same thing), so the ? inside the

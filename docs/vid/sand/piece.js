@@ -29,48 +29,53 @@ const PIECE={ no:10, slug:'sand', tags:['TECH','CHEMISTRY'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=96.3, VOHASH="83f3a9356f9e";
+const DUR=102.3, VOHASH="22584814eb4c";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:4.4,z:7.881,w:["A", "microchip", "starts", "as", "sand.", "So", "why", "can't", "you", "make", "one", "on", "a", "beach?"],t:[4.4, 4.49, 5.3, 5.79, 6.41, 6.49, 6.56, 6.67, 6.85, 7.0, 7.12, 7.28, 7.38, 7.44]},
-  {b:'MELT',a:11.381,z:15.103,w:["Beach", "sand", "is", "not", "silicon.", "It", "is", "silicon", "dioxide."],t:[11.381, 11.861, 12.291, 12.431, 12.721, 13.701, 13.891, 13.991, 14.611]},
-  {b:'MELT',a:15.853,z:22.772,w:["Every", "silicon", "atom", "in", "it", "is", "already", "gripping", "two", "atoms", "of", "oxygen,", "and", "melting", "sand", "only", "gives", "you", "glass."],t:[15.853, 16.223, 16.743, 17.053, 17.153, 17.253, 17.473, 17.993, 18.873, 19.113, 19.543, 19.573, 20.683, 20.803, 21.093, 21.473, 21.853, 22.203, 22.423]},
-  {b:'BURN',a:24.622,z:29.715,w:["The", "oxygen", "is", "burned", "off", "with", "carbon,", "in", "a", "furnace", "at", "eighteen", "hundred", "degrees."],t:[24.622, 24.942, 25.552, 25.622, 26.312, 26.502, 26.792, 27.382, 27.652, 27.662, 28.302, 28.599, 28.895, 29.192]},
-  {b:'BURN',a:30.465,z:35.128,w:["The", "carbon", "wants", "oxygen", "more", "than", "silicon", "does,", "so", "it", "leaves", "as", "carbon", "monoxide."],t:[30.465, 30.675, 31.125, 31.455, 31.885, 32.165, 32.445, 32.935, 33.315, 33.435, 33.585, 33.975, 34.135, 34.515]},
-  {b:'NINES',a:36.978,z:42.445,w:["What", "pours", "out", "is", "about", "ninety", "nine", "per", "cent", "silicon.", "Almost", "anywhere", "else,", "that", "is", "pure."],t:[36.978, 37.388, 37.898, 38.208, 38.408, 38.656, 38.904, 39.152, 39.4, 39.648, 40.438, 40.858, 41.428, 41.708, 41.988, 42.128]},
-  {b:'NINES',a:43.195,z:47.227,w:["For", "a", "chip", "it", "is", "filth.", "Chip", "grade", "silicon", "is", "nine", "nines."],t:[43.245, 43.485, 43.715, 44.065, 44.155, 44.235, 44.875, 45.395, 45.745, 46.505, 46.555, 46.865]},
-  {b:'NINES',a:47.977,z:50.709,w:["One", "foreign", "atom", "per", "billion", "is", "the", "entire", "budget."],t:[47.977, 48.272, 48.567, 48.857, 49.087, 49.657, 49.757, 49.907, 50.217]},
-  {b:'PULL',a:52.559,z:57.354,w:["It", "is", "also", "the", "wrong", "shape.", "A", "chip", "needs", "one", "crystal,", "every", "atom", "on", "the", "same", "grid."],t:[52.559, 52.609, 52.709, 53.019, 53.249, 53.639, 54.279, 54.369, 54.729, 55.169, 55.439, 56.179, 56.449, 56.659, 56.759, 56.929, 57.179]},
-  {b:'PULL',a:58.104,z:64.345,w:["So", "it", "is", "melted", "at", "fourteen", "hundred", "and", "fourteen", "degrees,", "and", "a", "seed", "crystal", "is", "touched", "to", "the", "surface."],t:[58.144, 58.269, 58.394, 58.544, 59.204, 59.984, 60.764, 61.544, 61.574, 61.604, 61.634, 61.664, 61.754, 62.114, 62.824, 63.104, 63.574, 63.704, 63.884]},
-  {b:'PULL',a:65.095,z:68.193,w:["Then", "it", "is", "pulled", "up,", "turning,", "about", "a", "millimetre", "a", "minute."],t:[65.095, 65.495, 65.545, 65.685, 66.295, 66.455, 66.995, 67.215, 67.475, 67.735, 67.775]},
-  {b:'PULL',a:68.943,z:74.386,w:["The", "melt", "freezes", "onto", "the", "seed,", "copies", "its", "grid,", "and", "keeps", "copying", "for", "two", "metres."],t:[68.953, 69.183, 69.513, 70.053, 70.373, 70.613, 71.113, 71.743, 72.063, 72.553, 72.723, 73.003, 73.553, 73.743, 74.206]},
-  {b:'SLICE',a:76.236,z:80.209,w:["The", "result", "weighs", "a", "quarter", "of", "a", "tonne", "and", "is", "one", "crystal", "end", "to", "end."],t:[76.246, 76.436, 76.846, 77.256, 77.316, 77.796, 77.916, 78.076, 78.236, 78.476, 78.636, 78.876, 79.546, 79.686, 79.846]},
-  {b:'SLICE',a:80.959,z:86.955,w:["It", "is", "sawn", "into", "wafers", "and", "polished", "flat", "to", "within", "an", "atom,", "across", "three", "hundred", "millimetres."],t:[80.959, 81.009, 81.169, 81.629, 82.019, 82.689, 83.029, 83.619, 83.959, 84.059, 84.319, 84.599, 85.199, 85.724, 86.25, 86.775]},
-  {b:'END',a:88.805,z:89.746,w:["Sand", "is", "the", "cheap", "part."],t:[88.805, 88.975, 89.105, 89.255, 89.545]},
-  {b:'END',a:90.496,z:91.692,w:["What", "a", "chip", "costs", "you", "is", "order."],t:[90.496, 90.716, 90.776, 91.006, 91.236, 91.396, 91.516]},
+  {b:'HOOK',a:4.4,z:7.881,w:["A", "microchip", "starts", "as", "sand.", "So", "why", "can't", "you", "make", "one", "on", "a", "beach?"],t:[4.4, 4.49, 5.3, 5.79, 6.41, 6.46, 6.52, 6.64, 6.84, 7.0, 7.12, 7.28, 7.38, 7.44]},
+  {b:'RECAP',a:11.381,z:15.568,w:["Three", "videos,", "one", "chip.", "This", "one", "is", "about", "the", "material", "it", "is", "made", "of."],t:[11.431, 11.851, 12.461, 12.761, 13.481, 13.731, 13.911, 14.031, 14.521, 14.541, 15.021, 15.111, 15.511, 15.548]},
+  {b:'MELT',a:17.418,z:21.14,w:["Beach", "sand", "is", "not", "silicon.", "It", "is", "silicon", "dioxide."],t:[17.418, 17.898, 18.328, 18.468, 18.758, 19.738, 19.928, 20.028, 20.648]},
+  {b:'MELT',a:21.89,z:28.809,w:["Every", "silicon", "atom", "in", "it", "is", "already", "gripping", "two", "atoms", "of", "oxygen,", "and", "melting", "sand", "only", "gives", "you", "glass."],t:[21.89, 22.26, 22.78, 23.09, 23.19, 23.29, 23.51, 24.03, 24.91, 25.15, 25.58, 25.61, 26.72, 26.84, 27.13, 27.51, 27.89, 28.24, 28.46]},
+  {b:'BURN',a:30.659,z:35.752,w:["The", "oxygen", "is", "burned", "off", "with", "carbon,", "in", "a", "furnace", "at", "eighteen", "hundred", "degrees."],t:[30.659, 30.979, 31.589, 31.659, 32.349, 32.539, 32.829, 33.419, 33.689, 33.699, 34.339, 34.636, 34.932, 35.229]},
+  {b:'BURN',a:36.502,z:41.165,w:["The", "carbon", "wants", "oxygen", "more", "than", "silicon", "does,", "so", "it", "leaves", "as", "carbon", "monoxide."],t:[36.502, 36.712, 37.162, 37.492, 37.922, 38.202, 38.482, 38.972, 39.352, 39.472, 39.622, 40.012, 40.172, 40.552]},
+  {b:'NINES',a:43.015,z:48.482,w:["What", "pours", "out", "is", "about", "ninety", "nine", "per", "cent", "silicon.", "Almost", "anywhere", "else,", "that", "is", "pure."],t:[43.015, 43.425, 43.935, 44.245, 44.445, 44.693, 44.941, 45.189, 45.437, 45.685, 46.475, 46.895, 47.465, 47.745, 48.025, 48.165]},
+  {b:'NINES',a:49.232,z:53.264,w:["For", "a", "chip", "it", "is", "filth.", "Chip", "grade", "silicon", "is", "nine", "nines."],t:[49.282, 49.522, 49.752, 50.102, 50.192, 50.272, 50.912, 51.432, 51.782, 52.542, 52.592, 52.902]},
+  {b:'NINES',a:54.014,z:56.746,w:["One", "foreign", "atom", "per", "billion", "is", "the", "entire", "budget."],t:[54.014, 54.309, 54.604, 54.894, 55.124, 55.694, 55.794, 55.944, 56.254]},
+  {b:'PULL',a:58.596,z:63.391,w:["It", "is", "also", "the", "wrong", "shape.", "A", "chip", "needs", "one", "crystal,", "every", "atom", "on", "the", "same", "grid."],t:[58.596, 58.646, 58.746, 59.046, 59.266, 59.646, 60.276, 60.366, 60.726, 61.176, 61.936, 62.246, 62.506, 62.726, 62.836, 62.996, 63.216]},
+  {b:'PULL',a:64.141,z:70.382,w:["So", "it", "is", "melted", "at", "fourteen", "hundred", "and", "fourteen", "degrees,", "and", "a", "seed", "crystal", "is", "touched", "to", "the", "surface."],t:[64.181, 64.306, 64.431, 64.581, 65.241, 66.021, 66.801, 67.581, 67.611, 67.641, 67.671, 67.701, 67.791, 68.151, 68.861, 69.141, 69.611, 69.741, 69.921]},
+  {b:'PULL',a:71.132,z:74.23,w:["Then", "it", "is", "pulled", "up,", "turning,", "about", "a", "millimetre", "a", "minute."],t:[71.132, 71.532, 71.572, 71.722, 72.332, 72.402, 73.032, 73.252, 73.512, 73.772, 73.812]},
+  {b:'PULL',a:74.98,z:80.424,w:["The", "melt", "freezes", "onto", "the", "seed,", "copies", "its", "grid,", "and", "keeps", "copying", "for", "two", "metres."],t:[74.99, 75.22, 75.55, 76.09, 76.41, 76.65, 77.15, 77.78, 78.1, 78.61, 78.76, 79.06, 79.59, 79.74, 80.244]},
+  {b:'SLICE',a:82.274,z:86.247,w:["The", "result", "weighs", "a", "quarter", "of", "a", "tonne", "and", "is", "one", "crystal", "end", "to", "end."],t:[82.284, 82.474, 82.884, 83.294, 83.354, 83.834, 83.954, 84.114, 84.274, 84.514, 84.674, 84.914, 85.584, 85.724, 85.884]},
+  {b:'SLICE',a:86.997,z:92.993,w:["It", "is", "sawn", "into", "wafers", "and", "polished", "flat", "to", "within", "an", "atom,", "across", "three", "hundred", "millimetres."],t:[86.997, 87.047, 87.207, 87.667, 88.057, 88.727, 89.067, 89.657, 89.997, 90.097, 90.357, 90.637, 91.237, 91.762, 92.288, 92.813]},
+  {b:'END',a:94.843,z:95.783,w:["Sand", "is", "the", "cheap", "part."],t:[94.843, 95.013, 95.143, 95.293, 95.583]},
+  {b:'END',a:96.533,z:97.729,w:["What", "a", "chip", "costs", "you", "is", "order."],t:[96.533, 96.753, 96.813, 97.043, 97.273, 97.433, 97.553]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:4.4,z:7.881},
-  MELT:{sc:10.98,a:11.381,z:22.772},
-  BURN:{sc:24.22,a:24.622,z:35.128},
-  NINES:{sc:36.58,a:36.978,z:50.709},
-  PULL:{sc:52.16,a:52.559,z:74.386},
-  SLICE:{sc:75.84,a:76.236,z:86.955},
-  END:{sc:88.41,a:88.805,z:91.692},
+  RECAP:{sc:10.98,a:11.381,z:15.568},
+  MELT:{sc:17.02,a:17.418,z:28.809},
+  BURN:{sc:30.26,a:30.659,z:41.165},
+  NINES:{sc:42.62,a:43.015,z:56.746},
+  PULL:{sc:58.2,a:58.596,z:80.424},
+  SLICE:{sc:81.87,a:82.274,z:92.993},
+  END:{sc:94.44,a:94.843,z:97.729},
 };
 const SENT={
   HOOK:[0],
-  MELT:[1,2],
-  BURN:[3,4],
-  NINES:[5,6,7],
-  PULL:[8,9,10,11],
-  SLICE:[12,13],
-  END:[14,15],
+  RECAP:[1],
+  MELT:[2,3],
+  BURN:[4,5],
+  NINES:[6,7,8],
+  PULL:[9,10,11,12],
+  SLICE:[13,14],
+  END:[15,16],
 };
 
 /* ===== THE SCENES ===== */
 const L={
+  // RECAP -- the handover, first thing on the blackboard
+  recap:{ hero:MIDY-190, chain:MIDY-100, to:MIDY+112 },
   /* THE COLD OPEN: a heap of sand and a finished wafer, with the whole of the
      folk answer in the space between them. Press OK and the heap is heated --
      and what rises out of it is a lump of GLASS, which is what melting sand
@@ -88,8 +93,8 @@ const L={
          notch:[299,411], stand:[[288,490],[312,490],[320,514],[280,514]],
          blob:[216,452] },
   // MELT -- one silicon, two oxygen, and the grip between them
-  melt:{ cx:216, cy:MIDY-14, si:42, ox:114, oh:30,
-         hero:MIDY-172, lab:MIDY-128, tag:MIDY+150 },
+  melt:{ cx:216, cy:MIDY+20, si:42, ox:114, oh:30,
+         hero:MIDY-140, lab:MIDY-96, tag:MIDY+170 },
   // BURN -- the furnace: carbon in, carbon monoxide out, silicon down the spout
   burn:{ cx:216, cy:MIDY+56, fw:94, fh:84,
          hero:MIDY-200, lab:MIDY-150, tag:MIDY+188, cin:MIDY-96 },
@@ -110,12 +115,12 @@ const SPOTS=[
   // r: the OK button of the hook card sits exactly where the molecule lands,
   // so without a named rest the hand sat on the silicon atom for 7 seconds.
   {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14, r:[216,386]},
-  {n:2,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:4,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:7,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:11, x:PX+10, y:CAPY, s:CAPSZ},
-  {n:13, x:PX+10, y:CAPY, s:CAPSZ},
-  {n:15, x:BOX[0]+56, y:BOX[1]+30, s:14},
+  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:8,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:12, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:14, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:16, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
 const ACTS=(()=>{
   const A=[];
@@ -129,21 +134,21 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const E=L.melt, U=L.burn, N=L.nines, Q=L.pull, S=L.slice;
   // MELT -- tug one oxygen away from the silicon. It does not come.
-  drag(W(2,7), W(2,7)+1.15*SPD, [E.cx+E.ox, E.cy+E.oh+30], [E.cx+E.ox+54, E.cy+E.oh+30],
+  drag(W(3,7), W(3,7)+1.15*SPD, [E.cx+E.ox, E.cy+E.oh+30], [E.cx+E.ox+54, E.cy+E.oh+30],
        [IL+40, MIDY+186]);
   // BURN -- drop the carbon in
   // the rest is LOW and LEFT, not up in the corner: from the top right the hop
   // to the caption strip is 599px, and 599px inside one 0.70s approach is a
   // hand that teleports.
-  drag(W(3,3), W(3,3)+1.10*SPD, [U.cx-70, U.cin-18], [U.cx-70, U.cin+44],
-       [IL+40, MIDY+170]);
+  drag(W(4,3), W(4,3)+1.10*SPD, [U.cx-70, U.cin-18], [U.cx-70, U.cin+44],
+       [IL+26, MIDY+146]);
   // NINES -- tap the one bad dot
-  tap (W(7,2), [N.x1+44, N.grid+36], [IR-26, MIDY+196]);
+  tap (W(8,2), [N.x1+44, N.grid+36], [IR-26, MIDY+196]);
   // PULL -- haul the seed up out of the melt. The one drag that IS the process.
-  drag(W(10,2), W(10,2)+1.30*SPD, [Q.cx+Q.bw+34, Q.melt-26], [Q.cx+Q.bw+34, Q.rod+54],
+  drag(W(11,2), W(11,2)+1.30*SPD, [Q.cx+Q.bw+34, Q.melt-26], [Q.cx+Q.bw+34, Q.rod+54],
        [IL+38, MIDY+200]);
   // SLICE -- draw the saw across
-  drag(W(13,2), W(13,2)+1.10*SPD, [S.x0+56, S.cy-S.r-28], [S.x0+56, S.cy+S.r+26],
+  drag(W(14,2), W(14,2)+1.10*SPD, [S.x0+56, S.cy-S.r-28], [S.x0+56, S.cy+S.r+26],
        [IR-28, MIDY+188]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
@@ -193,8 +198,8 @@ function explainer(ctx,W2,Hh,t){
 
   let boost=1;
   if(t>VO[0].z+1.60&&t<VO[0].z+1.95)boost=1.50;      // the heap taking the heat
-  if(t>wordAt(9,8)&&t<wordAt(9,8)+0.25)boost=1.42;   // the seed touching down
-  if(t>wordAt(13,2)&&t<wordAt(13,2)+0.22)boost=1.42; // the saw
+  if(t>wordAt(10,8)&&t<wordAt(10,8)+0.25)boost=1.42;   // the seed touching down
+  if(t>wordAt(14,2)&&t<wordAt(14,2)+0.22)boost=1.42; // the saw
 
   const O=L.open;
   deskSky(T,O.ground);
@@ -276,22 +281,62 @@ function explainer(ctx,W2,Hh,t){
 
   /* --- the program window. The title is the SERIES, not this part: three
      videos opening the same program is the thing that makes them one. --- */
-  if(T>=BEAT.MELT.sc-0.30&&T<SHUT){
+  if(T>=BEAT.RECAP.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,PIECE.part.series,!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
-    const beat=T<BEAT.BURN.sc?'WHAT SAND IS':T<BEAT.NINES.sc?'TAKING THE OXYGEN OFF'
+    const beat=T<BEAT.MELT.sc?'WHERE WE GOT TO':T<BEAT.BURN.sc?'WHAT SAND IS':T<BEAT.NINES.sc?'TAKING THE OXYGEN OFF'
               :T<BEAT.PULL.sc?'HOW CLEAN IS CLEAN':T<BEAT.SLICE.sc?'GROWING ONE CRYSTAL'
               :T<BEAT.END.sc?'CUTTING IT UP':'DONE';
     statusBar(r,T,beat);
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
     /* --- MELT: one silicon already holding two oxygens --- */
-    if(T<BEAT.BURN.sc){
+    /* --- RECAP: where the last part got to, and where this one picks it up.
+       It is the FIRST thing on the blackboard and it is NARRATED, because a
+       viewer starting here needs the handover more than they need anything on
+       a dialog box. The chain is what the earlier parts already produced;
+       the arrow is what this one turns it into. --- */
+    if(T<BEAT.MELT.sc){
+      const R=L.recap;
+      groupBox(BX,BY,BW,BH,'WHERE WE GOT TO');
+      const v1=VO[1];
+      const step=H.clamp((M-v1.t[0])/1.70);
+      const hand=H.clamp((M-v1.t[Math.min(8,v1.w.length-1)])/1.10);
+      pxShadow('THREE VIDEOS, ONE CHIP',216,R.hero,22,P.gold,P.ink,'center','"Silkscreen"');
+      if(GBOX)GBOX.push({x:IL+8,y:R.chain-30,w:IR-IL-16,h:(R.to+54)-(R.chain-30),k:'recapbox'});
+      /* Part one has no 'last time', so the chain is the PLAN: all three parts,
+         read off PIECE.part.titles so it cannot disagree with the part card or
+         with the series strip on the site. */
+      const FROM=PIECE.part.titles.map((x,i)=>(i+1)+'  '+x.toUpperCase());
+      FROM.forEach((f,i)=>{
+        const q=H.clamp(step*1.6-i*0.24); if(q<=0)return;
+        const yy=R.chain+i*34;
+        B.globalAlpha=q;
+        /* A TICK, and only where one is true. Part one's list is the PLAN, not
+           a history, so ticking it would claim work that has not happened; it
+           carries its own numbers instead. The first attempt drew the tick as
+           a four-step zigzag and it read as a squiggle, not a mark. */
+        if(PIECE.part.n>1){
+          B.fillStyle=H.rgba(H.mix(P.ice,P.bone,0.30));
+          for(let k=0;k<3;k++) B.fillRect(IL+28+k*2,yy+5+k*2,3,3);   // short arm, down
+          for(let k=0;k<5;k++) B.fillRect(IL+34+k*2,yy+9-k*2,3,3);   // long arm, up
+        }
+        px(f,IL+58,yy,14,H.mix(P.ice,P.bone,0.46),null,'"Silkscreen"');
+        B.globalAlpha=1; });
+      if(hand>0){
+        B.globalAlpha=hand;
+        dottedArrow([[216,R.to-44],[216,R.to-12]],hand,P.gold);
+        B.globalAlpha=1;
+        blockTag(216,R.to+16,'WE START WITH: THE MATERIAL',14,P.gold,P.ink); }
+      typeWrap(1,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+    }
+
+    else if(T<BEAT.BURN.sc){
       const E=L.melt, g=groupBox(BX,BY,BW,BH,'WHAT BEACH SAND ACTUALLY IS');
-      const pull=H.clamp((M-wordAt(2,7))/1.15);   // the drag, which achieves nothing
-      const jig=H.clamp((M-wordAt(2,13))/0.60);   // heat: it rattles, it does not let go
+      const pull=H.clamp((M-wordAt(3,7))/1.15);   // the drag, which achieves nothing
+      const jig=H.clamp((M-wordAt(3,13))/0.60);   // heat: it rattles, it does not let go
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       // spelt out, not 'SiO2': Silkscreen has no lowercase, so the formula came
       // out as 'SIO 2' with the subscript adrift beside it.
@@ -314,14 +359,14 @@ function explainer(ctx,W2,Hh,t){
       isoSolid(isoBox(E.cx+sh(0.4),E.cy,E.si,E.si+4),H.mix(P.ice,P.bone,0.42),rim,'si');
       pxMid('Si',E.cx+sh(0.4),E.cy-10,20,P.ink,'"Silkscreen"');
       if(after(2,13)) blockTag(E.cx,E.tag,'MELT IT AND YOU GET GLASS',14,P.gold,P.ink);
-      typeWrap(2,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(3,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- BURN: carbon in, carbon monoxide out --- */
     else if(T<BEAT.NINES.sc){
       const U=L.burn, g=groupBox(BX,BY,BW,BH,'THE CARBOTHERMIC FURNACE');
-      const drop=H.clamp((M-wordAt(3,3))/1.10), fire=H.clamp((M-wordAt(3,10))/0.90);
-      const out =H.clamp((M-wordAt(4,8))/1.10);
+      const drop=H.clamp((M-wordAt(4,3))/1.10), fire=H.clamp((M-wordAt(4,10))/0.90);
+      const out =H.clamp((M-wordAt(5,8))/1.10);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow(String(FURNACE),U.cx,U.hero,44,P.orange,P.ink,'center');
       px('DEGREES C',U.cx,U.lab,14,P.bone,'center');
@@ -356,7 +401,7 @@ function explainer(ctx,W2,Hh,t){
       B.fillRect(U.cx-38,U.cy-4,76,46);
       bevel(U.cx-38,U.cy-4,76,46,'field');
       // the tap: silicon leaves the bottom, which is the point of the furnace
-      const tap=H.clamp((M-wordAt(4,8))/1.40);
+      const tap=H.clamp((M-wordAt(5,8))/1.40);
       if(tap>0){
         B.fillStyle=H.rgba(H.mix(shell,P.ink,0.40));
         B.fillRect(U.cx+U.fw-14,U.cy+U.fh-34,30,10);
@@ -375,14 +420,14 @@ function explainer(ctx,W2,Hh,t){
         if(out>0.7) blockTag(U.cx,U.cy-128,'CO OUT',14,P.cyan,P.ink);
       }
       if(after(4,13)) blockTag(U.cx,U.tag,'99% SILICON, AND NOT CLEAN',14,P.gold,P.ink);
-      typeWrap(4,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(5,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     /* --- NINES: 99% against nine nines. The dot grid is the argument: 1% of
        a hundred dots is one dot, and one dot is obviously a lot. --- */
     else if(T<BEAT.PULL.sc){
       const N=L.nines, g=groupBox(BX,BY,BW,BH,'HOW CLEAN IS CLEAN');
-      const grid=H.clamp((M-wordAt(5,4))/1.20), flip=H.clamp((M-wordAt(6,5))/0.90);
+      const grid=H.clamp((M-wordAt(6,4))/1.20), flip=H.clamp((M-wordAt(7,5))/0.90);
       if(GBOX)GBOX.push({x:IL+10,y:N.num-30,w:IR-IL-20,h:(N.pct+22)-(N.num-30),k:'puritybox'});
       /* 'FURNACE GRADE' and 'CHIP GRADE' were 183px and 141px with 5px between
          them: they did not overlap, so checkOverlap had nothing to say, and
@@ -408,15 +453,15 @@ function explainer(ctx,W2,Hh,t){
         px(PURE,216,N.pct+34,20,P.cyan,'center','"Silkscreen"');
       }
       if(after(7,3)) blockTag(216,N.tag,'ONE STRANGER ATOM IN A BILLION',14,P.gold,P.ink);
-      typeWrap(7,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(8,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- PULL: the Czochralski puller. The seed goes down, comes up turning,
        and the melt freezes onto it copying the grid it was given. --- */
     else if(T<BEAT.SLICE.sc){
       const Q=L.pull, g=groupBox(BX,BY,BW,BH,'GROWING ONE CRYSTAL');
-      const dip =H.clamp((M-wordAt(9,8))/0.80);
-      const grow=H.clamp((M-wordAt(10,2))/1.30);
+      const dip =H.clamp((M-wordAt(10,8))/0.80);
+      const grow=H.clamp((M-wordAt(11,2))/1.30);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow(String(MELTPT),Q.cx,Q.hero,32,P.orange,P.ink,'center');
       px('DEGREES C, AND ONE GRID',Q.cx,Q.lab+26,14,P.bone,'center');
@@ -490,13 +535,13 @@ function explainer(ctx,W2,Hh,t){
         if(grow>0.55) blockTag(Q.cx+Q.bw+74,(top+bot)/2,'1 mm/min',14,P.ice,P.ink);
       }
       if(after(11,9)) blockTag(Q.cx,Q.tag,'ONE CRYSTAL, TWO METRES LONG',14,P.gold,P.ink);
-      typeWrap(11,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      typeWrap(12,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     /* --- SLICE: the boule on its side, the lanes, the wafers --- */
     else if(T<BEAT.END.sc){
       const S=L.slice, g=groupBox(BX,BY,BW,BH,'SAWN AND POLISHED');
-      const saw=H.clamp((M-wordAt(13,2))/1.10), fan=H.clamp((M-wordAt(13,6))/1.20);
+      const saw=H.clamp((M-wordAt(14,2))/1.10), fan=H.clamp((M-wordAt(14,6))/1.20);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('250 kg',216,S.hero,32,P.gold,P.ink,'center');
       if(GBOX)GBOX.push({x:S.x0-10,y:S.cy-S.r-16,w:(S.x1-S.x0)+20,
@@ -542,7 +587,7 @@ function explainer(ctx,W2,Hh,t){
                    H.rgba(H.mix(P.ice,P.ink,0.52)),'waf'+i);
         B.globalAlpha=1; }
       if(fan>0.6) blockTag(216,S.tag,'300 mm, FLAT TO AN ATOM',14,P.gold,P.ink);
-      typeWrap(13,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(14,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     B.restore();
@@ -554,10 +599,10 @@ function explainer(ctx,W2,Hh,t){
       const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
       winIcon(m.x+10,m.y+11,'i');
       const tx=m.x+52;
-      capLine('> Sand is free.',14,0,tx,m.y+12,14,'#000');
-      capLine('> Pure is not.',14,2,tx,m.y+40,14,'#000');
-      capLine('YOU PAY FOR',15,0,tx,m.y+86,20,'#000080','#c0c0c0');
-      capLine('THE ORDER.',15,5,tx,m.y+124,20,'#000080','#c0c0c0');
+      capLine('> Sand is free.',15,0,tx,m.y+12,14,'#000');
+      capLine('> Pure is not.',15,2,tx,m.y+40,14,'#000');
+      capLine('YOU PAY FOR',16,0,tx,m.y+86,20,'#000080','#c0c0c0');
+      capLine('THE ORDER.',16,5,tx,m.y+124,20,'#000080','#c0c0c0');
       button(m.x+m.w/2-32,m.y+m.h-26,64,20,'OK',t>=CLICK);
       OVERLAY=false;
     }
@@ -617,28 +662,30 @@ function buildScore(){
   add(2.60,'click'); add(2.84,'open');               // ...and the hook card after it
   PTRACK.forEach(q=>{ if(q.c) add(q.t,'click'); });
   RINGS.forEach(q=>add(q.t,'click'));
-  add(BEAT.MELT.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
+  add(BEAT.RECAP.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   const LAST=VO.length-1;
   add(VO[LAST].z+0.30,'snap'); add(VO[LAST].z+0.52,'click'); add(VO[LAST].z+0.67,'open');
-  [0,2,4,7,11,13,14,15].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  [0,1,3,5,8,12,14,15,16].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // RECAP -- the chain ticking in, then the handover
+  add(w(1,0),'draw'); add(w(1,Math.min(8,VO[1].w.length-1)),'tag');
   // the cold-open gag: press, the heap takes the heat, glass comes out
   const ok=VO[0].z+0.52, bit=ok+0.74, heat=bit+0.52;
   add(ok,'snap');
   for(let i=0;i<7;i++) add(bit+0.03+i*0.072,'knock',i%4);   // the furnace roaring up
   add(heat,'sub'); add(heat+0.34,'zap'); add(heat+0.52,'mos');
   // MELT -- the tug that fails
-  add(w(2,7),'draw'); add(w(2,13),'zap'); add(w(2,18),'tag');
+  add(w(3,7),'draw'); add(w(3,13),'zap'); add(w(3,18),'tag');
   // BURN -- carbon down the throat, CO out
-  add(w(3,3),'draw'); add(w(3,10),'zap'); add(w(4,8),'draw'); add(w(4,13),'tag');
+  add(w(4,3),'draw'); add(w(4,10),'zap'); add(w(5,8),'draw'); add(w(5,13),'tag');
   // NINES -- the grid, the flip, the punch
-  add(w(5,4),'draw'); add(w(6,5),'zap'); add(w(7,3),'tag');
+  add(w(6,4),'draw'); add(w(7,5),'zap'); add(w(8,3),'tag');
   // PULL -- the seed touching down, then the long haul
-  add(w(9,8),'zap'); add(w(10,2),'draw'); add(w(11,9),'tag');
+  add(w(10,8),'zap'); add(w(11,2),'draw'); add(w(12,9),'tag');
   // SLICE -- the saw
-  add(w(13,2),'draw'); add(w(13,6),'draw');
+  add(w(14,2),'draw'); add(w(14,6),'draw');
   for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
   const BPM=108, E8=30/BPM, FIG=[174.61,220.00,261.63,220.00,233.08,293.66,233.08,220.00];
-  for(let i=0,tt=BEAT.MELT.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
+  for(let i=0,tt=BEAT.RECAP.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
     add(tt,'note',FIG[i%FIG.length]*((i%16)<8?1:1.5));
     if(i%8===0) add(tt,'bass',FIG[0]/2);
   }

@@ -1,7 +1,14 @@
-# CATHODE DESK — house style v4.1
+# CATHODE DESK — house style v4.2
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.2 (2026-11-10)** — the part card is a PAIR of windows: the series title,
+> the same on all three parts, and the part number in its own small one below
+> it. It says "PART 2", not "PART 2 OF 3". **The recap left the card and became
+> the first spoken beat on the blackboard** — a dialog box is furniture, and the
+> one thing a viewer needs was set in the smallest type in the piece. `BEAT.RECAP`
+> is now required of every part; `PIECE.part.recap` is gone.
+>
 > **v4.1 (2026-11-10)** — an audit with instruments that do NOT read the
 > registries found what the registries could not. `blockTag()` sized its plate
 > from `text.length*(size*0.62)`; Silkscreen advances **0.6667**, so every tag
@@ -1116,12 +1123,26 @@ it up and sells it. If you can reorder the parts, you have not got a series.
   normal case, not the exception, which is why each part gets a recap rather
   than an assumption.
 * **A part says which part it is, before anything else.** `partCard()` rises out
-  of the taskbar at t=0.05, carries the series in its title bar, the part number,
-  that part's own subtitle and the `recap` line, and shuts on a press. It is the
-  first thing drawn and the cold open does not start until it has gone.
-* **`recap` is the catch-up**, one sentence, 16 to 110 characters — three rows of
-  34 at 14px Silkscreen, which is what the card is sized to hold. Part one has
-  nothing to recap, so it states the promise of the series instead.
+  of the taskbar at t=0.05 as **two windows**: the series title, and the part
+  number in a small one of its own underneath. It shuts on a press, and the cold
+  open does not start until it has gone.
+* **The title reads the same on all three.** That is what makes them one thing.
+  It is wrapped over two lines at the split that comes out most even — a greedy
+  wrap breaks "HOW A MICROCHIP IS / MADE", which is a worse read than
+  "HOW A MICROCHIP / IS MADE" for no reason.
+* **"PART 2", not "PART 2 OF 3".** How many there are is not what you need to
+  know when you are about to watch one.
+* **The recap is a SPOKEN BEAT, the first on the blackboard — not a line on the
+  card.** It lived on the card as three rows of small print and that was the
+  wrong place for it: the one thing a viewer who starts here actually needs was
+  the smallest type in the piece and gone in two seconds. It is `BEAT.RECAP`
+  now, narrated, in the form *"in the last video X, so now Y"*, and
+  `checkPiece()` refuses a part without one.
+* **The recap scene shows the chain, read off `PIECE`.** Parts after the first
+  tick off what the earlier parts produced and point an arrow at what this one
+  turns it into. Part one has no history, so its chain is the PLAN — the three
+  titles from `PIECE.part.titles`, **untick**, because a tick on a plan claims
+  work that has not happened.
 * **`shut` is the card's close time, and it lives in `PIECE`** because two things
   need it: the piece, to stop drawing the card, and `PTRACK`, to put the hand on
   the button. Held privately in the piece they drifted and the card shut by
