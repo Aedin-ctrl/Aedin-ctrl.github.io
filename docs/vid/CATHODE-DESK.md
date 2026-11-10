@@ -1,7 +1,15 @@
-# CATHODE DESK — house style v4.2
+# CATHODE DESK — house style v4.3
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.3 (2026-11-10)** — **the running-time target is 85–110s, not 65–75.**
+> Twelve finished pieces settle it: the nine built to the old bar all land
+> between 66.6s and 73.5s and each one stops just as it gets going, while the
+> three built to the longer bar (102.3s · 104.2s · 92.3s) are the better pieces.
+> The old rule said to get there "with breath, not with padding"; that was right
+> at 70s and wrong at 100s. **The gaps do not move** — the length comes from a
+> third mechanism. See Running time.
+>
 > **v4.2 (2026-11-10)** — the part card is a PAIR of windows: the series title,
 > the same on all three parts, and the part number in its own small one below
 > it. It says "PART 2", not "PART 2 OF 3". **The recap left the card and became
@@ -325,13 +333,28 @@ them.
 
 ## Running time
 
-**Target 65–75 seconds, or longer. Never shorter.**
+**Target 85–110 seconds. Never under 65.**
 
-**Get there with breath, not with padding.** At natural pace this script is
-44.6s of speech; the length comes from the gaps. Widening them from 0.45/1.20
-to **0.75s between sentences and 1.85s between beats** took it from 59.6s to
-70.1s and improved the pacing — padding the tail would have added the same
-seconds as dead air.
+Measured, finished: honey **71.7s** · halloumi **69.4s** · ice **73.5s** · sky
+**66.6s** · metal **71.4s** · shiver **67.4s** · sweat **67.7s** · fever
+**70.6s** · glass **67.9s** — then the chip series, built to the longer bar:
+sand **102.3s** · litho **104.2s** · fab **92.3s**. The first nine sat on the
+old 65–75 target and every one of them stops just as it gets going. The three
+that ran past 90 say more and are the better pieces.
+
+**Get there with a third mechanism, not with wider gaps.** The gaps stay at
+**0.75s between sentences and 1.85s between beats**. Widening them from
+0.45/1.20 to those values is what took honey from 59.6s to 70.1s, and that was
+the right fix at the time — but they are already about 35% of the running time,
+and widening them again is dead air, not pacing. A longer piece is longer
+because it *says more*, at the same cadence.
+
+**The arithmetic:** hook (1 beat) + two mechanisms (2 beats each, one of them
+charted) + the turn (2 beats) + a second-order consequence (1–2 beats) +
+takeaway (1 beat) = **9–11 beats · 190–240 spoken words**. A piece standing on
+one mechanism runs 30s and then repeats itself; if the second leg cannot be
+named before storyboarding, the episode does not exist yet. `IDEAS.md`
+annotates every entry with the legs it stands on for exactly this reason.
 
 **`SPD` is the one speed knob**, at module scope so the picture and the score
 read the same value. Every motion duration is written at **natural rate** and
