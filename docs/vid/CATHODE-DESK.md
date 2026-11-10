@@ -1,7 +1,26 @@
-# CATHODE DESK — house style v4.3
+# CATHODE DESK — house style v4.4
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.4 (2026-11-10)** — **a part opens on ONE card, and the card talks.**
+> It was two: the series card, and then the piece's own question in the cold
+> open — two questions put to the viewer before anything had been explained,
+> and neither of them was *the* question. The series question is now the only
+> one, it is **narrated while it types**, the part number **pops out from under
+> it** and is **said**, and the two windows are dismissed in the order they
+> arrived: OK, then the X. **Part one no longer gets a recap** — it has nothing
+> to hand over, so it opens on a question. See *Series*.
+>
+> Three things that were quietly true for months: `solidShape()` filed its
+> extent in `SCENE` and not in `GBOX`, so **no drawn object was visible to
+> `checkOverlap`**; the graphic-vs-graphic test only ever compared `tag:* vs
+> voxbar`, so a plate on anything else could not be found; and #010's puller
+> was filed from `Q.rod+36`, 36px below where it was drawn, **and** named
+> `pullerbox`. Each of the three on its own was enough to report a clean 23px
+> gap through a caption the rod was drawn straight across. All three fixed, and
+> `checkPiece`'s duration gate no longer refuses a standalone built to v4.3's
+> own target. See *Register what you draw* and *Shapes a sweep cannot see*.
+>
 > **v4.3 (2026-11-10)** — **the running-time target is 85–110s, not 65–75.**
 > Twelve finished pieces settle it: the nine built to the old bar all land
 > between 66.6s and 73.5s and each one stops just as it gets going, while the
@@ -1127,10 +1146,10 @@ The standing rule is **one-offs**. A **series** is the exception, and it is
 declared rather than implied:
 
 ```js
-part:{ n:1, of:3, first:10, series:'How a Microchip Is Made', shut:2.60,
+part:{ n:1, of:3, first:10, series:'How is a microchip made?',
        titles:['from sand to silicon','printing circuits with light',
                'testing, cutting, geopolitics'],
-       recap:'Three parts, beach to chip. This one: getting the material clean enough.' }
+       pop:3.27, shut:4.63, xshut:5.33 }
 ```
 
 **The parts have to need each other.** The first attempt at this was #006-#008,
@@ -1142,50 +1161,121 @@ standalones that mention each other. A real part **ends somewhere its successor
 begins**: #010 hands over a blank wafer, #011 prints a circuit on it, #012 cuts
 it up and sells it. If you can reorder the parts, you have not got a series.
 
-* **Every part still opens cold.** The viewer who starts at part three is the
-  normal case, not the exception, which is why each part gets a recap rather
-  than an assumption.
-* **A part says which part it is, before anything else.** `partCard()` rises out
-  of the taskbar at t=0.05 as **two windows**: the series title, and the part
-  number in a small one of its own underneath. It shuts on a press, and the cold
-  open does not start until it has gone.
-* **The title reads the same on all three.** That is what makes them one thing.
-  It is wrapped over two lines at the split that comes out most even — a greedy
-  wrap breaks "HOW A MICROCHIP IS / MADE", which is a worse read than
-  "HOW A MICROCHIP / IS MADE" for no reason.
+### One card, and it is the series' question
+
+**`series` is a QUESTION, and it is the only question the piece asks.** It used
+to be a statement — *How a Microchip Is Made* — sitting above a second card that
+asked the piece's own hook: *"a microchip starts as sand, so why can't you make
+one on a beach?"* Two cards, two questions, and the viewer had been asked both
+of them before a single thing had been explained. Whichever one was the real
+question, the other one spent its screen time diluting it.
+
+So: **the card asks the series question, identical on all three parts, and the
+piece's hook becomes the first line on the blackboard, where it is content.**
+That is also the honest place for it — *"sand, and yet you cannot make one on a
+beach"* is an argument, and arguments belong on the board.
+
+* **The title is wrapped over two lines** at the split that comes out most even.
+  A greedy wrap breaks `HOW IS A MICROCHIP / MADE?`, which is a worse read than
+  `HOW IS A / MICROCHIP MADE?` for no reason.
+* **The program window's title is the SERIES question**, not the part. Three
+  videos opening the same program is most of what makes them one thing.
+* **The status bar's third segment carries `PART n/of`**, and the segments are
+  registered in `FRAMES`, so `checkChrome()` holds that text inside them.
+
+### The card is narrated, and it is a sequence
+
+**Anything on screen long enough to read is spoken.** The card used to be two
+and a half seconds of text with no voice on it at all. The format's own rule is
+that the screen says what the voice is saying — v2.9 was thrown out for putting
+a question on the sky while the narrator said something else — and silent text
+breaks the same rule from the other side. A part's first two beats are therefore
+the card itself:
+
+| beat | says | drawn |
+|---|---|---|
+| `TITLE` | *"How is a microchip made?"* | types **word by word off its own word onsets** |
+| `PART` | *"Part one."* | `PART 1` appears as the narrator says it |
+
+Typing at a character rate drifts against a voice inside half a sentence. The
+onsets are measurements of this exact audio, so a word lands as it is said.
+
+**It is two objects, so it is a sequence.** Both windows used to arrive together
+at t=0.40 and die on a single press, which read as one graphic with a button on
+it rather than a program being used. In order:
+
+```
+0.05  the question rises out of the taskbar
+0.80  it types itself while the narrator asks it
+pop   the part number pops out from UNDER the question, in a window of its own
+      ...and the number appears when the narrator says it, not when the box opens
+shut  OK on the question; it shrinks and goes
+xshut the X on the part window; it shrinks and goes
+      half a second of nothing, and then the gag
+```
+
+**`pop`, `shut` and `xshut` live in `PIECE`** because two things need them: the
+piece, to draw the card, and `PTRACK`, to put the hand on the button. Held
+privately in the piece they drifted and the card shut by itself while the
+pointer was somewhere else entirely. `checkPiece()` holds the order: `pop` at or
+after `TITLE` ends, `shut` at or after `PART` ends, `xshut` at least 0.40s after
+`shut` — **two presses, not one.**
+
+### Part one opens on a question, not a recap
+
+**Every part still opens cold.** The viewer who starts at part three is the
+normal case, which is why each part hands over rather than assuming.
+
+**But part one has nothing to hand over.** It was made to carry a recap anyway,
+and the only thing a recap of nothing can say is the plan — *"three videos, one
+chip, this one is about the material it is made of"* — which is a table of
+contents read out loud, sitting exactly where the first real thought belongs.
+A question does the same orienting job and does work as well: *"so: what is a
+chip actually made of?"* hands straight to the beat that answers it.
+
+* **Part one: `BEAT.OPEN`**, a question, and `checkPiece()` **refuses a part one
+  that has a `RECAP`**.
+* **Parts two and up: `BEAT.RECAP`**, narrated, first on the blackboard, in the
+  form *"in the last video X, so now Y"*. These have a real handover and keep it.
+* `PIECE.part.recap` **does not exist.** It lived on the card as three rows of
+  small print — the one thing a viewer who starts here actually needs, set in
+  the smallest type in the piece and gone in two seconds. v4.2 said the field
+  was gone and left it in all three parts, holding a sentence that **was not the
+  one being spoken**. A dead field that looks authoritative is worse than no
+  field.
+
+### The card reaches lower than a dialog, so the gag sits lower
+
+`DLG` ends at **y=306** and every cold-open object is drawn to clear it. The
+part card is two windows and the stack ends at **`PART_FLOOR` = 358**, 52px
+lower. #011's pen was drawn against 306 and spent the whole card standing inside
+the part number's window; it moved down 72px. **Read `PART_FLOOR`; do not carry
+358 as a literal** — that is how the cloud in #004 ended up behind a dialog.
+
+**The gag stays.** It is the object's one trick and it is the best thing in the
+cold open. It simply loses its card: the object is on the sky from the first
+frame with the card above it, the card goes in two presses, and then it does the
+trick over about three seconds of its own silence. **The cold open ends when the
+PROGRAM WINDOW opens**, not when the first beat starts — it used to run on
+behind the window for the whole first beat, invisible but still drawing, and
+still registering objects the overlap sweep measured against text inside the
+window.
+
+### The rest
+
 * **"PART 2", not "PART 2 OF 3".** How many there are is not what you need to
   know when you are about to watch one.
-* **The recap is a SPOKEN BEAT, the first on the blackboard — not a line on the
-  card.** It lived on the card as three rows of small print and that was the
-  wrong place for it: the one thing a viewer who starts here actually needs was
-  the smallest type in the piece and gone in two seconds. It is `BEAT.RECAP`
-  now, narrated, in the form *"in the last video X, so now Y"*, and
-  `checkPiece()` refuses a part without one.
-* **The recap scene shows the chain, read off `PIECE`.** Parts after the first
-  tick off what the earlier parts produced and point an arrow at what this one
-  turns it into. Part one has no history, so its chain is the PLAN — the three
-  titles from `PIECE.part.titles`, **untick**, because a tick on a plan claims
-  work that has not happened.
-* **`shut` is the card's close time, and it lives in `PIECE`** because two things
-  need it: the piece, to stop drawing the card, and `PTRACK`, to put the hand on
-  the button. Held privately in the piece they drifted and the card shut by
-  itself while the pointer was somewhere else entirely.
-* **The script's `lead_in` has to cover the card.** 4.4s for a part with a short
-  recap, 5.6s with a full one. `checkPiece()` refuses a part whose `lead_in` is
-  under 4.0s, and a `shut` outside `1.6 .. lead_in-0.6`.
-* **A part may run longer**: 78-100s against a standalone's 65-78s. It spends its
-  first four seconds on the card and it is carrying a third of an argument.
+* **A part runs 82-115s** against a standalone's 65-115. It spends its first six
+  seconds on a narrated card and a gag, and it is carrying a third of an
+  argument.
 * **`first` exists because the palette rotates by piece number.** Part two would
   otherwise arrive in a different colour from part one, so all parts take
   `usePalette(PIECE.part.first)`. A series is deliberately one look.
-* **The program window's title is the SERIES, not the part.** Three videos
-  opening the same program is most of what makes them one thing.
-* **The status bar's third segment carries `PART n/of`**, and the segments are
-  registered in `FRAMES`, so `checkChrome()` holds that text inside them.
 * **`checkPiece()` validates the whole shape**: `of` in 2..4, `n` in 1..of,
-  `first` equal to `no - (n-1)`, a series name, exactly `of` titles, a recap of
-  legal length, a legal `shut`, and a `lead_in` long enough to hold the card. A
-  part that disagrees with its own number cannot ship.
+  `first` equal to `no - (n-1)`, a series name, exactly `of` titles, spoken
+  `TITLE` and `PART` beats, an `OPEN` for part one or a `RECAP` for the rest,
+  and `pop`/`shut`/`xshut` in order. A part that disagrees with its own number
+  cannot ship.
 
 ## The end card is the library's, and it stands alone
 
@@ -1215,9 +1305,13 @@ Win95 container on screen files itself there. A piece that never reaches
 
 ## Register what you draw, in SCENE as well as GBOX
 
-`solidShape()` files its own extent in `SCENE`, which is what `checkFraming()`
-measures. Anything drawn with raw `fillRect` does not, and a half-registered
-diagram is worse than an unregistered one: #011's optics beat had a `solidShape`
+`solidShape()` files its own extent in **`SCENE`, which `checkFraming()` reads,
+and in `GBOX`, which `checkOverlap()` reads.** It filed only the first of those
+for months, which meant **no drawn object was visible to the overlap sweep at
+all**: #010's `CO OUT` plate sat on the furnace stack through every frame of the
+beat with all thirteen sweeps at 0, because the stack was in `SCENE` and the
+sweep does not read `SCENE`. Anything drawn with raw `fillRect` still registers
+nothing, and a half-registered diagram is worse than an unregistered one: #011's optics beat had a `solidShape`
 lens on the left and a `fillRect` mirror stack on the right, so the sweep could
 see half of a deliberately balanced pair and called it 88px off centre. If a
 scene object is drawn by hand, push it:
@@ -1227,6 +1321,26 @@ if(SCENE)SCENE.push({x:S.x2-42,y:S.mid-8,w:84,h:96,k:'mirror'});
 ```
 
 Same rule, same reason, as raw-drawn geometry registering in `GBOX`.
+
+**A box that disagrees with the draw buys silence, and silence reads as a
+pass.** #010's puller rod was drawn from `Q.rod` and filed from `Q.rod+36`. The
+sweep compared the caption against a box that started 23px *below* it and
+reported a clean gap, while the renderer drew the rod 13px *into* it — through
+the letter A of "AND". The `+36` was somebody making a complaint go away.
+**Register the rectangle you actually fill.** If a hand-written box needs an
+offset to pass, the picture is what is wrong.
+
+**And the graphic-vs-graphic test has to be able to reach the case.** It was
+written for one — a tag plate on a voxel stack — and the condition was literally
+`tag:* vs voxbar`, so the one case it had been written for was the only case it
+could ever find. A plate is opaque wherever it lands. It now tests a plate
+against **any** registered surface that is not itself a plate, a container or
+the pointer.
+
+**A bounding box is not a silhouette.** A tapered shaft registers the empty
+corners either side of it, so a label beside the taper can be flagged when
+nothing is really covered. That is the sweep being conservative in the right
+direction: move the label, or accept that it sits in the object's rectangle.
 
 ## Two labels that do not overlap can still read as one line
 
@@ -1304,7 +1418,60 @@ looking:
   #008 and the furnace in #010 made the same mistake: a grey crate says nothing
   about what the thing does. A furnace got a stack, hoops, a lit throat and a
   tap that runs; a thermometer got a bulb, a stem, a column and a scale. **An
-  object has to carry what it does on the outside.**
+  object has to carry what it does on the outside.** The furnace then needed a
+  *second* pass, because having all four parts was not the same as reading as a
+  furnace — see **Window chrome belongs to windows**, which is what that pass
+  turned out to be about.
+
+## Window chrome belongs to windows
+
+The four layers put Win95 furniture and physical objects on the same screen, and
+the moment an object borrows the furniture's edges it stops being an object.
+
+#010's furnace is the case. It had everything the last revision asked for — a
+stack, hoops, a lit throat, a tap that runs — and still read as a grey crate,
+because the **throat was a `fillRect` with `bevel(...,'field')` on it**: the
+sunken border Win95 puts round a *text input*, on the mouth of a furnace. A
+viewer cannot say why that is wrong and does not need to; it reads as a form
+control with fire behind it.
+
+* **`bevel()`, `winFrame()`, `button()`, `groupBox()` are for chrome.** A window,
+  a dialog, a status bar, a group box, a button. Nothing that exists inside the
+  story gets them.
+* **An object gets its own edges**: facets from `solidShape()`, a rim, seams,
+  and openings cut as shapes. The furnace's throat is an arch with a heat
+  gradient inside it and **no border at all**.
+* **A primitive per feature is not a drawing.** The hoops were three 3px dark
+  lines, which is a scratch; a raised band is a **lit edge over a dark edge**,
+  and following the taper makes it say the shaft is not parallel as well.
+* **The silhouette carries the claim.** A furnace tapers — wider at the base
+  than the top. That one decision does more than the stack, the hoops and the
+  tap put together, because it is the part you read before you read anything.
+
+**And a heavy rim crushes a small object.** `solidShape()` strokes 9px of black
+and 3px of rim round whatever it is given. On a 28x34 lump that is most of the
+shape, so #010's three pieces of carbon came out as three empty rings whatever
+colour the facets were. Small objects get **bigger, and a mid-tone rim** — the
+near-white rim is for the hero object in the shot.
+
+## The pointer can do the explaining
+
+The hand is the one thing on screen that is not a diagram, so the shots where it
+*acts* are worth more than the shots where it watches.
+
+#010's purity beat draws a hundred identical dots and one of them is the foreign
+atom. It used to arrive already red, which made the grid a picture of a fact and
+the pointer a bystander standing nearby. **The click is what turns it**: a
+hundred identical things, and somebody going and finding the one. Same drawing,
+same beat, and now the pointer is the argument.
+
+* **Aim it at the thing.** That tap was sent to `N.x1+44` while the dot is drawn
+  at `N.x1-45+40` — 49px away, a hand tapping empty blackboard next to the point
+  it was making. Derive the hand's target from **the same arithmetic that places
+  the mark**, so they cannot drift apart.
+* **Nothing changes before the press.** If the state flips early the click is
+  decoration.
+* **One act per beat.** Two is a demonstration of a mouse.
 
 ## Accuracy
 

@@ -26,8 +26,13 @@ const PTRACK=(()=>{
      the part card for a part, so without this the hand spent the whole card
      sitting on the recap it was supposed to be letting you read. */
   const P=[PIECE.part?{t:0,x:PART_OK.x-96,y:PART_OK.y+74}:{t:0,x:250,y:196}];
-  if(PIECE.part) P.push({t:+Number(PIECE.part.shut).toFixed(3),
-                         x:PART_OK.x, y:PART_OK.y, c:1});
+  /* TWO presses, in the order the windows arrived: OK on the question, then
+     the X on the part number. One press used to shut both, which is why they
+     read as one graphic rather than two things on a desktop. */
+  if(PIECE.part){ P.push({t:+Number(PIECE.part.shut).toFixed(3),
+                          x:PART_OK.x, y:PART_OK.y, c:1});
+                  P.push({t:+Number(PIECE.part.xshut).toFixed(3),
+                          x:PART_X.x, y:PART_X.y, c:1}); }
   sess.forEach(S=>{
     P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
@@ -41,7 +46,11 @@ const PTRACK=(()=>{
       : S.first.y>=CAPY ? {t:rt, x:CAPREST[0], y:CAPREST[1]}
       : {t:rt, x:S.first.x+8, y:S.first.y+Math.round(S.first.s)+28});
   });
-  P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
+  /* The cold open's own question card belongs to a standalone. A part asks
+     the SERIES question on its card instead, so VO[0] is that card's line and
+     pressing OK_DIALOG after it would put the hand on a window that is not
+     there. */
+  if(!PIECE.part) P.push({t:+(VO[0].z+0.12).toFixed(3), x:OK_DIALOG.x, y:OK_DIALOG.y, c:1});
   // LAST sentence, not sentence 17: honey has 19, halloumi 18, ice 16. A
   // hard-coded index is how the sweeps used to break on the next script, and
   // here it took the whole runtime down before a single frame was drawn.
@@ -114,7 +123,12 @@ window.checkPiece=function(){
      it is carrying a third of an argument rather than a whole one. */
   // A part carries the part card AND a spoken recap before it starts teaching,
   // so both ends of its range sit above a standalone's.
-  const LO=PIECE.part?82:65, HI=PIECE.part?112:78;
+  /* House style v4.3: the target is 85-110s and the floor is 65. The old gate
+     here was 65-78 for a standalone, which was the v2.4 target and would now
+     REFUSE any standalone built to the current spec -- the next piece would
+     have failed its own sweep. The ceiling is one number for both; a part
+     still has a floor of its own because it carries a narrated card. */
+  const LO=PIECE.part?82:65, HI=115;
   if(DUR<LO||DUR>HI) bad.push({field:'DUR',got:DUR,need:LO+'-'+HI+'s'});
   if(PIECE.part){
     const q=PIECE.part;
@@ -131,19 +145,46 @@ window.checkPiece=function(){
        a viewer actually needs -- where the last part got to -- was set in the
        smallest type in the piece and gone in two seconds. It is the first thing
        on the blackboard now, narrated like everything else that matters. */
-    if(!BEAT.RECAP) bad.push({field:'BEAT.RECAP',got:Object.keys(BEAT).join(','),
-                              need:'a spoken RECAP beat, first on the blackboard'});
-    else if(!VO.some(v=>v.b==='RECAP'))
-      bad.push({field:'RECAP',got:'no sentences',need:'at least one spoken line'});
+    /* The card is NARRATED, so the first two spoken beats are the card itself:
+       TITLE asks the series question out loud while it types, and PART says
+       which part this is. It used to be 2.5s of silent text. */
+    if(!BEAT.TITLE||!VO.some(v=>v.b==='TITLE'))
+      bad.push({field:'BEAT.TITLE',got:Object.keys(BEAT).join(','),
+                need:'a spoken TITLE beat -- the series question, asked aloud'});
+    if(!BEAT.PART||!VO.some(v=>v.b==='PART'))
+      bad.push({field:'BEAT.PART',got:Object.keys(BEAT).join(','),
+                need:'a spoken PART beat -- "Part two.", said aloud'});
+    /* Part one has nothing to hand over, so it opens on a QUESTION. Requiring
+       a recap of it could only ever produce a plan -- "three videos, one chip,
+       this one is about the material it is made of" -- which is a table of
+       contents read aloud, and it was. Parts after the first have a real
+       handover and keep it. */
+    if(q.n===1){
+      if(!BEAT.OPEN||!VO.some(v=>v.b==='OPEN'))
+        bad.push({field:'BEAT.OPEN',got:Object.keys(BEAT).join(','),
+                  need:'part one opens on a question, not a recap'});
+      if(BEAT.RECAP) bad.push({field:'BEAT.RECAP',got:'present',
+                               need:'part one has nothing to recap'});
+    } else if(!BEAT.RECAP||!VO.some(v=>v.b==='RECAP'))
+      bad.push({field:'BEAT.RECAP',got:Object.keys(BEAT).join(','),
+                need:'a spoken RECAP beat, first on the blackboard'});
     /* The card's own close time. It lives in PIECE because TWO things need it:
        the piece, to stop drawing the card, and PTRACK, to put the hand on the
        button. Held in the piece alone they drifted apart and the card shut on
        its own while the hand was elsewhere. */
-    if(!(q.shut>=1.6&&q.shut<=VO[0].a-0.6))
-      bad.push({field:'part.shut',got:q.shut,need:'1.6 .. lead_in-0.6'});
-    // the lead_in has to be long enough for the card to open, be read and shut
-    if(VO[0].a<4.0) bad.push({field:'lead_in',got:VO[0].a,
-                              need:'>=4.0s -- the part card goes first'});
+    /* Four moments, in the order a person would do them: the question is
+       asked, the part number pops out from under it and is said, OK, then the
+       X. They live in PIECE because the piece draws them and PTRACK puts the
+       hand on them; held privately they drifted and a card shut by itself
+       while the pointer was somewhere else. */
+    const tv=VO.find(v=>v.b==='TITLE'), pv=VO.find(v=>v.b==='PART');
+    if(tv&&!(q.pop>=tv.z-0.10))
+      bad.push({field:'part.pop',got:q.pop,need:'>= TITLE end '+tv.z.toFixed(2)});
+    if(pv&&!(q.shut>=pv.z))
+      bad.push({field:'part.shut',got:q.shut,need:'>= PART end '+pv.z.toFixed(2)});
+    if(!(q.xshut>=q.shut+0.40))
+      bad.push({field:'part.xshut',got:q.xshut,need:'>= shut+0.40 -- two presses, not one'});
+    if(!(q.shut>=1.6)) bad.push({field:'part.shut',got:q.shut,need:'>=1.6'});
   }
   return bad;
 };
@@ -152,7 +193,12 @@ window.DUR=DUR; window.LW=LW; window.LH=LH; window.VO=VO; window.BEAT=BEAT; wind
 // first CONTENT beat (after the hook) and the LAST beat. Hard-coding JAR/END
 // worked for one script and threw on the next.
 const BKEYS=Object.keys(BEAT);
-const FIRST_CONTENT=BEAT[BKEYS[1]].sc, LAST_BEAT=BEAT[BKEYS[BKEYS.length-1]].sc;
+/* A part spends its first TWO beats on the card -- the series question and the
+   part number -- and neither is drawn inside the program window, so neither is
+   content. A standalone spends its first on the cold open. Hard-coding
+   BKEYS[1] measured a part's "composition" against a dialog box on the sky. */
+const FIRST_IDX=PIECE.part?2:1;
+const FIRST_CONTENT=BEAT[BKEYS[FIRST_IDX]].sc, LAST_BEAT=BEAT[BKEYS[BKEYS.length-1]].sc;
 window.checkBounds=function(step){
   const pad=2, lo={x:PX+pad,y:PY+pad}, hi={x:PX+PW-pad,y:PY+PH-pad};
   const bad=[]; const seen=new Set();
@@ -480,9 +526,15 @@ window.checkOverlap=function(step){
     for(let i=0;i<g.length;i++)for(let j=i+1;j<g.length;j++){
       const A=g[i],Bq=g[j];
       const ks=[A.k,Bq.k];
-      const isPair=(ks[0].indexOf('tag:')===0&&ks[1]==='voxbar')||
-                   (ks[1].indexOf('tag:')===0&&ks[0]==='voxbar');
-      if(!isPair) continue;
+      /* A tag plate is opaque, so it hides whatever it lands on whether that
+         is a voxel stack or a drawn object. This used to test `tag:* vs
+         voxbar` and nothing else, so the one case it had been written for was
+         the only case it could ever find. Now: a plate against any registered
+         surface that is not itself a plate, a container or the pointer. */
+      const ti=[ks[0].indexOf('tag:')===0, ks[1].indexOf('tag:')===0];
+      if(ti[0]===ti[1]) continue;                 // two plates, or neither
+      const other=ti[0]?ks[1]:ks[0];
+      if(other==='cursor'||other.slice(-3)==='box') continue;
       const o=hit(A,Bq); if(!o) continue;
       const k='GG|'+ks.join('~'); if(seen.has(k))continue; seen.add(k);
       hits.push({t:+tt.toFixed(2),a:A.k,b:Bq.k,overlap:o});

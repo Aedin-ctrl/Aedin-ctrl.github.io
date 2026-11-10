@@ -469,45 +469,105 @@ const PART_DLG=[46,168,340,120];
 const PART_NUM=[136,308,160,50];
 const PART_OK={x:PART_DLG[0]+4+(PART_DLG[2]-8)/2,
                y:PART_DLG[1]+4+15+1+(PART_DLG[3]-8-15-1)-26+10};
-function partCard(T,M,shut,t){
+/* The part window's own close box, which is where the second press lands.
+   winFrame draws an X on every window it makes; this is the one that gets
+   used. 13x12 at x+w-20, title strip +1. */
+const PART_X={x:PART_NUM[0]+PART_NUM[2]-20+6, y:PART_NUM[1]+3+1+6};
+/* How far down the screen the card reaches. DLG ended at 306 and the cold
+   open's object was drawn to clear that; the part stack ends 52px lower, so a
+   part's object sits lower than a standalone's. Pieces read this rather than
+   carrying 358 as a literal, which is how the cloud ended up behind a dialog. */
+const PART_FLOOR=PART_NUM[1]+PART_NUM[3];
+
+/* ===== THE CARD =====
+   ONE card, and it asks the series' question -- the question all the parts are
+   answering, identical on every one of them. It was two cards: this one, and
+   then the piece's own question in the cold open, which meant two questions
+   were asked before anything was taught and neither of them was THE question.
+
+   It is also narrated, which it was not. It used to be 2.5 seconds of text on
+   screen with no voice on it -- the format's own rule is that the screen says
+   what the voice is saying, and silent text breaks it from the other side. The
+   title types word by word off its own spoken sentence, so the typing IS the
+   narrator asking.
+
+   And it is a sequence, because it is two objects: the question arrives and is
+   asked, THEN the part number pops out from under it and is said, and they are
+   dismissed in the order they arrived -- OK on the question, then the X on the
+   part. Both appearing at once and dying on a single press read as one
+   graphic with a button on it rather than a program being used.          */
+function partCard(T,M,t){
   if(!PIECE.part) return;
   const q=PIECE.part, D=PART_DLG, N=PART_NUM;
+  const ok=q.shut, xt=q.xshut, pop=q.pop;
+  const shrink=(R,k)=>[R[0]+Math.round(k*R[2]*0.42), R[1]+Math.round(k*R[3]*0.42),
+                       Math.max(8,Math.round(R[2]*(1-k*0.84))),
+                       Math.max(8,Math.round(R[3]*(1-k*0.84)))];
+  const closing=(cut)=>H.clamp((H.clamp((M-cut)/0.24)-0.30)/0.70);
+
+  // ---- the part number, in a small window of its own, UNDER the question.
+  // Drawn first so the question's frame overlaps it, not the other way round.
+  if(T>=pop&&T<xt+0.24){
+    zoomRect([D[0]+Math.round(D[2]/2)-27,D[1]+D[3]-10,54,16],N,M,pop,pop+0.30);
+    if(T>=pop+0.30){
+      const sq=closing(xt);
+      if(sq>0){ const b2=shrink(N,sq);
+        INCHROME=true; winFrame(b2[0],b2[1],b2[2],b2[3],'',true); INCHROME=false; }
+      else {
+        const n=winFrame(N[0],N[1],N[2],N[3],'',true);
+        // the number appears when the narrator says it, not when the box opens
+        if(VO[1]&&M>=VO[1].a-0.06) pxMid('PART '+q.n,n.x+n.w/2,n.y+n.h/2,20,'#000080');
+        // the X goes down on the press
+        if(t>=xt){ const bx=N[0]+N[2]-20;
+          INCHROME=true; rect(bx,N[1]+4,13,12,P.face);
+          bevel(bx,N[1]+4,13,12,'pressed');
+          B.fillStyle='#000';
+          for(let i=0;i<5;i++){B.fillRect(bx+5+i,N[1]+8+i,2,1);B.fillRect(bx+9-i,N[1]+8+i,2,1);}
+          INCHROME=false; }
+      }
+    }
+  }
+
+  // ---- the question
   zoomRect([4,LH-40,54,16],D,M,0.05,0.40);
-  if(T<0.40||T>=shut+0.24) return;
-  // both windows shut together, the way every other dialog in the format shuts
-  const sq=H.clamp((H.clamp((M-shut)/0.24)-0.30)/0.70);
-  if(sq>0){ const sh=(R)=>[R[0]+Math.round(sq*R[2]*0.42), R[1]+Math.round(sq*R[3]*0.42),
-                           Math.max(8,Math.round(R[2]*(1-sq*0.84))),
-                           Math.max(8,Math.round(R[3]*(1-sq*0.84)))];
-    INCHROME=true;
-    const a=sh(D), b=sh(N);
-    winFrame(a[0],a[1],a[2],a[3],'',true); winFrame(b[0],b[1],b[2],b[3],'',true);
-    INCHROME=false; return; }
+  if(T<0.40||T>=ok+0.24) return;
+  const sq=closing(ok);
+  if(sq>0){ const a=shrink(D,sq);
+    INCHROME=true; winFrame(a[0],a[1],a[2],a[3],'',true); INCHROME=false; return; }
 
   const r=winFrame(D[0],D[1],D[2],D[3],q.series,true);
   /* The title, over two lines, split where the two come out most even. A greedy
-     wrap fills the first line and breaks "HOW A MICROCHIP IS / MADE", which is
-     a worse read than "HOW A MICROCHIP / IS MADE" for no reason. */
+     wrap fills the first line and breaks "HOW IS A MICROCHIP / MADE?", which is
+     a worse read than "HOW IS A / MICROCHIP MADE?" for no reason. */
   const words=String(q.series).toUpperCase().split(' '), lim=r.w-28;
   let best=null;
   for(let k=1;k<words.length;k++){
     const a=words.slice(0,k).join(' '), b=words.slice(k).join(' ');
     const wa=glyph(a,22,'"Silkscreen"').w, wb=glyph(b,22,'"Silkscreen"').w;
     if(wa>lim||wb>lim) continue;
-    const d=Math.abs(wa-wb); if(!best||d<best.d) best={a:a,b:b,d:d};
+    const d=Math.abs(wa-wb); if(!best||d<best.d) best={a:k,d:d};
   }
-  const hero = best?[best.a,best.b]:[String(q.series).toUpperCase()];
-  hero.forEach((L,i)=>px(L,r.x+14,r.y+10+i*26,22,'#000080',null,'"Silkscreen"'));
+  const cut=best?best.a:words.length;
+  /* Typed WORD BY WORD off the card's own spoken sentence, so a word lands on
+     screen as the narrator says it. Character-rate typing drifts against a
+     voice within half a sentence; the onsets are measurements of this exact
+     audio. */
+  let shown=words.length;
+  if(VO[0]){ shown=0;
+    for(let k=0;k<VO[0].t.length&&k<words.length;k++) if(M>=VO[0].t[k]) shown=k+1; }
+  const rows=[words.slice(0,cut),words.slice(cut)];
+  let seen=0;
+  rows.forEach((row,i)=>{
+    const vis=row.slice(0,Math.max(0,Math.min(row.length,shown-seen)));
+    seen+=row.length;
+    if(vis.length) px(vis.join(' '),r.x+14,r.y+10+i*26,22,'#000080',null,'"Silkscreen"');
+  });
   /* The catch-up is NOT here. It used to be three rows of small print on this
      card, which is the wrong place for it: a dialog box is furniture, and the
      thing a viewer actually needs -- where the last part got to -- was set in
      the smallest type in the piece and gone in two seconds. It is a spoken beat
      on the blackboard now, the first one, like everything else that matters. */
-  button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=shut);
-
-  // ...and the part number, in its own window underneath
-  const n=winFrame(N[0],N[1],N[2],N[3],'',true);
-  pxMid('PART '+q.n,n.x+n.w/2,n.y+n.h/2,20,'#000080');
+  button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=ok);
 }
 /* Put a glyph's INK centre on a point, both axes. px() places a top-left (or
    a centred advance width, which is not the same thing), so the ? inside the
@@ -665,6 +725,13 @@ function solidShape(facets,outer,rim,seam,key){
   const bx={x:Math.min(...xs)-4,y:Math.min(...ys)-4,
             w:Math.max(...xs)-Math.min(...xs)+8,h:Math.max(...ys)-Math.min(...ys)+8};
   if(SCENE)SCENE.push({x:bx.x,y:bx.y,w:bx.w,h:bx.h,k:key||'solid'});
+  /* ...and in GBOX, which is the registry checkOverlap reads. Filing a solid
+     only in SCENE made it visible to checkFraming and invisible to the sweep
+     that asks whether anything is written across it: #010's CO OUT plate sat
+     on the furnace stack through every frame with all thirteen sweeps at 0,
+     because the stack was in SCENE and the sweep does not read SCENE. Every
+     drawn silhouette is now a surface the overlap sweep can see. */
+  if(GBOX)GBOX.push({x:bx.x,y:bx.y,w:bx.w,h:bx.h,k:key||'solid'});
   return bx;
 }
 

@@ -12,12 +12,17 @@
    passed the test. Then the one number that explains the news: every leading
    edge fab on earth is waiting on machines from one company. */
 const PIECE={ no:12, slug:'fab', tags:['TECH','MONEY'],
-              part:{n:3, of:3, first:10, series:'How a Microchip Is Made',
-                    shut:3.60,
+              part:{n:3, of:3, first:10, series:'How is a microchip made?',
                     titles:['from sand to silicon',
                             'printing circuits with light',
                             'testing, cutting, geopolitics'],
-                    recap:'Last time: EUV light printed the circuit, 13.5 nanometres wide, in a vacuum.'},
+                    /* The card's four moments. pop: the part number comes out from
+                       under the question. shut: OK on the question. xshut: the X on
+                       the part window -- two presses, in the order they arrived.
+                       They live here because the piece draws them and PTRACK puts
+                       the hand on them; held privately they drift. */
+                    pop:3.22, shut:4.78, xshut:5.48},
+              
               myth:"not just a factory",
               title:"testing, cutting, geopolitics",
               blurb:"A finished wafer is not chips yet. What happens next explains why a big chip costs so much more than a small one, why the same silicon is sold as two products, and why this is in the news." };
@@ -28,41 +33,45 @@ const PIECE={ no:12, slug:'fab', tags:['TECH','MONEY'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=92.3, VOHASH="7d4f63b573a5";
+const DUR=93.4, VOHASH="d308bbd78ab5";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:5.6,z:8.383,w:["The", "wafer", "is", "finished.", "You", "still", "do", "not", "have", "a", "chip."],t:[5.6, 5.84, 6.24, 6.4, 7.24, 7.39, 7.65, 7.75, 7.89, 8.11, 8.17]},
-  {b:'RECAP',a:11.883,z:18.406,w:["In", "the", "last", "video,", "ultraviolet", "light", "printed", "that", "circuit.", "Now", "we", "cut", "the", "wafer", "up", "and", "find", "out", "what", "it", "is", "worth."],t:[11.883, 12.053, 12.313, 12.663, 13.283, 14.033, 14.403, 14.863, 15.103, 15.763, 15.963, 16.093, 16.293, 16.493, 17.003, 17.113, 17.203, 17.463, 17.663, 17.788, 17.913, 18.283]},
-  {b:'SHEET',a:20.256,z:24.97,w:["What", "you", "have", "is", "one", "disc", "carrying", "hundreds", "of", "identical", "copies,", "still", "joined", "together."],t:[20.266, 20.526, 20.726, 20.996, 21.126, 21.326, 21.686, 22.226, 22.676, 22.736, 23.176, 24.066, 24.246, 24.536]},
-  {b:'SHEET',a:25.72,z:33.053,w:["Before", "anything", "is", "cut,", "every", "copy", "is", "tested", "where", "it", "lies,", "by", "pressing", "fine", "needles", "onto", "its", "contacts", "and", "running", "it."],t:[25.76, 26.31, 27.13, 27.41, 27.44, 27.92, 28.32, 28.53, 28.96, 29.41, 29.59, 29.96, 30.16, 30.62, 30.88, 31.65, 31.68, 31.92, 32.56, 32.71, 33.033]},
-  {b:'DUST',a:34.903,z:40.721,w:["Some", "of", "them", "are", "dead.", "A", "single", "dust", "particle", "in", "the", "wrong", "place", "kills", "whichever", "copy", "it", "landed", "on."],t:[34.983, 35.103, 35.203, 35.393, 35.543, 35.903, 35.963, 36.373, 36.973, 37.193, 37.323, 37.543, 37.863, 38.263, 38.643, 39.583, 40.003, 40.133, 40.513]},
-  {b:'DUST',a:41.471,z:48.211,w:["That", "is", "why", "large", "chips", "cost", "so", "much", "more", "than", "small", "ones.", "The", "same", "dust", "takes", "out", "a", "bigger", "share", "of", "a", "bigger", "die."],t:[41.471, 41.761, 41.901, 42.111, 42.481, 42.831, 43.191, 43.301, 43.611, 43.911, 44.231, 44.621, 45.211, 45.411, 45.681, 45.991, 46.321, 46.491, 46.551, 46.961, 47.301, 47.461, 47.491, 47.891]},
-  {b:'CUT',a:50.061,z:56.053,w:["Then", "the", "disc", "is", "cut", "along", "the", "empty", "lanes", "between", "the", "copies,", "wired", "out,", "lidded,", "and", "tested", "again."],t:[50.071, 50.311, 50.481, 50.721, 50.841, 51.021, 51.341, 51.511, 51.801, 52.211, 52.581, 52.871, 53.681, 54.431, 54.641, 55.301, 55.421, 55.661]},
-  {b:'CUT',a:56.803,z:61.772,w:["The", "ones", "that", "only", "partly", "pass", "are", "not", "scrapped.", "They", "are", "sold", "as", "the", "slower", "product."],t:[56.803, 57.013, 57.293, 57.603, 57.893, 58.273, 58.553, 58.803, 58.973, 59.683, 59.993, 60.233, 60.703, 60.773, 60.963, 61.323]},
-  {b:'CHOKE',a:63.622,z:69.824,w:["Every", "leading", "edge", "factory", "on", "earth", "needs", "the", "same", "machine,", "and", "one", "company", "in", "the", "Netherlands", "builds", "it."],t:[63.622, 64.062, 64.672, 65.032, 65.672, 65.822, 66.302, 66.732, 66.982, 67.322, 67.942, 68.102, 68.252, 68.742, 68.752, 68.912, 69.512, 69.804]},
-  {b:'CHOKE',a:70.574,z:75.042,w:["Each", "one", "costs", "around", "two", "hundred", "million", "dollars", "and", "arrives", "in", "hundreds", "of", "crates."],t:[70.574, 70.804, 71.004, 71.264, 71.554, 71.844, 72.134, 72.564, 73.294, 73.464, 73.904, 74.024, 74.574, 74.644]},
-  {b:'CHOKE',a:75.792,z:80.205,w:["Roughly", "eighty", "per", "cent", "of", "the", "world's", "capacity", "for", "this", "sits", "on", "a", "single", "island."],t:[75.792, 76.047, 76.302, 76.557, 76.812, 76.952, 77.172, 77.702, 78.342, 78.462, 78.672, 79.232, 79.332, 79.392, 79.782]},
-  {b:'END',a:82.055,z:83.768,w:["The", "hard", "part", "was", "never", "the", "silicon."],t:[82.065, 82.225, 82.475, 82.685, 82.855, 83.145, 83.315]},
-  {b:'END',a:84.518,z:87.749,w:["It", "is", "that", "only", "a", "handful", "of", "buildings", "on", "earth", "can", "do", "this", "at", "all."],t:[84.518, 84.568, 84.638, 84.888, 85.138, 85.288, 85.638, 85.748, 86.338, 86.488, 86.898, 87.068, 87.108, 87.298, 87.388]},
+  {b:'TITLE',a:0.8,z:1.869,w:["How", "is", "a", "microchip", "made?"],t:[0.83, 0.93, 1.02, 1.06, 1.46]},
+  {b:'PART',a:3.719,z:4.334,w:["Part", "three."],t:[3.749, 4.154]},
+  {b:'RECAP',a:9.434,z:15.957,w:["In", "the", "last", "video,", "ultraviolet", "light", "printed", "that", "circuit.", "Now", "we", "cut", "the", "wafer", "up", "and", "find", "out", "what", "it", "is", "worth."],t:[9.434, 9.604, 9.864, 10.214, 10.834, 11.584, 11.954, 12.414, 12.654, 13.314, 13.514, 13.644, 13.844, 14.044, 14.554, 14.664, 14.754, 15.014, 15.214, 15.339, 15.464, 15.834]},
+  {b:'SHEET',a:17.807,z:20.59,w:["The", "wafer", "is", "finished.", "You", "still", "do", "not", "have", "a", "chip."],t:[17.807, 18.047, 18.447, 18.607, 19.447, 19.597, 19.857, 19.957, 20.097, 20.317, 20.377]},
+  {b:'SHEET',a:21.34,z:26.054,w:["What", "you", "have", "is", "one", "disc", "carrying", "hundreds", "of", "identical", "copies,", "still", "joined", "together."],t:[21.35, 21.61, 21.81, 22.08, 22.21, 22.41, 22.77, 23.31, 23.76, 23.82, 24.26, 25.15, 25.33, 25.62]},
+  {b:'SHEET',a:26.804,z:34.137,w:["Before", "anything", "is", "cut,", "every", "copy", "is", "tested", "where", "it", "lies,", "by", "pressing", "fine", "needles", "onto", "its", "contacts", "and", "running", "it."],t:[26.844, 27.394, 28.214, 28.494, 28.524, 29.004, 29.404, 29.614, 30.044, 30.494, 30.674, 31.044, 31.244, 31.704, 31.964, 32.734, 32.764, 33.004, 33.644, 33.794, 34.117]},
+  {b:'DUST',a:35.987,z:41.805,w:["Some", "of", "them", "are", "dead.", "A", "single", "dust", "particle", "in", "the", "wrong", "place", "kills", "whichever", "copy", "it", "landed", "on."],t:[36.067, 36.187, 36.287, 36.477, 36.627, 36.987, 37.047, 37.457, 38.057, 38.277, 38.407, 38.627, 38.947, 39.347, 39.727, 40.617, 41.027, 41.167, 41.597]},
+  {b:'DUST',a:42.555,z:49.295,w:["That", "is", "why", "large", "chips", "cost", "so", "much", "more", "than", "small", "ones.", "The", "same", "dust", "takes", "out", "a", "bigger", "share", "of", "a", "bigger", "die."],t:[42.555, 42.845, 42.985, 43.195, 43.565, 43.915, 44.275, 44.385, 44.695, 44.995, 45.315, 45.705, 46.295, 46.495, 46.765, 47.075, 47.405, 47.575, 47.635, 48.045, 48.385, 48.545, 48.575, 48.975]},
+  {b:'CUT',a:51.145,z:57.137,w:["Then", "the", "disc", "is", "cut", "along", "the", "empty", "lanes", "between", "the", "copies,", "wired", "out,", "lidded,", "and", "tested", "again."],t:[51.155, 51.395, 51.6, 51.805, 51.925, 52.105, 52.425, 52.595, 52.885, 53.295, 53.665, 53.955, 54.765, 55.515, 55.725, 56.385, 56.505, 56.745]},
+  {b:'CUT',a:57.887,z:62.856,w:["The", "ones", "that", "only", "partly", "pass", "are", "not", "scrapped.", "They", "are", "sold", "as", "the", "slower", "product."],t:[57.887, 58.097, 58.377, 58.687, 58.977, 59.357, 59.637, 59.887, 60.057, 60.767, 61.077, 61.317, 61.787, 61.857, 62.047, 62.407]},
+  {b:'CHOKE',a:64.706,z:70.908,w:["Every", "leading", "edge", "factory", "on", "earth", "needs", "the", "same", "machine,", "and", "one", "company", "in", "the", "Netherlands", "builds", "it."],t:[64.706, 65.146, 65.756, 66.116, 66.756, 66.906, 67.386, 67.816, 68.066, 68.406, 69.026, 69.186, 69.336, 69.826, 69.836, 69.996, 70.596, 70.888]},
+  {b:'CHOKE',a:71.658,z:76.126,w:["Each", "one", "costs", "around", "two", "hundred", "million", "dollars", "and", "arrives", "in", "hundreds", "of", "crates."],t:[71.658, 71.888, 72.088, 72.348, 72.638, 72.928, 73.218, 73.648, 74.378, 74.548, 74.988, 75.108, 75.658, 75.728]},
+  {b:'CHOKE',a:76.876,z:81.289,w:["Roughly", "eighty", "per", "cent", "of", "the", "world's", "capacity", "for", "this", "sits", "on", "a", "single", "island."],t:[76.876, 77.131, 77.386, 77.641, 77.896, 78.036, 78.256, 78.786, 79.426, 79.546, 79.756, 80.316, 80.416, 80.476, 80.866]},
+  {b:'END',a:83.139,z:84.852,w:["The", "hard", "part", "was", "never", "the", "silicon."],t:[83.149, 83.309, 83.559, 83.769, 83.939, 84.229, 84.399]},
+  {b:'END',a:85.602,z:88.833,w:["It", "is", "that", "only", "a", "handful", "of", "buildings", "on", "earth", "can", "do", "this", "at", "all."],t:[85.602, 85.652, 85.722, 85.972, 86.222, 86.372, 86.722, 86.832, 87.422, 87.572, 87.982, 88.152, 88.192, 88.382, 88.472]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  HOOK:{sc:0.0,a:5.6,z:8.383},
-  RECAP:{sc:11.48,a:11.883,z:18.406},
-  SHEET:{sc:19.86,a:20.256,z:33.053},
-  DUST:{sc:34.5,a:34.903,z:48.211},
-  CUT:{sc:49.66,a:50.061,z:61.772},
-  CHOKE:{sc:63.22,a:63.622,z:80.205},
-  END:{sc:81.66,a:82.055,z:87.749},
+  TITLE:{sc:0.0,a:0.8,z:1.869},
+  PART:{sc:3.32,a:3.719,z:4.334},
+  RECAP:{sc:9.03,a:9.434,z:15.957},
+  SHEET:{sc:17.41,a:17.807,z:34.137},
+  DUST:{sc:35.59,a:35.987,z:49.295},
+  CUT:{sc:50.75,a:51.145,z:62.856},
+  CHOKE:{sc:64.31,a:64.706,z:81.289},
+  END:{sc:82.74,a:83.139,z:88.833},
 };
 const SENT={
-  HOOK:[0],
-  RECAP:[1],
-  SHEET:[2,3],
-  DUST:[4,5],
-  CUT:[6,7],
-  CHOKE:[8,9,10],
-  END:[11,12],
+  TITLE:[0],
+  PART:[1],
+  RECAP:[2],
+  SHEET:[3,4,5],
+  DUST:[6,7],
+  CUT:[8,9],
+  CHOKE:[10,11,12],
+  END:[13,14],
 };
 
 /* ===== THE SCENES ===== */
@@ -97,13 +106,15 @@ const L={
 
 /* ===== THE POINTER TRACK ===== */
 const SPOTS=[
-  // r: the hook card's OK button lands in the middle of the wafer map
-  {n:0,  x:DLG[0]+54, y:DLG[1]+30, s:14, r:[216,386]},
-  {n:3,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:5,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:7,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:10,  x:PX+10, y:CAPY, s:CAPSZ},
-  {n:12, x:BOX[0]+56, y:BOX[1]+30, s:14},
+  /* The hook card's typing spot used to be first here. There is no hook card
+     now -- the series question types inside the part card, which partCard
+     drives itself -- so the first caption the hand types is the recap's. */
+  {n:2,  x:PX+10, y:CAPY, s:CAPSZ},
+  {n:5, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:7, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:9, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:12, x:PX+10, y:CAPY, s:CAPSZ},
+  {n:14, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
 const ACTS=(()=>{
   const A=[];
@@ -166,25 +177,36 @@ function explainer(ctx,W2,Hh,t){
   /* Declared once, printed everywhere. */
   const PRICE=200, TW_PCT=80, DIE_S=1, DIE_B=9;   // a big die is ~9 small ones
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
-  const PSHUT=PIECE.part.shut, pOut=PSHUT+0.24;
+  /* The card is one card and it shuts in two presses: OK on the question,
+     then the X on the part number. pOut is when the LAST of it has gone. */
+  const PSHUT=PIECE.part.shut, pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
-  if(t>VO[0].z+1.74&&t<VO[0].z+2.02)boost=1.45;      // the arrow stopping dead
-  if(t>wordAt(4,5)&&t<wordAt(4,5)+0.24)boost=1.45;   // the speck landing
-  if(t>wordAt(6,6)&&t<wordAt(6,6)+0.22)boost=1.42;   // the saw
+  if(t>PIECE.part.xshut+1.04&&t<PIECE.part.xshut+1.34)boost=1.45;      // the arrow stopping dead
+  if(t>wordAt(6,5)&&t<wordAt(6,5)+0.24)boost=1.45;   // the speck landing
+  if(t>wordAt(8,6)&&t<wordAt(8,6)+0.22)boost=1.42;   // the saw
 
   const O=L.open;
   deskSky(T,O.ground);
 
   /* --- THE PART CARD --- */
-  partCard(T,M,PSHUT,t);
+  partCard(T,M,t);
 
   /* --- THE COLD OPEN: a printed wafer, an empty package, and the gap --- */
-  const dlgOut=BEAT.SHEET.sc, okT=VO[0].z+0.52, bitT=okT+0.74;
+  /* THE GAG, with no card of its own. The object is on the sky from the FIRST
+     FRAME, with the card above it; the card goes, half a second of nothing,
+     and then it does its one trick. It used to be triggered by this piece's
+     OWN question card -- the second card in a row, and the second question put
+     to the viewer before a single thing had been explained. */
+  /* The cold open ends when the PROGRAM WINDOW opens, not when the first
+     blackboard beat starts. It used to run on behind the window for the whole
+     of the first beat -- invisible, but still drawing, and still registering
+     objects the overlap sweep then measured against text inside the window. */
+  const dlgOut=BEAT.RECAP.sc-0.30, bitT=pOut+0.50;
   const RUN=0.56, runT=bitT+RUN;
-  if(T>=pOut&&T<dlgOut){
+  if(T<dlgOut){
     const run=H.clamp((M-bitT)/RUN), stop=H.clamp((M-runT)/0.70);
-    const lit=H.lerp(0.62,1,H.clamp((M-pOut-0.3)/2.0));
+    const lit=H.lerp(0.62,1,H.clamp((M-0.3)/2.0));
     const rim=H.rgba(H.mix(P.ink,P.paper,lit));
     // the wafer, now with a circuit printed on it -- this is part two's output
     const wc=H.mix(P.ice,P.paper,0.52);
@@ -220,21 +242,12 @@ function explainer(ctx,W2,Hh,t){
         B.globalAlpha=1; }
     }
   }
-  zoomRect([4,LH-40,54,16],DLG,M,pOut+0.03,pOut+0.38);
-  if(T>=pOut+0.38&&T<okT+0.22){
-    const sq=H.clamp((H.clamp((M-okT)/0.22)-0.30)/0.70);
-    const dd=[DLG[0]+Math.round(sq*DLG[2]*0.42), DLG[1]+Math.round(sq*DLG[3]*0.42),
-              Math.max(8,Math.round(DLG[2]*(1-sq*0.84))), Math.max(8,Math.round(DLG[3]*(1-sq*0.84)))];
-    if(sq<=0){
-      const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
-      winIcon(r.x+10,r.y+9,'?');
-      typeLine(0,r.x+50,r.y+14,14,'#000',null,'"Silkscreen"',0,3);
-      typeLine(0,r.x+50,r.y+38,14,'#000',null,'"Silkscreen"',3,7);
-      typeLine(0,r.x+50,r.y+62,14,'#000',null,'"Silkscreen"',7);
-      mythStamp(t);
-      button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=okT);
-    } else { INCHROME=true; winFrame(dd[0],dd[1],dd[2],dd[3],'',true); INCHROME=false; }
-  }
+  /* The piece's own question card USED TO GO HERE -- typed with the hook,
+     pressed, shut, and then the trick. It is gone: the card at the top of a
+     part asks the series' question, and asking a second one underneath it put
+     two questions to the viewer before anything had been explained, and
+     neither of them was THE question. The hook it carried is now the first
+     line on the blackboard, where it is content.  */
 
   /* --- the program window. Third part, same program. --- */
   if(T>=BEAT.RECAP.sc-0.30&&T<SHUT){
@@ -282,12 +295,12 @@ function explainer(ctx,W2,Hh,t){
         dottedArrow([[216,R.to-44],[216,R.to-12]],hand,P.gold);
         B.globalAlpha=1;
         blockTag(216,R.to+16,'NEXT: CUT AND SOLD',14,P.gold,P.ink); }
-      typeWrap(1,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      typeWrap(2,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     else if(T<BEAT.DUST.sc){
       const S=L.sheet, g=groupBox(BX,BY,BW,BH,'ONE DISC, HUNDREDS OF COPIES');
-      const fill=H.clamp((M-wordAt(2,4))/1.40), probe=H.clamp((M-wordAt(3,8))/1.20);
+      const fill=H.clamp((M-wordAt(4,4))/1.40), probe=H.clamp((M-wordAt(5,8))/1.20);
       pxShadow('NOT CHIPS YET',216,S.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('TESTED WHERE THEY LIE',216,S.lab,14,P.bone,'center');
       if(GBOX)GBOX.push({x:S.cx-S.r-8,y:S.cy-S.r-8,w:2*(S.r+8),h:2*(S.r+8),k:'wafermapbox'});
@@ -320,14 +333,14 @@ function explainer(ctx,W2,Hh,t){
         if(probe>0.8){ B.fillStyle=H.rgba(H.hex(P.gold),0.85);
           B.fillRect(S.cx+32,py2+12,28,3); }
       }
-      if(after(2,16)) blockTag(216,S.tag,'NEEDLES, ON THE WAFER',14,P.gold,P.ink);
-      typeWrap(3,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      if(after(4,16)) blockTag(216,S.tag,'NEEDLES, ON THE WAFER',14,P.gold,P.ink);
+      typeWrap(5,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- DUST: one speck, two die sizes. The cost is the AREA it takes out. --- */
     else if(T<BEAT.CUT.sc){
       const D=L.dust, g=groupBox(BX,BY,BW,BH,'WHY BIG CHIPS COST SO MUCH MORE');
-      const land=H.clamp((M-wordAt(4,5))/0.70), show=H.clamp((M-wordAt(5,10))/1.30);
+      const land=H.clamp((M-wordAt(6,5))/0.70), show=H.clamp((M-wordAt(7,10))/1.30);
       pxShadow('ONE SPECK',216,D.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('SAME DUST, EITHER WAY',216,D.lab,14,P.bone,'center');
       if(GBOX)GBOX.push({x:IL+8,y:D.top-16,w:IR-IL-16,h:(D.pct+24)-(D.top-16),k:'diebox'});
@@ -352,14 +365,14 @@ function explainer(ctx,W2,Hh,t){
           B.fillStyle=H.rgba(H.hex(P.red),0.95);
           B.fillRect(cx-3,yy-3,7,7); });
       }
-      if(after(4,20)) blockTag(216,D.tag,'A BIGGER DIE IS A BIGGER TARGET',14,P.gold,P.ink);
-      typeWrap(5,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      if(after(6,20)) blockTag(216,D.tag,'A BIGGER DIE IS A BIGGER TARGET',14,P.gold,P.ink);
+      typeWrap(7,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     /* --- CUT: the lanes, and the bin the slow ones are sold in --- */
     else if(T<BEAT.CHOKE.sc){
       const C=L.cut, g=groupBox(BX,BY,BW,BH,'CUT, WIRED, AND SORTED');
-      const saw=H.clamp((M-wordAt(6,6))/1.15), bin=H.clamp((M-wordAt(7,8))/1.40);
+      const saw=H.clamp((M-wordAt(8,6))/1.15), bin=H.clamp((M-wordAt(9,8))/1.40);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('CUT ALONG THE LANES',216,C.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       if(GBOX)GBOX.push({x:C.cx-C.r-8,y:C.cy-C.r-8,w:2*(C.r+8),h:2*(C.r+8),k:'cutmapbox'});
@@ -400,16 +413,16 @@ function explainer(ctx,W2,Hh,t){
           isoSolid(isoBox(bx,C.lane,26,30),H.mix(col,P.ink,0.42),rim,'bin'+k);
           B.globalAlpha=1;
           const lq=H.clamp(bin*1.5-k*0.30); if(lq<=0)return;
-          B.globalAlpha=lq; blockTag(bx,C.lane+44,lab,14,col,P.ink); B.globalAlpha=1; });
+          B.globalAlpha=lq; blockTag(bx,C.lane+52,lab,14,col,P.ink); B.globalAlpha=1; });
       }
-      if(after(6,14)) blockTag(216,C.tag,'SAME SILICON, TWO PRODUCTS',14,P.gold,P.ink);
-      typeWrap(7,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
+      if(after(8,14)) blockTag(216,C.tag,'SAME SILICON, TWO PRODUCTS',14,P.gold,P.ink);
+      typeWrap(9,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
     /* --- CHOKE: one supplier, one island, one price --- */
     else if(T<BEAT.END.sc){
       const K=L.choke, g=groupBox(BX,BY,BW,BH,'WHY ONLY A FEW PLACES CAN');
-      const one=H.clamp((M-wordAt(8,10))/1.10), isle=H.clamp((M-wordAt(10,2))/1.40);
+      const one=H.clamp((M-wordAt(10,10))/1.10), isle=H.clamp((M-wordAt(12,2))/1.40);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('$'+PRICE+'m',216,K.num,44,P.gold,P.ink,'center');
       px('EACH, FROM ONE SUPPLIER',216,K.lab,14,P.bone,'center');
@@ -432,8 +445,8 @@ function explainer(ctx,W2,Hh,t){
         B.fillRect(IL+40,K.isle+96,Math.round(w2*TW_PCT/100),16);
         if(isle>0.8) px(TW_PCT+'% ON ONE ISLAND',216,K.isle+122,14,P.gold,'center');
       }
-      if(after(9,14)) blockTag(216,K.tag,'THAT IS THE CHOKEPOINT',14,P.gold,P.ink);
-      typeWrap(10,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
+      if(after(11,14)) blockTag(216,K.tag,'THAT IS THE CHOKEPOINT',14,P.gold,P.ink);
+      typeWrap(12,PX+26,CAPY,CAPSZ,'#cdd6d0',null,'"VT323"',CAPCH);
     }
 
     B.restore();
@@ -510,20 +523,24 @@ function buildScore(){
   add(BEAT.RECAP.sc-0.35,'open'); add(BEAT.END.sc-0.30,'open');
   const LAST=VO.length-1;
   add(VO[LAST].z+0.30,'snap'); add(VO[LAST].z+0.52,'click'); add(VO[LAST].z+0.67,'open');
-  [0,1,3,5,7,10,11,12].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
+  // 0 and 1 are the card: the question typing, then the part number
+  [0,1,2,3,5,7,9,12,13,14].forEach(n=>VO[n].t.forEach((tt,i)=>add(tt,'blip',i)));
   // RECAP -- the chain ticking in, then the handover
-  add(w(1,0),'draw'); add(w(1,Math.min(8,VO[1].w.length-1)),'tag');
+  add(w(2,0),'draw'); add(w(2,Math.min(8,VO[1].w.length-1)),'tag');
   // the cold open: press, the arrow runs, the arrow stops
-  const ok=VO[0].z+0.52, bit=ok+0.74, st=bit+0.56;
-  add(ok,'snap'); add(bit,'draw'); add(st,'sub'); add(st+0.34,'zap');
+  /* the gag: two presses, then the object does its trick. It used to hang off
+     VO[0].z -- the hook card's own sentence -- and that card is gone. */
+  const ok=PIECE.part.shut, xk=PIECE.part.xshut;
+  const bit=xk+0.24+0.50, st=bit+0.56;
+  add(ok,'snap'); add(xk,'snap'); add(bit,'draw'); add(st,'sub'); add(st+0.34,'zap');
   // SHEET -- the dies land, the probe comes down
-  add(w(2,4),'draw'); add(w(3,8),'draw'); add(w(3,16),'tag');
+  add(w(4,4),'draw'); add(w(5,8),'draw'); add(w(5,16),'tag');
   // DUST -- the speck
-  add(w(4,5),'zap'); add(w(5,10),'draw'); add(w(5,20),'tag');
+  add(w(6,5),'zap'); add(w(7,10),'draw'); add(w(7,20),'tag');
   // CUT -- the saw, then the bins
-  add(w(6,6),'draw'); add(w(7,8),'draw'); add(w(7,14),'tag');
+  add(w(8,6),'draw'); add(w(9,8),'draw'); add(w(9,14),'tag');
   // CHOKE -- the one machine, the island
-  add(w(8,10),'zap'); add(w(10,2),'draw'); add(w(10,14),'tag');
+  add(w(10,10),'zap'); add(w(12,2),'draw'); add(w(12,14),'tag');
   for(const k in BEAT) if(BEAT[k].sc>0) add(BEAT[k].sc,'mos');
   const BPM=108, E8=30/BPM, FIG=[174.61,220.00,261.63,220.00,233.08,293.66,233.08,220.00];
   for(let i=0,tt=BEAT.RECAP.a;tt<VO[VO.length-2].t[0];i++,tt+=E8){
