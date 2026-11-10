@@ -389,14 +389,20 @@ function explainer(ctx,W2,Hh,t){
       const pack=mp(wordAt(11,1),wordAt(11,1)+1.30*SPD);
       const n=Math.round(H.lerp(4,40,H.ease.inOut(pack)));
       for(let i=0;i<n;i++){
-        const y=Math.round(S.ay-54-i*(150/n));
+        const y=Math.round(S.ay-56-i*(110/n));
         rect(IL+66,y,IR-IL-132,2,H.rgba(H.mix(P.bone,P.ink,0.30),0.85));
       }
-      if(GBOX)GBOX.push({x:IL+66,y:Math.round(S.ay-54-150),w:IR-IL-132,h:152,k:'rungbox'});
+      /* `rungs`, not `rungbox`: a packed ladder is a THING, and naming it as a
+         container exempted it from checkOverlap -- which is how the beat's own
+         label came to be printed across the middle of it, unreadable, with
+         twelve sweeps reporting zero. The stack also sits lower now so the
+         label has somewhere to be. */
+      if(GBOX)GBOX.push({x:IL+66,y:Math.round(S.ay-166),w:IR-IL-132,h:112,k:'rungs'});
       // so the whole axis goes dark: nothing gets out
       B.fillStyle=H.rgba(H.hex(P.ink),0.70*H.ease.inOut(pack));
       B.fillRect(S.ax,S.ay,S.aw,S.ah);
-      if(after(11,11)) px('ABSORBED, ALL OF IT',216,S.lab,CAPSZ,'#cdd6d0','center','"VT323"');
+      // under the head, ABOVE the stack: S.lab is inside the rungs in this beat
+      if(after(11,11)) px('ABSORBED, ALL OF IT',216,S.hero+34,CAPSZ,'#cdd6d0','center','"VT323"');
       if(after(12,2)) blockTag(216,S.tag,'THAT IS THE DIFFERENCE',14,P.bone,P.ink);
       typeWrap(12,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }

@@ -1050,6 +1050,29 @@ telling you the gag is wrong — #005's tree had to fall back over the metal
 instead of away from it, which is also what kicking the foot out of a standing
 pole actually does.
 
+## The `*box` suffix is a promise, not an escape hatch
+
+A GBOX key ending in `box` marks a **container**: a surface that text is
+deliberately drawn on top of, so `checkOverlap` and `checkPointerIdle` leave it
+alone. A finger with `33°C` printed on it is a container. A slab with a
+temperature on it is a container.
+
+**It is not a way to quiet a complaint.** Building #006, #007 and #009 I named
+three ordinary objects `tankbox`, `rungbox` and `flowbox`, and all three went
+on to cover something:
+
+* #006's sugar tank lay straight across the `REST` and `SHIVERING` tags and
+  hid both of them completely.
+* #009's packed rungs had `ABSORBED, ALL OF IT` printed across the middle of
+  them, unreadable.
+* #007's flow column was the one honest one — the arrows really are a surface
+  nothing is written on.
+
+All twelve sweeps returned 0 through every one of those frames, because the
+name told them to. **Only looking found them.** Before naming something `*box`,
+ask whether text belongs *on* it. If the answer is no, it is a thing, and let
+the sweep do its job.
+
 ## Series: three pieces, one question
 
 The standing rule is **one-offs**. A **series** is the exception, and it is

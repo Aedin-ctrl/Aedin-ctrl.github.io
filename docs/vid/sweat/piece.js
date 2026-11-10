@@ -375,12 +375,16 @@ function explainer(ctx,W2,Hh,t){
         rect(x-62,U.sk,124,U.skh,H.rgba(H.mix(P.orange,P.ink,0.52)));
         if(GBOX)GBOX.push({x:x-62,y:U.sk,w:124,h:U.skh,k:'skinbox'});
         const go=after(9,2)?mp(wordAt(9,2),wordAt(9,2)+0.90*SPD):0;
-        const stop=wet?U.lid+8:U.top+14;
+        // the wet arrows run UP TO the humid layer and stop DEAD on it. Drawing
+        // them at a fraction of their length left them fizzling out in open
+        // air halfway up, which reads as "they ran out" rather than "they hit
+        // something" -- and the something is the whole beat.
+        const stop=wet?U.lid+62:U.top+14;
         if(go>0){
           for(let a=0;a<3;a++){
             const ax=x-40+a*40;
             dottedArrow([[ax,U.sk-6],[ax,stop]],
-                        H.clamp((wet?1-lid*0.62:1)*go*1.4-a*0.14),wet?P.red:P.cyan);
+                        H.clamp(go*1.4-a*0.14),wet?P.red:P.cyan);
           }
           // the column the arrows actually occupy. A dottedArrow draws raw
           // pixels and registers nothing, which is how this beat measured as

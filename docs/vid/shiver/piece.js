@@ -112,8 +112,12 @@ const L={
   waste:{ ox:PX+112, oy:MIDY+122, off:7, cubes:16,
           num:MIDY-156, lab:MIDY-110, tag:MIDY+156 },
   // COST -- 1x against 5x, drawn at 1 and 5, and the tank that pays for it
-  cost:{ ox:PX+112, oy:MIDY+150, off:7, unit:4,
-         num:MIDY-186, lab:MIDY-140, fx:IL+40, fy:MIDY+192, fw:IR-IL-80, fh:26 },
+  // the tank goes BELOW the bars' own tags, not across them. At MIDY+192 it
+  // lay over both of them and hid them completely -- and it could not be seen
+  // doing it, because it was named `tankbox` and a *box key is a container
+  // that checkOverlap deliberately ignores. The suffix is a promise.
+  cost:{ ox:PX+112, oy:MIDY+110, off:7, unit:4,
+         num:MIDY-186, lab:MIDY-140, fx:IL+40, fy:MIDY+200, fw:IR-IL-80, fh:22 },
 };
 
 /* ===== THE POINTER TRACK ===== */
@@ -310,7 +314,11 @@ function explainer(ctx,W2,Hh,t){
       const grow=mp(wordAt(1,2),wordAt(1,2)+0.90*SPD);
       rect(S.gx,S.gy,S.gw,S.gh,H.rgba(H.mix(P.ink,P.paper,0.12)));
       if(GBOX)GBOX.push({x:S.gx,y:S.gy,w:S.gw,h:S.gh,k:'gaugebox'});
-      const fill=Math.round(S.gh*0.62*H.ease.out(grow));
+      // the column rises to the TARGET LINE exactly, computed from it rather
+      // than from a fraction of the gauge: at 0.62 of the height it stopped
+      // 36px short of its own target, which says the body is NOT holding the
+      // number -- the opposite of what the beat is about.
+      const fill=Math.round((S.gy+S.gh-6-S.mark)*H.ease.out(grow));
       rect(S.gx+6,S.gy+S.gh-6-fill,S.gw-12,fill,H.rgba(H.mix(P.red,P.ink,0.18)));
       // the notch the whole body works to
       if(after(2,0)){
@@ -425,7 +433,7 @@ function explainer(ctx,W2,Hh,t){
       if(after(12,1)){
         const burn=mp(wordAt(12,1),wordAt(12,1)+1.40*SPD);
         rect(Q.fx,Q.fy,Q.fw,Q.fh,H.rgba(H.mix(P.ink,P.paper,0.14)));
-        if(GBOX)GBOX.push({x:Q.fx,y:Q.fy,w:Q.fw,h:Q.fh,k:'tankbox'});
+        if(GBOX)GBOX.push({x:Q.fx,y:Q.fy,w:Q.fw,h:Q.fh,k:'tank'});
         rect(Q.fx+3,Q.fy+3,Math.round((Q.fw-6)*(1-0.78*H.ease.inOut(burn))),Q.fh-6,P.gold);
         px('SUGAR',Q.fx+Q.fw/2,Q.fy+Q.fh+10,14,P.gold,'center','"Silkscreen"');
       }
