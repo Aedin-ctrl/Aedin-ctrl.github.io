@@ -245,7 +245,10 @@ function explainer(ctx,W2,Hh,t){
           linePix([[S.x,S.hit],[H.lerp(S.x,ex,k),H.lerp(S.hit,ey,k)]],c,5);});
         if(GBOX)GBOX.push({x:S.x-3*S.spread-4,y:S.hit,
                            w:6*S.spread+8,h:S.y1-S.hit,k:'fan'});}
-      if(after(1,5))blockTag(S.x,S.y0-2,'WHITE',14,P.paper,P.ink);
+      /* BESIDE the beam, not on it. The beam is 6px wide and the plate is
+         opaque and 68px wide, so centring the label on the thing it labels
+         erased the thing for the whole of that beat. */
+      if(after(1,5))blockTag(S.x+68,S.y0+10,'WHITE',14,P.paper,P.ink);
       if(after(2,3))blockTag(S.x,S.tag,'ALL SEVEN AT ONCE',14,P.ice,P.ink);
       typeWrap(2,PX+26,CAPY,CAPSZ,'#ffd28a',null,'"VT323"',CAPCH);
     }

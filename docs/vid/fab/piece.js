@@ -97,8 +97,12 @@ const L={
   dust:{ x1:IL+88, x2:IR-88, top:MIDY-56, small:14, big:42,
          hero:MIDY-184, lab:MIDY-138, pct:MIDY+92, tag:MIDY+196 },
   // CUT -- the lanes, the package, and the bin the slow ones go in
-  cut:{ cx:216, cy:MIDY-44, r:120, cell:30, lane:MIDY+130,
-        hero:MIDY-196, tag:MIDY+198 },
+  /* CUT -- re-stacked. The two bin labels had nowhere to go: under the bins
+     they ran into SAME SILICON, TWO PRODUCTS, and above them they landed on the
+     wafer map. The map comes up and shrinks, the bins come up with it, and the
+     labels get their own 24px between the bins and the takeaway. */
+  cut:{ cx:216, cy:MIDY-64, r:110, cell:28, lane:MIDY+120,
+        hero:MIDY-196, tag:MIDY+206 },
   // CHOKE -- one supplier, one island, one price
   choke:{ cx:216, num:MIDY-146, lab:MIDY-100, isle:MIDY+40,
           hero:MIDY-196, tag:MIDY+200 },
@@ -116,6 +120,12 @@ const SPOTS=[
   {n:12, x:PX+10, y:CAPY, s:CAPSZ},
   {n:14, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
+/* The W(n,i) indices here were the ONE set the re-cut's index shift missed:
+   the remap was written `\b(wordAt|after|typeWrap|w)\(` and regex is case
+   sensitive, so every `wordAt(` in the scenes moved and every `W(` in the acts
+   stayed. The hand went on acting at the sentences of the OLD script -- #012's
+   DUST tap fired thirteen seconds early, during SHEET, and parked on the wafer
+   map. Nothing drawn was wrong, so no sweep had anything to measure. */
 const ACTS=(()=>{
   const A=[];
   const near=(b)=>{
@@ -128,15 +138,17 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const S=L.sheet, D=L.dust, C=L.cut, K=L.choke;
   // SHEET -- bring the probe down onto a die
-  drag(W(3,8), W(3,8)+1.20*SPD, [S.cx+46, S.cy-96], [S.cx+46, S.cy-30],
+  drag(W(5,8), W(5,8)+1.20*SPD, [S.cx+46, S.cy-96], [S.cx+46, S.cy-30],
        [IL+40, MIDY+184]);
   // DUST -- tap the speck
-  tap (W(4,5), [D.x2+54, D.top+40], [IL+38, MIDY-178]);
+  tap (W(6,5), [D.x2+54, D.top+40], [IL+38, MIDY-178]);
   // CUT -- draw the saw down one lane
-  drag(W(6,6), W(6,6)+1.15*SPD, [C.cx-14, C.cy-C.r-24], [C.cx-14, C.cy+C.r+20],
+  drag(W(8,6), W(8,6)+1.15*SPD, [C.cx-14, C.cy-C.r-24], [C.cx-14, C.cy+C.r+20],
        [IR-28, MIDY+186]);
   // CHOKE -- tap beside the one machine everything waits on
-  tap (W(8,10), [K.cx-104, K.isle-10], [IR-26, MIDY-180]);
+  // 'beside', which it was not: at cx-104 the hand came down ON the machine
+  // and then waited there for its rest.
+  tap (W(10,10), [K.cx-46, K.isle+40], [IR-26, MIDY-180]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 /* ===== THE EXPLAINER: testing, cutting, geopolitics ===== */
@@ -303,18 +315,32 @@ function explainer(ctx,W2,Hh,t){
       const fill=H.clamp((M-wordAt(4,4))/1.40), probe=H.clamp((M-wordAt(5,8))/1.20);
       pxShadow('NOT CHIPS YET',216,S.hero,22,P.gold,P.ink,'center','"Silkscreen"');
       px('TESTED WHERE THEY LIE',216,S.lab,14,P.bone,'center');
-      if(GBOX)GBOX.push({x:S.cx-S.r-8,y:S.cy-S.r-8,w:2*(S.r+8),h:2*(S.r+8),k:'wafermapbox'});
+      /* The disc's own bounds, with no 8px of air round them. The pad is what
+         put the map 4px into TESTED WHERE THEY LIE once the key stopped
+         claiming to be a container. A registered box should be the thing. */
+      if(GBOX)GBOX.push({x:S.cx-S.r,y:S.cy-S.r,w:2*S.r,h:2*S.r,k:'wafermap'});
       // the wafer, seen flat-on, ruled into dies
       B.fillStyle=H.rgba(H.mix(P.ice,P.ink,0.52));
       for(let yy=-S.r;yy<=S.r;yy++){
         const w2=Math.round(Math.sqrt(Math.max(0,S.r*S.r-yy*yy)));
         B.fillRect(S.cx-w2,S.cy+yy,2*w2,1); }
       // and every die on it, landing in a ripple from the middle out
+      /* A die is on the wafer only if ALL FOUR OF ITS CORNERS are. This tested
+         the die's CENTRE against r-10, and a 26px square has corners 18px from
+         its centre, so dies hung 8px out over the edge of the disc -- three off
+         the top, into TESTED WHERE THEY LIE, and more off each side. The whole
+         point of the shot is a round thing ruled into square things; squares
+         that leave the circle say the opposite. */
       const rr=H.rng(61); const dies=[];
-      for(let gy=-5;gy<=4;gy++) for(let gx=-5;gx<=4;gx++){
+      const DS=S.cell-4;
+      const onWafer=(x,y)=>{
+        for(const [ox,oy] of [[0,0],[DS,0],[0,DS],[DS,DS]])
+          if(Math.hypot(x+ox-S.cx,y+oy-S.cy)>S.r-3) return false;
+        return true; };
+      for(let gy=-6;gy<=5;gy++) for(let gx=-6;gx<=5;gx++){
         const x=S.cx+gx*S.cell+2, y=S.cy+gy*S.cell+2;
+        if(!onWafer(x,y)) continue;
         const cxp=x+S.cell/2-S.cx, cyp=y+S.cell/2-S.cy;
-        if(Math.hypot(cxp,cyp)>S.r-10) continue;
         dies.push([x,y,Math.hypot(cxp,cyp)]);
       }
       dies.forEach(([x,y,d2])=>{
@@ -375,7 +401,7 @@ function explainer(ctx,W2,Hh,t){
       const saw=H.clamp((M-wordAt(8,6))/1.15), bin=H.clamp((M-wordAt(9,8))/1.40);
       const rim=H.rgba(H.mix(P.ink,P.paper,0.92));
       pxShadow('CUT ALONG THE LANES',216,C.hero,22,P.gold,P.ink,'center','"Silkscreen"');
-      if(GBOX)GBOX.push({x:C.cx-C.r-8,y:C.cy-C.r-8,w:2*(C.r+8),h:2*(C.r+8),k:'cutmapbox'});
+      if(GBOX)GBOX.push({x:C.cx-C.r,y:C.cy-C.r,w:2*C.r,h:2*C.r,k:'cutmap'});
       B.fillStyle=H.rgba(H.mix(P.ice,P.ink,0.52));
       for(let yy=-C.r;yy<=C.r;yy++){
         const w2=Math.round(Math.sqrt(Math.max(0,C.r*C.r-yy*yy)));
@@ -390,14 +416,30 @@ function explainer(ctx,W2,Hh,t){
       /* ...and the dies STEPPING APART as it passes. Without this the scene was
          pixel-for-pixel the grid from the beat before it: the saw drew four-pixel
          lines over lines that were already there, and 'cut' looked like 'ruled'. */
-      for(let gy=-4;gy<=3;gy++) for(let gx=-4;gx<=3;gx++){
+      /* Four corners, not the centre -- same fix as the beat before. */
+      const DS=C.cell-4;
+      const onDisc=(x,y)=>{
+        for(const [ax,ay] of [[0,0],[DS,0],[0,DS],[DS,DS]])
+          if(Math.hypot(x+ax-C.cx,y+ay-C.cy)>C.r-3) return false;
+        return true; };
+      /* ...and not all of them are the same product. The beat says some only
+         partly pass and are SOLD SLOWER, and the screen had a hundred identical
+         blue squares and two bins -- so the gold bin arrived with nothing on
+         the wafer to fill it. One die in five is gold, off a seeded rng so it
+         is the same five every frame. */
+      const sr=H.rng(97); const slow=[];
+      for(let gy=-5;gy<=4;gy++) for(let gx=-5;gx<=4;gx++) slow.push(sr()<0.20);
+      let di=0;
+      for(let gy=-5;gy<=4;gy++) for(let gx=-5;gx<=4;gx++){
+        const bad=slow[di++];
         const x=C.cx+gx*C.cell+2, y=C.cy+gy*C.cell+2;
+        if(!onDisc(x,y)) continue;
         const ox=x+C.cell/2-C.cx, oy=y+C.cell/2-C.cy;
-        if(Math.hypot(ox,oy)>C.r-10) continue;
         const k=H.ease.out(saw)*9/Math.max(1,C.r/22);
-        B.fillStyle=H.rgba(H.mix(P.cyan,P.ink,0.36));
+        const base=bad&&bin>0?P.gold:P.cyan;
+        B.fillStyle=H.rgba(H.mix(base,P.ink,0.36));
         B.fillRect(Math.round(x+ox*k/10),Math.round(y+oy*k/10),C.cell-4,C.cell-4);
-        B.fillStyle=H.rgba(H.mix(P.cyan,P.paper,0.34),0.7);
+        B.fillStyle=H.rgba(H.mix(base,P.paper,0.34),0.7);
         B.fillRect(Math.round(x+ox*k/10)+3,Math.round(y+oy*k/10)+3,C.cell-10,2); }
       // two bins: the ones that passed, and the ones that nearly did
       if(bin>0){
@@ -406,14 +448,21 @@ function explainer(ctx,W2,Hh,t){
            to call a scene settled -- and it was right to: for a third of a
            second the shot was one box on the left and nothing else. The
            LABELS keep the stagger; text is not scene geometry. */
-        [[IL+74,'FULL SPEED',P.cyan],[IR-74,'SOLD SLOWER',P.gold]].forEach(([bx,lab,col],k)=>{
+        /* FULL SPEED / SLOWER SPEED, not FULL SPEED / SOLD SLOWER: one was a
+           speed and the other was a sale, so the pair did not read as two
+           grades of the same thing. */
+        [[IL+74,'FULL SPEED',P.cyan],[IR-74,'SLOWER SPEED',P.gold]].forEach(([bx,lab,col],k)=>{
           const q=H.clamp(bin*1.5); if(q<=0)return;
           B.globalAlpha=q;
           // 26x30, not 30x22: at 30x22 isoBox clamps to a 4px-sided diamond
           isoSolid(isoBox(bx,C.lane,26,30),H.mix(col,P.ink,0.42),rim,'bin'+k);
           B.globalAlpha=1;
           const lq=H.clamp(bin*1.5-k*0.30); if(lq<=0)return;
-          B.globalAlpha=lq; blockTag(bx,C.lane+52,lab,14,col,P.ink); B.globalAlpha=1; });
+          /* ABOVE the bin, not below it. Below, at lane+52, both labels ran
+             into SAME SILICON, TWO PRODUCTS at C.tag and lost their bottom half
+             to it -- two opaque plates, which no sweep could see until
+             checkOverlap learned to compare a plate with another plate. */
+          B.globalAlpha=lq; blockTag(bx,C.lane+50,lab,14,col,P.ink); B.globalAlpha=1; });
       }
       if(after(8,14)) blockTag(216,C.tag,'SAME SILICON, TWO PRODUCTS',14,P.gold,P.ink);
       typeWrap(9,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);

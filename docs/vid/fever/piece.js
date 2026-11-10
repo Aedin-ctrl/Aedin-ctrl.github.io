@@ -321,11 +321,14 @@ function explainer(ctx,W2,Hh,t){
       if(GBOX)GBOX.push({x:R.gx,y:R.gy,w:R.gw,h:R.gh,k:'gaugebox'});
       const you=R.gy+R.gh-72;
       rect(R.gx+4,you,R.gw-8,3,P.ice);
-      px('YOU',R.gx+R.gw+8,you-8,14,P.ice,null,'"Silkscreen"');
+      px('YOU',R.gx+R.gw+54,you-8,14,P.ice,null,'"Silkscreen"');
       const up=after(2,3)?H.ease.inOut(mp(wordAt(2,3),wordAt(2,3)+1.20*SPD)):0;
       const ty=Math.round(H.lerp(you,R.gy+40,up));
       rect(R.gx+4,ty,R.gw-8,3,P.gold);
-      px('TARGET',R.gx-8,ty-8,14,P.gold,'right','"Silkscreen"');
+      /* Clear of the marker's end caps, not just of the column. `stem` and
+         `head` sit at exactly the labels' height either side of the gauge, so
+         8px of clearance from the COLUMN was 21-28px of overlap with them. */
+      px('TARGET',R.gx-44,ty-8,14,P.gold,'right','"Silkscreen"');
       if(up>0){ B.fillStyle=H.rgba(H.hex(P.red),0.22);
         B.fillRect(R.gx+4,ty+3,R.gw-8,you-ty-3); }
       const n=(NORMAL+(FEVER-NORMAL)*up).toFixed(1);
@@ -454,11 +457,11 @@ function explainer(ctx,W2,Hh,t){
       if(GBOX)GBOX.push({x:K.gx,y:K.gy,w:K.gw,h:K.gh,k:'gaugebox'});
       const hot=K.gy+40;
       rect(K.gx+4,hot,K.gw-8,3,P.red);
-      px('YOU',K.gx+K.gw+8,hot-8,14,P.red,null,'"Silkscreen"');
+      px('YOU',K.gx+K.gw+54,hot-8,14,P.red,null,'"Silkscreen"');
       const dn=after(11,4)?H.ease.inOut(mp(wordAt(11,4),wordAt(11,4)+1.10*SPD)):0;
       const ty=Math.round(H.lerp(hot,K.gy+K.gh-72,dn));
       rect(K.gx+4,ty,K.gw-8,3,P.gold);
-      px('TARGET',K.gx-8,ty-8,14,P.gold,'right','"Silkscreen"');
+      px('TARGET',K.gx-44,ty-8,14,P.gold,'right','"Silkscreen"');
       if(dn>0){ B.fillStyle=H.rgba(H.hex(P.orange),0.24);
         B.fillRect(K.gx+4,hot+3,K.gw-8,ty-hot-3); }
       if(dn>=1){

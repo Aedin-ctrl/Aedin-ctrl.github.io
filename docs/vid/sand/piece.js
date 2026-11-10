@@ -34,40 +34,40 @@ const PIECE={ no:10, slug:'sand', tags:['TECH','CHEMISTRY'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=101.6, VOHASH="d299aace0159";
+const DUR=101.4, VOHASH="9747cac4df00";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'TITLE',a:0.8,z:1.868,w:["How", "is", "a", "microchip", "made?"],t:[0.83, 0.93, 1.02, 1.06, 1.46]},
-  {b:'PART',a:3.718,z:4.13,w:["Part", "one."],t:[3.748, 3.998]},
-  {b:'OPEN',a:9.23,z:11.389,w:["So:", "what", "is", "a", "chip", "actually", "made", "of?"],t:[9.27, 9.78, 9.92, 9.99, 10.0, 10.3, 10.82, 11.09]},
-  {b:'OPEN',a:12.139,z:14.816,w:["Sand.", "And", "yet", "you", "cannot", "make", "one", "on", "a", "beach."],t:[12.159, 12.979, 13.139, 13.369, 13.459, 13.789, 14.009, 14.169, 14.279, 14.329]},
-  {b:'MELT',a:16.666,z:20.388,w:["Beach", "sand", "is", "not", "silicon.", "It", "is", "silicon", "dioxide."],t:[16.666, 17.146, 17.576, 17.716, 18.006, 18.986, 19.176, 19.276, 19.896]},
-  {b:'MELT',a:21.138,z:28.057,w:["Every", "silicon", "atom", "in", "it", "is", "already", "gripping", "two", "atoms", "of", "oxygen,", "and", "melting", "sand", "only", "gives", "you", "glass."],t:[21.138, 21.508, 22.028, 22.338, 22.438, 22.538, 22.758, 23.278, 24.158, 24.398, 24.828, 24.858, 25.968, 26.088, 26.378, 26.758, 27.138, 27.488, 27.708]},
-  {b:'BURN',a:29.907,z:35.0,w:["The", "oxygen", "is", "burned", "off", "with", "carbon,", "in", "a", "furnace", "at", "eighteen", "hundred", "degrees."],t:[29.907, 30.227, 30.837, 30.907, 31.597, 31.787, 32.077, 32.667, 32.937, 32.947, 33.587, 33.884, 34.18, 34.477]},
-  {b:'BURN',a:35.75,z:40.413,w:["The", "carbon", "wants", "oxygen", "more", "than", "silicon", "does,", "so", "it", "leaves", "as", "carbon", "monoxide."],t:[35.75, 35.96, 36.41, 36.74, 37.17, 37.45, 37.73, 38.22, 38.6, 38.72, 38.87, 39.26, 39.42, 39.8]},
-  {b:'NINES',a:42.263,z:47.73,w:["What", "pours", "out", "is", "about", "ninety", "nine", "per", "cent", "silicon.", "Almost", "anywhere", "else,", "that", "is", "pure."],t:[42.263, 42.673, 43.183, 43.493, 43.693, 43.941, 44.189, 44.437, 44.685, 44.933, 45.723, 46.143, 46.713, 46.993, 47.273, 47.413]},
-  {b:'NINES',a:48.48,z:52.512,w:["For", "a", "chip", "it", "is", "filth.", "Chip", "grade", "silicon", "is", "nine", "nines."],t:[48.53, 48.77, 49.0, 49.35, 49.44, 49.52, 50.16, 50.68, 51.03, 51.79, 51.84, 52.15]},
-  {b:'NINES',a:53.262,z:55.994,w:["One", "foreign", "atom", "per", "billion", "is", "the", "entire", "budget."],t:[53.262, 53.557, 53.852, 54.142, 54.372, 54.942, 55.042, 55.192, 55.502]},
-  {b:'PULL',a:57.844,z:62.639,w:["It", "is", "also", "the", "wrong", "shape.", "A", "chip", "needs", "one", "crystal,", "every", "atom", "on", "the", "same", "grid."],t:[57.844, 57.894, 57.994, 58.294, 58.514, 58.894, 59.524, 59.614, 59.974, 60.424, 61.184, 61.494, 61.754, 61.974, 62.084, 62.244, 62.464]},
-  {b:'PULL',a:63.389,z:69.63,w:["So", "it", "is", "melted", "at", "fourteen", "hundred", "and", "fourteen", "degrees,", "and", "a", "seed", "crystal", "is", "touched", "to", "the", "surface."],t:[63.429, 63.554, 63.679, 63.829, 64.489, 65.269, 66.049, 66.829, 66.859, 66.889, 66.919, 66.949, 67.039, 67.399, 68.109, 68.389, 68.859, 68.989, 69.169]},
-  {b:'PULL',a:70.38,z:73.478,w:["Then", "it", "is", "pulled", "up,", "turning,", "about", "a", "millimetre", "a", "minute."],t:[70.38, 70.78, 70.82, 70.97, 71.58, 71.65, 72.28, 72.5, 72.76, 73.02, 73.06]},
-  {b:'PULL',a:74.228,z:79.671,w:["The", "melt", "freezes", "onto", "the", "seed,", "copies", "its", "grid,", "and", "keeps", "copying", "for", "two", "metres."],t:[74.238, 74.468, 74.798, 75.338, 75.658, 75.898, 76.398, 77.028, 77.348, 77.838, 78.008, 78.278, 78.838, 78.978, 79.491]},
-  {b:'SLICE',a:81.521,z:85.494,w:["The", "result", "weighs", "a", "quarter", "of", "a", "tonne", "and", "is", "one", "crystal", "end", "to", "end."],t:[81.531, 81.721, 82.131, 82.541, 82.601, 83.081, 83.201, 83.361, 83.521, 83.761, 83.921, 84.161, 84.831, 84.971, 85.131]},
-  {b:'SLICE',a:86.244,z:92.24,w:["It", "is", "sawn", "into", "wafers", "and", "polished", "flat", "to", "within", "an", "atom,", "across", "three", "hundred", "millimetres."],t:[86.244, 86.294, 86.454, 86.914, 87.304, 87.974, 88.274, 88.904, 89.244, 89.344, 89.604, 89.884, 90.484, 91.009, 91.535, 92.06]},
-  {b:'END',a:94.09,z:95.03,w:["Sand", "is", "the", "cheap", "part."],t:[94.09, 94.26, 94.39, 94.54, 94.83]},
-  {b:'END',a:95.78,z:96.976,w:["What", "a", "chip", "costs", "you", "is", "order."],t:[95.78, 96.0, 96.06, 96.29, 96.52, 96.69, 96.8]},
+  {b:'TITLE',a:0.8,z:1.869,w:["How", "is", "a", "microchip", "made?"],t:[0.83, 0.93, 1.02, 1.06, 1.47]},
+  {b:'PART',a:3.719,z:4.131,w:["Part", "one."],t:[3.749, 3.999]},
+  {b:'OPEN',a:9.231,z:11.39,w:["So:", "what", "is", "a", "chip", "actually", "made", "of?"],t:[9.271, 9.791, 9.931, 10.001, 10.051, 10.301, 10.851, 11.121]},
+  {b:'OPEN',a:12.14,z:14.604,w:["Sand.", "But", "you", "cannot", "make", "one", "on", "a", "beach."],t:[12.18, 12.53, 12.94, 13.0, 13.35, 13.62, 13.82, 13.95, 14.01]},
+  {b:'MELT',a:16.454,z:20.176,w:["Beach", "sand", "is", "not", "silicon.", "It", "is", "silicon", "dioxide."],t:[16.454, 16.934, 17.364, 17.504, 17.794, 18.774, 18.964, 19.064, 19.684]},
+  {b:'MELT',a:20.926,z:27.845,w:["Every", "silicon", "atom", "in", "it", "is", "already", "gripping", "two", "atoms", "of", "oxygen,", "and", "melting", "sand", "only", "gives", "you", "glass."],t:[20.926, 21.296, 21.816, 22.126, 22.226, 22.326, 22.546, 23.066, 23.946, 24.186, 24.616, 24.646, 25.756, 25.876, 26.166, 26.546, 26.926, 27.276, 27.496]},
+  {b:'BURN',a:29.695,z:34.788,w:["The", "oxygen", "is", "burned", "off", "with", "carbon,", "in", "a", "furnace", "at", "eighteen", "hundred", "degrees."],t:[29.695, 30.015, 30.625, 30.695, 31.385, 31.575, 31.865, 32.455, 32.725, 32.735, 33.375, 33.672, 33.968, 34.265]},
+  {b:'BURN',a:35.538,z:40.201,w:["The", "carbon", "wants", "oxygen", "more", "than", "silicon", "does,", "so", "it", "leaves", "as", "carbon", "monoxide."],t:[35.538, 35.748, 36.198, 36.528, 36.958, 37.238, 37.518, 38.008, 38.388, 38.508, 38.658, 39.048, 39.208, 39.588]},
+  {b:'NINES',a:42.051,z:47.518,w:["What", "pours", "out", "is", "about", "ninety", "nine", "per", "cent", "silicon.", "Almost", "anywhere", "else,", "that", "is", "pure."],t:[42.051, 42.461, 42.971, 43.281, 43.481, 43.729, 43.977, 44.225, 44.473, 44.721, 45.511, 45.931, 46.501, 46.781, 47.061, 47.201]},
+  {b:'NINES',a:48.268,z:52.3,w:["For", "a", "chip", "it", "is", "filth.", "Chip", "grade", "silicon", "is", "nine", "nines."],t:[48.318, 48.558, 48.788, 49.138, 49.228, 49.308, 49.948, 50.268, 50.668, 51.378, 51.749, 52.12]},
+  {b:'NINES',a:53.05,z:55.782,w:["One", "foreign", "atom", "per", "billion", "is", "the", "entire", "budget."],t:[53.05, 53.345, 53.64, 53.93, 54.16, 54.73, 54.83, 54.98, 55.29]},
+  {b:'PULL',a:57.632,z:62.427,w:["It", "is", "also", "the", "wrong", "shape.", "A", "chip", "needs", "one", "crystal,", "every", "atom", "on", "the", "same", "grid."],t:[57.632, 57.682, 57.782, 58.082, 58.302, 58.682, 59.312, 59.402, 59.762, 60.212, 60.972, 61.282, 61.542, 61.762, 61.872, 62.032, 62.252]},
+  {b:'PULL',a:63.177,z:69.418,w:["So", "it", "is", "melted", "at", "fourteen", "hundred", "and", "fourteen", "degrees,", "and", "a", "seed", "crystal", "is", "touched", "to", "the", "surface."],t:[63.217, 63.342, 63.467, 63.617, 64.277, 65.057, 65.837, 66.617, 66.647, 66.677, 66.707, 66.737, 66.827, 67.187, 67.897, 68.177, 68.647, 68.777, 68.957]},
+  {b:'PULL',a:70.168,z:73.266,w:["Then", "it", "is", "pulled", "up,", "turning,", "about", "a", "millimetre", "a", "minute."],t:[70.168, 70.568, 70.608, 70.758, 71.368, 71.438, 72.068, 72.288, 72.548, 72.808, 72.848]},
+  {b:'PULL',a:74.016,z:79.46,w:["The", "melt", "freezes", "onto", "the", "seed,", "copies", "its", "grid,", "and", "keeps", "copying", "for", "two", "metres."],t:[74.026, 74.256, 74.586, 75.126, 75.446, 75.686, 76.186, 76.816, 77.136, 77.626, 77.796, 78.066, 78.626, 78.766, 79.28]},
+  {b:'SLICE',a:81.31,z:85.283,w:["The", "result", "weighs", "a", "quarter", "of", "a", "tonne", "and", "is", "one", "crystal", "end", "to", "end."],t:[81.32, 81.51, 81.92, 82.33, 82.39, 82.87, 82.99, 83.15, 83.31, 83.55, 83.71, 83.95, 84.62, 84.76, 84.92]},
+  {b:'SLICE',a:86.033,z:92.029,w:["It", "is", "sawn", "into", "wafers", "and", "polished", "flat", "to", "within", "an", "atom,", "across", "three", "hundred", "millimetres."],t:[86.033, 86.083, 86.243, 86.703, 87.093, 87.763, 88.103, 88.693, 89.033, 89.133, 89.393, 89.673, 90.273, 90.798, 91.324, 91.849]},
+  {b:'END',a:93.879,z:94.819,w:["Sand", "is", "the", "cheap", "part."],t:[93.879, 94.049, 94.179, 94.329, 94.619]},
+  {b:'END',a:95.569,z:96.765,w:["What", "a", "chip", "costs", "you", "is", "order."],t:[95.569, 95.789, 95.849, 96.079, 96.309, 96.469, 96.589]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  TITLE:{sc:0.0,a:0.8,z:1.868},
-  PART:{sc:3.32,a:3.718,z:4.13},
-  OPEN:{sc:8.83,a:9.23,z:14.816},
-  MELT:{sc:16.27,a:16.666,z:28.057},
-  BURN:{sc:29.51,a:29.907,z:40.413},
-  NINES:{sc:41.86,a:42.263,z:55.994},
-  PULL:{sc:57.44,a:57.844,z:79.671},
-  SLICE:{sc:81.12,a:81.521,z:92.24},
-  END:{sc:93.69,a:94.09,z:96.976},
+  TITLE:{sc:0.0,a:0.8,z:1.869},
+  PART:{sc:3.32,a:3.719,z:4.131},
+  OPEN:{sc:8.83,a:9.231,z:14.604},
+  MELT:{sc:16.05,a:16.454,z:27.845},
+  BURN:{sc:29.3,a:29.695,z:40.201},
+  NINES:{sc:41.65,a:42.051,z:55.782},
+  PULL:{sc:57.23,a:57.632,z:79.46},
+  SLICE:{sc:80.91,a:81.31,z:92.029},
+  END:{sc:93.48,a:93.879,z:96.765},
 };
 const SENT={
   TITLE:[0],
@@ -138,6 +138,12 @@ const SPOTS=[
   {n:16, x:PX+10, y:CAPY, s:CAPSZ},
   {n:18, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
+/* The W(n,i) indices here were the ONE set the re-cut's index shift missed:
+   the remap was written `\b(wordAt|after|typeWrap|w)\(` and regex is case
+   sensitive, so every `wordAt(` in the scenes moved and every `W(` in the acts
+   stayed. The hand went on acting at the sentences of the OLD script -- #012's
+   DUST tap fired thirteen seconds early, during SHEET, and parked on the wafer
+   map. Nothing drawn was wrong, so no sweep had anything to measure. */
 const ACTS=(()=>{
   const A=[];
   const near=(b)=>{
@@ -150,25 +156,25 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const E=L.melt, U=L.burn, N=L.nines, Q=L.pull, S=L.slice;
   // MELT -- tug one oxygen away from the silicon. It does not come.
-  drag(W(3,7), W(3,7)+1.15*SPD, [E.cx+E.ox, E.cy+E.oh+30], [E.cx+E.ox+54, E.cy+E.oh+30],
+  drag(W(5,7), W(5,7)+1.15*SPD, [E.cx+E.ox, E.cy+E.oh+30], [E.cx+E.ox+54, E.cy+E.oh+30],
        [IL+40, MIDY+186]);
   // BURN -- drop the carbon in
   // the rest is LOW and LEFT, not up in the corner: from the top right the hop
   // to the caption strip is 599px, and 599px inside one 0.70s approach is a
   // hand that teleports.
-  drag(W(4,3), W(4,3)+1.10*SPD, [U.cx-70, U.cin-18], [U.cx-70, U.cin+44],
+  drag(W(6,3), W(6,3)+1.10*SPD, [U.cx-70, U.cin-18], [U.cx-70, U.cin+44],
        [IL+26, MIDY+146]);
   /* NINES -- tap the one bad dot, ON the dot. This said it tapped it and
      landed 49px to the right of it: dot 44 is drawn at N.x1-45+40, N.grid+40,
      and the hand was sent to N.x1+44. The grid is the one place in the piece
      where the pointer can do the explaining -- a hundred identical dots, and
      the hand goes and finds the one -- so it has to actually touch it. */
-  tap (W(8,2), [N.x1-45+4*10+3, N.grid+4*10+3], [IR-26, MIDY+196]);
+  tap (W(10,2), [N.x1-45+4*10+3, N.grid+4*10+3], [IR-26, MIDY+196]);
   // PULL -- haul the seed up out of the melt. The one drag that IS the process.
-  drag(W(11,2), W(11,2)+1.30*SPD, [Q.cx+Q.bw+34, Q.melt-26], [Q.cx+Q.bw+34, Q.rod+54],
+  drag(W(13,2), W(13,2)+1.30*SPD, [Q.cx+Q.bw+34, Q.melt-26], [Q.cx+Q.bw+34, Q.rod+54],
        [IL+38, MIDY+200]);
   // SLICE -- draw the saw across
-  drag(W(14,2), W(14,2)+1.10*SPD, [S.x0+56, S.cy-S.r-28], [S.x0+56, S.cy+S.r+26],
+  drag(W(16,2), W(16,2)+1.10*SPD, [S.x0+56, S.cy-S.r-28], [S.x0+56, S.cy+S.r+26],
        [IR-28, MIDY+188]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
@@ -544,7 +550,7 @@ function explainer(ctx,W2,Hh,t){
          the shot is a hundred identical things and somebody picking one out.
          DOT44 is the dot and the tap in ACTS is aimed at the same arithmetic,
          so they cannot drift apart. */
-      const picked=t>=wordAt(8,2)+0.05;
+      const picked=t>=wordAt(10,2)+0.05;
       for(let i=0;i<100;i++){
         const q=H.clamp(grid*1.4-(i/100)*0.4); if(q<=0)continue;
         const col2=(picked&&i===44)?P.red:H.mix(P.ice,P.ink,0.30);

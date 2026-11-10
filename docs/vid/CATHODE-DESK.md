@@ -1,7 +1,21 @@
-# CATHODE DESK — house style v4.4
+# CATHODE DESK — house style v4.5
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.5 (2026-11-10)** — **a shape must stay inside the shape that contains
+> it**, and three more ways the sweeps were quiet. #012 ruled a round wafer into
+> square dies by testing each die's CENTRE against the radius, so dies hung 8px
+> out over the edge of the disc and into the caption above it — the shot's whole
+> claim is a round thing divided into square things. **Test the corners.** Also
+> new: `checkOverlap` now compares **a plate with another plate** (#012 laid
+> SAME SILICON, TWO PRODUCTS across the bottom half of both bin labels and no
+> sweep could see it); `checkPointerIdle` finally implements the exemption its
+> own comment has promised since v2.6, **positionally** — the hand is excused
+> where it last acted, not for a second after acting; and three keys that were
+> never containers (`wavebox`, `wafermapbox`, `cutmapbox`) gave their `*box`
+> suffix back. See *A shape stays inside its container* and *The `*box`
+> suffix*.
+>
 > **v4.4 (2026-11-10)** — **a part opens on ONE card, and the card talks.**
 > It was two: the series card, and then the piece's own question in the cold
 > open — two questions put to the viewer before anything had been explained,
@@ -1422,6 +1436,102 @@ looking:
   *second* pass, because having all four parts was not the same as reading as a
   furnace — see **Window chrome belongs to windows**, which is what that pass
   turned out to be about.
+
+## A shape stays inside its container
+
+When a beat establishes a boundary — a disc, a bar, a panel, a lake — then
+**everything the beat puts inside it has to be inside it**, including the last
+pixel of the last one. The boundary is the argument; a shape crossing it argues
+the opposite.
+
+#012's wafer map is the case. It rules a 300px disc into 26px square dies, and
+it decided which dies existed like this:
+
+```js
+if(Math.hypot(die_centre - wafer_centre) > r - 10) continue;   // WRONG
+```
+
+A square's corner is 18px from its centre, so testing the **centre** let dies
+hang 8px out over the rim of the disc — three off the top, through the caption
+above it, and more off each side. The shot says *one round wafer, hundreds of
+square copies*; squares leaving the circle say the wafer is not the boundary.
+
+```js
+const ok = [[0,0],[s,0],[0,s],[s,s]]                           // RIGHT
+  .every(([ox,oy]) => Math.hypot(x+ox-cx, y+oy-cy) <= r-3);
+```
+
+* **Test the corners, not the centre** — of anything square inside anything
+  round, and of anything at all inside a clip.
+* **Register the container's own bounds, with no padding.** The map was filed
+  8px larger than the disc it draws, and that pad alone put it 4px into the
+  caption once its key stopped claiming to be a container.
+* **Fewer items is the correct answer.** The honest test dropped 280 copies to
+  208. A number that falls out of the geometry beats a number that was tuned to
+  look right.
+
+## The `*box` suffix, audited
+
+The rule (*it is a promise, not an escape hatch*) was already here. What was
+missing was a way to check it, because a wrong `*box` is invisible by
+construction — it silences the three sweeps that would have objected.
+
+**The audit: rename every `*box` key in the library to drop the suffix, run the
+sweeps, and read what fires.** 31 keys, ~47 overlaps. Then classify each hit:
+
+* **text the container is there to carry** → the name was honest. `33°C` on a
+  finger, `Si` on an atom, `RESIST` on a stack, `TARGET`/`YOU` on an axis,
+  `ICE` on a lake. 28 of the 31 were this.
+* **anything else landing on it** → the name was a lie, and it had been hiding
+  something. Three were: `wavebox` (nothing is written on a sine wave — it was
+  hiding a 143px collision with `NANOMETRES`), `wafermapbox` and `cutmapbox`
+  (nothing is written on a wafer).
+
+**Do this audit after any beat gains a `*box`.** The question "does text belong
+*on* this?" is easy to answer wrongly while writing the draw, and the renamed
+sweep answers it for you.
+
+## The pointer is excused where it acted, not when
+
+`checkPointerIdle` flags a hand that has been stationary on content for longer
+than `SIT` (0.80s). Its comment has said since v2.6 that *"a button it has just
+pressed is a fine place to be"* — and nothing implemented that. The only thing
+exempt was the text caret, so the check was quietly wrong in both directions:
+it flagged a hand doing the right thing, and (because `solidShape` registered
+nothing in `GBOX` until v4.4) it could not see a hand parked on a diagram.
+
+The exemption is **positional**: the hand is excused while it sits within 3px of
+the last place it acted — a press or the end of a drag — and the moment it acts
+elsewhere or moves off, the exemption is gone.
+
+* **Not time-limited.** A hand that pressed OK and has not moved is still on the
+  button it pressed, whether the gag it is watching runs one second or three.
+  #002 and #007 were both flagged for watching their own cold open.
+* **A drag's destination is ON the object** — the probe comes down onto a die,
+  the saw is drawn down a lane. Flagging the hand for being where the drag put
+  it is flagging the act.
+* **Control-tested.** Parking a caption rest on #010's crucible — somewhere the
+  hand never acted — still reports two hits. An exemption that cannot fail its
+  own control is not an exemption, it is a hole.
+
+**And `near()` is not a rest.** The automatic rest offsets ±112/±132 from the
+act, which is still inside a 300px disc. A beat whose diagram fills the panel
+has to name its own rest, outside the diagram.
+
+## Say the same kind of thing on both sides of a comparison
+
+Two labelled things side by side are a sentence with an *and* in it, and the two
+halves have to be the same part of speech.
+
+#012 binned its chips into **FULL SPEED** and **SOLD SLOWER**: one is a speed,
+the other is a sale, so the pair did not read as two grades of one thing. It is
+**FULL SPEED** and **SLOWER SPEED** now. Same for `FURNACE`/`CHIP` in #010 and
+`BEFORE`/`NOW` in #011 — one word each, the same kind of word.
+
+**And the script has to agree with the screen.** #010 said *"sand, and yet you
+cannot make one on a beach"* over a card reading **BUT NOT ON A BEACH**. "And
+yet" and "but" are the same turn written twice in two registers; the plainer one
+wins, in both places.
 
 ## Window chrome belongs to windows
 

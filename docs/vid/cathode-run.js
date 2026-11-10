@@ -407,6 +407,31 @@ window.checkPointerIdle=function(step){
   // Widening fixed exclusion windows instead would have covered most of the
   // timeline and made the check mean nothing.
   const bad=[],seen=new Set(), dt=step||1/12, SIT=0.80;
+  /* ...and the END OF A DRAG is a fine place to be, for the same reason a
+     button it has just pressed is. A drag's whole point is that the hand takes
+     something somewhere, and where it takes it is ON the object: the probe
+     comes down onto a die, the saw is drawn down a lane. The hand then waits
+     there until its rest is due. Flagging that is flagging the act. The
+     exemption is narrow -- within 1.2s of arriving, and within 3px of the
+     arrival point -- so a hand that genuinely parks is still caught. */
+  /* Same for a press. The comment above has said since v2.6 that "a button it
+     has just pressed is a fine place to be" and nothing ever implemented it,
+     so the only thing actually exempt was the text caret. */
+  const ARRIVE=(window.PTRACKDBG||[]).filter(k=>k.d||k.c)
+                                     .sort((a,c)=>a.t-c.t);
+  /* "Where it last acted" -- not "where it acted in the last second". A hand
+     that pressed OK and has not moved since is still on the button it pressed,
+     whether the gag it is watching runs for one second or three; #002 and #007
+     were flagged for sitting on their own dialog button through the cold open,
+     which is what a hand does when the joke is the content. The moment it acts
+     somewhere else, or moves off, the exemption is gone -- so a hand parked on
+     a diagram it never touched is still caught, which is the case the check
+     was written for (#010's pointer sat 8.67s on a silicon atom off a SPOT
+     rest, and that still fires). */
+  const justDragged=(tt,x,y)=>{
+    let last=null;
+    for(const k of ARRIVE){ if(k.t>tt) break; last=k; }
+    return !!last && Math.abs(x-last.x)<=3 && Math.abs(y-last.y)<=3; };
   let prev=null, stillFor=0;
   for(let tt=0; tt<=DUR; tt+=dt){
     BOUNDS=[]; GBOX=[]; explainer(ctx,OUTW,OUTH,tt);
@@ -418,6 +443,7 @@ window.checkPointerIdle=function(step){
     stillFor = moved ? 0 : stillFor+dt;
     prev=p;
     if(p.caret || stillFor < SIT) continue;
+    if(justDragged(tt,p.x,p.y)) continue;
     const c={x:p.x,y:p.y,w:10,h:16};
     // a *box key is a CONTAINER -- the group box, the lake, the plot area.
     // Standing inside one is not standing in front of anything.
@@ -532,9 +558,19 @@ window.checkOverlap=function(step){
          the only case it could ever find. Now: a plate against any registered
          surface that is not itself a plate, a container or the pointer. */
       const ti=[ks[0].indexOf('tag:')===0, ks[1].indexOf('tag:')===0];
-      if(ti[0]===ti[1]) continue;                 // two plates, or neither
-      const other=ti[0]?ks[1]:ks[0];
-      if(other==='cursor'||other.slice(-3)==='box') continue;
+      if(!ti[0]&&!ti[1]) continue;                // neither is a plate
+      if(ti[0]&&ti[1]){
+        /* TWO PLATES. Both are opaque, so the one drawn second hides the one
+           drawn first along with its label -- and nothing else in this sweep
+           could see it: the plate-vs-surface test needs exactly one plate, and
+           the text test skips any string that sits on a plate of its own. #012
+           printed FULL SPEED and SOLD SLOWER and then laid SAME SILICON, TWO
+           PRODUCTS across the bottom half of both of them, unreadable, with
+           all thirteen sweeps at 0. */
+      } else {
+        const other=ti[0]?ks[1]:ks[0];
+        if(other==='cursor'||other.slice(-3)==='box') continue;
+      }
       const o=hit(A,Bq); if(!o) continue;
       const k='GG|'+ks.join('~'); if(seen.has(k))continue; seen.add(k);
       hits.push({t:+tt.toFixed(2),a:A.k,b:Bq.k,overlap:o});

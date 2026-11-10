@@ -103,7 +103,15 @@ const L={
   print:{ cx:216, mask:MIDY-96, waf:MIDY+96, span:132, gaps:[-96,-40,18,74],
           hero:MIDY-196, lab:MIDY-152, tag:MIDY+196 },
   // LIMIT -- two wavelengths, drawn at the same scale, and what each can print
-  limit:{ x1:IL+92, x2:IR-92, wav:MIDY-30, bar:MIDY+54,
+  /* LIMIT -- the wave centre was MIDY-30 and the waves swing 22px, so their
+     crests ran straight through NANOMETRES at lab+28. The unit is the one thing
+     on this beat that both numbers depend on, and a sine wave was drawn across
+     it. Down 28px. */
+  /* x1 moved out to IL+74: at IL+92 the two 44px numbers left 20px between
+     them -- half a character -- and 193 13.5 read as one run of digits. The
+     prose rule (a gap you could put a third label in) is stricter than
+     checkClearance, and it is the one a reader applies. */
+  limit:{ x1:IL+74, x2:IR-92, wav:MIDY-2, bar:MIDY+64,
           num:MIDY-128, lab:MIDY-82, tag:MIDY+190 },
   // ABSORB -- a lens that stops it dead, and a mirror stack that does not
   absorb:{ x1:IL+88, x2:IR-88, mid:MIDY+10,
@@ -125,6 +133,12 @@ const SPOTS=[
   {n:14, x:PX+10, y:CAPY, s:CAPSZ},
   {n:16, x:BOX[0]+56, y:BOX[1]+30, s:14},
 ];
+/* The W(n,i) indices here were the ONE set the re-cut's index shift missed:
+   the remap was written `\b(wordAt|after|typeWrap|w)\(` and regex is case
+   sensitive, so every `wordAt(` in the scenes moved and every `W(` in the acts
+   stayed. The hand went on acting at the sentences of the OLD script -- #012's
+   DUST tap fired thirteen seconds early, during SHEET, and parked on the wafer
+   map. Nothing drawn was wrong, so no sweep had anything to measure. */
 const ACTS=(()=>{
   const A=[];
   const near=(b)=>{
@@ -137,17 +151,17 @@ const ACTS=(()=>{
   const tap =(t,a,r)=>A.push({t0:+(t-LEAD).toFixed(3),t1:+(t-LEAD).toFixed(3),a:a,b:a,r:r||near(a),k:'click'});
   const R=L.print, I=L.limit, S=L.absorb, N=L.tin;
   // PRINT -- slide the mask into place over the wafer
-  drag(W(3,8), W(3,8)+1.20*SPD, [R.cx-R.span-34, R.mask], [R.cx-R.span+6, R.mask],
+  drag(W(5,8), W(5,8)+1.20*SPD, [R.cx-R.span-34, R.mask], [R.cx-R.span+6, R.mask],
        [IL+40, MIDY+172]);
   // LIMIT -- tap beside the short wave
-  tap (W(6,12), [I.x2+52, I.wav], [IL+38, MIDY+176]);
+  tap (W(8,12), [I.x2+52, I.wav], [IL+38, MIDY+176]);
   // ABSORB -- tap beside the lens that stops it
-  tap (W(7,6), [S.x1-54, S.mid], [IR-26, MIDY-178]);
+  tap (W(9,6), [S.x1-54, S.mid], [IR-26, MIDY-178]);
   // TIN -- pull the laser in onto the droplet. The one drag that IS the beat.
-  drag(W(11,2), W(11,2)+1.25*SPD, [N.x0+28, N.lane-74], [N.cx-54, N.lane-24],
+  drag(W(13,2), W(13,2)+1.25*SPD, [N.x0+28, N.lane-74], [N.cx-54, N.lane-24],
        [IR-28, MIDY+188]);
   // and send the flash out
-  tap (W(12,8), [N.cx+78, N.lane-62], [IL+40, MIDY+190]);
+  tap (W(14,8), [N.cx+78, N.lane-62], [IL+40, MIDY+190]);
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 /* ===== THE EXPLAINER: printing circuits with light ===== */
@@ -365,7 +379,12 @@ function explainer(ctx,W2,Hh,t){
                P.ink,'center');
       px('NOW',I.x2,I.lab,14,w2>0?P.bone:H.mix(P.ink,P.bone,0.34),'center');
       px('NANOMETRES',216,I.lab+28,14,P.bone,'center');
-      if(GBOX)GBOX.push({x:IL+10,y:I.wav-40,w:IR-IL-20,h:(I.bar+40)-(I.wav-40),k:'wavebox'});
+      /* The box is the WAVES, not the whole half of the screen they sat in,
+         and it is not called `wavebox`: nothing is written on a wave, so it is
+         a thing and the sweeps should police it. The old key swallowed the bars
+         and their labels too, which is how a 143px collision with NANOMETRES
+         went unreported. */
+      if(GBOX)GBOX.push({x:I.x1-80,y:I.wav-24,w:(I.x2+80)-(I.x1-80),h:48,k:'wave'});
       /* Both waves on ONE scale, because the comparison is the content. The
          long one gets 2 cycles across its half, the short one gets 2*193/13.5
          -- the ratio is drawn, not asserted. */
