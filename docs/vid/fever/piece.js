@@ -354,11 +354,21 @@ function explainer(ctx,W2,Hh,t){
                  H.rgba(H.mix(P.red,P.ink,0.72)));
       // the blanket, hauled up over it
       if(after(7,2)){
+        /* A faceted slab, not a flat rect in chrome navy. It was both: the
+           Win95 blue belongs to LAYER 1 and has no business on the screen,
+           and an unshaded rectangle in a frame where every other object is a
+           three-tone isometric solid reads as a hole, not a quilt. */
         const bl=H.ease.out(mp(wordAt(7,2),wordAt(7,2)+1.10*SPD));
-        const top=Math.round(H.lerp(S.bl+40,S.bl-18,bl));
-        rect(S.cx-74,top,148,S.bl+96-top,H.rgba(H.mix(P.navy,P.ink,0.28)));
-        rect(S.cx-74,top,148,4,H.rgba(H.mix(P.paper,P.ink,0.40)));
-        if(GBOX)GBOX.push({x:S.cx-74,y:top,w:148,h:S.bl+96-top,k:'blanketbox'});
+        const top=Math.round(H.lerp(S.bl+40,S.bl-18,bl)), bot=S.bl+96;
+        const q=S.cx, w=74, d=22;
+        const out=[[q,top],[q+w,top+d],[q+w,bot-d],[q,bot],[q-w,bot-d],[q-w,top+d]];
+        const fs=[[[q,top],[q+w,top+d],[q,top+2*d],[q-w,top+d]],
+                  [[q-w,top+d],[q,top+2*d],[q,bot],[q-w,bot-d]],
+                  [[q,top+2*d],[q+w,top+d],[q+w,bot-d],[q,bot]]];
+        const qc=H.mix(P.ice,P.earth,0.58);
+        solidShape(fs.map((f,i)=>({p:f,c:H.rgba(H.mix(qc,P.ink,[0,0.30,0.52][i]))})),
+                   out,H.rgba(H.mix(P.ink,P.paper,0.92)),
+                   H.rgba(H.mix(qc,P.ink,0.76)),'blanket');
       }
       px(FEVER.toFixed(1),216,S.num,44,P.red,'center','"Silkscreen"');
       px('MEASURED, DEGREES C',216,S.lab,14,'#cdd6d0','center','"Silkscreen"');
