@@ -21,9 +21,6 @@
    35 C your skin is already at the temperature the air would evaporate to, and
    no sweat rate is enough. */
 const PIECE={ no:7, slug:'sweat', tags:['BODY','PHYSICS'],
-              part:{n:2, of:3, first:6, series:'YOUR THERMOSTAT',
-                    titles:['why you shiver','why sweating cools you',
-                            'why a fever makes you cold']},
               myth:"not the water",
               title:"why sweating cools you",
               blurb:"Sweat does not cool you. Evaporation does, and the drop that rolls off your chin has removed nothing at all. That single distinction is why humid heat kills." };
@@ -150,7 +147,6 @@ const ACTS=(()=>{
 function explainer(ctx,W2,Hh,t){
   const T=Math.floor(t*12)/12, M=t;
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
-  const blink=Math.floor(T*2.2)%2===0;
   const wordAt=(n,i)=>VO[n].t[i];
   const after=(n,i)=>t>=VO[n].t[i];
   const said=(n,a,b)=>{const v=VO[n];const lo=a||0,hi=(b===undefined?v.w.length:b);
@@ -260,7 +256,7 @@ function explainer(ctx,W2,Hh,t){
   }
 
   /* --- the program window --- */
-  if(T>=BEAT.MAKE.sc-0.30){
+  if(T>=BEAT.MAKE.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,'Why does sweating cool you down?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
@@ -448,18 +444,9 @@ function explainer(ctx,W2,Hh,t){
     }
   }
 
-  /* --- the end card, on the bare desktop --- */
-  if(T>=SHUT){
-    const EC=LH/2-84;
-    zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
-    if(T>=SHUT+0.22){
-      pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
-      pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
-      pxShadow('part three:',LW/2,EC+94,18,P.bone,P.ink,'center','"VT323"');
-      pxShadow('why a fever makes you cold.',LW/2,EC+120,18,P.bone,P.ink,'center','"VT323"');
-      if(blink)rect(LW/2-60,EC+152,8,2,P.gold);
-      pxShadow(pieceTag()+'   '+partTag(),LW/2,PY+PH-26,14,P.bone,P.ink,'center','"VT323"');}
-  }
+  /* --- the end card. endCard() owns it, and owns being the only thing
+     a piece draws after SHUT. --- */
+  endCard(T,M,SHUT,'next:','why a fever makes you cold.');
 
   /* --- the pointer --- */
   const K=PTRACK, APPROACH=0.70;

@@ -19,9 +19,6 @@
 
    The 16-cube stack is the unit: one cube is 6.25% of the fuel burned. */
 const PIECE={ no:6, slug:'shiver', tags:['BODY','BIOLOGY'],
-              part:{n:1, of:3, first:6, series:'YOUR THERMOSTAT',
-                    titles:['why you shiver','why sweating cools you',
-                            'why a fever makes you cold']},
               myth:"not a malfunction",
               title:"why you shiver",
               blurb:"Shivering looks like your body losing its grip on the cold. It is the opposite: muscle deliberately run at zero efficiency, because the waste heat is the entire point." };
@@ -82,10 +79,16 @@ const L={
          // head, torso and two legs -- a torso with a cube on top read as two
          // boxes, not as a person, and the whole gag depends on recognising
          // that the thing juddering is YOU.
-         head:[[216,364],[234,375],[234,399],[216,410],[198,399],[198,375]],
-         headf:[[[216,364],[234,375],[216,386],[198,375]],
-                [[198,375],[216,386],[216,410],[198,399]],
-                [[216,386],[234,375],[234,399],[216,410]]],
+         head:[[216,370],[234,381],[234,405],[216,416],[198,405],[198,381]],
+         headf:[[[216,370],[234,381],[216,392],[198,381]],
+                [[198,381],[216,392],[216,416],[198,405]],
+                [[216,392],[234,381],[234,405],[216,416]]],
+         // a neck. Head and torso with a 6px hole between them read as two
+         // stacked crates; the sliver of neck is what makes it a person.
+         neck:[[216,402],[223,405],[223,421],[216,424],[209,421],[209,405]],
+         neckf:[[[216,402],[223,405],[216,408],[209,405]],
+                [[209,405],[216,408],[216,424],[209,421]],
+                [[216,408],[223,405],[223,421],[216,424]]],
          body:[[216,416],[250,436],[250,470],[216,490],[182,470],[182,436]],
          bodyf:[[[216,416],[250,436],[216,456],[182,436]],
                 [[182,436],[216,456],[216,490],[182,470]],
@@ -262,6 +265,7 @@ function explainer(ctx,W2,Hh,t){
       fs.map((f,i)=>({p:sh(f),c:H.rgba(H.mix(skin,P.ink,O.tone[i]))})),
       sh(out),rim,seam,key);
     part(O.legLf,O.legL,'legL'); part(O.legRf,O.legR,'legR');
+    part(O.neckf,O.neck,'neck');
     part(O.bodyf,O.body,'body'); part(O.headf,O.head,'head');
     // frost clinging on, then heat lifting off the shoulders
     if(sweep>0.4){ const rr=H.rng(41);
@@ -293,7 +297,7 @@ function explainer(ctx,W2,Hh,t){
   }
 
   /* --- the program window --- */
-  if(T>=BEAT.SET.sc-0.30){
+  if(T>=BEAT.SET.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,'Why do you shiver when you are cold?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
@@ -458,18 +462,9 @@ function explainer(ctx,W2,Hh,t){
     }
   }
 
-  /* --- the end card, on the bare desktop --- */
-  if(T>=SHUT){
-    const EC=LH/2-84;
-    zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
-    if(T>=SHUT+0.22){
-      pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
-      pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
-      pxShadow('part two:',LW/2,EC+94,18,P.bone,P.ink,'center','"VT323"');
-      pxShadow('why sweating cools you.',LW/2,EC+120,18,P.bone,P.ink,'center','"VT323"');
-      if(blink)rect(LW/2-60,EC+152,8,2,P.gold);
-      pxShadow(pieceTag()+'   '+partTag(),LW/2,PY+PH-26,14,P.bone,P.ink,'center','"VT323"');}
-  }
+  /* --- the end card. endCard() owns it, and owns being the only thing
+     a piece draws after SHUT. --- */
+  endCard(T,M,SHUT,'next:','why sweating cools you.');
 
   /* --- the pointer --- */
   const K=PTRACK, APPROACH=0.70;

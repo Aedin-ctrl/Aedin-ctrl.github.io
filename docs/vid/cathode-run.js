@@ -21,7 +21,13 @@ const PTRACK=(()=>{
     else sess.push({first:x, lastN:x.n, prev:x});
   });
   const pending=[];
-  const P=[{t:0,x:250,y:196}];
+  /* A series part opens on its own card, and the hand presses THAT first. The
+     default start of [250,196] is in open desktop for a standalone and inside
+     the part card for a part, so without this the hand spent the whole card
+     sitting on the recap it was supposed to be letting you read. */
+  const P=[PIECE.part?{t:0,x:PART_OK.x-96,y:PART_OK.y+74}:{t:0,x:250,y:196}];
+  if(PIECE.part) P.push({t:+Number(PIECE.part.shut).toFixed(3),
+                         x:PART_OK.x, y:PART_OK.y, c:1});
   sess.forEach(S=>{
     P.push({t:+(VO[S.first.n].t[0]-0.30).toFixed(3),
             x:S.first.x+3, y:S.first.y+Math.round(S.first.s*0.55), c:1});
@@ -103,7 +109,11 @@ window.checkPiece=function(){
     bad.push({field:'tags',got:PIECE.tags,need:'1 or 2'});
   else for(const t of PIECE.tags)
     if(TAGS.indexOf(t)<0) bad.push({field:'tag',got:t,need:'one of '+TAGS.join(',')});
-  if(DUR<65||DUR>78) bad.push({field:'DUR',got:DUR,need:'65-78s'});
+  /* A standalone is 65-78s. A part of a series is allowed to be longer, and has
+     to be: it spends its first four seconds on the part card and its recap, and
+     it is carrying a third of an argument rather than a whole one. */
+  const LO=PIECE.part?78:65, HI=PIECE.part?100:78;
+  if(DUR<LO||DUR>HI) bad.push({field:'DUR',got:DUR,need:LO+'-'+HI+'s'});
   if(PIECE.part){
     const q=PIECE.part;
     if(!(q.of>=2&&q.of<=4)) bad.push({field:'part.of',got:q.of,need:'2-4'});
@@ -113,6 +123,23 @@ window.checkPiece=function(){
     if(!q.series||q.series.length<4) bad.push({field:'part.series',got:q.series});
     if(!Array.isArray(q.titles)||q.titles.length!==q.of)
       bad.push({field:'part.titles',got:q.titles,need:q.of+' titles'});
+    /* The recap is what makes the numbering mean anything. Part two of the first
+       attempt at a series opened exactly like a standalone and the PART 2/3 in
+       the status bar was the only thing distinguishing it, which is how three
+       videos came to claim they were a series without being one. */
+    if(!q.recap||q.recap.length<16) bad.push({field:'part.recap',got:q.recap,
+                                              need:'a sentence of catch-up'});
+    /* The card's own close time. It lives in PIECE because TWO things need it:
+       the piece, to stop drawing the card, and PTRACK, to put the hand on the
+       button. Held in the piece alone they drifted apart and the card shut on
+       its own while the hand was elsewhere. */
+    if(!(q.shut>=1.6&&q.shut<=VO[0].a-0.6))
+      bad.push({field:'part.shut',got:q.shut,need:'1.6 .. lead_in-0.6'});
+    if(q.recap&&q.recap.length>110) bad.push({field:'part.recap',got:q.recap.length,
+                                              need:'<=110 chars (3 rows of 34)'});
+    // the lead_in has to be long enough for the card to open, be read and shut
+    if(VO[0].a<4.0) bad.push({field:'lead_in',got:VO[0].a,
+                              need:'>=4.0s -- the part card goes first'});
   }
   return bad;
 };
@@ -202,6 +229,33 @@ window.checkFraming=function(tol,step){
    own title bar, and message-box lines that ran out through the window's right
    edge, were invisible to all ten. A string whose top-left corner is inside a
    registered frame has to be wholly inside that frame.                     */
+/* ===== THE THIRTEENTH SWEEP: the end card stands alone =====
+   The sign-off is the one shot in a piece with NO window on it. The program
+   window has closed, the Good-To-Know dialog has closed, and GOOD TO KNOW THO
+   sits on the bare sky. #006-#009 all shipped with both windows still standing
+   behind it: the gold lettering was printed across a white dialog box, on top
+   of the dialog's own text, in the last three seconds of four videos.
+
+   Nothing caught it because the end card and the guard that takes the stage
+   DOWN were two hundred lines apart in nine separate copies -- the five older
+   pieces bounded their window block with `&& T<SHUT` and the four newer ones
+   simply did not, and no sweep had any opinion about what a piece draws late.
+   endCard() owns both halves now, and this holds it: once BARE is set, FRAMES
+   must be empty, because every Win95 container on screen files itself there. */
+window.checkEndCard=function(step){
+  const st=step||1/12, bad=[]; let saw=false;
+  for(let tt=0; tt<=DUR; tt+=st){
+    FRAMES=[]; BARE=false; explainer(ctx,OUTW,OUTH,tt);
+    const f=FRAMES, bare=BARE; FRAMES=null; BARE=false;
+    if(!bare) continue;
+    saw=true;
+    if(f.length) bad.push({t:+tt.toFixed(2), why:'a window is still open on the end card',
+                           open:[...new Set(f.map(q=>q.k))]});
+  }
+  // a piece with no end card at all is also a fault: every piece signs off
+  if(!saw) bad.push({t:null, why:'no end card -- endCard() is never reached'});
+  return bad;
+};
 window.checkChrome=function(step){
   const bad=[],seen=new Set();
   for(let tt=0; tt<=DUR; tt+=(step||1/6)){

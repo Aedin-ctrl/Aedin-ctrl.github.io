@@ -170,6 +170,16 @@ let GBOX=null;     // extents of the things text can hide behind
    between them had nothing to say. solidShape files itself here now, the way
    winFrame files its own containers. checkFraming() reads it. */
 let SCENE=null;
+/* True from the moment the desktop goes bare for the end card. The end card is
+   the ONE frame of a piece with no window on it at all -- the sign-off sits on
+   the vibrant sky, nothing else -- and four pieces shipped with the program
+   window and the Good-To-Know dialog BOTH still standing behind it, the gold
+   lettering printed straight across a white dialog and unreadable. The cause
+   was that every piece hand-rolled the same ten lines of end card while the
+   guard that takes the stage DOWN lived two hundred lines away in a different
+   `if`, so the two could disagree and nothing noticed. endCard() files this,
+   checkEndCard() reads it. */
+let BARE=false;
 let INCHROME=false;
 let OVERLAY=false; // true while drawing a window that FLOATS OVER the panel// true while drawing Win95 furniture, which is 9px by definition
 /* The glyph cache, split out of px() so a caller can MEASURE before placing.
@@ -424,6 +434,50 @@ const pieceTag=()=>'#'+String(PIECE.no).padStart(3,'0')+'  '+PIECE.tags.slice(0,
    by piece number and a series must not change colour halfway through: all
    three parts take the palette of part one. */
 const partTag=()=>PIECE.part?('PART '+PIECE.part.n+'/'+PIECE.part.of):'';
+
+/* ===== A SERIES HAS TO SAY SO, BEFORE ANYTHING ELSE =====
+   The first attempt at a series was three videos that each stood perfectly well
+   on their own, numbered PART 1/3 in the status bar and nowhere else. That is a
+   label, not a series: nothing in part two needed part one, so the numbering was
+   a claim the videos did not keep.
+
+   A real part opens by saying which part it is and what you missed. This card
+   does that and nothing else: it rises out of the taskbar before the cold open,
+   carries the series name in its title bar, the part number, this part's own
+   subtitle and -- for parts after the first -- one sentence of catch-up, and
+   then it shuts and gets out of the way. PIECE.part.recap is that sentence.
+   It is the FIRST thing a part draws, which is why the script's lead_in is long
+   enough to hold it: the voice does not start until the card has gone.         */
+// 196 tall, not 180: at 180 the third row of a three-row recap ran under the
+// OK button. The recap is capped at 110 characters, so three rows is the case
+// the card has to fit, not the exception.
+const PART_DLG=[46,108,340,196];
+const PART_OK={x:PART_DLG[0]+4+(PART_DLG[2]-8)/2,
+               y:PART_DLG[1]+4+15+1+(PART_DLG[3]-8-15-1)-26+10};
+function partCard(T,M,shut,t){
+  if(!PIECE.part) return;
+  const q=PIECE.part, D=PART_DLG;
+  zoomRect([4,LH-40,54,16],D,M,0.05,0.40);
+  if(T<0.40||T>=shut+0.24) return;
+  // it shuts the same way every other dialog in the format shuts
+  const sq=H.clamp((H.clamp((M-shut)/0.24)-0.30)/0.70);
+  if(sq>0){ const dd=[D[0]+Math.round(sq*D[2]*0.42), D[1]+Math.round(sq*D[3]*0.42),
+                      Math.max(8,Math.round(D[2]*(1-sq*0.84))),
+                      Math.max(8,Math.round(D[3]*(1-sq*0.84)))];
+    INCHROME=true; winFrame(dd[0],dd[1],dd[2],dd[3],'',true); INCHROME=false; return; }
+  const r=winFrame(D[0],D[1],D[2],D[3],q.series,true);
+  winIcon(r.x+10,r.y+11,'i');
+  px('PART '+q.n+' OF '+q.of,r.x+52,r.y+10,14,'#000080');
+  px(q.titles[q.n-1],r.x+14,r.y+44,14,'#000',null,'"Silkscreen"');
+  rect(r.x+14,r.y+68,r.w-28,1,'#808080');
+  // 34 chars of 14px Silkscreen is 294px and the card's client is 332 wide
+  const rows=[]; let cur='';
+  for(const w of String(q.recap||'').split(' ')){
+    if((cur+' '+w).trim().length>34){rows.push(cur);cur=w;} else cur=(cur?cur+' ':'')+w; }
+  if(cur)rows.push(cur);
+  rows.slice(0,3).forEach((L,i)=>px(L,r.x+14,r.y+76+i*21,14,'#000',null,'"Silkscreen"'));
+  button(r.x+r.w/2-32,r.y+r.h-26,64,20,'OK',t>=shut);
+}
 /* Put a glyph's INK centre on a point, both axes. px() places a top-left (or
    a centred advance width, which is not the same thing), so the ? inside the
    help icon was placed by eye in every piece: 3px left and 6px low, in all
@@ -542,6 +596,33 @@ function strokePoly(pts,col,th,open){
                                    Math.round(a0[1]+(b0[1]-a0[1])*k/n)-h,th,th);
   }
 }
+/* An isometric box from a centre and two half-extents: the silhouette plus the
+   three visible facets, in the order solidShape wants them (top, left, right).
+   Every prop in the first nine pieces typed these twelve coordinate pairs out
+   by hand, which is twelve chances to put one of them 1px wrong -- and a facet
+   whose corner misses the silhouette by 1px leaves a lit seam down the object.
+   isoBox(276,393,18,23) is exactly #008's head, to the pixel. */
+function isoBox(cx,cy,hw,hh){
+  /* The shoulder drop is 0.6 of the half-width, EXCEPT that it can never reach
+     the half-height: at s>=hh the top and bottom shoulders cross over and the
+     silhouette turns inside out into a bowtie. A crucible 160 wide and 80 tall
+     drew exactly that, and no sweep has an opinion about the shape of a
+     polygon -- it was only ever going to be caught by looking at it. Clamped,
+     a wide flat box degrades to a shallow plate, which is what it should be. */
+  const s=Math.max(2,Math.min(Math.round(hw*0.6),hh-2));
+  const t=cy-hh, b=cy+hh, m=t+2*s;
+  return {o:[[cx,t],[cx+hw,t+s],[cx+hw,b-s],[cx,b],[cx-hw,b-s],[cx-hw,t+s]],
+          f:[[[cx,t],[cx+hw,t+s],[cx,m],[cx-hw,t+s]],
+             [[cx-hw,t+s],[cx,m],[cx,b],[cx-hw,b-s]],
+             [[cx,m],[cx+hw,t+s],[cx+hw,b-s],[cx,b]]]};
+}
+/* ...and the solid it makes, shaded from one base colour. `tone` defaults to
+   the house [0, 0.30, 0.52]: top lit, left mid, right dark. */
+function isoSolid(bx,base,rim,key,tone){
+  const tn=tone||[0.00,0.30,0.52];
+  return solidShape(bx.f.map((f,i)=>({p:f,c:H.rgba(H.mix(base,P.ink,tn[i]))})),
+                    bx.o,rim,H.rgba(H.mix(base,P.ink,0.78)),key);
+}
 function solidShape(facets,outer,rim,seam,key){
   facets.forEach(f=>{ B.fillStyle=f.c;
     B.beginPath(); f.p.forEach((q,i)=>i?B.lineTo(q[0],q[1]):B.moveTo(q[0],q[1]));
@@ -593,3 +674,30 @@ function questionCard(lines,t,t0,t1,y,size,gap,until){
 }
 function introSky(CX,CY,CWd,CHd,T,groundH){ const g=(groundH===undefined)?400:groundH;
   skyBands(CX,CY,CWd,CHd,g); stars(CX,CY,CWd,(CHd-g)*0.9,34,7,T); }
+
+/* ===== THE END CARD IS THE LIBRARY'S, NOT THE PIECE'S =====
+   Pass it the shut time and two lines. It takes the stage down itself by being
+   the only thing a piece draws after SHUT, it zooms the frame in, it prints the
+   sign-off and it appends the part marker when the piece is part of a series.
+   A piece MUST NOT draw its own: nine copies of this is how four of them came
+   to be wrong. It returns true while the card owns the screen, so the caller
+   can use it as the upper bound on everything else:
+
+       if(T<SHUT){ ...the whole piece... }
+       endCard(T,M,SHUT,'it is now safe to','close this window.');            */
+function endCard(T,M,SHUT,l1,l2){
+  if(T<SHUT) return false;
+  BARE=true;                      // checkEndCard holds everything else off now
+  const EC=LH/2-84;
+  zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
+  if(T<SHUT+0.22) return true;
+  pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
+  pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
+  pxShadow(l1,LW/2,EC+94,18,P.bone,P.ink,'center','"VT323"');
+  pxShadow(l2,LW/2,EC+120,18,P.bone,P.ink,'center','"VT323"');
+  // the caret blinks on the CONTENT tick, like every other 12fps thing
+  if(Math.floor(T*2.2)%2===0) rect(LW/2-60,EC+152,8,2,P.gold);
+  pxShadow(pieceTag()+(PIECE.part?'   '+partTag():''),
+           LW/2,PY+PH-26,14,P.bone,P.ink,'center','"VT323"');
+  return true;
+}

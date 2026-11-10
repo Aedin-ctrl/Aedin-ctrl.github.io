@@ -462,18 +462,8 @@ function explainer(ctx,W2,Hh,t){
     }
   }
 
-  /* --- the end card, on the bare desktop --- */
-  if(T>=SHUT){
-    const EC=LH/2-84;
-    zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
-    if(T>=SHUT+0.22){
-      pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
-      pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
-      pxShadow('it is now safe to',LW/2,EC+94,18,P.bone,P.ink,'center','"VT323"');
-      pxShadow('close this window.',LW/2,EC+120,18,P.bone,P.ink,'center','"VT323"');
-      if(blink)rect(LW/2-60,EC+152,8,2,P.gold);
-      pxShadow(pieceTag(),LW/2,PY+PH-26,14,P.bone,P.ink,'center','"VT323"');}
-  }
+  /* --- the end card. endCard() owns it, and owns taking the stage down. --- */
+  endCard(T,M,SHUT,'it is now safe to','close this window.');
 
   /* --- the pointer --- */
   const K=PTRACK, APPROACH=0.70;

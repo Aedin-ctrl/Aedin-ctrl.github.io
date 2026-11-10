@@ -1,14 +1,23 @@
-# CATHODE DESK — house style v3.9
+# CATHODE DESK — house style v4.0
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.0 (2026-11-10)** — a **thirteenth sweep**, `checkEndCard()`: the sign-off
+> is the one shot with no window on it, and four pieces shipped with the program
+> window and the dialog both still standing behind it. The end card moved into
+> the library (`endCard()`), which owns both drawing it and being the only thing
+> a piece draws after `SHUT`. **A series now has to earn the name** — a `recap`,
+> a part card, and parts that hand over to each other; #006-#008 were demoted to
+> standalones because they did not. `isoBox()`/`isoSolid()` added, and clamped so
+> a box wider than it is tall stops drawing a bowtie.
+>
 > **v3.9 (2026-11-09)** — a **twelfth sweep**, `checkFraming()`: a cold-open
 > prop that has come to REST has to be centred on the frame. The cold open is
 > the one scene with no group box, so `checkComposition` — which measures a
 > band against that box — is structurally blind to it, and `solidShape()`
 > registered nothing anywhere, so no other sweep could see a prop either. #005
 > shipped with its block and its tree sitting 74px left of the middle and
-> twelve sweeps between them had nothing to say. `solidShape()` now files its
+> thirteen sweeps between them had nothing to say. `solidShape()` now files its
 > own extent, a key ending in `exit` marks a prop that is MEANT to leave, and
 > the status bar registers its own segments. Also **series**: `PIECE.part`
 > ({n, of, first, series, titles}) makes a numbered multi-parter, all parts
@@ -1068,7 +1077,7 @@ on to cover something:
 * #007's flow column was the one honest one — the arrows really are a surface
   nothing is written on.
 
-All twelve sweeps returned 0 through every one of those frames, because the
+All thirteen sweeps returned 0 through every one of those frames, because the
 name told them to. **Only looking found them.** Before naming something `*box`,
 ask whether text belongs *on* it. If the answer is no, it is a thing, and let
 the sweep do its job.
@@ -1079,26 +1088,128 @@ The standing rule is **one-offs**. A **series** is the exception, and it is
 declared rather than implied:
 
 ```js
-part:{ n:1, of:3, first:6, series:'YOUR THERMOSTAT',
-       titles:['why you shiver','why sweating cools you',
-               'why a fever makes you cold'] }
+part:{ n:1, of:3, first:10, series:'How a Microchip Is Made', shut:2.60,
+       titles:['from sand to silicon','printing circuits with light',
+               'testing, cutting, geopolitics'],
+       recap:'Three parts, beach to chip. This one: getting the material clean enough.' }
 ```
 
-* **Every part is a complete video.** You can watch part three cold. The series
-  is an invitation, not a prerequisite, and the site's strip links the parts
-  without ordering anyone around.
-* **`first` exists because the palette rotates by piece number.** Part two of a
-  trilogy would otherwise arrive in a different colour from part one, so all
-  parts take `usePalette(PIECE.part.first)`. A series is deliberately one look.
+**The parts have to need each other.** The first attempt at this was #006-#008,
+three videos about body temperature that each stood up perfectly well on their
+own, numbered PART 1/3 in the status bar and linked nowhere else. That is a
+label, not a series: nothing in part two depended on part one, so the numbering
+was a claim the videos did not keep, and it was removed — they ship as three
+standalones that mention each other. A real part **ends somewhere its successor
+begins**: #010 hands over a blank wafer, #011 prints a circuit on it, #012 cuts
+it up and sells it. If you can reorder the parts, you have not got a series.
+
+* **Every part still opens cold.** The viewer who starts at part three is the
+  normal case, not the exception, which is why each part gets a recap rather
+  than an assumption.
+* **A part says which part it is, before anything else.** `partCard()` rises out
+  of the taskbar at t=0.05, carries the series in its title bar, the part number,
+  that part's own subtitle and the `recap` line, and shuts on a press. It is the
+  first thing drawn and the cold open does not start until it has gone.
+* **`recap` is the catch-up**, one sentence, 16 to 110 characters — three rows of
+  34 at 14px Silkscreen, which is what the card is sized to hold. Part one has
+  nothing to recap, so it states the promise of the series instead.
+* **`shut` is the card's close time, and it lives in `PIECE`** because two things
+  need it: the piece, to stop drawing the card, and `PTRACK`, to put the hand on
+  the button. Held privately in the piece they drifted and the card shut by
+  itself while the pointer was somewhere else entirely.
+* **The script's `lead_in` has to cover the card.** 4.4s for a part with a short
+  recap, 5.6s with a full one. `checkPiece()` refuses a part whose `lead_in` is
+  under 4.0s, and a `shut` outside `1.6 .. lead_in-0.6`.
+* **A part may run longer**: 78-100s against a standalone's 65-78s. It spends its
+  first four seconds on the card and it is carrying a third of an argument.
+* **`first` exists because the palette rotates by piece number.** Part two would
+  otherwise arrive in a different colour from part one, so all parts take
+  `usePalette(PIECE.part.first)`. A series is deliberately one look.
+* **The program window's title is the SERIES, not the part.** Three videos
+  opening the same program is most of what makes them one thing.
 * **The status bar's third segment carries `PART n/of`**, and the segments are
-  registered in `FRAMES`, so `checkChrome()` holds that text inside them. The
-  status bar was unswept until a series needed a fourth thing in it.
-* **`checkPiece()` validates the shape**: `of` in 2..4, `n` in 1..of, `first`
-  equal to `no - (n-1)`, a series name, and exactly `of` titles. A part that
-  disagrees with its own number cannot ship.
-* **Make the parts interlock.** #008's chill is #006 and its sweat is #007; its
-  cold open reuses #006's figure at the same coordinates, shifted to make room
-  for the dial. The rhyme is the argument, not decoration.
+  registered in `FRAMES`, so `checkChrome()` holds that text inside them.
+* **`checkPiece()` validates the whole shape**: `of` in 2..4, `n` in 1..of,
+  `first` equal to `no - (n-1)`, a series name, exactly `of` titles, a recap of
+  legal length, a legal `shut`, and a `lead_in` long enough to hold the card. A
+  part that disagrees with its own number cannot ship.
+
+## The end card is the library's, and it stands alone
+
+The sign-off is the one shot in a piece with **no window on it at all**. The
+program window has closed, the Good-To-Know dialog has closed, and GOOD TO KNOW
+THO sits on the bare sky. Call it and nothing else after `SHUT`:
+
+```js
+if(T>=BEAT.FIRST.sc-0.30 && T<SHUT){ ...the whole piece... }
+endCard(T,M,SHUT,'it is now safe to','close this window.');
+```
+
+`endCard()` owns both halves — drawing the card, and being the only thing a
+piece draws once the card is up. **A piece must not hand-roll its own.** Nine
+pieces each carried their own copy of the same ten lines while the guard that
+takes the stage *down* lived two hundred lines away in a different `if`, so the
+two could disagree; four of the nine shipped with the program window *and* the
+dialog both still standing behind the card, the gold lettering printed across a
+white dialog box, on top of that dialog's own text, for the last three seconds
+of the video. Twelve sweeps reported zero, because no sweep had any opinion
+about what a piece draws late.
+
+**`checkEndCard()` is the thirteenth sweep.** `endCard()` sets `BARE` the moment
+the desktop goes bare; once `BARE` is set, `FRAMES` must be empty, because every
+Win95 container on screen files itself there. A piece that never reaches
+`endCard()` fails it too — every piece signs off.
+
+## Register what you draw, in SCENE as well as GBOX
+
+`solidShape()` files its own extent in `SCENE`, which is what `checkFraming()`
+measures. Anything drawn with raw `fillRect` does not, and a half-registered
+diagram is worse than an unregistered one: #011's optics beat had a `solidShape`
+lens on the left and a `fillRect` mirror stack on the right, so the sweep could
+see half of a deliberately balanced pair and called it 88px off centre. If a
+scene object is drawn by hand, push it:
+
+```js
+if(SCENE)SCENE.push({x:S.x2-42,y:S.mid-8,w:84,h:96,k:'mirror'});
+```
+
+Same rule, same reason, as raw-drawn geometry registering in `GBOX`.
+
+## Two labels that do not overlap can still read as one line
+
+`checkOverlap()` answers "do these two boxes intersect", which is not the
+question a reader asks. #010 printed `FURNACE GRADE` and `CHIP GRADE` under two
+columns with **5px between them** and it read as one continuous line of text;
+#011 did the same thing with `NANOMETRES` under both numbers. No sweep can see
+this. The fixes are all cheap and none of them is "move it 4px":
+
+* **One word per column** (`FURNACE` / `CHIP`), not two.
+* **The unit goes once, in the middle**, not under each number.
+* **Different rows** when both columns need a sentence.
+
+Two column labels on the same row need a gap you could put a third label in.
+
+## Shapes a sweep cannot see
+
+Three things in this format are pure geometry, and geometry is the one thing no
+sweep has an opinion about. All three were caught by pulling a frame and
+looking:
+
+* **`isoBox` inverts when it is wider than it is tall.** The shoulder drop is
+  0.6 of the half-width and at `s >= hh` the top and bottom shoulders cross
+  over: a crucible 160 wide and 80 tall drew a **bowtie**. It is clamped now, so
+  a wide flat box degrades to a shallow plate, which is what it should be — but
+  a *bowl* is still not a box, and #010's crucible had to be drawn as a rim
+  ellipse and a tapering wall before it stopped reading as an arrowhead.
+* **A flat fill is not a cylinder.** #010's ingot was a rectangle with vertical
+  lines across it and read as a ruler, or a strip of film. Rounded caps, a
+  highlight band along the top and a shadow along the bottom are the only things
+  that say "round".
+* **An isometric box with a slot in it is not a machine.** The thermostat in
+  #008 and the furnace in #010 made the same mistake: a grey crate says nothing
+  about what the thing does. A furnace got a stack, hoops, a lit throat and a
+  tap that runs; a thermometer got a bulb, a stem, a column and a scale. **An
+  object has to carry what it does on the outside.**
 
 ## Accuracy
 

@@ -16,9 +16,6 @@
    It closes the trilogy both ways: the chill at the start is part one, and the
    sweat when the fever breaks is part two. */
 const PIECE={ no:8, slug:'fever', tags:['BODY','BIOLOGY'],
-              part:{n:3, of:3, first:6, series:'YOUR THERMOSTAT',
-                    titles:['why you shiver','why sweating cools you',
-                            'why a fever makes you cold']},
               myth:"not the germ",
               title:"why a fever makes you cold",
               blurb:"You lie there at 39 degrees asking for another blanket. Nothing is broken: the infection moved your setpoint, and you are the one making the heat." };
@@ -76,14 +73,33 @@ const L={
   // person does not change at all, which is the entire piece. The figure is
   // part one's figure, translated +60 in x and otherwise untouched.
   open:{ ground:248,
-         stat:[[158,400],[194,420],[194,500],[158,520],[122,500],[122,420]],
-         statf:[[[158,400],[194,420],[158,440],[122,420]],
-                [[122,420],[158,440],[158,520],[122,500]],
-                [[158,440],[194,420],[194,500],[158,520]]],
-         head:[[276,364],[294,375],[294,399],[276,410],[258,399],[258,375]],
-         headf:[[[276,364],[294,375],[276,386],[258,375]],
-                [[258,375],[276,386],[276,410],[258,399]],
-                [[276,386],[294,375],[294,399],[276,410]]],
+         /* A THERMOMETER, drawn as one. What stood here before was a plain
+            isometric box with a yellow line across it: it was meant to be a
+            thermostat, it read as a grey crate, and a grey crate says nothing
+            about temperature at all. A bulb, a glass stem, a column standing
+            in it and a marker that slides is readable in one frame with no
+            caption -- and it can show the thing the beat is ABOUT, which is
+            the GAP between where the column is and where the marker went. */
+         bulb:[[156,470],[182,483],[182,509],[156,522],[130,509],[130,483]],
+         bulbf:[[[156,470],[182,483],[156,496],[130,483]],
+                [[130,483],[156,496],[156,522],[130,509]],
+                [[156,496],[182,483],[182,509],[156,522]]],
+         stem:[[156,366],[167,371],[167,479],[156,484],[145,479],[145,371]],
+         stemf:[[[156,366],[167,371],[156,376],[145,371]],
+                [[145,371],[156,376],[156,484],[145,479]],
+                [[156,376],[167,371],[167,479],[156,484]]],
+         merc:448,                  // the 37.0 line -- where the body IS
+         markLo:448, markHi:400,    // the setpoint, 37.0 -> 39.0
+         // a neck. Head and torso with a 6px hole between them read as two
+         // stacked crates; the sliver of neck is what makes it a person.
+         neck:[[276,402],[283,405],[283,421],[276,424],[269,421],[269,405]],
+         neckf:[[[276,402],[283,405],[276,408],[269,405]],
+                [[269,405],[276,408],[276,424],[269,421]],
+                [[276,408],[283,405],[283,421],[276,424]]],
+         head:[[276,370],[294,381],[294,405],[276,416],[258,405],[258,381]],
+         headf:[[[276,370],[294,381],[276,392],[258,381]],
+                [[258,381],[276,392],[276,416],[258,405]],
+                [[276,392],[294,381],[294,405],[276,416]]],
          body:[[276,416],[310,436],[310,470],[276,490],[242,470],[242,436]],
          bodyf:[[[276,416],[310,436],[276,456],[242,436]],
                 [[242,436],[276,456],[276,490],[242,470]],
@@ -96,7 +112,6 @@ const L={
          legRf:[[[294,480],[306,487],[294,494],[282,487]],
                 [[282,487],[294,494],[294,526],[282,519]],
                 [[294,494],[306,487],[306,519],[294,526]]],
-         notchLo:486, notchHi:432,
          tone:[0.00,0.30,0.52] },
   // RAISE -- one gauge, two markers: where you are, and where you are wanted
   raise:{ gx:216-34, gy:MIDY-120, gw:68, gh:236,
@@ -159,7 +174,6 @@ const ACTS=(()=>{
 function explainer(ctx,W2,Hh,t){
   const T=Math.floor(t*12)/12, M=t;
   const mp=(a,b)=>H.clamp((M-a)/(b-a));
-  const blink=Math.floor(T*2.2)%2===0;
   const wordAt=(n,i)=>VO[n].t[i];
   const after=(n,i)=>t>=VO[n].t[i];
   const said=(n,a,b)=>{const v=VO[n];const lo=a||0,hi=(b===undefined?v.w.length:b);
@@ -222,15 +236,33 @@ function explainer(ctx,W2,Hh,t){
           flush=H.clamp((M-turnT-0.10)/0.70);
     const lit=H.lerp(0.62,1,H.clamp((M-0.3)/2.2));
     const rim=H.rgba(H.mix(P.ink,P.paper,lit));
-    // the dial
-    const statc=H.mix(P.bone,P.ink,0.22);
-    solidShape(O.statf.map((f,i)=>({p:f,c:H.rgba(H.mix(statc,P.ink,O.tone[i]))})),
-               O.stat,rim,H.rgba(H.mix(statc,P.ink,0.80)),'stat');
-    // its notch, which is the only thing in the whole shot that moves
-    const ny=Math.round(H.lerp(O.notchLo,O.notchHi,H.ease.inOut(turn)));
-    B.fillStyle=P.gold; B.fillRect(126,ny,64,5);
-    if(turn>0&&turn<1){ B.fillStyle=H.rgba(H.hex(P.gold),0.35);
-      B.fillRect(126,ny+5,64,Math.round((O.notchLo-ny))); }
+    /* ===== the thermometer ===== */
+    const glass=H.mix(P.bone,P.ice,0.26), liq=H.mix(P.red,P.orange,0.18);
+    // GTONE, not O.tone: at the solids' 0.30/0.52 the empty half of the tube
+    // came out near-black and read as a tube full of something dark, which is
+    // the opposite of what an empty thermometer looks like.
+    const GTONE=[0.00,0.10,0.22];
+    solidShape(O.stemf.map((f,i)=>({p:f,c:H.rgba(H.mix(glass,P.ink,GTONE[i]))})),
+               O.stem,rim,H.rgba(H.mix(glass,P.ink,0.46)),'stem');
+    /* The column: 37.0, and it BARELY moves. That is the beat. The marker
+       leaves and the body is left standing underneath it, two degrees short,
+       which is why the thing shivers. */
+    const mtop=Math.round(H.lerp(O.merc,O.merc-14,flush));
+    B.fillStyle=H.rgba(H.mix(liq,P.ink,0.30)); B.fillRect(146,mtop,10,478-mtop);
+    B.fillStyle=H.rgba(liq);                  B.fillRect(156,mtop,10,478-mtop);
+    // ticks on the glass, long every third, so it reads as a SCALE
+    B.fillStyle=H.rgba(H.mix(P.ink,P.bone,0.30));
+    for(let i=0,y2=466; y2>=392; i++, y2-=12) B.fillRect(168,y2,i%3===0?9:5,2);
+    // the bulb is always full -- a thermometer's bulb is the reservoir
+    solidShape(O.bulbf.map((f,i)=>({p:f,c:H.rgba(H.mix(liq,P.ink,O.tone[i]))})),
+               O.bulb,rim,H.rgba(H.mix(liq,P.ink,0.72)),'bulb');
+    // the setpoint marker, the one thing in the shot that moves
+    const ny=Math.round(H.lerp(O.markLo,O.markHi,H.ease.inOut(turn)));
+    if(ny<mtop-2){ B.fillStyle=H.rgba(H.hex(P.gold),0.22);   // the GAP, shaded
+      B.fillRect(146,ny,20,mtop-ny); }
+    B.fillStyle=P.gold; B.fillRect(140,ny,32,3);
+    for(let i=0;i<10;i++){ const hh=1+Math.round(i*0.7);
+      B.fillRect(130+i,ny+1-hh,1,2*hh); }                    // arrowhead, pointing in
     // the person: part one's figure, unchanged except for the flush
     const skin=H.mix(P.bone,P.red,0.44*flush);
     const seam=H.rgba(H.mix(skin,P.ink,0.78));
@@ -241,6 +273,7 @@ function explainer(ctx,W2,Hh,t){
       fs.map((f,i)=>({p:sh(f),c:H.rgba(H.mix(skin,P.ink,O.tone[i]))})),
       sh(out),rim,seam,key);
     part(O.legLf,O.legL,'legL'); part(O.legRf,O.legR,'legR');
+    part(O.neckf,O.neck,'neck');
     part(O.bodyf,O.body,'body'); part(O.headf,O.head,'head');
     // heat coming off a body that is burning to catch up with its own dial
     if(flush>0){ const rr=H.rng(83);
@@ -268,7 +301,7 @@ function explainer(ctx,W2,Hh,t){
   }
 
   /* --- the program window --- */
-  if(T>=BEAT.RAISE.sc-0.30){
+  if(T>=BEAT.RAISE.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
     const r=winFrame(8,8,PW+8,PH+34,'Why does a fever make you feel cold?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
@@ -461,18 +494,9 @@ function explainer(ctx,W2,Hh,t){
     }
   }
 
-  /* --- the end card, on the bare desktop --- */
-  if(T>=SHUT){
-    const EC=LH/2-84;
-    zoomRect([LW/2-20,LH/2-10,40,20],[46,EC-18,340,196],M,SHUT,SHUT+0.22);
-    if(T>=SHUT+0.22){
-      pxShadow('GOOD TO',LW/2,EC,22,P.gold,P.ink,'center');
-      pxShadow('KNOW THO',LW/2,EC+40,22,P.gold,P.ink,'center');
-      pxShadow('that is all three.',LW/2,EC+94,18,P.bone,P.ink,'center','"VT323"');
-      pxShadow('close this window.',LW/2,EC+120,18,P.bone,P.ink,'center','"VT323"');
-      if(blink)rect(LW/2-60,EC+152,8,2,P.gold);
-      pxShadow(pieceTag()+'   '+partTag(),LW/2,PY+PH-26,14,P.bone,P.ink,'center','"VT323"');}
-  }
+  /* --- the end card. endCard() owns it, and owns being the only thing
+     a piece draws after SHUT. --- */
+  endCard(T,M,SHUT,'it is now safe to','close this window.');
 
   /* --- the pointer --- */
   const K=PTRACK, APPROACH=0.70;
