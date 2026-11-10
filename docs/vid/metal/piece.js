@@ -260,7 +260,10 @@ function explainer(ctx,W2,Hh,t){
        The POINTS are rotated, not the canvas: the pixel grid survives a
        polygon rotation and does not survive a bitmap one. The pivot TRAVELS
        as it turns, because the base is what got hit.                       */
-    const ang=-H.ease.in(fall)*1.34, co=Math.cos(ang), si=Math.sin(ang);
+    /* pow 1.8, not H.ease.in (which is t^3): at t^3 the tree had rotated 2px
+       0.15s after the crack landed, so the sound said IMPACT and the picture
+       stood still for six frames. A topple starts slow, not frozen. */
+    const ang=-Math.pow(fall,1.8)*1.34, co=Math.cos(ang), si=Math.sin(ang);
     const px0=O.pivot[0]+Math.round(O.kick*H.ease.out(fall)), py0=O.pivot[1];
     const tp=(p)=>p.map(q=>{const a2=q[0]-O.pivot[0], b2=q[1]-py0;
       return [Math.round(px0+a2*co-b2*si), Math.round(py0+a2*si+b2*co)];});
