@@ -1,0 +1,795 @@
+{
+  "date": "2026-11-10",
+  "generated": "2026-11-10T16:43:18.227Z",
+  "articles": [
+    {
+      "id": "2026-11-10-trump-picks-palantirs-security-chief-to-lead-cisa",
+      "headline": "Trump picks Palantir's security chief to lead CISA, vacant for nearly two years",
+      "summary": "Trump nominated Michael LoSapio, Palantir's chief information security officer, to run the US civilian cyber defense agency. CISA has lost over 1,000 staff, roughly a third of its workforce, since Trump returned to office.",
+      "impacts": [
+        "The agency that warns hospitals, utilities and cities about attacks is led by an acting director and short of staff.",
+        "A Palantir executive running CISA raises conflict-of-interest questions given Palantir's DHS and ICE contracts.",
+        "If the Senate does not act before Congress ends, the nomination has to start over, prolonging the vacancy.",
+        "Fewer staff means CISA must pick which infrastructure to watch most closely."
+      ],
+      "details": [
+        "President Trump has nominated Michael LoSapio, Palantir's chief information security officer since September 2024, to lead the Cybersecurity and Infrastructure Security Agency, according to The Register on November 10, 2026. LoSapio previously led Palantir's infrastructure and network security team. He joined the company in 2013, spent time at the database firm SingleStore, and returned to Palantir in 2017.",
+        "CISA is the US civilian agency that coordinates defense of critical infrastructure and issues emergency directives when attackers exploit widely used software. It has had no Senate-confirmed director since Jen Easterly left in January 2025. Nick Andersen has been acting director since February. A previous nominee, Sean Plankey, withdrew in April after more than a year of waiting, caught up in a dispute with Republican Senator Rick Scott over Coast Guard contracting.",
+        "The agency itself has shrunk. The Register reports CISA has lost more than 1,000 staff, about a third of its workforce, since Trump returned to office. In September Andersen said about 250 recruits were still awaiting security clearance. A strategy published last month, called CISA2030, says the agency will prioritize infrastructure whose failure would cause the most damage, which raises the question of what gets less attention with fewer people.",
+        "Palantir supplies software to federal agencies including DHS and ICE, and civil liberties groups and some Democratic lawmakers have criticized its immigration-related work over surveillance and handling of sensitive personal data. The Register also notes reported WhatsApp messages, obtained by the campaign group Foxglove, that suggest Palantir privately lobbied a UK health minister about extending its software into GP patient records, and that NHS England reportedly wants a second opinion on Palantir's claims about benefits.",
+        "Much is unknown. The article does not say whether LoSapio would leave Palantir or what would happen to any financial interests he holds in it. Timing is tight: if the Senate does not confirm him before the current Congress ends, Trump would have to renominate him for the incoming Democratic-controlled Senate. Watch for his confirmation hearing, where Palantir's government work is likely to be a main topic."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "cisa",
+        "palantir",
+        "cybersecurity",
+        "government",
+        "critical infrastructure",
+        "surveillance"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/10/trump-taps-palantir-security-chief-to-run-battered-us-cyber-defense-agency/5308763"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-france-blames-irans-revolutionary-guard-hackers-for-supermarket",
+      "headline": "France blames Iran's Revolutionary Guard hackers for supermarket freezer attacks that sparked fires",
+      "summary": "France's foreign ministry attributed October's attacks on refrigeration controllers at about 700 stores to Shahid Kaveh, an Iranian IRGC-linked unit. Authorities report at least 15 fires and losses in the tens of millions of euros.",
+      "impacts": [
+        "Cyberattacks that only sabotage physical equipment are now being attributed to a state, which raises the stakes for retailers and food suppliers.",
+        "The same controller types sit in blood banks, farms and cold-chain warehouses, so food and medical supplies are exposed.",
+        "Countries are likely to answer with sanctions and diplomatic pressure rather than anything military.",
+        "Small shops with internet-exposed industrial controllers are easy targets for the same techniques."
+      ],
+      "details": [
+        "On Monday, November 9, 2026, France's foreign ministry and its Cyber Crisis Coordination Center (C4) blamed Shahid Kaveh, a cyber unit linked to the Islamic Revolutionary Guard Corps, for the October attacks on supermarket refrigeration. The unit is better known by its hacktivist persona CyberAv3ngers. The ministry called it an unprecedented campaign and described it as the first cyber offensive campaign carried out purely for sabotage on French territory.",
+        "According to BleepingComputer and The Register, overnight on October 11 to 12 attackers reached Danfoss refrigeration controllers and set defrost settings to high temperatures. French authorities now say about 700 retail locations were targeted, up from earlier estimates of 250 to 350. Casino, Leclerc, Coopérative U, Metro, Carrefour and Intermarché were affected, along with smaller butchers, a slaughterhouse and food-processing cooperatives. The attacks caused at least 15 fires and losses in the tens of millions of euros.",
+        "France says its evidence includes attacker infrastructure that was also used to scout Schneider Electric equipment at small hydroelectric and water sites, techniques tied to the unit since at least April 2026, use of the FOFA internet device search platform, Farsi-language traces, and a propaganda outlet, CyberbanNews, that publicized the attacks on October 13. Investigators also linked attacks on Schneider equipment at small hydro installations to the same campaign, with moderate effects.",
+        "The picture is wider than France. The Register reports similar refrigeration attacks in early November in Belgium, Ireland, Luxembourg and Sweden, with temperatures reaching 50 C. BleepingComputer says a separate November wave hit more than 115 stores in six European countries, and France has not attributed that wave to Iran. France's blood service reported a similar incident at three storage sites, and the FBI and CISA have warned of attacks on industrial refrigeration worldwide.",
+        "Caveats matter. The attribution rests on the French government's assessment of infrastructure, language and media links, and neither article describes independent verification or any response from Iran. France says it will summon Iran's ambassador and propose new EU sanctions. Watch whether other governments back the attribution and whether the later waves are tied to the same group."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "iran",
+        "france",
+        "refrigeration",
+        "critical infrastructure",
+        "sabotage",
+        "cyberattack",
+        "irgc"
+      ],
+      "date": "2026-11-09",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/france-blames-iranian-hackers-for-supermarket-attacks-that-sparked-fires/"
+        },
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/09/france-blames-iran-for-supermarket-hack-meltdowns/5308591"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-fireworks-ai-discloses-a-second-october-breach-exposing",
+      "headline": "Fireworks AI discloses a second October breach exposing billing data and partial model weights",
+      "summary": "The AI inference platform says attackers used a compromised cloud provider to reach its development systems on October 24, after an earlier credential theft. Exposed data includes billing details and incomplete model weights and datasets for some customers.",
+      "impacts": [
+        "Companies that fine-tune models on a hosted platform may have partial weights or datasets in someone else's hands.",
+        "Stolen API keys let criminals resell AI access and run up bills on victims' accounts.",
+        "Chat transcripts from downstream apps can contain identifying details even without account links.",
+        "A breach at an unnamed cloud vendor shows how one supplier can open several companies at once."
+      ],
+      "details": [
+        "Fireworks AI runs open-source models such as Mistral, Llama and Gemma for developers. On November 9 it widened what it had disclosed about two October incidents, and BleepingComputer and The Register reported it on November 10.",
+        "The first incident was detected on October 6 and disclosed October 9. Attackers used stolen internal credentials to read environment variables in evaluation jobs, which included some customers' API keys and tokens. Fireworks linked the activity to a financially motivated group that sells unauthorized access to AI models through illicit gateways, a practice called LLMjacking.",
+        "The second incident began when a third-party cloud provider hosting Fireworks' research and development machines was compromised on October 23. On October 24 the intruders used that access to reach Fireworks development systems and run an unauthorized workload. Exposed data includes resource metadata, billing and shipping addresses, invoice and payment history, account balances and credit usage, plus a subset of incomplete model weights and datasets for certain customers. Fireworks says it does not store payment card numbers.",
+        "Downstream effects are surfacing. Notion warned some users that Notion AI chat sessions may have been exposed, saying fewer than 1% of its workspaces may be affected and that the transcripts lack direct links to users or workspaces. Bloomberg reports Fireworks is working with customers including Cursor and Harvey to assess the impact. Fireworks worked with Palo Alto Networks' Unit 42, rotated credentials, isolated affected systems and tightened access.",
+        "A lot is still unknown. Neither article names the cloud provider, says how many customers were affected, or explains what the unauthorized workload did. CEO Lin Qiao said the attackers do not appear to be after model weights because most downloads were partial and stopped. BleepingComputer notes Google's threat teams recently reported that LLMjacking is driving record costs, with cloud AI charges reaching up to $1 million. Watch for the provider's name and a full count of affected customers."
+      ],
+      "category": "AI",
+      "tags": [
+        "fireworks ai",
+        "data breach",
+        "llmjacking",
+        "supply chain",
+        "model weights",
+        "cloud",
+        "credentials"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/cyber-crime/2026/11/10/fireworks-ai-gets-burned-twice-as-customer-data-exposure-widens/5308722"
+        },
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/fireworks-ai-discloses-new-breach-after-cloud-provider-hack/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-a-researcher-published-30-alleged-zero-days-in",
+      "headline": "A researcher published 30+ alleged zero-days in N-able's N-central; the vendor took its cloud offline",
+      "summary": "Security researcher Sean Bales released proof-of-concept exploits for more than 30 flaws in an IT management platform used by service providers. N-able took hosted servers offline and told on-premises customers to shut down.",
+      "impacts": [
+        "Remote monitoring tools hold admin access to many client networks, so one flaw can reach hundreds of businesses.",
+        "Managed service providers and their customers lost the tool they use to patch and monitor systems.",
+        "AI-assisted bug hunting lets one researcher find dozens of flaws quickly.",
+        "A dispute over disclosure can leave vendors and users racing attackers with public exploit code."
+      ],
+      "details": [
+        "Late on Sunday, November 8, 2026, researcher Sean Bales disclosed more than 30 alleged zero-day vulnerabilities in N-able's N-central, a remote monitoring and management (RMM) platform used by managed service providers and IT teams, and posted a GitHub repository named Able2Shell with proof-of-concept exploits, BleepingComputer reports. He says the discovery was AI-assisted.",
+        "The flaws include authentication bypasses, credential disclosure, arbitrary file writes, directory traversal, cross-site scripting, XXE injection, remote code execution and privilege escalation. The most serious is an unauthenticated chain from XXE to remote code execution in the service-import function, which can steal a trusted local session, reset an account password, run commands and create an enabled default administrator account. Another flaw lets code running as a low-privilege user run commands as root. Bales tested a pre-release version, N-central Appliance 2026.4.0.31, and believes most or all flaws affect earlier versions.",
+        "On November 9, N-able took its hosted N-central environments offline in the Americas, Europe and Asia-Pacific and advised on-premises customers to temporarily shut down servers. It said it was building and validating a hotfix, has not observed active exploitation or unauthorized data access, and called the disclosure non-responsible communication by an independent researcher. It gave no restoration estimate and plans updates every four hours.",
+        "Bales says he previously reported two unrelated remote-code-execution bugs and a privilege escalation flaw in a different N-able product five to six months ago, that they remain unpatched, that follow-up emails went unanswered and that he received no bounty. N-able did not address those claims. He says the CEO and CTO contacted him after the disclosure and asked him to remove the repository and work with them, without threatening him.",
+        "BleepingComputer has not independently verified all the flaws, and it is unconfirmed whether older versions are affected. The scary reading, mass compromise of managed service providers, has not been reported. Watch for the hotfix, any sign of exploitation, and whether the repository stays online."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "n-able",
+        "zero-day",
+        "rmm",
+        "vulnerability",
+        "ai",
+        "managed service providers",
+        "disclosure"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/n-able-takes-cloud-platform-offline-after-30-plus-zero-days-published/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-attackers-used-a-defunct-data-platforms-aws-trust",
+      "headline": "Attackers used a defunct data platform's AWS trust links to raid customer cloud accounts",
+      "summary": "Wiz says attackers with compromised Qubole credentials assumed roles that customers had left trusting Qubole, then stole secrets and S3 data from multiple AWS environments. The number of victims is unknown.",
+      "impacts": [
+        "Old integrations that were never removed can quietly keep a door open into a company's cloud.",
+        "Stolen secrets can unlock other services such as Microsoft Entra ID and Okta tokens.",
+        "Entire storage buckets were downloaded in some cases, so sensitive data may already be out.",
+        "Security teams have to audit months of logs and rotate every secret a role could read."
+      ],
+      "details": [
+        "The Register reports that unknown attackers used compromised IAM credentials tied to Qubole's AWS account to reach customer AWS environments and steal secrets and other data, including from S3 buckets. Qubole is a cloud data processing platform that uses cross-account IAM roles, so customers do not hand over long-lived access keys. The attack abused that trust relationship.",
+        "Wiz, working with Google's Mandiant, traced activity to October 14, when Qubole-associated credentials called sts:AssumeRole to get temporary credentials for customer-managed integration roles. Activity continued October 15, and on October 18 the attackers began using a second IAM user from the same Qubole account. Sentra first flagged the suspicious activity. Wiz called it a broad, opportunistic supply chain campaign hitting multiple customer environments and attributed it to many organizations leaving trust policies active after they stopped using Qubole.",
+        "Inside victims' accounts, the attackers probed many services and took credentials, keys and secrets from Lambda, Secrets Manager and SSM Parameter Store. They used the open-source tool TruffleHog to test AWS credentials, found Microsoft Entra ID secrets and requested OAuth tokens using Okta client credentials found in the environments. They downloaded data from S3, sometimes entire buckets.",
+        "Wiz also found a separate campaign from October 8 to 11 that used customer-owned AWS access keys for Qubole integrations. A small number led to compromised environments, but Wiz could not definitively link it to the later activity. AWS says its services were not compromised and operated as designed, and advised reviewing cross-account roles, removing unused integrations and adding conditions such as source IP limits.",
+        "Unknowns remain: the number of affected organizations, who is behind it, how the stolen data is being used, and whether the two campaigns connect. Qubole did not respond to The Register. Wiz advises rotating integration credentials and revoking active sessions, since rotation alone does not end sessions already issued, and reviewing CloudTrail from October 1 for the suspicious account."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "aws",
+        "qubole",
+        "supply chain",
+        "cloud",
+        "credentials",
+        "wiz",
+        "data breach"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/09/attackers-backdoor-trusted-aws-integrations-to-steal-secrets/5308553"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-blood-cells-from-an-80-year-old-were",
+      "headline": "Blood cells from an 80-year-old were reprogrammed into neural stem cells that measured under 20",
+      "summary": "Bonn researchers converted blood cell precursors into neural stem cells whose epigenetic age fell by about 60 years. It is a lab result and not a treatment.",
+      "impacts": [
+        "It gives scientists a human cell model for studying what speeds or slows cellular aging.",
+        "It may help research on Alzheimer's disease, where age is the biggest risk factor.",
+        "Epigenetic clocks are estimates, so 'younger' does not yet mean cells work like young ones.",
+        "Headlines about reversing aging in people are far ahead of the evidence."
+      ],
+      "details": [
+        "A team from the University Hospital of Bonn, the University of Bonn and RWTH Aachen University reports in Aging Cell that it reprogrammed blood cells from an 80-year-old donor into neural stem cells whose molecular age, by epigenetic clock estimates, measured under 20. ScienceDaily describes this as reversing more than 60 years of cellular aging in the lab. The paper is by Berg, Franzen, Brustle and colleagues (DOI 10.1111/acel.70751).",
+        "The method skips the pluripotent stem cell stage used in earlier two-step approaches. Immature red blood cell precursors were converted directly into neural stem cells using transcription factors, proteins that switch genes on and off. Because this route is slower, the team could track rejuvenation over more than 100 days, and ScienceDaily reports about 60 years of rejuvenation by day 50.",
+        "Epigenetic clocks read chemical marks on DNA that shift with age. They are good statistical predictors but are estimates of biological age, not direct measures of how well a cell works. The researchers say the cells behave like young cells, which ScienceDaily gives as their claim. The team previously showed that nerve cells made this way could connect with existing neurons after transplantation into mouse brains.",
+        "The authors propose the system as a model for finding factors that speed up or slow rejuvenation and for Alzheimer's research. The work does not show a treatment that reverses aging in people, and nothing in the report suggests whole-body rejuvenation. Funding came from the EU's Horizon 2020 program, the German Research Foundation and Germany's research ministry.",
+        "What to watch: independent replication, tests of whether the cells function as young cells do, and whether other cell types respond the same way."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "aging",
+        "stem cells",
+        "epigenetic",
+        "alzheimers",
+        "reprogramming",
+        "longevity"
+      ],
+      "date": "2026-10-21",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Bonn)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261020085013.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-hubble-will-likely-fall-from-orbit-in-2033",
+      "headline": "Hubble will likely fall from orbit in 2033-34, and NASA says a boost mission has to launch by 2032",
+      "summary": "NASA asked private companies how they could service or boost the 35-year-old telescope. With no propulsion of its own, it is slowly sinking through atmospheric drag.",
+      "impacts": [
+        "Astronomy would lose its most productive space telescope years before a replacement flagship flies.",
+        "A commercial rescue would be a test of whether private firms can service big satellites in orbit.",
+        "Uncontrolled reentry is a debris risk, so NASA is also considering a controlled descent.",
+        "The decision is a cost and priority fight inside NASA's science budget."
+      ],
+      "details": [
+        "NASA says Hubble, in low Earth orbit, is slowly losing altitude to residual atmospheric drag and has no propulsion system to counter it. Its current analysis suggests that without intervention Hubble will likely reenter the atmosphere between 2033 and 2034. To prevent that with an orbital boost, a mission would need to launch by 2032.",
+        "On October 29, NASA issued a request for information asking companies about commercial technologies for servicing Hubble in orbit. Responses are due 3 p.m. EST on Monday, November 30. Options under consideration include sending a spacecraft to raise Hubble to a higher orbit, servicing it to upgrade its capabilities, or safely retiring it through a controlled descent or disposal in orbit. NASA stresses these are being explored and are not formally approved.",
+        "NASA Administrator Jared Isaacman said extending Hubble's life would mean more discoveries and more science. Nicky Fox, who leads NASA's Science Mission Directorate, called Hubble a national icon and said NASA is eager to explore boost options while developing a flagship mission to follow. Goddard Space Flight Center oversees the telescope, with operational support from Lockheed Martin Space, and the Space Telescope Science Institute in Baltimore handles science operations.",
+        "The reentry window is NASA's own analysis, and the report gives no cost or vendor. A request for information is an early step, not a contract. Servicing a satellite built decades ago, never designed for a robotic visit, would be technically hard.",
+        "Watch for how many companies respond by November 30 and whether NASA turns the request into funded plans before the 2032 launch deadline."
+      ],
+      "category": "Space",
+      "tags": [
+        "hubble",
+        "nasa",
+        "space telescope",
+        "orbit",
+        "isaacman",
+        "reentry"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (NASA release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104012254.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-antarctic-sea-ice-peaked-at-the-third-lowest",
+      "headline": "Antarctic sea ice peaked at the third-lowest extent on record, as the long-running upward trend stays reversed",
+      "summary": "NASA's Earth Observatory says winter 2026 Antarctic sea ice peaked at about 17.59 million square kilometers, the third-lowest maximum in the satellite record. Scientists are not yet sure whether the decline is permanent.",
+      "impacts": [
+        "Less sea ice exposes more dark ocean, which absorbs more heat.",
+        "Ice-shelf and wildlife habitat around Antarctica depend on seasonal sea ice.",
+        "It complicates a simple story: Antarctic ice grew for decades before this reversal.",
+        "Year-to-year swings are large, so one season does not settle the long-term trend."
+      ],
+      "details": [
+        "NASA's Earth Observatory, using data from the National Snow and Ice Data Center, reports that Antarctic sea ice reached its 2026 winter maximum, likely on September 14, at about 17.59 million square kilometers (6.79 million square miles). That is the third-lowest maximum since satellite records began in 1978.",
+        "For context, from 1979 to 2014 Antarctic sea ice extent grew by about 1% per decade, and winter extent set record highs in three consecutive years from 2012 to 2014. That upward trend ended in 2015 and substantial losses began in 2016. In 2023 Antarctica had both the lowest summer minimum and the lowest winter maximum on record.",
+        "The record comes from passive microwave sensors, which detect the microwave energy Earth's surface emits. Sea ice emits a stronger signal than open water, and microwaves pass through clouds, so observations continue under heavy cloud. The record started with NASA's Nimbus-7 and now includes later satellites such as DMSP, Aqua and JAXA's GCOM-W.",
+        "NASA stresses a caveat: Antarctic sea ice fluctuates considerably from year to year, and researchers are not yet sure whether the decline is a lasting change or within normal statistical variability. That is why the agency keeps tracking it annually. The article names no journal and gives no cause for the changes.",
+        "Watch the summer minimum early next year and whether coming winters keep landing near the bottom of the record."
+      ],
+      "category": "Climate",
+      "tags": [
+        "antarctica",
+        "sea ice",
+        "nasa",
+        "climate",
+        "satellites",
+        "polar"
+      ],
+      "date": "2026-10-15",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily (NASA Earth Observatory)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261015073210.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-a-caltech-robot-built-part-of-a-structure",
+      "headline": "A Caltech robot built part of a structure in orbit with no astronauts, a first, but did not finish",
+      "summary": "A DARPA-funded Caltech experiment extended two truss bays and built a third in orbit by itself. The team does not expect to finish the full 11-bay antenna before the mission ends in December.",
+      "impacts": [
+        "Autonomous assembly could make telescopes and antennas far larger than any rocket fairing allows.",
+        "It is a step toward kilometer-scale space structures such as space solar power.",
+        "The same robotics could also build military or surveillance structures far from human reach.",
+        "This is a proof of concept, not a finished structure."
+      ],
+      "details": [
+        "Caltech says its ASTRA experiment, the Autonomous In-Space Tensioned Reflector Assembly, autonomously assembled part of a truss structure in orbit without astronauts, which it describes as the first autonomous construction of a structure in orbit. It is funded by DARPA's NOM4D program and led by Sergio Pellegrino.",
+        "A robotic arm pulls composite tubes and joints from motorized dispensers and joins them into repeating sections called bays. The payload launched March 30, 2026 on SpaceX's Transporter-16 aboard Momentus's Vigoride 7. It carried two pre-built bays; the robot extended them and built a third. The target is a 1.4-meter reflector antenna with 11 bays, using a perforated reflective film co-invented with the University of Pennsylvania. The whole unit occupies about one cubic meter.",
+        "Operations were hard. The team had under 12 months to build and test the hardware, and communication was limited to seven or eight windows a day of about 15 minutes each. A flight-spare unit at Caltech let engineers reproduce problems seen in orbit and test fixes before uploading new instructions.",
+        "The caveat is that the antenna is unfinished. Caltech says technical difficulties and scheduling prevented completion and the hardware and procedure could be simplified. DARPA's Andrew Detor says the program aims at structures hundreds of meters or kilometers across. ASTRA is one of two projects in the program's in-orbit phase; the other, from the University of Illinois Urbana-Champaign, tests hardening carbon tubes on an ISS module.",
+        "Watch for the final in-orbit results in December and for follow-on work toward much larger structures."
+      ],
+      "category": "Space",
+      "tags": [
+        "caltech",
+        "darpa",
+        "robotics",
+        "space",
+        "in-orbit assembly",
+        "antenna"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Caltech)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261108233043.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-chromes-eighth-exploited-zero-day-of-2026-matches",
+      "headline": "Chrome's eighth exploited zero-day of 2026 matches the whole of 2025",
+      "summary": "Google patched CVE-2026-125350, a use-after-free bug in Chrome's XML component, and says an exploit exists in the wild. Eight exploited Chrome zero-days this year equals the total fixed in 2025.",
+      "impacts": [
+        "Browser flaws can be used to run attacker code just by visiting a page.",
+        "Patches roll out over days to weeks, leaving a window for attack.",
+        "Unknown attackers and targets mean users cannot judge their own risk.",
+        "Manual updates are the only way to close the window sooner."
+      ],
+      "details": [
+        "The Register reports Google has fixed CVE-2026-125350, a high-severity use-after-free bug in Chrome's XML component, and says an exploit for it exists in the wild. A use-after-free happens when software keeps using memory it has already released, which can let attackers corrupt memory and run code. It was reported anonymously on November 6.",
+        "The fix is in Chrome 157.0.8103.50 and .51 for Windows and macOS and .50 for Linux. The same update fixes eight other vulnerabilities, including high-severity flaws in WebGL, FileSystem, GPU, Compositing and V8. A related bug, CVE-2026-125346, another use-after-free in the XML component, was reported in October by Arni Hardarson of Neonix Security; Google has not said it is exploited.",
+        "This is the eighth actively exploited Chrome zero-day of 2026, equal to the eight Google fixed in all of 2025. By June Google had patched five, including flaws in V8, Skia and WebGPU, and two more V8 bugs were fixed in September, according to the article, which does not detail every one.",
+        "Google is withholding technical details until enough users have updated, so who is behind the attacks, who is targeted and how it is exploited are unknown. The update rolls out over days and weeks, and users can check manually under Settings, About Chrome.",
+        "Watch whether the related XML bug is also exploited and whether the year's count climbs further."
+      ],
+      "category": "Tech",
+      "tags": [
+        "chrome",
+        "zero-day",
+        "google",
+        "browser",
+        "vulnerability",
+        "exploited",
+        "patch"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/10/chrome-zero-day-whack-a-mole-continues-as-2026-tally-hits-8/5308732"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-microsoft-will-turn-on-claude-by-default-for",
+      "headline": "Microsoft will turn on Claude by default for UK Copilot tenants on Dec. 9, with US processing",
+      "summary": "Unless administrators choose otherwise, UK Microsoft Copilot tenants will get Anthropic's Claude models from December 9. Anthropic is a Microsoft subprocessor and processes the data in the United States.",
+      "impacts": [
+        "Organizations that do nothing will send Copilot data to a US-processed model.",
+        "UK customers sit outside Microsoft's EU Data Boundary, so the usual protections do not apply.",
+        "Compliance teams have about a month to decide and set the switch.",
+        "Opt-out defaults can change where data flows without an explicit decision."
+      ],
+      "details": [
+        "The Register reports that from December 9, 2026 Microsoft will enable Anthropic's Claude models by default for UK Copilot tenants. Administrators who have not chosen a setting by then will get Claude access, and Microsoft is retiring the setting that limited Claude access to Microsoft 365 only.",
+        "Anthropic is a Microsoft subprocessor. According to Microsoft's documentation, Anthropic processes the relevant data in the United States. UK tenants fall outside Microsoft's EU Data Boundary, which covers the EU and EFTA. Claude is already on by default for most commercial cloud customers, but not for the EU, EFTA or UK.",
+        "Administrators can disable it, but doing nothing means opting in. They have until December 9 to decide whether US processing meets their data-handling needs and to set access accordingly. Microsoft says the change reflects its commitment to offering choice between leading AI models.",
+        "The article does not say which data categories are processed, what contractual safeguards apply to US transfers, or whether a UK regulator has commented. It also does not say whether tenants that have already made a choice are affected.",
+        "Watch for regulator statements and whether Microsoft changes the default before December 9."
+      ],
+      "category": "Tech",
+      "tags": [
+        "microsoft",
+        "copilot",
+        "claude",
+        "anthropic",
+        "data privacy",
+        "uk",
+        "regulation"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/10/microsoft-is-giving-claude-the-keys-to-uk-copilot-tenants-by-default/5308693"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-stanfords-century-long-ai-study-flags-ai-agents",
+      "headline": "Stanford's century-long AI study flags AI agents hacking systems, and admits it is already outdated",
+      "summary": "The third report from Stanford's One Hundred Year Study on AI says scaling drives progress, creative jobs and coding are being disrupted, and governance is fragmented. The authors say it will be out of date by the time you read it.",
+      "impacts": [
+        "A long-running expert panel now treats autonomous AI hacking as a real risk, not a theoretical one.",
+        "Fragmented governance means no shared rules across countries.",
+        "AI-generated media is eroding trust in what people see and read.",
+        "Voters are already pushing back on AI data centers."
+      ],
+      "details": [
+        "The Register reviews AI100, the third report from Stanford's One Hundred Year Study on Artificial Intelligence. The study began in 2014, is overseen by a standing committee of AI experts, is run by Stanford's Institute for Human-Centered AI, and issues a report every five years, the first in 2016.",
+        "Its findings say scaling drives AI progress but the rising cost and difficulty of getting training data may limit it, and it compares AI's potential impact to that of the World Wide Web. Fields once thought safe from automation, such as creative industries, programming and mathematics, are being disrupted. It warns that AI-mediated information could reshape collective thinking and moral behavior, citing the recent retraction of about 1,400 scholarly papers.",
+        "Other concerns include the AI investment boom and bubble fears, concentration of frontier development, cybersecurity pressure, military use and declining trust due to AI-generated media. The report says the public has had little say in how AI is built, though recent US midterm activity suggests voters are pushing back on data centers. Governance is fragmented, increasingly framed around national security, and lacks international consensus.",
+        "It also says longstanding worries about bias, ethics and safety are converging with risks once seen as speculative, such as AI agents hacking systems without human oversight. Committee chair Sheila McIlraith called the last five years a watershed moment, and the report concedes it will be out of date by the time you read it.",
+        "The Register's reviewer felt the report raised more questions than answers. The report discloses that AI tools helped with transcription, drafting checks and plagiarism screening, while humans wrote it. Watch for follow-up work between the five-year editions."
+      ],
+      "category": "AI",
+      "tags": [
+        "stanford",
+        "ai100",
+        "ai governance",
+        "ai agents",
+        "ai bubble",
+        "data centers",
+        "report"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/10/stanfords-century-long-ai-study-admits-its-already-out-of-date/5308574"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-researchers-hijacked-two-automakers-phone-apps-to-unlock",
+      "headline": "Researchers hijacked two automakers' phone apps to unlock cars, using default passwords",
+      "summary": "Shubham Shah and Sam Curry found flaws in ForgeRock identity servers at two unnamed automakers. They could unlock vehicles, start engines and sound horns, and the issues were patched within two hours of the report.",
+      "impacts": [
+        "A phone-app account takeover can mean unlocking and starting a car remotely.",
+        "Factory default and staging credentials working in production is a basic mistake with big consequences.",
+        "A license plate can be enough to find a vehicle's identification number.",
+        "Researchers found these first, but the article cannot rule out others exploiting them."
+      ],
+      "details": [
+        "The Register reports that Shubham Shah, co-founder of Assetnote, and Sam Curry published separate write-ups of attack chains against two major automakers' identity systems. The companies are unnamed at their request. The Register notes speculation that they are Toyota and Lexus, which a Toyota spokesperson neither confirmed nor denied.",
+        "In the Australian case, the researchers found vehicle identification numbers through public license plate checkers and used them in internal API queries that exposed personal data and owner emails. Hardcoded admin credentials meant for staging also worked in production. After bypassing the web application firewall with a path traversal, they took over accounts using only an email address and created auth tokens to send commands through the app.",
+        "In the US case, a path traversal and path confusion bypassed the firewall to reach an Apache Felix admin console, and factory default credentials gave admin access. A scheduled task running an inline Groovy script gave shell access to the identity servers, from where they could view and change user data and log into owners' accounts. Both chains used weaknesses in the ForgeRock identity platform.",
+        "Impact included remotely starting engines, flashing headlights, sounding horns and unlocking vehicles. Shah said the US attack needed much more work. Per Curry's disclosure timeline, the researchers contacted the companies in early 2026 and the exploits were patched within two hours of the report.",
+        "Unknowns: the companies' identities, how many vehicles or accounts were exposed, and whether anyone besides the researchers exploited the flaws."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "connected cars",
+        "forgerock",
+        "vulnerability",
+        "automotive",
+        "authentication",
+        "assetnote",
+        "apps"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/09/researchers-pwn-automakers-android-apps-to-remotely-unlock-cars-honk-horns/5308483"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-a-lab-model-suggests-alzheimers-mutations-may-disrupt",
+      "headline": "A lab model suggests Alzheimer's mutations may disrupt nerve-to-muscle signals outside the brain",
+      "summary": "UCF researchers built a miniature human nerve-muscle junction with Alzheimer's-linked mutations and saw impaired communication, with no brain involved. It is a lab model of a rare inherited form, and not yet shown in patients.",
+      "impacts": [
+        "It could mean Alzheimer's has effects beyond memory, possibly earlier motor signs.",
+        "Drugs aimed only at the brain may not fix problems elsewhere in the body.",
+        "Results from familial Alzheimer's may not carry over to the common form.",
+        "No test or treatment follows from this yet."
+      ],
+      "details": [
+        "A University of Central Florida team led by James Hickman and Xiufang Guo, with scientists at the company Hesperos, reports that genetic mutations linked to familial Alzheimer's disrupted nerve-to-muscle connections in a lab model. The paper, in Alzheimer's & Dementia, is titled 'Evaluating the peripheral nervous system pathology of Alzheimer's disease utilizing a functional human NMJ microphysiological system' (DOI 10.1002/alz.71281), with funding from the National Institute on Aging. Hickman co-founded Hesperos.",
+        "The team built a miniature neuromuscular junction from healthy human muscle cells and motor neurons derived from stem cells that carry the mutations. They measured how reliably nerve signals triggered muscle contractions and how long muscles kept contracting before fatiguing. The mutated nerve cells communicated worse with muscle. Because the model contains no brain or spinal cord, the effect can arise outside the central nervous system.",
+        "Guo suggested motor changes may be an earlier indication of Alzheimer's, but that is not established in patients. Hickman said deficits in the peripheral nervous system can arise directly from the mutations and that drugs targeting the brain may not fix problems in the rest of the body. Familial Alzheimer's typically begins between ages 40 and 65.",
+        "Caveats are large. The experiments do not show these changes occur before memory loss in people. They come from a lab model of a rare inherited form, and the authors say more research is needed to see how closely they reflect disease in people, especially the common form. ScienceDaily's summary reports no sample sizes or quantitative results.",
+        "Watch for studies in patients that check whether motor or nerve-muscle changes appear before cognitive symptoms."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "alzheimers",
+        "neurons",
+        "brain",
+        "ucf",
+        "muscle",
+        "dementia"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (UCF)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261108233103.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-kids-who-eat-more-ultra-processed-food-showed",
+      "headline": "Kids who eat more ultra-processed food showed stronger brain reward responses and gained more fat",
+      "summary": "A USC study of 46 children aged 7 to 10 linked ultra-processed food intake to stronger reward-region responses to food images and larger gains in BMI and body fat. It is observational and small.",
+      "impacts": [
+        "It points to a possible brain pathway between processed food and weight gain in childhood.",
+        "Ultra-processed foods are about 67% of US children's calories, per the article, so exposure is high.",
+        "Correlation is not proof that the foods change the brain.",
+        "A planned intervention study may show whether swapping foods changes responses."
+      ],
+      "details": [
+        "Researchers at the Keck School of Medicine of USC and Kaiser Permanente Southern California report in JAMA Network Open (DOI 10.1001/jamanetworkopen.2026.40252) that children who ate more ultra-processed foods showed stronger brain reward responses to food images, and those responses were linked to greater weight and body fat gain a year later. Kathleen Page is senior author.",
+        "The study followed 46 children aged 7 to 10 from the ongoing BrainChild study, all at a healthy weight at the start. They had MRI scans while viewing appealing foods such as cookies and French fries, plus dietary assessments, and BMI, body fat percentage and waist circumference were measured at baseline and after one year.",
+        "Higher intake was linked to greater activity in the dorsal striatum, a region involved in reward and motivation, when viewing food images. Stronger striatal responses were linked to larger increases in BMI and body fat over the next year. Adjusting for the response weakened the link between ultra-processed intake and BMI by 31% and body fat percentage by 44%, suggesting it explains part of the connection.",
+        "The article cites that ultra-processed foods make up about 67% of calories consumed by US children, without a source. Page called childhood an important period when the brain is very sensitive to food and the food environment.",
+        "Caveats: the study is observational, the sample is small, and it cannot show that these foods cause heightened brain activity or weight gain. The team plans an intervention study using minimally processed alternatives. Watch for that trial."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "ultra-processed food",
+        "children",
+        "brain",
+        "obesity",
+        "fmri",
+        "nutrition",
+        "usc"
+      ],
+      "date": "2026-11-03",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (USC Keck School of Medicine)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261101010549.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-mouse-study-without-fiber-gut-bacteria-may-feed",
+      "headline": "Mouse study: without fiber, gut bacteria may feed on the gut's mucus proteins and make harmful metabolites",
+      "summary": "Princeton researchers report that fiber suppresses bacterial breakdown of host proteins, including mucus-layer proteins, into harmful phenols. The work is in mice and not yet shown in people.",
+      "impacts": [
+        "It adds a mechanism for why high-fiber diets are linked to better gut health.",
+        "Indigestible plant proteins may be a second, labelable kind of fiber-like nutrient.",
+        "Another study suggests body cells make some metabolites without microbes, complicating microbiome treatments.",
+        "Human effects are unproven."
+      ],
+      "details": [
+        "Researchers at the Ludwig Institute for Cancer Research's Princeton branch, led by Jenna AbuSalim and Joshua Rabinowitz, report in PNAS (DOI 10.1073/pnas.2605226123) that gut bacteria break down amino acids into phenol compounds, some linked to harm and some linked to healthy body weight and gut health. They used stable isotope labelling in mice to trace proteins through digestion.",
+        "Phenols made from the amino acid tyrosine, such as p-cresol sulfate, are linked to harm, while those made from phenylalanine, such as hippuric acid, are linked to healthy weight and gut health. The harmful phenols came mainly from bacteria breaking down host proteins, including mucus-layer proteins. Fiber suppressed that. The beneficial ones came almost entirely from indigestible dietary proteins, which the authors call proteins imitating fiber, or Prif.",
+        "A separate Nature Metabolism paper from June 2026 (DOI 10.1038/s42255-026-01550-8) found mammalian cells can make many phenol and indole metabolites without gut bacteria, including some previously thought to be microbial only. Many stayed high in the blood of antibiotic-treated mice and patients, so therapies that only change the microbiome may not always work.",
+        "Rabinowitz said food packaging may eventually list Prif right below fiber. Funding came from the Ludwig Institute, the NIH and Princeton.",
+        "Caveats: most evidence is from mice and lab work, and long-term effects in people are not established. 'Eating your gut lining' is the headline's framing of a mechanism, not a finding of harm in people. Watch for human feeding studies."
+      ],
+      "category": "Health",
+      "tags": [
+        "gut",
+        "microbiome",
+        "fiber",
+        "diet",
+        "metabolites",
+        "princeton"
+      ],
+      "date": "2026-11-09",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Ludwig Institute)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261105083622.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-ai-analysis-of-reddit-posts-hints-at-unexpected",
+      "headline": "AI analysis of Reddit posts hints at unexpected effects among 14,000 gray-market retatrutide users",
+      "summary": "Penn researchers analysed about 150,000 posts and found users of the unapproved weight-loss drug reported increased appetite, sleep problems, faster heart rate and muscle symptoms. The findings are hypotheses.",
+      "impacts": [
+        "Thousands of people use unapproved, unregulated drug products with unknown purity and dosing.",
+        "Social media can flag possible side effects before trials report them, but cannot prove them.",
+        "Users may combine several experimental peptides, muddying any pattern.",
+        "Retatrutide is still in Phase 3 trials and not approved."
+      ],
+      "details": [
+        "A University of Pennsylvania team led by Neil Sehgal and Sharath Chandra Guntuku published 'Self-Reported Adverse Effects Among Social Media Users Taking Nonapproved Retatrutide' in JAMA Network Open (DOI 10.1001/jamanetworkopen.2026.38929). Retatrutide is an investigational drug that activates three hormone receptors, compared with one for semaglutide and two for tirzepatide, and is in Phase 3 trials.",
+        "The team studied about 150,000 Reddit posts and comments from roughly 40,000 users. About 14,000 claimed to have taken unapproved retatrutide. After excluding expected effects such as weight loss and reduced appetite, 7,823 users reported at least one symptom that could be medically classified.",
+        "The most common classifiable symptom was increased appetite, notable because the drug is meant to suppress it. Phase 2 trials mainly reported digestive problems such as nausea. Compared with the team's earlier Reddit analysis of semaglutide and tirzepatide, retatrutide posts proportionally mentioned more appetite changes, sleep disturbances, increased heart rate and muscle-related symptoms, and fewer digestive complaints.",
+        "The authors caution these are hypotheses, not proof of new side effects. Reddit users differ from trial participants, and posts cannot establish causation. Users may not be taking real retatrutide, since gray-market products vary in ingredients, purity and dosage.",
+        "Disclosures: one author received a grant from Novo Nordisk and consulting fees from Currax. Watch the Phase 3 results to see whether any of these signals appear."
+      ],
+      "category": "Health",
+      "tags": [
+        "retatrutide",
+        "glp-1",
+        "weight loss",
+        "reddit",
+        "drug safety",
+        "gray market"
+      ],
+      "date": "2026-10-21",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Pennsylvania)",
+          "url": "https://www.sciencedaily.com/releases/2026/10/261020085018.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-nasa-lays-out-a-2028-moon-landing-plan",
+      "headline": "NASA lays out a 2028 Moon landing plan that tests two companies' landers in Earth orbit first",
+      "summary": "At an October 23 briefing, NASA described Artemis III in 2027 as an Earth-orbit docking test with Blue Origin and SpaceX landers, and Artemis IV in 2028 as the landing, using either lander.",
+      "impacts": [
+        "The schedule depends on in-orbit refueling and docking that has not yet been shown at this scale.",
+        "Two landers give NASA a fallback but add a lot of testing.",
+        "Competition with strategic rivals is driving the timeline, per NASA's administrator.",
+        "Slips would push back any permanent lunar presence."
+      ],
+      "details": [
+        "NASA Administrator Jared Isaacman and other leaders described an accelerated Artemis plan at an October 23 briefing. ScienceDaily republished NASA's summary on November 9. It centers on two missions.",
+        "Artemis III in 2027 would launch four astronauts on Orion and SLS for a planned 14-day mission in Earth orbit. The crew would practice rendezvous and docking with test versions of two companies' landers: Blue Origin's Blue Moon first, then a test Version 3 Starship from SpaceX.",
+        "Artemis IV in 2028 would be the landing, launching Orion on SLS from Kennedy Space Center. NASA would use SpaceX or Blue Origin's lander, keeping two options. Starship would be refueled in Earth orbit before meeting Orion, while Blue Moon Mark 2 would use extra propulsion stages. NASA is also weighing two upper stage options for SLS and working with Axiom Space on a lighter Sortie suit weighing about half the primary suit.",
+        "NASA says Artemis III hardware is on schedule and that processing improvements cut preparation times by about 50%. It says engineers redesigned and tested a fuel-line component in five months at roughly one-tenth of an outside vendor's estimate. Isaacman cited competition from strategic competitors seeking a permanent presence beyond Earth.",
+        "The article does not list specific risks. Testing two landers and two upper stages is meant to avoid reliance on a single solution. Watch Artemis III in 2027, the first real test of the plan."
+      ],
+      "category": "Space",
+      "tags": [
+        "nasa",
+        "artemis",
+        "moon",
+        "starship",
+        "blue origin",
+        "spacesuit",
+        "isaacman"
+      ],
+      "date": "2026-10-23",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (NASA release)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261108233054.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-the-royal-navy-stands-up-its-first-uncrewed",
+      "headline": "The Royal Navy stands up its first uncrewed boat squadron, about 180 people running drone boats",
+      "summary": "The squadron entered service at Portsmouth on November 5 as part of the Navy's Hybrid Navy plan, replacing the experimental Project Beehive. It is understood to use Kraken and SYOS boats.",
+      "impacts": [
+        "Navies are replacing missing warships with cheap uncrewed vessels that can strike, scout or counter drones.",
+        "Remote boats lower the risk to crews but raise questions about autonomous weapons.",
+        "Capability claims mostly come from manufacturers.",
+        "Contested seas make drone boats a likely feature of future conflicts."
+      ],
+      "details": [
+        "The Register reports the Royal Navy commissioned its first uncrewed boat squadron on November 5, 2026 at Portsmouth Naval Base, part of a Hybrid Navy strategy to operate seaborne drones on front-line operations. It has about 180 personnel, roughly a Type 23 frigate's crew, in two watches for round-the-clock operations.",
+        "It replaces Project Beehive, the experimental program that obtained 20 uncrewed boats from UK firm Kraken Technology Group. The boats are understood, not officially confirmed, to include the Kraken K3 Scout, 8.4 meters long with speeds up to 55 knots and up to 650 nautical miles range, and the SYOS Aerospace SM400 Rattler, 7.2 meters long with a range up to 950 nautical miles. Their makers list roles including anti-ship, anti-submarine, counter-drone and casualty evacuation.",
+        "The squadron is to act as a pathfinder for drone operations, bring more types of uncrewed surface vessels into service, and work alone or within a task group. First Sea Lord Sir Gwyn Jenkins has argued uncrewed vessels would fill gaps left by a much-depleted surface fleet. Fleet Commander Vice-Admiral Steve Moorhouse called it a historic occasion and warned the seas are becoming more contested.",
+        "The Register adds that the previous week the force launched BAE Systems Nyan one-way strike drones and a Tekever AR5 drone from an aircraft carrier for the first time.",
+        "Caveats: the boat types are reported, the number of boats the squadron fields is not stated, and the capabilities come largely from manufacturers' specifications. Watch for its first deployment and any rules on autonomy."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "royal navy",
+        "drones",
+        "autonomous",
+        "military",
+        "uk",
+        "uncrewed boats"
+      ],
+      "date": "2026-11-05",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/offbeat/2026/11/10/royal-navy-stands-up-first-autonomous-boat-squadron/5308494"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-uk-smart-meters-replacing-12-13-million-as",
+      "headline": "UK smart meters: replacing 12-13 million as 2G and 3G shut down could cost about 4 billion pounds",
+      "summary": "A Wirepas report says millions of early UK smart meters rely on networks being switched off, with replacement costs that would feed into energy bills. The estimates come from a company selling an alternative.",
+      "impacts": [
+        "Households could end up paying through energy bills for equipment that is only about a decade old.",
+        "Meters that lose connectivity stop reporting readings automatically.",
+        "Even 4G meters may face another replacement when 4G ends, likely in the 2040s.",
+        "Cost estimates come from a vendor and are not independently checked."
+      ],
+      "details": [
+        "The Register reports that 12 to 13 million UK smart meters could stop working properly when 2G and 3G networks shut down. Early meters sent data over 2G or 3G, and meters with 4G only arrived at the end of 2024. The government announced the 2G and 3G phase-out in 2021. 3G is already withdrawn, while BT/EE will start closing 2G in May 2029, VMO2 in summer 2029 and Vodafone in spring 2030.",
+        "Replacement is estimated at about 4 billion pounds gross, ultimately feeding into household bills. Newer SMETS2 meters mostly need a communications module swapped, estimated at 1.3 to 1.4 billion pounds before hub hardware. About 7 million older SMETS1 units have the cellular hardware built in, so whole meters must be replaced, estimated at 2.1 to 2.45 billion pounds, or 300 to 350 pounds per installation.",
+        "SMETS2 replacements mostly affect central and southern Britain, because northern second-generation meters use a long-range radio network. SMETS1 issues apply nationwide. Smart meters were meant to reach 80% of households by 2020 but suffered delays and technical problems, and meters also stopped working as smart meters when customers changed supplier.",
+        "The Department for Energy Security and Net Zero said smart meters already help consumers save money and that the move to 4G is a planned upgrade.",
+        "Caveats: the figures come from Wirepas, an IoT company that promotes its own technology as a solution, and are not independently verified. Some meters would have been replaced in normal renewal cycles anyway. Watch for an official cost estimate and who pays."
+      ],
+      "category": "Economy",
+      "tags": [
+        "smart meters",
+        "uk",
+        "2g",
+        "energy bills",
+        "infrastructure",
+        "telecoms"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/networks/2026/11/10/smart-meters-to-cost-the-uk-billions-2g-switch-off-means-replacing-12-13-million/5308728"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-anthropics-mythos-bug-hunting-model-is-going-into",
+      "headline": "Anthropic's Mythos bug-hunting model is going into Cisco and IBM security products",
+      "summary": "Cisco will let its AI Defense red-teaming tools call Mythos and IBM plans to build it into its Concert risk scanner. Customers get its functionality without getting the model, which Anthropic restricts because attackers could misuse it.",
+      "impacts": [
+        "A model that finds software flaws is moving from vetted testers into mainstream enterprise tools.",
+        "The same capability would help attackers, which is why access is controlled.",
+        "Defenders could get fixes for flaws that traditional scanners miss.",
+        "Demand is high, and Anthropic says it has a long queue of buyers."
+      ],
+      "details": [
+        "The Register reports Anthropic's Mythos, a bug-finding model first offered through Project Glasswing to vetted organizations, is being added to Cisco and IBM products. Anthropic has restricted access because in the wrong hands it could help attackers exploit software flaws, and has since widened access through other controlled programs.",
+        "Cisco says its AI Defense suite will let red-teaming tools call Mythos to test customers' setups for weaknesses and inappropriate activity in AI models, agents and applications, at no extra cost under existing licenses. Cisco's Jeff Schultz said the tool is super-charged by Mythos. IBM plans to integrate it into Concert, a tool that scans applications for risks, saying Mythos will find weaknesses traditional scanners miss, judge which are real risks and generate fixes for developer approval.",
+        "Both deals expose Mythos's functionality to end users without giving them the model itself. Anthropic's Natalie Mead said there is a long queue of buyers and that working with Cisco makes it easier to meet demand.",
+        "Anthropic also released version 5.2 of Mythos and Fable, which it says generate output up to 30% faster than 5.1 at 8 dollars per million input tokens and 40 dollars per million output tokens. A fast mode is up to 2.5 times quicker at double the price. It says Fable 5.2's cyber and biology safeguards are as robust as 5.1's with fewer unnecessary blocks.",
+        "The article gives no count of bugs Mythos has found, no timeline for IBM's integration, and no performance details. Anthropic did not say whether the deals mean broader availability or whether it has similar deals elsewhere. Watch for results from early customers."
+      ],
+      "category": "AI",
+      "tags": [
+        "anthropic",
+        "mythos",
+        "cisco",
+        "ibm",
+        "vulnerability",
+        "ai security",
+        "red teaming"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/10/anthropics-super-bug-finding-mythos-model-is-going-into-cisco-and-ibm-products/5308616"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-10-gooey-ocean-snow-may-carry-six-times-more",
+      "headline": "Gooey ocean 'snow' may carry six times more carbon to the deep sea, a Science study estimates",
+      "summary": "Scripps and Lincoln researchers found the stickiness of sinking marine snow affects how fast bacteria eat it and how far it sinks. The six-fold figure comes from lab experiments and simulations.",
+      "impacts": [
+        "Climate models of how oceans store carbon may be missing a key variable.",
+        "Only about 2 of 10+ gigatons of carbon leaving surface waters each year reach long-term storage depths.",
+        "Changes in ocean biology could shift how much carbon the sea locks away.",
+        "The estimate is not yet confirmed by direct ocean measurements."
+      ],
+      "details": [
+        "Researchers from UC San Diego's Scripps Institution of Oceanography and the University of Lincoln report in Science (published October 8, DOI 10.1126/science.adx4170) that the viscosity of marine snow, sinking organic debris, affects how quickly bacteria break it down and how far it sinks. The stickiest particles can carry more than six times as much carbon to the deep ocean as thinner ones. Lead author is Bryce Inman.",
+        "Marine snow removes more than 10 gigatons of carbon from surface waters each year, but only about 2 gigatons reach depths where carbon can stay stored for hundreds or thousands of years. A companion Nature Communications paper describes the imaging method, which uses molecular rotors to measure the 3D viscous habitat of bacteria in mucus.",
+        "Bacteria preferentially colonise the less viscous outer areas of particles, while the denser inner regions are harder to penetrate. The project began in 2021 and the team developed a working imaging technique in 2025. Funding came from the Simons Foundation and the UK's EPSRC.",
+        "The six-fold figure is the team's estimate, based on laboratory experiments and computer simulations, not direct measurements in the ocean. The article says implications for mucus-bacteria interactions in other settings are speculative.",
+        "Watch for field measurements and whether ocean carbon models start including particle viscosity."
+      ],
+      "category": "Climate",
+      "tags": [
+        "ocean",
+        "carbon",
+        "marine snow",
+        "climate",
+        "scripps",
+        "carbon sink"
+      ],
+      "date": "2026-10-08",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (UC San Diego)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261105224558.htm"
+        }
+      ]
+    }
+  ]
+}
