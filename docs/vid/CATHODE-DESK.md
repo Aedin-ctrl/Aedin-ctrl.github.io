@@ -49,6 +49,9 @@
 > the first spoken beat on the blackboard** — a dialog box is furniture, and the
 > one thing a viewer needs was set in the smallest type in the piece. `BEAT.RECAP`
 > is now required of every part; `PIECE.part.recap` is gone.
+> *(It was not. The field stayed in all three parts for two days, holding a
+> sentence nobody spoke. Removed for real in v4.4 — a changelog entry is a
+> claim, and this one was wrong.)*
 >
 > **v4.1 (2026-11-10)** — an audit with instruments that do NOT read the
 > registries found what the registries could not. `blockTag()` sized its plate
@@ -802,7 +805,8 @@ NATURE WILDLIFE BODY TECH HISTORY MONEY NEWS
 
 Full words, not abbreviations — `CHEM` was something nobody would file anything
 under. **At most two**, and `checkPiece()` rejects a tag typed freehand, a
-missing blurb, and a running time outside 65–78s. A library stops being
+missing blurb, and a running time outside **65–115s** (a part: 82–115s; see
+*Running time*). A library stops being
 browsable the moment one video invents its own vocabulary.
 
 **The overview panel always lands on a wiped stage** — `wipeStage()`, in every
@@ -847,6 +851,12 @@ in this order, and nothing else:
 2. **The question card opens above it.** The Win95 dialog carries the piece's
    title question and types it out. It sits in the top half; the object owns
    the bottom half. That is why `DLG` is at y=150.
+   > **A SERIES PART HAS NO CARD OF ITS OWN HERE.** Its card asks the series
+   > question and is narrated (see *Series*), and a second question underneath
+   > it meant two questions were put to the viewer before anything had been
+   > explained. A part keeps steps 1, 3 and 4 — the object, the press, the
+   > trick — and its hook becomes the first line on the blackboard. The press
+   > that starts the trick is the X on the part window, not an OK of its own.
 3. **OK is pressed, and the card closes on the press** — nothing stands in
    front of what happens next.
 4. **The object does one trick, and the trick is a joke.** The iceberg cracks
@@ -1041,6 +1051,10 @@ constants tied to the layout, not offsets from the last thing touched.
 
 ## Refute the folk answer
 
+> **On a part, the folk answer goes on the BLACKBOARD**, not on the card: a
+> part's card asks the series question and carries nothing else. #010 puts it
+> in `BEAT.OPEN` — *"sand. But you cannot make one on a beach."*
+
 **If there is a well-known wrong explanation, kill it on the question card** —
 before any mechanism, while the question is still the only thing in the viewer's
 head. Ice floats *because there is air in it*; the sky is blue *because it
@@ -1150,9 +1164,33 @@ on to cover something:
   nothing is written on.
 
 All thirteen sweeps returned 0 through every one of those frames, because the
-name told them to. **Only looking found them.** Before naming something `*box`,
-ask whether text belongs *on* it. If the answer is no, it is a thing, and let
-the sweep do its job.
+name told them to. Before naming something `*box`, ask whether text belongs
+*on* it. If the answer is no, it is a thing, and let the sweep do its job.
+
+### Auditing it
+
+"Only looking found them" was true for a year and it is not good enough, because
+**a wrong `*box` is invisible by construction** — it silences the three sweeps
+that would have objected. There is a procedure now.
+
+The rule (*it is a promise, not an escape hatch*) was already here. What was
+missing was a way to check it, because a wrong `*box` is invisible by
+construction — it silences the three sweeps that would have objected.
+
+**The audit: rename every `*box` key in the library to drop the suffix, run the
+sweeps, and read what fires.** 31 keys, ~47 overlaps. Then classify each hit:
+
+* **text the container is there to carry** → the name was honest. `33°C` on a
+  finger, `Si` on an atom, `RESIST` on a stack, `TARGET`/`YOU` on an axis,
+  `ICE` on a lake. 28 of the 31 were this.
+* **anything else landing on it** → the name was a lie, and it had been hiding
+  something. Three were: `wavebox` (nothing is written on a sine wave — it was
+  hiding a 143px collision with `NANOMETRES`), `wafermapbox` and `cutmapbox`
+  (nothing is written on a wafer).
+
+**Do this audit after any beat gains a `*box`.** The question "does text belong
+*on* this?" is easy to answer wrongly while writing the draw, and the renamed
+sweep answers it for you.
 
 ## Series: three pieces, one question
 
@@ -1369,6 +1407,12 @@ this. The fixes are all cheap and none of them is "move it 4px":
 * **Different rows** when both columns need a sentence.
 
 Two column labels on the same row need a gap you could put a third label in.
+This is stricter than `checkClearance`, and it is the one a reader applies:
+#011's two 44px numbers left 20px between them — half a character — and
+`193 13.5` read as one run of digits with all thirteen sweeps at 0.
+
+**And they have to be the same KIND of label** — see *Say the same kind of thing
+on both sides of a comparison*.
 
 ## An estimate filed as a fact is worse than nothing
 
@@ -1470,27 +1514,6 @@ const ok = [[0,0],[s,0],[0,s],[s,s]]                           // RIGHT
   208. A number that falls out of the geometry beats a number that was tuned to
   look right.
 
-## The `*box` suffix, audited
-
-The rule (*it is a promise, not an escape hatch*) was already here. What was
-missing was a way to check it, because a wrong `*box` is invisible by
-construction — it silences the three sweeps that would have objected.
-
-**The audit: rename every `*box` key in the library to drop the suffix, run the
-sweeps, and read what fires.** 31 keys, ~47 overlaps. Then classify each hit:
-
-* **text the container is there to carry** → the name was honest. `33°C` on a
-  finger, `Si` on an atom, `RESIST` on a stack, `TARGET`/`YOU` on an axis,
-  `ICE` on a lake. 28 of the 31 were this.
-* **anything else landing on it** → the name was a lie, and it had been hiding
-  something. Three were: `wavebox` (nothing is written on a sine wave — it was
-  hiding a 143px collision with `NANOMETRES`), `wafermapbox` and `cutmapbox`
-  (nothing is written on a wafer).
-
-**Do this audit after any beat gains a `*box`.** The question "does text belong
-*on* this?" is easy to answer wrongly while writing the draw, and the renamed
-sweep answers it for you.
-
 ## The pointer is excused where it acted, not when
 
 `checkPointerIdle` flags a hand that has been stationary on content for longer
@@ -1521,7 +1544,9 @@ has to name its own rest, outside the diagram.
 ## Say the same kind of thing on both sides of a comparison
 
 Two labelled things side by side are a sentence with an *and* in it, and the two
-halves have to be the same part of speech.
+halves have to be the same part of speech. *(The spacing half of this rule is
+**Two labels that do not overlap can still read as one line**; this is the
+wording half.)*
 
 #012 binned its chips into **FULL SPEED** and **SOLD SLOWER**: one is a speed,
 the other is a sale, so the pair did not read as two grades of one thing. It is

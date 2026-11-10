@@ -478,6 +478,12 @@ const PART_X={x:PART_NUM[0]+PART_NUM[2]-20+6, y:PART_NUM[1]+3+1+6};
    part's object sits lower than a standalone's. Pieces read this rather than
    carrying 358 as a literal, which is how the cloud ended up behind a dialog. */
 const PART_FLOOR=PART_NUM[1]+PART_NUM[3];
+/* ...and the card REGISTERS, so that clearance is checked and not just advised.
+   PART_FLOOR sat here for a version as a number the spec told you to read and
+   no piece ever read -- #011's pen was lowered by a hand-typed 90px, and if
+   PART_NUM moves nothing will notice. The two windows go into GBOX as plain
+   keys while they are on screen, so checkOverlap measures any cold-open object
+   against the card the same way it measures anything else. */
 
 /* ===== THE CARD =====
    ONE card, and it asks the series' question -- the question all the parts are
@@ -516,7 +522,11 @@ function partCard(T,M,t){
       else {
         const n=winFrame(N[0],N[1],N[2],N[3],'',true);
         // the number appears when the narrator says it, not when the box opens
-        if(VO[1]&&M>=VO[1].a-0.06) pxMid('PART '+q.n,n.x+n.w/2,n.y+n.h/2,20,'#000080');
+        /* INCHROME: the words inside a dialog are the dialog, the same as its
+           title bar. Without it the card's own title collided with the card the
+           moment the card started registering. */
+        if(VO[1]&&M>=VO[1].a-0.06){ INCHROME=true;
+          pxMid('PART '+q.n,n.x+n.w/2,n.y+n.h/2,20,'#000080'); INCHROME=false; }
         // the X goes down on the press
         if(t>=xt){ const bx=N[0]+N[2]-20;
           INCHROME=true; rect(bx,N[1]+4,13,12,P.face);
@@ -535,6 +545,9 @@ function partCard(T,M,t){
   if(sq>0){ const a=shrink(D,sq);
     INCHROME=true; winFrame(a[0],a[1],a[2],a[3],'',true); INCHROME=false; return; }
 
+  if(GBOX){ GBOX.push({x:D[0],y:D[1],w:D[2],h:D[3],k:'card'});
+            if(T>=pop+0.30&&T<xt+0.24)
+              GBOX.push({x:N[0],y:N[1],w:N[2],h:N[3],k:'cardnum'}); }
   const r=winFrame(D[0],D[1],D[2],D[3],q.series,true);
   /* The title, over two lines, split where the two come out most even. A greedy
      wrap fills the first line and breaks "HOW IS A MICROCHIP / MADE?", which is
@@ -557,11 +570,13 @@ function partCard(T,M,t){
     for(let k=0;k<VO[0].t.length&&k<words.length;k++) if(M>=VO[0].t[k]) shown=k+1; }
   const rows=[words.slice(0,cut),words.slice(cut)];
   let seen=0;
+  INCHROME=true;
   rows.forEach((row,i)=>{
     const vis=row.slice(0,Math.max(0,Math.min(row.length,shown-seen)));
     seen+=row.length;
     if(vis.length) px(vis.join(' '),r.x+14,r.y+10+i*26,22,'#000080',null,'"Silkscreen"');
   });
+  INCHROME=false;
   /* The catch-up is NOT here. It used to be three rows of small print on this
      card, which is the wrong place for it: a dialog box is furniture, and the
      thing a viewer actually needs -- where the last part got to -- was set in
