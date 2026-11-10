@@ -346,7 +346,18 @@ function voxBar(Pr,bx,by,hgt,col,drop,foot){ // drop: 0..1, per-cube landing fro
     const lift=(1-H.ease.out(k))*7;          // 0.32s drop, eased out, as the spec sets
     for(let a=0;a<f;a++)for(let b=0;b<f;b++)cube(Pr,bx+a,by+b,z+lift,col);}}
 function blockTag(x,y,text,size,bg,col){
-  const w=text.length*(size*0.62)+14,h=size+10,d=4;
+  /* MEASURED, not estimated. This read `text.length*(size*0.62)`, which assumed
+     Silkscreen advances 0.62 of its point size. It advances 0.6667. So every
+     tag past ~17 characters was drawn on a plate NARROWER than its own text:
+     "ONE CRYSTAL, TWO METRES LONG" hung 9px off each end onto the background,
+     with its first and last letter clipped by the plate edge.
+
+     The reason thirteen sweeps had nothing to say is that the SAME wrong
+     number was pushed to GBOX, so checkOverlap and checkBounds were both
+     comparing against a box that agreed with the mistake. A registry is only
+     a measurement if something measured it -- an estimate filed as a fact is
+     worse than nothing, because it silences the checks as well. */
+  const w=glyph(String(text),size,'"Silkscreen"').w+14,h=size+10,d=4;
   if(GBOX)GBOX.push({x:Math.round(x-w/2),y:Math.round(y-h/2),w:Math.round(w+d),h:Math.round(h+d),k:'tag:'+text});
   B.fillStyle=H.rgba(H.hex(bg).map(c=>c*0.62));
   B.beginPath();B.moveTo(x+w/2,y-h/2);B.lineTo(x+w/2+d,y-h/2+d);B.lineTo(x+w/2+d,y+h/2+d);B.lineTo(x+w/2,y+h/2);B.fill();

@@ -36,7 +36,7 @@ const VO=[
   {b:'PRINT',a:12.713,z:15.667,w:["They", "are", "printed,", "all", "at", "once,", "like", "a", "photograph."],t:[12.713, 12.993, 13.273, 13.833, 14.073, 14.233, 14.553, 14.873, 15.033]},
   {b:'PRINT',a:16.417,z:24.109,w:["The", "wafer", "is", "coated", "in", "a", "light", "sensitive", "film,", "light", "is", "shone", "through", "a", "mask,", "and", "wherever", "the", "light", "lands", "the", "film", "changes."],t:[16.427, 16.617, 16.947, 17.077, 17.487, 17.617, 17.677, 18.027, 18.617, 19.177, 19.717, 20.117, 20.517, 21.227, 21.347, 21.817, 21.977, 22.477, 22.567, 22.827, 23.217, 23.427, 23.767]},
   {b:'PRINT',a:24.859,z:29.772,w:["Develop,", "etch,", "strip,", "repeat.", "A", "modern", "chip", "takes", "dozens", "of", "passes."],t:[24.859, 25.569, 26.169, 26.469, 27.399, 27.479, 27.884, 28.289, 28.709, 29.179, 29.339]},
-  {b:'LIMIT',a:31.622,z:36.681,w:["There", "is", "a", "hard", "limit.", "You", "cannot", "print", "a", "feature", "much", "smaller", "than", "the", "wavelength", "you", "print", "it", "with."],t:[31.622, 31.842, 32.062, 32.112, 32.322, 32.922, 33.122, 33.522, 33.912, 34.202, 34.402, 34.772, 35.422, 35.702, 35.792, 36.492, 36.702, 36.762, 36.862]},
+  {b:'LIMIT',a:31.622,z:36.681,w:["There", "is", "a", "hard", "limit.", "You", "cannot", "print", "a", "feature", "much", "smaller", "than", "the", "wavelength", "you", "print", "it", "with."],t:[31.622, 31.842, 32.062, 32.112, 32.322, 32.922, 33.122, 33.522, 33.912, 34.202, 34.402, 34.772, 35.422, 35.702, 35.792, 36.492, 36.601, 36.631, 36.661]},
   {b:'LIMIT',a:37.431,z:44.131,w:["For", "years", "that", "was", "deep", "ultraviolet,", "at", "a", "hundred", "and", "ninety", "three", "nanometres.", "Today", "it", "is", "thirteen", "point", "five."],t:[37.491, 37.701, 38.151, 38.731, 38.781, 39.141, 40.171, 40.494, 40.817, 41.14, 41.462, 41.785, 42.108, 42.431, 42.661, 42.891, 43.244, 43.598, 43.951]},
   {b:'ABSORB',a:45.981,z:51.978,w:["Light", "that", "short", "has", "a", "problem.", "Almost", "everything", "absorbs", "it,", "including", "air,", "and", "including", "glass."],t:[45.981, 46.331, 46.611, 46.971, 47.171, 47.241, 47.801, 48.201, 48.901, 49.541, 49.721, 50.541, 50.821, 51.081, 51.651]},
   {b:'ABSORB',a:52.728,z:59.537,w:["So", "there", "are", "no", "lenses.", "The", "machine", "is", "a", "vacuum,", "and", "the", "light", "is", "bounced", "off", "mirrors", "stacked", "a", "hundred", "layers", "deep."],t:[52.788, 52.878, 53.248, 53.448, 53.608, 54.308, 54.578, 55.208, 55.398, 55.888, 56.068, 56.268, 56.468, 56.788, 56.928, 57.618, 57.658, 58.148, 58.565, 58.981, 59.398, 59.448]},
@@ -396,7 +396,7 @@ function explainer(ctx,W2,Hh,t){
           B.fillStyle=H.rgba(H.mix(P.bone,P.ice,0.26),0.42*(1-i/7));
           B.fillRect(dx-i*7,N.lane-2,5,4); }
       }
-      if(fall>0.9&&blow<0.4) px('30 um OF TIN',dx,N.lane-44,14,P.bone,'center');
+      if(fall>0.9&&blow<0.4) px('30 MICRONS OF TIN',dx,N.lane-44,14,P.bone,'center');
       // the two pulses, coming in from the left
       if(pulse>0){
         [0,1].forEach(k=>{ const q=H.clamp(pulse*2.1-k*1.05); if(q<=0)return;

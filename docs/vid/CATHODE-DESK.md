@@ -1,7 +1,16 @@
-# CATHODE DESK — house style v4.0
+# CATHODE DESK — house style v4.1
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.1 (2026-11-10)** — an audit with instruments that do NOT read the
+> registries found what the registries could not. `blockTag()` sized its plate
+> from `text.length*(size*0.62)`; Silkscreen advances **0.6667**, so every tag
+> past ~17 characters was drawn on a plate narrower than its own text and the
+> same wrong number was filed in GBOX, which silenced checkOverlap and
+> checkBounds along with it. It measures now. `realign.py` clamps word onsets to
+> the length of their own wav — the monotonic nudge cascaded one caption 0.18s
+> past the end of its audio.
+>
 > **v4.0 (2026-11-10)** — a **thirteenth sweep**, `checkEndCard()`: the sign-off
 > is the one shot with no window on it, and four pieces shipped with the program
 > window and the dialog both still standing behind it. The end card moved into
@@ -1188,6 +1197,48 @@ this. The fixes are all cheap and none of them is "move it 4px":
 * **Different rows** when both columns need a sentence.
 
 Two column labels on the same row need a gap you could put a third label in.
+
+## An estimate filed as a fact is worse than nothing
+
+A registry is only a measurement if something measured it. `blockTag()` wrote
+`text.length*(size*0.62)` into GBOX as the tag's extent. Silkscreen advances
+0.6667 of its point size, not 0.62, so from about 17 characters up the plate was
+**narrower than the text printed on it** — "ONE CRYSTAL, TWO METRES LONG" hung
+9px off each end, first and last letter clipped by the plate edge, visible in
+the frame at normal size.
+
+Thirteen sweeps had nothing to say, and that is the part worth remembering: the
+*same wrong number* was what `checkOverlap` and `checkBounds` compared against,
+so the mistake was checking itself. **Measure with `glyph(str,size,font).w`.**
+If you cannot measure a thing, do not file a guess about it — leave it
+unregistered, where at least its absence is honest.
+
+The only other estimate left is `groupBox`'s label plate (`len*7+6` for 6px
+Press Start 2P, which advances 1.0 — so the plate is wider than the text and
+the error is in the safe direction). Checked, 2026-11-10.
+
+## Audit with instruments that do not read the registries
+
+Every sweep in this format asks a registry what was drawn. When the drawing code
+and the registry share a mistake, re-running the sweeps confirms the mistake.
+Three instruments that do not, each of which earned its keep:
+
+* **Measure text through a different API.** Hook `px()` and re-measure every
+  call with `ctx.measureText`'s `actualBoundingBox`, then apply your own
+  collision rule. 11,039 frames across twelve pieces, and it is what caught the
+  tag plates.
+* **Diff against the clip.** Render the frame, render it again with
+  `CanvasRenderingContext2D.prototype.clip` stubbed out, and compare: any pixel
+  that changes outside the client panel is content the clip was quietly cutting
+  off. This needs no registry at all. **Validate it against a control** — inject
+  a deliberate off-panel `rect()` and confirm it is caught, or you have only
+  proved the instrument is silent.
+* **Measure contrast off the canvas.** Text sitting on a `*box` container is
+  exempt from `checkOverlap` and nothing then checks it can be READ. Sample the
+  string's own pixels and compare luminance against its backdrop. Expect hits on
+  the mosaic beat-transition, on the first frame of any alpha fade, and on the
+  inactive Win95 title bar — all three are intentional, so confirm each flagged
+  string reaches healthy contrast later rather than dismissing it.
 
 ## Shapes a sweep cannot see
 
