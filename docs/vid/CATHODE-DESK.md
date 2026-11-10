@@ -13,8 +13,22 @@
 > own comment has promised since v2.6, **positionally** — the hand is excused
 > where it last acted, not for a second after acting; and three keys that were
 > never containers (`wavebox`, `wafermapbox`, `cutmapbox`) gave their `*box`
-> suffix back. See *A shape stays inside its container* and *The `*box`
-> suffix*.
+> suffix back — found by renaming all 31 of them and reading what fired, which
+> is a procedure now.
+>
+> Two more, found after the first four were fixed. **The card REGISTERS**: v4.4
+> added `PART_FLOOR`, told pieces to read it rather than carry 358 as a literal,
+> and no piece ever read it, so the clearance was advice. `partCard()` files its
+> two windows in `GBOX` and `checkOverlap` measures them like anything else —
+> which needed the card's own title marked `INCHROME`, because the words inside
+> a dialog are the dialog. And **a case-sensitive regex ate an index remap**:
+> the re-cut shifted every sentence index with `\b(wordAt|after|typeWrap|w)\(`
+> while the pointer acts are written `W(n,i)`, so every scene moved and every
+> act stayed. #012's DUST tap fired thirteen seconds early, during SHEET, and
+> parked on the wafer map. **Nothing drawn was wrong, so no sweep had anything
+> to measure** — after any index remap, diff the `W(` set against the `wordAt(`
+> set. See *A shape stays inside its container*, *The `*box` suffix*, *The
+> pointer is excused where it acted*, and *Series*.
 >
 > **v4.4 (2026-11-10)** — **a part opens on ONE card, and the card talks.**
 > It was two: the series card, and then the piece's own question in the cold
