@@ -85,19 +85,20 @@ const L={
      careful line -- and the line is the width of a hundred thousand
      transistors. The gag is the scale, stated as a count. */
   /* THE COLD OPEN, LOWERED 72px. The part card is two windows, not one, and
-     the stack reaches to y=358 -- 52px below where a standalone's single
-     dialog ends. The pen was drawn to clear 306 and spent the whole card
-     standing inside the part number's window. */
+     the stack reaches to PART_FLOOR=358 -- 52px below where a standalone's
+     single dialog ends. The pen was drawn to clear 306 and spent the whole
+     card standing inside the part number's window. Lowered 90px in all: at 72
+     it cleared the card by 10px and read as hanging off the bottom of it. */
   open:{ ground:248,
-         pen:[[189,368],[201,374],[201,482],[189,488],[177,482],[177,374]],
-         penf:[[[189,368],[201,374],[189,380],[177,374]],
-               [[177,374],[189,380],[189,488],[177,482]],
-               [[189,380],[201,374],[201,482],[189,488]]],
-         tip:[[189,488],[196,485],[189,512],[182,485]],
-         disc:[[257,541],[233,565],[199,565],[175,541],[175,507],[199,483],
-               [233,483],[257,507]],
-         notch:[215,483], stand:[[204,562],[228,562],[236,586],[196,586]],
-         line:[189,510,54] },
+         pen:[[189,386],[201,392],[201,500],[189,506],[177,500],[177,392]],
+         penf:[[[189,386],[201,392],[189,398],[177,392]],
+               [[177,392],[189,398],[189,506],[177,500]],
+               [[189,398],[201,392],[201,500],[189,506]]],
+         tip:[[189,506],[196,503],[189,530],[182,503]],
+         disc:[[257,559],[233,583],[199,583],[175,559],[175,525],[199,501],
+               [233,501],[257,525]],
+         notch:[215,501], stand:[[204,580],[228,580],[236,604],[196,604]],
+         line:[189,528,54] },
   // PRINT -- mask above, light through it, pattern in the resist below
   print:{ cx:216, mask:MIDY-96, waf:MIDY+96, span:132, gaps:[-96,-40,18,74],
           hero:MIDY-196, lab:MIDY-152, tag:MIDY+196 },

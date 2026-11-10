@@ -342,17 +342,17 @@ function explainer(ctx,W2,Hh,t){
       if(ans>0){ B.globalAlpha=ans;
         pxShadow('SAND',216,R.chain-6,56,P.gold,P.ink,'center');
         B.globalAlpha=1; }
-      /* ...and the correction, on the word "beach". Struck through rather than
-         crossed out: the claim is not wrong, it is incomplete, and MELT is
-         about to say why. */
+      /* ...and the correction, which is NOT struck through. Two reasons the
+         first cut was wrong. One: a 4px rule across 20px Silkscreen does not
+         read as a strike, it reads as a redaction -- the line was dead on the
+         glyphs' midline and the words underneath it were gone. Two, and worse:
+         "BUT NOT ON A BEACH" *is* the correction, so striking it crossed out
+         the true half of the beat and left SAND standing unchallenged. The
+         colour does the work. Red against the gold is the whole argument. */
       const no=H.clamp((M-VO[q1].t[VO[q1].w.length-1])/0.55);
       if(no>0){ B.globalAlpha=no;
-        const g2=pxShadow('BUT NOT ON A BEACH',216,R.chain+92,20,
-                          H.mix(P.ice,P.bone,0.30),P.ink,'center','"Silkscreen"');
-        B.globalAlpha=1;
-        const half=Math.round(glyph('BUT NOT ON A BEACH',20,'"Silkscreen"').w/2);
-        B.fillStyle=H.rgba(H.hex(P.red),no);
-        B.fillRect(216-half,R.chain+100,Math.round(2*half*no),4); }
+        pxShadow('BUT NOT ON A BEACH',216,R.chain+92,20,P.red,P.ink,'center','"Silkscreen"');
+        B.globalAlpha=1; }
       typeWrap(q0,PX+26,CAPY,CAPSZ,P.gold,null,'"VT323"',CAPCH);
     }
 
