@@ -612,6 +612,60 @@ window.checkOverlap=function(step){
   return hits;
 };
 
+/* ===== THE FOURTEENTH SWEEP: a window lands on a clear stage =====
+   #013 drew the piece's closing statement on the stage and opened the summary
+   dialog over it in the SAME instant, so the answer to the question the piece
+   had spent ninety seconds asking spent its last five seconds underneath a
+   window -- with all thirteen sweeps returning 0. Three separate things made
+   it unreachable: checkOverlap exempts any text pair that straddles the
+   overlay boundary (`a.overlay!==b.overlay`, which is correct -- a window IS
+   opaque and its own text does not collide with what it hides), window chrome
+   is skipped by `b.chrome`, and the window plate is not a text item at all, so
+   there was nothing in any registry to collide WITH.
+
+   The missing fact was never a rectangle -- all the rectangles were already
+   registered. It was the ORDER. Content drawn before a window and under it is
+   hidden; content drawn after a window and on it is that window's own. So
+   winFrame() records the lengths BOUNDS and GBOX had when it ran, and anything
+   with a lower index than that is underneath.
+
+   The biggest window in a frame is the stage -- the program window the piece
+   runs in, which is the thing content is SUPPOSED to be inside. Every other
+   window floats, and a floater has to land on clear stage. Exempt: the
+   pointer (allowed anywhere, like every other sweep), the group box (an
+   outline the size of the panel -- every dialog covers part of it by
+   definition), and the question card's own two windows, which are windows and
+   not content.                                                              */
+window.checkCard=function(step){
+  const st=step||1/12, bad=[], seen=new Set();
+  const EXEMPT=new Set(['cursor','groupbox','card','cardnum']);
+  const ov=(a,b)=>{const x=Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x),
+                         y=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
+                   return (x>1&&y>1)?[Math.round(x),Math.round(y)]:null;};
+  for(let tt=0; tt<=DUR; tt+=st){
+    BOUNDS=[]; GBOX=[]; WINS=[]; explainer(ctx,OUTW,OUTH,tt);
+    const r=BOUNDS, g=GBOX, w=WINS; BOUNDS=null; GBOX=null; WINS=null;
+    if(w.length<2) continue;         // one window cannot float over anything
+    let stage=w[0]; for(const q of w) if(q.w*q.h>stage.w*stage.h) stage=q;
+    for(const q of w){
+      if(q===stage) continue;
+      for(let i=0;i<q.nb&&i<r.length;i++){
+        const b=r[i]; if(b.chrome) continue;
+        const o=ov(q,b); if(!o) continue;
+        const k='T|'+b.s+'|'+q.title; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),window:q.title||'(untitled)',covers:b.s,overlap:o});
+      }
+      for(let i=0;i<q.ng&&i<g.length;i++){
+        const b=g[i]; if(EXEMPT.has(b.k)) continue;
+        const o=ov(q,b); if(!o) continue;
+        const k='G|'+b.k+'|'+q.title; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),window:q.title||'(untitled)',covers:b.k,overlap:o});
+      }
+    }
+  }
+  return bad;
+};
+
 /* ===== LAYER SOUND =====
    The spec's kit, one source per layer: chrome = UI snaps, screen = chip
    blips, objects = hollow plastic knocks, glass = mains hum + phosphor zap.

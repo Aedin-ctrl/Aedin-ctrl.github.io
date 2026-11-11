@@ -1,7 +1,20 @@
-# CATHODE DESK — house style v4.5
+# CATHODE DESK — house style v4.6
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.6 (2026-11-10)** — **a window must land on a clear stage**, and a
+> **fourteenth sweep**, `checkCard()`, to hold it. #013's last beat drew the
+> piece's closing statement on the stage and opened the summary dialog over it
+> in the same instant: the answer to the question the piece had spent ninety
+> seconds asking spent its five seconds underneath a window, with all thirteen
+> sweeps returning 0. Three things made it unreachable — `checkOverlap` exempts
+> any pair that straddles the overlay boundary (correctly: a window IS opaque),
+> chrome is skipped, and **the window plate is not a text item**, so there was
+> nothing to collide with. The missing fact was never a rectangle; every
+> rectangle was already registered. It was the **draw order**. `winFrame()` now
+> records the lengths `BOUNDS` and `GBOX` had when it ran, and anything with a
+> lower index than that is underneath it. See *A window lands on a clear stage*.
+>
 > **v4.5 (2026-11-10)** — **a shape must stay inside the shape that contains
 > it**, and three more ways the sweeps were quiet. #012 ruled a round wafer into
 > square dies by testing each die's CENTRE against the radius, so dies hung 8px
@@ -711,6 +724,7 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkPointerJumps()` | the pointer moving more than 95px in one frame |
 | `checkPointerIdle()` | the pointer sitting still on top of content for over 0.8s |
 | `checkComposition()` | a beat's content sitting off-centre in the box, or filling too little of it |
+| `checkCard()` | a floating window opening on top of stage content |
 
 **Prove a new sweep fires before trusting it.** Put the defect back, confirm the
 sweep names it, then restore. A checker that has only ever returned 0 has not
@@ -1368,6 +1382,76 @@ about what a piece draws late.
 the desktop goes bare; once `BARE` is set, `FRAMES` must be empty, because every
 Win95 container on screen files itself there. A piece that never reaches
 `endCard()` fails it too — every piece signs off.
+
+## A window lands on a clear stage
+
+**A floating window — the Good-To-Know summary card, a `test.exe` dialog, the
+question card — opens on a stage with nothing on it.** It is not a layer you
+put over a finished picture. Whatever is under it is gone for as long as it is
+up, and the viewer has no way of knowing something was there.
+
+The failure is specific and it is easy to write by accident, because both
+halves look right on their own. #013's last beat:
+
+```js
+/* WRONG -- both of these are inside `if(T>=BEAT.END.sc)` */
+px('THE ACCURACY WAS NEVER',216,MIDY+32,15,P.bone,'center');
+px('THE QUESTION',216,MIDY+80,15,P.bone,'center');
+blockTag(216,MIDY+176,'HOW RARE IT IS',14,P.gold,'#000');
+const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
+```
+
+The statement is the answer to the question in the title bar, and it was drawn
+on the stage and then covered by the card at the same instant — five seconds of
+a ninety-second piece, spent face down. **Wipe the stage and let the card carry
+the statement**, which is what every other piece in the library already does:
+
+```js
+/* RIGHT */
+wipeStage(CX,CY,CWd,CHd); groupBox(BX,BY,BW,BH,'DONE');
+const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
+capLine('HOW RARE IT IS',15,0,bk.x+16,bk.y+86,20,'#000080','#c0c0c0',null,0.90);
+```
+
+**`checkCard()` is the fourteenth sweep,** and the thing worth taking from it
+is *what* was missing. Not a rectangle: the window's plate, the statement's
+extent and the tag's plate were all registered already, in the registries the
+other thirteen sweeps read. Three separate exemptions, each of them correct on
+its own terms, closed every route to it — `checkOverlap` skips any pair that
+straddles the overlay boundary (**a window IS opaque; its own text genuinely
+does not collide with what it hides**), chrome is skipped everywhere, and the
+window plate is not a text item so there was nothing for the text test to find.
+
+What was missing was the **draw order**. Content drawn *before* a window and
+under it is hidden; content drawn *after* a window and on it is that window's
+own, and those two are the same rectangle. So `winFrame()` records the lengths
+`BOUNDS` and `GBOX` had at the moment it ran:
+
+```js
+if(WINS) WINS.push({x:x,y:y,w:w,h:h,title:String(title||''),
+                    nb:BOUNDS?BOUNDS.length:0, ng:GBOX?GBOX.length:0});
+```
+
+Anything at a lower index than `nb`/`ng` was drawn underneath. **No registry
+needed a new field and no draw site needed touching** — there are 73 `GBOX.push`
+calls across the library and pieces, and a sequence number on each of them
+would have been 73 chances to write the wrong one. A window's own arrival is
+the only moment the order has to be recorded.
+
+**The biggest window in a frame is the stage.** That is the program window the
+piece runs in, and content is *supposed* to be inside it; every other window
+floats and has to land clear. Exempt: the pointer, which is allowed anywhere
+(every other sweep says so), the group box, which is an outline the size of the
+panel and which every dialog covers by definition, and the question card's own
+two windows, which are windows and not content.
+
+**Control-tested, both branches.** Putting the two `px()` lines back scores 2
+and names them — `{"window":"Good To Know Tho","covers":"THE ACCURACY WAS
+NEVER","overlap":[333,14]}`. Putting a `blockTag` back scores 2 and names the
+label *and* its plate. Removed again, it is 0, and 0 on all fourteen pieces.
+It also sees what it should see and pass: #013 has 184 frames with two windows
+up, the `test.exe` dialog floating over 7 text items and the summary card over
+5, and finds no intersection in any of them, because there is none.
 
 ## Register what you draw, in SCENE as well as GBOX
 

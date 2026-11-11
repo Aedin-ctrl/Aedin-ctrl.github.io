@@ -105,6 +105,10 @@ function winFrame(x,y,w,h,title,active){
   // the title has to stay behind
   if(FRAMES){ FRAMES.push({x:tx+4,y:ty+2,w:(x+w-20)-(tx+4)-2,h:th,k:'titlebar'});
               FRAMES.push({x:x+4,y:y+4+th+1,w:w-8,h:h-8-th-1,k:'client'}); }
+  /* The OUTER plate, not the client area: a window hides what is under its
+     border and its title bar as surely as what is under its middle. */
+  if(WINS) WINS.push({x:x,y:y,w:w,h:h,title:String(title||''),
+                      nb:BOUNDS?BOUNDS.length:0, ng:GBOX?GBOX.length:0});
   INCHROME=true; px(title,tx+4,ty+4,6,active?'#ffffff':'#c0c0c0'); INCHROME=false;
   // close button
   const bx=x+w-20;rect(bx,ty+1,13,12,P.face);bevel(bx,ty+1,13,12,'button');
@@ -161,6 +165,12 @@ let BOUNDS=null;   // text extents
    v3.8 nothing swept chrome at all, and #005's title ran off the end of its own
    title bar in every single frame of the piece. */
 let FRAMES=null;
+/* Every window, with the DRAW ORDER it arrived in: `nb`/`ng` are the lengths
+   BOUNDS and GBOX had when the window was drawn, so everything already in them
+   was drawn UNDERNEATH it. That is the whole mechanism of checkCard() -- no
+   registry needed a new field and no draw site needed touching, because a
+   window's own arrival is the only moment the order has to be recorded. */
+let WINS=null;
 let GBOX=null;     // extents of the things text can hide behind
 /* Every free-standing object in the cold open. The cold open is the one scene
    with NO group box behind it, so checkComposition -- which measures a band
