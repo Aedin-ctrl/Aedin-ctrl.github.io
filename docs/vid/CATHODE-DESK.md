@@ -1448,7 +1448,7 @@ two windows, which are windows and not content.
 **Control-tested, both branches.** Putting the two `px()` lines back scores 2
 and names them — `{"window":"Good To Know Tho","covers":"THE ACCURACY WAS
 NEVER","overlap":[333,14]}`. Putting a `blockTag` back scores 2 and names the
-label *and* its plate. Removed again, it is 0, and 0 on all fourteen pieces.
+label *and* its plate. Removed again, it is 0, and 0 on all thirteen pieces.
 It also sees what it should see and pass: #013 has 184 frames with two windows
 up, the `test.exe` dialog floating over 7 text items and the summary card over
 5, and finds no intersection in any of them, because there is none.
