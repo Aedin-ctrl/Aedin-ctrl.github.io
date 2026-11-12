@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.6.1
+# CATHODE DESK — house style v4.7
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -14,6 +14,35 @@
 > rectangle was already registered. It was the **draw order**. `winFrame()` now
 > records the lengths `BOUNDS` and `GBOX` had when it ran, and anything with a
 > lower index than that is underneath it. See *A window lands on a clear stage*.
+>
+> **v4.7 (2026-11-12)** — **a gate before the storyboard, and the caption rule
+> gets its evidence.** #012 (the straw) was built, rendered, pushed and scrapped:
+> derivable to the last digit, clean at −14 LUFS, **0 on all fourteen sweeps**,
+> and unwatchable. The subject was picked on one filter — *can I verify every
+> number* — and that filter cannot see the two things that actually killed it.
+> Its beats joined with **"and then"** six times (a list, not an argument) and its
+> subject was a **quantity, not a thing** (nothing on screen you have ever
+> touched). Both were visible before a frame was drawn. See *Does the idea work?*
+> for the four-line gate, which is now mandatory before a storyboard.
+>
+> And the research pass that came out of it found this file was **already right
+> and already ignored**: generation rule 10 has said *"do not retype the sentence
+> as the caption"* since v2.x, and all thirteen pieces hand `typeWrap()` the
+> literal spoken words. Mayer's redundancy principle says what that costs
+> (d ≈ 0.87 against narration alone), and Yue/Bjork/Bjork add the sharp part —
+> **abridged** text beats identical text, while viewers *prefer* identical text
+> and do worse with it. Captions are abridged from the next piece on; the
+> thirteen keep theirs. The same pass confirmed **temporal contiguity** (d ≈ 1.30,
+> the largest of the five) is the thing this format already does better than
+> almost anything, by hanging the picture off measured word onsets. **Do not
+> trade that away.** See *How it is displayed*.
+>
+> Also recorded there: **there is no retention statistic worth quoting.** Every
+> "first three seconds" number findable is a vendor blog and they contradict each
+> other (3s retention given as 28%, 32%, 50–58%). The hook rule stands on
+> Loewenstein's information-gap theory instead, which is a real literature: the
+> gap **only opens once a question is activated**, which is why the cold open must
+> ask rather than assert — the mechanism, not a preference.
 >
 > **v4.6.1 (2026-11-11)** — **documentation only.** The Enforcement table named
 > ten sweeps of the fourteen that exist: `checkPiece`, `checkChrome`,
@@ -364,6 +393,158 @@ scene and shrink on the new one. Peaking anywhere else turns the second half of
 the transition into a hold on content the viewer has already finished with.
 
 ---
+
+## Does the idea work? — the gate before the gate
+
+**Added v4.7 after #012 was built, rendered, pushed and scrapped.** That piece
+was derivable to the last digit, rendered clean at −14 LUFS and returned 0 on all
+fourteen sweeps, and it was still unwatchable: *"doesn't make sense, doesn't have
+a lot of visual cues, I really don't understand what they're talking about."*
+**Passing the checks is not the same as being worth watching.** The filter used
+to pick it — *can I verify every number* — is necessary and nowhere near
+sufficient. Three more, and an idea has to pass all three **before** a storyboard
+is drawn.
+
+### 1. The but/therefore test — is it an argument or a list?
+
+Write the beats out and join them with the only connective that honestly fits.
+**If the only word that fits between two beats is "and then", they are not an
+argument, they are a list.** "But" supplies conflict; "therefore" supplies
+consequence; "and then" supplies nothing.
+
+This is Parker and Stone's working rule, formalised by Randy Olson as **ABT**
+(And, But, Therefore) as a way to turn a scientist's *"this, and this, and
+this"* into a story. The exact original wording is only in secondary sources —
+treat it as a tool, not a law. The tool is what matters:
+
+| #012, the straw — as built | |
+|---|---|
+| the air pushes, **and then** | the ceiling is 10.33 m, **and then** |
+| Galileo was wrong, **and then** | mercury is shorter, **and then** |
+| it is three units, **and then** | it boils first |
+
+Six true facts, every one verified, joined by nothing. **That is the whole
+diagnosis, and it was visible before a frame was drawn.** Compare a piece that
+works:
+
+> honey does not spoil, **but** it is mostly water, **therefore** something must
+> be stopping the microbes, **but** it is not a preservative, **therefore** it is
+> the water itself being unavailable…
+
+**Write the chain into the build dir before the script.** An idea that cannot be
+chained is not ready, however good its numbers are.
+
+### 2. The concreteness test — can they picture it unaided?
+
+Concrete things are processed faster and more accurately than abstract ones;
+the usual account is that an abstract idea has only a verbal code to retrieve,
+where a concrete one also has an imagery code. (The *mechanism* is contested —
+context-availability and Barsalou-style accounts compete with dual coding — but
+the effect itself is not.)
+
+**Name the subject in one noun phrase. If that phrase is a quantity, a ratio or
+a field, the idea is abstract and will draw badly.** "Pressure", "a column of
+water", "a density ratio" are abstractions — #012 had nothing else. "A jar of
+honey", "a wafer of silicon", "twenty-two cars in a circle" are things.
+
+### 3. The been-inside-it test
+
+Curiosity is a gap between what someone knows and what they want to know, and
+the gap **only opens once a question is activated in their mind** (Loewenstein
+1994, *Psychological Bulletin*). It pulls harder when the missing information
+feels important, salient, and likely to be resolved.
+
+**So the cold open must ASK, not assert** — that is not a stylistic preference,
+it is the mechanism by which anyone starts caring. And the gap is widest when
+the viewer has personally been inside the phenomenon: a jam with no cause, a
+fever that makes you cold, a jar that never goes off. *(The popular claim that
+curiosity peaks when you "almost know" the answer is unverified secondary
+material — do not build on it.)*
+
+### The gate, as four lines in the build dir
+
+```
+SUBJECT   one noun phrase, and it must be a thing            -> concreteness
+CHAIN     beat -> but/therefore -> beat -> ... , no "and then" -> argument
+QUESTION  the exact words the card will type, ending in "?"   -> the gap opens
+INSIDE    the sentence "you have been in this" must be true   -> it is about them
+```
+
+All four, before the storyboard. #012 failed SUBJECT and CHAIN and would have
+been caught in ten minutes.
+
+## How it is displayed — what the evidence actually says
+
+Mayer's multimedia-learning work is the closest thing to an evidence base for
+this format, and three of its principles bear directly on choices this file has
+already made. Effect sizes below are from Mayer 2017 (*J. Computer Assisted
+Learning*); the 2014 Cambridge Handbook chapter reports different, generally
+larger figures from a different study set, and at least one individual-
+differences study failed to replicate coherence and signalling. **Directional,
+not exact.**
+
+### The one this format already gets right: temporal contiguity (d ≈ 1.30)
+
+Corresponding words and pictures land **simultaneously**, not one after the
+other — and it is the largest effect of the five. Cathode Desk hangs the picture
+off word onsets measured from the rendered waveform, so an on-screen word appears
+on the frame it is spoken. **That is the single most defensible thing about the
+format. Do not trade it away for anything.**
+
+### The one this format gets WRONG: redundancy (d ≈ 0.87)
+
+People learn **more** from graphics + narration than from graphics + narration +
+**identical** on-screen text, and the effect is specifically about text and
+narration presented *at the same time*. Yue, Bjork & Bjork (2013) sharpen it:
+identical text impaired recall and transfer, while a **small mismatch —
+abridged text — improved** learning. Learners **preferred** the identical text
+while performing worse with it, so *"it feels right"* is not evidence.
+
+**Rule 10 of the generation rules has said "do not retype the sentence as the
+caption" since v2.x. Every piece in the library does it anyway** — `typeWrap()`
+is handed `VO[n].w`, the literal spoken words, five to seven times per piece.
+The rule was right, nothing enforced it, and the research says what it costs.
+
+**Going forward the caption carries the sentence's load-bearing clause, not the
+sentence.** Not a summary of the beat — the few words that the picture is
+actually about:
+
+```
+spoken:  "A hundred and one kilopascals holds up ten point three metres
+          of water, and no more."
+caption: 101 kPa -> 10.33 m. AND NO MORE.          <- abridged, not verbatim
+```
+
+**The boundary condition that keeps captions at all:** short-form video is
+watched on mute, and Mayer's own exception is for cases where on-screen text
+carries something the viewer needs. A muted viewer has no narration channel, so
+removing text entirely is wrong for this medium. **Abridged, not absent.**
+
+The thirteen pieces built before v4.7 keep their verbatim captions; this is not
+worth re-rendering a library for. It applies from the next piece.
+
+### Coherence (d ≈ 0.70) — the beat that only exists for completeness
+
+Extraneous material hurts, even when it is true and interesting. **A beat that
+adds no link to the chain is extraneous by definition.** #012's "three ways of
+writing one number" beat added a fact and no causal step; it was the right thing
+to cut and the but/therefore test would have cut it.
+
+### Signalling (d ≈ 0.46) — weakest of the five, and already handled
+
+Cue the essential material: the gold hero number, the takeaway plate, the
+phosphor flash on the key moment. Already in the format. Being the weakest
+effect, it is not worth adding more of.
+
+### On retention statistics: there are none worth quoting
+
+Every "first three seconds" figure findable is a vendor blog, and they
+contradict each other badly — 3-second retention is given as 28%, 32%, 50–58%;
+first-three-second drop-off as 45%, 50%, 55%. No platform-published or
+peer-reviewed numbers surfaced. **The defensible claim is only that the opening
+seconds carry disproportionate weight and the magnitude is not reliably known.**
+Do not put a retention statistic in this file or in `UPLOAD.md`. The hook rule
+stands on Loewenstein, which is a real literature, not on a marketing blog.
 
 ## Structure of an explainer
 
@@ -1750,7 +1931,9 @@ It is orange juice (3.3–4.2) that actually matches.
 
 ## Workflow
 
-**Storyboard first.** One HTML page, a grid of 6–10 panels, each a canvas
+**The idea gate first** — SUBJECT / CHAIN / QUESTION / INSIDE, four lines in the build dir, before anything is drawn. See *Does the idea work?*. An idea that cannot be chained with but/therefore is not an episode yet, however good its numbers are.
+
+**Storyboard second.** One HTML page, a grid of 6–10 panels, each a canvas
 showing that beat's key frame drawn in this style with the real drawing code.
 Under each: beat number, start/end time, exact on-screen text, how it gets
 there from the previous panel, key sounds. Then wait for approval.
