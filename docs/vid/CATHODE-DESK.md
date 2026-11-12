@@ -1,6 +1,6 @@
-# CATHODE DESK — house style v4.7
+# CATHODE DESK — house style v4.8
 
-**Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
+**Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
 > **v4.6 (2026-11-10)** — **a window must land on a clear stage**, and a
 > **fourteenth sweep**, `checkCard()`, to hold it. #013's last beat drew the
@@ -14,6 +14,19 @@
 > rectangle was already registered. It was the **draw order**. `winFrame()` now
 > records the lengths `BOUNDS` and `GBOX` had when it ran, and anything with a
 > lower index than that is underneath it. See *A window lands on a clear stage*.
+>
+> **v4.8 (2026-11-12)** — **every sentence names what moves.** The script is now
+> written as two columns — spoken line, and the thing that MOVES while it is
+> spoken — and a sentence that cannot fill the right-hand column does not go in
+> the script. A label appearing, a number appearing, a plate landing and a caption
+> typing **do not count as movement**; something arriving, changing state,
+> travelling, being counted or being compared does. #012's right-hand column,
+> filled honestly, would have read *a line gets taller · the line stops · a number
+> appears · a shorter line appears · three plates appear · two more lines appear*
+> — **six sentences and one event**, visible in a table that takes ten minutes.
+> The table is also how the v4.7 abridged caption is found: the caption is
+> whatever names the thing in the right-hand column. See *Every sentence names
+> what moves*.
 >
 > **v4.7 (2026-11-12)** — **a gate before the storyboard, and the caption rule
 > gets its evidence.** #012 (the straw) was built, rendered, pushed and scrapped:
@@ -504,6 +517,58 @@ caught in ten minutes.** The gate itself was control-tested against four pieces
 known to work and one known to have failed before being trusted — see
 `gate-test/STRESS-TEST.md`, which is also what found that SUBJECT was testing
 the wrong thing and that CLOSES was missing.
+
+## Every sentence names what moves — the paired script
+
+**Added v4.8.** The script is **not** written and then illustrated. It is written
+as two columns, and a sentence that cannot fill its right-hand column does not go
+in the script.
+
+```
+| # | spoken                                    | WHAT MOVES                        |
+|---|-------------------------------------------|-----------------------------------|
+| 1 | "Twenty-two cars, one circle, no junction"| 22 dots take even spacing, orbit  |
+| 2 | "Everyone asked to hold thirty"           | speed readout settles, all green  |
+| 3 | "One driver brakes a little harder"       | ONE dot reddens, its gap closes   |
+```
+
+**The test is the right-hand column, and it is brutal:** if the only thing you
+can write there is *"the number appears"* or *"the label lands"*, the sentence is
+narration with a caption, not an explainer. Text arriving is not an event.
+
+This is the rule #012 broke everywhere. Its right-hand column, honestly filled,
+would have read: *a line gets taller · the line stops · a second number appears ·
+a shorter line appears beside it · three plates appear · two more lines appear.*
+**Six sentences and one actual event**, and it is visible in a table that takes
+ten minutes to write.
+
+### What counts as "moves"
+
+| counts | does not count |
+|---|---|
+| something **appears that was not there** — a prop, a wafer, a cube | a **label** appearing |
+| something **changes state** — melts, freezes, reddens, stops | a **number** appearing |
+| something **travels** — a wave, a cursor, a share being cut out of a bar | a **plate** landing |
+| something is **counted** — dots filling in, a stack building | a **caption** typing |
+| a **comparison is drawn** — two things put side by side, a share cut | the **beat name** changing |
+
+The right column cannot repeat itself either. **Three sentences in a row whose
+visual is "another rule drops in" is one event with three captions**, which is
+how #012's last beat read.
+
+### It is also the fix for the redundancy problem
+
+v4.7 established that the caption must carry the **load-bearing clause**, not the
+spoken sentence. The paired table is how you find that clause: it is whatever
+names the thing in the right-hand column. If the right column says *"the red
+spreads backwards while every dot still runs forwards"*, the caption is
+`THE JAM GOES BACKWARDS` — not the sentence that said it.
+
+### Where it lives
+
+`SCRIPT.md` in the build dir, written **after the gate and before `script.json`**,
+and it is the thing to read when the storyboard looks thin. The voice is built
+from `script.json`; `SCRIPT.md` is what proves `script.json` was worth building.
 
 ## How it is displayed — what the evidence actually says
 
@@ -1963,7 +2028,7 @@ It is orange juice (3.3–4.2) that actually matches.
 
 ## Workflow
 
-**The idea gate first** — SUBJECT / CHAIN / QUESTION / INSIDE, four lines in the build dir, before anything is drawn. See *Does the idea work?*. An idea that cannot be chained with but/therefore is not an episode yet, however good its numbers are.
+**The idea gate first** — SUBJECT / CHAIN / QUESTION / INSIDE / CLOSES, five lines in the build dir (`GATE.md`), before anything is drawn. See *Does the idea work?*. An idea that cannot be chained with but/therefore is not an episode yet, however good its numbers are.
 
 **Storyboard second.** One HTML page, a grid of 6–10 panels, each a canvas
 showing that beat's key frame drawn in this style with the real drawing code.
