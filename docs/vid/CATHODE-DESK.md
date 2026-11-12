@@ -1,6 +1,53 @@
-# CATHODE DESK — house style v4.9
+# CATHODE DESK — house style v4.11
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.11 (2026-11-12)** — **two things no sweep can see, both found in series
+> D with all fourteen returning 0.**
+>
+> **A stamp names the answer it kills, never the one it gives.** Every stamp in
+> the library is a negation of the folk answer — `NOT THE AIR`, `NOT A VAULT`,
+> `NOT INTERMEDIARIES`, `NOT YOUR LUNGS`, `NOT THE WATER`. #017 was built with
+> `the ruler moved` and #018 with `the debt moves`, which state the piece's own
+> conclusion instead, and each fails differently. The first **gives the turn
+> away in the cold open**: #017 spends its whole length walking the viewer from
+> *bread got dearer* to *the unit shrank*, and the stamp announced the
+> destination before the first beat. The second is **simply false** — #018's
+> finding is that the interest/principal split migrates while the debt barely
+> moves for eighteen years, so `the debt moves` contradicts the piece it is
+> stamped on. The rule the library had been following without writing down:
+> **the stamp is the wrong answer, crossed out.** It is what the viewer believes
+> walking in, in three or four words. If it cannot be written as a negation, the
+> misconception has not been found — and inventing one is already forbidden
+> above. They ship as `NOT THE BREAD` and `NOT THE DEBT`.
+>
+> **A number on screen must be the number the narrator says.** #018's card
+> formatted the monthly payment through `Math.round`, printing **$1,799**
+> beneath a narrator saying *"one thousand seven hundred and ninety-eight"* —
+> and beneath its own caption, `$1,798.65 x 360`, **in the same frame**. Three
+> statements of one quantity, two of them disagreeing. #020 did the same thing
+> in one glance: `−27.6%` under the bar and `−28%` in the readout card directly
+> below it, on screen together, and with two different minus signs because
+> `toFixed()` hands back an ASCII hyphen where every other figure uses U+2212.
+> **Display formatting is a content decision, not a presentation one.** A
+> rounded number is a different claim from the one the voice makes, and the
+> sweeps read geometry, not arithmetic — they confirm the glyphs fit the box and
+> can never tell you the box is lying. Read every rendered number against the
+> sentence it plays under; the figures are in `script.json` and the formatter is
+> three lines from them.
+
+> **v4.10 (2026-11-12)** — **a series may run to eight parts, and the rules
+> that matter are not the ones a validator can check.** `checkPiece()` capped
+> `part.of` at **4**, written when C was the only series that existed and this
+> file's series section was titled *"three pieces, one question"*. `IDEAS.md`
+> has meanwhile planned a five-part **D** and **E** and two eight-part series,
+> so the ledger and the code disagreed — and the disagreement was **invisible
+> until a five-part part was actually built**, where it would have failed its
+> own sweep at the END of the build rather than the start. The cap is now
+> **2–8**. This buys nothing on its own: the binding constraints on a series
+> are *every part stands alone*, *one part one turn*, and *a part ends where
+> its successor begins*, and **no sweep can check any of them.** A longer
+> series is a bigger promise to the viewer, not a bigger number in a field.
 
 > **v4.6 (2026-11-10)** — **a window must land on a clear stage**, and a
 > **fourteenth sweep**, `checkCard()`, to hold it. #013's last beat drew the
@@ -1454,6 +1501,13 @@ own above the card**, landing on the question's **last word**.
   there is no stamp. A tag that restates its title teaches the viewer that the
   gold tag is decoration, which costs every later piece that needs one.
 
+- **The stamp is a negation — the wrong answer, crossed out.** It names what
+  the viewer believes walking in, never what the piece concludes: `NOT THE
+  AIR`, `NOT A VAULT`, `NOT INTERMEDIARIES`, `NOT THE BREAD`. A stamp that
+  asserts the true thing either gives the turn away before the first beat
+  (#017's first draft, `the ruler moved`) or contradicts its own piece (#018's,
+  `the debt moves`, over ninety seconds showing the debt barely moving). If it
+  will not take the word *not*, the misconception has not been found yet.
 - When it is spoken too, it is **one short sentence**, three or four words, and
   it gets a **picture of its own**: in #005 the word `COLDER` is printed large
   and the pointer strikes it out, and it is gone before the first bar lands.
@@ -1566,7 +1620,11 @@ sweeps, and read what fires.** 31 keys, ~47 overlaps. Then classify each hit:
 *on* this?" is easy to answer wrongly while writing the draw, and the renamed
 sweep answers it for you.
 
-## Series: three pieces, one question
+## Series: one question, two to eight pieces
+
+**Written for three and still mostly phrased that way** — the examples below
+are C, which was three parts. Everything in them holds for any length the
+validator now accepts (2–8); where a passage says "three", read "all of them".
 
 The standing rule is **one-offs**. A **series** is the exception, and it is
 declared rather than implied:

@@ -132,7 +132,16 @@ window.checkPiece=function(){
   if(DUR<LO||DUR>HI) bad.push({field:'DUR',got:DUR,need:LO+'-'+HI+'s'});
   if(PIECE.part){
     const q=PIECE.part;
-    if(!(q.of>=2&&q.of<=4)) bad.push({field:'part.of',got:q.of,need:'2-4'});
+    /* v4.10: the cap was 4, written when C (3 parts) was the only series that
+       existed and the spec section was titled "Series: three pieces, one
+       question". IDEAS.md meanwhile planned a 5-part D and E and two 8-part
+       series, so the ledger and the validator disagreed, and the disagreement
+       was invisible until a 5-part part was actually built -- it would have
+       failed its own sweep at the end of the build, not the start. 8 is the
+       longest thing the ledger plans. The REAL limit on a series is the series
+       rules (every part stands alone, one part one turn), which no validator
+       can check. */
+    if(!(q.of>=2&&q.of<=8)) bad.push({field:'part.of',got:q.of,need:'2-8'});
     if(!(q.n>=1&&q.n<=q.of)) bad.push({field:'part.n',got:q.n,need:'1..of'});
     if(q.first!==PIECE.no-(q.n-1)) bad.push({field:'part.first',got:q.first,
                                              need:PIECE.no-(q.n-1)});
