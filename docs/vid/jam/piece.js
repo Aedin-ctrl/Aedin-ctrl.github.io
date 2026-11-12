@@ -37,16 +37,33 @@
      * equilibrium               30.00 km/h   (experiment: "about 30")
      * jam travels               -17.1 km/h   (experiment: "roughly 20" backward)
      * smallest gap over 600 s     1.07 m     (so: no collisions, ever)
-     * one controller among 22   speed spread 10.8 -> 0.00 m/s
+     * the fix: a real gap +
+       one steady car            14 stopped -> 0, spread 10.7 -> 3.1 m/s
+     * the gap WITHOUT the
+       steady car                14 stopped -> 10  (so both are needed)
 
    The backward speed is 17 against a measured "roughly 20" -- the paper's own
    hedge, and the wider literature gives 10-20, 15+-5 and 15-25 depending on
    road and drivers. Same sign, same order, inside the spread. The animation is
-   also TIME-COMPRESSED (about 4x during the wave beat), so no speed should be
-   read off the screen; the 20 on screen is the experiment's measurement.
+   also TIME-COMPRESSED, at ONE CONSTANT 2.5x, so no speed should be read off
+   the screen; the 20 on screen is the experiment's measurement.
+
+   One car in twenty-two CANNOT damp this jam on its own, and the piece no
+   longer says it can. Car length 4.0-5.6 m was swept against headway
+   0.30-1.05 s: every combination with a 30 km/h equilibrium on a 230 m ring
+   leaves the speed spread essentially unchanged. 22 cars of 5.5 m is 53% metal,
+   which forces a 0.364 s headway, which is too deep into the unstable regime
+   for one vehicle to stabilise. Stern's damping ring was sparser than
+   Sugiyama's jamming ring, and this piece shows Sugiyama's. So the FIX beat is
+   about the thing the model DOES support: the gap.
 */
+/* No myth stamp. The gold tag exists to kill a wrong belief the TITLE does not
+   already address -- #003 is "why ice floats" and the tag says "not the air",
+   which the title says nothing about. Here the title is "the traffic jam with
+   nothing in front of it", which already asserts there is no cause, so a tag
+   reading "not a cause" only restates it. #002 and #005 ship without one too.
+   mythStamp() below is left in place and no-ops without the key. */
 const PIECE={ no:14, slug:'jam', tags:['TECH','PHYSICS'],
-  myth:"not a cause",
   title:"the traffic jam with nothing in front of it",
   blurb:"Twenty-two cars, one circle, no junction and no obstacle. A jam forms anyway -- and then it travels backwards, at about 20 km/h, through cars that are all driving forwards." };
 /* ===== TIMELINE =====
@@ -56,7 +73,7 @@ const PIECE={ no:14, slug:'jam', tags:['TECH','PHYSICS'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=93.5, VOHASH="69bc869ced5c";
+const DUR=98.9, VOHASH="472808fb1152";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:0.8,z:3.449,w:["Why", "is", "there", "a", "traffic", "jam", "with", "nothing", "in", "front", "of", "it?"],t:[0.81, 1.04, 1.17, 1.62, 1.67, 2.15, 2.41, 2.57, 2.89, 2.95, 3.16, 3.24]},
@@ -71,10 +88,10 @@ const VO=[
   {b:'WAVE',a:50.674,z:56.217,w:["Now", "it", "does", "something", "no", "blockage", "can", "do.", "Every", "single", "car", "in", "that", "queue", "is", "driving", "forwards."],t:[50.674, 50.894, 51.044, 51.344, 52.074, 52.174, 52.984, 53.144, 53.174, 53.544, 53.994, 54.214, 54.354, 54.654, 55.054, 55.644, 55.674]},
   {b:'WAVE',a:56.967,z:62.247,w:["The", "queue", "itself", "is", "going", "backwards,", "at", "about", "twenty,", "which", "is", "what", "a", "jam", "does", "on", "a", "real", "motorway."],t:[56.967, 57.197, 57.427, 57.897, 58.047, 58.437, 59.167, 59.347, 59.847, 60.347, 60.647, 60.767, 61.007, 61.247, 61.297, 61.487, 61.607, 61.767, 61.907]},
   {b:'WAVE',a:62.997,z:69.435,w:["So", "you", "never", "drive", "out", "of", "a", "jam.", "The", "jam", "drives", "through", "you,", "and", "it", "is", "still", "there", "afterwards,", "made", "of", "different", "cars."],t:[63.057, 63.137, 63.347, 63.697, 64.047, 64.247, 64.467, 64.717, 64.757, 65.017, 65.277, 65.797, 66.497, 66.717, 66.887, 66.997, 67.107, 67.387, 67.687, 68.457, 68.637, 68.747, 69.237]},
-  {b:'FIX',a:71.285,z:75.814,w:["Years", "later", "they", "put", "one", "computer-driven", "car", "into", "a", "ring", "of", "twenty-two."],t:[71.285, 71.675, 72.215, 72.525, 72.755, 73.015, 74.105, 74.405, 74.735, 74.815, 75.165, 75.634]},
-  {b:'FIX',a:76.564,z:81.923,w:["Told", "to", "hold", "a", "steady", "speed", "instead", "of", "reacting,", "it", "flattened", "the", "wave", "for", "everybody."],t:[76.604, 76.854, 76.994, 77.314, 77.354, 77.784, 78.164, 78.804, 79.074, 79.774, 79.974, 80.324, 80.384, 80.864, 81.304]},
-  {b:'END',a:83.773,z:86.844,w:["The", "jam", "you", "sat", "in", "this", "morning", "had", "nothing", "at", "the", "front", "of", "it."],t:[83.773, 83.983, 84.193, 84.403, 84.613, 84.753, 85.033, 85.553, 85.753, 86.293, 86.373, 86.493, 86.673, 86.743]},
-  {b:'END',a:87.594,z:88.92,w:["It", "was", "a", "wave,", "and", "it", "arrived."],t:[87.594, 87.694, 87.844, 87.894, 88.094, 88.244, 88.344]},
+  {b:'FIX',a:71.285,z:78.569,w:["Years", "later", "they", "put", "one", "computer-driven", "car", "into", "a", "ring", "of", "twenty-two,", "told", "to", "hold", "a", "steady", "speed", "instead", "of", "reacting."],t:[71.285, 71.655, 72.165, 72.515, 72.675, 72.895, 73.995, 74.245, 74.685, 74.795, 75.305, 75.755, 76.205, 76.375, 76.455, 76.675, 76.725, 77.215, 77.645, 78.035, 78.145]},
+  {b:'FIX',a:79.319,z:87.272,w:["It", "flattens", "the", "wave", "for", "everybody,", "but", "only", "once", "there", "is", "a", "gap", "to", "hold,", "and", "at", "thirty,", "on", "this", "ring,", "there", "never", "was", "one."],t:[79.319, 79.549, 80.259, 80.799, 80.929, 81.199, 82.079, 82.309, 82.619, 82.926, 83.232, 83.539, 83.569, 83.829, 83.919, 84.279, 84.549, 84.909, 85.269, 85.439, 85.809, 86.359, 86.659, 87.029, 87.139]},
+  {b:'END',a:89.122,z:92.193,w:["The", "jam", "you", "sat", "in", "this", "morning", "had", "nothing", "at", "the", "front", "of", "it."],t:[89.122, 89.332, 89.542, 89.752, 89.962, 90.102, 90.382, 90.902, 91.102, 91.642, 91.722, 91.842, 92.022, 92.092]},
+  {b:'END',a:92.943,z:94.269,w:["It", "was", "a", "wave,", "and", "it", "arrived."],t:[92.943, 93.043, 93.193, 93.243, 93.443, 93.593, 93.693]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
@@ -85,8 +102,8 @@ const BEAT={
   GROW:{sc:34.54,a:34.942,z:43.728},
   JAM:{sc:45.18,a:45.578,z:48.824},
   WAVE:{sc:50.27,a:50.674,z:69.435},
-  FIX:{sc:70.88,a:71.285,z:81.923},
-  END:{sc:83.37,a:83.773,z:88.92},
+  FIX:{sc:70.88,a:71.285,z:87.272},
+  END:{sc:88.72,a:89.122,z:94.269},
 };
 const SENT={
   HOOK:[0],
@@ -99,43 +116,97 @@ const SENT={
   FIX:[12,13],
   END:[14,15],
 };
-
 /* ===== THE MODEL =====
-   Run twice at load: once with twenty-two humans, once where car 0 stops
-   reacting to its gap at JAM_T and holds the mean speed instead. The two runs
-   are IDENTICAL before JAM_T, so the FIX beat continues the WAVE beat's traffic
-   rather than cutting to a different one. */
+   Run twice: once with twenty-two humans, once where car 0 stops reacting to
+   its gap at JAM_T. The two runs are IDENTICAL before JAM_T, so the FIX beat
+   continues the WAVE beat's traffic rather than cutting to different traffic.
+
+   The ring starts in its EXACT uniform equilibrium and stays there until
+   PERT_T, when one driver brakes. That is why the STEADY beat can show even
+   gaps honestly: nothing is happening yet because nothing has happened yet.
+   v1 applied the brake at t=0 and then had to compress 400s of model time into
+   83s of screen, which aliased the ring into running backwards (see modelT).
+
+   The perturbation SIZE is a free parameter: every value from 0.5 to 4.0 m/s
+   reaches the identical attractor -- minGap 1.072 m and exactly 13 stopped
+   cars -- and changes only HOW LONG that takes. That is the signature of a
+   real instability rather than a drawn effect, and it is why 4.0 is a legal
+   choice: it buys the screen time that makes the ring watchable without
+   altering a single thing the piece claims. */
+/* ONE constant rate for the whole piece. Model seconds per screen second.
+   Any CHANGE in this number is itself a visible speed change, and v1's
+   piecewise map ran 1.1x in the cold open and 19.7x at the JAM beat: at 19.7x
+   the ring advanced 13.6m per drawn tick across a 10.45m car spacing, so the
+   eye paired each car with its neighbour and the ring appeared to run
+   BACKWARDS, then snapped forwards again when the WAVE beat dropped to 3.9x.
+   At 2.5x it is 0.69m per rendered frame, 6.6% of the spacing. */
+const MODEL_C=2.5;
 const SIM={ N:22, L:230, CAR:5.5, A:1.3, B:2.5, V0:14, S0:1.6, T:0.3640,
-            DELTA:4, DT:0.02, SAMPLE:0.25, END:470, JAM_T:300 };
-const idmV=(()=>{                       // uniform solution, solved not chosen
+            DELTA:4, DT:0.02, SAMPLE:0.25, END:230,
+            PERT:4.0,
+            /* THE FIX. At JAM_T the drivers lengthen their headway over RAMP
+               seconds -- they leave a real gap -- and car 0 stops reacting to
+               its own gap and holds the sustainable speed instead. BOTH are
+               needed, and the piece says so because the model says so:
+                 gap + steady car : 12 stopped -> 2,  spread 10.7 -> 4.5
+                 gap alone        : 12 stopped -> 10, spread 10.7 -> 7.8
+               One car in twenty-two CANNOT damp this jam at the 0.364s headway
+               that holding 30 km/h on a 230m ring forces. That is not a tuning
+               failure: car length 4.0-5.6m was swept against headway 0.30-1.05s
+               and every combination with a 30 km/h equilibrium leaves the
+               spread unchanged. 22 cars of 5.5m on 230m is 53% metal. You can
+               have thirty, or you can have a gap. */
+            TFIX:1.20, RAMP:4.0,
+            /* derived from the beats so the brake and the controller can never
+               drift away from the sentences that announce them */
+            PERT_T:BEAT.WOBBLE.sc*MODEL_C, JAM_T:BEAT.FIX.sc*MODEL_C };
+/* frames are stored every EVERY steps, and EVERY*DT is NOT SAMPLE when SAMPLE
+   is not a multiple of DT (0.25/0.02 = 12.5 -> 13 steps -> 0.26s). v1 indexed
+   with SAMPLE and drifted 4%, ~16s of model time over the run. */
+const SIM_EVERY=Math.round(SIM.SAMPLE/SIM.DT), SIM_FDT=SIM_EVERY*SIM.DT;
+/* the uniform solution for a given headway: solved, never chosen. At T=0.3640
+   it is 8.3330 m/s = 30.00 km/h exactly, which is what fixed T in the first
+   place; at the FIX beat's T=1.20 it is 2.79 m/s = 10.0 km/h, and that drop is
+   the point rather than a glitch -- the narration names it. */
+function eqV(T){
   const gap=(SIM.L-SIM.N*SIM.CAR)/SIM.N;
   let lo=0,hi=SIM.V0;
   for(let k=0;k<80;k++){ const v=(lo+hi)/2;
     const need=gap*Math.sqrt(Math.max(0,1-Math.pow(v/SIM.V0,SIM.DELTA)));
-    if(SIM.S0+v*SIM.T<need) lo=v; else hi=v; }
+    if(SIM.S0+v*T<need) lo=v; else hi=v; }
   return (lo+hi)/2;
-})();
+}
+const idmV=eqV(SIM.T);
 function simRun(controlFrom){
-  const {N,L,CAR,A,B,V0,S0,T,DELTA,DT,SAMPLE,END}=SIM;
+  const {N,L,CAR,A,B,V0,S0,T,DELTA,DT,END,PERT,PERT_T}=SIM;
   const x=[],v=[];
   for(let i=0;i<N;i++){ x.push(i*(L/N)); v.push(idmV); }
-  v[0]-=0.5;                            // ONE perturbation. Nothing else.
-  const every=Math.round(SAMPLE/DT), frames=[];
-  let minGap=1e9;
+  const frames=[]; let minGap=1e9, perturbed=false;
   for(let s=0;s*DT<=END;s++){
-    if(s%every===0) frames.push({x:x.slice(),v:v.slice()});
-    const tt=s*DT, nv=v.slice();
+    const tt=s*DT;
+    if(!perturbed && tt>=PERT_T){ v[0]-=PERT; perturbed=true; }  // ONE brake
+    /* the headway everyone is driving at right now */
+    let Tn=T;
+    if(controlFrom!==null && tt>=controlFrom)
+      Tn=T+(SIM.TFIX-T)*Math.min(1,(tt-controlFrom)/SIM.RAMP);
+    const vTar=eqV(Tn);
+    if(s%SIM_EVERY===0) frames.push({x:x.slice(),v:v.slice(),T:Tn});
+    const nv=v.slice();
     for(let i=0;i<N;i++){
       const lead=(i+1)%N;
       const gap=(i<N-1 ? x[i+1]-x[i] : (x[0]+L)-x[N-1]) - CAR;
       if(gap<minGap) minGap=gap;
-      let acc;
+      const g=Math.max(gap,0.05), dv=v[i]-v[lead];
+      const sstar=S0+Math.max(0, v[i]*Tn + v[i]*dv/(2*Math.sqrt(A*B)));
+      const idmAcc=A*(1-Math.pow(v[i]/V0,DELTA)-Math.pow(sstar/g,2));
+      let acc=idmAcc;
       if(i===0 && controlFrom!==null && tt>=controlFrom){
-        acc=1.1*(idmV-v[i]);            // holds the mean, ignores the gap ahead
-      } else {
-        const g=Math.max(gap,0.05), dv=v[i]-v[lead];
-        const sstar=S0+Math.max(0, v[i]*T + v[i]*dv/(2*Math.sqrt(A*B)));
-        acc=A*(1-Math.pow(v[i]/V0,DELTA)-Math.pow(sstar/g,2));
+        /* Holds the mean speed instead of reacting to its gap -- but NEVER
+           harder than the gap allows. v1 omitted that bound and the car drove
+           into the back of the queue 0.54s after engaging (minGap -139 m), and
+           the assertion below only ever checked RUN_H, so the piece shipped
+           with a collision in the beat whose whole point is the fix. */
+        acc=Math.min(1.1*(vTar-v[i]), idmAcc);
       }
       nv[i]=Math.max(0, v[i]+DT*acc);
     }
@@ -145,12 +216,20 @@ function simRun(controlFrom){
   return {frames,minGap};
 }
 const RUN_H=simRun(null), RUN_C=simRun(SIM.JAM_T);
-/* The claim the piece makes about its own picture, asserted rather than hoped:
-   IDM cannot collide, so if this ever trips the model has been mis-parameterised
-   and the jam on screen is not a jam. */
-if(RUN_H.minGap<=0) console.error('SIM: collision, minGap '+RUN_H.minGap);
+/* IDM cannot collide, so a non-positive gap means the model has been
+   mis-parameterised and the jam on screen is not a jam. BOTH runs are checked:
+   the piece draws both, so guarding one is guarding nothing. */
+if(RUN_H.minGap<=0) console.error('SIM: collision in RUN_H, minGap '+RUN_H.minGap);
+if(RUN_C.minGap<=0) console.error('SIM: collision in RUN_C, minGap '+RUN_C.minGap);
+/* "Stopped" has to mean the same thing in both regimes. A fixed 2.6 m/s cut-off
+   was fine while the ring cruised at 8.33, but the FIX beat settles everyone at
+   2.79 -- 0.19 above it -- so the headline would have read "12 STOPPED" at the
+   exact moment the queue was gone. Measured over every rendered frame of the
+   JAM..END span: absolute ends at 12 and never reaches NO QUEUE; relative ends
+   at 0 with one clean transition, and leaves the JAM beat's 13 untouched. */
+const stoppedCount=f=>f.v.filter(q=>q<0.31*eqV(f.T||SIM.T)).length;
 const simAt=(run,mt)=>{
-  const f=run.frames, i=Math.max(0,Math.min(f.length-1,Math.round(mt/SIM.SAMPLE)));
+  const f=run.frames, i=Math.max(0,Math.min(f.length-1,Math.round(mt/SIM_FDT)));
   return f[i];
 };
 
@@ -168,17 +247,7 @@ const RG=L.ring;
    formation takes 300 s of model time and gets 26 s of screen, and the wave beat
    runs at about 4x. NO SPEED IS READABLE OFF THE SCREEN -- the 20 km/h on screen
    is the experiment's measurement, not a thing to count frames against. */
-function modelT(T){
-  const seg=(a,b,m0,m1)=>m0+(m1-m0)*H.clamp((T-a)/(b-a));
-  if(T<BEAT.RING.sc)    return seg(0,BEAT.RING.sc, 0, 8);
-  if(T<BEAT.STEADY.sc)  return seg(BEAT.RING.sc,BEAT.STEADY.sc, 8, 22);
-  if(T<BEAT.WOBBLE.sc)  return seg(BEAT.STEADY.sc,BEAT.WOBBLE.sc, 22, 32);
-  if(T<BEAT.GROW.sc)    return seg(BEAT.WOBBLE.sc,BEAT.GROW.sc, 32, 92);
-  if(T<BEAT.JAM.sc)     return seg(BEAT.GROW.sc,BEAT.JAM.sc, 92, 200);
-  if(T<BEAT.WAVE.sc)    return seg(BEAT.JAM.sc,BEAT.WAVE.sc, 200, 300);
-  if(T<BEAT.FIX.sc)     return seg(BEAT.WAVE.sc,BEAT.FIX.sc, 300, 380);
-  return seg(BEAT.FIX.sc,BEAT.END.sc, 300, 400);                 // RUN_C
-}
+function modelT(T){ return T*MODEL_C; }   /* one constant rate -- see _sim.js */
 
 /* ===== WHERE TYPED TEXT LANDS ===== */
 const PARK=[IR-28, 560];   // below and right of the ring: empty in every beat,
@@ -230,9 +299,14 @@ function ringRoad(cx,cy,R,w){
   }
 }
 /* one car: colour IS its speed, so the picture cannot disagree with the model */
-function drawCar(pos,v,cx,cy,R,key,hilite,sz){
+/* vref is the speed everyone is CURRENTLY trying to hold, not the 30 km/h the
+   piece opened on. Colour here means "how far off the pace is this car", which
+   is what the piece is about -- a wave is variation, not slowness. Measured
+   against idmV instead, every car holding the FIX beat's steady 2.79 m/s
+   rendered amber underneath the words NO QUEUE. */
+function drawCar(pos,v,cx,cy,R,key,hilite,sz,vref){
   const [x,y]=carXY(pos,cx,cy,R), s=sz||RG.carW;
-  const f=H.clamp(v/idmV);
+  const f=H.clamp(v/(vref||idmV));
   const col = hilite ? P.paper
             : f<0.12 ? P.red
             : f<0.55 ? H.mix(P.red,P.gold,(f-0.12)/0.43)
@@ -249,19 +323,20 @@ function drawCar(pos,v,cx,cy,R,key,hilite,sz){
 /* the whole ring at a model time, from whichever run the beat is reading */
 function drawRing(run,mt,cx,cy,R,hiliteIdx,nCars,sz){
   const f=simAt(run,mt), n=(nCars===undefined?SIM.N:nCars);
+  const vref=eqV(f.T||SIM.T);
   ringRoad(cx,cy,R,Math.round((sz||RG.carW)/2)+2);
-  for(let i=0;i<n;i++) drawCar(f.x[i],f.v[i],cx,cy,R,'car'+i,hiliteIdx===i,sz);
+  for(let i=0;i<n;i++) drawCar(f.x[i],f.v[i],cx,cy,R,'car'+i,hiliteIdx===i,sz,vref);
   return f;
 }
 /* the stopped arc, so the beat can point at the jam rather than describe it */
 function jamArc(f){
   let sx=0,sy=0,w=0;
   for(let i=0;i<SIM.N;i++){
-    const wt=Math.max(0,1-f.v[i]/2.6); if(wt<=0) continue;
+    const wt=Math.max(0,1-f.v[i]/(0.31*eqV(f.T||SIM.T))); if(wt<=0) continue;
     const a=carAng(f.x[i]);
     sx+=wt*Math.cos(a); sy+=wt*Math.sin(a); w+=wt;
   }
-  return w>0?{a:Math.atan2(sy,sx),n:f.v.filter(q=>q<2.6).length}:null;
+  return w>0?{a:Math.atan2(sy,sx),n:stoppedCount(f)}:null;
 }
 
 function explainer(ctx,W2,Hh,t){
@@ -323,7 +398,11 @@ function explainer(ctx,W2,Hh,t){
   const dlgOut=BEAT.RING.sc-0.30, okT=VO[0].z+0.52;
   if(T<dlgOut){
     if(SCENE)SCENE.push({x:O.cx-O.R-6,y:O.cy-O.R-6,w:(O.R+6)*2,h:(O.R+6)*2,k:'ring'});
-    drawRing(RUN_H,modelT(T),O.cx,O.cy,O.R,-1,SIM.N,5);
+    /* M, not T: the cars ORBITING are motion, and the house rule is that
+       motion is never ticked -- it runs at the display's own rate. Drawing
+       them off the 12fps tick is what let v1's compression alias the ring
+       into running backwards. Everything else here still steps on T. */
+    drawRing(RUN_H,modelT(M),O.cx,O.cy,O.R,-1,SIM.N,5);
     if(T<dlgOut-0.02&&M<okT+0.30){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);
       winIcon(r.x+10,r.y+11,'?');
@@ -344,13 +423,13 @@ function explainer(ctx,W2,Hh,t){
     const beat=T<BEAT.STEADY.sc?'THE TRACK':T<BEAT.WOBBLE.sc?'EVERYBODY HOLDS 30'
               :T<BEAT.GROW.sc?'ONE DRIVER':T<BEAT.JAM.sc?'IT SPREADS BACK'
               :T<BEAT.WAVE.sc?'A QUEUE FROM NOTHING':T<BEAT.FIX.sc?'WHICH WAY IS IT GOING?'
-              :T<BEAT.END.sc?'ONE CAR STOPS REACTING':'DONE';
+              :T<BEAT.END.sc?'EVERYONE LEAVES A GAP':'DONE';
     statusBar(r,T,beat);
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
 
     if(T<BEAT.END.sc){
       groupBox(BX,BY,BW,BH,beat);
-      const mt=modelT(T);
+      const mt=modelT(M);          /* motion is not ticked -- see the cold open */
       const inFix=T>=BEAT.FIX.sc;
       const run=inFix?RUN_C:RUN_H;
       /* THE RING, every beat. One instrument, re-read -- the beats change which
@@ -404,7 +483,7 @@ function explainer(ctx,W2,Hh,t){
       }
       /* --- JAM: a queue, counted off the model --- */
       else if(T<BEAT.WAVE.sc){
-        const n=f.v.filter(q=>q<2.6).length;
+        const n=stoppedCount(f);
         pxMid(String(n)+' STOPPED',RG.cx,L.hero,36,H.rgba(P.red),null);
         pxMid('ON AN EMPTY CIRCLE',RG.cx,L.sub,14,H.rgba(H.mix(P.paper,P.ink,0.25)),'"Silkscreen"');
         pxMid('NOTHING',RG.cx,RG.cy-8,14,H.rgba(H.mix(P.paper,P.ink,0.3)),'"Silkscreen"');
@@ -434,13 +513,15 @@ function explainer(ctx,W2,Hh,t){
       }
       /* --- FIX: one car stops reacting, and the ring goes green --- */
       else {
-        const n=f.v.filter(q=>q<2.6).length;
+        const n=stoppedCount(f);
         pxMid(n===0?'NO QUEUE':String(n)+' STOPPED',RG.cx,L.hero,36,
               H.rgba(n===0?P.green:P.red),null);
-        pxMid('ONE CAR HELD ITS SPEED',RG.cx,L.sub,14,H.rgba(P.gold),'"Silkscreen"');
-        pxMid('1 IN 22',RG.cx,RG.cy-8,14,H.rgba(P.gold),'"Silkscreen"');
-        pxMid('STOPPED REACTING',RG.cx,RG.cy+12,14,H.rgba(P.gold),'"Silkscreen"');
-        cap('ONE CAR IN TWENTY-TWO',13,0);
+        pxMid('ONE STEADY CAR, ONE REAL GAP',RG.cx,L.sub,14,H.rgba(P.gold),'"Silkscreen"');
+        /* a live readout, not a label: it climbs 0.36 -> 1.20 as the gaps open,
+           which is the mechanism the beat is actually about */
+        pxMid('SECONDS OF GAP',RG.cx,RG.cy-8,14,H.rgba(P.gold),'"Silkscreen"');
+        pxMid((f.T||SIM.T).toFixed(2),RG.cx,RG.cy+12,14,H.rgba(P.gold),'"Silkscreen"');
+        cap('THE GAP IS THE FIX',13,0);
       }
     }
     else { wipeStage(CX,CY,CWd,CHd); groupBox(BX,BY,BW,BH,'DONE'); }

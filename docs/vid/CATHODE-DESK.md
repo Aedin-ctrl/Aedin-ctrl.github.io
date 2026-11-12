@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.8
+# CATHODE DESK — house style v4.9
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -15,6 +15,19 @@
 > records the lengths `BOUNDS` and `GBOX` had when it ran, and anything with a
 > lower index than that is underneath it. See *A window lands on a clear stage*.
 >
+> **v4.9 (2026-11-12)** — **a model read at a compressed rate is motion, and it
+> can alias.** #014 drew its orbiting cars from the 12 fps content tick at up to
+> 19.7x compression, advancing them 130% of a car spacing per tick, and the ring
+> read as running **backwards** through three beats. Drawn from `M` now, at one
+> constant 2.5x, with the per-frame advance asserted over every rendered frame.
+> No sweep can see this: every single frame is correct. Also: the myth-stamp
+> rule now tests the TITLE rather than the subject, because a title that states
+> an absence settles the myth as finally as one that contradicts it, and #014
+> shipped `NOT A CAUSE` under the title "the traffic jam with nothing in front
+> of it". And a guard that checks one of two runs is guarding neither — #014's
+> controller drove into the back of the queue for a whole beat behind an
+> assertion that only ever read `RUN_H`.
+
 > **v4.8 (2026-11-12)** — **every sentence names what moves.** The script is now
 > written as two columns — spoken line, and the thing that MOVES while it is
 > spoken — and a sentence that cannot fill the right-hand column does not go in
@@ -382,6 +395,33 @@ Drawn content on 2s, movement free — the oldest split in hand-drawn animation,
 taken to its end. v1.0 ran everything at 12 and read as a slideshow.
 **Do not raise the content tick to fix smoothness** — that is what makes it stop
 looking drawn. Loosen the motion instead.
+
+**A simulation read at a compressed rate is motion, and it can alias.** #014
+drew twenty-two cars orbiting a ring from `T`, the content tick, because the
+positions come out of a model and the model felt like drawn content. Two things
+followed. First, the cars are *continuous motion* and belong on `M` — the rule
+above already said so. Second, and the part no rule covered: when evenly spaced
+objects advance more than **half their spacing** between the frames you actually
+draw, the eye pairs each one with its neighbour and the whole group reads as
+moving **the other way**. #014's cars sat 10.45 m apart and its time
+compression peaked at 19.7×, advancing them 13.6 m per 12 fps tick — 130% of the
+spacing — so the ring ran visibly backwards through three beats and snapped
+forwards again when the compression dropped to 3.9×.
+
+So, for anything periodic driven off a model clock:
+
+- **One constant compression for the whole piece.** Any *change* in the rate is
+  itself a visible speed change, and a change large enough to cross the aliasing
+  threshold reads as a reversal. #014 is a flat 2.5× throughout; buy the screen
+  time you need by making the model reach its state sooner, not by speeding the
+  clock up for one beat.
+- **Bound the per-frame advance and assert it.** Check it at the *render* frame
+  rate, which is lower than the browser's, over every frame of the finished
+  piece — #014 asserts 0 backward frames and a maximum advance of 27.2% of a
+  spacing. An eyeball check cannot see this: each individual frame is correct.
+- **No sweep can catch it.** The fourteen sweeps read one frame at a time, and
+  every frame of a reversed ring is perfectly well formed. This one was found by
+  the person watching it, which is the expensive way.
 
 - Positions snap to whole buffer pixels. No sub-pixel drift.
 - Voxels **drop in** from above over 0.32s, `H.ease.out`, landing ~0.22s in.
@@ -1400,6 +1440,19 @@ own above the card**, landing on the question's **last word**.
 - **If the title already settles it, there is no stamp.** #005 asks *why does
   metal feel colder than wood* and answers *it isn't colder* in its first spoken
   line; stamping `NOT COLDER` over that is the same sentence twice.
+
+  **The test is the TITLE, not the subject.** #003 is "why ice floats", which
+  says nothing at all about trapped air, so `NOT THE AIR` has work to do — it
+  reaches a belief the title leaves standing. #014 is "the traffic jam with
+  nothing in front of it", which *already asserts there is no cause*, so
+  `NOT A CAUSE` only restates the title. Both pieces have a real, widely held
+  misconception behind them; the difference is whether the title has already
+  dealt with it. A title that **states the absence** settles the myth just as
+  finally as #005's title **contradicts** it, and #014 shipped with the stamp
+  anyway because this rule read as being about contradiction alone. Say the
+  title out loud, then say the stamp: if the second is contained in the first,
+  there is no stamp. A tag that restates its title teaches the viewer that the
+  gold tag is decoration, which costs every later piece that needs one.
 
 - When it is spoken too, it is **one short sentence**, three or four words, and
   it gets a **picture of its own**: in #005 the word `COLDER` is printed large
