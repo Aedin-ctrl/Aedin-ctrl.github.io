@@ -1,4 +1,4 @@
-/* ===== #014 -- WHY NO STRAW WORKS PAST 10 METRES =====
+/* ===== #014 -- HOW TALL CAN A STRAW BE? =====
    The piece. The format is cathode-lib.js; what needs both is cathode-run.js.
 
    The folk answer is that you suck water up a straw. You do not: sucking is not
@@ -54,8 +54,8 @@
    or how many ceilings are marked on it. The sameness is the argument.
 */
 const PIECE={ no:14, slug:'lift', tags:['PHYSICS','HISTORY'],
-  myth:"that you suck",
-  title:"why no straw works past 10 metres",
+  myth:"not your lungs",
+  title:"how tall can a straw be",
   blurb:"Sucking is not a force. The air pushes, it pushes with 101 kPa, and that buys you 10.33 metres of water and not one centimetre more." };
 
 /* ---- the arithmetic, declared once; every picture is drawn FROM these ---- */
@@ -76,36 +76,36 @@ const H_PUMP=7.0;                       // "about seven" -- sources give 15-25 f
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=105.2, VOHASH="0c356e77a0e2";
+const DUR=97.1, VOHASH="6c3ac262e227";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
-  {b:'HOOK',a:0.8,z:5.867,w:["Put", "an", "eleven", "metre", "straw", "into", "a", "lake", "and", "suck", "as", "hard", "as", "you", "like.", "Nothing", "arrives."],t:[0.84, 1.0, 1.13, 1.53, 1.86, 2.25, 2.6, 2.69, 3.08, 3.37, 3.77, 3.93, 4.26, 4.44, 5.04, 5.08, 5.46]},
-  {b:'PUSH',a:10.167,z:12.094,w:["You", "have", "never", "sucked", "anything", "up", "a", "straw."],t:[10.167, 10.337, 10.567, 11.047, 11.207, 11.677, 11.787, 11.837]},
-  {b:'PUSH',a:12.844,z:16.876,w:["You", "lower", "the", "pressure", "at", "the", "top,", "and", "the", "air", "outside", "pushes", "the", "water", "up."],t:[12.854, 13.044, 13.384, 13.584, 14.124, 14.464, 14.704, 14.724, 14.934, 15.194, 15.354, 15.834, 16.244, 16.584, 16.794]},
-  {b:'CEILING',a:18.726,z:23.128,w:["So", "the", "height", "is", "not", "about", "how", "hard", "you", "pull.", "It", "is", "set", "by", "the", "weight", "of", "the", "air."],t:[18.786, 18.886, 19.136, 19.626, 19.786, 20.036, 20.446, 20.696, 21.026, 21.636, 21.666, 21.786, 21.906, 22.086, 22.326, 22.386, 22.746, 22.866, 23.046]},
-  {b:'CEILING',a:23.878,z:29.36,w:["A", "hundred", "and", "one", "kilopascals", "holds", "up", "ten", "point", "three", "metres", "of", "water,", "and", "no", "more."],t:[24.042, 24.206, 24.37, 24.534, 24.698, 25.728, 26.188, 26.548, 26.908, 27.268, 27.628, 27.988, 28.188, 28.778, 28.938, 29.038]},
-  {b:'GALILEO',a:31.21,z:37.354,w:["Tuscan", "well", "diggers", "hit", "that", "ceiling", "in", "the", "sixteen", "hundreds,", "and", "Galileo", "was", "asked", "why."],t:[31.28, 31.71, 32.04, 32.62, 32.87, 33.2, 33.81, 33.98, 34.497, 35.013, 35.53, 35.78, 36.42, 36.62, 37.03]},
-  {b:'GALILEO',a:38.104,z:42.858,w:["He", "blamed", "the", "water:", "the", "column", "snaps", "under", "its", "own", "weight", "at", "thirty", "four", "feet."],t:[38.114, 38.274, 38.734, 38.984, 39.644, 39.844, 40.254, 40.544, 41.134, 41.154, 41.334, 41.744, 41.924, 42.104, 42.284]},
-  {b:'GALILEO',a:43.608,z:49.504,w:["That", "is", "ten", "point", "three", "six", "metres.", "Right", "to", "three", "centimetres,", "wrong", "for", "the", "whole", "reason."],t:[43.608, 43.988, 44.358, 44.728, 45.098, 45.468, 45.838, 46.208, 46.628, 46.838, 47.558, 48.278, 48.728, 48.788, 48.898, 49.318]},
-  {b:'MERCURY',a:51.354,z:55.684,w:["Torricelli", "blamed", "the", "air,", "then", "proved", "it", "by", "changing", "the", "liquid."],t:[51.434, 52.204, 52.774, 53.034, 53.594, 54.194, 54.484, 54.684, 54.774, 55.184, 55.344]},
-  {b:'MERCURY',a:56.434,z:64.849,w:["Mercury", "is", "thirteen", "and", "a", "half", "times", "denser,", "so", "the", "column", "comes", "out", "thirteen", "and", "a", "half", "times", "shorter.", "Seven", "hundred", "and", "sixty", "millimetres."],t:[56.434, 57.054, 57.409, 57.764, 58.034, 58.124, 58.484, 58.894, 59.494, 59.624, 59.824, 60.324, 60.624, 60.919, 61.214, 61.494, 61.504, 61.804, 62.554, 62.936, 63.319, 63.701, 64.084, 64.466]},
-  {b:'SAME',a:66.699,z:70.985,w:["He", "had", "not", "built", "a", "new", "instrument.", "He", "had", "written", "the", "same", "fact", "in", "a", "shorter", "unit."],t:[66.699, 66.819, 66.999, 67.199, 67.509, 67.569, 67.749, 68.619, 68.719, 68.899, 69.309, 69.479, 69.699, 69.929, 70.049, 70.509, 70.529]},
-  {b:'SAME',a:71.735,z:79.003,w:["A", "hundred", "and", "one", "kilopascals.", "Ten", "point", "three", "metres", "of", "water.", "Seven", "hundred", "and", "sixty", "millimetres", "of", "mercury."],t:[71.955, 72.175, 72.395, 72.615, 72.835, 73.413, 73.991, 74.569, 75.147, 75.725, 75.915, 76.325, 76.735, 77.145, 77.555, 77.965, 78.375, 78.495]},
-  {b:'BOIL',a:80.853,z:88.257,w:["You", "never", "reach", "ten", "point", "three", "anyway.", "Near", "the", "top", "there", "is", "almost", "no", "pressure", "left,", "and", "water", "boils", "at", "room", "temperature."],t:[80.853, 81.063, 81.553, 81.838, 82.123, 82.408, 82.693, 83.413, 83.673, 83.873, 84.203, 84.533, 84.863, 85.033, 85.153, 85.963, 86.533, 86.703, 86.993, 87.283, 87.393, 87.623]},
-  {b:'BOIL',a:89.007,z:93.745,w:["A", "real", "pump", "manages", "about", "seven.", "In", "Denver,", "thin", "air", "stops", "you", "at", "eight", "and", "a", "half."],t:[89.007, 89.087, 89.507, 89.747, 90.377, 91.187, 91.207, 91.327, 91.827, 92.077, 92.267, 92.587, 92.777, 92.897, 93.387, 93.407, 93.467]},
-  {b:'END',a:95.595,z:98.263,w:["Which", "is", "why", "a", "deep", "well's", "pump", "is", "not", "at", "the", "top."],t:[95.595, 95.935, 96.245, 96.285, 96.355, 96.625, 96.965, 97.275, 97.405, 97.605, 97.735, 97.915]},
-  {b:'END',a:99.013,z:100.568,w:["It", "is", "at", "the", "bottom,", "pushing."],t:[99.133, 99.173, 99.213, 99.253, 99.433, 100.093]},
+  {b:'HOOK',a:0.8,z:2.978,w:["How", "tall", "can", "a", "straw", "be", "before", "it", "stops", "working?"],t:[0.83, 1.02, 1.16, 1.31, 1.37, 1.62, 1.71, 2.06, 2.13, 2.39]},
+  {b:'PUSH',a:7.278,z:9.205,w:["You", "have", "never", "sucked", "anything", "up", "a", "straw."],t:[7.278, 7.448, 7.678, 8.158, 8.318, 8.788, 8.898, 8.948]},
+  {b:'PUSH',a:9.955,z:13.987,w:["You", "lower", "the", "pressure", "at", "the", "top,", "and", "the", "air", "outside", "pushes", "the", "water", "up."],t:[9.965, 10.155, 10.495, 10.695, 11.235, 11.575, 11.815, 11.835, 12.045, 12.305, 12.465, 12.945, 13.355, 13.695, 13.905]},
+  {b:'CEILING',a:15.837,z:20.239,w:["So", "the", "height", "is", "not", "about", "how", "hard", "you", "pull.", "It", "is", "set", "by", "the", "weight", "of", "the", "air."],t:[15.897, 15.997, 16.247, 16.737, 16.897, 17.147, 17.557, 17.807, 18.137, 18.747, 18.777, 18.897, 19.017, 19.197, 19.437, 19.497, 19.857, 19.977, 20.157]},
+  {b:'CEILING',a:20.989,z:26.471,w:["A", "hundred", "and", "one", "kilopascals", "holds", "up", "ten", "point", "three", "metres", "of", "water,", "and", "no", "more."],t:[21.153, 21.317, 21.481, 21.645, 21.809, 22.839, 23.299, 23.659, 24.019, 24.379, 24.739, 25.099, 25.299, 25.889, 26.049, 26.149]},
+  {b:'GALILEO',a:28.321,z:34.465,w:["Tuscan", "well", "diggers", "hit", "that", "ceiling", "in", "the", "sixteen", "hundreds,", "and", "Galileo", "was", "asked", "why."],t:[28.391, 28.821, 29.151, 29.731, 29.981, 30.311, 30.921, 31.091, 31.608, 32.124, 32.641, 32.891, 33.531, 33.731, 34.141]},
+  {b:'GALILEO',a:35.215,z:39.969,w:["He", "blamed", "the", "water:", "the", "column", "snaps", "under", "its", "own", "weight", "at", "thirty", "four", "feet."],t:[35.225, 35.385, 35.845, 36.095, 36.755, 36.955, 37.365, 37.655, 38.245, 38.265, 38.445, 38.855, 39.035, 39.215, 39.395]},
+  {b:'GALILEO',a:40.719,z:46.615,w:["That", "is", "ten", "point", "three", "six", "metres.", "Right", "to", "three", "centimetres,", "wrong", "for", "the", "whole", "reason."],t:[40.719, 41.099, 41.469, 41.839, 42.209, 42.579, 42.949, 43.319, 43.739, 43.949, 44.669, 45.389, 45.839, 45.899, 46.009, 46.429]},
+  {b:'MERCURY',a:48.465,z:52.795,w:["Torricelli", "blamed", "the", "air,", "then", "proved", "it", "by", "changing", "the", "liquid."],t:[48.545, 49.315, 49.885, 50.145, 50.705, 51.305, 51.595, 51.795, 51.885, 52.295, 52.455]},
+  {b:'MERCURY',a:53.545,z:59.546,w:["Mercury", "is", "thirteen", "and", "a", "half", "times", "denser,", "so", "the", "column", "is", "seven", "hundred", "and", "sixty", "millimetres."],t:[53.545, 54.235, 54.67, 55.105, 55.305, 55.395, 55.785, 56.265, 56.905, 57.065, 57.305, 57.795, 58.087, 58.379, 58.671, 58.962, 59.254]},
+  {b:'SAME',a:61.396,z:65.682,w:["He", "had", "not", "built", "a", "new", "instrument.", "He", "had", "written", "the", "same", "fact", "in", "a", "shorter", "unit."],t:[61.396, 61.516, 61.696, 61.896, 62.206, 62.266, 62.446, 63.316, 63.416, 63.596, 64.006, 64.176, 64.396, 64.626, 64.746, 65.206, 65.226]},
+  {b:'SAME',a:66.432,z:70.935,w:["Three", "ways", "of", "writing", "one", "number,", "and", "the", "barometer", "is", "just", "the", "shortest", "one."],t:[66.572, 66.852, 67.192, 67.362, 67.962, 68.212, 68.842, 68.982, 69.122, 69.602, 69.812, 70.112, 70.272, 70.712]},
+  {b:'BOIL',a:72.785,z:80.189,w:["You", "never", "reach", "ten", "point", "three", "anyway.", "Near", "the", "top", "there", "is", "almost", "no", "pressure", "left,", "and", "water", "boils", "at", "room", "temperature."],t:[72.785, 72.995, 73.485, 73.77, 74.055, 74.34, 74.625, 75.345, 75.605, 75.805, 76.135, 76.465, 76.795, 76.965, 77.085, 77.895, 78.465, 78.635, 78.925, 79.215, 79.325, 79.555]},
+  {b:'BOIL',a:80.939,z:85.677,w:["A", "real", "pump", "manages", "about", "seven.", "In", "Denver,", "thin", "air", "stops", "you", "at", "eight", "and", "a", "half."],t:[80.939, 81.019, 81.439, 81.679, 82.309, 83.119, 83.139, 83.259, 83.759, 84.009, 84.199, 84.519, 84.709, 84.829, 85.319, 85.339, 85.399]},
+  {b:'END',a:87.527,z:90.195,w:["Which", "is", "why", "a", "deep", "well's", "pump", "is", "not", "at", "the", "top."],t:[87.527, 87.867, 88.177, 88.217, 88.287, 88.557, 88.897, 89.207, 89.337, 89.537, 89.667, 89.847]},
+  {b:'END',a:90.945,z:92.5,w:["It", "is", "at", "the", "bottom,", "pushing."],t:[91.065, 91.105, 91.145, 91.185, 91.365, 92.025]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
-  HOOK:{sc:0.0,a:0.8,z:5.867},
-  PUSH:{sc:9.77,a:10.167,z:16.876},
-  CEILING:{sc:18.33,a:18.726,z:29.36},
-  GALILEO:{sc:30.81,a:31.21,z:49.504},
-  MERCURY:{sc:50.95,a:51.354,z:64.849},
-  SAME:{sc:66.3,a:66.699,z:79.003},
-  BOIL:{sc:80.45,a:80.853,z:93.745},
-  END:{sc:95.19,a:95.595,z:100.568},
+  HOOK:{sc:0.0,a:0.8,z:2.978},
+  PUSH:{sc:6.88,a:7.278,z:13.987},
+  CEILING:{sc:15.44,a:15.837,z:26.471},
+  GALILEO:{sc:27.92,a:28.321,z:46.615},
+  MERCURY:{sc:48.07,a:48.465,z:59.546},
+  SAME:{sc:61.0,a:61.396,z:70.935},
+  BOIL:{sc:72.38,a:72.785,z:85.677},
+  END:{sc:87.13,a:87.527,z:92.5},
 };
 const SENT={
   HOOK:[0],
@@ -188,8 +188,10 @@ const ACTS=(()=>{
   drag(W(4,8), W(4,8)+1.10*SPD, [C.cx-120,CEIL_W], [C.cx+120,CEIL_W], PARK);
   // GALILEO -- press the one line that carries both numbers
   tap (W(7,1), [C.cx+96,CEIL_W], PARK);
-  // BOIL -- the ceiling coming down
-  drag(W(12,1), W(12,1)+1.45*SPD, [C.cx+86,CEIL_W], [C.cx+86,CEIL_B], PARK);
+  /* BOIL has NO act. The hand arrived 0.70s before the drag and waited on the
+     10.11 rule, which checkPointerIdle reported -- and a ceiling rule spans the
+     full panel width, so there is nowhere on it the hand can legally wait. The
+     beat's action is the rules dropping in; it does not need a hand as well. */
   return A.sort((x,y)=>x.t0-y.t0);
 })();
 
@@ -259,13 +261,25 @@ function explainer(ctx,W2,Hh,t){
     const w=str?(shadow?pxShadow(str,x,y,size,col,shadow,null,font):px(str,x,y,size,col,null,font)):0;
     if(live) CARET={x:x+w+Math.round(size*0.35),y:y,h:size,col:col};
     return w;};
+  /* NO SILENT SLICE. This was rows.slice(0,3), which drew the first three rows
+     and threw the rest away -- and because nothing WRONG was drawn, not one of
+     the fourteen sweeps could see it. #014 shipped a cold-open card missing its
+     own last word, a MERCURY caption missing "seven hundred and sixty
+     millimetres" (the beat's entire number) and a SAME caption missing
+     "mercury". Found by eye, which is the one way this format is not supposed
+     to need.
+
+     Every row is now drawn. A caption that does not fit runs out of the client
+     area instead of vanishing, and checkBounds and checkChrome both report
+     that -- an overflow you can measure beats an omission you cannot. The
+     script is what gets shortened; the frame is fixed. */
   const typeWrap=(n,x,y,size,col,shadow,font,perLine)=>{
     const ws=VO[n].w, lim=perLine||CAPCH;
     const rows=[]; let cur=[], len=0;
     ws.forEach((wd,i)=>{ if(len+wd.length+1>lim&&cur.length){rows.push(cur);cur=[];len=0;}
                          cur.push(i); len+=wd.length+1; });
     if(cur.length)rows.push(cur);
-    rows.slice(0,3).forEach((rw,k)=>
+    rows.forEach((rw,k)=>
       typeLine(n,x,y+k*Math.round(size*1.5),size,col,shadow,font,rw[0],rw[rw.length-1]+1));
   };
   const capLine=(str,n,i,x,y,size,col,shadow,font,span)=>{
@@ -328,7 +342,7 @@ function explainer(ctx,W2,Hh,t){
   /* --- the program window --- */
   if(T>=BEAT.PUSH.sc-0.30&&T<SHUT){
     const done=T>=BEAT.END.sc;
-    const r=winFrame(8,8,PW+8,PH+34,'How high can you suck?',!done);
+    const r=winFrame(8,8,PW+8,PH+34,'How tall can a straw be?',!done);
     const CX=r.x,CY=r.y,CWd=r.w,CHd=r.h-18;
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     const beat=T<BEAT.CEILING.sc?'THE AIR PUSHES':T<BEAT.GALILEO.sc?'THE CEILING'
@@ -446,12 +460,12 @@ function explainer(ctx,W2,Hh,t){
        above the box centre and checkComposition called it "high". --- */
     else if(T<BEAT.BOIL.sc){
       groupBox(BX,BY,BW,BH,'ONE FACT');
-      const rows=[['101 kPa',11,0],['10.33 m of WATER',11,5],['760 mm of MERCURY',11,11]];
+      const rows=[['101 kPa',11,0],['10.33 m of WATER',11,4],['760 mm of MERCURY',11,9]];
       let widest=0;
       rows.forEach(q=>{widest=Math.max(widest,glyph(q[0],20,'"Silkscreen"').w+14);});
       rows.forEach((q,i)=>{ if(!after(q[1],q[2]))return;
         blockTag(C.cx,MIDY-92+i*92,q[0],20,H.rgba(P.gold),'#000'); });
-      if(after(11,5)){
+      if(after(11,4)){
         const y0=MIDY-92-17, y1=MIDY+92+17, bxx=Math.round(C.cx-widest/2-18);
         rect(bxx,y0,2,y1-y0,H.rgba(P.paper,0.8));
         rect(bxx,y0,10,2,H.rgba(P.paper,0.8));
