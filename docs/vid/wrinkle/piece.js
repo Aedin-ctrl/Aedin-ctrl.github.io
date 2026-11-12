@@ -46,7 +46,7 @@
    through the sweat ducts shifts the local electrolyte balance, which drives
    the sympathetic response. The piece says proposed. */
 const PIECE={ no:20, slug:'wrinkle', tags:['BODY','BIOLOGY'],
-  myth:"not the water",
+  myth:"not swelling",
   title:"why your fingers wrinkle in water",
   blurb:"Not because the skin soaks up water -- a finger with no nerve supply sits in the same bath and stays smooth. The vessels underneath narrow, the pulp loses volume, and the skin is pulled down from beneath." };
 /* ===== TIMELINE =====

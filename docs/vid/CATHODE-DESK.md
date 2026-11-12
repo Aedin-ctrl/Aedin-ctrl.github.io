@@ -1,6 +1,19 @@
-# CATHODE DESK — house style v4.11
+# CATHODE DESK — house style v4.12
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.12 (2026-11-12)** — **a stamp is also a no-repeat.** A full-library
+> audit found #007 `sweat` and #020 `wrinkle` shipping the **same stamp**,
+> `NOT THE WATER`, and the second one was wrong on its own terms: #020's script
+> says out loud that the skin *does* soak up water and that this is not what
+> makes the ridges, so the thing it denies is the **swelling**, not the water.
+> It ships as `NOT SWELLING`. Two pieces wearing one stamp is the gold tag
+> saying the two episodes kill the same belief, which is the no-repeats rule in
+> three words — so **the stamp goes in the no-repeats table with the mechanism,
+> and no two pieces may carry the same one.** No sweep can check this: a stamp
+> is one short string in `PIECE`, and nothing reads the other twenty. Grep them
+> all before adding one — `grep -ho 'myth:"[^"]*"' */piece.js | sort | uniq -c`
+> prints the whole library in one line.
 
 > **v4.11 (2026-11-12)** — **two things no sweep can see, both found in series
 > D with all fourteen returning 0.**
@@ -1501,6 +1514,10 @@ own above the card**, landing on the question's **last word**.
   there is no stamp. A tag that restates its title teaches the viewer that the
   gold tag is decoration, which costs every later piece that needs one.
 
+- **No two pieces carry the same stamp.** It belongs in the no-repeats table
+  beside the mechanism: an identical tag on two episodes claims they kill the
+  same belief. `grep -ho 'myth:"[^"]*"' */piece.js | sort | uniq -c` is the
+  check, and nothing automatic does it.
 - **The stamp is a negation — the wrong answer, crossed out.** It names what
   the viewer believes walking in, never what the piece concludes: `NOT THE
   AIR`, `NOT A VAULT`, `NOT INTERMEDIARIES`, `NOT THE BREAD`. A stamp that
