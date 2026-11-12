@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.6
+# CATHODE DESK — house style v4.6.1
 
 **Locked 2026-11-08. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -14,6 +14,15 @@
 > rectangle was already registered. It was the **draw order**. `winFrame()` now
 > records the lengths `BOUNDS` and `GBOX` had when it ran, and anything with a
 > lower index than that is underneath it. See *A window lands on a clear stage*.
+>
+> **v4.6.1 (2026-11-11)** — **documentation only.** The Enforcement table named
+> ten sweeps of the fourteen that exist: `checkPiece`, `checkChrome`,
+> `checkFraming` and `checkEndCard` were never added to it, `checkEndCard`
+> missing since the v4.0 entry that introduced it. Nothing in the code changed.
+> The table did, and it now states that it is the whole set and that `sweep.mjs`
+> runs exactly those names — so the next time the two drift apart, the document
+> says which one to trust. A rule nobody can see enforced is advice, and this
+> file has already been bitten once by advice (`PART_FLOOR`, v4.4).
 >
 > **v4.5 (2026-11-10)** — **a shape must stay inside the shape that contains
 > it**, and three more ways the sweeps were quiet. #012 ruled a round wafer into
@@ -711,10 +720,13 @@ click, and is instantly obvious as the one that was forgotten.
 
 ### Enforcement
 
-Every rule above is checked by a sweep, and all of them must return **0**:
+Every rule above is checked by a sweep, and all **fourteen** must return **0**.
+**This table is the whole set** — `sweep.mjs` runs exactly these names, so if a
+sweep exists and is not listed here, one of the two is wrong.
 
 | sweep | catches |
 |---|---|
+| `checkPiece()` | the registry itself: a bad tag, a short blurb, a running time outside **65–115s** (a part: 82–115s), an incoherent `part` block |
 | `checkLegibility()` | type under the floor |
 | `checkBounds()` | anything leaving the window's client area |
 | `checkStraddle()` | a label lying across the group box border |
@@ -724,6 +736,9 @@ Every rule above is checked by a sweep, and all of them must return **0**:
 | `checkPointerJumps()` | the pointer moving more than 95px in one frame |
 | `checkPointerIdle()` | the pointer sitting still on top of content for over 0.8s |
 | `checkComposition()` | a beat's content sitting off-centre in the box, or filling too little of it |
+| `checkChrome()` | a string overflowing the innermost window frame it sits in |
+| `checkFraming()` | a prop escaping the client panel, or the scene off-centre once it has settled |
+| `checkEndCard()` | a window still open over the sign-off — or no end card at all |
 | `checkCard()` | a floating window opening on top of stage content |
 
 **Prove a new sweep fires before trusting it.** Put the defect back, confirm the
@@ -1331,6 +1346,15 @@ part card is two windows and the stack ends at **`PART_FLOOR` = 358**, 52px
 lower. #011's pen was drawn against 306 and spent the whole card standing inside
 the part number's window; it moved down 72px. **Read `PART_FLOOR`; do not carry
 358 as a literal** — that is how the cloud in #004 ended up behind a dialog.
+
+**And this one is checked, not advised.** For a version it was only written here,
+and no piece ever read it (see v4.4). `partCard()` now files both of its windows
+in `GBOX` while they are on screen, so **`checkOverlap()` measures any cold-open
+object against the card** exactly as it measures anything else. Getting the floor
+wrong is now a sweep hit rather than something you have to have read this
+paragraph to avoid. No piece reads `PART_FLOOR` in code today and none needs to —
+but if you hand-type the clearance and `PART_NUM` later moves, the constant is
+still the only thing that follows it.
 
 **The gag stays.** It is the object's one trick and it is the best thing in the
 cold open. It simply loses its card: the object is on the sky from the first
