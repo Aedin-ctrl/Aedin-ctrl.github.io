@@ -23,7 +23,9 @@
 > Its beats joined with **"and then"** six times (a list, not an argument) and its
 > subject was a **quantity, not a thing** (nothing on screen you have ever
 > touched). Both were visible before a frame was drawn. See *Does the idea work?*
-> for the four-line gate, which is now mandatory before a storyboard.
+> for the five-line gate, which is now mandatory before a storyboard. The gate
+> was then control-tested against four known-good pieces and the scrapped one,
+> which found two defects in it — see `gate-test/STRESS-TEST.md`.
 >
 > And the research pass that came out of it found this file was **already right
 > and already ignored**: generation rule 10 has said *"do not retype the sentence
@@ -434,7 +436,7 @@ works:
 **Write the chain into the build dir before the script.** An idea that cannot be
 chained is not ready, however good its numbers are.
 
-### 2. The concreteness test — can they picture it unaided?
+### 2. The concreteness test — **what is it drawn AS?**
 
 Concrete things are processed faster and more accurately than abstract ones;
 the usual account is that an abstract idea has only a verbal code to retrieve,
@@ -442,10 +444,21 @@ where a concrete one also has an imagery code. (The *mechanism* is contested —
 context-availability and Barsalou-style accounts compete with dual coding — but
 the effect itself is not.)
 
-**Name the subject in one noun phrase. If that phrase is a quantity, a ratio or
-a field, the idea is abstract and will draw badly.** "Pressure", "a column of
-water", "a density ratio" are abstractions — #012 had nothing else. "A jar of
-honey", "a wafer of silicon", "twenty-two cars in a circle" are things.
+**This line was wrong in its first draft and the stress test caught it.** It said
+to reject any subject that was a quantity — which rejects **#013**, one of the
+best pieces in the library, whose subject is a *probability*. The difference
+between #013 and #012 is not the subject. It is what the subject is **drawn as**:
+
+| | subject | drawn as |
+|---|---|---|
+| #013, works | a probability | **a million dots you can count, and a bar split 99 against 9,999** |
+| #012, scrapped | a pressure | **a line, with numbers beside it** |
+
+**So an abstract subject is fine if it can be rendered as a countable, changing
+thing. It is fatal when it can only be rendered as a value.** Name the subject,
+then name the thing on screen that stands for it, and check that the second one
+can be *counted* or *watched changing*. "A jar of honey", "twenty-two cars in a
+circle", "a million dots" pass. "A column with a number next to it" does not.
 
 ### 3. The been-inside-it test
 
@@ -461,17 +474,36 @@ fever that makes you cold, a jar that never goes off. *(The popular claim that
 curiosity peaks when you "almost know" the answer is unverified secondary
 material — do not build on it.)*
 
-### The gate, as four lines in the build dir
+### 4. The closes test — does the gap shut again?
+
+Loewenstein again: the gap pulls harder when the missing information seems
+**likely to be resolved**. A piece that opens a question and then declines to
+answer it has spent the viewer's attention and returned nothing. Honey, ice,
+metal and tests all land their answer.
+
+**An honest "and nobody knows why" is a fine SECOND-ORDER beat and a bad
+ENDING.** #025 (why fingers wrinkle) resolves its mechanism and leaves only the
+*purpose* open, in the last few seconds — that passes. #104 (why a bicycle stays
+up) ends on "there is no single cause", which does not, and the fix is to change
+the question to one the evidence answers: not *"why does it stay up"* but
+*"what is actually holding it up"*, which closes on what it **is not**, with the
+open part demoted.
+
+### The gate, as five lines in the build dir
 
 ```
-SUBJECT   one noun phrase, and it must be a thing            -> concreteness
+SUBJECT   the subject, AND the countable/changing thing it is drawn as
 CHAIN     beat -> but/therefore -> beat -> ... , no "and then" -> argument
 QUESTION  the exact words the card will type, ending in "?"   -> the gap opens
 INSIDE    the sentence "you have been in this" must be true   -> it is about them
+CLOSES    the question asked is answered on screen            -> the gap shuts
 ```
 
-All four, before the storyboard. #012 failed SUBJECT and CHAIN and would have
-been caught in ten minutes.
+All five, before the storyboard. **#012 failed four of them and would have been
+caught in ten minutes.** The gate itself was control-tested against four pieces
+known to work and one known to have failed before being trusted — see
+`gate-test/STRESS-TEST.md`, which is also what found that SUBJECT was testing
+the wrong thing and that CLOSES was missing.
 
 ## How it is displayed — what the evidence actually says
 
