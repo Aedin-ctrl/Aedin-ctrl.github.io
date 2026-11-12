@@ -1,0 +1,724 @@
+{
+  "date": "2026-11-12",
+  "generated": "2026-11-12T16:06:22.290Z",
+  "articles": [
+    {
+      "id": "2026-11-12-nvidia-ceo-jensen-huang-resigns-after-a-board",
+      "headline": "Nvidia CEO Jensen Huang resigns after a board probe into an affair and a suspected Chinese intelligence link",
+      "summary": "Nvidia accepted Jensen Huang's resignation on Nov. 11, after its board opened an investigation into an admitted affair. The New York Times reported US authorities suspect the woman involved of passing intelligence to Beijing. CFO Colette Kress is interim CEO.",
+      "impacts": [
+        "The company that supplies much of the world's AI chips is now led by an interim CEO while a search runs.",
+        "The case ties a top tech executive to US worries about chips reaching China.",
+        "Export-control enforcement and Nvidia's Singapore sales will likely get fresh scrutiny."
+      ],
+      "details": [
+        "Nvidia told the SEC in a Form 8-K that it accepted Jensen Huang's resignation on November 11, 2026, effective immediately. Chief financial officer Colette Kress is interim leader while the board looks for a permanent CEO. The Register notes Huang founded Nvidia in 1993 and that its market value peaked above $5.5 trillion earlier this year. It calls the story developing.",
+        "The path to the resignation was short. On October 29 the New York Times alleged that US intelligence agencies were investigating a woman who goes by Alice Huang, or Huang Le, on suspicion that she passes intelligence to Beijing. On November 8, the Times reported that US authorities believe she and Jensen Huang had a romantic relationship, and that she is a Chinese citizen who worked for Megaspeed, a Singapore-based company that has bought large amounts of Nvidia hardware. The Times suspects some of that hardware reached Chinese users.",
+        "The same day, Nvidia's board said it was starting an independent investigation. Huang emailed staff, apologized to his family and colleagues, admitted he had been unfaithful to his wife and said there was 'no excuse'. He did not directly link this to the Times reports. Nvidia told the Times his conversations with her were normal CEO-to-customer-executive contact and posed no threat to its intellectual property or US national security.",
+        "The Register also reports, citing the Times, a second alleged relationship with a company employee. The Register did not confirm that independently. Nobody has publicly shown that Huang passed information to anyone, and the reporting rests largely on unnamed US officials, so the espionage claim remains an allegation.",
+        "The geopolitical backdrop is real. The US restricts advanced GPU exports to China, and Singapore has at times accounted for about 22 percent of Nvidia's revenue even though it caps datacenter power at 1.6 GW, which suggests much of that hardware is bought on behalf of customers elsewhere. Nvidia has said it is satisfied those sales do not evade sanctions. Watch for the board's findings, any government action on Megaspeed, and who is named CEO."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "nvidia",
+        "jensen huang",
+        "china",
+        "export controls",
+        "chips",
+        "espionage",
+        "ai"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register: Jensen Huang resigns as Nvidia chief executive",
+          "url": "https://www.theregister.com/systems/2026/11/12/jensen-huang-resigns-as-nvidia-chief-executive/5309411"
+        },
+        {
+          "name": "The Register: Nvidia board opens probe after Huang admits affair",
+          "url": "https://www.theregister.com/legal/2026/11/09/nvidia-ceo-jensen-huang-admits-affair-with-possible-chinese-asset/5308327"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-russian-cloud-yandex-says-drone-strikes-on-its",
+      "headline": "Russian cloud Yandex says drone strikes on its datacenters destroyed 2.84% of customer data",
+      "summary": "Yandex says drone attacks on three of its sites, starting in early October, caused a fire and outages. It restored over 97% of customer data but lost 2.84% to hardware damage and missing backups.",
+      "impacts": [
+        "Datacenters are now targets in the Russia-Ukraine war, and cloud customers can lose data with them.",
+        "Customers who relied on the provider for backups found there were none for some of their data.",
+        "Companies in conflict zones may rethink hybrid or off-site backups."
+      ],
+      "details": [
+        "Yandex, Russia's largest cloud provider, has admitted that drone attacks on its datacenters caused permanent data loss. The Register reports the first strike came in early October 2026 and caused a fire and an outage in the ru-central1-b availability zone. More strikes hit other Yandex sites, disrupting further cloud services and payment services. In all, drones damaged three Yandex locations. Ukrainian press reported that Kyiv ordered the attacks, which The Register did not independently confirm.",
+        "On November 10 Yandex published a recovery update. It said it had restored more than 97 percent of customer data. The rest, 2.84 percent, was lost, which Yandex blamed on 'critical hardware damage and a lack of backups on the platform'.",
+        "The Register points out that it is unclear what that means in practice: whether Yandex does not back up its own cloud, whether its resilience methods fail to create multiple copies of customer data, or whether customers failed to protect their own data. Yandex has since turned on backups by default for all new virtual machines, which means customers will pay for more storage unless they opt out.",
+        "On November 11 Yandex launched a new availability zone, ru-central1-f, in an undisclosed location. It comes with resource quotas and cannot yet handle traffic to private endpoints. The Register suggests sanctions on technology sales to Russia may make it hard to buy enough hardware to offer unrestricted access.",
+        "The broader lesson is that physical attacks on commercial infrastructure are no longer hypothetical. A single zone failing is normally something cloud designs survive; the reported loss shows what happens when that design, or the customer's backup choices, falls short. Watch whether Yandex publishes a fuller postmortem and whether attacks on datacenters on either side continue."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "drones",
+        "datacenter",
+        "yandex",
+        "russia",
+        "ukraine",
+        "backups",
+        "cloud",
+        "data loss"
+      ],
+      "date": "2026-11-12",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register: Yandex says drone attacks on its datacenters caused data loss",
+          "url": "https://www.theregister.com/off-prem/2026/11/12/russian-cloud-yandex-says-drone-attacks-on-its-datacenters-caused-data-loss/5309234"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-europol-seizes-257-domains-and-235-servers-tied",
+      "headline": "Europol seizes 257 domains and 235 servers tied to Gootloader, CastleRAT and StealC malware",
+      "summary": "Police in nine countries took down infrastructure for three malware families and found 6.4 million victim datasets on it. The stolen data was being sold to other criminals, including for ransomware.",
+      "impacts": [
+        "Credentials stolen by infostealers are the entry point for many ransomware attacks.",
+        "Victims can check whether their data was in the seized sets through services like HaveIBeenPwned.",
+        "Takedowns hit the shared tools criminals rent, but the groups tend to rebuild."
+      ],
+      "details": [
+        "Europol and partners in Bulgaria, Canada, Denmark, Germany, Moldova, the Netherlands, Poland, the UK and the US have seized 257 domains and 235 servers used by three malware operations, BleepingComputer reported on November 12. The action is part of Operation Endgame, coordinated by Europol and Eurojust with private-sector partners.",
+        "The three families play different roles. Gootloader, active since 2020, is a loader that installs other malware. StealC is an infostealer that collects credentials, cryptocurrency wallets and other data. CastleRAT is a remote access trojan that appeared last year and gives attackers control of infected machines. All three have been used by various criminal groups, including ransomware gangs.",
+        "Investigators found 6.4 million victim datasets on the infrastructure. Europol said over 6 million victim credentials were identified and that suspects were selling them on. The data is being shared with services including HaveIBeenPwned, DIVD, CheckjeHack, NoMoreLeaks, Sekoia, the Shadowserver Foundation and NL-NCSC so affected people can be alerted. Compromised WordPress sites have been a common entry point, and users were urged to update passwords, turn on multi-factor authentication and patch.",
+        "BleepingComputer lists earlier phases of Operation Endgame: in June 2026, nearly 15,000 infected WordPress sites were cleaned and 106 servers tied to SocGholish and Evil Corp were seized; later that month another action took down 326 servers and 142 domains tied to Amadey and StealC, recovering about 27 million stolen credentials.",
+        "The reporting does not say anyone was arrested in this phase. Past takedowns show these services often return under new names, so the lasting effect is mostly the leaked-credential alerts and the disruption of the criminal supply chain."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "malware",
+        "europol",
+        "operation endgame",
+        "infostealer",
+        "credentials",
+        "ransomware",
+        "police"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer: Police dismantle Gootloader, CastleRAT, StealC malware infrastructure",
+          "url": "https://www.bleepingcomputer.com/news/security/police-dismantles-gootloader-castlerat-stealc-malware-infrastructure/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-engineered-immune-cells-that-switch-on-only-inside",
+      "headline": "Engineered immune cells that switch on only inside the brain wiped out a deadly childhood brain tumor in mice",
+      "summary": "UCSF's B-SYNC CAR-T cells eliminated diffuse midline glioma in every mouse tested when injected into the brain's ventricles. Human trials could begin as early as April 2027.",
+      "impacts": [
+        "Nearly all children with this cancer die within a year, and treatments have failed.",
+        "Cells that activate only where needed could limit side effects of cell therapy.",
+        "Mouse results often fail to carry over to people."
+      ],
+      "details": [
+        "UCSF scientists built an immune cell therapy called B-SYNC CAR-T that stays inactive until it reaches the brain, then attacks tumors. In mice, it eliminated diffuse midline glioma (DMG) in every animal tested, according to a study published October 28, 2026 in Science Translational Medicine and summarized by ScienceDaily on November 8. DMG grows in the brainstem, and nearly all children diagnosed die within a year.",
+        "The design builds on the team's earlier synNotch system. B-SYNC senses brevican, a protein found throughout the brain, and then produces receptors targeting two tumor proteins, EphA2 and IL13Rα2. That avoids the problem of an earlier version, which relied on a mutation only about 20 percent of patients carry.",
+        "When injected into the brain's ventricles, the cells fully eliminated tumors in two mouse models, while conventional CAR-T cells did not. About seven weeks later, every treated mouse rejected a fresh dose of tumor cells, and the B-SYNC cells remained active for more than 70 days. Given by IV, some cells entered the brain and switched on there, and cells in blood and spleen did not.",
+        "UCSF plans clinical trials as early as April 2027, using each patient's own cells and comparing IV and ventricular delivery. The researchers have not fully explained why the therapy works so well; one idea is that delaying activation limits T cell exhaustion. Human safety and benefit are unproven."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "car-t",
+        "brain tumor",
+        "glioma",
+        "ucsf",
+        "cancer",
+        "immunotherapy",
+        "children"
+      ],
+      "date": "2026-11-08",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: Scientists wipe out deadly brain tumors in every mouse tested",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104084009.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-nasas-swift-observatory-has-fallen-back-to-earth",
+      "headline": "NASA's Swift observatory has fallen back to Earth after nearly 22 years in orbit",
+      "summary": "The US Space Force says Swift re-entered at 7:39 a.m. EST over North Sumatra. NASA expected most of it to burn up, though some pieces might survive.",
+      "impacts": [
+        "It ran more than ten times longer than its two-year plan.",
+        "Rapid-response X-ray and gamma-ray alerts to other observatories end with it.",
+        "No debris recovery has been reported."
+      ],
+      "details": [
+        "NASA's Neil Gehrels Swift Observatory has re-entered the atmosphere after nearly 22 years in space, ScienceDaily reported on November 6, reprinting NASA material. The US Space Force confirmed re-entry at 7:39 a.m. EST over North Sumatra, Indonesia. NASA expected most of the spacecraft to burn up, and officials acknowledged some components might survive. No recovered debris is reported.",
+        "Swift launched in 2004 for a planned two-year mission. It carried three telescopes covering different types of light and was built to study gamma-ray bursts, flashes thought to come from collapsing massive stars or mergers of compact objects such as neutron stars.",
+        "Its signature feature was speed: after detecting a burst, it could point its telescopes at the source and alert observatories worldwide, letting astronomers watch brief events before they faded. It also contributed to studies of active galaxies, stellar X-ray flares, supernovae and solar system objects such as comets and asteroids.",
+        "The article does not give the spacecraft's mass, its paper count or cost, and does not say whether debris reached the ground."
+      ],
+      "category": "Space",
+      "tags": [
+        "swift",
+        "nasa",
+        "re-entry",
+        "gamma-ray bursts",
+        "orbit",
+        "space debris"
+      ],
+      "date": "2026-11-06",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: NASA's Swift telescope falls to Earth",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261105224545.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-permanent-daylight-saving-time-would-add-over-a",
+      "headline": "Permanent daylight saving time would add over a billion dark school commutes, a study estimates",
+      "summary": "A Current Biology study of 14 states estimates the Sunshine Protection Act would put many more children on the road before sunrise. Fatal crashes involving child pedestrians were about twice as likely in dark mornings.",
+      "impacts": [
+        "Nineteen states have measures that would take effect if the federal bill passes.",
+        "Bright morning light helps set the body clock, which affects sleep and mood.",
+        "Later school start times could offset the effect."
+      ],
+      "details": [
+        "University of Washington researchers published a study in Current Biology on October 29, 2026, on the Sunshine Protection Act, which would make daylight saving time permanent; ScienceDaily carried a release on November 4. The US House approved legislation this summer, but it has stalled in the Senate. Nineteen states have approved measures that would take effect if it becomes law.",
+        "The team examined 14 of those states, combining school enrollment, school start times and geographic coordinates to estimate how many school trips would happen before sunrise. In Washington state, that is nearly 35 million additional dark commutes; in Georgia, the largest rise, about 71 million. Alabama and Mississippi, where schools start on average before 8 a.m., would go from about 2 million dark trips each to over 20 million each. The paper's title says over a billion more dark commutes nationwide, while the release text says at least 2 billion, so the exact figure should be checked in the paper.",
+        "The authors say an analysis of US collision records found fatal crashes involving school-aged pedestrians were roughly twice as likely in dark mornings as after sunrise. That is an association, not proof darkness caused the crashes. Bright morning light also helps synchronize the circadian clock, and permanent DST would reduce it from November through March.",
+        "The national estimate assumes children leave home around 8 a.m., which the authors say is likely an underestimate. Senior author Horacio de la Iglesia said 'Nobody wants their kids to go to school in the dark.' The researchers say later school start times could offset the effect."
+      ],
+      "category": "Health",
+      "tags": [
+        "daylight saving time",
+        "sleep",
+        "circadian",
+        "school",
+        "children",
+        "traffic safety",
+        "sunshine protection act"
+      ],
+      "date": "2026-11-04",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: Permanent daylight saving time has a dark side, scientists warn",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261103003157.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-united-airlines-restricts-third-party-ai-agents-citing",
+      "headline": "United Airlines restricts third-party AI agents, citing unintended purchases and data exposure",
+      "summary": "United says unauthorized AI agents could make unintended purchases, expose customer data or skip steps that need a human, like confirming baggage rules. The Register notes banks have made similar moves.",
+      "impacts": [
+        "AI assistants that act on your behalf are being shut out of some accounts.",
+        "Sharing logins with an AI assistant can expose your data, United warns.",
+        "How the blocks would be enforced is not yet explained."
+      ],
+      "details": [
+        "United Airlines has restricted unauthorized third-party AI agents, The Register reported on November 12. United warns such bots could make unintended purchases, expose customer data, or bypass checks that require a human to acknowledge something. The restrictions cover United's own platforms and indirect access through travel agencies and aggregators, and change its booking, ticketing and distribution policies.",
+        "United says automated actions could violate aviation rules, pointing to the check-in step where a passenger confirms their bags contain no banned substances. It also warns that sharing account credentials with personal or third-party AI assistants can expose sensitive information and may cause unintended account changes or use of MileagePlus miles. It would prefer customers use its own app.",
+        "The Register links this to a wider pattern. Earlier this year, Professor Hannah Fry gave an AI agent named Cassandra a bank card and it disclosed passwords and made poor purchases. In October, reports said major US banks were blocking third-party AI agents from acting inside customer accounts, and in November the Telegraph reported several UK banks had followed. In September Amazon blocked Meta's Muse shopping agent. The bank reports come from outlets the article links but does not verify itself.",
+        "Open questions: the article gives no effective date and no enforcement mechanism. The Register suggested options such as biometric confirmation or detecting automated browser control, but those are its suggestions, not United's plans. United had not responded to the outlet at publication."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai agents",
+        "united airlines",
+        "agentic ai",
+        "privacy",
+        "banks",
+        "credentials"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register: United Airlines wants you to check in, not your chatbot",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/12/united-airlines-wants-you-to-check-in-not-your-chatbot/5309373"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-an-independent-ai-assisted-analysis-of-m87-data",
+      "headline": "An independent AI-assisted analysis of M87 data recovers the black hole's ring, confirming the 2019 image",
+      "summary": "Four Australian researchers used machine learning and a different method on the same Event Horizon Telescope data and got a nearly identical ring, the first independent validation of the image, per the lead author.",
+      "impacts": [
+        "It addresses worries that the famous image was an artifact of the processing.",
+        "The method uses AI, so what it \"knows\" about black holes matters.",
+        "No other team has been reported to reproduce it yet."
+      ],
+      "details": [
+        "Four Australian researchers published a paper in Nature confirming the ring structure in the 2019 Event Horizon Telescope image of the supermassive black hole M87, The Register reported on November 11. The team, led by Samuel Lai, a postdoctoral fellow at CSIRO in Western Australia, used the same base EHT data.",
+        "The 2019 image was produced by hundreds of scientists using eight telescopes in places including Chile, the US and Antarctica. Because they are so far apart, instrument and environmental errors could affect the reconstruction, and alternative analyses might have produced an image without a ring.",
+        "Lai's team built an independent imaging algorithm using machine learning and AI techniques. Instead of pairs of stations it used closed triplets, which compare three telescopes to correct for error. The result was a black hole almost identical in size and shape to the 2019 image. Lai compared the task to 'standing in your backyard and trying to take a photo of a doughnut on the Moon', said the model 'had no idea what a black hole looked like' when applied to the M87 data, and called it 'the first truly independent validation of the EHT image'.",
+        "EHT director Laurent Loinard said it was 'extremely gratifying' that an independent method recovers the ring, in 'excellent agreement' with the collaboration's results. The article does not give error figures or say whether others have reproduced the result."
+      ],
+      "category": "Space",
+      "tags": [
+        "black hole",
+        "m87",
+        "event horizon telescope",
+        "nature",
+        "machine learning",
+        "astronomy"
+      ],
+      "date": "2026-11-11",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "The Register: Scientists check their work and confirm it with update on iconic black hole image",
+          "url": "https://www.theregister.com/science/2026/11/11/scientists-check-their-work-and-confirm-it-with-update-on-iconic-black-hole-image/5309183"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-attackers-hijack-screenconnect-at-managed-service-providers-and",
+      "headline": "Attackers hijack ScreenConnect at managed service providers and push rogue remote tools to dozens of firms",
+      "summary": "Huntress saw six compromised MSPs and 286 endpoints across 47 organizations, with numbers still rising. ConnectWise disabled five extensions across about 400 partner environments.",
+      "impacts": [
+        "One compromised IT provider can give attackers a path into all of its customers.",
+        "Legitimate remote-management tools are being used as the payload, which is hard to flag.",
+        "Smaller companies that outsource IT may not know their provider was hit."
+      ],
+      "details": [
+        "Huntress reported on November 11 an active campaign that abuses compromised ScreenConnect environments to install rogue remote clients on customers' devices, BleepingComputer says. Huntress counted six compromised managed service providers and 286 affected endpoints across 47 organizations, and said the totals were still growing.",
+        "The attackers use ScreenConnect's Run Command feature, so Huntress says the activity abuses legitimate functionality rather than a software vulnerability. It has not determined how they got in first; its telemetry points to stolen credentials or hijacked operator sessions. Researchers warned an attacker might also compromise a technician's workstation during a live session, which ConnectWise said it was still confirming.",
+        "ConnectWise confirmed unauthorized access to partner accounts and disabled five third-party extensions (Labtech Plus, RMM Plus, RMM+, and two Password Link variants) across roughly 400 partner environments. On-premises customers must disable them manually, and ConnectWise stressed that doing so does not remove malware or existing access.",
+        "BleepingComputer found a batch script, uploaded to VirusTotal on July 25, 2026 and posing as a Social Security statement, that referenced one of the same rogue client IDs. Whether it is linked to this campaign is unclear. Huntress said attacks using legitimate remote-management software as an initial payload have risen significantly in 2026. Because attacker tags are sequential, other providers may have been compromised earlier."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "screenconnect",
+        "connectwise",
+        "msp",
+        "huntress",
+        "remote access",
+        "supply chain",
+        "rmm"
+      ],
+      "date": "2026-11-11",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer: Active ScreenConnect attacks breach MSPs",
+          "url": "https://www.bleepingcomputer.com/news/security/active-screenconnect-attacks-breach-msps-impact-dozens-of-organizations/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-attackers-are-using-an-open-source-ai-penetration",
+      "headline": "Attackers are using an open-source AI penetration-testing agent to steal AWS credentials",
+      "summary": "Arctic Wolf says attackers ran self-hosted AntiFox instances on Alibaba Cloud to exploit web servers and harvest AWS secrets. Amazon says its services worked as designed.",
+      "impacts": [
+        "Tools built for defenders to test systems are being run by attackers at machine speed.",
+        "A rule against live use in the tool's license has no technical enforcement.",
+        "Stolen cloud keys left in app config files remain the weak point."
+      ],
+      "details": [
+        "Arctic Wolf observed attackers using AntiFox, an open-source agentic penetration-testing platform, against web services and Amazon Web Services environments, BleepingComputer reported on November 11. The attackers ran their own AntiFox instances on Alibaba Cloud for exploitation, webshell deployment, credential checks, configuration discovery and AWS secret harvesting.",
+        "AntiFox began as a fork of ARTEX 0.1.1 and has a Chinese-language interface. It lets users deploy AI agents to map exposed services and probe endpoints. In one case an attacker planted an ASPX webshell on an internet-facing IIS server, ran commands, read application settings and database connection strings, then used valid IAM credentials and EC2 roles to send hundreds of AWS API requests in about 30 minutes. Most were blocked, some succeeded, and the attacker got production secrets. In another incident a valid AWS identity was used to read, copy and delete S3 objects.",
+        "The article notes earlier attacks with a similar Chinese framework, ARTEX AI, which later went closed-source after being used against South Korean banks; CrowdStrike linked it to a campaign by a group it calls Vapor Panda that targeted over 200 organizations in 14 countries. AntiFox remains on GitHub, and its publishers prohibit use against live systems, but BleepingComputer says no technical controls enforce that.",
+        "Amazon told the outlet that AWS services were not compromised and worked as designed, and that the research describes attackers using credentials stolen from customers' compromised applications. It recommended least-privilege permissions, requiring IMDSv2, keeping long-term access keys out of app configs and enabling GuardDuty. Arctic Wolf advises correlating IIS webshell activity with unusual AWS access and rotating exposed credentials."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai agents",
+        "aws",
+        "penetration testing",
+        "credential theft",
+        "antifox",
+        "alibaba cloud",
+        "cyberattack"
+      ],
+      "date": "2026-11-11",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer: Hackers use AntiFox AI agents in AWS credential-theft attacks",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-use-antifox-ai-agents-in-aws-credential-theft-attacks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-notion-says-a-breach-at-ai-vendor-fireworks",
+      "headline": "Notion says a breach at AI vendor Fireworks exposed some customers' AI chat transcripts",
+      "summary": "Notion says transcripts from its AI Insights feature were in data accessed at Fireworks AI. It estimates under 1% of users are affected and advises rotating any secrets typed into chats.",
+      "impacts": [
+        "Anything typed into an AI assistant can end up with a vendor you never heard of.",
+        "'Zero data retention' promises did not stop the exposure.",
+        "If you pasted keys or passwords into chats, rotate them."
+      ],
+      "details": [
+        "Notion disclosed that a breach at Fireworks AI, which hosts some of the open-weight models behind Notion AI, exposed Notion AI chat transcripts from a small number of workspaces, BleepingComputer reported on November 11. Fireworks said an attacker accessed its development environment through a third-party cloud provider on October 23, touching resource metadata, billing information, model weights and datasets for some customers. An earlier incident in early October exposed environment variables holding API keys for a limited number of accounts.",
+        "Notion says Fireworks alerted it on November 2 to an exposed dataset and described it as synthetic test data. Notion cut traffic to Fireworks, deleted data from the vendor's systems and halted training runs by November 3. On November 8 Fireworks confirmed customer data, including Notion users' data, had been accessed.",
+        "The exposed transcripts came from the Insights feature, which lets workspace admins see how teams use AI by analyzing stored conversations. Notion has disabled it. For most affected workspaces the chats were unattributable, and they did not include tool call results. Notion says Fireworks had committed contractually to zero data retention.",
+        "Notion estimates under 1% of users are affected. Owners can check a Security incident review section and members can download their own transcripts. Notion tells affected users to rotate any passwords, API keys or credentials they entered into those chats. Those who got no notice need not act for now."
+      ],
+      "category": "AI",
+      "tags": [
+        "notion",
+        "fireworks ai",
+        "data breach",
+        "ai chat",
+        "third-party",
+        "privacy",
+        "credentials"
+      ],
+      "date": "2026-11-11",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer: Notion says Fireworks breach exposed customer AI chat transcripts",
+          "url": "https://www.bleepingcomputer.com/news/security/notion-says-fireworks-breach-exposed-customer-ai-chat-transcripts/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-us-datacenter-power-demand-has-grown-about-19",
+      "headline": "US datacenter power demand has grown about 19% a year while grid capacity grew about 2%",
+      "summary": "Insurance broker Howden says datacenters could need up to 58% of their power off the grid by 2030 to avoid growing their share. Connection delays of two to six years could cost big projects up to $2.4 billion.",
+      "impacts": [
+        "Power, not chips, may become the limit on AI buildouts.",
+        "Datacenters building their own generation raises questions about costs and who pays.",
+        "Grid connection delays shift where AI sites get built."
+      ],
+      "details": [
+        "A Howden analysis, reported by The Register on November 11, finds US power demand from datacenters is growing far faster than the grid can supply it. Using EIA and S&P Global data, Howden says power delivered to data campuses has risen 19 percent a year on average since 2000, while grid capacity grew about 2 percent a year. Datacenters held roughly 5 percent of US grid capacity in 2025, up from 0.1 percent in 2000.",
+        "Howden estimates datacenters may need to source up to 58 percent of their power off the grid by 2030 just to keep their share from growing. Holding at 5 percent would need about 110 gigawatts of behind-the-meter generation, which Howden thinks is unlikely; it expects more reliance on the grid, slower progress at power-constrained sites, and more alternative supplies.",
+        "For the largest power-constrained projects, Howden says grid connection delays of two to six years could mean $800 million to $2.4 billion in lost revenue. Gartner warned in June that AI datacenter energy use is on track to grow 26 percent this year.",
+        "The Register cautions against reading Howden's chart too literally: it uses different axes (about 1,400 GW for the grid, 80 GW for datacenters), so the lines crossing does not mean datacenters are about to use most US power. Howden is an insurer, so its emphasis on operational risk reflects its business."
+      ],
+      "category": "Economy",
+      "tags": [
+        "data centers",
+        "energy",
+        "power grid",
+        "ai",
+        "howden",
+        "electricity",
+        "infrastructure"
+      ],
+      "date": "2026-11-11",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register: US bit barn boom sees energy needs grow 10x as fast as grid capacity",
+          "url": "https://www.theregister.com/systems/2026/11/11/us-bit-barn-boom-sees-energy-needs-grow-10x-as-fast-as-grid-capacity/5309191"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-nih-study-links-two-forever-chemicals-to-up",
+      "headline": "NIH study links two 'forever chemicals' to up to 93% higher rates of aggressive breast cancer",
+      "summary": "Women with the highest blood levels of PFOS had a 93% higher rate of ER-negative breast cancer, and PFOA a 67% higher rate. There was no clear link to breast cancer overall.",
+      "impacts": [
+        "PFOA and PFOS persist in most people's bodies even though they were largely phased out.",
+        "Whether newer replacement PFAS carry similar risk is unknown.",
+        "The numbers are relative rates, not an individual's absolute risk."
+      ],
+      "details": [
+        "A National Institutes of Health study in the Journal of Clinical Oncology found that women with higher blood levels of PFOA and PFOS had higher rates of estrogen receptor-negative breast cancer, a more aggressive type, ScienceDaily reported on November 12. The team, led by NIH investigator Alexandra J. White, found no clear link between either chemical and breast cancer overall.",
+        "Women in the highest PFOA group had a 67 percent higher rate of ER-negative breast cancer than the lowest group, and for PFOS the highest group had a 93 percent higher rate. The study measured 17 PFAS in blood collected years before diagnosis, using the Sister Study, which enrolled 50,884 women aged 35 to 74 between 2003 and 2009. The analysis covered 1,609 women who later developed breast cancer and 2,269 comparison women. A meta-analysis of prior research supported the findings.",
+        "The researchers suggest PFAS may act through pathways unrelated to hormones, such as gene activity or immune effects, but did not test this. White said ER-negative cancer is 'a more aggressive tumor type with few known risk factors'.",
+        "Caveats: the percentages describe differences between groups, not an individual's chance of cancer, and the study shows association, not cause. The women all had a sister with breast cancer, so results may not carry over to everyone. White said more research is needed on newer replacement PFAS."
+      ],
+      "category": "Health",
+      "tags": [
+        "pfas",
+        "forever chemicals",
+        "breast cancer",
+        "nih",
+        "environment",
+        "cancer"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily: Common forever chemicals linked to nearly double the rate of aggressive breast cancer",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261112025527.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-energy-drink-and-stimulant-products-appear-in-11",
+      "headline": "Energy drink and stimulant products appear in 11 times more cardiac arrest reports, a preliminary study finds",
+      "summary": "An American Heart Association presentation of 28,345 FDA reports found cardiac arrest was mentioned about 11 times more often for stimulant products. The data cannot show cause or true risk.",
+      "impacts": [
+        "About 45% of the cardiovascular reports involved adults 18 to 34.",
+        "Voluntary reports can't tell you how many people drank these products safely.",
+        "Doctors are urged to ask young patients with palpitations about energy drink use."
+      ],
+      "details": [
+        "Independent research presented at the American Heart Association's Scientific Sessions 2026 and reported on November 11 compared FDA adverse-event reports from 2017 to 2025. Of 28,345 reports in people 13 and older, 854 involved caffeine or stimulant products; the other 27,491 served as a comparison group.",
+        "Stimulant-product reports mentioned cardiac arrest about 11 times more often, heart attacks about 4.5 times, ventricular arrhythmias or palpitations about 4 times, rapid heart rate nearly 3 times and chest pain 2.71 times. About 45 percent of cardiovascular reports involving these products concerned adults aged 18 to 34. Study author Sai Samayamanthula, a University of Virginia medical student, said occasional use is probably low risk for many healthy people.",
+        "Gregory Marcus of UCSF, who chaired the 2026 AHA scientific statement on caffeine and was not part of the study, noted it does not prove caffeine products cause these events. The FDA database is voluntary and incomplete, so the multipliers describe how often problems appeared in reports, not a true 11-fold risk. The work is preliminary and was not yet peer reviewed.",
+        "Context: energy drink sales topped $20 billion in 2024. The AHA statement says most adults can consume up to 400 mg of caffeine a day, and some energy drinks have up to three times the caffeine per ounce as coffee. The FDA treats these products as foods or supplements, so they don't face pre-market safety testing."
+      ],
+      "category": "Health",
+      "tags": [
+        "energy drinks",
+        "caffeine",
+        "cardiac arrest",
+        "heart",
+        "aha",
+        "fda",
+        "supplements"
+      ],
+      "date": "2026-11-11",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: Energy drinks linked to 11 times more reports of cardiac arrest",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261110042543.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-sheeppox-virus-dna-found-in-1-000-year",
+      "headline": "Sheeppox virus DNA found in 1,000-year-old manuscripts, including the York Gospels",
+      "summary": "University College Dublin researchers detected sheeppox DNA on medieval parchment and in Bronze Age sheep teeth, showing the virus has circulated for at least 3,700 years with little genetic change.",
+      "impacts": [
+        "Old books can preserve genetic records of animal epidemics.",
+        "The study suggests the virus changed little over millennia.",
+        "Sheeppox is causing an ongoing outbreak in Greece."
+      ],
+      "details": [
+        "A team led by University College Dublin found sheeppox virus DNA in medieval manuscripts, including the 1,000-year-old York Gospels, ScienceDaily reported on November 11. The work was led by PhD candidate Louis L'Hôte and Dr. Kevin Daly. ScienceDaily describes it as published in Science Advances but lists a bioRxiv preprint as the reference, so peer-review status should be checked.",
+        "Parchment is made from animal skins, which can carry traces of infection. The team examined the York Gospels, the Corpus Glossary at Cambridge and other British and European manuscripts, and found sheeppox DNA on multiple pages. Oddly, some was on calfskin and goatskin parchment, which the authors say could mean other livestock were occasionally infected or that skins were contaminated during parchment production.",
+        "They also analyzed sheep teeth from Eurasian steppe settlements, the oldest known genetic traces of sheeppox, which together with the manuscripts shows the disease has affected livestock for more than 3,700 years. Comparing ancient and modern sequences, they estimate the capripoxvirus family's main branches split between 11,500 and 3,700 years ago, a window overlapping livestock domestication.",
+        "L'Hôte said the sheeppox genome was very stable over the last few millennia, in contrast with smallpox. Sheeppox is highly contagious and kills many young sheep, and he noted an ongoing outbreak in Greece. This is a study of an animal virus; it does not show a threat to humans."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "sheeppox",
+        "ancient dna",
+        "virus",
+        "manuscripts",
+        "livestock",
+        "paleogenomics"
+      ],
+      "date": "2026-11-11",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: Scientists find deadly virus DNA hidden in 1,000-year-old manuscripts",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261106174545.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-microsoft-tells-exchange-2016-and-2019-users-to",
+      "headline": "Microsoft tells Exchange 2016 and 2019 users to treat their servers as permanently vulnerable",
+      "summary": "Microsoft's November Exchange SE update notes says versions 2016 and 2019 are no longer tested for vulnerabilities and get no updates. The final patches shipped Oct. 13.",
+      "impacts": [
+        "Servers still running these versions will gather unpatched flaws from now on.",
+        "Email servers are a common ransomware entry point.",
+        "Microsoft's own docs now say to upgrade immediately."
+      ],
+      "details": [
+        "Microsoft told customers still running Exchange Server 2016 or 2019 to treat those versions as permanently vulnerable, The Register reported on November 12. The warning is in the release notes for the November Exchange Server Subscription Edition update, which says the older versions 'are no longer tested for vulnerabilities and there are no updates released'.",
+        "The timeline: mainstream support ended October 14, 2025. A paid Extended Security Updates program was announced in July 2025 to end April 2026 with a promise it would not be extended, but Microsoft added six more months anyway. The final security updates for 2016 and 2019 came on October 13, 2026. A Windows Server update in October reportedly broke Exchange as well.",
+        "The November update fixed nine vulnerabilities in Exchange SE, including a critical remote code execution flaw, CVE-2026-118207. The article does not say whether the older versions share these flaws or whether any are exploited, since Microsoft no longer tests them.",
+        "The 'permanently vulnerable' wording is Microsoft's own, quoted from its documentation. The article's closing 'you have been warned' tone is editorial."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "exchange",
+        "microsoft",
+        "end of life",
+        "email server",
+        "patch",
+        "vulnerability"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register: Exchange Server 2016 and 2019 enter their 'permanently vulnerable' era",
+          "url": "https://www.theregister.com/saas/2026/11/12/microsoft-exchange-server-2016-and-2019-enter-their-permanently-vulnerable-era/5309401"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-a-bug-shrank-eight-ca-private-keys-to",
+      "headline": "A bug shrank eight CA private keys to one byte, and 16 eMudhra certificates are now revoked",
+      "summary": "eMudhra revoked eight more intermediate certificates after a bug in a 2025 script. Browser makers blocked the affected certificates, and eMudhra is leaving the public TLS business.",
+      "impacts": [
+        "Certificate authorities underpin browser trust, so key handling errors matter.",
+        "The weak keys could be recovered by testing 256 values.",
+        "eMudhra says there is no evidence of malicious use."
+      ],
+      "details": [
+        "eMudhra, a certificate authority, revoked eight more intermediate CA certificates, bringing the total to 16, BleepingComputer reported on November 11. A custom Python script it wrote in April 2025 to move private keys between hardware security modules from different vendors had a bug that reduced eight ECDSA private keys to a single byte. A researcher known as Wayne found they could be recovered by testing just 256 values.",
+        "The script also handled eight RSA keys in host memory instead of keeping them inside the HSM. Those keys were not weakened, but eMudhra could not show they met its certificate policy. The newly revoked RSA certificates, revoked November 7, had issued TLS and code-signing certificates since May 2026, the last on November 3.",
+        "The company missed warning signs: in June 2025 it saw certificate revocation lists signed by keys that did not match their CA certificates, fixed the signing and did not investigate why. The incident was disclosed October 17, 2026. Mozilla, Google, Apple and others blocked the certificates, and Microsoft shipped out-of-band updates on October 26.",
+        "eMudhra plans to exit publicly trusted TLS certificates, stop issuing under its G1 hierarchy by November 16, and has commissioned a KPMG review due December 4. It says it found no evidence the keys were used maliciously. All details come from its own incident report."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "certificate authority",
+        "emudhra",
+        "private keys",
+        "tls",
+        "pki",
+        "mozilla"
+      ],
+      "date": "2026-11-11",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer: eMudhra revokes 8 more CA certificates",
+          "url": "https://www.bleepingcomputer.com/news/security/emudhra-revokes-8-more-ca-certificates-after-private-key-mishap/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-a-stat-opinion-warns-that-accurate-ai-health",
+      "headline": "A STAT opinion warns that accurate AI health advice can still push people toward unhealthy choices",
+      "summary": "Penn researchers say safety tests for health chatbots check accuracy only. They found accurate chatbot vaccine answers that used framing, like calling chickenpox parties 'common', that could weaken vaccination intent.",
+      "impacts": [
+        "Over 300 million people ask ChatGPT health questions weekly, per the authors.",
+        "They propose testing whether answers change health behavior, not just whether they are correct.",
+        "This is an opinion piece with a small pilot, not a large trial."
+      ],
+      "details": [
+        "In a STAT First Opinion on November 10, Jessica Fishman and John Jackson Jr. of the University of Pennsylvania argue that AI health tools are tested almost entirely for accuracy. They say over 300 million people ask ChatGPT health questions each week and the federal government is moving AI deeper into care.",
+        "They cite a study from the Children's Hospital of Philadelphia Vaccine Education Center and Penn's Message Effects Lab that asked ChatGPT, Gemini and Claude vaccination questions. Answers were highly accurate, but some statements could weaken intentions to vaccinate. For a chickenpox party question, all three first called such parties 'popular' or 'common' before recommending vaccination, and describing a behavior as common can encourage it.",
+        "The authors propose behavioral benchmarking: randomized experiments checking whether responses make people more or less likely to protect their health, limited to areas with strong scientific consensus like smoking cessation and childhood vaccination. They compare it to crash tests, not a new regulatory regime.",
+        "They also note that in October 2026 several states sued OpenAI over ChatGPT's alleged dangerous medical advice. This is an opinion article; its claims about harm from framing are argued from examples and one study, not a measured population effect."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai",
+        "chatgpt",
+        "health",
+        "vaccines",
+        "chatbots",
+        "safety",
+        "misinformation"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "STAT: AI's health advice can be accurate and still make us sicker",
+          "url": "https://www.statnews.com/2026/11/10/ai-health-advice-accuracy-messaging-risk-behavioral-benchmarking/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-after-378-days-in-a-simulated-mars-habitat",
+      "headline": "After 378 days in a simulated Mars habitat, four NASA volunteers walk out",
+      "summary": "The CHAPEA crew finished their mission on Oct. 31. NASA used it to study communication delays, independent decision-making, and crew health and productivity.",
+      "impacts": [
+        "It tests how a Mars crew copes when mission control can't answer immediately.",
+        "Lessons feed into NASA's planned Moon Base and later Mars preparations.",
+        "NASA's article reports no specific results yet."
+      ],
+      "details": [
+        "Four NASA volunteers ended a simulated Mars mission lasting more than a year, ScienceDaily reported on November 10, reprinting NASA material. The crew, Matthew Montgomery, James Spicer, Ross Elder and Ellen Ellis, completed the mission on October 31, 2026 and stepped outside for the first time in over a year. NASA's own page lists the mission as 378 days.",
+        "It was part of the Crew Health and Performance Exploration Analog (CHAPEA) program. The volunteers never left Earth. They operated and tested systems, tended crops, conserved limited supplies, and performed simulated spacewalks.",
+        "The challenges studied include communication delays, since future Mars crews cannot get instant guidance the way station astronauts can, and the need to solve problems independently. NASA also examines how to keep crews healthy, productive and safe in a confined environment over long periods.",
+        "The article says lessons are expected to inform NASA's planned Moon Base and eventual crewed Mars expeditions. It reports no data or findings from the experiment, and the experiment simulates rather than replicates actual spaceflight."
+      ],
+      "category": "Space",
+      "tags": [
+        "mars",
+        "nasa",
+        "chapea",
+        "analog mission",
+        "isolation",
+        "astronauts"
+      ],
+      "date": "2026-11-10",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily: NASA's CHAPEA Mars crew finally emerges",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261109205406.htm"
+        },
+        {
+          "name": "NASA: CHAPEA Mission 2 crew reflects after 378 days on simulated Mars",
+          "url": "https://www.nasa.gov/centers-and-facilities/johnson/chapea-mission-2-crew-reflects-after-378-days-on-simulated-mars/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-parker-solar-probe-finds-the-suns-turbulent-magnetic",
+      "headline": "Parker Solar Probe finds the Sun's turbulent magnetic fields reverse their spin at small scales",
+      "summary": "A Japan-Germany-led team using Parker data reports the first direct observation of the preferred rotation of solar-wind magnetic turbulence flipping, which could eventually help geomagnetic storm models.",
+      "impacts": [
+        "Geomagnetic storms can disrupt satellites and power grids.",
+        "The link to forecasting is potential, not demonstrated.",
+        "It is a basic-physics result about plasma turbulence."
+      ],
+      "details": [
+        "A team including researchers at TU Braunschweig and the University of Tokyo reports that turbulent magnetic fields in the solar wind reverse their preferred direction of rotation across a range of wavelengths, ScienceDaily reported on November 11. The paper is in The Astrophysical Journal Letters, based on NASA's Parker Solar Probe data, and is described as the first direct observation of such a reversal in space turbulence.",
+        "At larger scales, fields tend to rotate counterclockwise when viewed outward from the Sun; at smaller scales, clockwise. The reversal sharpens and moves to longer wavelengths farther from the Sun, and occurs where plasma shifts from fluid-like motion to behavior governed by individual particles. First author Masatomi Iizawa said: 'We see a clear structure in the spectrum, even though the turbulence represents unstructured motions.'",
+        "Space plasma is so thin that particles rarely collide, so its turbulence differs from air or water. Turbulence may influence shock waves and magnetic clouds after solar eruptions, which can drive geomagnetic storms, and the findings could help improve forecasting models.",
+        "The forecasting benefit is framed as a possibility. The reversal is at very small scales, so its relevance to large storms is indirect, and the authors call it an important piece of a long-standing puzzle, not a solution."
+      ],
+      "category": "Space",
+      "tags": [
+        "parker solar probe",
+        "solar wind",
+        "plasma",
+        "turbulence",
+        "space weather",
+        "sun",
+        "nasa"
+      ],
+      "date": "2026-11-11",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily: NASA's Parker Solar Probe discovers a hidden pattern in the Sun's magnetic fields",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261109205411.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-12-each-mosquito-species-prefers-different-people-driven-by",
+      "headline": "Each mosquito species prefers different people, driven by skin chemistry and microbes, a Florida study finds",
+      "summary": "Florida International University tested three mosquito species on 119 volunteers. No one attracted all three, and each species favored different body odor and skin-microbe profiles.",
+      "impacts": [
+        "The three species spread dengue, Zika, yellow fever and West Nile.",
+        "Repellents could someday be tuned to the species in your region.",
+        "No specific attractant compound has been proven."
+      ],
+      "details": [
+        "A Florida International University study in iScience, published November 10, tested three mosquito species, Aedes aegypti, Aedes albopictus and Culex quinquefasciatus, on 119 human volunteers. Together they spread yellow fever, dengue, Zika, West Nile and other diseases. Researchers collected body odor and skin microbiome samples alongside biting tests, in what is described as the first direct comparison of several species on the same people.",
+        "No participant attracted all three species. Aedes aegypti, a daytime biter, preferred people without added fragrances and with lower levels of certain volatile compounds, and slightly favored men. Aedes albopictus was drawn to people whose skin released more ketones and plant-like compounds. Culex, which feeds after dark, seemed especially sensitive to skin microbes: some bacterial families made people more attractive and others seemed to discourage biting.",
+        "Human skin releases more than 1,000 volatile organic compounds, many not yet identified. Lead student Kaylee Marrero said, 'We didn't expect the species to prefer different people when we started the study.' The team suggests species-specific repellents and public health efforts focused on the local species.",
+        "Caveats: the work shows connections, not that any specific compound or bacterium causes attraction. No repellent was developed, the sex difference is described as slight, and the article does not give per-species sample sizes or how far results generalize."
+      ],
+      "category": "Health",
+      "tags": [
+        "mosquitoes",
+        "skin microbiome",
+        "dengue",
+        "zika",
+        "repellent",
+        "fiu",
+        "disease vectors"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily: Scientists discover why some mosquitoes love you and others don't",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261106174541.htm"
+        }
+      ]
+    }
+  ]
+}
