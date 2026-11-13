@@ -95,12 +95,13 @@
     margin:20px auto 0;max-width:100%;}
   .player .stage{margin:0;flex:1 1 auto;min-width:0;}
   .nav{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:5px;width:48px;height:92px;text-decoration:none;background:#1e1b26;
-    border:1px solid #332e40;color:#9f98ad;
-    transition:border-color .12s,color .12s,transform .12s;}
-  .nav .g{font-family:'Press Start 2P',monospace;font-size:19px;line-height:1;}
-  .nav .n{font-family:'Silkscreen',monospace;font-size:10px;line-height:1;color:#6f6880;}
-  .nav:hover,.nav:focus-visible{border-color:var(--orange);color:var(--orange);transform:translateY(-2px);}
+    gap:6px;width:56px;height:118px;text-decoration:none;background:#272232;
+    border:1px solid #4a4259;color:#e8e4dc;
+    transition:border-color .12s,color .12s,background .12s,transform .12s;}
+  .nav .g{font-family:'Press Start 2P',monospace;font-size:22px;line-height:1;}
+  .nav .n{font-family:'Silkscreen',monospace;font-size:11px;line-height:1;color:#a79fb8;}
+  .nav:hover,.nav:focus-visible{border-color:var(--orange);color:var(--orange);
+    background:#2f2838;transform:translateY(-2px);}
   .nav:hover .n,.nav:focus-visible .n{color:var(--orange);}
 
   /* ---- speed + size, in the bottom-right corner of the picture ----
@@ -109,7 +110,13 @@
      margin-left:auto keeps it hard against the right edge of whichever row it
      ends up on, so on a narrow bar the popup still opens in the corner. */
   .fx{position:relative;flex:0 0 auto;display:flex;margin-left:auto;}
-  .bar .fx>button{min-width:0;padding:8px 8px;}
+  .bar .fx>button{min-width:0;padding:0;width:27px;height:27px;
+    display:flex;align-items:center;justify-content:center;color:#000;}
+  .bar .fx>button svg{width:11px;height:11px;display:block;shape-rendering:crispEdges;}
+  /* a mark, not a number: it only appears when the speed is off 1x */
+  .bar .fx>button.set{position:relative;}
+  .bar .fx>button.set::after{content:'';position:absolute;top:2px;right:2px;
+    width:4px;height:4px;background:var(--orange);box-shadow:0 0 0 1px #000;}
   .fxpop{position:absolute;right:0;bottom:calc(100% + 8px);display:block;
     background:var(--face);padding:9px;width:max-content;max-width:min(calc(100cqw - 14px),368px);z-index:9;
     box-shadow:inset 1px 1px 0 var(--hi),inset -1px -1px 0 var(--dk),
@@ -131,6 +138,7 @@
      steps aside. The scrub still says where you are. */
   @container (max-width:400px){
     .bar{gap:4px;padding:7px 6px;}
+    .bar button{padding:8px 6px;}
     .bar .t{display:none;}
   }
 

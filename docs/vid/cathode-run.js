@@ -971,7 +971,12 @@ const fxB=document.getElementById('fxb'),fxP=document.getElementById('fxp'),
       fxRate=document.getElementById('fxrate'),fxSize=document.getElementById('fxsize'),
       stageEl=document.querySelector('.stage');
 function fxMark(){
-  if(fxB) fxB.textContent=(PREFS.rate===1?'1':String(PREFS.rate))+'x';
+  /* The button is a settings button and says nothing -- but a speed that
+     follows you to the next video with no sign of itself is a trap, so when
+     the rate is anything but 1x the button wears a mark and the title says
+     what it is. */
+  if(fxB){ fxB.classList.toggle('set',PREFS.rate!==1);
+           fxB.title='speed and size'+(PREFS.rate!==1?' \u2014 playing at '+PREFS.rate+'x':''); }
   [[fxRate,'rate'],[fxSize,'size']].forEach(([host,key])=>{
     if(!host) return;
     host.querySelectorAll('button').forEach(b=>
