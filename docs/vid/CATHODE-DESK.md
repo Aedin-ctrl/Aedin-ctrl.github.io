@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.15
+# CATHODE DESK — house style v4.16
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -2290,6 +2290,72 @@ v1.0 and v1.1; a tomato is pH 4.3–4.9, so honey is the *more* acidic of the tw
 It is orange juice (3.3–4.2) that actually matches.
 
 ---
+
+## The view has to be able to show the mechanism
+
+**v4.16, from #022.** The piece is *"what is actually holding a bicycle up"*,
+and the answer is that it leans and steers into the lean. It was built side-on,
+because trail is a side-on fact — and **leaning is rotation about the line the
+wheels roll along, which in a side view points straight at the camera.** So the
+one thing the piece exists to show was invisible. Every sweep returned 0; the
+lean *trace* under the machine moved while the machine itself sat still, which
+is worse than nothing, because the instrument said something was happening and
+the picture denied it.
+
+The geometry beats kept the side view. The behaviour beats are drawn **from
+behind**, where a lean is a lean and the front wheel showing more of its rim
+*is* the steering. Two views, chosen per beat by what each has to prove.
+
+**Ask it before the storyboard: can the view I have chosen show the thing the
+piece is about?** A diagram that cannot express the mechanism is not a drawing
+problem, it is the wrong camera.
+
+## A measurement taken before the font loads is not a measurement
+
+**v4.16, from #023.** Eight token plates were sized with
+`const CHUNKW = TOKS.map(s => glyph(s, 14, '"Silkscreen"').w + 10)` at **module
+scope** — which runs as the file is parsed, long before `document.fonts.ready`.
+Every width came back in whatever fallback the browser had to hand, the plates
+were laid out to those numbers, and the text was then drawn in Silkscreen. Three
+of the eight ran into their neighbour.
+
+This is **An estimate filed as a fact** wearing a different hat, and it is
+harder to see, because the code is doing the right thing — it calls `glyph()`,
+it does not guess. It just calls it too early. `glyph()` caches, so there is no
+reason not to measure inside the draw. **Any width that feeds a layout is
+computed per frame, never at module scope.** The same applies to `ACTS` and
+`SPOTS`, which are also built as the file loads: a pointer target must not come
+off a font metric at all — give it a fixed point.
+
+## Two more ways a container silences the sweep
+
+**v4.16.** `*box` already carries the warning that it is a promise, not an
+escape hatch. Two new shapes of the same failure:
+
+* **#023 printed the first row's token ids onto the second row's plates.** The
+  rows were 56px apart; plate 26 + integer 14 needs more than that. Nothing
+  objected, because the plate under the text was a `chunkbox` and text on a
+  container is allowed — but it was *somebody else's* container. A container
+  excuses the text that belongs to it, and nothing else. Row pitch is now plate
+  + gap + text + air, and it is 64.
+* **A step drawn at the wrong rate is gone by the frame anybody reads.** #022's
+  mechanism is a race between two inverted pendulums, and theta grows as
+  cosh(sqrt(g/L)·t) — so at the rate first chosen *both* were flat on the
+  baseline within a second, and `checkComposition`'s settled frame, half a
+  second before the beat hands over, measured two horizontal lines. The short
+  one reaches horizontal at s = 0.84 while the tall one is still at 13°: that
+  instant **is** the picture, so the clock stops there and holds it. **When a
+  simulation is the explanation, solve for the frame you want and stop the
+  clock on it** — do not let it run on into a shape that proves nothing.
+
+## Do not shrink type below the floor to make something fit
+
+**v4.16, from #023.** Eight token plates at the 14px label floor come to 397px
+against a 372px box. Dropping the type to 12px made them fit and
+`checkLegibility` reported eight failures at once — correctly: it is the same
+text, now unreadable. **The layout gives way, not the type.** The sentence
+breaks into two rows of four, which is what a line of text does anyway, and the
+floor is never the variable.
 
 ## Workflow
 
