@@ -114,7 +114,12 @@ const NFING=20, MONTHS=17.5;
    blood flow underneath as two bars growing in opposite directions from one
    baseline. Everything else is counted onto the same pair. */
 const L={
-  open:{ ground:252, cx:216, fy:330, fw:92, fh:150 },
+  /* The cold open's two fingers STAND ON THE GROUND LINE, which deskSky puts
+     at LH-ground = 516, and their tops clear the bottom of DLG (306) by 20px.
+     They were at fy=330/fh=150 -- hanging in the sky with 76% of them behind
+     the title card, so the whole setup for the gag was a 24px stub and there
+     was nothing to look at while the question typed. See v4.18. */
+  open:{ ground:252, cx:216, fy:522, fw:100, fh:190 },
   hero:92,
   fingL:[76,132,100,196],      // the normal finger   (x,y,w,h)
   fingR:[256,132,100,196],
@@ -282,9 +287,9 @@ function explainer(ctx,W2,Hh,t){
   if(T<dlgOut){
     mythStamp(t);
     const g=H.clamp((M-gagT)/1.7);
-    if(SCENE)SCENE.push({x:O.cx-150,y:O.fy-O.fh-10,w:300,h:O.fh+30,k:'hands'});
-    finger([O.cx-132,O.fy-O.fh,O.fw,O.fh],g*7,0.58,'ofL');
-    finger([O.cx+40, O.fy-O.fh,O.fw,O.fh],0,     0.58,'ofR');
+    if(SCENE)SCENE.push({x:O.cx-150,y:O.fy-O.fh-6,w:300,h:O.fh+22,k:'hands'});
+    finger([O.cx-134,O.fy-O.fh,O.fw,O.fh],g*7,0.58,'ofL');
+    finger([O.cx+34, O.fy-O.fh,O.fw,O.fh],0,     0.58,'ofR');
     waterLine(O.fy-18,M);
     if(T<dlgOut-0.02&&M<okT+0.30){
       const r=winFrame(DLG[0],DLG[1],DLG[2],DLG[3],'Good To Know Tho',true);

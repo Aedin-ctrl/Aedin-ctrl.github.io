@@ -1,7 +1,48 @@
-# CATHODE DESK — house style v4.17
+# CATHODE DESK — house style v4.18
 
-**Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
+**Locked 2026-11-13. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.18 (2026-11-13)** — **the card must not sit on the gag: the object is
+> the title card's visual hook and has to be VISIBLE while the question types.**
+> Reported by the user watching #020: *"the gag is fully hidden behind the title
+> card — you've got to be able to see both, even before the gag happens, like
+> the still image."* And, said plainly a moment later, which is the rule:
+> **the title card plays, OK is pressed, THEN the gag happens — but you can see
+> the setup for the gag the whole time the card is up.**
+>
+> #020's two fingers stood from y=180 to y=330 behind a dialog ending at 306.
+> **76% of the subject of the video was behind the card**, leaving a 24px stub
+> of two grey stumps, and the gag — one finger wrinkling, the other staying
+> smooth, which is the entire argument of the piece — played in that stub.
+> Fifteen sweeps at 0.
+>
+> Three things that are worth separating:
+>
+> 1. **This is v4.13's rule with the layers the other way round, and v4.13
+>    stopped one step short.** That version taught `checkCard` that *a window
+>    that is buried is as broken as one that buries*. A card that buries the
+>    OBJECT is the same fault, same two rectangles, and it was not asked.
+>    `checkCard` now measures **the fraction of each cold-open object's area a
+>    card covers** and flags anything at or above **30%**. The worst honest
+>    case in the library is 11% — the PART number window nibbling the top of a
+>    vault as it shuts — so the threshold has real headroom.
+> 2. **Draw order is not the question, and the new loop deliberately ignores
+>    the index.** #020 drew its fingers *before* its card; litho draws its card
+>    *before* its wafer. Order decides which of the two you can see; the
+>    overlap is wrong in both directions. The program window is exempt, because
+>    it is the stage, not a card.
+> 3. **The real cause was that the object was never standing on anything.**
+>    `deskSky(T,ground)` puts the horizon at `LH-ground`, and every cold open
+>    that works — honey's jar, sand's heap, litho's wafer — sets its object
+>    **on that line**, filling the gap between the bottom of the card and the
+>    ground. #020's fingers were at fy=330 against a horizon at 516: hanging in
+>    the sky, in the one band of the frame the card occupies. They now stand on
+>    the ground line at fy=522, 190 tall, topping out 20px below the card.
+>
+> Verified against a deliberately broken control before being trusted: restored
+> to fy=330 the sweep reports `hides:"hands", pct:77`. The whole library was
+> then measured and **#020 `wrinkle` was the only piece with the fault**.
+>
 > **v4.17 (2026-11-13)** — **the page is a player, not a loop that starts
 > without you.** The user: *"when I click in a video it starts automatically
 > playing with the sound off — I want both changed."* A piece opened playing
@@ -1946,6 +1987,26 @@ wrong is now a sweep hit rather than something you have to have read this
 paragraph to avoid. No piece reads `PART_FLOOR` in code today and none needs to —
 but if you hand-type the clearance and `PART_NUM` later moves, the constant is
 still the only thing that follows it.
+
+### The object is the card's picture, so it has to be visible WITH the card
+
+The cold open is **one still image with a dialog on it**: the question types,
+the object sits under it, OK is pressed, and *then* the object does its trick.
+The setup is on screen for the whole of the card — that is the visual hook that
+stops the opening being a text box on a gradient. So:
+
+* **The object STANDS ON THE GROUND LINE.** `deskSky(T,ground)` puts the
+  horizon at `LH-ground`; honey's jar, sand's heap and litho's wafer all sit on
+  it and fill the band between the bottom of the card and the ground. An object
+  placed by eye somewhere in the sky is in the one band the card occupies.
+* **Its top clears the card** — `DLG` ends at **306**, the part card's stack at
+  **`PART_FLOOR` = 358** — and clears it measured against **the box the piece
+  REGISTERS**, not the number passed in.
+* **And it is checked.** `checkCard` flags any card covering **30% or more of a
+  cold-open object's area**. #020 `wrinkle` shipped at 76% — two fingers hanging in the
+  sky behind the dialog, with the gag playing in the 24px sticking out below
+  it — and fifteen sweeps said nothing, because the sweep only ever asked
+  whether the object covered the WINDOW. See v4.18.
 
 **The gag stays.** It is the object's one trick and it is the best thing in the
 cold open. It simply loses its card: the object is on the sky from the first

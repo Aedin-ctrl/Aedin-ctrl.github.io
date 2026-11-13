@@ -655,6 +655,35 @@ window.checkCard=function(step){
     BOUNDS=[]; GBOX=[]; WINS=[]; SCENE=[]; explainer(ctx,OUTW,OUTH,tt);
     const r=BOUNDS, g=GBOX, w=WINS, sc=SCENE;
     BOUNDS=null; GBOX=null; WINS=null; SCENE=null;
+    /* ...and the THIRD question, which is the first two turned on the object:
+       is the GAG still visible while the card is up? v4.13 taught this sweep
+       that a buried window is as broken as one that buries, and then stopped
+       one step short -- a card that covers the cold open's object is the same
+       fault with the layers the other way round, and #020 shipped with it.
+       Its two fingers stood from y=180 to y=330 behind a dialog ending
+       at 306: 76% of the subject of the video hidden, a 24px stub left under
+       the card, with all fifteen sweeps at 0.
+
+       DRAW ORDER IS NOT THE QUESTION HERE and the index is deliberately not
+       consulted: #020 drew its fingers before the card and litho draws its
+       card before its wafer. Order decides which of the two you can see; the
+       overlap is wrong in both directions, and the loop above already owns the
+       other one. What is measured is the fraction of the OBJECT's area the
+       card covers -- an object poking a few pixels under the card's bottom
+       edge is normal framing (the worst in the library is 11%), half of it
+       gone is not. The program window is exempt: it is the stage, not a card,
+       and a cold-open object still registered behind it is simply off-stage. */
+    for(const q of w){
+      if(q.w>=PW&&q.h>=PH) continue;
+      for(const b of sc){
+        const o=ov(q,b); if(!o) continue;
+        const cov=(o[0]*o[1])/Math.max(1,b.w*b.h);
+        if(cov<0.30) continue;
+        const k='C|'+b.k+'|'+q.title; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),window:q.title||'(untitled)',
+                  hides:b.k,pct:Math.round(cov*100),overlap:o});
+      }
+    }
     if(w.length<2) continue;         // one window cannot float over anything
     let stage=w[0]; for(const q of w) if(q.w*q.h>stage.w*stage.h) stage=q;
     for(const q of w){
