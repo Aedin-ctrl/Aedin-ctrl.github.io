@@ -1,0 +1,754 @@
+{
+  "date": "2026-11-13",
+  "generated": "2026-11-13T16:07:28.347Z",
+  "articles": [
+    {
+      "id": "2026-11-13-fbi-north-korean-hackers-stole-over-400-million",
+      "headline": "FBI: North Korean hackers stole over $400 million using deepfaked video calls",
+      "summary": "The FBI says a North Korea-linked group stole more than $400 million in about 18 months by staging fake Zoom or Teams calls, using hijacked accounts and recorded or deepfake video of people the target knows. Cloud infrastructure was seized.",
+      "impacts": [
+        "A video call with a face you recognize is no longer proof the person is real, or that the account inviting you is theirs.",
+        "Founders and executives are the main targets: over 80% of 677 identified targets were founders or C-suite.",
+        "Open-source maintainers are being hit too, which can turn one stolen laptop into a poisoned software release.",
+        "Rule of thumb from the reporting: never paste commands or run scripts because a call asks you to."
+      ],
+      "details": [
+        "The FBI says North Korea-linked actors stole more than $400 million in cryptocurrency over roughly 18 months through a scheme it calls FaceStealer. As part of coordinated US government action, the cloud infrastructure used in the campaign was seized, along with more than 900 victim webcam recordings the attackers had used to impersonate people. Separately, the Justice Department announced the seizure and restraint of more than $1.2 billion in crypto stolen by TraderTraitor, another North Korea-linked group, after the Binance hack. The Hacker News notes it could not clearly separate that figure from the $400 million.",
+        "The scheme works in stages. Attackers first compromise a victim and hijack their messaging accounts (Telegram, LinkedIn, Slack, Discord), reading contacts and chat history. They then message the victim's contacts proposing a call about an 'investment opportunity', send a Calendly invite, and shortly before the call send a typosquatted meeting link. On the fake call, the target sees prerecorded webcam footage of a trusted contact or an earlier victim, plus other recorded or deepfake participants with AI-generated headshots. The target's own video is recorded for reuse.",
+        "The trap is a fake technical problem. A claimed audio fault or outdated SDK prompts the target to click a link, run a script or paste commands into a terminal, a ClickFix-style lure that installs data- and crypto-stealing malware. The new victim's accounts are then used to reach their own contacts, so the scheme spreads through trust.",
+        "Scale figures come from researchers cited in the report. Arctic Wolf counted more than 400 victims in 20+ countries in April 2026, with 45% of identified targets CEOs or founders. A later update counted 677 targets across 58 countries, over 80% founders or C-suite. The FBI also says FaceStealer was used against the maintainer of the Axios npm package, leading to a trojanized release that delivered a remote access trojan. The group is tracked as BlueNoroff, also known as APT38, Sapphire Sleet and UNC1069.",
+        "Caveats matter here. The Hacker News article relies on secondhand summaries of the FBI, DOJ and IC3 documents. Attribution rests on government and researcher assessments and could change. The report also covers a related but distinct campaign, Contagious Interview, which uses fake recruiters and coding tests; a joint advisory from Japan, the US, Australia and Germany estimated at least 30,000 devices compromised across 100 countries, though that figure is described second-hand.",
+        "Practical advice in the coverage: confirm unexpected meeting invitations over a separate channel, treat 'fix this now' prompts during calls as a red flag, and never run code from an unverified source. JFrog recommends running any interview assignment only in a disposable virtual machine, never on a work laptop."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "north korea",
+        "deepfake",
+        "crypto",
+        "social engineering",
+        "fbi",
+        "lazarus",
+        "phishing"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/fbi-says-north-korean-hackers-stole.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-a-worldwide-microsoft-365-outage-hit-outlook-teams",
+      "headline": "A worldwide Microsoft 365 outage hit Outlook, Teams and Copilot; no root cause yet",
+      "summary": "Microsoft's incident began Thursday at 1:26 PM ET. Servers became unexpectedly unavailable and strained the rest. By Friday morning recovery was 'encouraging', but some users still saw problems.",
+      "impacts": [
+        "Work that depends on one vendor's cloud, from email to AI assistants, stops together when that vendor has a bad day.",
+        "Email may arrive late rather than be lost: Microsoft extended its mail timeout window to 48 hours.",
+        "Admins had few options beyond waiting, since the fault was on Microsoft's side.",
+        "With no stated root cause yet, it's unclear whether recent configuration changes were involved."
+      ],
+      "details": [
+        "Microsoft is working through a global outage of Microsoft 365 services that began on Thursday, November 12 at 1:26 PM ET. Outlook, Teams and Copilot were the most reported, and Microsoft's admin-center advisory (tracked as MO1550821) also listed Exchange Online, SharePoint Online, Microsoft 365 Copilot and Microsoft Defender XDR. Downdetector reports also named Azure, OneDrive and the Microsoft Store.",
+        "Earlier that day Microsoft had been investigating Exchange Online mailbox connectivity problems in the Americas, then confirmed that users in any region could be affected. It first blamed elevated infrastructure load across several regions. It later said a number of servers were unexpectedly unavailable, straining the remaining infrastructure, and then that a core process on affected servers was becoming overwhelmed, causing a loss of capacity.",
+        "Microsoft's response, per BleepingComputer's report, was to pause all deployments, redistribute connection traffic worldwide, move traffic away from affected systems, restart servers and begin returning them to service. It was also checking whether reverting a small number of recent configuration updates could speed recovery. On November 12 it reported only limited recovery; by November 13 it described 'encouraging recovery progress' in service availability and email delivery, with some users still seeing intermittent issues.",
+        "Microsoft extended its email timeout window to 48 hours to preserve delayed messages, and some users reported delayed email arriving. A separate Teams incident (TM1550488) ran from 9:45 to 10:53 AM ET the same day in North and South America, attributed to resource contention and since resolved. Microsoft has not said whether the two incidents are related.",
+        "What is not known: a confirmed root cause, a time for full restoration, and whether configuration changes were to blame. BleepingComputer's account comes from user reports, Downdetector data and Microsoft's public updates, and Microsoft had not answered its questions about root cause. The story is a reminder of concentration risk rather than evidence of an attack; nothing in the reporting suggests malicious activity."
+      ],
+      "category": "Tech",
+      "tags": [
+        "microsoft",
+        "outage",
+        "cloud",
+        "copilot",
+        "infrastructure",
+        "outlook"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/microsoft/massive-microsoft-365-outage-disrupts-outlook-teams-copilot-worldwide/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-silentair-hacked-asian-phone-networks-diverted-taiwanese-users",
+      "headline": "SilentAir: hacked Asian phone networks diverted Taiwanese users' calls and texts",
+      "summary": "Telecom-security firm Enea says attackers inside compromised mobile operators in at least six Asian countries rerouted selected people's calls and SMS, including two-factor codes. Enea links the group to China only with low confidence.",
+      "impacts": [
+        "SMS two-factor codes can be intercepted at the network level, with no malware on your phone.",
+        "Political and government VIPs were among targets, but the report names no victims.",
+        "Phone operators trust each other's signaling traffic, which this campaign abused.",
+        "Prefer app-based or hardware authentication over SMS codes for important accounts."
+      ],
+      "details": [
+        "Enea, a Stockholm-based telecom and cybersecurity software firm, has named a group it calls SilentAir. According to The Hacker News, the group used compromised equipment inside Asian mobile operators to intercept calls and texts of selected people, mostly in Taiwan. Enea found attack sources in at least six Asian countries, but the report names no countries, operators or targets.",
+        "The method abuses how phone networks trust each other. Attackers sent SS7 or Diameter signaling into the IPX, the shared network operators use, claiming the hacked equipment now served a target's phone, via an UpdateLocation message or its Diameter equivalent. If the victim's home network accepted it, the target's calls and texts were diverted. For some targets Enea saw two-factor codes intercepted right after diversion, suggesting attempts to take over other accounts; it did not say whether any account was actually taken over.",
+        "Interception made up 18.3% of SilentAir's attacks, compared with 2.1% for a typical surveillance company in Enea's earlier research. Attacks came in bursts, from a handful of subscribers up to several thousand in a month, with gaps of months. Silent SMS messages, disguised as spam-like English motivational lines, were sent at very large scale, mainly to Taiwanese subscribers, possibly to test whether diversions worked.",
+        "On attribution, Enea assessed with high confidence that SilentAir is a state-level actor. It linked the group to China only with low confidence, citing Taiwan-only targeting, a UTC+8 working pattern starting at 9 a.m., and pauses on weekends and Chinese holidays. It considers a link to a group called Liminal Panda possible but unconfirmed. That is circumstantial evidence, not proof.",
+        "Enea began tracking unusual SS7 and Diameter attacks from Asian operators in early 2025 and later found earlier activity. It has told the operators where the sources were found. SilentAir is disrupted for now but could return. The report does not say whether the hacked equipment was cleaned up, and Enea could not analyze the malware.",
+        "Enea's recommendations are aimed at operators: GTP firewalls that share data with SS7 and Diameter firewalls, treating the whole IPX as untrusted, and detecting signaling threats inside their own networks. The report does not advise individuals who may be targeted."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "telecom",
+        "surveillance",
+        "china",
+        "espionage",
+        "sms",
+        "taiwan",
+        "privacy"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/silentair-hijacks-asian-telecom.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-check-point-firewalls-were-hacked-to-root-and",
+      "headline": "Check Point firewalls were hacked to root, and one intrusion wiped a VMware server",
+      "summary": "Check Point issued emergency hotfixes for CVE-2026-123039, a flaw exploited against 'a couple of dozen' customers. One intrusion chain moved from a gateway to a VMware ESXi host and deployed wiper malware.",
+      "impacts": [
+        "Security appliances at the network edge are high-value targets, and compromise gives attackers a foothold inside.",
+        "A wiper on a hypervisor host can take down many virtual machines at once.",
+        "Admins who can't patch right away can stop the dynamic_server process as a stopgap.",
+        "No attacker has been named, so it's unclear who is behind it."
+      ],
+      "details": [
+        "Check Point Software released emergency hotfixes for CVE-2026-123039, a high-severity local privilege escalation flaw. In its advisory the company said it observed 'an active exploit of this vulnerability against a couple of dozen customers', with exploitation beginning in late October 2026.",
+        "The flaw sits in the DynamicCLI interprocess communication interface of Gaia OS. A root-level daemon, dynamic_server, listens on a world-writable local socket at /tmp/dynamic_socket and does not authenticate connecting processes, so an authenticated local user can send a command that executes as root. Affected products include Firewall, Security Gateway, Security Management Server, Multi-Domain Security Management Server and Scalable Platforms.",
+        "In a separate report Check Point described the full intrusion chain. Attackers first got into the Mobile Access portal using a separate flaw called PHP2Shell, escalated to root with the new zero-day, dropped webshells and installed the TSGA backdoor and TSProxy malware, which had previously been seen in attacks on Ivanti appliances. They then pivoted from the gateway to a VMware ESXi host and deployed destructive wiper malware.",
+        "Mitigation: install the hotfixes. Teams that can't do so immediately should stop the dynamic_server process and prevent it restarting. Check Point published indicators of compromise, including commands that bypass the default Clish wrapper, which suggest execution as root through the socket.",
+        "What's unknown matters: no threat actor is named, the number of victims beyond 'a couple of dozen' is unclear, and whether the wiper attack was widespread isn't stated. The wiper's name and behavior are not described, and the reporting doesn't say whether the same actors used the Ivanti-linked tools before. This follows Check Point's September warning about two other critical zero-days, and CISA has added five Check Point flaws to its exploited-vulnerabilities catalog over two years."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "zero-day",
+        "check point",
+        "wiper",
+        "vmware",
+        "firewall",
+        "exploited",
+        "critical infrastructure"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/check-point-patches-zero-day-that-lets-hackers-get-root-access/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-perseverance-confirms-complex-organic-carbon-in-ancient-mars",
+      "headline": "Perseverance confirms complex organic carbon in ancient Mars rocks, not proof of life",
+      "summary": "Using its SHERLOC laser instrument, the rover found macromolecular carbon in two rocks in Jezero crater, only a few microns below the surface. The carbon can form with or without life, and its origin is unknown.",
+      "impacts": [
+        "Organic material may have survived in ancient Martian lake and river sediments better than expected.",
+        "It strengthens the case for bringing Mars samples back to Earth for lab analysis.",
+        "It does not show life ever existed on Mars.",
+        "The shallow depth hints at how organics resist or avoid destruction by surface radiation."
+      ],
+      "details": [
+        "A study reported by ScienceDaily says NASA's Perseverance rover has confirmed organic carbon in ancient rocks in the Bright Angel formation inside Jezero crater, where the rover explores sediments from an ancient river and lake. Two rocks there contain the material. The finding builds on NASA's September 2025 report of a potential biosignature in the same area, which was tentative; this study confirms the rocks contain organic carbon.",
+        "The measurements came from SHERLOC, an instrument on the rover's arm that uses Raman spectroscopy: a laser hits the sample and the scattered light identifies minerals and organic compounds, without damaging the rock. The team found macromolecular carbon, large interconnected networks of carbon atoms similar to material in Earth rocks and meteorites.",
+        "The unusual part is depth. The carbon sits only a few microns below the exposed surface, less than the thickness of a sheet of paper, the shallowest detection of this kind reported on Mars. Radiation and reactive chemicals at the surface normally break organics down, so the team suggests the carbon is either resistant or was shielded by minerals such as clays or iron-rich soil.",
+        "The carbon was found in mudstone formed when water carried sediment into the crater, alongside carbonate and sulfate minerals that formed later when water altered the rocks. That pattern suggests organic material may have entered or formed in the rocks during at least two separate periods. Curiosity, more than 2,000 miles away in Gale Crater, previously detected organics, so such building blocks may have been widespread in ancient Martian lakes and rivers, according to lead author Ashley Murphy.",
+        "What is not proven: macromolecular carbon can form through biological activity or through non-biological chemistry, so its presence alone does not show Mars hosted life. The study does not establish fossilized microorganisms, and the formation mechanism remains unknown. The rovers lack the laboratory equipment to separate fossil evidence from geology, so answering that likely requires returned samples. The work was published in Science Advances; lead authors are Ashley Murphy of the Planetary Science Institute and Kyle Uckert, deputy principal investigator of SHERLOC."
+      ],
+      "category": "Space",
+      "tags": [
+        "mars",
+        "nasa",
+        "perseverance",
+        "organic",
+        "life",
+        "astrobiology"
+      ],
+      "date": "2026-11-12",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261111005908.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-new-attacks-let-a-rogue-cloud-host-read",
+      "headline": "New attacks let a rogue cloud host read secrets inside AMD's 'confidential' VMs",
+      "summary": "Mior and Skyfall, from ETH Zurich (and Google for Skyfall), break AMD SEV-SNP protections in lab tests. Both need control of the host, and Mior also needs BIOS control. No in-the-wild use is reported.",
+      "impacts": [
+        "'Confidential computing' promises that even a cloud operator can't see your data, and these attacks challenge that promise.",
+        "Realistic threats are a malicious or compromised cloud operator or insider, not an ordinary hacker.",
+        "Cloud customers depend on their provider to deploy the firmware fixes.",
+        "Mior can forge attestation reports, which undermines how customers verify what their VM runs."
+      ],
+      "details": [
+        "Two attacks disclosed this week let a malicious host read data inside AMD SEV-SNP confidential virtual machines, which are designed to keep the server operator out. Both were demonstrated in lab tests on AMD EPYC server processors, according to The Hacker News.",
+        "Mior, from ETH Zurich, exploits startup. The Platform Security Processor builds the Reverse Map Table, which records page ownership. The team redirected the processor's writes into a graphics card's memory, so startup finished without errors but part of the real table stayed uninitialized, including the entry protecting the table itself. The hypervisor could then rewrite protections, enable debugging and use debug commands to read and write VM memory. It succeeded in all 1,000 attempts across two test runs and can forge attestation reports. It requires control of the hypervisor and BIOS plus a PCIe device, and was tested on one EPYC 9135 (Zen 5). AMD tracks it as CVE-2026-0462, CVSS 5.9.",
+        "Skyfall, from ETH Zurich and Google, builds on Transient Scheduler Attacks first disclosed in July 2025. When a hypervisor deliberately makes a VM fail to start, the processor has already cached part of the VM's saved state without cleaning it up, and timing attacks can read it. The team recovered register values and a disk-encryption key from a test VM. It needs only a malicious host, no hardware tampering, and was shown on Zen 3 and Zen 4 chips but not Zen 5. AMD tracks it as CVE-2026-40671, CVSS 4.9. Reviewers noted a realistic attack would need an idle core, rapid failing VM starts, and a VM that doesn't crash.",
+        "AMD's fixes: SEV firmware and microcode dated August 12, with platform firmware targeted for November (Skyfall) and December (Mior); embedded EPYC fixes are due January to April 2027. Affected lines include EPYC 7003, 8004, 8005, 9004 and 9005. Customers get BIOS updates from their server vendor, and Supermicro has published a fix list.",
+        "What's uncertain: neither advisory says the flaws were exploited in the wild, no workarounds are listed, and it's unclear whether updates work standalone or only with BIOS updates. Cloud tenants can't verify fixes themselves. The moderate severity scores reflect the heavy prerequisites; the significance is conceptual, showing the hardware guarantee has gaps."
+      ],
+      "category": "Tech",
+      "tags": [
+        "amd",
+        "cloud",
+        "vulnerability",
+        "confidential computing",
+        "hardware",
+        "firmware",
+        "data centers"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/new-mior-and-skyfall-attacks-let-rogue.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-brain-implants-are-restoring-speech-one-als-patient",
+      "headline": "Brain implants are restoring speech; one ALS patient has communicated 2 million words",
+      "summary": "Science News surveys speech neuroprostheses. A UC Davis patient with ALS uses his implant 10 to 14 hours a day, but it's slow, and the next device is only at safety testing.",
+      "impacts": [
+        "People who can't speak because of ALS or paralysis may eventually get fast, natural communication.",
+        "Decoding speech from the brain raises privacy and consent questions the article says remain unsolved.",
+        "Cost, surgery and a shortage of trained clinicians could limit who gets access.",
+        "Signal quality may drift over time as disease or tissue changes."
+      ],
+      "details": [
+        "Science News reports on the state of speech-restoring brain implants. Casey Harrell, a climate activist diagnosed with ALS in 2020, received four small electrode grids over his left speech motor cortex in 2023. The device decodes his attempted speech into text, which can be voiced by computer. According to a June Nature Medicine report cited in the article, he uses it 10 to 14 hours a day and has communicated nearly 2 million words.",
+        "The system works by recording neural signals, using machine learning to map patterns to phonemes, and a language model to assemble words and sentences. It doesn't need the muscles to carry the message. Vocabulary in early testing was 50 words and grew to more than 125,000 by the second day.",
+        "Speed and accuracy are limits. Harrell's replies can take minutes, and he likens it to trying to catch a moving train. A 2025 Nature study by a related team made a voice-synthesis system with about 10 milliseconds of delay, close to real-time conversation, but just over half of its sounds were intelligible to listeners.",
+        "The next generation is smaller. Paradromics, an Austin company, has a fully implantable device about the size of a dime with 421 electrodes and a chest-mounted transceiver. In June, surgeon Matthew Willsey implanted it in a 68-year-old woman who could no longer speak clearly; the current goal is safety testing, then real-time speech. A UCSF study in Nature Neuroscience decoded words and gestures to control avatars for two people with paralysis.",
+        "Open questions per the article: implants are invasive and may be expensive, demand could outstrip trained clinicians, and signals may become less reliable over time. David Brandman estimates implanting a device in an ALS patient could be about five years away. The article does not discuss neural-data privacy or consent in depth, which is the part of this field likely to draw scrutiny as consumer brain devices spread."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "bci",
+        "implant",
+        "speech",
+        "als",
+        "neural data",
+        "paradromics"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/brain-implants-restore-voices-injuries"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-earths-own-atmosphere-supplied-about-85-of-the",
+      "headline": "Earth's own atmosphere supplied about 85% of the May 2024 superstorm's ring current",
+      "summary": "Japan's Arase satellite found the storm's ring current was overwhelmingly made of heavy ions from Earth's upper atmosphere, not the solar wind. Current forecasting models lean on solar wind data.",
+      "impacts": [
+        "Storm forecasts may be missing a big ingredient: how much of Earth's own atmosphere gets pulled into the storm.",
+        "Severe storms threaten satellites, GPS, communications and power grids.",
+        "It's based on one satellite and one storm, so the conclusion is still tentative.",
+        "A proposed JAXA mission, FACTORS, would study the effect, but it is not yet approved."
+      ],
+      "details": [
+        "On May 10 to 11, 2024, a large sunspot produced several eruptions whose plasma clouds merged and struck Earth's magnetosphere. The 'Mother's Day' storm reached a SYM-H minimum of -518 nanotesla, the second-largest geomagnetic disturbance recorded since 1981, and pushed auroras to unusually low latitudes.",
+        "A study led by Naritoshi Kitamura of Nagoya University, with 20 authors, analyzed data from the Arase satellite and reports that roughly 85% of the ions in the storm's ring current came from Earth's ionosphere, the charged layer of the upper atmosphere. The solar wind supplied very little. Researchers had expected the solar wind to remain a significant contributor during a dense-plasma event.",
+        "Near the storm's peak, Arase measured a 40% drop in magnetic field intensity at about 16,000 km altitude, much closer to Earth than similar reductions previously documented, and detected a decline in energetic electrons in that region. The paper was published in Science Advances.",
+        "The authors suggest heavy ions from the atmosphere may have strengthened the disturbance and pushed the ring current to peak unusually close to Earth. If so, atmospheric conditions may influence storm severity more than current models, which rely heavily on solar wind data, account for. The wording is 'may have', not a confirmed cause.",
+        "Caveats: the composition measurements come from one satellite during one storm, so broader conclusions need more events. The authors haven't determined whether the field distortion directly caused the electron loss, and forecasting models haven't been changed based on this result. Better forecasts could help operators protect spacecraft and grids, and the findings support FACTORS, a proposed two-satellite JAXA mission that is still being prepared for a proposal opportunity."
+      ],
+      "category": "Space",
+      "tags": [
+        "solar storm",
+        "space weather",
+        "geomagnetic",
+        "satellites",
+        "power grid",
+        "aurora"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261111005905.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-a-new-kind-of-landslide-moved-still-frozen",
+      "headline": "A new kind of landslide moved still-frozen permafrost; 150 more may exist",
+      "summary": "Researchers say a 2018 Canadian slide the volume of seven Great Pyramids was a new 'permafrost detachment slide'. Fire and warming may let water thaw frozen ground from below, so the slab can detach.",
+      "impacts": [
+        "Thawing permafrost may fail in sudden, large blocks, not just as slow mud.",
+        "Slides can dam rivers and create lakes, as the 2018 one did.",
+        "Roads, pipelines and communities in cold regions could face hazards models don't capture.",
+        "The claim that 150 other slides are the same type is a possibility, not a finding."
+      ],
+      "details": [
+        "Science News reports that a large 2018 landslide in Canada's Northwest Territories has been identified as a new type of catastrophic slide, called a permafrost detachment slide, in Geophysical Research Letters. The slab, about the volume of seven Great Pyramids of Giza, slid down the Mackenzie Valley, dammed the Redstone River and created a lake about 3.5 kilometers long. Scientists were puzzled because it began in ground that had been frozen for years.",
+        "Permafrost normally thaws from the top down, releasing muddy slurry. Here, large blocks of still-frozen ground had moved hundreds of meters. The team, led by Joseph Young, studied two of the largest slides: the 2018 event (about 18 million cubic meters) and a 2017 event (about 4.5 million cubic meters). Both began on flat sliding surfaces roughly 20 meters underground, at the base of the permafrost layer, and satellite data showed the ground had been creeping forward by meters per year for decades.",
+        "The proposed mechanism: wildfire and warming weaken the frozen surface, creating tension cracks. Water seeps deeper through the cracks, thaws the permafrost from below, and the frozen layer eventually detaches. Ground-temperature records from 2020 to 2022 at undisturbed and burned forest sites, plus computer simulations, supported the idea that fire and extreme summer heat can start the process.",
+        "Young estimates more than 150 other slides in the region seen from satellites may be the same type, and that such slides could occur wherever permafrost is thin and warm and a rapid warming event triggers movement. Outside expert Dmitry Nicolsky said slides starting in thawing ground usually move slowly, and scientists need to study subsurface conditions more closely: 'it might go slowly or it might go catastrophically.'",
+        "Limits: the conclusions rest on a small number of field sites, a few years of instrument data and models, and the 150-slide extrapolation is unconfirmed. Young frames the slides as a visible sign of climate change. This adds to earlier coverage that few climate models handle abrupt permafrost thaw."
+      ],
+      "category": "Climate",
+      "tags": [
+        "permafrost",
+        "landslide",
+        "climate",
+        "arctic",
+        "wildfire",
+        "canada"
+      ],
+      "date": "2026-11-02",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/melting-permafrost-new-type-landslide"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-attackers-hijacked-4-837-github-accounts-to-steal",
+      "headline": "Attackers hijacked 4,837 GitHub accounts to steal cloud credentials, Aikido says",
+      "summary": "The 'wfx-loot' campaign slipped malicious GitHub workflows into repositories, confirmed theft of secrets from at least 1,835 targets, then deleted its logs within a minute. Packages on Packagist and Go were poisoned as a side effect.",
+      "impacts": [
+        "CI/CD pipelines hold cloud and publishing keys, so one stolen token can reach production and package registries.",
+        "Some compromised accounts belonged to Fortune 100 firms, a US agency and a French government body.",
+        "Stolen AI service keys (OpenAI, Anthropic, Gemini and others) were also targeted.",
+        "Owners should look for the 'wfx-docs' branch and rotate secrets if the payload ran."
+      ],
+      "details": [
+        "Researchers at Aikido Security named the campaign 'wfx-loot'. Per BleepingComputer, it began around 12:45 UTC on November 10. The attacker used stolen credentials from 4,837 GitHub accounts to probe 61,764 repositories for write access, and confirmed theft of secrets from at least 1,835 targets. Compromised accounts included some belonging to Fortune 100 organizations, the US General Services Administration, the French government, Nextcloud and WebdriverIO.",
+        "To test permissions the attacker opened pull requests titled 'docs: dependency audit notes'. 92% remain open, suggesting owners didn't notice. The payload, a roughly 1,500-line shell script, arrived by modifying an existing workflow, adding a new workflow on a short-lived branch, or planting an npm install hook.",
+        "The script collects GitHub Actions secrets and tokens, AWS, Azure and Google Cloud credentials, and credentials for Git, SSH, Docker, Kubernetes, npm, PyPI, Vault and Terraform. It also goes after AI service keys, .env files, private keys and shell histories, and can exchange OIDC tokens for temporary cloud sessions. Data was sent by HTTP POST to two attacker-controlled endpoints, and the attacker then reverted changes and deleted workflow runs and logs in under a minute.",
+        "About 50 compromised accounts appear to have publishing rights on ecosystems including npm, PyPI, Go, crates and Packagist. Automated publishing carried the payload into a Packagist package and two versions of a Go module. Researchers believe CI secret theft was the main goal, with package releases a byproduct. There is some overlap with the 2025 GhostAction campaign.",
+        "Caveats: 1,835 is a confirmed minimum, not a full count; the article doesn't explain how the 4,837 accounts' credentials were obtained, and doesn't report any GitHub statement. The findings rest on Aikido's analysis. Advice: check for a branch named 'wfx-docs', the probe pull request and gaps in workflow run numbers, and treat all secrets available to affected workflows as compromised."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "github",
+        "supply chain",
+        "credentials",
+        "cloud",
+        "open source",
+        "malware",
+        "ai agents"
+      ],
+      "date": "2026-11-12",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/hackers-compromise-4-800-github-accounts-to-steal-cloud-credentials/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-operation-tornado-354-dark-web-vendors-and-buyers",
+      "headline": "Operation TorNado: 354 dark web vendors and buyers arrested in 14 countries",
+      "summary": "Police say an operation running from May 2025 to October 2026 hit Archetyp, Nemesis, Tor2Door, Bohemia and Kingdom. Seizures in Europe and the US include cash, crypto, drugs and 209 firearms combined.",
+      "impacts": [
+        "Dark web markets keep returning after takedowns, but vendors and buyers are traceable over time.",
+        "Cash and crypto seizures run to hundreds of millions of dollars, per agency figures.",
+        "The arrests are suspects, not convictions, and the figures aren't independently verified.",
+        "Earlier operations show the same pattern: takedown, regroup, repeat."
+      ],
+      "details": [
+        "Authorities arrested 354 suspects in a joint international operation codenamed Operation TorNado, BleepingComputer reports. The suspects were vendors and buyers on five dark web marketplaces: Archetyp, Nemesis, Tor2Door, Bohemia and Kingdom. The operation ran from May 2025 to October 2026 and involved agencies from 14 countries.",
+        "Beyond the marketplaces, police also targeted vendors and buyers on forums, single-vendor shops and encrypted messaging services. National authorities ran independent investigations with support from Europol. Europol said the operation showed dark web markets 'continue to adapt despite takedowns'.",
+        "Seizures in Europe: over 60 million euros in cash and cryptocurrency, 950 kilograms of drugs including amphetamines, cocaine, ketamine, psilocybin mushrooms, MDMA and cannabis, and 57 firearms. In the United States: over 4.8 metric tonnes of illicit drugs, 152 firearms and over 150 million euros (about $166 million).",
+        "The US Justice Department said TorNado followed the earlier JCODE operation, whose intelligence helped identify dark web drug traffickers and led to related but separate investigations. It said the operation 'significantly disrupted the online opioid trade'.",
+        "The article places TorNado in a line of similar actions: DisrupTor (2020, 179 arrests), Hydra's takedown in 2022, SpecTor (2023, 288 arrests) and RapTor (May 2025, 270 arrests). Caveats: the 354 are suspects and the allegations haven't been resolved in court, the figures come from Europol and DOJ statements, and the report gives no detail on individual cases, charges or outcomes."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "dark web",
+        "police",
+        "europol",
+        "crime",
+        "crypto",
+        "drugs"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/police-arrest-354-vendors-buyers-in-global-cybercrime-crackdown/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-claude-codes-dont-ask-again-file-left-secrets",
+      "headline": "Claude Code's 'don't ask again' file left secrets in 1,122 public GitHub copies",
+      "summary": "Apiiro found that approving a command with 'don't ask again' can save it, password included, in a project file that often gets committed. Anthropic gave no reply in the report.",
+      "impacts": [
+        "Agent settings folders like .claude/ and .cursor/ should be treated like .env files.",
+        "Passwords typed inside commands slip past popular secret scanners.",
+        "Leaked database and cloud credentials can give outsiders direct access.",
+        "Fix: rotate any exposed secret first, then remove the file from git and add it to .gitignore."
+      ],
+      "details": [
+        "When a Claude Code user picks 'Yes, and don't ask again', the tool can save the approved command word for word in .claude/settings.local.json in the project. If the command contained a password, token or key, it is stored in plain text, and matching commands then run without prompts. Security company Apiiro published the research, which The Hacker News reported.",
+        "Apiiro's GitHub search found 104,185 copies of the file in 103,617 repositories. 1,122 copies (about 1.1%) contain at least one secret, totaling 1,379 distinct secrets: more than a third open a database directly, including 379 database passwords, plus 43 SSH logins, 42 tokens for GitHub, GitLab and npm, and 23 AWS keys. Owners include 63 organizations. In half of the affected repositories the file had been there at least 217 days.",
+        "Why it persists: Claude Code adds the file to the user's global git excludes, which protects only one computer, and never adds it to the project's own .gitignore. In 539 of 1,105 traced repositories, a commit listing Claude as co-author changed the file, suggesting Claude often commits it. Counting older commits, shared settings and saved chat logs, the researchers count 2,539 secrets across 1,994 repositories.",
+        "Detection gaps: Gitleaks flagged 564 of the 1,122 files and TruffleHog 643; neither flagged 215, mostly passwords typed inside commands after patterns like PGPASSWORD= or sshpass -p. Of 16 coding agents compared, Claude Code was the only one confirmed to save the full approved command by default.",
+        "The article reports no reply from Anthropic. An August 2025 bug report was auto-closed as 'not planned' after 60 days of inactivity, and four related reports were closed by the same bot. Caveats: the researchers don't say whether anyone has used the secrets; one notified company confirmed its key was live; and their definition of a secret mixed known key formats with password patterns, with an AI reviewer agreeing."
+      ],
+      "category": "AI",
+      "tags": [
+        "claude",
+        "ai agents",
+        "credentials",
+        "github",
+        "privacy",
+        "anthropic",
+        "security"
+      ],
+      "date": "2026-11-07",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/claude-codes-dont-ask-again-file.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-china-extends-its-rare-earth-export-control-pause",
+      "headline": "China extends its rare-earth export-control pause, but only to January 10, 2027",
+      "summary": "A day before the pause was due to lapse on Nov. 10, China's Commerce Ministry pushed it back two months. It is part of the wider Xi-Trump trade truce, and Trump is due at an APEC summit in Shenzhen later this month.",
+      "impacts": [
+        "Chip, EV and defense supply chains get a two-month reprieve, not a fix.",
+        "The truce depends on ongoing US-China talks and could lapse again.",
+        "The pages I opened don't say which earlier controls remain in force outside the pause.",
+        "Western diversification efforts are still years away, according to earlier coverage."
+      ],
+      "details": [
+        "This follows our earlier note that the pause was due to expire November 10 with no renewal announced. On November 9, China's Ministry of Commerce said it would extend the suspension of export controls, which now runs until January 10, 2027. Reuters, in a version republished by The Star, says the ministry's statement was brief and gave no other details.",
+        "Background: China introduced export controls on certain rare earths in April 2025, expanded them considerably in October 2025 to include certain industrial diamonds and lithium battery technology, and in November 2025, after a Xi-Trump summit in South Korea, paused those measures for one year. The extension preserves part of that wide-ranging deal. Benchmark Mineral Intelligence describes the paused measures as covering rare earths, lithium-ion batteries and graphite anode materials, and says the extension runs 'only until 10 January 2027'.",
+        "The extension was part of a wider suspension of trade countermeasures and tariffs China announced the same day, while Beijing negotiates with Washington over a lasting agreement. Trump is scheduled to travel to Shenzhen later in November for an APEC leaders' summit, where he is expected to meet Xi.",
+        "What's unclear: the pages I could open don't say which controls remain in force outside the pause, or give analyst reasoning for the timing. The Benchmark article is paywalled after its opening, and its price indexes are not tied to the announcement. The two-month window means the question returns in January unless a longer deal is signed."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "china",
+        "rare earths",
+        "export controls",
+        "trade",
+        "supply chain",
+        "chips"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Reuters via The Star",
+          "url": "https://www.thestar.com.my/aseanplus/aseanplus-news/2026/11/09/china-extends-suspension-of-rare-earth-export-controls-until-january"
+        },
+        {
+          "name": "Benchmark Mineral Intelligence",
+          "url": "https://source.benchmarkminerals.com/article/china-extends-pause-on-rare-earth-and-battery-export-controls-until-2027"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-a-theory-says-dark-energy-was-negative-until",
+      "headline": "A theory says dark energy was negative until 9.5 billion years ago, then flipped",
+      "summary": "Istanbul Technical University physicists revisited a neglected branch of an alternative gravity theory and found it predicts dark energy changing sign. It is a model, not an observation, and untested against the full DESI data.",
+      "impacts": [
+        "If dark energy isn't constant, standard cosmology would need rewriting.",
+        "The idea might ease the 'Hubble tension', the disagreement over how fast the universe expands.",
+        "DESI's hints that dark energy varies are below the threshold for a discovery.",
+        "Nothing in daily life changes, but it shows how unsettled 'settled' cosmology is."
+      ],
+      "details": [
+        "A research team at Istanbul Technical University, led by Prof. Özgür Akarsu, reports that dark energy's effective density may have been negative in the early universe and turned positive about 9.5 billion years ago, around redshift 1.5. The work appeared in Physical Review D, according to ScienceDaily.",
+        "The team revisited teleparallel f(T) gravity, an alternative to general relativity that describes gravity through torsion rather than curvature. Earlier studies of an exponential form of the theory focused on one set of solutions that assumed dark energy density stays positive. The new work examined a neglected branch: for the same present-day matter content, the theory allows a standard-looking history or one where dark energy starts negative and later turns positive. The model keeps the six standard ΛCDM parameters and adds none.",
+        "The idea arrives alongside hints from DESI, the Dark Energy Spectroscopic Instrument, that dark energy may not be a fixed constant. The article stresses that evidence is below the threshold for a discovery and depends on which datasets are combined. The research was first submitted in October 2024, before DESI's March 2025 results. The team has not yet tested the model against DESI's completed five-year survey of more than 47 million galaxies and quasars.",
+        "An earlier model from the same group, with a sign-switching dark energy, suggested the change could fit DESI data and ease the Hubble tension; the new theory offers a possible physical mechanism. An extended version could match microwave background observations while allowing the higher local expansion rates seen in some measurements.",
+        "The article is clear that neither a dark energy reversal nor a recent slowdown in cosmic acceleration has been established. Proposed tests include the growth of cosmic structure, redshift-space distortions and weak gravitational lensing, plus the full DESI dataset. Akarsu calls the preliminary picture encouraging."
+      ],
+      "category": "Space",
+      "tags": [
+        "dark energy",
+        "cosmology",
+        "universe",
+        "gravity",
+        "desi",
+        "physics"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261111005901.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-mice-that-cleared-a-virus-kept-scarred-spleens",
+      "headline": "Mice that cleared a virus kept scarred spleens and weak T cells, unless vaccinated",
+      "summary": "Pompeu Fabra University researchers found lasting immune damage in mice after the virus was gone. Vaccinated mice showed no such damage. It's a mouse study and no humans were tested.",
+      "impacts": [
+        "It raises the question of whether some infections leave quiet immune damage after symptoms end.",
+        "Vaccination might protect immune health, not just prevent illness, but that is untested in people.",
+        "The article gives no sample sizes or effect sizes, so the strength is unclear.",
+        "Treat it as a hypothesis for human studies, not a health warning."
+      ],
+      "details": [
+        "Researchers at Pompeu Fabra University in Barcelona report that mice recovering from an acute viral infection kept lasting immune damage after the virus was cleared. The study, led by Andreas Meyerhans with first author Paula Cebollada Rica and 21 authors in total, appeared in Cell Death & Disease, per ScienceDaily. The article does not name the virus.",
+        "After the virus was eliminated, the mice's immune function did not return to normal. Their spleens developed fibrosis, a buildup of scar-like tissue, and immune cells were arranged abnormally. These changes disrupted interactions between immune cells needed to activate T cells, which recognize and destroy infected cells. The authors describe the mice as left in an 'immunocompromised state', less able to respond to new challenges.",
+        "Mice vaccinated before infection showed no spleen damage or T-cell dysfunction. Their spleens kept a normal structure and their T cells performed at levels similar to mice that had never been infected.",
+        "Caveats are substantial. The findings come from a mouse model, and the researchers state the results do not establish the same effects in humans. The article gives no numbers: no group sizes, percentages, statistics or time between infection and measurement, and it doesn't specify the vaccine type or schedule. The press release also says its content may have been edited, and the article names the journal inconsistently between text and references.",
+        "The study raises whether infections affect long-term immune health after symptoms resolve, and whether vaccination protects it. The vaccination-policy discussion reflects the researchers' views, not findings of the study."
+      ],
+      "category": "Health",
+      "tags": [
+        "immune system",
+        "virus",
+        "vaccine",
+        "infection",
+        "mice",
+        "t cells"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261112025531.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-single-amygdala-neurons-predicted-which-images-people-would",
+      "headline": "Single amygdala neurons predicted which images people would later remember",
+      "summary": "Cedars-Sinai researchers recorded from individual amygdala neurons in 90+ patients. How strongly a category-tuned neuron fired on first sight predicted later recall, and the effect was stronger than in the hippocampus.",
+      "impacts": [
+        "It points to a possible target for memory treatments, though none exists yet.",
+        "The 'save button' label is a metaphor, since the study doesn't prove a causal mechanism.",
+        "Whether stimulating these neurons changes memory hasn't been tested.",
+        "The recall test covered minutes, not long-term memory."
+      ],
+      "details": [
+        "A study in Nature Neuroscience, led by Jiayang Xiao of Cedars-Sinai Health Sciences University, recorded from single amygdala neurons in more than 90 people with drug-resistant epilepsy. These patients already had electrodes implanted to find where their seizures start, which let the team record individual neurons. Science News covered the work.",
+        "Participants saw images of everyday objects from five categories, such as food and animals, and 10 to 30 minutes later tried to recall which they had seen. Activity in certain amygdala neurons corresponded with images later remembered. Individual neurons preferred one of the five categories, and the strength of a category neuron's response the first time an image appeared predicted whether it would be recalled.",
+        "Hippocampus activity was also linked to recall, but the correlation was weaker and slightly delayed, which Xiao said surprised her since the hippocampus is the classic memory region. The researchers describe a two-step process: the amygdala sorts an image by category, and the strength of that first response determines whether it is stored. The article says the study 'doesn't nail down the exact mechanism'.",
+        "Cory Inman, who wasn't involved, compared older scalp-electrode methods to a microphone outside a stadium versus one pinned to a single fan, which is why single-neuron recordings give a sharper picture.",
+        "Limits: the work is correlational, the task spanned minutes not long-term memory, and the participants are epilepsy patients. Whether stimulating amygdala neurons changes memory, and whether any treatment could follow, hasn't been tested; memory disorders currently have no broadly effective treatments."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "memory",
+        "amygdala",
+        "neurons",
+        "epilepsy",
+        "neuroscience"
+      ],
+      "date": "2026-11-12",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/brain-amygdala-neuron-saves-memories"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-ai-tunes-a-visual-brain-implant-in-a",
+      "headline": "AI tunes a visual brain implant in a blind man, who sees flashes and shapes",
+      "summary": "Researchers used deep learning to predict what a 27-year-old participant would perceive from electrical stimulation of his visual cortex, which made stimulation more precise. It's a one-person proof of concept.",
+      "impacts": [
+        "It's a step toward cortical vision prostheses for people whose eyes or optic nerves are damaged.",
+        "What the participant perceived was spots, flashes and shapes, not usable pictures.",
+        "Brain responses varied day to day, so devices may need to adapt to each person.",
+        "Only one participant was studied, with a temporary implant."
+      ],
+      "details": [
+        "A team from UC Santa Barbara, ETH Zurich and Miguel Hernández University used deep learning to make an experimental visual cortical prosthesis more precise, ScienceDaily reports. The study, in Neuron, is titled 'Deep learning-based control of electrically evoked activity in human visual cortex'. Such prostheses bypass the eyes and optic nerves and stimulate the visual cortex directly.",
+        "The team trained a neural network to predict how the cortex responds to different stimulation settings, including the brain's resting activity just before each pulse to capture its current state. The predictions were used to choose patterns most likely to produce the desired neural activity.",
+        "Testing happened in 2024 at Hospital IMED Elche in Spain. The participant, a 27-year-old man blinded by traumatic brain injury, had a temporary 96-electrode implant planned for removal after about six months. Stimulation produced phosphenes, perceived spots, flashes or shapes of light.",
+        "Findings: AI-selected patterns produced the intended neural activity more accurately than comparison methods and needed less current. Recorded brain activity predicted the participant's reported experiences better than the stimulation settings did. The implant could both stimulate and record, letting the model learn from real responses.",
+        "Caveats from the article: the technology is experimental, perceptions were limited to flashes and shapes, electrodes interact so more electrodes doesn't reliably give a fuller image, and neural responses fluctuate. With a single participant the results can't yet be generalized; it is a proof of concept within a larger feasibility trial in Spain."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "bci",
+        "implant",
+        "vision",
+        "ai",
+        "blindness",
+        "neural data"
+      ],
+      "date": "2026-11-12",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261110042553.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-arctic-ice-shows-a-montana-copper-smelter-spread",
+      "headline": "Arctic ice shows a Montana copper smelter spread arsenic and lead across the far north",
+      "summary": "A Nature Sustainability study of 10 ice cores traced elevated heavy metals from 1870 to 1914 most likely to Anaconda's smelter, about 30 tons of arsenic a day by modeling. Health effects weren't measured.",
+      "impacts": [
+        "Industrial pollution can travel thousands of kilometers and be recorded in ice.",
+        "Hundreds of thousands of nearby residents were exposed for decades before controls.",
+        "The study doesn't measure health outcomes; those rely on established links to these metals.",
+        "Researchers want epidemiologists to combine the data with census records."
+      ],
+      "details": [
+        "A study published November 3 in Nature Sustainability, led by Joseph McConnell of the Desert Research Institute, analyzed 10 Arctic ice cores from Canada, Greenland and Russia. Ice layers from roughly 1870 to 1914 contain elevated arsenic, lead and other heavy metals; in some cores arsenic reached up to 15 times pre-industrial levels. Science News covered it.",
+        "The researchers traced the pollution to the Anaconda Copper Mining Company's smelting operation in southwestern Montana. Greenland cores showed the largest increases, consistent with west-to-east atmospheric circulation, and McConnell argues a European source would have raised the Russian Arctic more. Anaconda's ore contained arsenic and lead, setting it apart from other regional mines.",
+        "Using ice concentrations and atmospheric dispersion models, the team estimated Anaconda emitted roughly 30 tons of arsenic per day in the late 1800s and early 1900s, about four times what Chile, today's largest copper producer, emits. From 1919 the company installed capture devices and arsenic emissions fell by about 60%, but the researchers say it waited roughly a decade, and hundreds of thousands of nearby residents had been exposed for decades.",
+        "Historian Fred Quivik notes the emissions were known at the time, with ranchers reporting livestock killed by arsenic. The site's grounds are now multiple Superfund sites.",
+        "Caveats: the Anaconda attribution is 'most likely', resting on circulation patterns and modeling, not direct measurement. Emission estimates carry model uncertainty, only 10 cores were analyzed, and health concerns rest on earlier associations of these metals with lower IQ and some cancers."
+      ],
+      "category": "Climate",
+      "tags": [
+        "arctic",
+        "pollution",
+        "ice cores",
+        "arsenic",
+        "lead",
+        "history"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/toxic-secrets-hiding-arctic-ice-harm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-accidental-ozempic-exposure-near-conception-wasnt-tied-to",
+      "headline": "Accidental Ozempic exposure near conception wasn't tied to most pregnancy complications",
+      "summary": "Only 529 pregnancies had exposure records. After adjustment most complications weren't elevated, though preterm birth was higher among women using the drugs for diabetes. It doesn't prove safety.",
+      "impacts": [
+        "It's reassuring for accidental exposure in weight-loss users, but not an all-clear.",
+        "Current advice to stop GLP-1 drugs before planned pregnancy still stands, per the senior author.",
+        "Diabetes itself may explain the preterm birth signal.",
+        "The article's numbers are internally inconsistent, so check the paper before relying on them."
+      ],
+      "details": [
+        "A Danish nationwide cohort study examined 756,636 single-baby pregnancies among 480,231 women with deliveries from 2009 to 2023, using national health registries. Possible accidental exposure was defined as filling a prescription for semaglutide or liraglutide within eight weeks before or after the first day of the last menstrual period. Only 529 pregnancies had exposure records in that window. ScienceDaily reports the study, in Human Reproduction Open, led by Kathrine Hviid with senior author Henriette Svarre Nielsen.",
+        "Outcomes included preterm birth, pre-eclampsia, gestational diabetes, large-for-gestational-age babies, stillbirth and placental problems. Crude analyses showed several complications more often in exposed women, but most associations lost significance after adjusting for age, BMI, smoking, education, pre-existing diabetes and timing.",
+        "The exception was preterm birth in women prescribed the drugs for diabetes: reported adjusted odds were 84% higher for semaglutide and 70% higher for liraglutide. No elevated preterm risk appeared in women using them for weight management. The article also gives smaller figures (about 11% and 9%) for women with pre-existing diabetes without explaining the mismatch, so readers should check the original paper.",
+        "Limitations: it's observational, so shows association not causation; diabetes may explain the results; it relied on prescription fills, not confirmed use; and the exposed group is small.",
+        "Nielsen said future work must separate diabetes from weight-management prescriptions, and that the findings don't justify dropping advice to stop GLP-1 drugs before planned pregnancy. An accompanying commentary said the results could support more individualized counseling and managing diabetes before and during pregnancy."
+      ],
+      "category": "Health",
+      "tags": [
+        "glp-1",
+        "pregnancy",
+        "ozempic",
+        "semaglutide",
+        "obesity",
+        "denmark"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261111005911.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-stopping-statins-after-70-carried-a-small-extra",
+      "headline": "Stopping statins after 70 carried a small extra risk: 12.7% vs 9.2% over four years",
+      "summary": "A preliminary randomized trial of 1,880 adults over 70 found no significant difference at two years, but a gap emerged over a longer follow-up. The lead author says no general recommendation can be made.",
+      "impacts": [
+        "Older adults on statins for prevention shouldn't stop without talking to their doctor.",
+        "At two years the difference wasn't statistically significant; the estimate was about one extra event per 40 people.",
+        "Stopping didn't measurably improve muscle pain, falls or quality of life.",
+        "It's preliminary and not yet peer-reviewed."
+      ],
+      "details": [
+        "A study presented at the American Heart Association's Scientific Sessions 2026 tested whether adults aged 70 and older could safely stop statins. ScienceDaily describes it as preliminary and independent, with no journal named. It enrolled 1,880 adults (average age 77) at 24 centers in Switzerland, France and the Netherlands. All took statins for primary prevention, having never had a heart attack or stroke, and each had at least two chronic conditions.",
+        "Participants were randomized: 938 to stop statins and 942 to continue, from November 2021 to April 2026. Primary outcomes were heart attacks, acute ischemic strokes and death from any cause; secondary ones were quality of life, muscle pain, falls and sarcopenia.",
+        "At two years, no statistically significant difference appeared in the primary outcome; the article estimates about one additional cardiovascular event for every 40 people who stopped. Over up to four years, 12.7% of those who stopped had a heart attack, stroke or death versus 9.2% of those who continued. Stopping didn't measurably improve quality of life, muscle pain, falls or sarcopenia.",
+        "About 14% of participants switched groups during the study; additional analyses reported the results didn't change. The article doesn't give a full statistical breakdown of the four-year figures.",
+        "Lead author Rita Redberg of UCSF said the small increase in risk means 'one cannot make a general recommendation about stopping statins in this patient population,' and advised shared decision-making. She noted discontinuation is generally safe for most people this age without prior cardiovascular events."
+      ],
+      "category": "Health",
+      "tags": [
+        "statins",
+        "heart",
+        "aging",
+        "clinical trial",
+        "cholesterol",
+        "older adults"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261112025534.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-13-a-florida-dark-magic-mushroom-makes-both-psilocybin",
+      "headline": "A Florida 'dark magic mushroom' makes both psilocybin and deadly amatoxin",
+      "summary": "Researchers found Galerina indica on a rotting palm trunk in a Florida wetland. It carries genes for both compounds, and the team also reports a new amatoxin form. The finding is a warning for foragers.",
+      "impacts": [
+        "A mushroom's psychedelic effects could mask a lethal toxin, so wild foraging gets riskier.",
+        "It shows fungal chemistry is more varied than expected.",
+        "Horizontal gene transfer may explain how the genes ended up together, but that's unproven.",
+        "Why mushrooms make poisons is still poorly understood."
+      ],
+      "details": [
+        "Science News reports that researchers identified a tiny fungus, Galerina indica, nicknamed the 'dark magic mushroom', that makes both the hallucinogen psilocybin and deadly amatoxins. The work was reported November 11 in Current Biology. It is the first fungus found to produce both.",
+        "Chemist and fungal biologist Andrew Kunik found it in 2025 on a decaying, moss-covered palm trunk in a central Florida wetland, while in Matthew Smith's lab at the University of Florida. It was the first report of the species in Florida. A blue bruising reaction hinted at psilocybin and guided the chemical analysis; full DNA analysis found genes for both compound types.",
+        "Amatoxins are the toxins in death cap mushrooms and can be lethal in tiny amounts. The team also reported a previously unknown amatoxin form, alpha-proamanitin. Two related species they provisionally named Galerina species 1 and 2 differ: species 1 makes psilocybin but no amatoxin, and species 2 makes neither.",
+        "Fungi usually produce one compound class, not both. The researchers suggest ancestors of these mushrooms acquired some genes by horizontal gene transfer, swapping DNA with unrelated species. Amatoxin genes look ancient, while psilocybin genes may have been acquired independently by two species or inherited from a common ancestor; the family tree is too poorly known to decide.",
+        "Anne Pringle, a mycologist not involved, said the work reveals more diversity in fungal chemistry than scientists appreciated, and that people should be uncomfortable with the question 'Can I eat it?'. She also noted scientists still don't know why mushrooms make poisons; predator defense is suspected but poorly supported."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "mushroom",
+        "fungus",
+        "psilocybin",
+        "toxin",
+        "genetics",
+        "florida"
+      ],
+      "date": "2026-11-11",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Science News",
+          "url": "https://www.sciencenews.org/article/dark-magic-mushroom-psilocybin-amatoxin"
+        }
+      ]
+    }
+  ]
+}
