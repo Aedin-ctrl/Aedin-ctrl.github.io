@@ -261,10 +261,15 @@ function stageBar(y,h,frac,col,label,show){
 }
 /* the vocabulary: fifty thousand entries, drawn as a bar with ONE lit cell.
    The cell is at the word's own id, so its position is the number. */
+/* NOT a *box. The audit (rename every container key, sweep, read what fires)
+   found that NOTHING is ever written on the vocabulary bar or on the model
+   row -- their labels sit outside them. A `*box` name on a surface that
+   carries no text is the escape hatch the spec warns about: it silences
+   checkOverlap on a shape that might one day be covered. They are things. */
 function vocabBar(y,litId,g){
   const [sx,,sw]=L.stage;
   rect(sx,y,sw,22,H.rgba(H.mix(P.ink,P.bone,0.09)));
-  if(GBOX)GBOX.push({x:sx,y:y,w:sw,h:22,k:'vocabbox'});
+  if(GBOX)GBOX.push({x:sx,y:y,w:sw,h:22,k:'vocab'});
   for(let i=0;i<sw;i+=3) rect(sx+i,y+4,1,14,H.rgba(H.mix(P.bone,P.ink,0.72)));
   if(g>0){ const lx=sx+Math.round(sw*litId/NVOCAB);
     rect(lx-1,y-3,3,28,H.rgba(P.gold)); }
@@ -496,7 +501,7 @@ function explainer(ctx,W2,Hh,t){
           const x=Math.round(CXb-NMODELS*22+i*44);
           const on=t>=wordAt(8,0)+i*0.10;
           rect(x,L.strip,36,22,H.rgba(on?H.mix(P.cyan,P.ink,0.45):H.mix(P.ink,P.bone,0.08)));
-          if(GBOX)GBOX.push({x:x,y:L.strip,w:36,h:22,k:'modelbox'});
+          if(GBOX)GBOX.push({x:x,y:L.strip,w:36,h:22,k:'models'});
         }
         px('MODELS',CXb,L.strip+28,14,H.rgba(H.mix(P.bone,P.ink,0.3)),'center','"Silkscreen"');
       }

@@ -2348,6 +2348,33 @@ escape hatch. Two new shapes of the same failure:
   simulation is the explanation, solve for the frame you want and stop the
   clock on it** — do not let it run on into a shape that proves nothing.
 
+## A beat that opens on an empty stage
+
+**v4.16.** A beat's first sentence is spoken over whatever the beat drew at its
+own first word — and if every element is gated on a word that arrives two
+seconds in, the panel is empty for two seconds while the narrator talks. No
+sweep reports it: `checkComposition` measures the **settled** frame, half a
+second before the beat hands over, which is the fullest frame of the beat.
+
+`render/_density.mjs <slug>` samples every 0.25s and counts registered items
+inside the group box. Fewer than three is the flag. #023 had three such holes
+(ASK, MEASURE, SPLIT — 2.5s at worst) and #022 one. The fix is always the same:
+**the furniture of the beat goes up on the beat's first word, and only the
+values wait for theirs** — an empty track with its label, a panel with no
+verdict yet, a reply slot reading `...`.
+
+**Two things that read as thin and are not.** The END overview and a series
+PART card are overlays drawn on a wiped stage, so they count nothing by
+construction. And on anything built before the registration rules, the probe
+measures **how much of the drawing is registered**, not how full the picture
+is: #004's two sine waves and #001's cube row are both on screen and both
+largely invisible to GBOX. The probe is only a composition check on pieces
+built under the current rules.
+
+**Known and not fixed:** #017 `ruler` opens its TWO beat on a loaf and nothing
+else for about 1.25s. It is live and the fix would mean re-rendering a piece
+that may already be posted, so it is recorded here rather than changed.
+
 ## Do not shrink type below the floor to make something fit
 
 **v4.16, from #023.** Eight token plates at the 14px label floor come to 397px
