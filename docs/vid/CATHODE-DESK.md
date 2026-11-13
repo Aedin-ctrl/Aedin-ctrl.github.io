@@ -1,6 +1,41 @@
-# CATHODE DESK — house style v4.16
+# CATHODE DESK — house style v4.17
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.17 (2026-11-13)** — **the page is a player, not a loop that starts
+> without you.** The user: *"when I click in a video it starts automatically
+> playing with the sound off — I want both changed."* A piece opened playing
+> and silent, which is the worst pairing of the two: the only part of it a
+> browser will grant without a gesture is the half nobody wants. So a piece now
+> **opens on a held frame** and **asks for sound**, and the first press of
+> anything — PLAY, the scrub, the spacebar, a click on the page — arms the
+> audio. Pressing PLAY is that gesture, so the normal path is one button.
+>
+> Three things came with it, and all three are **page furniture, never drawn
+> into the frame**: a **speed** control (0.5× to 2×, opening at 1×), a **size**
+> control (S/M/L/XL on the stage), and **previous / next arrows flanking the
+> picture**, wrapping at both ends of the library so neither end is a dead
+> stop. Speed, size and the sound wish follow you from one piece to the next
+> **inside the tab** and are **cleared by a reload** — `sessionStorage` plus an
+> explicit check of the navigation type, because that is the rule as asked for.
+>
+> Two things that are easy to get wrong and were:
+> - **A speed control changes TWO clocks.** Piece-time maps to real time as
+>   `t0 + t/rate`; the picture, the voice and the lookahead that schedules the
+>   effects all divide by it, and one of the three left undivided puts the
+>   clicks on a different clock from the words.
+> - **The voice is a media element fed from a BLOB, not a URL.** It has to be
+>   an element at all because `AudioBufferSourceNode.playbackRate` is a
+>   resampler — 2× arrives an octave high — and only a media element has
+>   `preservesPitch`. But an element streaming from a URL can only seek where
+>   the server answers a Range request, and on a host that does not, every
+>   scrub *and every speed change* silently rewound the voice to zero while the
+>   picture carried on. Measured, not assumed: on a server without ranges the
+>   voice sat 6s behind after one speed change. A blob is local and always
+>   seekable.
+>
+> `?bare=1` and `?t=` are untouched: the render path still opens on a held
+> frame, and the bar — which now carries the gear — is still hidden with it.
 
 > **v4.15 (2026-11-12)** — **the ending is an OVERVIEW, and #001 has had the
 > right one since the beginning.** The user, on the money parts: *"the end
@@ -1047,7 +1082,12 @@ Every frame is a pure function of `t`. All randomness from `H.rng(seed)` /
 `H.makeNoise(seed)` **inside** the draw. Never `Math.random`. The same `t` must
 always give the same pixels — the video renderer depends on it.
 
-Expose `window.seek(t)`, `window.DURATION`, `window.scoreSound`.
+Expose `window.seek(t)`, `window.DURATION`, `window.scoreSound`,
+`window.pictureTime()`.
+
+The **speed control does not touch determinism**: it changes how fast `t` is
+advanced, never what a given `t` draws. `window.seek(t)` is still the only way
+a frame is asked for, which is why the renderer never sees the control at all.
 
 ---
 
@@ -1063,8 +1103,16 @@ line placed on each beat, played from an offset so scrubbing stays in sync.
 Lines are written to the beat's actual length — measure the synthesised audio
 and cut words until it fits; never let a line run into the next beat.
 
-Browsers refuse to start audio without a gesture, so a sampler page plays
-**silent until a button is pressed**, and says so on the button.
+Browsers refuse to start audio without a gesture, so a piece **opens on a held
+frame with the sound already asked for**, and the first press of anything —
+PLAY, the scrub, the spacebar, a click on the page — arms it. AUDIO ON/OFF is
+still a real toggle, and the choice is remembered alongside speed and size.
+Never open playing: the only half a browser grants unasked is the silent one.
+
+The voice is an `<audio>` element fed from a **blob**, routed into the graph
+through `createMediaElementSource`, because the speed control needs
+`preservesPitch` and seeking needs to not depend on the host answering Range
+requests. Everything else stays synthesised and stays a pure function of `t`.
 
 Full SOUND kit, unchanged. Medium-true palette only:
 - **Chrome** → real mouse-button snaps, soft UI clicks

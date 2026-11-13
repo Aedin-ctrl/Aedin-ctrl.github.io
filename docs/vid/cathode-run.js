@@ -745,6 +745,31 @@ window.checkNarration=function(){
   return bad;
 };
 
+/* ===== VIEWING PREFERENCES =====
+   Speed, size and whether the sound is wanted. They follow you from one
+   video to the next inside the tab, and a RELOAD clears them -- which is the
+   rule as asked for, and is why this is sessionStorage plus an explicit check
+   of the navigation type rather than localStorage. Every access is wrapped:
+   sessionStorage throws outright in a private window and in some embeds, and
+   the player must not die with it. */
+const RATES=[0.5,0.75,1,1.25,1.5,2];
+const SIZES=[['S',320],['M',430],['L',580],['XL',760]];
+const PREFS=(()=>{
+  const d={rate:1,size:430,sound:true};
+  try{
+    const nav=performance.getEntriesByType('navigation')[0];
+    if(nav&&nav.type==='reload'){ sessionStorage.removeItem('cathode.prefs'); return d; }
+    const raw=JSON.parse(sessionStorage.getItem('cathode.prefs')||'{}');
+    // validated, not trusted: a stale or hand-edited value must not be able to
+    // set a rate of 0 and stop the clock dead.
+    if(RATES.indexOf(raw.rate)>=0) d.rate=raw.rate;
+    if(SIZES.some(z=>z[1]===raw.size)) d.size=raw.size;
+    if(typeof raw.sound==='boolean') d.sound=raw.sound;
+  }catch(e){}
+  return d;
+})();
+function savePrefs(){ try{ sessionStorage.setItem('cathode.prefs',JSON.stringify(PREFS)); }catch(e){} }
+
 /* ===== LAYER SOUND =====
    The spec's kit, one source per layer: chrome = UI snaps, screen = chip
    blips, objects = hollow plastic knocks, glass = mains hum + phosphor zap.
@@ -752,9 +777,12 @@ window.checkNarration=function(){
    instantly and stays a pure function of t like the picture does.
 
    Browsers will not start audio without a user gesture, so nothing is built
-   until SOUND ON is pressed -- the picture plays silent until then, which is
-   why the button says what it says. */
-const AU={on:false,ctx:null,t0:0,i:0,vo:null,voBuf:null,hum:null,g:{}};
+   until one arrives. The page now ASKS for sound by default and arms itself on
+   the first press -- PLAY, the scrub, the spacebar, a click anywhere -- so the
+   silent-until-you-find-the-button state only exists while nothing is playing.
+   AUDIO OFF is still a real toggle, and it is remembered like the other two
+   preferences. */
+const AU={on:false,ctx:null,t0:0,i:0,vo:null,voFailed:false,hum:null,g:{}};
 
 function auBuild(){
   const C=window.AudioContext||window.webkitAudioContext; if(!C) return false;
@@ -863,21 +891,37 @@ function auStartHum(){
     o.type='sine';o.frequency.value=f;g.gain.value=i?0.35:1;
     o.connect(g);g.connect(AU.g.hum);o.start();AU.hum.push(o);});
 }
+/* The voice is an <audio> element routed into the graph, not a decoded
+   AudioBuffer. An AudioBufferSourceNode CAN be sped up -- but its playbackRate
+   is a resampler, so 2x arrives a whole octave high and 0.5x an octave low.
+   A media element has preservesPitch, which is what makes a speed control
+   usable on a voice. The effects and the bed stay synthesised, so they are
+   still a pure function of t and still cost no bytes. */
+function applyRate(){
+  const el=AU.vo; if(!el) return;
+  el.playbackRate=PREFS.rate;
+  // the standard name landed late; the two prefixed ones are what older
+  // Safari and Firefox read, and setting all three is free.
+  el.preservesPitch=true; el.webkitPreservesPitch=true; el.mozPreservesPitch=true;
+}
+/* piece-time t maps to real time as t0 + t/rate: every schedule below divides,
+   and getting one of them wrong puts the clicks and the voice on two clocks. */
 function auSeek(t){                       // audio follows the picture, never leads
   if(!AU.on||!AU.ctx) return;
   AU.i=0; while(AU.i<SCORE.length&&SCORE[AU.i].t<t) AU.i++;
-  AU.t0=AU.ctx.currentTime-t;
-  if(AU.vo){try{AU.vo.stop();}catch(e){} AU.vo=null;}
-  if(AU.voBuf&&t<DURATION-0.05){
-    const s=AU.ctx.createBufferSource();s.buffer=AU.voBuf;s.connect(AU.g.voice);
-    s.start(AU.ctx.currentTime,Math.max(0,t)); AU.vo=s;}
+  AU.t0=AU.ctx.currentTime-t/PREFS.rate;
+  const el=AU.vo; if(!el) return;
+  applyRate();
+  try{ el.currentTime=H.clamp(t,0,Math.max(0,DURATION-0.02)); }catch(e){}
+  if(playing&&t<DURATION-0.05){ const pr=el.play(); if(pr&&pr.catch) pr.catch(()=>{}); }
+  else { try{el.pause();}catch(e){} }
 }
-function auStop(){ if(AU.vo){try{AU.vo.stop();}catch(e){} AU.vo=null;} }
+function auStop(){ if(AU.vo){try{AU.vo.pause();}catch(e){}} }
 function auTick(t){                       // schedule a 0.25s lookahead
   if(!AU.on||!AU.ctx) return;
-  const c=AU.ctx, until=t+0.25;
+  const c=AU.ctx, r=PREFS.rate, until=t+0.25*r;
   while(AU.i<SCORE.length&&SCORE[AU.i].t<until){
-    const e=SCORE[AU.i++], when=Math.max(c.currentTime,AU.t0+e.t);
+    const e=SCORE[AU.i++], when=Math.max(c.currentTime,AU.t0+e.t/r);
     try{ if(e.k==='note')SFX.note(when,e.n,0.21);
          else if(e.k==='bass')SFX.bass(when,e.n,0.5);
          else SFX[e.k](when,e.n); }catch(err){}
@@ -896,9 +940,11 @@ window.DURATION=DURATION;
 window.seek=(t)=>{cur=H.clamp(t,0,DURATION);explainer(ctx,OUTW,OUTH,cur);
   scrub.value=(cur/DURATION)*1000;timeEl.textContent=cur.toFixed(2)+' / '+DURATION.toFixed(1);};
 function frame(ts){if(!playing)return;
-  // dt is clamped: a backgrounded tab hands back a delta of seconds, which
-  // used to jump the picture past half the piece while the audio stayed put.
-  const dt=Math.min(0.1,(ts-last)/1000);last=ts;cur+=dt;
+  // dt is clamped BEFORE the rate is applied: a backgrounded tab hands back a
+  // delta of seconds, which used to jump the picture past half the piece while
+  // the audio stayed put. Clamping after multiplying would let 2x through at
+  // twice the ceiling.
+  const dt=Math.min(0.1,(ts-last)/1000)*PREFS.rate;last=ts;cur+=dt;
   if(cur>=DURATION){
     if(loopEl.checked){cur=0;auSeek(0);}else{cur=DURATION;setPlay(false);}}
   window.seek(cur);auTick(cur);requestAnimationFrame(frame);}
@@ -906,40 +952,131 @@ function setPlay(v){playing=v;ppB.textContent=v?'PAUSE':'PLAY';
   if(v){last=performance.now();auSeek(cur);requestAnimationFrame(frame);}else auStop();}
 // picture clock, exposed so a harness can measure it against the audio clock
 window.pictureTime=()=>cur;
-ppB.onclick=()=>setPlay(!playing);
+ppB.onclick=()=>{setPlay(!playing);autoArm();};
 scrub.oninput=()=>{window.seek((scrub.value/1000)*DURATION);auSeek(cur);};
-document.addEventListener('keydown',e=>{if(e.code==='Space'){e.preventDefault();setPlay(!playing);}});
+document.addEventListener('keydown',e=>{
+  if(e.code!=='Space') return;
+  // Space is the page's play/pause -- except when a control in the bar has
+  // focus, where it belongs to that control. Swallowing it there meant the
+  // speed and size buttons could be reached by keyboard and not pressed.
+  const a=document.activeElement;
+  if(a&&a.closest&&a.closest('.bar')) return;
+  e.preventDefault();setPlay(!playing);autoArm();});
 
-/* --- audio is armed by a click, because browsers require one --- */
+/* ===== speed and size =====
+   One popup at the end of the control bar, which puts it in the bottom-right
+   corner of the picture without a magic offset -- and means `?bare=1`, which
+   hides the bar, takes it along. */
+const fxB=document.getElementById('fxb'),fxP=document.getElementById('fxp'),
+      fxRate=document.getElementById('fxrate'),fxSize=document.getElementById('fxsize'),
+      stageEl=document.querySelector('.stage');
+function fxMark(){
+  if(fxB) fxB.textContent=(PREFS.rate===1?'1':String(PREFS.rate))+'x';
+  [[fxRate,'rate'],[fxSize,'size']].forEach(([host,key])=>{
+    if(!host) return;
+    host.querySelectorAll('button').forEach(b=>
+      b.classList.toggle('on',Number(b.dataset.v)===PREFS[key]));
+  });
+}
+function applySize(){ if(stageEl) stageEl.style.maxWidth=PREFS.size+'px'; }
+function setRate(r){
+  PREFS.rate=r; savePrefs(); fxMark();
+  // re-anchor: AU.t0 and the voice element are both rate-dependent, so a rate
+  // changed mid-play has to re-seek or the clicks drift off the voice.
+  auSeek(cur);
+}
+function setSize(px){ PREFS.size=px; savePrefs(); applySize(); fxMark(); }
+if(fxRate&&fxSize){
+  RATES.forEach(r=>{const b=document.createElement('button');
+    b.type='button'; b.dataset.v=r; b.textContent=(r===1?'1':String(r))+'x';
+    b.onclick=()=>setRate(r); fxRate.appendChild(b);});
+  SIZES.forEach(([lab,px])=>{const b=document.createElement('button');
+    b.type='button'; b.dataset.v=px; b.textContent=lab;
+    b.onclick=()=>setSize(px); fxSize.appendChild(b);});
+}
+if(fxB&&fxP){
+  const openFx=v=>{fxP.hidden=!v;fxB.setAttribute('aria-expanded',String(v));};
+  fxB.onclick=e=>{e.stopPropagation();openFx(fxP.hidden);};
+  fxP.addEventListener('click',e=>e.stopPropagation());
+  document.addEventListener('click',()=>openFx(false));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')openFx(false);});
+}
+applySize(); fxMark();
+
+/* --- audio is armed by a gesture, because browsers require one --- */
 async function armAudio(){
   if(!AU.ctx && !auBuild()){sndB.textContent='NO AUDIO';return false;}
   if(AU.ctx.state==='suspended') await AU.ctx.resume();
-  if(!AU.voBuf){
-    sndB.textContent='LOADING';
-    // Raced against a timeout: on a slow connection, or anywhere decodeAudioData
-    // never settles, the button used to sit on LOADING for ever with no way back.
-    // The effects and the bed are synthesised, so they still work voiceless.
+  if(!AU.vo && !AU.voFailed){
+    const back=sndB.textContent; sndB.textContent='LOADING';
+    // Raced against a timeout: on a slow connection, or anywhere the element
+    // never reports itself ready, the button used to sit on LOADING for ever
+    // with no way back. The effects and the bed are synthesised, so they still
+    // work voiceless.
     try{
-      AU.voBuf=await Promise.race([
-        // The URL carries the track's content hash. It used to be a bare
-        // 'narration.mp3' with cache:'force-cache', which tells the browser to
-        // reuse ANY cached copy regardless of freshness -- so a reload could
-        // show a new picture driven by the previous take's voice.
+      // The URL carries the track's content hash. It used to be a bare
+      // 'narration.mp3' with cache:'force-cache', which tells the browser to
+      // reuse ANY cached copy regardless of freshness -- so a reload could
+      // show a new picture driven by the previous take's voice.
+      //
+      // The whole file is fetched and handed to the element as a BLOB, not as
+      // a URL for it to stream. An element streaming from a URL can only seek
+      // where the server answers a Range request, and on a host that does not
+      // every scrub -- and every speed change, which re-seeks -- silently
+      // rewinds the voice to zero while the picture carries on. A blob is
+      // local and always seekable, so the scrub stays exact the way the
+      // decoded buffer used to be.
+      const el=new Audio(); el.preload='auto';
+      const got=await Promise.race([
         (async()=>{ const r=await fetch('narration.mp3?v='+VOHASH);
                     if(!r.ok) throw new Error('narration '+r.status);
-                    return await AU.ctx.decodeAudioData(await r.arrayBuffer()); })(),
+                    return await r.blob(); })(),
         new Promise((_,rej)=>setTimeout(()=>rej(new Error('voice timed out')),8000))
       ]);
-    }catch(e){ AU.voBuf=null; console.warn('[cathode] voice unavailable:',e.message); }
+      el.src=URL.createObjectURL(got);
+      await Promise.race([
+        new Promise((res,rej)=>{
+          el.addEventListener('canplay',res,{once:true});
+          el.addEventListener('error',()=>rej(new Error('narration undecodable')),{once:true});
+        }),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('voice timed out')),8000))
+      ]);
+      // Routed into the graph, so the voice bus still mixes it under the
+      // effects exactly as the buffer source did.
+      AU.ctx.createMediaElementSource(el).connect(AU.g.voice);
+      AU.vo=el; applyRate();
+    }catch(e){ AU.vo=null; AU.voFailed=true;
+               console.warn('[cathode] voice unavailable:',e.message); }
+    sndB.textContent=back;
   }
   auStartHum(); return true;
 }
+function sndLabel(){ sndB.textContent=PREFS.sound?'AUDIO ON':'AUDIO OFF'; }
+/* The first press that starts the piece turns the sound on, if it is wanted.
+   Pressing PLAY is a gesture, so "press play and you hear it" is the normal
+   path and nobody has to find a second button. */
+let arming=false;
+async function autoArm(){
+  if(!PREFS.sound||AU.on||arming) return;
+  arming=true;
+  try{ const ok=await armAudio();
+       // re-read the wish AFTER the await: the same press that armed this can
+       // also have been the press on AUDIO ON that turned it back off.
+       if(ok&&PREFS.sound){ AU.on=true; AU.g.master.gain.value=0.9; auSeek(cur); } }
+  finally{ arming=false; }
+}
 sndB.onclick=async()=>{
-  if(AU.on){AU.on=false;auStop();AU.g.master.gain.value=0;sndB.textContent='AUDIO OFF';return;}
-  if(!await armAudio()) return;
-  AU.on=true;AU.g.master.gain.value=0.9;sndB.textContent='AUDIO ON';
-  auSeek(cur);
+  if(AU.on||arming){ PREFS.sound=false; savePrefs(); sndLabel();
+                     AU.on=false; auStop(); if(AU.g.master) AU.g.master.gain.value=0; return; }
+  PREFS.sound=true; savePrefs(); sndLabel();
+  await autoArm();
 };
+sndLabel();
+/* Armed from the three gestures that actually start the piece -- PLAY, the
+   spacebar, the scrub -- and not from any click on the document: a visitor who
+   lands here and clicks straight back to the library should not have pulled
+   half a megabyte of voice down on the way out. */
+scrub.addEventListener('input',()=>autoArm());
 (async()=>{
   try{await Promise.all(['8px "Press Start 2P"','16px "Press Start 2P"','10px "Silkscreen"',
     '38px "Silkscreen"','9px "VT323"'].map(f=>document.fonts.load(f,'AaZz0123456789%?°')));
@@ -962,6 +1099,8 @@ sndB.onclick=async()=>{
     document.querySelector('.bar').style.display='none';
     cv.style.width=LW+'px';
   }
-  if(!isNaN(qt)){window.seek(qt);setPlay(false);}
-  else{window.seek(0);setPlay(true);}
+  // It opens on a held frame, never playing: the sound is wanted by default
+  // and a browser will not grant it without a press, so starting the picture
+  // on its own would only guarantee you watched the first seconds silent.
+  window.seek(isNaN(qt)?0:qt); setPlay(false);
 })();

@@ -12,16 +12,22 @@
   .sub{color:#a9a2b5;font-size:14px;max-width:70ch;}
   .sub b{color:var(--cyan);font-weight:600;}
   .stage{background:#000;border:2px solid var(--sh);box-shadow:0 0 0 2px var(--dk),0 18px 50px rgba(0,0,0,.6);
-         margin:20px auto 0;position:relative;max-width:430px;}
+         margin:20px auto 0;position:relative;max-width:430px;container-type:inline-size;}
   canvas#tv{display:block;width:100%;height:auto;image-rendering:pixelated;}
-  .bar{display:flex;align-items:center;gap:10px;background:var(--face);border-top:2px solid var(--hi);padding:7px 9px;}
+  .bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;background:var(--face);border-top:2px solid var(--hi);padding:7px 8px;}
+  /* Six controls on a 430px bar: every one of them is nowrap and none of them
+     reserves width it is not using, or AUDIO ON breaks across two lines and
+     shoves the clock off the end. */
   .bar button{font-family:'Press Start 2P',monospace;font-size:9px;background:var(--face);color:#000;cursor:pointer;
      border:none;box-shadow:inset 1px 1px 0 var(--hi),inset -1px -1px 0 var(--dk),inset 2px 2px 0 #dfdfdf,inset -2px -2px 0 var(--sh);
-     padding:8px 11px;min-width:62px;}
+     padding:8px 9px;min-width:0;white-space:nowrap;}
   .bar button:active{box-shadow:inset 1px 1px 0 var(--dk),inset -1px -1px 0 var(--hi),inset 2px 2px 0 var(--sh),inset -2px -2px 0 #dfdfdf;}
-  .bar input[type=range]{flex:1;accent-color:var(--navy);min-width:80px;}
-  .bar .t{font-family:'Silkscreen',monospace;font-size:13px;color:#000;min-width:86px;text-align:right;}
-  .bar label{font-family:'Press Start 2P',monospace;font-size:8px;color:#000;display:flex;align-items:center;gap:5px;cursor:pointer;}
+  /* basis 0, not 60: with flex-wrap on, a line breaks on the HYPOTHETICAL
+     size, so a 60px basis pushed the gear onto a second row before anything
+     was allowed to shrink. */
+  .bar input[type=range]{flex:1 1 0;accent-color:var(--navy);min-width:44px;}
+  .bar .t{font-family:'Silkscreen',monospace;font-size:11px;color:#000;text-align:right;white-space:nowrap;}
+  .bar label{font-family:'Press Start 2P',monospace;font-size:8px;color:#000;display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;}
   section{margin-top:40px;}
   h2{font-family:'Press Start 2P',monospace;font-size:12px;color:var(--cyan);margin-bottom:14px;}
   .layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;}
@@ -79,3 +85,57 @@
   .series .part.here{border-color:var(--orange);color:#e8e4dc;background:#221e2c;}
   .series .part.here b{color:var(--orange);}
   .series .part.soon{border-style:dashed;opacity:.6;}
+
+
+  /* ---- the player row: arrows, stage, arrows ----
+     The arrows flank the picture and are not drawn on it, so nothing the
+     piece renders is ever sat under a control. They wrap at both ends of the
+     library, so neither end is a dead stop. */
+  .player{display:flex;align-items:center;justify-content:center;gap:14px;
+    margin:20px auto 0;max-width:100%;}
+  .player .stage{margin:0;flex:1 1 auto;min-width:0;}
+  .nav{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:5px;width:48px;height:92px;text-decoration:none;background:#1e1b26;
+    border:1px solid #332e40;color:#9f98ad;
+    transition:border-color .12s,color .12s,transform .12s;}
+  .nav .g{font-family:'Press Start 2P',monospace;font-size:19px;line-height:1;}
+  .nav .n{font-family:'Silkscreen',monospace;font-size:10px;line-height:1;color:#6f6880;}
+  .nav:hover,.nav:focus-visible{border-color:var(--orange);color:var(--orange);transform:translateY(-2px);}
+  .nav:hover .n,.nav:focus-visible .n{color:var(--orange);}
+
+  /* ---- speed + size, in the bottom-right corner of the picture ----
+     It lives at the end of the control bar, so it is anchored to the corner
+     without a magic offset, and `?bare=1` hides the bar and takes it along.
+     margin-left:auto keeps it hard against the right edge of whichever row it
+     ends up on, so on a narrow bar the popup still opens in the corner. */
+  .fx{position:relative;flex:0 0 auto;display:flex;margin-left:auto;}
+  .bar .fx>button{min-width:0;padding:8px 8px;}
+  .fxpop{position:absolute;right:0;bottom:calc(100% + 8px);display:block;
+    background:var(--face);padding:9px;width:max-content;max-width:min(calc(100cqw - 14px),368px);z-index:9;
+    box-shadow:inset 1px 1px 0 var(--hi),inset -1px -1px 0 var(--dk),
+               inset 2px 2px 0 #dfdfdf,inset -2px -2px 0 var(--sh),0 8px 22px rgba(0,0,0,.55);}
+  .fxpop[hidden]{display:none;}
+  .fxrow{display:flex;align-items:center;gap:8px;}
+  .fxrow+.fxrow{margin-top:7px;}
+  .fxrow>b{font-family:'Press Start 2P',monospace;font-size:8px;color:#000;
+    width:40px;flex:0 0 auto;}
+  .fxopts{display:flex;gap:4px;flex-wrap:wrap;}
+  .bar .fxopts button{font-family:'Silkscreen',monospace;font-size:12px;
+    min-width:38px;padding:6px 4px;}
+  .bar .fxopts button.on{background:#9a9a9a;
+    box-shadow:inset 1px 1px 0 var(--dk),inset -1px -1px 0 var(--hi),
+               inset 2px 2px 0 var(--sh),inset -2px -2px 0 #dfdfdf;}
+
+  /* Measured against the STAGE, not the window: size S is 320px wide on a
+     desktop too, and at that width the six controls only fit once the clock
+     steps aside. The scrub still says where you are. */
+  @container (max-width:400px){
+    .bar{gap:4px;padding:7px 6px;}
+    .bar .t{display:none;}
+  }
+
+  @media (max-width:620px){
+    .player{gap:5px;}
+    .nav{width:28px;height:76px;gap:3px;}
+    .nav .g{font-size:14px;} .nav .n{font-size:8px;}
+  }
