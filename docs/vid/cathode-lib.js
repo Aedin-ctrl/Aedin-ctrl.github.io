@@ -107,8 +107,12 @@ function winFrame(x,y,w,h,title,active){
               FRAMES.push({x:x+4,y:y+4+th+1,w:w-8,h:h-8-th-1,k:'client'}); }
   /* The OUTER plate, not the client area: a window hides what is under its
      border and its title bar as surely as what is under its middle. */
+  /* ns is how deep the cold open's SCENE list was when this window opened.
+     Anything pushed after that index was drawn ON TOP of the window, which is
+     how #015's bank came to cover all but a sliver of "PART 1". */
   if(WINS) WINS.push({x:x,y:y,w:w,h:h,title:String(title||''),
-                      nb:BOUNDS?BOUNDS.length:0, ng:GBOX?GBOX.length:0});
+                      nb:BOUNDS?BOUNDS.length:0, ng:GBOX?GBOX.length:0,
+                      ns:SCENE?SCENE.length:0});
   INCHROME=true; px(title,tx+4,ty+4,6,active?'#ffffff':'#c0c0c0'); INCHROME=false;
   // close button
   const bx=x+w-20;rect(bx,ty+1,13,12,P.face);bevel(bx,ty+1,13,12,'button');

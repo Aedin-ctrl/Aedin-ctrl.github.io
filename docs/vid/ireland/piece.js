@@ -53,6 +53,10 @@
    attached; it is an assumption nobody has ever said out loud. v4.9's rule is
    that the stamp tests the TITLE, and a title naming an absence settles it. */
 const PIECE={ no:15, slug:'ireland', tags:['MONEY','HISTORY'],
+  /* Sentences this piece is allowed to print VERBATIM -- the narrated question card.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[2],
   part:{ n:1, of:5, first:15, series:'How does money actually work?',
          titles:['the six months Ireland had no banks',
                  'where money actually comes from',
@@ -131,7 +135,7 @@ const SENT={
    below the box rather than across its edge. */
 const L={
   // the cold open, on the desk sky: the same town, sitting on the ground
-  open:{ ground:252, street:474, x0:84, x1:348, n:7, bank:[156,344,120,86] },
+  open:{ ground:252, street:474, x0:84, x1:348, n:7, bank:[156,PART_FLOOR+20,120,86] },
   hero:92,                       // headline row, 22px Silkscreen, centred
   bank:[141,138,150,112],        // x,y,w,h -- the shutter drops down its face
                                  // y is 138, not 124: the pediment added 18px
@@ -337,6 +341,33 @@ function explainer(ctx,W2,Hh,t){
                                Math.max(0.5,str.length*0.040));
 
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
+
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE -- three of these six landed in the
+     last quarter of their beat, so the strip sat empty for most of it and then
+     flashed one line that the next beat wiped. Nothing accumulated, so nothing
+     built. They now behave like the bullets of a slide: each takeaway types in
+     UNDER the one before it and STAYS, three at a time, the oldest fading off
+     the top. At any moment the viewer can see what the piece has established. */
+  const CAPS=[['NO NEW NOTES',4,2],['A FIXED PILE OF PAPER',5,9],['IT CIRCULATED LIKE CASH',7,11],['10,000,000 CHEQUES / NONE CLEARED',8,1],['HE KNEW YOUR FACE',11,16],['IT DOES NOT SCALE',14,18]];
+  const capStack=()=>{
+    /* The closing overview shows these same takeaways as its bullets, so the
+       strip stands down when that window opens rather than printing them
+       twice. */
+    if(after(16,0)) return;
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
   const pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
@@ -347,9 +378,6 @@ function explainer(ctx,W2,Hh,t){
 
   const O=L.open;
   deskSky(T,O.ground);
-
-  /* --- THE PART CARD --- */
-  partCard(T,M,t);
 
   /* --- THE COLD OPEN, with the gag and no card of its own.
      The town is on the desk from the first frame with the card above it. The
@@ -378,6 +406,13 @@ function explainer(ctx,W2,Hh,t){
       if(sp<=0.02&&i===2) rect(x-3,O.street-46,21,1,H.rgba(P.red));
     }
   }
+
+  /* --- THE PART CARD, drawn LAST of the cold open.
+     It used to be drawn first, which put the desktop object IN FRONT OF THE
+     WINDOW: #015's bank covered all but a sliver of "PART 1". A Win95 window
+     is in front of the desktop, always -- so the card goes after the object,
+     and the object may sit under it without hiding it. --- */
+  partCard(T,M,t);
 
   /* --- the program window. Same program on all five parts. --- */
   if(T>=dlgOut&&T<SHUT){
@@ -450,7 +485,6 @@ function explainer(ctx,W2,Hh,t){
         counterPlate(L.cNotes,'NEW NOTES ISSUED','0',true);
         px('ALL THE CASH THERE WAS',216,556,14,H.rgba(P.red),'center','"Silkscreen"');
       }
-      cap('NO NEW NOTES',4,2);
     }
 
     /* ============ STUCK -- a fixed pile cannot keep clearing trades ======== */
@@ -473,7 +507,6 @@ function explainer(ctx,W2,Hh,t){
           px('X',x-5,y-1,16,H.rgba(P.red),null,'"Silkscreen"');
         } else note(x-11,y,'nf'+i);
       }
-      cap('A FIXED PILE OF PAPER',5,9);
     }
 
     /* ============ CHEQUE -- one promise, written, and passed on ============ */
@@ -497,7 +530,6 @@ function explainer(ctx,W2,Hh,t){
         const x=Math.round(H.lerp(xa,xb,H.ease.inOut(fr)));
         cheque(x-12,L.lane,'q0');
       }
-      cap('IT CIRCULATED LIKE CASH',7,11);
     }
 
     /* ============ COUNT -- ten million, against a counter reading zero ===== */
@@ -524,7 +556,6 @@ function explainer(ctx,W2,Hh,t){
         for(let i=0;i<n2;i++)
           cheque(L.bank[0]+L.bank[2]+8,L.bank[1]+6+i*12,'u'+i);
       }
-      cap('10,000,000 CHEQUES / NONE CLEARED',8,1);
     }
 
     /* ============ JUDGE -- somebody has to say whose promise is good ======= */
@@ -554,7 +585,6 @@ function explainer(ctx,W2,Hh,t){
         cheque(Math.round(H.lerp(TOWNX(8),TOWNX(9),back))-12,L.lane,'qr',true);
         if(back>0.8) px('NO',TOWNX(9),L.lane+20,16,H.rgba(P.red),'center','"Silkscreen"');
       }
-      cap('HE KNEW YOUR FACE',11,16);
     }
 
     /* ============ LIMIT -- the hinge. It worked, and it does not scale ===== */
@@ -588,14 +618,13 @@ function explainer(ctx,W2,Hh,t){
         if(GBOX)GBOX.push({x:IL+4,y:L.street-52,w:IR-IL-8,h:54,k:'crowd'});
         if(grow>0.7) px('4,950 PAIRS',216,L.low,14,H.rgba(P.red),'center','"Silkscreen"');
       }
-      cap('IT DOES NOT SCALE',14,18);
     }
 
     /* ============ END -- the two piles, and the handover ================== */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
       /* the comparison the piece has been building: what the economy ran on */
-      if(!after(16,8)){
+      if(!after(16,0)){
         pxShadow('WHAT IT RAN ON',216,L.hero,22,P.gold,P.ink,'center','"Silkscreen"');
         const a=mp(wordAt(15,0),wordAt(15,6));
         /* The two piles are counted, not scaled: five notes against thirty
@@ -610,16 +639,27 @@ function explainer(ctx,W2,Hh,t){
       /* the stage is wiped before the summary window opens -- v4.6: a window
          must land on a clear stage, and the piece's closing statement must not
          spend its last seconds underneath one. */
-      const done=after(16,8);
+      const done=after(16,0);
       if(done) wipeStage(CX,CY,CWd,CHd);
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'where money comes from',true);
-        typeWrap(16,bk.x+16,bk.y+30,14,'#000',null,'"Silkscreen"',30);
+        /* honey's shape: an info dialog whose bullets ARE the piece's
+           takeaways, each arriving on its own word, then the close in two
+           short lines. Rule 10 throughout -- not one word of this is the
+           narration retyped. */
+        winIcon(bk.x+10,bk.y+11,'i');
+        const tx=bk.x+52;
+        capLine('> Banks shut.',16,0,tx,bk.y+8,14,'#000');
+        capLine('> Cheques moved.',16,2,tx,bk.y+30,14,'#000');
+        capLine('> A face you knew.',16,4,tx,bk.y+52,14,'#000');
+        capLine('THE PROMISE',16,13,tx,bk.y+84,20,'#000080','#c0c0c0');
+        capLine('WAS THE MONEY.',16,17,tx,bk.y+120,20,'#000080','#c0c0c0');
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'part two: where it','actually comes from.');

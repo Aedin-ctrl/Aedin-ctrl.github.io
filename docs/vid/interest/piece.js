@@ -36,6 +36,10 @@
    slots seen from the bank's side, against a deposit repayable in the
    morning. Naming it is part five's job. */
 const PIECE={ no:18, slug:'interest', tags:['MONEY','TECH'],
+  /* Sentences this piece is allowed to print VERBATIM -- the two recap cards.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[2,3],
   part:{ n:4, of:5, first:15, series:'How does money actually work?',
          titles:['the six months Ireland had no banks',
                  'where money actually comes from',
@@ -244,6 +248,31 @@ function explainer(ctx,W2,Hh,t){
   const cap=(str,n,i)=>capLine(str,n,i,PX+26,CAPY,CAPSZ,H.rgba(P.gold),null,'"VT323"',
                                Math.max(0.5,str.length*0.040));
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
+
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['WHAT THIRTY YEARS COSTS',3,8],['$1,798.65 x 360',5,2],['2.16x WHAT YOU BORROWED',7,0],['83% INTEREST',9,6],['THE SPLIT WALKS',10,5],['HALF THE TERM = 29%',12,9],['PAYMENT 223 OF 360',13,0],['EARLY DOLLARS DELETE INTEREST',16,0]];
+  const capStack=()=>{
+    /* The closing overview shows these same takeaways as its bullets, so the
+       strip stands down when that window opens rather than printing them
+       twice. */
+    if(after(18,0)) return;
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
   const pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
@@ -254,7 +283,6 @@ function explainer(ctx,W2,Hh,t){
 
   const O=L.open;
   deskSky(T,O.ground);
-  partCard(T,M,t);
 
   /* --- COLD OPEN. One payment on the desk, split two ways, and the gag is
      the whole piece: the divider walks from one end of it to the other. --- */
@@ -265,6 +293,13 @@ function explainer(ctx,W2,Hh,t){
     if(SCENE)SCENE.push({x:O.bar[0]-6,y:O.bar[1]-6,w:O.bar[2]+12,h:O.bar[3]+12,k:'pay'});
     payBar(O.bar,H.lerp(0.834,0.02,g),true,'opay');
   }
+
+  /* --- THE PART CARD, drawn LAST of the cold open.
+     It used to be drawn first, which put the desktop object IN FRONT OF THE
+     WINDOW: #015's bank covered all but a sliver of "PART 1". A Win95 window
+     is in front of the desktop, always -- so the card goes after the object,
+     and the object may sit under it without hiding it. --- */
+  partCard(T,M,t);
 
   if(T>=dlgOut&&T<SHUT){
     const done=T>=BEAT.END.sc;
@@ -297,7 +332,6 @@ function explainer(ctx,W2,Hh,t){
       if(GBOX)GBOX.push({x:288,y:348+(bh0-bh1),w:48,h:bh1,k:'repaidbar'});
       rect(288,348+(bh0-bh1),48,bh1,H.rgba(H.mix(P.red,P.ink,0.30)));
       if(g>0.7) px('SO IT HAS TO COST SOMETHING',216,470,16,H.rgba(P.paper),'center','"Silkscreen"');
-      cap('WHAT THIRTY YEARS COSTS',3,8);
     }
 
     /* ============ LOAN -- three hundred and sixty slots lay themselves out = */
@@ -313,7 +347,6 @@ function explainer(ctx,W2,Hh,t){
       readout(L.out,'EVERY MONTH, FOR 30 YEARS',money2(PAY),P.gold);
       if(after(4,0)) px('$300,000  .  30 YEARS  .  6%',216,L.low,16,
                         H.rgba(P.paper),'center','"Silkscreen"');
-      cap('$1,798.65 x 360',5,2);
     }
 
     /* ============ TOTAL -- what all of them come to ======================= */
@@ -342,7 +375,6 @@ function explainer(ctx,W2,Hh,t){
         if(g>0.85) px('2.16x',216,392,22,H.rgba(P.paper),'center','"Silkscreen"');
       }
       readout(L.out,'YOU WILL HAND OVER',money(TOTAL),P.red);
-      cap('2.16x WHAT YOU BORROWED',7,0);
     }
 
     /* ============ ONE / MIGRATE / SLOW / HALF / CROSS -- the split walks === */
@@ -394,10 +426,6 @@ function explainer(ctx,W2,Hh,t){
         readout(L.out,'FIRST PAYMENT MOSTLY DEBT','No.'+CROSS,P.paper);
         if(after(14,0)) px('YEAR 18.6 OF 30',216,L.low,16,H.rgba(P.red),'center','"Silkscreen"');
       }
-      if(phase==='ONE')          cap('83% INTEREST',9,6);
-      else if(phase==='MIGRATE') cap('THE SPLIT WALKS',10,5);
-      else if(phase==='HALF')    cap('HALF THE TERM = 29%',12,9);
-      else if(phase==='CROSS')   cap('PAYMENT 223 OF 360',13,0);
     }
 
     /* ============ EXTRA -- the same dollar, early and late ================ */
@@ -437,13 +465,12 @@ function explainer(ctx,W2,Hh,t){
       }
       if(l>0.8) px('EARLY DOLLARS DELETE INTEREST',216,L.low-36,14,
                    H.rgba(P.paper),'center','"Silkscreen"');
-      cap('EARLY DOLLARS DELETE INTEREST',16,0);
     }
 
     /* ============ END -- the other side of it ============================= */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
-      if(!after(18,14)){
+      if(!after(18,0)){
         pxShadow('FROM THE OTHER SIDE',216,L.hero,20,P.gold,P.ink,'center','"Silkscreen"');
         /* the same 360 slots, now money owed TO the bank */
         const flip=mp(wordAt(17,5),wordAt(17,12));
@@ -465,16 +492,27 @@ function explainer(ctx,W2,Hh,t){
                        H.rgba(P.paper),'center','"Silkscreen"');
         }
       }
-      const done=after(18,14);
+      const done=after(18,0);
       if(done) wipeStage(CX,CY,CWd,CHd);
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'the gap that kills a bank',true);
-        typeWrap(18,bk.x+16,bk.y+26,14,'#000',null,'"Silkscreen"',30);
+        /* honey's shape: an info dialog whose bullets ARE the piece's
+           takeaways, each arriving on its own word, then the close in two
+           short lines. Rule 10 throughout -- not one word of this is the
+           narration retyped. */
+        winIcon(bk.x+10,bk.y+11,'i');
+        const tx=bk.x+52;
+        capLine('> Interest first.',18,0,tx,bk.y+8,14,'#000');
+        capLine('> Principal later.',18,2,tx,bk.y+30,14,'#000');
+        capLine('> Payment 223.',18,4,tx,bk.y+52,14,'#000');
+        capLine('HALF THE TERM',18,12,tx,bk.y+84,20,'#000080','#c0c0c0');
+        capLine('BUYS 29%.',18,16,tx,bk.y+120,20,'#000080','#c0c0c0');
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'part five: why that gap','kills a healthy bank.');

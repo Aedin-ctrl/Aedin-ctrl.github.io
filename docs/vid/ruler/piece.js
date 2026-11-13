@@ -41,6 +41,10 @@
    The quarter-to-three-dollars loaf is an ILLUSTRATION and is said as one.
    The load-bearing number is the index ratio, not the bread. */
 const PIECE={ no:17, slug:'ruler', tags:['MONEY','HISTORY'],
+  /* Sentences this piece is allowed to print VERBATIM -- the two recap cards.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[2,3],
   part:{ n:3, of:5, first:15, series:'How does money actually work?',
          titles:['the six months Ireland had no banks',
                  'where money actually comes from',
@@ -112,7 +116,7 @@ const SENT={
    the whole piece; the stick under it does not. Everything the index is built
    from is counted onto the same shelf. */
 const L={
-  open:{ ground:252, loaf:[168,372,96,58], stick:[112,452,208] },
+  open:{ ground:252, loaf:[168,PART_FLOOR+32,96,58], stick:[112,452,208] },
   hero:92,
   basket:[126,130,180,146],     // x,y,w,h -- clamped at the BASKET beat
   shelf:286,                    // the line the basket stands on
@@ -247,6 +251,31 @@ function explainer(ctx,W2,Hh,t){
                                Math.max(0.5,str.length*0.040));
 
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
+
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['SO: THE UNIT',3,10],['THE SAME SENTENCE, BOTH ENDS',6,4],['THE RULER IS RUBBER',8,12],['80,000 PRICES, 75 CITIES',10,3],['THE SWAP IS THE ARGUMENT',13,10],['A 1970 DOLLAR = 12 CENTS',14,10],['IT HALVES IN 23 YEARS',15,8]];
+  const capStack=()=>{
+    /* The closing overview shows these same takeaways as its bullets, so the
+       strip stands down when that window opens rather than printing them
+       twice. */
+    if(after(17,0)) return;
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
   const pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
@@ -257,7 +286,6 @@ function explainer(ctx,W2,Hh,t){
 
   const O=L.open;
   deskSky(T,O.ground);
-  partCard(T,M,t);
 
   /* --- COLD OPEN. The loaf is on the desk from frame one with a stick under
      it. The gag: the loaf does not move and the stick shrinks away beneath
@@ -270,6 +298,13 @@ function explainer(ctx,W2,Hh,t){
     loaf(O.loaf[0]+O.loaf[2]/2,O.loaf[1],O.loaf[2],O.loaf[3],'oloaf');
     stick(O.stick[0],O.stick[1],O.stick[2]*(1-0.76*g),null,null,'ostick');
   }
+
+  /* --- THE PART CARD, drawn LAST of the cold open.
+     It used to be drawn first, which put the desktop object IN FRONT OF THE
+     WINDOW: #015's bank covered all but a sliver of "PART 1". A Win95 window
+     is in front of the desktop, always -- so the card goes after the object,
+     and the object may sit under it without hiding it. --- */
+  partCard(T,M,t);
 
   if(T>=dlgOut&&T<SHUT){
     const done=T>=BEAT.END.sc;
@@ -305,7 +340,6 @@ function explainer(ctx,W2,Hh,t){
         pxShadow('$',216,398,32,P.gold,P.ink,'center','"Silkscreen"');
         stick(L.stickX,474,L.stickW*0.9,null,null,'rstick');
       }
-      cap('SO: THE UNIT',3,10);
     }
 
     /* ============ ASK -- one loaf, two prices ============================= */
@@ -361,7 +395,6 @@ function explainer(ctx,W2,Hh,t){
       }
       if(merge>0.3) pxShadow('THE SAME SENTENCE, BOTH ENDS',216,430,16,P.paper,P.ink,'center','"Silkscreen"');
       if(merge>0.6) px('NOTHING ABOUT THE BREAD CHANGED',216,462,14,H.rgba(P.gold),'center','"Silkscreen"');
-      cap('THE SAME SENTENCE, BOTH ENDS',6,4);
     }
 
     /* ============ RULER -- you cannot measure with it ===================== */
@@ -377,7 +410,6 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(P.red),'center','"Silkscreen"');
       px('AND NOTHING MOVED',216,L.stickY+136,14,H.rgba(H.mix(P.bone,P.ink,0.30)),
          'center','"Silkscreen"');
-      cap('THE RULER IS RUBBER',8,12);
     }
 
     /* ============ BASKET -- hold it still and count ======================= */
@@ -415,8 +447,6 @@ function explainer(ctx,W2,Hh,t){
       counterPlate(L.idx,'THE INDEX',idx.toFixed(1),changing&&swap>0.5?P.red:P.bone);
       if(changing&&after(13,0))
         px('THE SWAP IS THE ARGUMENT',216,L.low,16,H.rgba(P.red),'center','"Silkscreen"');
-      if(!changing) cap('80,000 PRICES, 75 CITIES',10,3);
-      else cap('THE SWAP IS THE ARGUMENT',13,10);
     }
 
     /* ============ NUMBER -- twelve cents ================================== */
@@ -431,7 +461,6 @@ function explainer(ctx,W2,Hh,t){
       stick(L.stickX,L.stickY+66,Math.max(8,L.stickW*H.lerp(1,0.124,H.ease.inOut(g))),
             null,H.mix(P.red,P.bone,0.20),'snow');
       if(g>0.85) counterPlate(L.idx,'A 1970 DOLLAR IS WORTH','12c',P.red);
-      cap('A 1970 DOLLAR = 12 CENTS',14,10);
     }
 
     /* ============ HALF -- and it keeps going ============================== */
@@ -447,13 +476,12 @@ function explainer(ctx,W2,Hh,t){
       if(g>0.6) px('23 YEARS',L.stickX+Math.round(L.stickW*0.25),L.stickY+44,16,
                    H.rgba(P.gold),'center','"Silkscreen"');
       if(g>0.9) counterPlate(L.idx,'THE UNIT HALVES IN','23 YEARS',P.gold);
-      cap('IT HALVES IN 23 YEARS',15,8);
     }
 
     /* ============ END -- shorter than a mortgage ========================== */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
-      if(!after(17,22)){
+      if(!after(17,0)){
         pxShadow('SHORTER THAN A MORTGAGE',216,L.hero,20,P.gold,P.ink,'center','"Silkscreen"');
         const g=mp(wordAt(16,0),wordAt(16,4));
         px('THE UNIT HALVES',L.stickX,200,14,H.rgba(P.bone),null,'"Silkscreen"');
@@ -482,16 +510,27 @@ function explainer(ctx,W2,Hh,t){
           rect(288,424+(bh0-bh1),48,bh1,H.rgba(H.mix(P.red,P.ink,0.30)));
         }
       }
-      const done=after(17,22);
+      const done=after(17,0);
       if(done) wipeStage(CX,CY,CWd,CHd);
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'what it costs',true);
-        typeWrap(17,bk.x+16,bk.y+26,14,'#000',null,'"Silkscreen"',30);
+        /* honey's shape: an info dialog whose bullets ARE the piece's
+           takeaways, each arriving on its own word, then the close in two
+           short lines. Rule 10 throughout -- not one word of this is the
+           narration retyped. */
+        winIcon(bk.x+10,bk.y+11,'i');
+        const tx=bk.x+52;
+        capLine('> Prices rose.',17,0,tx,bk.y+8,14,'#000');
+        capLine('> Unit shrank.',17,3,tx,bk.y+30,14,'#000');
+        capLine('> One event.',17,6,tx,bk.y+52,14,'#000');
+        capLine('THE RULER',17,21,tx,bk.y+84,20,'#000080','#c0c0c0');
+        capLine('SHRANK.',17,26,tx,bk.y+120,20,'#000080','#c0c0c0');
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'part four: what thirty','years of it costs.');

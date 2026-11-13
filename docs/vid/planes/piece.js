@@ -56,6 +56,10 @@
    #013 spent base rates; this spends SELECTION -- a sample filtered by the
    outcome being measured, and a missing part whose shape is recoverable. */
 const PIECE={ no:21, slug:'planes', tags:['HISTORY','TECH'],
+  /* Sentences this piece is allowed to print VERBATIM -- the narrated question card.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[0],
   myth:"not the holes",
   title:"the planes that came back",
   blurb:"Four hundred bombers went out and three hundred and eighty came home. The holes in them are the hits a bomber survives -- and from that histogram alone, Wald recovered how the missing twenty were lost." };
@@ -353,6 +357,27 @@ function explainer(ctx,W2,Hh,t){
                                Math.max(0.5,str.length*0.040));
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
 
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['ARMOUR WHERE THE HOLES ARE.',2,9],['YOU ONLY EVER SEE THE SURVIVORS.',4,0],['THIS HISTOGRAM IS THE WHOLE INPUT.',7,0],['ONE EQUATION. ONE ROOT.',9,6],[XN.filter(v=>v>0).join(' + ')+' = '+LOST+'.',11,1]];
+  const capStack=()=>{
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
+
   let boost=1;
   if(t>wordAt(3,0)&&t<wordAt(3,0)+0.28)boost=1.50;    // EXCEPT
   if(t>wordAt(4,14)&&t<wordAt(4,14)+0.30)boost=1.54;  // ...the MISSING ones
@@ -425,7 +450,6 @@ function explainer(ctx,W2,Hh,t){
            H.rgba(P.cyan),'center','"Silkscreen"');
       }
       readout(L.out,'SO: ARMOUR',after(2,9)?'THE HOLES':'...',after(2,9)?P.gold:P.bone);
-      cap('ARMOUR WHERE THE HOLES ARE.',2,9);
     }
 
     /* ====== TURN -- the sample was selected before you ever saw it ======== */
@@ -457,7 +481,6 @@ function explainer(ctx,W2,Hh,t){
       }
       readout(L.out,'THE CLEAN PLACES ARE',after(4,12)?'NOT LUCKY':'...',
               after(4,12)?P.gold:P.bone);
-      cap('YOU ONLY EVER SEE THE SURVIVORS.',4,0);
     }
 
     /* ====== WALD -- four hundred aircraft, and the twenty that are not ====
@@ -507,7 +530,6 @@ function explainer(ctx,W2,Hh,t){
       if(after(7,6)) px('NO CRASHED PLANE WAS MEASURED',216,L.low,16,
                         H.rgba(P.red),'center','"Silkscreen"');
       readout(L.out,'CAME HOME',home>0.35?RET+' OF '+NPL:'...',home>0.35?P.gold:P.bone);
-      cap('THIS HISTOGRAM IS THE WHOLE INPUT.',7,0);
     }
 
     /* ====== SOLVE -- one equation, one root ============================== */
@@ -538,7 +560,6 @@ function explainer(ctx,W2,Hh,t){
       }
       readout(L.out,'A HIT DOWNS A BOMBER',after(9,6)?(PK*100).toFixed(1)+'%':'...',
               after(9,6)?P.red:P.bone);
-      cap('ONE EQUATION. ONE ROOT.',9,6);
     }
 
     /* ====== REBUILD -- the aircraft nobody measured come back out ========= */
@@ -578,13 +599,12 @@ function explainer(ctx,W2,Hh,t){
       }
       readout(L.out,'RECONSTRUCTED LOSSES',after(12,0)?XN.reduce((s,v)=>s+v,0)+' OF '+NPL:'...',
               after(12,0)?P.gold:P.bone);
-      cap(XN.filter(v=>v>0).join(' + ')+' = '+LOST+'.',11,1);
     }
 
     /* ====== END ========================================================== */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
-      if(!after(15,10)){
+      if(!after(15,21)){
         pxShadow('THE SHAPE OF WHAT IS MISSING',216,L.hero,18,P.gold,P.ink,'center','"Silkscreen"');
         const [fx,fy,fw,fh]=L.fleet;
         if(GBOX)GBOX.push({x:fx,y:fy,w:fw,h:fh,k:'fleetbox'});
@@ -596,21 +616,29 @@ function explainer(ctx,W2,Hh,t){
         const [lx,ly]=cellXY(380);
         px('RECOVERED FROM SURVIVORS ALONE',216,ly+26,16,
            H.rgba(P.gold),'center','"Silkscreen"');
-        if(after(14,0)) px('EVERY LIST OF WHAT WINNERS DID',216,446,16,
-                           H.rgba(P.paper),'center','"Silkscreen"');
-        if(after(14,6)) px('IS ASSEMBLED OUT OF WINNERS',216,476,16,
+        /* This printed all eleven words of sentence 14 across two lines --
+           rule 10, committed in the very build that was meant to respect it,
+           and found by checkNarration. The clause is what carries it. */
+        if(after(14,6)) px('ASSEMBLED OUT OF WINNERS.',216,460,18,
                            H.rgba(P.red),'center','"Silkscreen"');
       }
-      const fin=after(15,10);
+      const fin=after(15,21);
       if(fin) wipeStage(CX,CY,CWd,CHd);
       if(fin){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'about that picture',true);
-        typeWrap(15,bk.x+16,bk.y+30,14,'#000',null,'"Silkscreen"',30);
+        /* RULE 10: the box carries the load-bearing CLAUSE, not the spoken
+           sentence. It used to be typeWrap() on the raw narration, which (a)
+           retyped all 28 words of it and (b) opened the window ALREADY PART-FILLED,
+           because typeWrap prints everything said so far and the window opened
+           mid-sentence. Gated on the same word the window opens on, it types
+           from empty. */
+        capLine('THE PICTURE SURVIVED.',15,21,bk.x+16,bk.y+86,16,'#000080','#c0c0c0','"Silkscreen"',1.05);
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'it is now safe to','close this window.');

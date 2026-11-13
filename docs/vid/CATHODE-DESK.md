@@ -1,6 +1,117 @@
-# CATHODE DESK — house style v4.12
+# CATHODE DESK — house style v4.15
 
 **Locked 2026-11-12. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.15 (2026-11-12)** — **the ending is an OVERVIEW, and #001 has had the
+> right one since the beginning.** The user, on the money parts: *"the end
+> message is too long — the end is supposed to be like the takeaways or
+> overview. Look at the honey video, I like how simple the end is."* Correct,
+> and #001 `honey` is the model this file should have been citing all along:
+>
+> ```js
+> const m=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'Good To Know Tho',true);
+> winIcon(m.x+10,m.y+11,'i');          // an INFORMATION dialog, which is what it is
+> const tx=m.x+52;
+> capLine('> Dry.',17,0,tx,m.y+8, 14,'#000');      // one word each, arriving
+> capLine('> Acidic.',17,1,tx,m.y+30,14,'#000');   // on its own spoken word
+> capLine('> Sealed.',17,2,tx,m.y+52,14,'#000');
+> capLine('BREAK ANY ONE',18,0,tx,m.y+82, 20,'#000080','#c0c0c0');
+> capLine('AND IT SPOILS.',18,5,tx,m.y+118,20,'#000080','#c0c0c0');
+> ```
+>
+> **Three or four bulleted takeaways, then the close in two short lines.** The
+> bullets are the piece's own takeaways — the same ones the strip has been
+> building all the way down — so the window is a recap of what was established,
+> not a restatement of the last sentence. The strip stands down while it is up,
+> because printing them twice is just printing them twice.
+>
+> **And it is simple because it cannot be anything else.** `capLine()` with a
+> null font is VT323, which advances about **one pixel per character per point
+> of size**. The text column inside `BOX` is **292px**, so the hard limits are
+> **20 characters at 14px and 14 characters at 20px.** That is why #001's
+> bullets are single words, and it is the reason a long closing line physically
+> cannot be set here. **Write to the box, not to the sentence.**
+>
+> The box also opens on the **first** word of the closing sentence, so the
+> overview BUILDS line by line instead of arriving whole — the same rule as
+> v4.14's, applied to five rows instead of one.
+
+> **v4.14 (2026-11-12)** — **the closing box was retyping the narration, which
+> is rule 10, and rule 10 has never once been enforced.** Reported by the user
+> watching #015: *"the end card is way too long, it starts typing before the
+> card appears, it turns up half-filled, and the grammar isn't proper."* All
+> three are real, and the answer to *is this following the guidelines* is **no**.
+>
+> **1. It is a violation, not a gap.** Generation rule 10 has said *"print the
+> CAPTION, not the raw spoken words"* since **v2.x**. v4.7 restated it, gave the
+> research behind it, and said it applied **from the next piece**. Seven pieces
+> were then built — #015 to #021 — and **every one of them piped its closing
+> sentence straight into a dialog through `typeWrap()`**: 25 words in #015, 34
+> in #017, 28 in #021. The cause is not subtle. **Nothing checked**, and the
+> end-box pattern was copied forward from piece to piece, so one unchecked
+> mistake reproduced itself seven times. A rule with no sweep is a comment.
+>
+> **2. It opened part-filled because of what `typeWrap` is.** It prints
+> *everything said so far*, so a window that opens mid-sentence opens already
+> holding every word spoken up to that instant — #017's box appeared with 23 of
+> its 34 words in it. **A window and the line inside it are gated on the SAME
+> word**, and then it types from empty.
+>
+> **3. The fix is the one this file already prescribed.** The closing box now
+> carries a short abridged clause, in Silkscreen, answering the question in its
+> own title bar: `where money comes from` → `THAT IS A BANK.` Note the font —
+> `capLine()` with a null font is **VT323 at ~16px per character**, and a
+> 27-character line measured 435px against a 432px screen.
+>
+> **4. `checkNarration()` is the FIFTEENTH sweep.** It reassembles the drawn
+> text in draw order before comparing, because `typeWrap` breaks a sentence into
+> rows and the first version of this sweep, looking at items one at a time,
+> returned **clean on a box containing all 25 words.** It flags only *retyping*
+> — eight words and over half the sentence — never quoting, because a caption
+> carrying the load-bearing clause is made of the sentence's own words and that
+> is the rule being obeyed. The two legitimate cases are **declared** in
+> `PIECE.verbatim`: the narrated question card, and a deliberate quotation
+> (#016 prints the Bank of England's own sentence, which is the beat). Pieces
+> #001–#014 are grandfathered by v4.7's own clause.
+>
+> **5. And the gap, which is separate: a caption appeared ALONE and LATE.**
+> Three of #015's six landed in the **last quarter of their beat** — the strip
+> sat empty for most of it, flashed one line, and the next beat wiped it.
+> Nothing accumulated, so nothing built. **Takeaways now stack like the bullets
+> of a slide:** each types in under the one before it and stays, three at a
+> time, the oldest dimming off the top, so at any moment the viewer can see what
+> the piece has established. This is a new rule, because nothing in this file
+> said when a caption should appear or how long it should live.
+
+> **v4.13 (2026-11-12)** — **a window that is BURIED is as broken as one that
+> buries, and `checkCard` only ever asked the second question.** Reported by the
+> user watching #015: *"the part one box is completely underneath and behind the
+> gag, you can't even see it."* Correct — "PART 1" was a sliver of blue behind a
+> bank, and the same fault was in #016 and #019. Four things had to line up:
+>
+> 1. **`partCard()` was called BEFORE the cold open drew its object**, so the
+>    desktop object painted over the window. On a Win95 desktop the window is in
+>    front, always. The card now draws **last** of the cold open.
+> 2. **`PART_FLOOR` already existed for exactly this**, and this file already
+>    said pieces should read it rather than carry 358 as a literal — **and not
+>    one of the five read it.** All of them now do.
+> 3. **The registered box is not the stated `y`.** `bankBuilding()` reserves
+>    18px above its origin for the pediment and `loaf()` is positioned by its
+>    CENTRE, so an object whose top looked 6px clear of the card still overlapped
+>    it by 12 and 15. **Clear the card against the box a piece REGISTERS, not
+>    against the number passed in** — `_detail.mjs` prints the overlap.
+> 4. **No sweep could see any of it.** The cold open's objects go into `SCENE`,
+>    which only `checkFraming` ever read, and `checkCard` compared windows
+>    against `BOUNDS` and `GBOX` only — and only against items drawn *before*
+>    the window. A window could therefore be completely covered with all
+>    fourteen at 0. `winFrame()` now records `ns`, the depth of `SCENE` when the
+>    window opened, and **`checkCard` flags anything pushed after that which
+>    overlaps it.** Verified against a deliberately broken control before being
+>    trusted: it reports `buriedBy:"town", overlap:[160,14]`.
+>
+> The general rule, which is the third time this file has had to write a version
+> of it: **a sweep can only see what the piece hands it, and a list nothing
+> compares is not a check.** `SCENE` had been write-only for every sweep but one.
 
 > **v4.12 (2026-11-12)** — **a stamp is also a no-repeat.** A full-library
 > audit found #007 `sweat` and #020 `wrinkle` shipping the **same stamp**,
@@ -712,6 +823,27 @@ spoken:  "A hundred and one kilopascals holds up ten point three metres
 caption: 101 kPa -> 10.33 m. AND NO MORE.          <- abridged, not verbatim
 ```
 
+**The ending is an OVERVIEW (v4.15).** The closing window is an information
+dialog: three or four **bulleted takeaways**, each arriving on its own spoken
+word, then the close in **two short lines**. The bullets are the piece's own
+takeaways, so the window recaps what was established rather than restating the
+last sentence, and the caption strip stands down while it is up. **#001 `honey`
+is the model.** The limits are physical: `capLine()`'s null font is VT323 at
+about one pixel per character per point, and the column inside `BOX` is 292px —
+**20 characters at 14px, 14 characters at 20px.** Write to the box.
+
+**Takeaways ACCUMULATE (v4.14).** A caption used to appear alone, be wiped by
+the next beat, and leave nothing behind — and three of #015's six landed in the
+**last quarter of their beat**, so the strip was empty for most of it. Treat the
+strip as the bullets of a slide: each takeaway **types in under the one before
+it and stays**, three at a time, the oldest dimming off the top. A viewer who
+looks up mid-piece can then see what has been established, and a viewer on mute
+has a running summary instead of one line that flashes and goes.
+
+**And gate a takeaway EARLY in its beat**, on the word that makes it true, not
+on the last words of the beat. A line that arrives with three seconds left is a
+footnote to a beat that has already finished.
+
 **The boundary condition that keeps captions at all:** short-form video is
 watched on mute, and Mayer's own exception is for cases where on-screen text
 carries something the viewer needs. A muted viewer has no narration channel, so
@@ -1012,7 +1144,12 @@ the rule that prevents it recurring. **Follow them when generating, not after.**
     (`after(18,5) -> 'AND IT SPOILS.'`) is not the same as printing
     `said(18, 5)`, which is the literal narration — "of those and it spoils.",
     509px against a 412px box. Sync the caption to a word; do not retype the
-    sentence as the caption.
+    sentence as the caption. **Enforced since v4.14 by `checkNarration()`, the
+    fifteenth sweep** — this rule stood unchecked from v2.x and was broken by
+    every one of the seven pieces built after v4.7 said it applied. Legitimate
+    verbatim printing (the narrated question card; a deliberate quotation) is
+    declared in `PIECE.verbatim`. **A window and the line inside it are gated on
+    the SAME word**, or the window opens already holding everything said so far.
 11. **A scene clears its own props before the next idea starts.** The six-cube
     "one sixth water" row stayed up until the next *sentence*, so it sat behind
     the comparison that followed. Gate a prop on the word that replaces it, not
@@ -1098,7 +1235,7 @@ click, and is instantly obvious as the one that was forgotten.
 
 ### Enforcement
 
-Every rule above is checked by a sweep, and all **fourteen** must return **0**.
+Every rule above is checked by a sweep, and all **fifteen** must return **0**.
 **This table is the whole set** — `sweep.mjs` runs exactly these names, so if a
 sweep exists and is not listed here, one of the two is wrong.
 

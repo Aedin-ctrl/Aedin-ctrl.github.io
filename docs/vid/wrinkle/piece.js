@@ -46,6 +46,10 @@
    through the sweat ducts shifts the local electrolyte balance, which drives
    the sympathetic response. The piece says proposed. */
 const PIECE={ no:20, slug:'wrinkle', tags:['BODY','BIOLOGY'],
+  /* Sentences this piece is allowed to print VERBATIM -- the narrated question card.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[0],
   myth:"not swelling",
   title:"why your fingers wrinkle in water",
   blurb:"Not because the skin soaks up water -- a finger with no nerve supply sits in the same bath and stays smooth. The vessels underneath narrow, the pulp loses volume, and the skin is pulled down from beneath." };
@@ -242,6 +246,27 @@ function explainer(ctx,W2,Hh,t){
                                Math.max(0.5,str.length*0.040));
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
 
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['IT DOES SOAK. THAT IS NOT IT.',2,5],['ONE WRINKLED. ONE DID NOT.',5,2],['ONE FELL. THE OTHER ROSE.',6,4],['THE OPPOSITE OF SWELLING',9,4],['DOCTORS USE IT AS A TEST',11,0],['ONE SAYS YES. ONE SAYS NO.',14,0]];
+  const capStack=()=>{
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
+
   let boost=1;
   if(t>wordAt(5,2)&&t<wordAt(5,2)+0.28)boost=1.52;    // one wrinkled, one smooth
   if(t>wordAt(7,5)&&t<wordAt(7,5)+0.28)boost=1.50;    // it rose
@@ -307,7 +332,6 @@ function explainer(ctx,W2,Hh,t){
       }
       if(back>0.5) px('BUT NOT THE RIDGES',216,L.lbl,16,H.rgba(P.red),'center','"Silkscreen"');
       readout(L.out,'WATER ABSORBED','YES',back>0.5?P.bone:P.ice);
-      cap('IT DOES SOAK. THAT IS NOT IT.',2,5);
     }
 
     /* ============ NERVE -- the control, which is the episode ============== */
@@ -327,7 +351,6 @@ function explainer(ctx,W2,Hh,t){
            H.rgba(H.mix(P.bone,P.ink,0.34)),'center','"Silkscreen"');
       }
       if(after(5,2)) readout(L.out,'WRINKLED','1 OF 2',P.gold);
-      cap('ONE WRINKLED. ONE DID NOT.',5,2);
     }
 
     /* ============ BLOOD -- two numbers, opposite signs =================== */
@@ -356,7 +379,6 @@ function explainer(ctx,W2,Hh,t){
       }
       if(g2>0.85) readout(L.out,'SAME WATER, OPPOSITE WAYS','↓ AND ↑',P.paper);
       else        readout(L.out,'NORMAL FINGER',sgn(NORMAL_DF),P.red);
-      cap('ONE FELL. THE OTHER ROSE.',6,4);
     }
 
     /* ============ PULL -- the ridges are the opposite of swelling ========= */
@@ -400,7 +422,6 @@ function explainer(ctx,W2,Hh,t){
       if(after(9,0)) px('SKIN PULLED DOWN, NOT PUSHED OUT',216,L.base+10,16,
                         H.rgba(P.paper),'center','"Silkscreen"');
       readout(L.out,'THE RIDGES ARE','NOT SWELLING',P.gold);
-      cap('THE OPPOSITE OF SWELLING',9,4);
     }
 
     /* ============ ACTION -- it is deliberate, and it is used ============= */
@@ -423,7 +444,6 @@ function explainer(ctx,W2,Hh,t){
         }
       }
       readout(L.out,'SMOOTH AFTER WARM WATER','NERVE FAULT',P.red);
-      cap('DOCTORS USE IT AS A TEST',11,0);
     }
 
     /* ============ WHY -- and here the evidence stops ===================== */
@@ -453,7 +473,6 @@ function explainer(ctx,W2,Hh,t){
            H.rgba(P.red),'center','"Silkscreen"');
       }
       readout(L.out,'WHAT IT IS FOR','UNSETTLED',P.red);
-      cap('ONE SAYS YES. ONE SAYS NO.',14,0);
     }
 
     /* ============ END ==================================================== */
@@ -478,11 +497,18 @@ function explainer(ctx,W2,Hh,t){
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'still open',true);
-        typeWrap(16,bk.x+16,bk.y+30,14,'#000',null,'"Silkscreen"',30);
+        /* RULE 10: the box carries the load-bearing CLAUSE, not the spoken
+           sentence. It used to be typeWrap() on the raw narration, which (a)
+           retyped all 10 words of it and (b) opened the window ALREADY PART-FILLED,
+           because typeWrap prints everything said so far and the window opened
+           mid-sentence. Gated on the same word the window opens on, it types
+           from empty. */
+        capLine('NOBODY KNOWS YET.',16,6,bk.x+16,bk.y+86,16,'#000080','#c0c0c0','"Silkscreen"',1.05);
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'it is now safe to','close this window.');

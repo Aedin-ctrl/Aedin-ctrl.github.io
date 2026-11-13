@@ -39,6 +39,10 @@
    The only population-level number in the piece is the 97%, which is sourced,
    is drawn as a proportion rather than an amount, and is labelled Britain. */
 const PIECE={ no:16, slug:'lend', tags:['MONEY','TECH'],
+  /* Sentences this piece is allowed to print VERBATIM -- the two recap cards, and s7 is the Bank of England quoted verbatim, which is the beat.
+     Everything else must be an abridged caption (rule 10); checkNarration
+     is the fifteenth sweep and it reads this list. */
+  verbatim:[2,3,7],
   part:{ n:2, of:5, first:15, series:'How does money actually work?',
          titles:['the six months Ireland had no banks',
                  'where money actually comes from',
@@ -113,7 +117,7 @@ const SENT={
    The whole argument is which of the three move, so all three are on screen
    together for every beat that makes a claim about them. */
 const L={
-  open:{ ground:252, bank:[150,336,132,96] },
+  open:{ ground:252, bank:[150,PART_FLOOR+6,132,96] },
   hero:92,
   ctr:[52,126,328,62],            // DEPOSITS CREATED HERE -- this loan only
   colL:[52,214,160,190],          // what the bank OWES you   (your deposit)
@@ -241,6 +245,31 @@ function explainer(ctx,W2,Hh,t){
                                Math.max(0.5,str.length*0.040));
 
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
+
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['SO WHERE DOES IT COME FROM?',3,3],['THE TEXTBOOK PICTURE',5,2],['NOT INTERMEDIARIES',7,3],['BOTH NUMBERS AT ONCE',9,0],['NOTHING LEFT THE VAULT',10,0],['97% IS SOMEBODY’S LOAN',11,13],['NOT A VAULT RUNNING DRY',14,0],['REPAYING DESTROYS IT',15,2]];
+  const capStack=()=>{
+    /* The closing overview shows these same takeaways as its bullets, so the
+       strip stands down when that window opens rather than printing them
+       twice. */
+    if(after(17,0)) return;
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
   const pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
@@ -251,7 +280,6 @@ function explainer(ctx,W2,Hh,t){
 
   const O=L.open;
   deskSky(T,O.ground);
-  partCard(T,M,t);
 
   /* --- THE COLD OPEN. Part one shut this bank; part two opens it, and the
      gag is the one thing a vault is not supposed to do: the door swings and
@@ -276,6 +304,13 @@ function explainer(ctx,W2,Hh,t){
       if(x>vx+sw) note(x,y,'cn'+i);
     }
   }
+
+  /* --- THE PART CARD, drawn LAST of the cold open.
+     It used to be drawn first, which put the desktop object IN FRONT OF THE
+     WINDOW: #015's bank covered all but a sliver of "PART 1". A Win95 window
+     is in front of the desktop, always -- so the card goes after the object,
+     and the object may sit under it without hiding it. --- */
+  partCard(T,M,t);
 
   if(T>=dlgOut&&T<SHUT){
     const done=T>=BEAT.END.sc;
@@ -312,7 +347,6 @@ function explainer(ctx,W2,Hh,t){
         rect(bx+3,by+3,bw-6,sh,H.rgba(H.mix(P.ink,P.bone,0.24)));
         for(let yy=0;yy<sh;yy+=5) rect(bx+3,by+3+yy,bw-6,2,H.rgba(H.mix(P.ink,P.bone,0.40)));
       }
-      cap('SO WHERE DOES IT COME FROM?',3,3);
     }
 
     /* ============ ASK / SAVERS / NO / BOTH / VAULT -- the three instruments = */
@@ -374,10 +408,6 @@ function explainer(ctx,W2,Hh,t){
            'center','"Silkscreen"');
         typeWrap(7,IL+6,322,14,H.rgba(P.red),P.ink,'"Silkscreen"',33);
       }
-      if(T>=BEAT.SAVERS.sc&&T<BEAT.NO.sc) cap('THE TEXTBOOK PICTURE',5,2);
-      if(T>=BEAT.NO.sc&&T<BEAT.BOTH.sc)   cap('NOT INTERMEDIARIES',7,3);
-      if(T>=BEAT.BOTH.sc&&T<BEAT.VAULT.sc)cap('BOTH NUMBERS AT ONCE',9,0);
-      if(T>=BEAT.VAULT.sc)                cap('NOTHING LEFT THE VAULT',10,0);
       if(T>=BEAT.ASK.sc&&T<BEAT.SAVERS.sc)
         pxShadow('WHOSE MONEY IS IT?',216,L.hero,22,P.gold,P.ink,'center','"Silkscreen"');
     }
@@ -407,7 +437,6 @@ function explainer(ctx,W2,Hh,t){
         if(rows>=9) px("EVERY ROW IS SOMEBODY'S LOAN",216,L.low-14,14,
                        H.rgba(P.paper),'center','"Silkscreen"');
       }
-      cap('97% IS SOMEBODY’S LOAN',11,13);
     }
 
     /* ============ LIMIT -- it is bounded, and not by a vault ============== */
@@ -430,7 +459,6 @@ function explainer(ctx,W2,Hh,t){
       });
       vaultBox(L.vault,1);
       if(after(14,0)) px('NOT A VAULT RUNNING DRY',216,L.low,16,H.rgba(P.red),'center','"Silkscreen"');
-      cap('NOT A VAULT RUNNING DRY',14,0);
     }
 
     /* ============ KILL -- repaying destroys it ============================ */
@@ -444,13 +472,12 @@ function explainer(ctx,W2,Hh,t){
       ledgerCol(L.colL,'OWES YOU',[{s:'£100,000',big:true,col:P.gold,struck:k>0.3}]);
       ledgerCol(L.colR,'YOU OWE',[{s:'£100,000',big:true,col:P.paper,struck:k>0.5}]);
       vaultBox(L.vault,1);
-      cap('REPAYING DESTROYS IT',15,2);
     }
 
     /* ============ END -- the vault leaves; the promises are the money ===== */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
-      if(!after(17,8)){
+      if(!after(17,0)){
         pxShadow('WHAT THE MONEY IS',216,L.hero,22,P.gold,P.ink,'center','"Silkscreen"');
         /* The vault EMPTIES, in place. The first build slid it off the
            bottom of the frame and it crossed the group box border on the way
@@ -464,16 +491,27 @@ function explainer(ctx,W2,Hh,t){
         if(rows>=12) px('EVERYONE’S UNPAID PROMISES',216,200+12*26+16,16,
                         H.rgba(P.gold),'center','"Silkscreen"');
       }
-      const done=after(17,8);
+      const done=after(17,0);
       if(done) wipeStage(CX,CY,CWd,CHd);
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'the unit it is counted in',true);
-        typeWrap(17,bk.x+16,bk.y+30,14,'#000',null,'"Silkscreen"',30);
+        /* honey's shape: an info dialog whose bullets ARE the piece's
+           takeaways, each arriving on its own word, then the close in two
+           short lines. Rule 10 throughout -- not one word of this is the
+           narration retyped. */
+        winIcon(bk.x+10,bk.y+11,'i');
+        const tx=bk.x+52;
+        capLine('> Loan and deposit.',17,0,tx,bk.y+8,14,'#000');
+        capLine('> The same instant.',17,2,tx,bk.y+30,14,'#000');
+        capLine('> 97% of it.',17,4,tx,bk.y+52,14,'#000');
+        capLine('NOTHING LEFT',17,9,tx,bk.y+84,20,'#000080','#c0c0c0');
+        capLine('THE VAULT.',17,12,tx,bk.y+120,20,'#000080','#c0c0c0');
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'part three: the unit','does not keep its size.');

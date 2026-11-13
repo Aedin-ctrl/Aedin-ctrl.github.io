@@ -652,8 +652,9 @@ window.checkCard=function(step){
                          y=Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y);
                    return (x>1&&y>1)?[Math.round(x),Math.round(y)]:null;};
   for(let tt=0; tt<=DUR; tt+=st){
-    BOUNDS=[]; GBOX=[]; WINS=[]; explainer(ctx,OUTW,OUTH,tt);
-    const r=BOUNDS, g=GBOX, w=WINS; BOUNDS=null; GBOX=null; WINS=null;
+    BOUNDS=[]; GBOX=[]; WINS=[]; SCENE=[]; explainer(ctx,OUTW,OUTH,tt);
+    const r=BOUNDS, g=GBOX, w=WINS, sc=SCENE;
+    BOUNDS=null; GBOX=null; WINS=null; SCENE=null;
     if(w.length<2) continue;         // one window cannot float over anything
     let stage=w[0]; for(const q of w) if(q.w*q.h>stage.w*stage.h) stage=q;
     for(const q of w){
@@ -671,6 +672,75 @@ window.checkCard=function(step){
         bad.push({t:+tt.toFixed(2),window:q.title||'(untitled)',covers:b.k,overlap:o});
       }
     }
+    /* ...and the reverse question, which this sweep never asked: a window that
+       is BURIED is as broken as one that buries. The cold open's object list
+       is SCENE, which only checkFraming ever read, so #015's bank could be
+       drawn after the part card and cover all but a sliver of "PART 1" with
+       all fourteen sweeps at 0. Anything pushed to SCENE after a window opened
+       was painted on top of it. */
+    for(const q of w){
+      for(let i=q.ns||0;i<sc.length;i++){
+        const b=sc[i]; if(/exit$/.test(b.k)) continue;
+        const o=ov(q,b); if(!o) continue;
+        const k='S|'+b.k+'|'+q.title; if(seen.has(k))continue; seen.add(k);
+        bad.push({t:+tt.toFixed(2),window:q.title||'(untitled)',buriedBy:b.k,overlap:o});
+      }
+    }
+  }
+  return bad;
+};
+
+/* ===== THE FIFTEENTH SWEEP: DO NOT RETYPE THE NARRATION =====
+   Generation rule 10 has said "print the CAPTION, not the raw spoken words"
+   since v2.x, and v4.7 restated it and said it applied from the next piece.
+   Seven pieces were then built that all retyped their closing sentence into a
+   dialog -- up to 34 words of it -- because the pattern was copied forward from
+   piece to piece and NOTHING EVER CHECKED. A rule with no sweep is a comment.
+
+   The two legitimate cases are real: the narrated question card, where the
+   typing IS the narrator asking, and a deliberate verbatim QUOTATION (#016
+   prints the Bank of England's own sentence, which is the point of the beat).
+   Both are now DECLARED, in PIECE.verbatim, so an exemption is a visible
+   decision in the piece header rather than a thing that quietly happens. */
+window.checkNarration=function(){
+  const bad=[];
+  /* v4.7 grandfathered what came before it: "The thirteen pieces built before
+     v4.7 keep their verbatim captions ... It applies from the next piece."
+     #014 was the last of them. */
+  if(typeof PIECE!=='undefined' && PIECE.no<=14) return bad;
+  const allow=new Set((typeof PIECE!=='undefined'&&PIECE.verbatim)||[]);
+  const norm=x=>String(x).toUpperCase().replace(/[^A-Z0-9']/g,'');
+  /* typeWrap() breaks a sentence into ROWS, so no single drawn item ever holds
+     more than a few words of it -- the first version of this sweep looked at
+     items one at a time and returned CLEAN on a box containing all 25 words.
+     The drawn text has to be reassembled in draw order before it is compared.
+     Sampled just after each sentence finishes, which is when a retyped one is
+     fully on screen. */
+  for(let n=0;n<VO.length;n++){
+    if(allow.has(n)) continue;
+    const sn=VO[n].w.map(norm);
+    const lim=Math.max(8,Math.ceil(sn.length*0.55));
+    if(sn.length<lim) continue;
+    const tt=Math.min(DUR,VO[n].z+0.12);
+    BOUNDS=[]; explainer(ctx,OUTW,OUTH,tt);
+    const r=BOUNDS; BOUNDS=null;
+    const W=[];
+    for(const b of r){ if(b.chrome) continue;
+      String(b.s||'').split(/\s+/).map(norm).filter(Boolean).forEach(x=>W.push(x)); }
+    if(W.length<lim) continue;
+    // longest contiguous run common to the drawn text and the sentence
+    let best=0, at=-1, prev=new Array(sn.length+1).fill(0);
+    for(let a=1;a<=W.length;a++){
+      const cur=new Array(sn.length+1).fill(0);
+      for(let c=1;c<=sn.length;c++){
+        if(W[a-1]===sn[c-1]){ cur[c]=prev[c-1]+1;
+          if(cur[c]>best){ best=cur[c]; at=c-cur[c]; } }
+      }
+      prev=cur;
+    }
+    if(best>=lim)
+      bad.push({sentence:n, of:sn.length, printed:best, limit:lim,
+                t:+tt.toFixed(2), text:sn.slice(at,at+Math.min(best,8)).join(' ')});
   }
   return bad;
 };

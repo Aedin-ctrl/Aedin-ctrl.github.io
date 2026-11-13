@@ -116,7 +116,7 @@ const SENT={
    NOTHING IN THIS PIECE PROPAGATES. See the header: #014 already spent the
    cascade, so the picture here is two stable states and a tipping point. */
 const L={
-  open:{ ground:252, bank:[150,352,132,84] },
+  open:{ ground:252, bank:[150,PART_FLOOR+6,132,84] },
   hero:92,
   due:[60,138,312,34],          // DUE IN THE MORNING   -- the short bar
   loans:[60,196,312,34],        // DUE OVER THIRTY YEARS -- the long one
@@ -267,6 +267,31 @@ function explainer(ctx,W2,Hh,t){
   const cap=(str,n,i)=>capLine(str,n,i,PX+26,CAPY,CAPSZ,H.rgba(P.gold),null,'"VT323"',
                                Math.max(0.5,str.length*0.040));
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
+
+  /* ===== THE TAKEAWAY STACK =====
+     A caption used to appear ALONE and LATE, then be wiped by the next beat, so
+     the strip sat empty for most of a beat and nothing ever accumulated. They
+     now behave like the bullets of a slide: each takeaway types in UNDER the
+     one before it and STAYS, three at a time, the oldest fading off the top. */
+  const CAPS=[['THIRTY YEARS vs THE MORNING',2,4],['THE GAP IS THE BUSINESS',4,2],['NO BANK CAN',5,10],['BOTH ENDINGS ARE STABLE',9,6],['IT DEPENDS WHAT YOU EXPECT',8,0],['$42bn IN ONE DAY',11,10],['NO VAULT SURVIVES EVERYONE',13,4],['THE QUEUE GOES. NOBODY IS PAID.',15,1]];
+  const capStack=()=>{
+    /* The closing overview shows these same takeaways as its bullets, so the
+       strip stands down when that window opens rather than printing them
+       twice. */
+    if(after(17,0)) return;
+    const fired=CAPS.filter(c=>after(c[1],c[2]));
+    if(!fired.length) return;
+    const show=fired.slice(-3);
+    show.forEach((c,k)=>{
+      const newest=(k===show.length-1), age=show.length-1-k;
+      const y=CAPY+k*26;
+      const col=newest?P.gold:H.mix(P.gold,P.ink,0.34+age*0.16);
+      if(newest) capLine('\u00b7 '+c[0],c[1],c[2],PX+26,y,CAPSZ,H.rgba(col),null,
+                         '"VT323"',Math.max(0.5,c[0].length*0.040));
+      else       px('\u00b7 '+c[0],PX+26,y,CAPSZ,H.rgba(col),null,'"VT323"');
+    });
+  };
+
   const pOut=PIECE.part.xshut+0.24;
 
   let boost=1;
@@ -277,7 +302,6 @@ function explainer(ctx,W2,Hh,t){
 
   const O=L.open;
   deskSky(T,O.ground);
-  partCard(T,M,t);
 
   /* --- COLD OPEN. A bank on the desk with a queue in front of it. The gag:
      the queue does not move an inch and the bank goes dark anyway, which is
@@ -295,6 +319,13 @@ function explainer(ctx,W2,Hh,t){
     for(let i=0;i<5;i++) depositor(bx-20+i*44,by+bh+28,'wait','od'+i);
     if(g>0.75) rect(bx+6,by+6,bw-12,bh-12,H.rgba(P.ink,0.55));
   }
+
+  /* --- THE PART CARD, drawn LAST of the cold open.
+     It used to be drawn first, which put the desktop object IN FRONT OF THE
+     WINDOW: #015's bank covered all but a sliver of "PART 1". A Win95 window
+     is in front of the desktop, always -- so the card goes after the object,
+     and the object may sit under it without hiding it. --- */
+  partCard(T,M,t);
 
   if(T>=dlgOut&&T<SHUT){
     const done=T>=BEAT.END.sc;
@@ -353,9 +384,6 @@ function explainer(ctx,W2,Hh,t){
         readout(L.out,'PAID BEFORE THE CASH RAN OUT','4 OF 10',P.red);
       else
         readout(L.out,'THE BANK IS SOLVENT','YES',P.green);
-      if(ph==='RECAP') cap('THIRTY YEARS vs THE MORNING',2,4);
-      if(ph==='GAP')   cap('THE GAP IS THE BUSINESS',4,2);
-      if(ph==='CANT')  cap('NO BANK CAN',5,10);
     }
 
     /* ============ FORK / BOTH -- two stable states ======================== */
@@ -374,10 +402,8 @@ function explainer(ctx,W2,Hh,t){
         readout(L.out,'WHICH ONE HAPPENS','BELIEF',P.paper);
         if(after(10,0)) px('DIAMOND & DYBVIG 1983  .  NOBEL 2022',216,L.low,14,
                            H.rgba(H.mix(P.bone,P.ink,0.30)),'center','"Silkscreen"');
-        cap('BOTH ENDINGS ARE STABLE',9,6);
       } else {
         readout(L.out,'WHAT DECIDES IT','NOT THE LOANS',P.red);
-        cap('IT DEPENDS WHAT YOU EXPECT',8,0);
       }
     }
 
@@ -414,7 +440,6 @@ function explainer(ctx,W2,Hh,t){
       readout(L.out,'ASKED FOR, IN ONE DAY','$42bn',P.red);
       if(g2>0.5) px('ASKED FOR -- NOT ALL OF IT LEFT',216,L.low,14,
                     H.rgba(H.mix(P.bone,P.ink,0.30)),'center','"Silkscreen"');
-      cap('$42bn IN ONE DAY',11,10);
     }
 
     /* ============ VAULT -- the obvious fix, applied, failing ============== */
@@ -435,7 +460,6 @@ function explainer(ctx,W2,Hh,t){
       rect(74,398+drop,284,Math.max(2,34-drop),H.rgba(H.mix(P.red,P.ink,0.44)));
       if(g>0.85) px('STILL GONE',216,L.low-16,22,H.rgba(P.red),'center','"Silkscreen"');
       readout(L.out,'NO VAULT SURVIVES','EVERYONE',P.red);
-      cap('NO VAULT SURVIVES EVERYONE',13,4);
     }
 
     /* ============ FIX -- the queue dissolves, and nobody is paid ========== */
@@ -466,13 +490,12 @@ function explainer(ctx,W2,Hh,t){
       if(q>0.9) px('NOBODY WAS PAID',216,L.queue[1]+32,16,
                    H.rgba(P.green),'center','"Silkscreen"');
       readout(L.out,'DOLLARS ACTUALLY PAID OUT','0',P.green);
-      cap('THE QUEUE GOES. NOBODY IS PAID.',15,1);
     }
 
     /* ============ END -- the spine closes ================================= */
     if(T>=BEAT.END.sc){
       groupBox(BX,BY,BW,BH,'DONE');
-      if(!after(17,20)){
+      if(!after(17,0)){
         pxShadow('NEVER HAVING TO BE KEPT',216,L.hero,20,P.gold,P.ink,'center','"Silkscreen"');
         /* the two endings converge into one */
         const c=mp(wordAt(16,0),wordAt(16,7));
@@ -493,16 +516,28 @@ function explainer(ctx,W2,Hh,t){
           }
         }
       }
-      const done=after(17,20);
+      const done=after(17,0);
       if(done) wipeStage(CX,CY,CWd,CHd);
       if(done){
         OVERLAY=true;
         const bk=winFrame(BOX[0],BOX[1],BOX[2],BOX[3],'how money actually works',true);
-        typeWrap(17,bk.x+16,bk.y+26,14,'#000',null,'"Silkscreen"',30);
+        /* honey's shape: an info dialog whose bullets ARE the piece's
+           takeaways, each arriving on its own word, then the close in two
+           short lines. Rule 10 throughout -- not one word of this is the
+           narration retyped. */
+        winIcon(bk.x+10,bk.y+11,'i');
+        const tx=bk.x+52;
+        capLine('> A publican.',17,0,tx,bk.y+8,14,'#000');
+        capLine('> A loan.',17,6,tx,bk.y+30,14,'#000');
+        capLine('> An index.',17,14,tx,bk.y+52,14,'#000');
+        capLine('> A mortgage.',17,16,tx,bk.y+74,14,'#000');
+        capLine('EVERY ONE',17,18,tx,bk.y+106,20,'#000080','#c0c0c0');
+        capLine('WAS A PROMISE.',17,20,tx,bk.y+142,20,'#000080','#c0c0c0');
         button(bk.x+bk.w/2-32,bk.y+bk.h-26,64,20,'OK',t>=CLICK);
         OVERLAY=false;
       }
     }
+    capStack();
     B.restore();
   }
   endCard(T,M,SHUT,'that is all five.','close this window.');
