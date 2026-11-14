@@ -421,9 +421,13 @@ function explainer(ctx,W2,Hh,t){
   const CLICK=VO[VO.length-1].z+0.52, SHUT=CLICK+0.15;
 
   /* ===== THE TAKEAWAY STACK ===== */
+  /* 'NEITHER IS NEEDED.' was the caption AND the beat's hero line in the same
+     frame. The hero stays; the caption now carries the half the stage leaves
+     out -- not sufficient either, which is the finding most retellings drop.
+     v4.19. */
   const CAPS=[['NOBODY IS STEERING IT.',2,0],['ANSWER 1: THE SPIN.',3,5],
               ['ANSWER 2: THE TRAIL.',4,16],['NO GYRO. TRAIL -4 MM.',6,13],
-              ['STABLE ABOVE 2.3 M/S.',7,10],['NEITHER IS NEEDED.',9,2],
+              ['STABLE ABOVE 2.3 M/S.',7,10],['NOT NEEDED, NOT ENOUGH.',9,2],
               ['THE SHORT ONE FALLS FASTER.',13,6],['IT STEERS INTO THE FALL.',15,3]];
   const capStack=()=>{
     if(after(17,0)) return;

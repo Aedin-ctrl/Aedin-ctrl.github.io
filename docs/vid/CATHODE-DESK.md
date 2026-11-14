@@ -1,7 +1,69 @@
-# CATHODE DESK — house style v4.18
+# CATHODE DESK — house style v4.19
 
 **Locked 2026-11-13. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
+> **v4.19 (2026-11-13)** — **four faults found by WATCHING #017 `ruler`, none
+> of which any of the fifteen sweeps could see.** The user asked what was wrong
+> with it; it was returning 15/15.
+>
+> **1. A picture that denies its own caption.** `TWO` ends on the gold line
+> **NOTHING ABOUT THE BREAD CHANGED**, under the narrator saying *"it is the
+> same loaf"* — with the two loaves at **110×93 and 110×64**, one visibly a
+> third taller than the other. The merge reset the **width** to 110 and left
+> the height computed from the swollen value (`Math.round(lw*0.58)`, `lw` still
+> 160). This is the #018 fault — *a number on screen must be the number the
+> narrator says* — in geometry rather than digits, and it gets the same
+> treatment: **`_samesize.mjs`** looks for a frame that asserts sameness in
+> words while the registered siblings it is asserting it about differ by more
+> than 5%. The first regex matched any `SAME`, which made ruler's own caption
+> *"THE SAME SENTENCE, BOTH ENDS"* a hit over a deliberately swollen loaf — the
+> claim has to be about the **object**, not about a sentence.
+>
+> **2. A beat that opens showing one of the two things it is about.** `TWO`
+> cuts at 29.67 and its right-hand loaf did not exist until `split > 0.1`,
+> which is word 2 of *"there are **two** ways to say what happened"* — so for
+> **1.1s** the stage held one loaf, centred, unlabelled, while the narrator
+> said the word two. v4.16's empty-stage rule says the furniture goes up on the
+> beat's first word; **the furniture is whatever the first sentence CLAIMS.**
+> And it could not be fixed by sliding one loaf out of the middle: a 110px loaf
+> needs 120px of centre separation to clear its twin, so any opening that reads
+> as a pair is already the fully split one. The beat opens on the pair; what
+> arrives on the words is the labels.
+>
+> **3. A stage that holds still for seven seconds.** `RECAP`'s twelve ledger
+> rows were drawn complete and motionless from the scene cut at 9.27 until the
+> collapse began at 16.5 — two whole sentences, with nothing moving but a line
+> of text typing in a corner, over an unlabelled gold block. **An object that
+> belongs to a sentence arrives on that sentence**: the rows now count in
+> across *"the total of everyone's unpaid promises"*, and they are **named**,
+> because twelve gold bars are not self-evidently part two's promises. (No
+> sweep for this one: a probe on registered geometry measures registration
+> coverage, not motion, and flagged 16 seconds of `planes` that is animating
+> throughout. **A measurement that cannot tell the difference is not a
+> sweep** — this was found by looking and is fixed by looking.)
+>
+> **4. The caption repeating the stage word for word.** The strip carries the
+> load-bearing clause — *not* what the picture is already saying. #017 printed
+> **THE SAME SENTENCE, BOTH ENDS** twice in one frame, white inside the box and
+> gold in the strip below it, and did the same with three more. **`_dupcap.mjs`**
+> compares the two. Library: ruler 4, run 1, lend 1, interest 1, bike 1 — and
+> **the first version of the probe cried wolf five more times, because a
+> caption TYPES**, so mid-stroke it passes through every prefix of itself and
+> matched any stage line that was a prefix of a longer caption (`NO VAULT
+> SURVIVES` inside `NO VAULT SURVIVES EVERYONE`, which is a caption doing its
+> job). Only the finished caption counts.
+>
+> Two general rules came out of it. **A line is deleted from the stage at the
+> stage's own cost:** dropping #018's duplicate put that beat's centre of mass
+> 79px high against a 56px tolerance and `checkComposition` caught it, so a
+> duplicate is *replaced* with the half of the sentence the caption leaves out,
+> not simply removed. And **two halves of a comparison must be the same
+> construction** — ruler's left half was a loaf alone and its right a loaf over
+> a ruler, so there was nothing to read the growing loaf against and no pair
+> for "the same sentence from opposite ends" to be a pair *of*. Both halves now
+> carry the same ruler: left, the loaf grows against a fixed unit; right, the
+> unit shrinks under a fixed loaf.
+>
 > **v4.18 (2026-11-13)** — **the card must not sit on the gag: the object is
 > the title card's visual hook and has to be VISIBLE while the question types.**
 > Reported by the user watching #020: *"the gag is fully hidden behind the title

@@ -273,7 +273,11 @@ function explainer(ctx,W2,Hh,t){
      the strip sat empty for most of a beat and nothing ever accumulated. They
      now behave like the bullets of a slide: each takeaway types in UNDER the
      one before it and STAYS, three at a time, the oldest fading off the top. */
-  const CAPS=[['THIRTY YEARS vs THE MORNING',2,4],['THE GAP IS THE BUSINESS',4,2],['NO BANK CAN',5,10],['BOTH ENDINGS ARE STABLE',9,6],['IT DEPENDS WHAT YOU EXPECT',8,0],['$42bn IN ONE DAY',11,10],['NO VAULT SURVIVES EVERYONE',13,4],['THE QUEUE GOES. NOBODY IS PAID.',15,1]];
+  /* 'IT DEPENDS WHAT YOU EXPECT' was the caption AND the beat's hero line,
+     printed together in the same frame. The hero is the anchor and stays; the
+     caption now carries sentence 8's own payoff, which the stage never says.
+     v4.19. */
+  const CAPS=[['THIRTY YEARS vs THE MORNING',2,4],['THE GAP IS THE BUSINESS',4,2],['NO BANK CAN',5,10],['BOTH ENDINGS ARE STABLE',9,6],['GONE BY THE AFTERNOON',8,0],['$42bn IN ONE DAY',11,10],['NO VAULT SURVIVES EVERYONE',13,4],['THE QUEUE GOES. NOBODY IS PAID.',15,1]];
   const capStack=()=>{
     /* The closing overview shows these same takeaways as its bullets, so the
        strip stands down when that window opens rather than printing them

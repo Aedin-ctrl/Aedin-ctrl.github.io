@@ -463,7 +463,13 @@ function explainer(ctx,W2,Hh,t){
         px('THE SAME, LATE',216,356,16,H.rgba(P.red),'center','"Silkscreen"');
         px(cutL+' PAYMENTS GONE',216,382,22,H.rgba(P.red),'center','"Silkscreen"');
       }
-      if(l>0.8) px('EARLY DOLLARS DELETE INTEREST',216,L.low-36,14,
+      /* 'EARLY DOLLARS DELETE INTEREST' is this beat's caption and was printed
+         on the stage here as well -- the same words twice in one frame. The
+         strip keeps the caption; the stage takes the half of sentence 16 the
+         strip does NOT carry, which is also what keeps the beat's centre of
+         mass inside checkComposition's band -- deleting the line outright put
+         it 79px high against a 56px tolerance. v4.19. */
+      if(l>0.8) px('A LATE ONE SKIPS THE CHEAPEST',216,L.low-36,14,
                    H.rgba(P.paper),'center','"Silkscreen"');
     }
 

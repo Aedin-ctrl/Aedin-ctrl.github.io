@@ -257,7 +257,14 @@ function explainer(ctx,W2,Hh,t){
      the strip sat empty for most of a beat and nothing ever accumulated. They
      now behave like the bullets of a slide: each takeaway types in UNDER the
      one before it and STAYS, three at a time, the oldest fading off the top. */
-  const CAPS=[['SO: THE UNIT',3,10],['THE SAME SENTENCE, BOTH ENDS',6,4],['THE RULER IS RUBBER',8,12],['80,000 PRICES, 75 CITIES',10,3],['THE SWAP IS THE ARGUMENT',13,10],['A 1970 DOLLAR = 12 CENTS',14,10],['IT HALVES IN 23 YEARS',15,8]];
+  /* THE CAPTION CARRIES THE CLAUSE THE PICTURE DOES NOT SAY. Four of these
+     were word-for-word what the stage was already printing in the same frame
+     -- 'THE SAME SENTENCE, BOTH ENDS' appeared twice at once, in white inside
+     the box and in gold in the strip below it. More than any other piece in
+     the library. Two captions were rewritten to the clause the stage leaves
+     out, and the two stage lines that the strip says better were dropped.
+     v4.19. */
+  const CAPS=[['SO: THE UNIT',3,10],['THE SAME SENTENCE, BOTH ENDS',6,4],['YOU CANNOT MEASURE WITH IT',8,12],['MEASURE MONEY AGAINST GOODS',10,3],['THE SWAP IS THE ARGUMENT',13,10],['A 1970 DOLLAR = 12 CENTS',14,10],['IT HALVES IN 23 YEARS',15,8]];
   const capStack=()=>{
     /* The closing overview shows these same takeaways as its bullets, so the
        strip stands down when that window opens rather than printing them
@@ -330,12 +337,25 @@ function explainer(ctx,W2,Hh,t){
       /* part two's ledger rows, collapsing into one $ which lands on a stick */
       const coll=after(3,0)?mp(wordAt(3,4),wordAt(3,9)):0;
       const rows=12;
-      for(let i=0;i<rows;i++){
+      /* THE ROWS ARRIVE ON THEIR OWN SENTENCE. All twelve used to be drawn,
+         complete and motionless, from the scene cut at 9.27 until the collapse
+         began at 16.5 -- seven seconds of an unlabelled gold block with
+         nothing moving but a line of text typing in a corner, while two whole
+         sentences were spoken. They now count in across "the total of
+         everyone's unpaid promises", which is what they are. v4.19. */
+      const fill=coll>0?1:mp(wordAt(2,4),wordAt(2,12));
+      const shown=Math.max(2,Math.round(fill*rows));
+      for(let i=0;i<shown;i++){
         const y0=320+i*11, y1=368;
         const y=Math.round(H.lerp(y0,y1,H.ease.inOut(coll)));
         const w=Math.round(H.lerp(296,40,H.ease.inOut(coll)));
         rect(Math.round(216-w/2),y,w,6,H.rgba(H.mix(P.gold,P.ink,0.50-((i%2)*0.12))));
       }
+      /* and they are NAMED, because twelve gold bars are not self-evidently
+         part two's promises */
+      if(fill>0.2&&coll<0.15)
+        px('UNPAID PROMISES',216,302,14,H.rgba(H.mix(P.gold,P.ink,0.30)),
+           'center','"Silkscreen"');
       if(coll>0.75){
         pxShadow('$',216,398,32,P.gold,P.ink,'center','"Silkscreen"');
         stick(L.stickX,474,L.stickW*0.9,null,null,'rstick');
@@ -359,41 +379,64 @@ function explainer(ctx,W2,Hh,t){
     /* ============ TWO -- the same event, drawn twice, then one deleted ===== */
     if(T>=BEAT.TWO.sc&&T<BEAT.RULER.sc){
       groupBox(BX,BY,BW,BH,'BOTH ENDS');
-      const split=mp(wordAt(5,2),wordAt(5,8));
+      /* THE BEAT OPENS ON THE PAIR. The split used to start on word 2 of
+         "there are TWO ways to say what happened", and the right-hand loaf did
+         not exist until then -- so for the first 1.1s of a beat about two
+         things the stage held ONE loaf, centred, unlabelled, while the
+         narrator said the word two. Two identical loaves either side of the
+         divider ARE that sentence; what arrives on the words is the LABELS.
+         Nothing can slide out of the middle instead, because a 110px loaf
+         needs 120px of centre separation to clear its twin -- any opening
+         that reads as a pair is already the fully split one. v4.19. */
+      const lx=120, rx=310;
+      const say=mp(wordAt(5,2),wordAt(5,8));
       const merge=after(7,4)?mp(wordAt(7,4),wordAt(7,9)):0;
-      if(split>0.1&&merge<0.9)
-        for(let y=132;y<470;y+=8) rect(216,y,1,4,H.rgba(H.mix(P.bone,P.ink,0.60)));
+      if(merge<0.9){
+        const dn=132+Math.round(338*H.clamp((M-BEAT.TWO.sc)/0.70));
+        for(let y=132;y<dn;y+=8) rect(216,y,1,4,H.rgba(H.mix(P.bone,P.ink,0.60)));
+      }
       const grow=after(6,0)?mp(wordAt(6,0),wordAt(6,2)):0;
       const shrink=after(6,4)?mp(wordAt(6,4),wordAt(6,7)):0;
       // LEFT: the loaf swells
-      const lx=Math.round(H.lerp(216,120,split));
-      if(split>0.55){
+      if(say>0.55){
         px('BREAD GOT',lx,142,14,H.rgba(P.bone),'center','"Silkscreen"');
         px('DEARER',lx,164,14,H.rgba(P.bone),'center','"Silkscreen"');
       }
       /* capped at 160: the left half is 174px wide and an uncapped swell ran
          the loaf out through the group box border at x=21. */
-      const lw=Math.min(160,Math.round(110*(1+1.2*grow)));
-      loaf(lx,250,merge>0.5?110:lw,Math.round(lw*0.58),'lloaf');
+      const swell=Math.min(160,Math.round(110*(1+1.2*grow)));
+      /* AND THE MERGE PUTS BOTH DIMENSIONS BACK. It reset the WIDTH to 110 and
+         left the height computed from the swollen value, so the beat ended on
+         a 110x93 loaf beside a 110x64 one -- visibly a third taller -- in the
+         exact frame that says NOTHING ABOUT THE BREAD CHANGED while the
+         narrator says "it is the same loaf". v4.19. */
+      const lw=Math.round(H.lerp(swell,110,H.ease.inOut(H.clamp((merge-0.15)/0.45))));
+      loaf(lx,250,lw,Math.round(lw*0.58),'lloaf');
+      /* and the left half gets the SAME ruler, at a fixed length. Without it
+         the two halves were not the same construction -- left was a loaf on
+         its own, right was a loaf over a ruler -- so there was nothing to read
+         the growing loaf against, and no pair for "the same sentence from
+         opposite ends" to be a pair OF. Left: the loaf grows against a fixed
+         unit. Right: the unit shrinks under a fixed loaf. v4.19. */
+      stick(lx-70,330,140,null,null,'lstick');
       // RIGHT: the loaf is fixed and the stick shrinks under it
-      if(split>0.1){
-        const rx=Math.round(H.lerp(216,310,split));
-        if(split>0.55){
-          px('THE DOLLAR',rx,142,14,H.rgba(P.gold),'center','"Silkscreen"');
-          px('GOT SMALLER',rx,164,14,H.rgba(P.gold),'center','"Silkscreen"');
-        }
-        loaf(rx,250,110,64,'rloaf');
-        /* a ghost of what the stick WAS, so the shrink is a comparison and
-           not just a short stick. Without it the right half showed a small
-           object with nothing to be small against. */
-        if(shrink>0.02){
-          for(let i=0;i<140;i+=5) rect(rx-70+i,336,3,1,H.rgba(H.mix(P.bone,P.ink,0.62)));
-          rect(rx-70,330,1,14,H.rgba(H.mix(P.bone,P.ink,0.62)));
-          rect(rx+70,330,1,14,H.rgba(H.mix(P.bone,P.ink,0.62)));
-        }
-        stick(rx-70,330,140*(1-0.78*shrink),null,null,'tstick');
+      if(say>0.55){
+        px('THE DOLLAR',rx,142,14,H.rgba(P.gold),'center','"Silkscreen"');
+        px('GOT SMALLER',rx,164,14,H.rgba(P.gold),'center','"Silkscreen"');
       }
-      if(merge>0.3) pxShadow('THE SAME SENTENCE, BOTH ENDS',216,430,16,P.paper,P.ink,'center','"Silkscreen"');
+      loaf(rx,250,110,64,'rloaf');
+      /* a ghost of what the stick WAS, so the shrink is a comparison and
+         not just a short stick. Without it the right half showed a small
+         object with nothing to be small against. */
+      if(shrink>0.02){
+        for(let i=0;i<140;i+=5) rect(rx-70+i,336,3,1,H.rgba(H.mix(P.bone,P.ink,0.62)));
+        rect(rx-70,330,1,14,H.rgba(H.mix(P.bone,P.ink,0.62)));
+        rect(rx+70,330,1,14,H.rgba(H.mix(P.bone,P.ink,0.62)));
+      }
+      stick(rx-70,330,140*(1-0.78*shrink),null,null,'tstick');
+      /* the hero line here used to be THE SAME SENTENCE, BOTH ENDS -- the
+         caption strip's own words, printed twice in one frame. The strip keeps
+         it; the stage keeps the clause the strip does not carry. */
       if(merge>0.6) px('NOTHING ABOUT THE BREAD CHANGED',216,462,14,H.rgba(P.gold),'center','"Silkscreen"');
     }
 
@@ -445,8 +488,8 @@ function explainer(ctx,W2,Hh,t){
       /* the index: it MOVES when the swap happens, which is the beat's claim */
       const base=100, idx=base+(changing?Math.round(swap*3.4*10)/10:0);
       counterPlate(L.idx,'THE INDEX',idx.toFixed(1),changing&&swap>0.5?P.red:P.bone);
-      if(changing&&after(13,0))
-        px('THE SWAP IS THE ARGUMENT',216,L.low,16,H.rgba(P.red),'center','"Silkscreen"');
+      /* 'THE SWAP IS THE ARGUMENT' is the caption, and it was printed here as
+         well -- the same words twice in one frame. The strip keeps it. */
     }
 
     /* ============ NUMBER -- twelve cents ================================== */

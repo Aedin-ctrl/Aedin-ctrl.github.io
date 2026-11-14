@@ -458,7 +458,10 @@ function explainer(ctx,W2,Hh,t){
         px(s,216,y,16,H.rgba(P.paper),'center','"Silkscreen"');
       });
       vaultBox(L.vault,1);
-      if(after(14,0)) px('NOT A VAULT RUNNING DRY',216,L.low,16,H.rgba(P.red),'center','"Silkscreen"');
+      /* 'NOT A VAULT RUNNING DRY' is the caption for this beat, fired on the
+         same word -- it was printed here as well, so the strip and the stage
+         said the identical thing in the identical frame. The strip keeps it,
+         because a caption persists and a stage line is wiped. v4.19. */
     }
 
     /* ============ KILL -- repaying destroys it ============================ */
