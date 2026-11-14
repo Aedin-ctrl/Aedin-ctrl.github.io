@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy — Aedin Lai</title>
+<meta name="description" content="What this site, LectureNotes and typr do with your information. Short version: almost nothing.">
+<link rel="icon" href="data:,">
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('/fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('/fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{--paper:#fff;--ink:#101114;--muted:#4b5059;--faint:#6f747c;--line:#e6e7eb;}
+  @media(prefers-color-scheme:dark){:root{--paper:#0d0e11;--ink:#f2f3f5;--muted:#b7bcc4;--faint:#9aa0aa;--line:#24262c;}}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;
+       line-height:1.65;padding:48px 16px 72px;}
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-0.01em;
+     font-size:clamp(26px,5vw,34px);margin-bottom:6px;}
+  .sub{color:var(--muted);font-size:15px;margin-bottom:28px;}
+  .legal{color:var(--muted);font-size:14px;}
+  .legal h3{font-family:'Space Grotesk',sans-serif;font-size:16px;color:var(--ink);margin:26px 0 6px;}
+  .legal p,.legal li{margin:6px 0;}
+  .legal ul{padding-left:20px;}
+  .legal a{color:var(--ink);text-decoration:underline;}
+  .legal code{font-size:12.5px;background:rgba(127,127,127,.12);padding:1px 4px;border-radius:3px;}
+  .legal .updated{color:var(--faint);font-size:12.5px;}
+  .back{display:inline-block;margin-top:34px;padding-top:18px;border-top:1px solid var(--line);
+        color:var(--faint);font-size:13px;text-decoration:none;}
+  .back:hover{color:var(--ink);}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Privacy</h1>
+    <p class="sub">What this site, LectureNotes and typr do with your information. Short version: almost nothing.</p>
+    <div class="legal">
+            <p class="updated">Last updated November 13, 2026</p>
+
+            <h3>This website</h3>
+            <ul>
+              <li><strong>No cookies, no analytics, no tracking.</strong> Nothing on this site stores anything in your browser or counts your visits, so there's nothing to consent to.</li>
+              <li><strong>No accounts or forms.</strong> The address bar at the top only navigates this page; nothing you type is sent anywhere.</li>
+              <li><strong>Hosting.</strong> The site is hosted on GitHub Pages. Like any web host, GitHub may log visitors' IP addresses for security and operations; see <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener noreferrer">GitHub's privacy statement</a>.</li>
+              <li><strong>Fonts are served from this site</strong>, not from Google.</li>
+              <li><strong>Embedded projects.</strong> Some projects open inside the page from my other sites (casino.aedinlai.com, calorietracker.aedinlai.com, hallway-marathon.github.io). Those pages load fonts from Google Fonts, so Google receives your IP address when you open them.</li>
+              <li><strong>News.</strong> The news tab's question box opens Claude (claude.ai) in a new tab with your question and the story; nothing is sent until you press Ask, and then it goes to Anthropic under your own Claude account. Source links go to the publishers' sites.</li>
+              <li><strong>Email.</strong> If you email me, I get your address and whatever you write, and use it only to reply.</li>
+            </ul>
+
+            <h3>LectureNotes (Mac and Windows app)</h3>
+            <ul>
+              <li><strong>I don't collect anything.</strong> The app sends no analytics or usage data to me, and I never see your recordings, transcripts or notes.</li>
+              <li><strong>Stays on your computer:</strong> audio is transcribed on your computer and never uploaded. Transcripts, answers and notes are saved to <code>~/Documents/LectureNotes</code> (on Windows, <code>Documents\LectureNotes</code>). Answers from the free on-device AI model are also produced on your computer. A small log of when Claude calls succeeded or failed is kept in <code>~/Library/Logs/LectureNotes</code> (on Windows, <code>%LOCALAPPDATA%\LectureNotes\Logs</code>, next to a troubleshooting log of app errors that also never leaves your PC).</li>
+              <li><strong>If you connect Claude</strong> (optional), the questions it detects (with the few sentences said just before them), screenshots you take with the camera tool, and the transcript used to write notes are sent to Anthropic through your own Claude account, to produce the answers. Anthropic's <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and your plan's terms apply to that.</li>
+              <li><strong>Installing it</strong> downloads files from this site, existential.audio (BlackHole audio driver, Mac only), ollama.com (Ollama and the AI model) and huggingface.co (the speech model). Those servers see your IP address, like any download.</li>
+            </ul>
+
+            <h3>typr (the Mac app)</h3>
+            <ul>
+              <li><strong>I don't collect anything.</strong> No analytics or usage data, and I never see your scripts.</li>
+              <li><strong>Stays on your Mac:</strong> your script, settings and the draft wording it generates (saved in <code>~/Library/Application Support/typr</code>).</li>
+              <li><strong>Keyboard access</strong> (the Accessibility permission) is used only to type into the document in front of you and, during a take, to notice when a key is pressed or the mouse is clicked so it can pause. Keys and clicks aren't recorded or saved.</li>
+              <li><strong>If Claude Code is signed in</strong> on your Mac, the script is sent to Anthropic through your own Claude account to write the rough-draft wording. Anthropic's <a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> and your plan's terms apply to that.</li>
+              <li><strong>Installing it</strong> downloads the app from this site.</li>
+            </ul>
+
+            <h3>Cathode Desk (the video publisher)</h3>
+            <ul>
+              <li><strong>It is a personal tool, used by one person: me.</strong> It is a command-line script on my own computer that uploads my own short videos to my own YouTube, Facebook, Instagram and TikTok accounts. It is not offered to anyone else, there are no other users, and it has no sign-up.</li>
+              <li><strong>It collects nothing from anybody.</strong> It reads no viewer data, no analytics and no comments. It only sends my video file and the caption I wrote to the platform I am posting to.</li>
+              <li><strong>Account access.</strong> Authorising it gives it permission to upload videos to my own accounts and nothing else. On YouTube it uses only the <code>youtube.upload</code> permission, which can upload a video but cannot read my subscribers, my watch history or anyone else's data.</li>
+              <li><strong>Where the keys live.</strong> The access tokens stay in a private folder on my own computer and are never sent anywhere except back to the platform that issued them.</li>
+              <li><strong>Revoking it.</strong> I can remove its access at any time from the security settings of each account; nothing is kept afterwards.</li>
+            </ul>
+
+            <h3>Other</h3>
+            <p>This site isn't directed at children under 13. If anything here changes, this page will be updated. Questions: <a href="mailto:lai.ae@northeastern.edu">lai.ae@northeastern.edu</a>.</p>
+          </div>
+    <a class="back" href="/">← aedinlai.com</a>
+  </main>
+</body>
+</html>
