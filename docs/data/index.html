@@ -108,12 +108,24 @@
       One contract a time.
     </p>
     <p class="note">
-      <strong>Why it will probably lose, said in advance:</strong> with three
-      minutes left the side that is winning already costs 80–90¢, and the
-      spread on these venues gets <em>wider</em> near the close, not tighter.
-      The rule is buying information that is already in the price. That is a
-      reason to measure it rather than a reason to skip it — and it is why
-      fills here are pessimistic.
+      <strong>What it actually buys, which was not what I expected.</strong>
+      The prediction here was that the rule would pay 80–90¢ for the side
+      already winning. It does the opposite: in the first hour,
+      <strong>22 of 23 trades bought the underdog, at an average of 24¢</strong>.
+      Because "trending" means the coin's <em>direction of travel</em> and not
+      "is it above the window's open", the rule mostly fires when the price
+      rose early and is now drifting back — so it buys the cheap side, betting
+      the drift continues. That is a bet on short-term reversal against the
+      window's position, which is a different and more interesting thing than
+      backing the favourite.
+    </p>
+    <p class="note">
+      It still has to clear a real cost: the spread on these venues gets
+      <em>wider</em> near the close, not tighter, and fills here cross it and
+      pay the venue's fee. Prices below 2¢ and above 97¢ are refused — at
+      those ends the market is saying the window is already over, and a 0.1¢
+      contract that happens to win pays a thousandfold and would swamp every
+      other trade in the record.
     </p>
   </section>
 
