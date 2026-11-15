@@ -233,6 +233,9 @@
   // file so it can be opened straight off disk.
   var FEEDS = ['https://arb.aedinlai.com/data/index.json', 'index.json'];
   var D = null;
+  // Windows needed before a hit rate is presented as anything but noise.
+  // Four windows can read '+34 pts of edge' and mean nothing at all.
+  var MIN_N = 30;
 
   var TFNAME = {300:'5 min', 900:'15 min', 3600:'1 hour', 14400:'4 hour',
                 86400:'1 day', 90000:'1 day', 604800:'1 week',
@@ -373,12 +376,15 @@
     }
     var fracs = Object.keys(h.fracs).map(Number).sort(function(a,b){ return a-b; });
     var W = 760, H = 260, L = 46, R = 16, T = 14, B = 34;
-    var lo = 0.35, hi = 0.90;
+    // 0..1, so a 0% or 100% rate cannot clip off the chart. A thin
+    // sample reaches both ends routinely, and a line that silently
+    // leaves the frame reads as a line that stopped.
+    var lo = 0.28, hi = 1.0;
     function x(f){ return L + (f - 0.1) / 0.85 * (W - L - R); }
     function y(v){ return T + (hi - v) / (hi - lo) * (H - T - B); }
 
     var g = '';
-    for(var v = 0.4; v <= 0.9001; v += 0.1){
+    for(var v = 0.3; v <= 1.0001; v += 0.1){
       g += '<line x1="'+L+'" y1="'+y(v).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(v).toFixed(1)+
            '" stroke="var(--line)"/>' +
            '<text x="'+(L-7)+'" y="'+(y(v)+4).toFixed(1)+'" text-anchor="end" ' +
@@ -408,8 +414,16 @@
     g += '<line x1="'+x(dp).toFixed(1)+'" y1="'+T+'" x2="'+x(dp).toFixed(1)+'" y2="'+(H-B)+
          '" stroke="var(--s2)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".75"/>';
 
+    // A handful of windows will swing this line from 0% to 100% and show a
+    // "+34 pt edge" that is pure noise. Below MIN_N the measured line is
+    // drawn faint and the edges are greyed, so a small sample cannot be
+    // read as a finding before it is one.
+    var thin = fracs.every(function(f){
+      var r = h.fracs[f]; return !r || r.n < MIN_N; });
+
     g += path('control', 'var(--muted)', true);
-    g += path('rate', 'var(--s1)', false);
+    g += '<g' + (thin ? ' opacity=".42"' : '') + '>' +
+         path('rate', 'var(--s1)', false) + '</g>';
 
     fracs.forEach(function(f){
       g += '<text x="'+x(f).toFixed(1)+'" y="'+(H-B+18)+'" text-anchor="middle" ' +
@@ -426,18 +440,25 @@
     fracs.forEach(function(f){
       var r = h.fracs[f];
       var edge = r.edge;
-      var cls = edge == null ? 'dim' : (edge > 0.02 ? 'pos' : (edge < -0.02 ? 'neg' : 'dim'));
+      var cls = (edge == null || r.n < MIN_N) ? 'dim'
+                : (edge > 0.02 ? 'pos' : (edge < -0.02 ? 'neg' : 'dim'));
       rows += '<tr><td>' + Math.round(f*100) + '%' +
         (Math.abs(f - dp) < 1e-9 ? ' <span class="dim">· the rule trades here</span>' : '') +
         '</td><td>' + r.n + '</td><td>' + pct(r.rate) + '</td>' +
         '<td class="dim">' + pct(r.control) + '</td>' +
         '<td class="' + cls + '">' + (edge==null ? '—' :
-          (edge>0?'+':'') + (edge*100).toFixed(1) + ' pts') + '</td></tr>';
+          (edge>0?'+':'') + (edge*100).toFixed(1) + ' pts' +
+          (r.n < MIN_N ? ' <span class="dim">· too few</span>' : '')) +
+        '</td></tr>';
     });
     el('hitTable').innerHTML = rows + '</tbody>';
-    el('hitFoot').textContent = h.n_windows + ' windows of ' + tfName(+tf) +
-      ' on ' + coin.toUpperCase() + '. ' + pct(h.up_share) + ' of them finished up, ' +
+    var foot = h.n_windows + ' windows of ' + tfName(+tf) + ' on ' +
+      coin.toUpperCase() + '. ' + pct(h.up_share) + ' of them finished up, ' +
       'so always buying the same side would score ' + pct(h.baseline) + '.';
+    if(thin) foot += '  Under ' + MIN_N + ' windows nothing here means anything ' +
+      'yet — a handful can swing a rate from 0% to 100%. The line is drawn ' +
+      'faint until there are enough.';
+    el('hitFoot').textContent = foot;
   }
 
   function drawBreakdown(){
