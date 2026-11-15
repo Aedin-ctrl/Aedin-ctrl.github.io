@@ -36,8 +36,12 @@
   .banner b{color:var(--warn)}
   .banner[hidden]{display:none}
 
-  .grid{display:grid;gap:9px;margin-top:20px;
-        grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .grid{display:block;margin-top:20px}
+  .vgroup{margin-bottom:14px}
+  .vname{font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;
+         color:var(--muted);font-weight:650;margin:0 0 6px 2px}
+  .vcards{display:grid;gap:9px;
+          grid-template-columns:repeat(auto-fit,minmax(152px,1fr))}
   .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
   .m .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--muted)}
   .m .v{font-size:25px;font-weight:650;letter-spacing:-.025em;margin-top:2px;line-height:1.1}
@@ -158,6 +162,14 @@
 
   <section>
     <h2>Each account, broken down <span>— filter it any way you like</span></h2>
+    <p class="note">
+      There is <strong>one account per venue per timeframe</strong>, $100 each.
+      A 5-minute window and an hourly one are different bets with different
+      spreads and different amounts of noise to cut through, so averaging them
+      into one number answers neither question. Splitting by coin as well
+      would be seventy-odd accounts of a handful of trades each, so coins stay
+      as a filter inside an account rather than as accounts of their own.
+    </p>
     <div class="controls">
       <div class="ctl"><label for="fVenue">Account</label><select id="fVenue"></select></div>
       <div class="ctl"><label for="fTf">Timeframe</label><select id="fTf"></select></div>
@@ -218,11 +230,25 @@
     <h2>What exists to trade <span>— checked against all three venues</span></h2>
     <p class="note">
       No venue runs an hourly or daily <em>up/down</em> market any more.
-      Kalshi and Gemini list strike ladders at those lengths ("BTC $64,400 or
-      above"), which is a different contract; Polymarket's hourly and daily
-      up/down windows were discontinued after 2025. So the paper accounts
-      trade 5- and 15-minute windows, and the longer timeframes are studied
-      from the price record instead — which needs no contract.
+      Kalshi and Gemini list <strong>strike ladders</strong> at those lengths
+      ("BTC $64,400 or above" — 10 rungs on Gemini, up to 188 on Kalshi);
+      Polymarket's hourly and daily up/down windows were discontinued after
+      2025.
+    </p>
+    <p class="note">
+      A ladder becomes the same bet by taking <strong>the rung nearest the
+      price at the window's open</strong>: "above that strike at the close"
+      is then "finished higher than it started". That is how the hourly and
+      daily accounts trade. It is an approximation — the strike is a round
+      number and the opening price is not — so how far off centre each one
+      sits is recorded per window in basis points, and anything more than 60
+      bps off is refused rather than traded as if the question had not
+      changed. On a $100 grid at a $64,800 coin the offset is at most ~7.7 bps.
+    </p>
+    <p class="note">
+      Weekly and monthly ladders are listed by the venues and are deliberately
+      <em>not</em> traded: a window measured in weeks cannot be tested by a
+      rule about its last few minutes inside any sensible run.
     </p>
     <div class="wrap"><table id="venueTable"></table></div>
   </section>
@@ -312,24 +338,44 @@
     drawVenues();
   }
 
+  function acctList(){
+    return Object.keys(D.accounts || {}).sort(function(x,y){
+      var a = D.accounts[x], b = D.accounts[y];
+      if(a.venue !== b.venue) return a.venue < b.venue ? -1 : 1;
+      return (a.seconds||0) - (b.seconds||0);
+    });
+  }
+
   function cards(){
-    var out = '';
-    var names = Object.keys(D.accounts || {});
-    names.forEach(function(a){
+    // One card per venue x timeframe. Grouped by venue so the thing worth
+    // comparing -- the same venue across window lengths -- sits together.
+    var out = '', lastVenue = null;
+    acctList().forEach(function(a){
       var t = D.accounts[a];
+      if(t.venue !== lastVenue){
+        if(lastVenue !== null) out += '</div>';
+        out += '<div class="vgroup"><div class="vname">' + esc(t.venue) + '</div>' +
+               '<div class="vcards">';
+        lastVenue = t.venue;
+      }
       var pnl = t.pnl == null ? 0 : t.pnl;
       var cls = pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'dim');
-      out += '<div class="m"><div class="k">' + esc(a) + '</div>' +
+      var traded = (t.open||0) + (t.settled||0);
+      out += '<div class="m"><div class="k">' +
+          esc(tfName(t.seconds)) + '</div>' +
         '<div class="v">' + money(t.equity) + '</div>' +
         '<div class="n"><span class="' + cls + '">' +
           (pnl>0?'+':'') + pnl.toFixed(2) + '</span> from $' +
           t.start.toFixed(0) + ' · ' + t.settled + ' settled</div>' +
         '<div class="n">hit ' + pct(t.hit) + ' · bought ' +
-          pct(t.fill_rate, 0) + ' of ' + (t.signals||0) + ' signals</div>' +
-        '<div class="n dim">' + (t.stood_down||0) + ' times the coin barely ' +
-          'moved, so the rule stood down</div></div>';
+          pct(t.fill_rate, 0) + ' of ' + (t.signals||0) + '</div>' +
+        (traded === 0 && (t.signals||0) === 0
+           ? '<div class="n dim">no signal yet</div>'
+           : '<div class="n dim">' + (t.stood_down||0) + ' stand-downs</div>') +
+        '</div>';
     });
-    if(!out) out = '<div class="m"><div class="k">accounts</div>' +
+    if(out) out += '</div></div>';
+    else out = '<div class="m"><div class="k">accounts</div>' +
       '<div class="v">—</div><div class="n">nothing yet</div></div>';
     el('accountCards').innerHTML = out;
   }
@@ -366,8 +412,9 @@
         var p = k.split('|'); bTfs[p[0]] = 1; bCoins[p[1]] = 1;
       });
     });
-    var vs = ['all'].concat(Object.keys(D.accounts || {}));
-    opts(el('fVenue'), vs, vs.map(function(v){ return v==='all'?'all accounts':v; }), true);
+    var vs = ['all'].concat(acctList());
+    opts(el('fVenue'), vs, vs.map(function(v){
+      return v==='all' ? 'all accounts' : (D.accounts[v].label || v); }), true);
     var tl = Object.keys(bTfs).sort(function(a,b){ return a-b; });
     opts(el('fTf'), ['all'].concat(tl),
          ['all timeframes'].concat(tl.map(function(s){ return tfName(+s); })), true);
@@ -498,7 +545,8 @@
     var h = '<thead><tr><th>Account</th><th>Timeframe</th><th>Coin</th>' +
       '<th>Settled</th><th>Hit</th><th>Avg price</th><th>P&amp;L</th><th>ROI</th></tr></thead><tbody>';
     rows.forEach(function(r){
-      h += '<tr><td>'+esc(r.a)+'</td><td>'+tfName(r.tf)+'</td><td>'+esc(r.coin.toUpperCase())+
+      var lab = (D.accounts[r.a] && D.accounts[r.a].venue) || r.a;
+      h += '<tr><td>'+esc(lab)+'</td><td>'+tfName(r.tf)+'</td><td>'+esc(r.coin.toUpperCase())+
         '</td><td>'+r.n+'</td><td>'+pct(r.hit)+'</td><td>'+
         (r.px==null?'—':r.px.toFixed(2))+'</td><td>'+signed(r.pnl)+'</td><td>'+
         (r.roi==null?'<span class="dim">—</span>':
@@ -516,7 +564,9 @@
         agg[r] = agg[r] || {}; agg[r][a] = s[r];
       });
     });
-    var accts = Object.keys(D.accounts || {});
+    var accts = acctList().filter(function(a){
+      var sk = D.accounts[a].skips || {};
+      return Object.keys(sk).length > 0; });
     var reasons = Object.keys(agg);
     if(!reasons.length){
       el('skipTable').innerHTML = '<tbody><tr><td class="empty">' +
@@ -528,7 +578,8 @@
       return sy - sx;
     });
     var h = '<thead><tr><th>Reason</th>' + accts.map(function(a){
-      return '<th>'+esc(a)+'</th>'; }).join('') + '<th>Total</th></tr></thead><tbody>';
+      return '<th>'+esc(D.accounts[a].label || a)+'</th>'; }).join('') +
+      '<th>Total</th></tr></thead><tbody>';
     reasons.forEach(function(r){
       var tot = 0;
       h += '<tr><td>'+esc(r)+'</td>' + accts.map(function(a){
