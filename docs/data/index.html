@@ -178,6 +178,17 @@
       was <em>able</em> to get, which is a different and much more flattering
       number. Every refusal is recorded with its reason.
     </p>
+    <p class="note">
+      <strong>These are not failed paper fills.</strong> A paper account
+      <em>could</em> fill everything — that is exactly what would make it
+      useless. <em>No offer on that side</em> means there was no ask resting
+      on the book at all, so filling would be inventing liquidity that did
+      not exist. <em>Price below 0.02 / above 0.97</em> are this project's own
+      bounds: at those ends the market is saying the window is over.
+      <em>No signal</em> is different again — the coin barely moved, so the
+      rule had no view and never tried. It is counted separately from the
+      buy rate on the cards above for that reason.
+    </p>
     <div class="wrap"><table id="skipTable"></table></div>
   </section>
 
@@ -313,8 +324,10 @@
         '<div class="n"><span class="' + cls + '">' +
           (pnl>0?'+':'') + pnl.toFixed(2) + '</span> from $' +
           t.start.toFixed(0) + ' · ' + t.settled + ' settled</div>' +
-        '<div class="n">hit ' + pct(t.hit) + ' · filled ' +
-          pct(t.fill_rate, 0) + ' of ' + t.attempts + ' tries</div></div>';
+        '<div class="n">hit ' + pct(t.hit) + ' · bought ' +
+          pct(t.fill_rate, 0) + ' of ' + (t.signals||0) + ' signals</div>' +
+        '<div class="n dim">' + (t.stood_down||0) + ' times the coin barely ' +
+          'moved, so the rule stood down</div></div>';
     });
     if(!out) out = '<div class="m"><div class="k">accounts</div>' +
       '<div class="v">—</div><div class="n">nothing yet</div></div>';
