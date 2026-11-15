@@ -174,6 +174,29 @@
       would be seventy-odd accounts of a handful of trades each, so coins stay
       as a filter inside an account rather than as accounts of their own.
     </p>
+    <p class="note">
+      Two further accounts now run <em>beside</em> the original rule rather
+      than replacing it, so its record stays continuous:
+    </p>
+    <ul class="note">
+      <li><strong>fade_e450_l360_k20</strong> — promoted by the sweep's own
+      gate at <strong>p&nbsp;=&nbsp;0.003</strong>. With seven and a half
+      minutes left on a 15-minute window, and the price still within 20 basis
+      points of where it opened, it buys the side the last six minutes moved
+      <em>against</em>. It is right about half the time and pays about 41¢ for
+      it, so the money comes from the price, not from being right. It trades
+      every coin and every venue.</li>
+      <li><strong>basket5</strong> — the same rule on the five coins that made
+      money in <em>both</em> halves of the record (bnb, btc, xrp, eth, doge).
+      <strong>This one did not earn its place.</strong> Running the identical
+      coin-picking procedure on a coin-flip world beats it 7.6% of the time,
+      so the coins were chosen by hindsight and the basket is here only to be
+      settled forward. It is marked a challenger, not a promotion.</li>
+    </ul>
+    <p class="note">
+      Both were chosen on roughly <strong>one day</strong> of recorded windows.
+      That is the real caveat, and no control can fix it — only more days can.
+    </p>
     <div class="controls">
       <div class="ctl"><label for="fVenue">Account</label><select id="fVenue"></select></div>
       <div class="ctl"><label for="fTf">Timeframe</label><select id="fTf"></select></div>
@@ -200,10 +223,21 @@
     <p class="note">
       <strong>Read the control column, not the profit column.</strong> A grid
       of thousands produces a spectacular winner from pure noise — that is
-      what a grid does. So the outcomes get shuffled, the whole grid is
-      re-scored, and the best of that no-signal world is recorded. If a
-      shuffled world wins as often as this one, there is nothing here.
-      Nothing is promoted to a live account unless that test passes.
+      what a grid does. So the whole grid is re-scored against a no-signal
+      world and the best of <em>that</em> is recorded. If the no-signal world
+      wins as often as this one, there is nothing here. Nothing is promoted
+      to a live account unless that test passes.
+    </p>
+    <p class="note">
+      <strong>The no-signal world is built by flipping the side, not by
+      shuffling the outcomes.</strong> Shuffling outcomes while leaving prices
+      alone breaks the link between the two — a 10¢ ticket starts winning half
+      the time — so the no-signal world comes out wildly profitable and
+      <em>every</em> rule looks worthless against it. That is what this sweep
+      did for its first several days, and it reads exactly like "there is no
+      edge". The honest null leaves the market untouched and randomises only
+      the thing the rule claims to know: which side to buy, at the same
+      instant, paying the same book.
     </p>
     <div id="sweepBox"></div>
     <p class="foot" id="sweepFoot"></p>
