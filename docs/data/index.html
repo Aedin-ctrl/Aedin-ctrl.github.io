@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Data</title>
+<meta name="description" content="Crypto up/down windows across three venues: the whole path of every window, and a paper test of trading the trend into the close.">
+<style>
+  /* Light only, deliberately -- the same choice the arb board makes. This
+     gets read next to a venue's own screen and should look the same every
+     time of day. */
+  :root{
+    --paper:#f7f6f3; --card:#ffffff; --line:#e6e4dd; --rule:#c9c7bd;
+    --ink:#0b0b0b; --ink2:#52514e; --muted:#8b8984;
+    --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a;
+    --good:#0a7a26; --bad:#c0392b; --warn:#b4690e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{background:var(--paper);-webkit-text-size-adjust:100%}
+  body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       background:var(--paper);color:var(--ink);line-height:1.5;
+       font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+  main{max-width:1000px;margin:0 auto;padding:34px 16px 90px}
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:clamp(23px,3.4vw,30px);font-weight:650;letter-spacing:-.022em}
+  .tag{font-size:12px;color:var(--muted)}
+  .paperchip{font-size:11px;font-weight:650;letter-spacing:.06em;
+             text-transform:uppercase;color:#fff;background:var(--s2);
+             border-radius:999px;padding:2px 9px}
+  .lede{color:var(--ink2);font-size:14px;max-width:72ch}
+
+  .banner{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--warn);
+          background:#fffdf7;border-radius:9px;padding:10px 13px;font-size:13px;
+          color:var(--ink2)}
+  .banner b{color:var(--warn)}
+  .banner[hidden]{display:none}
+
+  .grid{display:grid;gap:9px;margin-top:20px;
+        grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+  .m{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:12px 13px}
+  .m .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.075em;color:var(--muted)}
+  .m .v{font-size:25px;font-weight:650;letter-spacing:-.025em;margin-top:2px;line-height:1.1}
+  .m .n{font-size:11.5px;color:var(--ink2);margin-top:3px}
+
+  section{background:var(--card);border:1px solid var(--line);
+          border-radius:13px;padding:18px 20px;margin-top:18px}
+  h2{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.07em;
+     color:var(--muted);margin-bottom:11px}
+  h2 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
+  .note{font-size:12.5px;color:var(--ink2);margin:-4px 0 12px;max-width:74ch}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;font-weight:500}
+  th{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafaf8}
+  .pos{color:var(--good);font-weight:600} .neg{color:var(--bad)}
+  .dim{color:var(--muted)}
+  .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+
+  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+  .ctl{display:flex;flex-direction:column;gap:4px}
+  .ctl label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  select{font:inherit;font-size:13px;padding:5px 9px;border:1px solid var(--line);
+         border-radius:8px;background:var(--card);color:var(--ink);min-width:118px}
+
+  .sub{font-size:11.5px;font-weight:600;color:var(--ink2);
+       margin:16px 0 4px;letter-spacing:.01em}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+        border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink2)}
+  .dot{width:7px;height:7px;border-radius:50%}
+  .foot{font-size:11.5px;color:var(--muted);margin-top:11px;
+        border-top:1px solid var(--line);padding-top:9px}
+  .empty{color:var(--muted);font-size:13px;padding:22px 0;text-align:center}
+  svg{display:block;max-width:100%;height:auto;margin:0 auto}
+  footer{margin-top:24px;font-size:11.5px;color:var(--muted);max-width:74ch}
+  a{color:var(--s1)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+       background:#f1f0ec;border-radius:4px;padding:1px 4px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Data</h1>
+    <span class="paperchip">paper</span>
+    <span class="tag" id="stamp">loading…</span>
+  </header>
+  <p class="lede">
+    Every crypto up/down window on Kalshi, Polymarket and Gemini — the whole
+    path of each one, recorded every few seconds, and how it actually
+    settled. Riding on top: a paper test of one rule, with $100 of play
+    money per venue. <strong>No real money is involved anywhere in this
+    page.</strong>
+  </p>
+
+  <div class="banner" id="staleBanner" hidden></div>
+
+  <section>
+    <h2>The rule being tested</h2>
+    <p class="note" id="ruleNote">
+      Wait until the last fifth of the window — minute 4 of 5, minute 12 of
+      15. Look at which way the coin is moving right then. Buy that side,
+      cross the spread, pay the venue's real fee, hold to settlement.
+      One contract a time.
+    </p>
+    <p class="note">
+      <strong>Why it will probably lose, said in advance:</strong> with three
+      minutes left the side that is winning already costs 80–90¢, and the
+      spread on these venues gets <em>wider</em> near the close, not tighter.
+      The rule is buying information that is already in the price. That is a
+      reason to measure it rather than a reason to skip it — and it is why
+      fills here are pessimistic.
+    </p>
+  </section>
+
+  <div class="grid" id="accountCards"></div>
+
+  <section>
+    <h2>Does the way it is going tell you how it finishes?
+      <span>— the question underneath all of this</span></h2>
+    <p class="note">
+      For each point through a window, how often the direction of travel at
+      that moment matched the finish. <strong>Read the grey line first.</strong>
+      It is a random walk with this coin's own volatility and no
+      predictability whatsoever — and it still scores about 65%, because the
+      last fifth of a window is <em>part of</em> the window. Only the gap
+      between the two lines means anything.
+    </p>
+    <div class="controls">
+      <div class="ctl"><label for="hitCoin">Coin</label><select id="hitCoin"></select></div>
+      <div class="ctl"><label for="hitTf">Timeframe</label><select id="hitTf"></select></div>
+    </div>
+    <div id="hitChart"></div>
+    <div class="chips">
+      <span class="chip"><i class="dot" style="background:var(--s1)"></i>measured</span>
+      <span class="chip"><i class="dot" style="background:var(--muted)"></i>random-walk control</span>
+      <span class="chip"><i class="dot" style="background:var(--s2)"></i>the moment the rule trades</span>
+    </div>
+    <div class="wrap"><table id="hitTable"></table></div>
+    <p class="foot" id="hitFoot"></p>
+  </section>
+
+  <section>
+    <h2>Each account, broken down <span>— filter it any way you like</span></h2>
+    <div class="controls">
+      <div class="ctl"><label for="fVenue">Account</label><select id="fVenue"></select></div>
+      <div class="ctl"><label for="fTf">Timeframe</label><select id="fTf"></select></div>
+      <div class="ctl"><label for="fCoin">Coin</label><select id="fCoin"></select></div>
+    </div>
+    <div class="wrap"><table id="breakdown"></table></div>
+    <p class="foot">
+      <code>ROI</code> is profit over what was actually risked — the honest
+      denominator for a contract bought at 85¢. <code>Hit</code> is how often
+      the side bought was the side that won.
+    </p>
+  </section>
+
+  <section>
+    <h2>Why trades were not taken <span>— the denominator</span></h2>
+    <p class="note">
+      A strategy that logs only its fills reports the average of the trades it
+      was <em>able</em> to get, which is a different and much more flattering
+      number. Every refusal is recorded with its reason.
+    </p>
+    <div class="wrap"><table id="skipTable"></table></div>
+  </section>
+
+  <section>
+    <h2>Can you even buy it? <span>— offers by how far through the window</span></h2>
+    <p class="note">
+      How often each side has an offer resting on it, by tenth of the window.
+      This is where the sharpest finding so far lives: once a window looks
+      decided, <strong>nobody offers the favourite</strong> — you can buy the
+      loser for a penny, but the side the rule wants has no ask at all. The
+      rule is most often unbuyable exactly when it is most confident.
+    </p>
+    <div class="wrap"><table id="offerTable"></table></div>
+  </section>
+
+  <section>
+    <h2>Recent paper trades</h2>
+    <div class="wrap"><table id="tradeTable"></table></div>
+  </section>
+
+  <section>
+    <h2>What exists to trade <span>— checked against all three venues</span></h2>
+    <p class="note">
+      No venue runs an hourly or daily <em>up/down</em> market any more.
+      Kalshi and Gemini list strike ladders at those lengths ("BTC $64,400 or
+      above"), which is a different contract; Polymarket's hourly and daily
+      up/down windows were discontinued after 2025. So the paper accounts
+      trade 5- and 15-minute windows, and the longer timeframes are studied
+      from the price record instead — which needs no contract.
+    </p>
+    <div class="wrap"><table id="venueTable"></table></div>
+  </section>
+
+  <footer>
+    Paper only — there is no order path in this system and no venue
+    credential with write scope. Collected on the Pi every 15 seconds.
+    Prices come from each venue's real order book, never from a summary
+    field: Polymarket's cached summary was measured 22¢ away from its own
+    book, so quoting it would manufacture profit that does not exist.
+  </footer>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  // The feed rides the existing arb tunnel on a path, so it needs no DNS
+  // record of its own. A local copy of this page falls back to a sibling
+  // file so it can be opened straight off disk.
+  var FEEDS = ['https://arb.aedinlai.com/data/index.json', 'index.json'];
+  var D = null;
+
+  var TFNAME = {300:'5 min', 900:'15 min', 3600:'1 hour', 14400:'4 hour',
+                86400:'1 day', 90000:'1 day', 604800:'1 week',
+                646200:'1 week', 2595600:'1 month'};
+  function tfName(s){ return TFNAME[s] || (Math.round(s/60) + ' min'); }
+  function el(id){ return document.getElementById(id); }
+  function pct(x, nd){ return x==null ? '—' : (x*100).toFixed(nd==null?1:nd)+'%'; }
+  function money(x){ return x==null ? '—' : '$'+x.toFixed(2); }
+  function signed(x){
+    if(x==null) return '<span class="dim">—</span>';
+    var c = x>0 ? 'pos' : (x<0 ? 'neg' : 'dim');
+    return '<span class="'+c+'">'+(x>0?'+':'')+x.toFixed(2)+'</span>';
+  }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function ago(ts){
+    if(!ts) return '—';
+    var s = Math.max(0, Math.round(Date.now()/1000 - ts));
+    if(s < 90) return s+'s ago';
+    if(s < 5400) return Math.round(s/60)+'m ago';
+    return Math.round(s/3600)+'h ago';
+  }
+
+  function fetchFeed(i){
+    i = i || 0;
+    if(i >= FEEDS.length){ fail(); return; }
+    fetch(FEEDS[i], {cache:'no-store'})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function(j){ D = j; render(); })
+      .catch(function(){ fetchFeed(i+1); });
+  }
+  function fail(){
+    el('stamp').textContent = 'feed unreachable';
+    el('staleBanner').hidden = false;
+    el('staleBanner').innerHTML = '<b>The feed could not be reached.</b> ' +
+      'The collector runs on the Pi; if it is offline this page has nothing ' +
+      'to show. Nothing is wrong with your browser.';
+  }
+
+  // ---------------------------------------------------------------- render
+  function render(){
+    el('stamp').textContent = 'updated ' + ago(D.generated);
+
+    // A board that cannot say how stale it is will show a dead collector as
+    // a quiet market. This is that guard.
+    var h = D.health || {};
+    if(h.stale){
+      el('staleBanner').hidden = false;
+      el('staleBanner').innerHTML = '<b>The collector is not reporting.</b> ' +
+        'Last sample ' + esc(ago(h.last_sample)) + '. Everything below is ' +
+        'the record up to that point, not a live picture.';
+    } else {
+      el('staleBanner').hidden = true;
+    }
+
+    cards();
+    buildFilters();
+    drawHits();
+    drawBreakdown();
+    drawSkips();
+    drawOffers();
+    drawTrades();
+    drawVenues();
+  }
+
+  function cards(){
+    var out = '';
+    var names = Object.keys(D.accounts || {});
+    names.forEach(function(a){
+      var t = D.accounts[a];
+      var pnl = t.pnl == null ? 0 : t.pnl;
+      var cls = pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'dim');
+      out += '<div class="m"><div class="k">' + esc(a) + '</div>' +
+        '<div class="v">' + money(t.equity) + '</div>' +
+        '<div class="n"><span class="' + cls + '">' +
+          (pnl>0?'+':'') + pnl.toFixed(2) + '</span> from $' +
+          t.start.toFixed(0) + ' · ' + t.settled + ' settled</div>' +
+        '<div class="n">hit ' + pct(t.hit) + ' · filled ' +
+          pct(t.fill_rate, 0) + ' of ' + t.attempts + ' tries</div></div>';
+    });
+    if(!out) out = '<div class="m"><div class="k">accounts</div>' +
+      '<div class="v">—</div><div class="n">nothing yet</div></div>';
+    el('accountCards').innerHTML = out;
+  }
+
+  function opts(sel, vals, labels, keep){
+    var cur = keep && sel.value;
+    sel.innerHTML = vals.map(function(v,i){
+      return '<option value="'+esc(v)+'">'+esc(labels[i])+'</option>'; }).join('');
+    if(cur && vals.indexOf(cur) >= 0) sel.value = cur;
+  }
+
+  function buildFilters(){
+    var coins = [], tfs = [];
+    Object.keys(D.hits || {}).forEach(function(k){
+      var h = D.hits[k];
+      if(coins.indexOf(h.coin) < 0) coins.push(h.coin);
+      if(tfs.indexOf(h.seconds) < 0) tfs.push(h.seconds);
+    });
+    coins.sort(); tfs.sort(function(a,b){ return a-b; });
+    // Before the collector has enough history there are no hit tables at
+    // all. An empty <select> reads as a broken control, so say what is
+    // actually happening instead of rendering nothing.
+    if(coins.length) opts(el('hitCoin'), coins, coins, true);
+    else opts(el('hitCoin'), [''], ['no data yet'], false);
+    if(tfs.length) opts(el('hitTf'), tfs, tfs.map(tfName), true);
+    else opts(el('hitTf'), [''], ['no data yet'], false);
+    el('hitCoin').disabled = el('hitTf').disabled = !coins.length;
+    el('hitCoin').onchange = el('hitTf').onchange = drawHits;
+
+    // Breakdown filters come from what the accounts actually traded.
+    var bCoins = {}, bTfs = {};
+    Object.keys(D.accounts || {}).forEach(function(a){
+      Object.keys(D.accounts[a].by_tf_coin || {}).forEach(function(k){
+        var p = k.split('|'); bTfs[p[0]] = 1; bCoins[p[1]] = 1;
+      });
+    });
+    var vs = ['all'].concat(Object.keys(D.accounts || {}));
+    opts(el('fVenue'), vs, vs.map(function(v){ return v==='all'?'all accounts':v; }), true);
+    var tl = Object.keys(bTfs).sort(function(a,b){ return a-b; });
+    opts(el('fTf'), ['all'].concat(tl),
+         ['all timeframes'].concat(tl.map(function(s){ return tfName(+s); })), true);
+    var cl = Object.keys(bCoins).sort();
+    opts(el('fCoin'), ['all'].concat(cl), ['all coins'].concat(cl), true);
+    el('fVenue').onchange = el('fTf').onchange = el('fCoin').onchange = drawBreakdown;
+  }
+
+  // ---- the headline chart ------------------------------------------------
+  function drawHits(){
+    var coin = el('hitCoin').value, tf = el('hitTf').value;
+    var h = (D.hits || {})[coin + '|' + tf];
+    if(!h){
+      el('hitChart').innerHTML = '<p class="empty">Not enough windows on ' +
+        'record yet. A 15-minute table needs hours of price history and a ' +
+        'daily one needs weeks, so this fills in gradually as the collector runs.</p>';
+      el('hitTable').innerHTML = ''; el('hitFoot').textContent = '';
+      return;
+    }
+    var fracs = Object.keys(h.fracs).map(Number).sort(function(a,b){ return a-b; });
+    var W = 760, H = 260, L = 46, R = 16, T = 14, B = 34;
+    var lo = 0.35, hi = 0.90;
+    function x(f){ return L + (f - 0.1) / 0.85 * (W - L - R); }
+    function y(v){ return T + (hi - v) / (hi - lo) * (H - T - B); }
+
+    var g = '';
+    for(var v = 0.4; v <= 0.9001; v += 0.1){
+      g += '<line x1="'+L+'" y1="'+y(v).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(v).toFixed(1)+
+           '" stroke="var(--line)"/>' +
+           '<text x="'+(L-7)+'" y="'+(y(v)+4).toFixed(1)+'" text-anchor="end" ' +
+           'font-size="11" fill="var(--muted)">'+Math.round(v*100)+'%</text>';
+    }
+    // 50% is where a coin flip sits; it is drawn so the control's distance
+    // above it is visible rather than implied.
+    g += '<line x1="'+L+'" y1="'+y(0.5).toFixed(1)+'" x2="'+(W-R)+'" y2="'+y(0.5).toFixed(1)+
+         '" stroke="var(--rule)" stroke-dasharray="3 3"/>';
+
+    function path(key, col, dash){
+      var pts = [], dots = '';
+      fracs.forEach(function(f){
+        var r = h.fracs[f]; var v = r && r[key];
+        if(v == null) return;
+        pts.push(x(f).toFixed(1) + ',' + y(v).toFixed(1));
+        dots += '<circle cx="'+x(f).toFixed(1)+'" cy="'+y(v).toFixed(1)+
+                '" r="3.4" fill="'+col+'"/>';
+      });
+      if(pts.length < 2) return dots;
+      return '<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+col+
+             '" stroke-width="2" '+(dash?'stroke-dasharray="5 4" ':'')+'/>' + dots;
+    }
+
+    // Mark where the rule actually trades.
+    var dp = D.rule ? D.rule.decide_at : 0.8;
+    g += '<line x1="'+x(dp).toFixed(1)+'" y1="'+T+'" x2="'+x(dp).toFixed(1)+'" y2="'+(H-B)+
+         '" stroke="var(--s2)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".75"/>';
+
+    g += path('control', 'var(--muted)', true);
+    g += path('rate', 'var(--s1)', false);
+
+    fracs.forEach(function(f){
+      g += '<text x="'+x(f).toFixed(1)+'" y="'+(H-B+18)+'" text-anchor="middle" ' +
+           'font-size="11" fill="var(--muted)">'+Math.round(f*100)+'%</text>';
+    });
+    g += '<text x="'+((L+W-R)/2)+'" y="'+(H-3)+'" text-anchor="middle" ' +
+         'font-size="11" fill="var(--muted)">how far through the window</text>';
+
+    el('hitChart').innerHTML =
+      '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="hit rate against a random-walk control">'+g+'</svg>';
+
+    var rows = '<thead><tr><th>Through window</th><th>Windows</th>' +
+      '<th>Measured</th><th>Control</th><th>Edge</th></tr></thead><tbody>';
+    fracs.forEach(function(f){
+      var r = h.fracs[f];
+      var edge = r.edge;
+      var cls = edge == null ? 'dim' : (edge > 0.02 ? 'pos' : (edge < -0.02 ? 'neg' : 'dim'));
+      rows += '<tr><td>' + Math.round(f*100) + '%' +
+        (Math.abs(f - dp) < 1e-9 ? ' <span class="dim">· the rule trades here</span>' : '') +
+        '</td><td>' + r.n + '</td><td>' + pct(r.rate) + '</td>' +
+        '<td class="dim">' + pct(r.control) + '</td>' +
+        '<td class="' + cls + '">' + (edge==null ? '—' :
+          (edge>0?'+':'') + (edge*100).toFixed(1) + ' pts') + '</td></tr>';
+    });
+    el('hitTable').innerHTML = rows + '</tbody>';
+    el('hitFoot').textContent = h.n_windows + ' windows of ' + tfName(+tf) +
+      ' on ' + coin.toUpperCase() + '. ' + pct(h.up_share) + ' of them finished up, ' +
+      'so always buying the same side would score ' + pct(h.baseline) + '.';
+  }
+
+  function drawBreakdown(){
+    var fv = el('fVenue').value, ft = el('fTf').value, fc = el('fCoin').value;
+    var rows = [];
+    Object.keys(D.accounts || {}).forEach(function(a){
+      if(fv !== 'all' && a !== fv) return;
+      var by = D.accounts[a].by_tf_coin || {};
+      Object.keys(by).forEach(function(k){
+        var p = k.split('|');
+        if(ft !== 'all' && p[0] !== ft) return;
+        if(fc !== 'all' && p[1] !== fc) return;
+        var v = by[k];
+        rows.push({a:a, tf:+p[0], coin:p[1], n:v.n, won:v.won, hit:v.hit,
+                   pnl:v.pnl, roi:v.roi, px:v.avg_price});
+      });
+    });
+    rows.sort(function(x,y){ return (y.pnl||0) - (x.pnl||0); });
+    if(!rows.length){
+      el('breakdown').innerHTML = '<tbody><tr><td class="empty" colspan="7">' +
+        'No settled trades match that filter yet.</td></tr></tbody>';
+      return;
+    }
+    var h = '<thead><tr><th>Account</th><th>Timeframe</th><th>Coin</th>' +
+      '<th>Settled</th><th>Hit</th><th>Avg price</th><th>P&amp;L</th><th>ROI</th></tr></thead><tbody>';
+    rows.forEach(function(r){
+      h += '<tr><td>'+esc(r.a)+'</td><td>'+tfName(r.tf)+'</td><td>'+esc(r.coin.toUpperCase())+
+        '</td><td>'+r.n+'</td><td>'+pct(r.hit)+'</td><td>'+
+        (r.px==null?'—':r.px.toFixed(2))+'</td><td>'+signed(r.pnl)+'</td><td>'+
+        (r.roi==null?'<span class="dim">—</span>':
+          '<span class="'+(r.roi>0?'pos':(r.roi<0?'neg':'dim'))+'">'+
+          (r.roi>0?'+':'')+(r.roi*100).toFixed(1)+'%</span>')+'</td></tr>';
+    });
+    el('breakdown').innerHTML = h + '</tbody>';
+  }
+
+  function drawSkips(){
+    var agg = {};
+    Object.keys(D.accounts || {}).forEach(function(a){
+      var s = D.accounts[a].skips || {};
+      Object.keys(s).forEach(function(r){
+        agg[r] = agg[r] || {}; agg[r][a] = s[r];
+      });
+    });
+    var accts = Object.keys(D.accounts || {});
+    var reasons = Object.keys(agg);
+    if(!reasons.length){
+      el('skipTable').innerHTML = '<tbody><tr><td class="empty">' +
+        'Nothing refused yet.</td></tr></tbody>'; return;
+    }
+    reasons.sort(function(x,y){
+      var sx = accts.reduce(function(t,a){ return t + (agg[x][a]||0); }, 0);
+      var sy = accts.reduce(function(t,a){ return t + (agg[y][a]||0); }, 0);
+      return sy - sx;
+    });
+    var h = '<thead><tr><th>Reason</th>' + accts.map(function(a){
+      return '<th>'+esc(a)+'</th>'; }).join('') + '<th>Total</th></tr></thead><tbody>';
+    reasons.forEach(function(r){
+      var tot = 0;
+      h += '<tr><td>'+esc(r)+'</td>' + accts.map(function(a){
+        var n = agg[r][a] || 0; tot += n;
+        return '<td>' + (n || '<span class="dim">—</span>') + '</td>'; }).join('');
+      h += '<td>'+tot+'</td></tr>';
+    });
+    el('skipTable').innerHTML = h + '</tbody>';
+  }
+
+  function drawOffers(){
+    var o = D.offers || [];
+    if(!o.length){ el('offerTable').innerHTML =
+      '<tbody><tr><td class="empty">No samples yet.</td></tr></tbody>'; return; }
+    var by = {};
+    o.forEach(function(r){
+      var k = r.venue + '|' + r.seconds;
+      by[k] = by[k] || {};
+      by[k][r.tenth] = r;
+    });
+    var h = '<thead><tr><th>Venue · window</th>';
+    for(var t = 0; t < 10; t++) h += '<th>' + (t*10) + '–' + (t*10+10) + '%</th>';
+    h += '</tr></thead><tbody>';
+    Object.keys(by).sort().forEach(function(k){
+      var p = k.split('|');
+      h += '<tr><td>' + esc(p[0]) + ' · ' + tfName(+p[1]) + '</td>';
+      for(var t = 0; t < 10; t++){
+        var r = by[k][t];
+        if(!r){ h += '<td class="dim">—</td>'; continue; }
+        var up = r.n ? r.up_ok / r.n : null;
+        var dn = r.n ? r.down_ok / r.n : null;
+        var worst = Math.min(up==null?1:up, dn==null?1:dn);
+        var cls = worst < 0.5 ? 'neg' : (worst < 0.9 ? '' : 'dim');
+        h += '<td class="' + cls + '">' + Math.round(up*100) + '/' +
+             Math.round(dn*100) + '</td>';
+      }
+      h += '</tr>';
+    });
+    el('offerTable').innerHTML = h + '</tbody>';
+  }
+
+  function drawTrades(){
+    var t = D.trades || [];
+    if(!t.length){ el('tradeTable').innerHTML =
+      '<tbody><tr><td class="empty">No trades yet. The rule only acts in the ' +
+      'last fifth of a window, and only when it can actually buy.</td></tr></tbody>';
+      return; }
+    var h = '<thead><tr><th>When</th><th>Account</th><th>Coin</th><th>Window</th>' +
+      '<th>Side</th><th>Move</th><th>Paid</th><th>Result</th><th>P&amp;L</th></tr></thead><tbody>';
+    t.slice(0, 60).forEach(function(r){
+      h += '<tr><td>'+esc(ago(r.ts))+'</td><td>'+esc(r.account)+'</td>' +
+        '<td>'+esc(r.coin.toUpperCase())+'</td><td>'+tfName(r.seconds)+'</td>' +
+        '<td>'+esc(r.side)+'</td>' +
+        '<td class="dim">'+(r.sig_bps==null?'—':(r.sig_bps>0?'+':'')+r.sig_bps.toFixed(1)+' bps')+'</td>' +
+        '<td>'+(r.price==null?'—':r.price.toFixed(2))+'</td>' +
+        '<td>'+(r.result ? esc(r.result) : '<span class="dim">open</span>')+'</td>' +
+        '<td>'+signed(r.pnl)+'</td></tr>';
+    });
+    el('tradeTable').innerHTML = h + '</tbody>';
+  }
+
+  function drawVenues(){
+    var v = D.venues || [];
+    if(!v.length){ el('venueTable').innerHTML =
+      '<tbody><tr><td class="empty">Nothing recorded yet.</td></tr></tbody>'; return; }
+    var h = '<thead><tr><th>Venue</th><th>Window</th><th>Contract</th>' +
+      '<th>Seen</th><th>Settled</th></tr></thead><tbody>';
+    v.forEach(function(r){
+      h += '<tr><td>'+esc(r.venue)+'</td><td>'+tfName(r.seconds)+'</td>' +
+        '<td>'+(r.kind==='updown' ? 'up / down' :
+          '<span class="dim">strike ladder</span>')+'</td>' +
+        '<td>'+r.n+'</td><td>'+(r.settled||0)+'</td></tr>';
+    });
+    el('venueTable').innerHTML = h + '</tbody>';
+  }
+
+  fetchFeed(0);
+  setInterval(function(){ fetchFeed(0); }, 60000);
+})();
+</script>
+</body>
+</html>
