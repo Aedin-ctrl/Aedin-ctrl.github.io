@@ -1,0 +1,776 @@
+{
+  "date": "2026-11-14",
+  "generated": "2026-11-15T03:23:08.108Z",
+  "articles": [
+    {
+      "id": "2026-11-14-a-nationwide-us-ground-stop-followed-a-network",
+      "headline": "A nationwide US ground stop followed a network update; officials rule out hacking so far",
+      "summary": "The FAA halted departures across the US on Nov. 13 after a communications failure hit its air route control centers. Officials say there is no sign of a cyberattack and point to a network upgrade, but no official root cause has been announced.",
+      "impacts": [
+        "A single shared telecom network can ground every US flight at once.",
+        "Delays were expected to last several days after the stop was lifted.",
+        "Aging copper links and upgrades to them are a fragile point in air traffic control.",
+        "Without a stated root cause, the 'not a hack' claim is hard for outsiders to check."
+      ],
+      "details": [
+        "The FAA issued a nationwide ground stop on Friday, Nov. 13, after a communications problem hit its air route traffic control centers. Departures were halted at US airports and thousands of flights were canceled or delayed. SecurityWeek reports the order was lifted at 8:15 pm ET, more than four hours later; The Register puts the stop at about five hours, lifted around 8:30 pm. Departures resumed, but officials expected delays to continue for several days.",
+        "Officials said early on that they saw no evidence of hacking. Homeland Security Secretary Markwayne Mullin said the failure did not look like a cyberattack and seemed mechanical, adding 'there's no chatter, we haven't seen any footprints,' but also 'we're not going to rule that out.' The NSA, Defense Department and CISA were involved. Bloomberg, citing a person familiar with the matter, reported that the FBI does not believe a cyberattack or criminal activity was the cause and is looking at a software update.",
+        "The explanations have shifted. Transportation Secretary Sean Duffy first blamed legacy equipment, saying switches and routers in the FAA network were flooded with data and began producing inconsistent information. Mullin said patches and new equipment were overloading the older system. On Saturday, The Register reports, Duffy attributed the stop to problems with copper wiring during an L3Harris network upgrade, and said it was not yet determined whether the cause was incompetence or a faulty router.",
+        "L3Harris manages the FAA Telecommunications Infrastructure, which connects more than 4,400 facilities. The company said it had completed more than 70 percent of the planned conversion of airspace communications from legacy copper to fiber and is supporting the investigation. CBS News, citing its own sources, reported that an update to the private network caused a reboot and that the network then crashed; The Register did not independently confirm that.",
+        "Officials said the outage was unrelated to the Microsoft outage earlier in the week, and that the FAA's recently deployed AI systems played no part. Air Space Intelligence, which holds an $875 million FAA contract, said its products were not involved. SecurityWeek notes the previous nationwide ground stop was in January 2023, when a contractor accidentally deleted files in the system that delivers safety notices to pilots; no cyberattack was found then either.",
+        "What to watch: whether the FAA or L3Harris publishes a root cause, whether the update and reboot account is confirmed, and whether the migration off copper is slowed or accelerated. For now the evidence points to an infrastructure failure rather than an attack, but that rests on officials' statements, not a published investigation."
+      ],
+      "category": "Tech",
+      "tags": [
+        "faa",
+        "air traffic",
+        "critical infrastructure",
+        "outage",
+        "aviation",
+        "infrastructure"
+      ],
+      "date": "2026-11-14",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "SecurityWeek",
+          "url": "https://www.securityweek.com/no-signs-of-hacking-in-faa-ground-stop-as-fbi-reportedly-probes-software-update/"
+        },
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/offbeat/2026/11/13/faa-blames-ground-stop-on-faulty-copper-wiring/5309912"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-brain-implant-startup-synchron-pauses-trials-of-its",
+      "headline": "Brain-implant startup Synchron pauses trials of its wireless device and cuts jobs",
+      "summary": "Synchron, a leading brain-computer interface company, has paused clinical trials of its second-generation implant and is laying off New York staff. Leaders say it is not a safety issue; the cause has not been explained.",
+      "impacts": [
+        "Delays for people with paralysis or ALS hoping for commercial brain-computer interfaces.",
+        "A reminder that implant timelines depend on small hardware parts.",
+        "Thin public detail makes it hard to judge what went wrong."
+      ],
+      "details": [
+        "STAT reports that Synchron, a Brooklyn-based brain-implant company, has paused clinical trials of its second-generation brain-computer interface. The device is a wireless version of the company's first-generation implant, which is delivered through blood vessels: a catheter is threaded through veins to place a stent near the brain's motor cortex. The aim is to let people with conditions such as ALS and paralysis control digital devices with brain activity.",
+        "Company leaders said the pause is not related to safety. STAT gives no further technical explanation. CEO Tom Oxley hinted at a possible cause at a New York panel last week, saying a single delayed component can slow an FDA submission and that 'We had one particular component that we were caught up on.' Synchron is also cutting jobs in New York City and, according to WIRED, which first reported the news, is developing a new device.",
+        "STAT describes this as Synchron's first major setback. The article does not say how many people were enrolled in the paused trial, which component is at issue, how long the pause will last, or how many jobs will go. It also does not say when the new device could reach trials or regulators. STAT notes that a WIRED link mentions 'performance issues' in its URL, but STAT's own text does not confirm that wording, so that detail should be checked against WIRED's reporting.",
+        "The news matters because the field has been moving quickly and Synchron's approach avoids open brain surgery, which is part of its appeal. A pause shows how fragile the path from prototype to approved product can be, even for a company that is far ahead of most.",
+        "What to watch: WIRED's fuller reporting, any FDA filing or statement, and whether first-generation implant users are affected. Until then, the safe reading is that a trial is paused for an unspecified hardware or regulatory reason, with no public evidence of patient harm."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "implant",
+        "bci",
+        "clinical trial",
+        "neuroscience",
+        "als"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/11/13/health-news-brain-implant-startup-pauses-trials/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-a-former-openai-engineer-says-six-chinese-ai",
+      "headline": "A former OpenAI engineer says six Chinese AI models carry fingerprints of Nvidia Blackwell chips",
+      "summary": "Will DePue says random-number patterns in the weights of models from DeepSeek, Moonshot, MiniMax and Ant Group match Nvidia Blackwell GPUs, which cannot be exported to China. The fingerprints show the hardware, not where it sat.",
+      "impacts": [
+        "Export controls on advanced chips may be easier to evade than assumed.",
+        "Pressure on Congress to tighten rules on cloud access to restricted chips.",
+        "Model weights can leak clues about the hardware that trained them."
+      ],
+      "details": [
+        "The Register reports that Will DePue, who left OpenAI earlier in 2026 and founded the AI consultancy Unemployment Labs, has published forensic evidence that DeepSeek, Moonshot AI, MiniMax and Ant Group used Nvidia Blackwell GPUs to train models. Blackwell chips are restricted from export to China.",
+        "The method rests on how models start training. Weights need starting values, and with PyTorch and Nvidia's cuRAND library those values come from a pseudorandom algorithm and a seed in a pattern tied to the specific GPU. DePue searched more than six trillion combinations of chip layout and seed and matched them against published open-weights models.",
+        "He reports that six Chinese models, including DeepSeek-V4-Pro, Kimi K3 and MiniMax-M3, show signs of initialization on Blackwell systems, and four match Grace Blackwell (GB200 and GB300) rack-scale systems. The report links DeepSeek-V3 to Hopper-generation chips and DeepSeek-V4-Flash to Blackwell. The Register says it is the first public link between MiniMax and Ant Group and Blackwell use. The report includes seed values so others can try to reproduce it. DePue says senior researchers, including some inside OpenAI and Anthropic, confirmed the result; The Register does not verify that.",
+        "The key caveat is that a hardware fingerprint does not show where the hardware was. Labs could have rented the chips from US cloud providers, a gap the proposed Cloud Security Act targets. The Register also reports no response from Nvidia or US agencies to this specific report.",
+        "The story lands during an Nvidia leadership crisis. Jensen Huang resigned as CEO after reports of an affair with Alice Huang, a Chinese businesswoman who founded Singapore-based Megaspeed International, which is reportedly under US investigation for allegedly smuggling Nvidia chips to China. The administration said it is unsure whether she was a spy; Beijing denies it and the FBI is investigating. Lawmakers are weighing at least four chip-control bills. Separately, Israeli firm Lava said it found 32 Nvidia B300 GPUs with China-geolocated IP addresses through exposed monitoring endpoints.",
+        "What to watch: independent reproduction of the seed matches, any official response from Nvidia or Commerce, and whether the cloud-access bills move."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "china",
+        "nvidia",
+        "ai",
+        "export controls",
+        "deepseek",
+        "chips"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/13/chinese-ai-labs-are-training-models-on-nvidias-blackwell-despite-export-controls-says-ex-openai-engineer/5309891"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-the-years-published-software-bug-count-passed-100",
+      "headline": "The year's published software-bug count passed 100,000, more than double 2025",
+      "summary": "VulnCheck counted 100,222 CVEs in 2026 as of Nov. 13. Its disclosure director blames AI-driven bug hunting, while attackers are exploiting new flaws faster.",
+      "impacts": [
+        "Defenders cannot patch everything; triage by exposure matters more than raw counts.",
+        "Attackers reverse-engineer patches while users are still applying them.",
+        "Open-source maintainers are swamped by AI-generated reports."
+      ],
+      "details": [
+        "The Register reports that the number of CVEs published in 2026 passed 100,000 on Friday, Nov. 13, more than double the 2025 total. VulnCheck counted 100,222 as of about 4 pm UTC that day, according to Josh Bressers, its director of coordinated vulnerability disclosure. Microsoft alone added 1,094 flaws on Patch Tuesday, after 1,474 the month before.",
+        "Bressers attributes most of the surge to AI-driven vulnerability hunting; he says the organizations that assign CVEs are 'just screaming into the atmosphere right now,' and adds 'It's AI.' The Register notes that attribution is his assessment, not a measured breakdown.",
+        "Exploitation is speeding up too. About 1.4 percent of 2026 CVEs (1,363) are in VulnCheck's exploited-vulnerabilities catalog. The share is steady, but one percent of 100,000 is far more exploitable bugs than one percent of 1,000. CrowdStrike found that from January to June, 88 percent of exploitation using public proof-of-concept code happened within 48 hours of release, and two China-linked groups attacked within 24 hours of disclosure. VulnCheck says the median time from CVE publication to exploitation fell from 120 days in 2025 to 80 days in the first half of 2026.",
+        "As an example, VulnCheck disclosed 14 root-level flaws in Copeland refrigeration controllers on Friday; two are under active exploitation, and Bressers said honeypot activity began minutes after publication. Iranian hackers have used similar devices to spoil food and start fires in European supermarkets.",
+        "Open source is feeling the load. Individual maintainers are overwhelmed, and curl's maintainer ended its bug bounty in January 2026 because of AI-generated submissions; since Oct. 26, only high and critical reports are handled privately. Bressers argues the industry has a 'data problem' and should focus on the flaws that actually affect a given organization. CISA's June 2026 directive BOD 26-04 prioritizes assets by internet exposure, active exploitation and automatability rather than by CVSS score alone.",
+        "Caveat: the 100,222 figure is VulnCheck's tally at the time of the interview and other trackers may differ."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "vulnerability",
+        "cve",
+        "ai",
+        "zero-day",
+        "patch",
+        "open source",
+        "exploited"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/13/this-years-bug-count-just-passed-100k/5309882"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-us-seizes-1-2-billion-from",
+      "headline": "Follow-up: US seizes $1.2 billion from the Binance theft and disrupts the 'FaceStealer' scam",
+      "summary": "The Justice Department won court authority to seize or restrain over $1.2 billion of the roughly $6.3 billion stolen from Binance. Separately, the FBI disrupted FaceStealer, a fake-video-call campaign tied to more than $400 million in thefts.",
+      "impacts": [
+        "Some stolen crypto can be frozen if exchanges act fast.",
+        "Fake meeting invites from a hacked friend's account are now a standard attack.",
+        "Open-source maintainers are named as targets, which could affect software supply chains."
+      ],
+      "details": [
+        "The Record reports that the Justice Department obtained court authorization to seize or restrain more than $1.2 billion stolen in the Binance attack, part of $2.7 billion frozen by several crypto platforms after the theft, which the article describes as last month's $6.3 billion hack. Assistant Attorney General A. Tysen Duva said the Criminal Division immediately halted about half of the breach. Binance and the FBI attribute the theft to TraderTraitor, a North Korean group.",
+        "DOJ says tracing and forfeiture continue because the group keeps laundering funds through bridges, mixers and exchanges. Elliptic reported that the launderers create their own worthless tokens to route money through decentralized-exchange pools, a technique also seen in the 2025 Bybit laundering. An FBI official said North Korea uses crypto theft proceeds to fund its weapons program.",
+        "Separately, the FBI and DOJ disrupted cloud infrastructure behind FaceStealer, a social engineering campaign that allegedly stole over $400 million in crypto over 18 months. The FBI obtained a warrant to seize more than 900 webcam videos of victims. Investigators have interviewed many victims but have not identified the first one.",
+        "The scheme, per the FBI and DOJ: victims get Calendly invitations to Zoom or Teams meetings from accounts the hackers had already compromised, with links to fake domains that deliver malware. Hackers may hijack Telegram, LinkedIn, Slack or Discord accounts and contact the victim's contacts, sometimes months later. In the calls they play videos of past victims to simulate other participants, record the target's webcam for later use, and sometimes use AI deepfakes of crypto figures. A fake audio error prompts the target to 'fix' it, installing malware such as a cookie harvester, keylogger, screen capturer and backdoor.",
+        "The campaign targets the crypto industry and open-source developers; the FBI cited attempts on maintainers of npm and Rust packages and said a JavaScript library maintainer was nearly lured into a fake Teams call this year. It attributes FaceStealer to APT38, which it links to the npm package compromises and a March attack on the axios package; the article says TraderTraitor is one of several units that split off from APT38.",
+        "Caveats: the article does not confirm that FaceStealer was used in the Binance theft, and an FBI agent said that is unclear. The laundering descriptions from Elliptic and DTEX are analysts' assessments, not official findings."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "binance",
+        "north korea",
+        "crypto",
+        "fbi",
+        "deepfake",
+        "social engineering",
+        "lazarus"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/stolen-binance-crypto-recovered-doj-facestealer-disrupted"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-starships-upper-stage-returns-to-the-pad-for",
+      "headline": "Starship's upper stage returns to the pad for the first time after a booster is lost",
+      "summary": "On Flight 15, SpaceX put Starship in orbit with 26 Starlink satellites but lost the booster in the Gulf. SpaceNews reports the upper stage then returned to its launch site on Nov. 14, a first.",
+      "impacts": [
+        "Reusable upper stages would cut launch costs, and raise the pace of launches.",
+        "The booster loss was unexplained, so reliability is still unproven.",
+        "Larger, more frequent launches raise debris and air-traffic questions."
+      ],
+      "details": [
+        "SpaceX's Starship Flight 15 launched Friday, Nov. 13, from Starbase, Texas. AP reporting republished by Phys.org says the upgraded first-stage booster, 236 feet tall, was diverted offshore instead of returning to the pad and exploded in the Gulf of Mexico. That ended a planned double catch of booster and ship. SpaceX had caught boosters three times before. The company gave no explanation; commentator Kate Tice said the abort was in line with safety checks to protect the pad.",
+        "The 171-foot ship reached orbit and deployed 26 Starlink satellites. It was planned to make 15 laps at about 170 miles (275 km) before returning to Starbase on Saturday for a mid-air catch by the tower's mechanical arms, in a flight lasting up to 22 hours.",
+        "SpaceNews reports, in the opening paragraph of an article that is otherwise paywalled, that the upper stage 'successfully returned to the launch site for the first time' on Nov. 14, calling it a milestone toward rapid reuse. I could not read the rest, so details of the catch, any damage and next steps are not confirmed here.",
+        "The stack is meant to be the production vehicle for Moon and Mars missions, so ship reuse matters for cost. But a lost booster on the same flight shows the system is still being proven.",
+        "What to watch: SpaceX's account of the booster failure, any regulatory review, and whether the ship is actually reused."
+      ],
+      "category": "Space",
+      "tags": [
+        "spacex",
+        "starship",
+        "rocket",
+        "nasa",
+        "satellites",
+        "orbit"
+      ],
+      "date": "2026-11-14",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "SpaceNews",
+          "url": "https://spacenews.com/spacex-catches-starship-upper-stage/"
+        },
+        {
+          "name": "Phys.org (AP)",
+          "url": "https://phys.org/news/2026-11-spacex-starship-soars-orbit-booster.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-a-malicious-update-reportedly-hit-a-german-military",
+      "headline": "A malicious update reportedly hit a German military-drone maker; the Bundeswehr grounded its drones",
+      "summary": "Quantum Systems says an active cyberattack disrupted its drones in late October. Press reports say a malicious update to its ground-control software was pushed, and German forces grounded the drones as a precaution.",
+      "impacts": [
+        "Software update channels for military drones are a target.",
+        "Firms backing Ukraine say they face persistent attacks.",
+        "A poisoned update can reach many customers at once."
+      ],
+      "details": [
+        "BleepingComputer reports that Quantum Systems, a German defense firm building reconnaissance and interceptor drones, detected an incident in late October that it calls part of an active cyberattack by 'hostile actors.' It says it worked with authorities to restore its unmanned systems to safe operation.",
+        "Citing internal sources, Der Spiegel and the Financial Times report that a malicious update file for QBase, the company's ground-control and mission-planning software, was distributed, apparently from the vendor's update server. Der Spiegel named the Vector reconnaissance drone, called Falke in German service, as one aircraft planned with QBase. It is unclear how many customers installed the update.",
+        "Further reports say German forces grounded Quantum Systems drones as a precaution and excluded them from a recent exercise, and that military counterintelligence, the domestic intelligence service and the federal cyber agency are involved. The Register later reported the Bundeswehr lifted its precautionary grounding. Those details come from press reports, not official confirmation in the article.",
+        "No attacker has been named. Quantum Systems said it believes it was targeted because of its support for Ukraine; Germany announced funding in October for tens of thousands of its interceptor drones for Ukrainian forces. The company said 'The European defense industry has been facing persistent cyberattacks for years.'",
+        "The article notes a parallel: in July, Australian drone maker CubePilot, which also supports Ukraine, suffered a DNS hijacking that caused severe disruption. DNS hijacking could have been used to push malicious updates to its users, but that was never confirmed.",
+        "What to watch: official attribution, how many installations received the update, and whether other drone makers report similar incidents."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "drones",
+        "germany",
+        "ukraine",
+        "supply chain",
+        "cyberattack",
+        "espionage"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/german-military-drone-operations-disrupted-by-cyberattack/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-us-measles-passes-5-400-cases",
+      "headline": "Follow-up: US measles passes 5,400 cases with two more deaths as a decision on elimination status nears",
+      "summary": "CDC counts 5,412 measles cases in 2026, up 230 in a week, with 6 deaths on its tally and 10 in state reports. A PAHO commission is expected to rule Nov. 17 on whether the US loses elimination status.",
+      "impacts": [
+        "Children in under-vaccinated areas face real risk; at least four deaths this year were children.",
+        "Losing elimination status would formalize measles as endemic again.",
+        "True case counts are probably higher than reported."
+      ],
+      "details": [
+        "CIDRAP reports the US has 5,412 measles cases in 2026, up 230 in the past week, the 14th straight week with a triple-digit increase. 96 percent of cases were in people who were unvaccinated or of unknown status, and 11 percent were hospitalized. Kids and teens account for most cases.",
+        "CDC lists 6 measles deaths this year after adding 2 in this update, but notes the figure lags state reports. States have reported 10 deaths: a child in Grant County, Wisconsin (the state's second after a baby died the previous week), an unvaccinated Montour County, Pennsylvania resident (the state's seventh this year), and one in New York. At least four of the year's deaths were children. Wisconsin and Pennsylvania withheld further details.",
+        "Pennsylvania has the most cases at 1,542, with 61 new this week, and its outbreak appears to be slowing. MMR doses there rose to 56,000 in September and 61,000 in October versus a normal monthly average of about 25,000, though cases could rise again in late winter or spring. Wisconsin has 651 cases and the most new ones, 174, with Grant County holding over a third. Ohio has 372, Indiana 171, Minnesota 160.",
+        "Kindergarten MMR coverage for 2025-26 was 92.7 percent in Pennsylvania, 88.1 in Ohio, 85.7 in Minnesota and 85.1 in Wisconsin, and all four allow some non-medical exemptions. West Virginia, which does not allow religious or philosophical exemptions and had about 98.9 percent kindergarten coverage, has only 2 cases.",
+        "A PAHO commission is meeting to decide whether the US and Mexico lose measles elimination status, as Canada did; a decision is expected Nov. 17. CIDRAP says most infectious disease experts agree measles is again endemic across North America. Brewer of UNC, who chairs the committee reporting on US measles activity, said the US is no longer safe for children regarding measles.",
+        "Caveats: epidemiologists believe true infections are much higher, since Utah genomic data suggest many cases go unrecorded. Among unvaccinated children the estimated fatality rate is 1 to 3 deaths per 1,000 cases."
+      ],
+      "category": "Health",
+      "tags": [
+        "measles",
+        "cdc",
+        "public health",
+        "vaccine",
+        "outbreak",
+        "children"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/measles/2-more-people-die-measles-complications-us-cases-top-5400"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-congos-ebola-outbreak-reaches-11-145",
+      "headline": "Follow-up: Congo's Ebola outbreak reaches 11,145 cases as armed attacks hamper responders",
+      "summary": "WHO says up to 500 new Ebola cases are still diagnosed each week in Congo, and violence is blocking containment. It has logged 81 attacks on health facilities and workers since May.",
+      "impacts": [
+        "Conflict in North Kivu and Ituri makes contact tracing dangerous.",
+        "Patients and contacts fleeing violence can spread the virus.",
+        "Spillover cases abroad have so far been contained."
+      ],
+      "details": [
+        "CIDRAP reports the outbreak of the Bundibugyo strain has reached 11,145 cases and 5,437 deaths, citing a CDC situation summary. WHO says prevention has substantially reduced transmission in earlier hot spots, but up to 500 new infections are still diagnosed each week. The 'up to 500' figure is an upper estimate, not a precise count.",
+        "WHO calls the situation 'concerning' and says intensifying violence is hindering containment. It has logged 81 attacks on healthcare facilities and workers since the outbreak began in May. Last week in North Kivu province, 66 civilians were killed, including three health workers, and three facilities were looted and burned. Response work stopped and Ebola patients were forced to flee, including 1,000 contacts.",
+        "A UN update says Allied Democratic Forces rebels have recently killed more people in villages in North Kivu and Ituri than Ebola has, a UN claim for recent days rather than a formal tally. UN Ebola coordinator Julien Harneis says contact tracing in ADF-controlled areas is very hazardous and residents are frustrated. WHO's regional emergency director Marie Roseline Belizaire urged an immediate halt to hostilities so health workers can reach communities.",
+        "Abroad, Nigeria ended its 21-day monitoring period with all 62 contacts cleared; its only patient was a Swiss woman infected in Uganda, evacuated to Geneva on Oct. 26 and later discharged. Kenya started a 42-day countdown after its last patient left care.",
+        "The CIDRAP article does not discuss vaccines or treatments. Earlier coverage on this site noted no approved vaccine for Bundibugyo.",
+        "What to watch: whether weekly diagnoses fall, whether contacts who fled are re-found, and whether attacks on responders continue."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "congo",
+        "bundibugyo",
+        "outbreak",
+        "who",
+        "public health"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/ebola/500-ebola-cases-still-diagnosed-week-amid-escalating-attacks-officials-say"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-germanys-parliament-gives-its-spy-agencies-powers-to",
+      "headline": "Germany's parliament gives its spy agencies powers to hack and sabotage abroad",
+      "summary": "The Bundestag passed, 308 to 190, the biggest overhaul of German intelligence law since the postwar era. The BND can act against threats abroad, including hacking and disrupting hostile servers, with a doubled oversight panel.",
+      "impacts": [
+        "Germany joins states that let intelligence services hack and disrupt, not only watch.",
+        "AI analysis of large datasets and biometric image matching get a legal basis.",
+        "Critics see risks in the domestic provisions and political use."
+      ],
+      "details": [
+        "The Record reports the Bundestag approved the bill on a Friday in November by 308 votes to 190 with 71 abstentions, calling it the biggest overhaul of Germany's intelligence laws since the postwar era.",
+        "The BND, the foreign intelligence service, can act against threats abroad rather than just report on them. Powers reportedly include hacking foreign systems, sabotaging adversaries' supply chains and taking down servers run by hostile state-backed hackers. The domestic BfV gets a shorter list of covert powers, such as blocking or rerouting data traffic, but cannot use force against people. Both agencies gain a legal basis to analyze large datasets with AI and to match images biometrically against material found online.",
+        "Limits: the bill bars measures meant to endanger a person's life or physical safety, and Germans' messages and queries to chatbots and search engines are protected from BND surveillance. Hacking operations and active measures inside Germany need advance approval from the Independent Control Council, whose panel doubled from six to twelve members. Agencies can order telecom providers to 'freeze' traffic data, and the BND can keep bulk metadata for 13 months instead of 12.",
+        "Critics say protections for journalists and lawyers are weaker than for doctors. An amendment lets the BfV restrict information-sharing with state intelligence offices if security is at risk; AfD lawmaker Christian Wirth called it a 'Lex AfD.' The article ties the bill to the AfD dispute over the BfV's 'confirmed extremist' label, now on hold pending a court challenge in Cologne.",
+        "Officials cite a rising Russian threat, including a 2025 air traffic control cyberattack Germany attributed to APT28.",
+        "The article does not say when the law takes effect or whether further steps such as upper-house approval remain."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "germany",
+        "intelligence",
+        "hacking",
+        "surveillance",
+        "regulation",
+        "russia",
+        "biometrics"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/german-parliament-passes-law-giving-spy-agencies-hacking-power"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-new-york-city-votes-44-5-to-ban",
+      "headline": "New York City votes 44-5 to ban pricing based on shoppers' personal data",
+      "summary": "The City Council passed a ban on businesses using personal data to charge different people different prices for the same product, with fines up to $1,000 per violation. Seattle passed a similar ban last month.",
+      "impacts": [
+        "Prices could stop varying by who you are, if enforcement works.",
+        "Evidence of surveillance pricing in practice is still thin.",
+        "A state version awaits the governor's signature."
+      ],
+      "details": [
+        "The Record reports the New York City Council voted 44-5 on a Thursday to bar retailers and other businesses from using customers' personal data to set different prices for the same product. The Department of Consumer and Worker Protection can fine violators up to $1,000 per violation. Transparent discounts such as buy-one-get-one deals, loyalty programs and veteran and student discounts are exempt. Mayor Zohran Mamdani praised the bill.",
+        "NYC is the second city to pass such a ban after Seattle, which signed one last month. New Jersey, Connecticut and Maryland already have similar bans. New York State's legislature passed a surveillance-pricing bill in June, but Gov. Kathy Hochul has not signed it; advocates worry she could use a state power to amend it and weaken it. More state bills are expected when sessions begin next year.",
+        "Consumer Reports' Grace Gedye said the law would affect about eight million people and could push businesses to change pricing nationwide. In October the FTC ordered nine companies, including Uber, DoorDash, Walmart, Target and major airlines, to explain how they use personal data in pricing. Target paid $5 million in 2022 to settle a California suit alleging lower prices for customers in its parking lot than for in-store shoppers. Kroger is accused by advocates of surveillance pricing, which it denies; it says its digital price tags are not based on personal data. A San Francisco outlet found hotel rates for the same NYC rooms varied with the browser's location.",
+        "Caveats: the article gives no effective date, and says public evidence of surveillance pricing is limited, though grocers, rideshare firms and airlines are suspected of it."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "privacy",
+        "surveillance pricing",
+        "regulation",
+        "data",
+        "ftc",
+        "consumer"
+      ],
+      "date": "2026-11-12",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/nyc-council-passes-bill-ban-surveillance-pricing"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-the-fbi-warns-that-open-source",
+      "headline": "Follow-up: the FBI warns that open-source AI hacking tool Artex works at 'machine speed'",
+      "summary": "An FBI flash alert says criminals and states use Artex, an open-source platform that wires any LLM to hacking tools, to go from target to privileged access in under three hours. Censys found over 1,600 exposed consoles.",
+      "impacts": [
+        "Low-skill attackers can run complex multi-target intrusions.",
+        "Weaker third-party vendors are favored stepping stones.",
+        "Removing the main repository did not stop forks and a commercial version."
+      ],
+      "details": [
+        "The Record reports an FBI flash alert, issued on a Friday in November, warning that cybercriminals and nation-states are using Artex to breach government agencies and critical sectors. Artex is an open-source platform that can connect to any large language model and use it to automate hacking. It was released on GitHub in August by an account called 'Autumn-27'; the WSJ identified the developer as Chinese security engineer Li Puhua.",
+        "In an Oct. 8 statement the developer said malicious actors had abused the tool and denied responsibility. The main repository was later removed, but forks, archived copies and a commercial version remain. The FBI says Artex automates multiple phases of an intrusion, from reconnaissance to data theft, at 'machine speed,' and some intrusions went from first targeting to privileged access in under three hours.",
+        "Chinese models are the most common in attacker-controlled instances, with DeepSeek dominating because of capability, low cost and what the FBI describes as a lack of observable guardrails when requests are framed as penetration testing. Artex can pair with Claude, GPT, DeepSeek, GLM, Grok and Kimi. Censys found over 1,600 publicly exposed consoles, a floor since private deployments are not counted.",
+        "Targets include finance, government, technology, defense, semiconductors, energy, healthcare, manufacturing, telecoms and legal. The article cites attacks on South Korean and Japanese financial institutions; Microsoft says Chinese state-backed actors used Artex in a supply chain attack on ConnectWise; Amazon reports Chinese-linked groups using it for large-scale credential theft to reach AI models and for a crypto exchange campaign using deepfakes to bypass identity checks.",
+        "The agents map trust between organizations and compromise weaker vendors, favoring less-monitored systems like partner portals, mobile backends and legacy services. Its high volume of attempts can trigger sensors, but the speed makes it hard for defenders to keep up.",
+        "Caveats: attribution comes from the WSJ, Microsoft, Amazon and the FBI and is not independently verified in the article, and the model-prevalence claims are the FBI's observations. The developer's denial is his position. Earlier coverage on this site covered Artex use by Chinese state hackers."
+      ],
+      "category": "AI",
+      "tags": [
+        "artex",
+        "ai agents",
+        "fbi",
+        "hacking",
+        "china",
+        "llm",
+        "cyberattack"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/artex-ai-tool-fbi-flash-alert"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-japans-breach-wave-hits-osaka-over-1-million",
+      "headline": "Japan's breach wave hits Osaka: over 1 million email addresses exposed via a vendor",
+      "summary": "Osaka city says hackers got into an email service run by its contractor, exposing more than a million addresses. An expert says October made up 58% of this year's reported incidents in Japan.",
+      "impacts": [
+        "One vendor breach can expose many organizations at once.",
+        "Exposed addresses fuel convincing phishing that impersonates the city.",
+        "Japan is budgeting emergency funds for cyber defense."
+      ],
+      "details": [
+        "The Record reports Osaka City warned on Nov. 13 that more than 1 million email addresses tied to an online administrative services platform were exposed. Anyone who received an email from the city's system between July and Oct. 31 is affected. Hackers got into Arara, an email distribution service used by TKC Corporation, which maintains the platform under contract. The city told its 2.8 million residents to watch for fake emails and not to open links or attachments. Days earlier Osaka Prefecture disclosed a separate breach involving food support participants.",
+        "A Nov. 2 attack on Arara reportedly exposed 77 million email addresses from nearly 400 customers, including TKC and Sega, and hackers used the service to send millions of malicious emails impersonating card companies and financial institutions. The article does not say how much that figure overlaps with Osaka's.",
+        "Other Japanese organizations hit include Japan Airlines, Sony Network Communications and Capcom, which the article names without detail. Prime Minister Sanae Takaichi held a cabinet meeting on cybersecurity and announced emergency measures covering AI-based cyber defense, information gathering, offensive cyber operations and victim support, with about $62 million in emergency funds. JPCERT said about three weeks ago that attackers use AI to scan for known flaws before striking.",
+        "NTT's Mihoko Matsubara said attacks grew from July and surged through October, which accounted for 58 percent of this year's reported incidents, and that about 380 million pieces of personal data have been stolen this year; the article does not show how that was estimated. Some stolen data is sold on the dark web and used for fraudulent securities trades. A new cybersecurity law took effect shortly before the surge; Matsubara noted the timing but did not claim it caused the attacks.",
+        "The article says some breaches appear to involve AI tools including Claude and Artex, but Matsubara said not every breach can be attributed to AI. The attackers are not named."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "japan",
+        "data breach",
+        "privacy",
+        "phishing",
+        "cloud",
+        "supply chain"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/city-of-osaka-japan-email-data-breach"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-trezor-confirms-hidden-cellular-implants-in",
+      "headline": "Follow-up: Trezor confirms hidden cellular implants in three wallets sold by a reseller",
+      "summary": "Trezor says three Safe 5 wallets from reseller CryptoBilis held an extra circuit board that reads recovery phrases off the screen and sends them over mobile networks. Firmware 2.13.1 blocks known implants but cannot undo an earlier capture.",
+      "impacts": [
+        "Buying a hardware wallet from an unofficial seller can compromise it before you open it.",
+        "Funds must move to a new wallet and new recovery phrase.",
+        "It is unknown who installed the implants."
+      ],
+      "details": [
+        "The Hacker News reports Trezor has confirmed that three Trezor Safe 5 wallets bought from reseller CryptoBilis contained an implant, an extra circuit board between the main board and the screen. It reads the recovery phrase from the display and sends it over the mobile network to an attacker-controlled server, copying it during backup creation and when a user types a phrase to restore, plus any passphrase shown on screen. It encrypts the data and retries until it can send. It does not alter the wallet's firmware or Secure Element.",
+        "Trezor examined one wallet in its lab and identified the other two from owners' photos; engineers extracted the implant's firmware from the first. It has had no reports of lost funds but cannot see balances since wallets are self-custodial. It says the implants resemble those Ledger found in devices from the same reseller. It has not said who installed them or where in the supply chain. So far implants were found only in Safe 5 wallets from this reseller.",
+        "Timeline: the wallets were bought between Aug. 20 and Sept. 23; Trezor dropped CryptoBilis as a reseller on Oct. 9; it first warned of a suspected implant on Oct. 30; firmware 2.13.1 followed in early November and the confirmation came around Nov. 12. Trezor is cutting its reseller network by about 80 percent.",
+        "Firmware 2.13.1, available for the Safe 7, Safe 5, Safe 3 and Model T, stops the implants found so far from capturing data on updated wallets, but 'can't protect a wallet backup that was captured before it.' Advice for CryptoBilis buyers since March: move funds to a new wallet with a new recovery phrase, never type an existing phrase into a suspect device, keep the wallet and contact support for a replacement, and do not weigh or open it as a test.",
+        "Trezor will not publish technical details that could help attackers and says it will update if it finds implants elsewhere or learns of losses. Earlier coverage on this site noted Trezor's first warning."
+      ],
+      "category": "Tech",
+      "tags": [
+        "trezor",
+        "crypto",
+        "supply chain",
+        "hardware",
+        "implant",
+        "security"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/trezor-confirms-hidden-hardware.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-follow-up-cursor-says-stolen-fireworks-ai-credentials",
+      "headline": "Follow-up: Cursor says stolen Fireworks AI credentials led to a trojanized Claude Code extension",
+      "summary": "Cursor traced its marketplace compromise to a key stolen at AI vendor Fireworks. Up to 5,000 users may have received the malicious extension, which was live about 11 hours.",
+      "impacts": [
+        "Stored AI-agent traces can hold live credentials.",
+        "One vendor's stolen key opened several of Cursor's systems.",
+        "A flaw in the backdoor's code likely limited the damage."
+      ],
+      "details": [
+        "BleepingComputer reports Cursor confirmed that attackers stole credentials from Fireworks AI, a provider it used for model training and inference, and used them to distribute malicious copies of Anthropic's Claude Code extension through Cursor's marketplace. The unauthorized copies were placed on Oct. 29, versions 2.1.312 and 2.1.313, and stayed up about 11 hours. Anthropic's own extension and Open VSX were not affected.",
+        "The chain, per Cursor: attackers got an access key stored at Fireworks, used it to copy data from a read-only bucket shared with Fireworks, and found historical coding-agent traces, mostly from 2025, from users without Privacy Mode. Some traces held unredacted API credentials, which opened more Cursor systems. Data from several SaaS tools yielded a credential that let them publish the extension.",
+        "The payload ran malicious JavaScript trying to install a persistent SSH backdoor: it gathered system information, added an attacker's SSH key, tried to enable SSH and set up persistence. Researchers found coding errors that likely stopped it working on many Windows and macOS systems where SSH was not already on, per the article's unnamed sources.",
+        "Cursor estimates up to 5,000 users who requested those versions may have received the malicious builds. Fewer than 0.05 percent of users had traces exposed and fewer than 0.01 percent of customers had API credentials compromised. Stolen data included archived non-production source repositories, limited support emails, usage metrics, contact details and summaries of some agent conversations. Cursor says production infrastructure, official releases, customer repositories and Privacy Mode data were unaffected. It revoked the key, rotated credentials, moved inference away from Fireworks and rebuilt its marketplace.",
+        "Wiz calls the wider wave of credential theft at AI developer platforms 'Black October,' naming Railway, Northflank, Lightning AI, OpenCode and Warp; Railway customers' stolen secrets produced about $740,000 in fraudulent AI charges. The figures are Cursor's estimates and Fireworks gave no statement in the article. Users who installed those versions should follow Cursor's guidance."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "cursor",
+        "claude",
+        "supply chain",
+        "credentials",
+        "ai agents",
+        "github",
+        "data breach"
+      ],
+      "date": "2026-11-14",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "BleepingComputer",
+          "url": "https://www.bleepingcomputer.com/news/security/cursor-confirms-security-breach-led-to-malicious-claude-code-extension/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-a-radio-source-pulsing-every-7-9-minutes",
+      "headline": "A radio source pulsing every 7.9 minutes is probably a white dwarf orbiting a Sun-like star",
+      "summary": "Astronomers found a long-period radio transient that pulses about every 7.9 minutes only during part of a 32-hour orbit. They believe it is a white dwarf pulsar, the first found with a Sun-like companion.",
+      "impacts": [
+        "A new type of object shows how much of the radio sky is unexplored.",
+        "It helps test whether long-period transients are white dwarfs, not neutron stars.",
+        "Such systems may be common but hard to see."
+      ],
+      "details": [
+        "A team led by Samuel McSweeney reports in Nature Astronomy a long-period radio transient whose pulses recur about every 7.9 minutes. The Murchison Widefield Array in Western Australia found the pulses, MeerKAT in South Africa pinned them to a single faint star, and Keck in Hawaii recorded the companion's spectrum. Natasha Hurley-Walker described it in The Conversation, as republished by Phys.org on Nov. 14.",
+        "The companion is a G-type star with nearly the Sun's mass and temperature. The pulsing object is about two-thirds the Sun's mass, too light to be a neutron star, so the authors believe it is a white dwarf pulsar, the first found orbiting a Sun-like star. The binary orbit takes about 32 hours, and pulses appear only in a roughly six-hour window followed by about 26 hours of silence.",
+        "The authors say the 32-hour orbit is the 'most natural explanation' for the on-off pattern, not a certainty. The mass estimate depends on combining orbit size, period and spectroscopy. The formation story, a giant engulfing its companion, is a proposed scenario. The idea that such systems are common is speculative because white dwarfs near bright stars are hard to detect. The article does not give a distance.",
+        "Doctoral student Csanád Horváth developed the search method. The result matters because the nature of long-period transients has been an open question, and a case with a measurable companion allows a mass estimate.",
+        "What to watch: more detections that show whether this is typical, and independent checks of the white dwarf identification."
+      ],
+      "category": "Space",
+      "tags": [
+        "radio",
+        "white dwarf",
+        "astronomy",
+        "pulsar",
+        "telescope",
+        "star"
+      ],
+      "date": "2026-11-14",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Phys.org (The Conversation)",
+          "url": "https://phys.org/news/2026-11-dead-star-radio-minutes-partner.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-one-crispr-infusion-cut-blood-fats-in-monkeys",
+      "headline": "One CRISPR infusion cut blood fats in monkeys for three years; a human version is in trials",
+      "summary": "A base editor targeting the liver gene ANGPTL3 lowered the protein about 94% and triglycerides 43% in monkeys over three years. Verve, a Lilly subsidiary funded the work; human safety is unproven.",
+      "impacts": [
+        "A one-time edit could replace lifelong lipid drugs, if it proves safe in people.",
+        "Permanent edits raise long-term safety questions.",
+        "Authors are mostly company employees, a conflict to keep in mind."
+      ],
+      "details": [
+        "Medical Xpress reports a Nature study by Taiji Mizoguchi and colleagues: a CRISPR base editor and guide RNA, packaged in fat-based particles, changes one DNA letter in ANGPTL3, a liver protein that slows removal of fats from the blood. The particles are largely cleared but the DNA change is meant to persist. The antibody evinacumab hits the same target but needs infusions every four weeks.",
+        "Ten monkeys with normal lipids were followed three years after a single infusion. ANGPTL3 protein averaged about 94 percent below pretreatment levels, triglycerides 43 percent lower and LDL cholesterol 13 percent lower. Liver samples looked similar at seven weeks and three years.",
+        "In four monkeys with a disrupted LDL-receptor gene, a model of homozygous familial hypercholesterolemia, a version with a sugar-based targeting molecule cut average LDL from 458 to 247 mg/dL in 35 days, a 46 percent drop. That experiment was short and did not show years of lowering.",
+        "Liver enzymes rose temporarily and returned to baseline within two weeks, with no evidence of lasting liver toxicity. In cultured human liver cells the human version showed no detectable unintended editing at about 3,000 candidate sites, though the authors note that cannot rule out every unwanted change.",
+        "The human version, VERVE-201, is in a phase 1b trial (NCT06451770); human safety and efficacy are not established. Verve Therapeutics, an Eli Lilly subsidiary, funded the work, and most authors are company employees, with several holding Lilly shares or named on related patents."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "crispr",
+        "gene editing",
+        "cholesterol",
+        "clinical trial",
+        "biotech",
+        "lilly"
+      ],
+      "date": "2026-11-14",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Medical Xpress",
+          "url": "https://medicalxpress.com/news/2026-11-crispr-infusion-lowers-blood-fats.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-first-us-addiction-guidance-on-medetomidine-a-sedative",
+      "headline": "First US addiction guidance on medetomidine, a sedative in street opioids with brutal withdrawal",
+      "summary": "The American Society of Addiction Medicine issued its first national document on spotting and treating medetomidine exposure. Withdrawal can cause dangerous blood pressure and heart rate spikes and may need ICU care.",
+      "impacts": [
+        "People using street opioids may be exposed without knowing.",
+        "Symptoms can look like sepsis, so clinicians need to know local supply.",
+        "Cravings for the sedative can look like opioid cravings and drive relapse."
+      ],
+      "details": [
+        "STAT reports ASAM released its first national document on recognizing and treating medetomidine exposure. Medetomidine is a potent sedative, an alpha-2 agonist like xylazine and clonidine, found in the illicit supply nearly always mixed with opioids. Clinicians in Philadelphia first saw it in spring 2024, when a weekend cluster of overdoses left patients oversedated with slow heart rates even after naloxone; none died. Severe withdrawal became clear that autumn, and by the end of 2025 it had been detected in at least 18 states.",
+        "For intoxication, naloxone is still the first step, but patients may stay unresponsive after breathing resumes; low heart rate and blood pressure can be treated with IV fluids and basic care.",
+        "Withdrawal begins with nausea and vomiting without the diarrhea of opioid withdrawal; clonidine is recommended. If that fails or patients cannot keep it down, they may develop very high blood pressure and fast heart rate within hours, which may need IV dexmedetomidine. Unlike withdrawal from other street drugs it may require ICU care, and one physician said doses needed are higher than he would have used for xylazine five years ago.",
+        "Medetomidine does not appear to cause xylazine's severe wounds but is considerably more potent as a sedative. Test strips exist but not every community does regular drug checking. Some patients on opioid-use-disorder medications still crave and may relapse, mistaking medetomidine craving for opioid craving; researchers describe a possible new alpha-2 sedative addiction disorder.",
+        "The guidance is labeled 'considerations' rather than guidelines because larger studies to validate it have not been done."
+      ],
+      "category": "Health",
+      "tags": [
+        "medetomidine",
+        "opioids",
+        "overdose",
+        "public health",
+        "addiction",
+        "drug supply"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/11/13/medetomidine-withdrawal-asam-new-treatment-guidance/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-chatgpt-wallet-lets-openais-agents-check-out-for",
+      "headline": "ChatGPT Wallet lets OpenAI's agents check out for Pro users, with approval by Face ID",
+      "summary": "OpenAI launched Wallet for a limited group of US ChatGPT Pro users. Agents called dots pick products and buy using tokenized cards after the user approves each purchase.",
+      "impacts": [
+        "Agents spending real money raises the stakes of mistakes and manipulation.",
+        "Spending limits and rules are planned, not yet available.",
+        "Sites like Amazon block agents, limiting reach."
+      ],
+      "details": [
+        "TechCrunch reports OpenAI launched Wallet on Friday, Nov. 13. OpenAI's agents, called 'dots,' help users decide what to buy and then complete the purchase. It is limited to a group of US ChatGPT Pro subscribers aged 18 and up with a US-issued Visa, Mastercard or American Express card.",
+        "Users add cards once. Before checkout they can review items, total and card, and they approve each purchase with a security check such as Face ID or a fingerprint, which creates a transaction record. The Wallet charges via a payment token, so neither the dot nor the merchant sees the card number. The dot passes the shipping address and contact information the merchant needs. Purchases still earn card rewards and keep dispute rights.",
+        "OpenAI plans to add spending limits and rules by category or time period, so users can pre-approve purchases that the agent then completes more autonomously. That would be the point where agent mistakes cost money without a human tap.",
+        "Coverage is limited: some sites block AI agents, and Amazon, the largest, steers users to its own Alexa agent. OpenAI published a Commerce Partner Playbook for sites that want to support agent shopping. TechCrunch notes DoorDash and Uber have reported few agent-placed orders so far. The article does not name the processor or partners behind the token system.",
+        "The rollout is limited so OpenAI can test the feature. United Airlines recently said it would restrict third-party AI agents, citing unintended purchases."
+      ],
+      "category": "AI",
+      "tags": [
+        "openai",
+        "chatgpt",
+        "ai agents",
+        "payments",
+        "privacy",
+        "chatbots"
+      ],
+      "date": "2026-11-13",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/13/chatgpts-new-wallet-lets-ai-agents-shop-and-check-out-for-you/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-palantir-wins-a-10-1m-deal-with-three",
+      "headline": "Palantir wins a £10.1M deal with three more UK police forces despite lock-in warnings",
+      "summary": "Bedfordshire, Cambridgeshire and Hertfordshire police signed a five-year contract for Palantir data-integration software, as MPs warn of dependence on US suppliers.",
+      "impacts": [
+        "More police data may be pooled into one US vendor's platform.",
+        "Vendor lock-in is hard to reverse once data is integrated.",
+        "Public detail on safeguards is missing."
+      ],
+      "details": [
+        "The Register reports a five-year, £10.1 million contract, running to October 2031, covering Bedfordshire Police, Cambridgeshire Constabulary and Hertfordshire Constabulary, with Cambridgeshire leading. According to the award notice the forces expect an 'enterprise-wide data integration and analytics capability' to ingest, link and analyse data from multiple policing systems.",
+        "Background: London Mayor Sadiq Khan blocked a separate £50 million Met Police contract with Palantir over procurement concerns. Palantir sued the Met and that case was settled in October.",
+        "The Bureau of Investigative Journalism reports former Met commissioner Cressida Dick has advised Palantir as a paid adviser since September 2025. Palantir says she advises on public-sector service delivery; Dick says her role was limited to advice and she never lobbied for Palantir or introduced it to her contacts.",
+        "Critics have warned about dependence on the supplier. A UK MPs' report warned of vendor lock-in to US suppliers including Palantir, calling its growing public-sector presence 'an unacceptable point of weakness,' and said the view was not ideologically driven.",
+        "The article does not describe privacy safeguards, what data the forces will feed in, or whether other UK forces use Palantir."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "palantir",
+        "police",
+        "uk",
+        "surveillance",
+        "data",
+        "privacy"
+      ],
+      "date": "2026-11-13",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/public-sector/2026/11/13/palantir-adds-three-uk-police-forces-to-its-beat-with-101m-deal/5309699"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-yale-review-of-51-trials-metformin-semaglutide-diet",
+      "headline": "Yale review of 51 trials: metformin, semaglutide, diet and exercise slow aging clocks; supplements don't",
+      "summary": "A Nature Medicine analysis found prescription drugs and lifestyle changes lowered epigenetic age, while over-the-counter supplements showed no measurable effect. It does not show longer life.",
+      "impacts": [
+        "Popular anti-aging supplements lack support on this measure.",
+        "Epigenetic clocks may not equal healthier or longer lives.",
+        "Drugs used for other conditions may affect aging markers."
+      ],
+      "details": [
+        "ScienceDaily reports a Yale team analyzed 51 clinical studies to see which interventions move DNA-methylation 'epigenetic clocks' in humans. The paper, in Nature Medicine, was led by Raghav Sehgal with senior author Albert Higgins-Chen. They examined more than 110 biomarkers, including 16 major clocks, comparing before and after interventions in four groups: prescription drugs, lifestyle changes, over-the-counter supplements and medical procedures.",
+        "The strongest reductions came from metformin, semaglutide and anti-TNF therapies. Regular exercise combined with a healthy diet, Mediterranean, low-fat or low-carb, consistently lowered epigenetic age. Supplements and some procedures showed no measurable reduction. Newer clocks performed better than older ones, and people with disease showed larger changes than healthy participants.",
+        "The caveat is central: the study does not show that lowering epigenetic age extends lifespan or prevents age-related disease. Higgins-Chen said the 'true meaning of that change must be fully understood.' Researchers still need to establish whether treatments directly cause the changes, how fast they occur, whether they last after treatment ends, and which biological processes drive them.",
+        "Next steps include larger, more diverse populations. The Yale release linked in the article is dated Aug. 21, 2026; ScienceDaily ran the story Nov. 13."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "aging",
+        "metformin",
+        "semaglutide",
+        "biotech",
+        "clinical trial",
+        "longevity"
+      ],
+      "date": "2026-11-13",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261112230452.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-14-apple-details-secure-exclaves-that-wall-camera-and",
+      "headline": "Apple details 'Secure Exclaves' that wall camera and mic data off from its own operating system",
+      "summary": "Apple says new isolated runtimes keep ambient camera and microphone data away from the main OS, apps and Apple itself, and verify that privacy indicators are really on screen.",
+      "impacts": [
+        "Always-on sensors in home devices are a privacy risk that hardware isolation tries to limit.",
+        "Indicator tampering by malware becomes harder.",
+        "The claims are Apple's own and unverified by outsiders."
+      ],
+      "details": [
+        "SecurityWeek reports Apple published details on its security blog about Secure Exclaves, an isolated architecture in its silicon that keeps camera and microphone data used for ambient sensing apart from the main operating system. Ambient sensing includes listening for 'Hey Siri' and, on the HomeView smart display, recognizing faces and voices. Apple says data processed in an exclave 'cannot be accessed by the main operating system, apps, or Apple.'",
+        "Design goals: the main OS cannot extract or alter exclave data, only a narrow set of information can cross over, and users can tell when a sensor session is active without interference. For background sensing only specific metadata reaches the system; on HomeView the result is a person identifier, position and confidence level, with no audio or video shared.",
+        "For full sensor access, a dedicated exclave acts as a gatekeeper and releases data only after confirming the indicator is on and has been shown long enough. On iPhone, where the indicator is an on-screen dot, another exclave checks which pixels were actually drawn. Covered features include person recognition on HomeView, Siri Recap and Live Rewind, indicators on iPhone 18 Pro, iPhone 18 Pro Max and 'iPhone Duo,' and camera indicators on MacBook Neo and HomeView.",
+        "Exclaves run on a minimal capability-based microkernel that Apple formally verifies, which found hard-to-spot critical flaws that could have led to full kernel compromise, many caught early. Apple states the kernel is still under active development and 'we do not claim complete coverage of all aspects of the kernel'; verification is applied gradually.",
+        "All technical claims are Apple's description; the article cites no independent verification."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "apple",
+        "privacy",
+        "camera",
+        "microphone",
+        "biometrics",
+        "security",
+        "hardware"
+      ],
+      "date": "2026-11-14",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "SecurityWeek",
+          "url": "https://www.securityweek.com/apple-reveals-how-secure-exclaves-shield-camera-and-microphone-data/"
+        }
+      ]
+    }
+  ]
+}
