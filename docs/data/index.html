@@ -76,6 +76,10 @@
   .chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;
         border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink2)}
   .dot{width:7px;height:7px;border-radius:50%}
+  .verdict{font-size:12.5px;border-radius:9px;padding:9px 12px;margin:6px 0 10px;
+           border:1px solid var(--line);border-left-width:3px}
+  .verdict.no{background:#fffdf7;border-left-color:var(--warn)}
+  .verdict.ok{background:#f5fbf6;border-left-color:var(--good)}
   .foot{font-size:11.5px;color:var(--muted);margin-top:11px;
         border-top:1px solid var(--line);padding-top:9px}
   .empty{color:var(--muted);font-size:13px;padding:22px 0;text-align:center}
@@ -181,6 +185,28 @@
       denominator for a contract bought at 85¢. <code>Hit</code> is how often
       the side bought was the side that won.
     </p>
+  </section>
+
+  <section>
+    <h2>The sweep <span>— every rule variant, replayed against the record</span></h2>
+    <p class="note">
+      The accounts above test <em>one</em> rule, chosen by guesswork. This
+      replays the same recorded windows against thousands of variants: when
+      to jump in, how far back to look, <strong>follow or fade</strong>, and
+      how much the price's <strong>distance from the open</strong> should
+      matter. It trades nothing — it prices each variant against the real
+      book that was quoted at the time.
+    </p>
+    <p class="note">
+      <strong>Read the control column, not the profit column.</strong> A grid
+      of thousands produces a spectacular winner from pure noise — that is
+      what a grid does. So the outcomes get shuffled, the whole grid is
+      re-scored, and the best of that no-signal world is recorded. If a
+      shuffled world wins as often as this one, there is nothing here.
+      Nothing is promoted to a live account unless that test passes.
+    </p>
+    <div id="sweepBox"></div>
+    <p class="foot" id="sweepFoot"></p>
   </section>
 
   <section>
@@ -336,6 +362,64 @@
     drawOffers();
     drawTrades();
     drawVenues();
+    drawSweep();
+  }
+
+  function drawSweep(){
+    var sw = D.sweep || {};
+    var tfs = sw.timeframes || [];
+    if(!tfs.length){
+      el('sweepBox').innerHTML = '<p class="empty">The sweep has not run ' +
+        'yet, or there are not enough settled windows to replay. It needs ' +
+        'at least 40 per timeframe.</p>';
+      el('sweepFoot').textContent = '';
+      return;
+    }
+    var out = '';
+    tfs.forEach(function(t){
+      var sig = (t.p_reality != null && t.p_reality <= 0.05);
+      out += '<div class="sub">' + esc(tfName(t.seconds)) + ' — ' +
+        t.windows + ' settled windows, ' + (t.variants||0).toLocaleString() +
+        ' variants</div>';
+      if(!(t.rows||[]).length){
+        out += '<p class="empty">Nothing clears the minimum fill yet.</p>';
+        return;
+      }
+      out += '<div class="verdict ' + (sig ? 'ok' : 'no') + '">' +
+        (sig
+          ? '<b>Clears the control.</b> '
+          : '<b>Does not clear the control — treat as noise.</b> ') +
+        'Best variant ' + (t.best_per_trade*100).toFixed(2) + '¢/trade; ' +
+        'a shuffled world with no signal at all finds ' +
+        (t.null_median*100).toFixed(2) + '¢ typically and ' +
+        (t.null_p95*100).toFixed(2) + '¢ at the 95th. ' +
+        'p = ' + t.p_reality.toFixed(3) + '.' +
+        ((t.promoted||[]).length
+          ? ' <b>Promoted:</b> ' + t.promoted.map(esc).join(', ')
+          : (t.why_not ? ' Nothing promoted.' : '')) +
+        '</div>';
+      out += '<div class="wrap"><table><thead><tr><th>Variant</th>' +
+        '<th>Enter</th><th>Look back</th><th>Mode</th><th>Distance gate</th>' +
+        '<th>Signals</th><th>Filled</th><th>Hit</th><th>¢/trade</th>' +
+        '</tr></thead><tbody>';
+      t.rows.forEach(function(r){
+        out += '<tr><td>' + esc(r.id) + '</td>' +
+          '<td>' + r.entry_s + 's out</td>' +
+          '<td>' + (r.mode === 'position' ? '<span class="dim">n/a</span>' : r.look_s + 's') + '</td>' +
+          '<td>' + esc(r.mode) + '</td>' +
+          '<td>' + (r.k_bps == null ? '<span class="dim">none</span>'
+                    : r.k_bps + ' bps, ' + esc(r.far)) + '</td>' +
+          '<td>' + r.n + '</td><td>' + r.n_fill + '</td>' +
+          '<td>' + pct(r.hit) + '</td>' +
+          '<td class="' + (sig ? (r.per_trade>0?'pos':'neg') : 'dim') + '">' +
+            (r.per_trade*100).toFixed(2) + '¢</td></tr>';
+      });
+      out += '</tbody></table></div>';
+    });
+    el('sweepBox').innerHTML = out;
+    el('sweepFoot').textContent = sw.ran
+      ? 'Swept ' + ago(sw.ran) + '. Re-runs every 30 minutes as more windows settle.'
+      : '';
   }
 
   function acctList(){
