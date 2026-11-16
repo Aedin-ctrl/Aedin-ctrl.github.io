@@ -237,6 +237,12 @@
   </section>
 
   <section>
+    <h2>Generations <span>— what was retired, what replaced it</span></h2>
+    <div class="wrap scroll"><table id="evoTable"></table></div>
+    <p class="foot" id="evoFoot"></p>
+  </section>
+
+  <section>
     <h2>The sweep <span>— every variant, replayed</span></h2>
     <div id="sweepBox"></div>
     <p class="foot" id="sweepFoot"></p>
@@ -290,6 +296,10 @@
   function el(id){ return document.getElementById(id); }
   function pct(x, nd){ return x==null ? '—' : (x*100).toFixed(nd==null?1:nd)+'%'; }
   function money(x){ return x==null ? '—' : '$'+x.toFixed(2); }
+  function cents(x, nd){
+    return x==null ? '—' :
+      ((x>0?'+':'') + (x*100).toFixed(nd==null?2:nd) + '\u00a2');
+  }
   function signed(x){
     if(x==null) return '<span class="dim">—</span>';
     var c = x>0 ? 'pos' : (x<0 ? 'neg' : 'dim');
@@ -347,6 +357,54 @@
     drawTrades();
     drawVenues();
     drawSweep();
+    drawEvolution();
+  }
+
+  // Every eight hours the eight worst tiles are retired and eight new ones
+  // take their place. CULLING THE WORST MAKES THE BOARD LOOK BETTER whether
+  // or not anything improved, so what died is shown next to what lives.
+  function drawEvolution(){
+    var e = D.evolution || {}, log = e.log || [];
+    if(!log.length){
+      el('evoTable').innerHTML = '<tbody><tr><td class="empty">' +
+        'No generation has turned over yet.</td></tr></tbody>';
+      el('evoFoot').textContent = e.every_s ?
+        ('Every ' + Math.round(e.every_s/3600) + ' hours: the 8 worst ' +
+         'tiles retire, 8 mutations of the best replace them.') : '';
+      return;
+    }
+    var h = '<thead><tr><th>Gen</th><th>When</th><th>What</th>' +
+      '<th class="lft">Rule</th><th class="lft">Book</th><th>Fitness</th>' +
+      '<th>vs coin flip</th><th>Profit/trade</th><th>Trades</th>' +
+      '<th class="lft">From</th></tr></thead><tbody>';
+    log.forEach(function(r){
+      var born = r.action === 'breed';
+      var nm = (D.strategies||{})[r.variant||''] || {};
+      h += '<tr>' +
+        '<td>' + (r.gen==null?'—':r.gen) + '</td>' +
+        '<td>' + esc(ago(r.ts)) + '</td>' +
+        '<td><span class="' + (born?'pos':'neg') + '">' +
+          (born ? 'born' : 'retired') + '</span></td>' +
+        '<td class="lft">' + esc(nm.name || r.note || r.variant || '—') +
+          '</td>' +
+        '<td class="lft">' + esc(String(r.account||'').split('|')[0]) +
+          ' \u00b7 ' + esc(tfName(+String(r.account||'').split('|')[1])) +
+          '</td>' +
+        '<td>' + cents(r.fit) + '</td>' +
+        '<td>' + cents(r.lift) + '</td>' +
+        '<td>' + cents(r.edge) + '</td>' +
+        '<td>' + (r.n==null?'—':r.n) + '</td>' +
+        '<td class="lft dim">' + esc(born ? (r.parent||'the search') : '') +
+          '</td>' +
+      '</tr>';
+    });
+    el('evoTable').innerHTML = h + '</tbody>';
+    var born = log.filter(function(r){ return r.action==='breed'; }).length;
+    el('evoFoot').textContent =
+      'Generation ' + (e.gen||0) + ', last turned over ' + ago(e.ran) +
+      '. ' + born + ' born, ' + (log.length-born) + ' retired. ' +
+      'A bred rule\u2019s fitness here is its replay over the whole ' +
+      'record, which is in-sample; only the forward record settles it.';
   }
 
   function drawSweep(){
@@ -427,6 +485,9 @@
   // never traded never sits at the top of "most recent".
   var TSORT = {key:'equity', dir:-1};
   var TOPTS = [
+    {k:'fit',    t:'fitness',      v:function(t){ return t.fit; }},
+    {k:'skill',  t:'skill vs coin flip', v:function(t){ return t.lift; }},
+    {k:'gen',    t:'this generation', v:function(t){ return t.gen_pnl; }},
     {k:'equity', t:'amount owned', v:function(t){ return t.equity; }},
     {k:'pnl',    t:'profit',       v:function(t){ return t.pnl; }},
     {k:'edge',   t:'edge per trade',
@@ -544,6 +605,8 @@
         '<div class="v">' + money(t.equity) + '</div>' +
         '<div class="n"><span class="' + cls + '">' +
           (pnl>0?'+':'') + pnl.toFixed(2) + '</span> \u00b7 ' + n + '</div>' +
+        '<div class="n ' + (t.fit==null ? 'dim' :
+            (t.fit>0 ? 'pos' : 'neg')) + '">fit ' + cents(t.fit) + '</div>' +
         '<div class="n dim">' + esc(short) + '</div>' +
       '</div>';
     }).join('');
@@ -578,6 +641,20 @@
      f:function(a){ return tfName(D.accounts[a].seconds); }},
     {k:'coins',  t:'coins', lft:true,
      v:function(a){ return strat(a).coins || 'all'; }},
+    {k:'fit',    t:'fitness',
+     v:function(a){ return D.accounts[a].fit; },
+     f:function(a){ var x=D.accounts[a].fit;
+       return '<span class="'+(x==null?'dim':x>0?'pos':'neg')+'">'+
+              cents(x)+'</span>'; }},
+    {k:'skill',  t:'vs coin flip',
+     v:function(a){ return D.accounts[a].lift; },
+     f:function(a){ return cents(D.accounts[a].lift); }},
+    {k:'gen',    t:'this generation',
+     v:function(a){ return D.accounts[a].gen_pnl; },
+     f:function(a){ var x=D.accounts[a].gen_pnl;
+       return x==null ? '—' : '<span class="'+(x>0?'pos':x<0?'neg':'dim')+
+         '">'+(x>0?'+':'')+x.toFixed(2)+'</span> <span class="dim">\u00b7 '+
+         (D.accounts[a].gen_n||0)+'</span>'; }},
     {k:'equity', t:'amount owned',
      v:function(a){ return D.accounts[a].equity; },
      f:function(a){ return money(D.accounts[a].equity); }},
@@ -841,6 +918,16 @@
         esc(tfName(t.seconds)) + '<span class="badge">' + esc(orig) + '</span></div>' +
       curve(D.history ? D.history[a] : null, 480, 150) +
       '<div class="stats">' +
+        stat('fitness', cents(t.fit),
+             t.fit==null ? 'dim' : (t.fit>0?'pos':'neg')) +
+        stat('vs coin flip', cents(t.lift),
+             t.lift==null ? 'dim' : (t.lift>0?'pos':'neg')) +
+        stat('the coin flip earned', cents(t.flip)) +
+        stat('t', t.t==null ? '—' : (t.t>0?'+':'') + t.t.toFixed(2)) +
+        stat('this generation', t.gen_pnl==null ? '—' :
+             ((t.gen_pnl>0?'+':'') + t.gen_pnl.toFixed(2) +
+              ' \u00b7 ' + (t.gen_n||0)),
+             t.gen_pnl==null ? 'dim' : (t.gen_pnl>0?'pos':'neg')) +
         stat('amount owned', money(t.equity)) +
         stat('profit', (pnl>0?'+':'') + pnl.toFixed(2),
              pnl>0?'pos':pnl<0?'neg':'dim') +
