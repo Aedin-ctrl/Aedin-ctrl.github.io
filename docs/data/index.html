@@ -194,29 +194,12 @@
 
   <div class="banner" id="staleBanner" hidden></div>
 
-  <section>
-    <h2>How this works</h2>
-    <p class="note">
-      Every crypto up/down window on three venues is recorded every few
-      seconds — the quotes on both sides, the coin price, and how it
-      settled. <strong>59 paper accounts</strong> of $100 each then trade
-      different rules against that record. Fills cross the spread and pay
-      the venue's real fee; prices below 2¢ and above 97¢ are refused.
-      Tap <span class="ibtn" aria-hidden="true">i</span> on any market to
-      see its rule.
-    </p>
-    <p class="note">
-      <strong>Bet size follows the account.</strong> Above $100 it stakes
-      <strong>2%</strong> of itself per trade; at or below $100 it drops
-      back to a single contract, re-checked before every trade so it moves
-      both ways on its own. 2% is the growth peak if the measured edge is
-      real — 3% has a <em>lower</em> median while quadrupling the chance of
-      ruin, because Kelly's curve is a hump and 3% is over the top of it.
-      The $100 floor exists because betting a percentage of a <em>losing</em>
-      account compounds the loss: one account that lands at $55 under flat
-      sizing lands at $1 under 2%.
-    </p>
-  </section>
+
+  <p class="note" style="margin-top:14px">
+    97 accounts, so the top row means nothing by itself — each tests its own
+    question (tap <span class="ibtn" aria-hidden="true">i</span>). Over $100
+    stakes 2% of itself, otherwise 1 contract.
+  </p>
 
   <div class="tilehead">
     <span class="tblttl" id="tileCount">Paper markets</span>
@@ -246,16 +229,8 @@
   </div>
 
   <section>
-    <h2>Does the way it is going tell you how it finishes?
-      <span>— the question underneath all of this</span></h2>
-    <p class="note">
-      For each point through a window, how often the direction of travel at
-      that moment matched the finish. <strong>Read the grey line first.</strong>
-      It is a random walk with this coin's own volatility and no
-      predictability whatsoever — and it still scores about 65%, because the
-      last fifth of a window is <em>part of</em> the window. Only the gap
-      between the two lines means anything.
-    </p>
+    <h2>Direction vs finish <span>— and the random-walk control</span></h2>
+    <p class="note">Only the gap between the two lines means anything.</p>
     <div class="controls">
       <div class="ctl"><label for="hitCoin">Coin</label><select id="hitCoin"></select></div>
       <div class="ctl"><label for="hitTf">Timeframe</label><select id="hitTf"></select></div>
@@ -272,11 +247,6 @@
 
   <section>
     <h2>By coin <span>— inside one account</span></h2>
-    <p class="note">
-      The table above is one row per account. This is one account split by
-      coin. <code>ROI</code> is profit over what was risked; <code>hit</code>
-      is how often the side bought won.
-    </p>
     <div class="controls">
       <div class="ctl"><label for="fVenue">Account</label><select id="fVenue"></select></div>
       <div class="ctl"><label for="fTf">Timeframe</label><select id="fTf"></select></div>
@@ -286,20 +256,9 @@
   </section>
 
   <section>
-    <h2>The sweep <span>— every rule variant, replayed</span></h2>
+    <h2>The sweep <span>— every variant, replayed</span></h2>
     <p class="note">
-      Thousands of variants priced against the book that was really quoted
-      at the time. <strong>Read the control, not the profit.</strong> A big
-      grid finds a spectacular winner in pure noise, so the whole grid is
-      re-scored against a no-signal world and only a rule that beats that
-      gets a live account.
-    </p>
-    <p class="note">
-      The no-signal world <strong>flips the side</strong>, it does not
-      shuffle the outcomes. Shuffling breaks the link between price and
-      result — a 10¢ ticket starts winning half the time — which made the
-      null wildly profitable and every rule look worthless. That bug hid
-      every result here for days.
+      The control flips the side, not the outcome. Read it, not the profit.
     </p>
     <div id="sweepBox"></div>
     <p class="foot" id="sweepFoot"></p>
@@ -308,29 +267,14 @@
   <section>
     <h2>Why trades were not taken <span>— the denominator</span></h2>
     <p class="note">
-      A strategy that logs only its fills reports a flattering average.
-      <strong>No offer on that side</strong> means nothing was resting on
-      the book — filling would invent liquidity. <strong>Below 2¢ / above
-      97¢</strong> means the market has already called it.
-      <strong>No signal</strong> is the rule standing down, not a miss.
-    </p>
-    <p class="note">
-      The totals are cumulative, so a refusal that has been <em>fixed</em>
-      keeps its number forever. <strong>Read "last seen"</strong>: an age
-      that keeps growing means that reason has stopped firing. It turns
-      green after half an hour of silence.
+      Read <strong>last seen</strong>, not the totals: a growing age means
+      that reason has stopped.
     </p>
     <div class="wrap scroll"><table id="skipTable"></table></div>
   </section>
 
   <section>
     <h2>Can you even buy it? <span>— offers by point in the window</span></h2>
-    <p class="note">
-      How often each side has an offer resting on it, by tenth of the
-      window. Offers thin sharply towards the close: once a window is
-      decided, the favourite's ask disappears entirely — you can buy the
-      loser for a penny and the winner at no price at all.
-    </p>
     <div class="wrap scroll"><table id="offerTable"></table></div>
   </section>
 
@@ -340,15 +284,7 @@
   </section>
 
   <section>
-    <h2>What exists to trade <span>— all three venues</span></h2>
-    <p class="note">
-      No venue runs hourly or daily <em>up/down</em> any more. Kalshi and
-      Gemini list strike ladders instead, so the hourly and daily accounts
-      take the rung nearest the price at the window's open — "above that
-      strike" becomes "finished higher than it started". The offset is
-      recorded per window and anything beyond 60bps is dropped. Weekly and
-      monthly ladders are recorded, never traded.
-    </p>
+    <h2>What exists to trade</h2>
     <div class="wrap"><table id="venueTable"></table></div>
   </section>
 
