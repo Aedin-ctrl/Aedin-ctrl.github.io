@@ -28,7 +28,6 @@
   .paperchip{font-size:11px;font-weight:650;letter-spacing:.06em;
              text-transform:uppercase;color:#fff;background:var(--s2);
              border-radius:999px;padding:2px 9px}
-  .lede{color:var(--ink2);font-size:14px;max-width:72ch}
 
   .banner{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--warn);
           background:#fffdf7;border-radius:9px;padding:10px 13px;font-size:13px;
@@ -64,8 +63,6 @@
   h2{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.07em;
      color:var(--muted);margin-bottom:11px}
   h2 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
-  .note{font-size:12.5px;color:var(--ink2);margin:-2px 0 9px;max-width:72ch;
-        line-height:1.5}
 
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -184,23 +181,7 @@
     <span class="paperchip">paper</span>
     <span class="tag" id="stamp">loading…</span>
   </header>
-  <p class="lede">
-    Every crypto up/down window on Kalshi, Polymarket and Gemini — the whole
-    path of each one, recorded every few seconds, and how it actually
-    settled. Riding on top: a paper test of one rule, with $100 of play
-    money per venue. <strong>No real money is involved anywhere in this
-    page.</strong>
-  </p>
-
   <div class="banner" id="staleBanner" hidden></div>
-
-
-  <p class="note" style="margin-top:14px">
-    104 accounts, so the top row means nothing by itself — each tests its own
-    question (tap <span class="ibtn" aria-hidden="true">i</span>). Over $100
-    stakes 2% of itself, otherwise 1 contract. <strong>Coin flip</strong>
-    is the control: anything that cannot beat that line is not a strategy.
-  </p>
 
   <div class="tilehead">
     <span class="tblttl" id="tileCount">Paper markets</span>
@@ -231,7 +212,6 @@
 
   <section>
     <h2>Direction vs finish <span>— and the random-walk control</span></h2>
-    <p class="note">Only the gap between the two lines means anything.</p>
     <div class="controls">
       <div class="ctl"><label for="hitCoin">Coin</label><select id="hitCoin"></select></div>
       <div class="ctl"><label for="hitTf">Timeframe</label><select id="hitTf"></select></div>
@@ -258,19 +238,12 @@
 
   <section>
     <h2>The sweep <span>— every variant, replayed</span></h2>
-    <p class="note">
-      The control flips the side, not the outcome. Read it, not the profit.
-    </p>
     <div id="sweepBox"></div>
     <p class="foot" id="sweepFoot"></p>
   </section>
 
   <section>
     <h2>Why trades were not taken <span>— the denominator</span></h2>
-    <p class="note">
-      Read <strong>last seen</strong>, not the totals: a growing age means
-      that reason has stopped.
-    </p>
     <div class="wrap scroll"><table id="skipTable"></table></div>
   </section>
 
