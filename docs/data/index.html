@@ -1072,6 +1072,12 @@
              ((t.gen_pnl>0?'+':'') + t.gen_pnl.toFixed(2) +
               ' \u00b7 ' + (t.gen_n||0)),
              t.gen_pnl==null ? 'dim' : (t.gen_pnl>0?'pos':'neg')) +
+        stat('venue fee at 50\u00a2', t.fee50==null ? '\u2014' :
+             (t.fee50*100).toFixed(2) + '\u00a2') +
+        stat('min order', t.min_order==null ? '\u2014' :
+             (t.min_order.toFixed(0) +
+              (t.min_order>1 ? ' contracts' : ' contract')),
+             t.min_order>1 ? 'neg' : '') +
         stat('amount owned', money(t.equity)) +
         stat('profit', (pnl>0?'+':'') + pnl.toFixed(2),
              pnl>0?'pos':pnl<0?'neg':'dim') +
@@ -1097,6 +1103,7 @@
       '<h5>The model</h5>' +
       '<p>' + esc(st.blurb || '') + '</p>' +
       '<p class="rule">' + esc(bits.join(' · ')) + '</p>' +
+      (t.short_side ? '<p class="rule">one instrument, quoted on up · buying ' + esc(t.short_side) + ' is SELLING up, not buying a second ticket</p>' : '') +
       (st.p != null
         ? '<p class="rule">control p = ' + st.p.toFixed(4) + ' — ' +
           (st.p <= 0.05 ? 'beat its control' : 'did NOT beat its control') + '</p>'
