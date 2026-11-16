@@ -415,11 +415,17 @@
     });
     el('evoTable').innerHTML = h + '</tbody>';
     var born = log.filter(function(r){ return r.action==='breed'; }).length;
+    var rej = (e.rejected||[]).length, tried = (e.rejected||[])
+      .reduce(function(t,r){ return t + (r.tried||0); }, 0);
     el('evoFoot').textContent =
       'Generation ' + (e.gen||0) + ', last turned over ' + ago(e.ran) +
-      '. ' + born + ' born, ' + (log.length-born) + ' retired. ' +
-      'A bred rule\u2019s fitness here is its replay over the whole ' +
-      'record, which is in-sample; only the forward record settles it.';
+      '. ' + born + ' born, ' + (log.length-born) + ' retired' +
+      (rej ? ', ' + rej + ' parent' + (rej>1?'s':'') + ' passed over after ' +
+             tried + ' variants failed the record' : '') +
+      (e.empty ? ', ' + e.empty + ' tile(s) left empty' : '') +
+      '. Every rule born here was positive in both halves of the whole ' +
+      'record before it got a tile \u2014 in-sample by construction; only ' +
+      'the forward record settles it.';
   }
 
   function drawSweep(){
