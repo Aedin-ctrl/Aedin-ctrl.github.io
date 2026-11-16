@@ -1092,9 +1092,11 @@
         stat('bought', pct(t.fill_rate, 0)) +
         stat('stood down', String(t.stood_down||0)) +
         stat('last traded', t.last_trade ? ago(t.last_trade) : '—') +
-        stat('bet size', t.sized
-              ? ((D.sizing ? (D.sizing.frac*100).toFixed(0) : '2') + '% of itself')
-              : '1 contract', t.sized ? 'pos' : 'dim') +
+        stat('bet size', t.stake_frac
+              ? ((t.stake_frac*100).toFixed(0) + '% of itself')
+              : (t.min_order > 1 ? t.min_order.toFixed(0) + ' contracts'
+                                 : '1 contract'),
+             t.stake_frac ? 'pos' : 'dim') +
         stat('last bet', t.last_contracts
               ? (t.last_contracts.toFixed(0) + ' contract' +
                  (t.last_contracts > 1 ? 's' : ''))
