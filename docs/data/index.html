@@ -120,9 +120,24 @@
   .infopanel h5{margin:13px 0 3px;font-size:10.5px;text-transform:uppercase;
     letter-spacing:.06em;color:var(--muted);font-weight:650}
   .sublab{font-size:11.5px;color:var(--muted);margin:1px 0 9px}
-  .curve{width:100%;height:auto;display:block;margin:2px 0 4px}
+  .chart{display:flex;align-items:flex-start;gap:0;margin:2px 0 0}
+  .yax{flex:0 0 44px}
+  .plot{flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;
+        cursor:crosshair;-webkit-overflow-scrolling:touch}
+  /* The page-wide `svg{max-width:100%}` would shrink the plot back to
+     the panel width and there would be nothing to scroll. */
+  .curve{display:block;max-width:none;flex:0 0 auto}
   .curve .zero{stroke:var(--line);stroke-width:1;stroke-dasharray:3 3}
-  .curve .ax{font-size:8px;fill:var(--muted)}
+  .curve .gx{stroke:var(--line);stroke-width:1;opacity:.45}
+  .curve .hair{stroke:var(--ink2);stroke-width:1;opacity:.55}
+  .ax{font-size:8px;fill:var(--muted)}
+  .ax.mid{text-anchor:middle}
+  .ax.end{text-anchor:end}
+  .readout{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+           font-size:12px;margin:2px 0 6px;padding-left:44px;min-height:16px}
+  .readout .rt{font-variant-numeric:tabular-nums;color:var(--ink2)}
+  .readout .rv{font-weight:650;font-variant-numeric:tabular-nums}
+  .readout .rh{color:var(--muted);font-size:11px}
   .stats{display:grid;gap:5px;margin-top:8px;
     grid-template-columns:repeat(auto-fit,minmax(86px,1fr))}
   .sv{border:1px solid var(--line);border-radius:7px;padding:5px 7px}
@@ -834,14 +849,52 @@
 
   // ----------------------------------------------------- the curve
   // Cumulative realised P&L, one point per settled trade (downsampled by
-  // the feed). Drawn by hand rather than with a library because the whole
-  // page is one file and a chart of sixty points does not need 200KB of
-  // dependency to be read correctly.
-  function curve(pts, w, h){
+  // the feed, never truncated). Drawn by hand rather than with a library
+  // because the whole page is one file and a chart of a hundred points
+  // does not need 200KB of dependency to be read correctly.
+  //
+  // THE TIME AXIS IS PROPORTIONAL TO TIME, not to trade number, so a gap
+  // where the rule stood down looks like a gap. That means a long record
+  // does not fit the panel, so the plot SCROLLS sideways and the money
+  // axis is a separate fixed strip -- scroll a combined chart and the
+  // scale disappears with it, which is how a reader loses track of
+  // whether the line is at +$5 or +$500.
+  var CURVE = null;
+
+  function niceStep(span, want){
+    var S = [900, 1800, 3600, 7200, 10800, 21600, 43200, 86400, 172800];
+    for(var i=0;i<S.length;i++){ if(span/S[i] <= want) return S[i]; }
+    return S[S.length-1];
+  }
+  function clock(t){
+    var d = new Date(t*1000);
+    return String(d.getHours()).padStart(2,'0') + ':' +
+           String(d.getMinutes()).padStart(2,'0');
+  }
+  function daylab(t){
+    var d = new Date(t*1000);
+    return (d.getMonth()+1) + '/' + d.getDate();
+  }
+  function stamp(t){ return daylab(t) + ' ' + clock(t); }
+
+  // One place builds the readout, because three copies of it is how a
+  // minus sign goes missing from one of them -- it did: a losing account
+  // read "$75.55" in the hover and "-75.55" everywhere else on the page.
+  function readHTML(p){
+    var v = p[1];
+    var sign = v > 0 ? '+' : v < 0 ? '\u2212' : '';
+    return '<span class="rt">' + esc(stamp(p[0])) + '</span>' +
+      '<span class="rv ' + (v>0?'pos':v<0?'neg':'dim') + '">' +
+        sign + '$' + Math.abs(v).toFixed(2) + '</span>' +
+      '<span class="rh">total since this account opened</span>';
+  }
+
+  function curve(pts, h){
     if(!pts || pts.length < 2){
+      CURVE = null;
       return '<p class="rule dim">No settled trades yet — nothing to draw.</p>';
     }
-    var pad = {l:34, r:8, t:8, b:16};
+    var pad = {l:6, r:10, t:8, b:18};
     var xs = pts.map(function(p){ return p[0]; });
     var ys = pts.map(function(p){ return p[1]; });
     var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
@@ -850,6 +903,10 @@
     // it started from makes a loss look like a rise.
     lo = Math.min(lo, 0); hi = Math.max(hi, 0);
     if(hi - lo < 0.5){ hi += 0.25; lo -= 0.25; }
+    var span = Math.max(60, x1 - x0);
+    // About an hour to the inch, so an evening of trading is a screenful
+    // and a two-day record is a scroll rather than a smear.
+    var w = Math.max(460, Math.min(3200, Math.round(span/3600 * 62) + pad.l + pad.r));
     var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
     var X = function(v){ return pad.l + (x1===x0 ? pw : (v-x0)/(x1-x0)*pw); };
     var Y = function(v){ return pad.t + ph - (v-lo)/(hi-lo)*ph; };
@@ -861,15 +918,49 @@
     var zy = Y(0).toFixed(1);
     var area = d + ' L ' + X(x1).toFixed(1) + ' ' + zy +
                ' L ' + X(x0).toFixed(1) + ' ' + zy + ' Z';
-    function tlab(t){
-      var dt = new Date(t*1000);
-      return (dt.getMonth()+1) + '/' + dt.getDate() + ' ' +
-             String(dt.getHours()).padStart(2,'0') + ':' +
-             String(dt.getMinutes()).padStart(2,'0');
+
+    // Ticks on round local times, not on round offsets from the first
+    // trade -- "03:00" is a time of day a person recognises, "t+7h14m" is
+    // not. getTimezoneOffset keeps the rounding local rather than UTC.
+    var step = niceStep(span, Math.max(3, Math.floor(pw / 86)));
+    var off = new Date(x0*1000).getTimezoneOffset()*60;
+    var first = Math.ceil((x0 - off)/step)*step + off;
+    var ticks = '', lastDay = null;
+    for(var t = first; t <= x1; t += step){
+      var tx = X(t).toFixed(1);
+      var day = daylab(t);
+      ticks += '<line class="gx" x1="'+tx+'" y1="'+pad.t+'" x2="'+tx+
+               '" y2="'+(pad.t+ph)+'"/>' +
+               '<text class="ax mid" x="'+tx+'" y="'+(h-5)+'">' +
+               (day !== lastDay ? day + ' ' : '') + clock(t) + '</text>';
+      lastDay = day;
     }
-    return '<svg class="curve" viewBox="0 0 ' + w + ' ' + h +
-      '" role="img" aria-label="cumulative profit and loss, ' +
-      pts.length + ' settled trades, ending ' + last.toFixed(2) + ' dollars">' +
+
+    CURVE = {pts:pts, x0:x0, x1:x1, lo:lo, hi:hi, w:w, h:h, pad:pad, col:col};
+
+    // Three labels, and the zero one is dropped when it would sit on top
+    // of an end label -- two numbers printed over each other read as one
+    // wrong number.
+    var ylab = '<text class="ax end" x="40" y="' + (Y(hi)+4).toFixed(1) +
+        '">' + (hi>0?'+':'') + hi.toFixed(2) + '</text>' +
+      '<text class="ax end" x="40" y="' + (Y(lo)+4).toFixed(1) + '">' +
+        (lo>0?'+':'') + lo.toFixed(2) + '</text>';
+    if(Math.min(Math.abs(Y(0)-Y(hi)), Math.abs(Y(0)-Y(lo))) > 11){
+      ylab += '<text class="ax end" x="40" y="' + (Y(0)+4).toFixed(1) +
+              '">0.00</text>';
+    }
+    var yax =
+      '<svg class="yax" viewBox="0 0 44 ' + h + '" width="44" height="' + h +
+        '" aria-hidden="true">' + ylab + '</svg>';
+
+    return '<div class="chart">' + yax +
+      '<div class="plot" id="curvePlot">' +
+      '<svg class="curve" id="curveSvg" width="' + w + '" height="' + h +
+        '" viewBox="0 0 ' + w + ' ' + h +
+        '" role="img" aria-label="cumulative profit and loss, ' +
+        pts.length + ' points, from ' + stamp(x0) + ' to ' + stamp(x1) +
+        ', ending ' + last.toFixed(2) + ' dollars">' +
+      ticks +
       '<path d="' + area + '" fill="' + col + '" opacity=".10"/>' +
       '<line x1="' + pad.l + '" y1="' + zy + '" x2="' + (w-pad.r) +
         '" y2="' + zy + '" class="zero"/>' +
@@ -877,14 +968,61 @@
         '" stroke-width="1.6" stroke-linejoin="round"/>' +
       '<circle cx="' + X(x1).toFixed(1) + '" cy="' + Y(last).toFixed(1) +
         '" r="2.6" fill="' + col + '"/>' +
-      '<text class="ax" x="2" y="' + (Y(hi)+4).toFixed(1) + '">' +
-        (hi>0?'+':'') + hi.toFixed(2) + '</text>' +
-      '<text class="ax" x="2" y="' + (Y(lo)+4).toFixed(1) + '">' +
-        (lo>0?'+':'') + lo.toFixed(2) + '</text>' +
-      '<text class="ax" x="' + pad.l + '" y="' + (h-3) + '">' + tlab(x0) + '</text>' +
-      '<text class="ax" style="text-anchor:end" x="' + (w-pad.r) + '" y="' +
-        (h-3) + '">' + tlab(x1) + '</text>' +
-      '</svg>';
+      '<line id="curveHair" class="hair" x1="0" y1="' + pad.t + '" x2="0" y2="' +
+        (pad.t+ph) + '" style="display:none"/>' +
+      '<circle id="curveDot" class="hdot" r="3.2" cx="0" cy="0" ' +
+        'fill="' + col + '" style="display:none"/>' +
+      '</svg></div></div>' +
+      '<div class="readout" id="curveRead">' +
+        readHTML(pts[pts.length-1]) + '</div>';
+  }
+
+  // Follow the pointer along the line. THE NUMBER SHOWN IS THE RUNNING
+  // TOTAL for the account since it opened -- not the per-generation
+  // figure, which is a different column and would make the same curve
+  // read two different ways depending on where you put your finger.
+  function wireCurve(){
+    var svg = el('curveSvg'), plot = el('curvePlot'), read = el('curveRead');
+    if(!svg || !CURVE || !read) return;
+    var hair = el('curveHair'), dot = el('curveDot');
+    var C = CURVE, ph = C.h - C.pad.t - C.pad.b, pw = C.w - C.pad.l - C.pad.r;
+    function X(v){ return C.pad.l + (C.x1===C.x0 ? pw : (v-C.x0)/(C.x1-C.x0)*pw); }
+    function Y(v){ return C.pad.t + ph - (v-C.lo)/(C.hi-C.lo)*ph; }
+    function at(clientX){
+      var r = svg.getBoundingClientRect();
+      // The SVG is drawn at its own width inside a scroller, so the
+      // client box may be scaled; map back through it rather than
+      // assuming one pixel is one unit.
+      var ux = (clientX - r.left) / (r.width || 1) * C.w;
+      var best = null, bd = Infinity;
+      for(var i=0;i<C.pts.length;i++){
+        var dx = Math.abs(X(C.pts[i][0]) - ux);
+        if(dx < bd){ bd = dx; best = C.pts[i]; }
+      }
+      return best;
+    }
+    function show(clientX){
+      var p = at(clientX);
+      if(!p) return;
+      var x = X(p[0]), y = Y(p[1]);
+      hair.setAttribute('x1', x); hair.setAttribute('x2', x);
+      hair.style.display = ''; dot.style.display = '';
+      dot.setAttribute('cx', x); dot.setAttribute('cy', y);
+      read.innerHTML = readHTML(p);
+    }
+    function clear(){
+      hair.style.display = 'none'; dot.style.display = 'none';
+      read.innerHTML = readHTML(C.pts[C.pts.length-1]);
+    }
+    plot.addEventListener('mousemove', function(e){ show(e.clientX); });
+    plot.addEventListener('mouseleave', clear);
+    plot.addEventListener('touchstart', function(e){
+      if(e.touches[0]) show(e.touches[0].clientX); }, {passive:true});
+    plot.addEventListener('touchmove', function(e){
+      if(e.touches[0]) show(e.touches[0].clientX); }, {passive:true});
+    // The newest trade is the point people want first, so open scrolled
+    // to the right-hand end rather than to the account's first week.
+    plot.scrollLeft = plot.scrollWidth;
   }
 
   function stat(k, v, cls){
@@ -916,7 +1054,7 @@
       '<h4 id="infoTitle">' + esc(st.name || 'base') + '</h4>' +
       '<div class="sublab">' + esc(t.venue || '') + ' · ' +
         esc(tfName(t.seconds)) + '<span class="badge">' + esc(orig) + '</span></div>' +
-      curve(D.history ? D.history[a] : null, 480, 150) +
+      curve(D.history ? D.history[a] : null, 158) +
       '<div class="stats">' +
         stat('fitness', cents(t.fit),
              t.fit==null ? 'dim' : (t.fit>0?'pos':'neg')) +
@@ -959,6 +1097,7 @@
         : '') +
       (st.detail ? '<p>' + esc(st.detail) + '</p>' : '');
     openInfo();
+    wireCurve();
     el('infoClose').addEventListener('click', closeInfo);
   }
 
