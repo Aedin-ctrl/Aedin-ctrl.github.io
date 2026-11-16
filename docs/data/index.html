@@ -303,6 +303,12 @@
       97¢</strong> means the market has already called it.
       <strong>No signal</strong> is the rule standing down, not a miss.
     </p>
+    <p class="note">
+      The totals are cumulative, so a refusal that has been <em>fixed</em>
+      keeps its number forever. <strong>Read "last seen"</strong>: an age
+      that keeps growing means that reason has stopped firing. It turns
+      green after half an hour of silence.
+    </p>
     <div class="wrap scroll"><table id="skipTable"></table></div>
   </section>
 
@@ -1159,15 +1165,24 @@
       var sy = accts.reduce(function(t,a){ return t + (agg[y][a]||0); }, 0);
       return sy - sx;
     });
-    var h = '<thead><tr><th>Reason</th>' + accts.map(function(a){
+    var h = '<thead><tr><th class="lft">Reason</th>' + accts.map(function(a){
       return '<th>'+esc(D.accounts[a].label || a)+'</th>'; }).join('') +
-      '<th>Total</th></tr></thead><tbody>';
+      '<th>Total</th><th>Last seen</th></tr></thead><tbody>';
+    // LAST SEEN is the column that makes a fix checkable. The totals are
+    // cumulative, so something that has stopped keeps its number forever
+    // and the table cannot tell "still happening" from "fixed an hour
+    // ago". If an age keeps growing, that reason has stopped firing.
+    var now = Math.floor(Date.now()/1000);
     reasons.forEach(function(r){
       var tot = 0;
-      h += '<tr><td>'+esc(r)+'</td>' + accts.map(function(a){
+      h += '<tr><td class="lft">'+esc(r)+'</td>' + accts.map(function(a){
         var n = agg[r][a] || 0; tot += n;
         return '<td>' + (n || '<span class="dim">—</span>') + '</td>'; }).join('');
-      h += '<td>'+tot+'</td></tr>';
+      var last = (D.skip_last||{})[r];
+      var age = last ? (now - last) : null;
+      var cls = age == null ? 'dim' : (age > 1800 ? 'pos' : '');
+      h += '<td>'+tot+'</td><td class="'+cls+'">' +
+           (last ? esc(ago(last)) : '<span class="dim">—</span>') + '</td></tr>';
     });
     el('skipTable').innerHTML = h + '</tbody>';
   }
