@@ -205,6 +205,17 @@
       Tap <span class="ibtn" aria-hidden="true">i</span> on any market to
       see its rule.
     </p>
+    <p class="note">
+      <strong>Bet size follows the account.</strong> Above $100 it stakes
+      <strong>2%</strong> of itself per trade; at or below $100 it drops
+      back to a single contract, re-checked before every trade so it moves
+      both ways on its own. 2% is the growth peak if the measured edge is
+      real — 3% has a <em>lower</em> median while quadrupling the chance of
+      ruin, because Kelly's curve is a hump and 3% is over the top of it.
+      The $100 floor exists because betting a percentage of a <em>losing</em>
+      account compounds the loss: one account that lands at $55 under flat
+      sizing lands at $1 under 2%.
+    </p>
   </section>
 
   <div class="tilehead">
@@ -686,7 +697,13 @@
     {k:'fill',   t:'bought', v:function(a){ return D.accounts[a].fill_rate; },
      f:function(a){ return pct(D.accounts[a].fill_rate,0); }},
     {k:'stood',  t:'stand-downs',
-     v:function(a){ return D.accounts[a].stood_down||0; }}
+     v:function(a){ return D.accounts[a].stood_down||0; }},
+    {k:'size',   t:'bet size', lft:true,
+     v:function(a){ return D.accounts[a].sized ? 1 : 0; },
+     f:function(a){ return D.accounts[a].sized
+         ? '<span class="pos">' +
+           (D.sizing ? (D.sizing.frac*100).toFixed(0) : '2') + '%</span>'
+         : '<span class="dim">1 ctr</span>'; }}
   ];
 
   var MKF = {strat:'all', venue:'all', tf:'all', coin:'all', size:'all'};
@@ -928,6 +945,13 @@
         stat('bought', pct(t.fill_rate, 0)) +
         stat('stood down', String(t.stood_down||0)) +
         stat('last traded', t.last_trade ? ago(t.last_trade) : '—') +
+        stat('bet size', t.sized
+              ? ((D.sizing ? (D.sizing.frac*100).toFixed(0) : '2') + '% of itself')
+              : '1 contract', t.sized ? 'pos' : 'dim') +
+        stat('last bet', t.last_contracts
+              ? (t.last_contracts.toFixed(0) + ' contract' +
+                 (t.last_contracts > 1 ? 's' : ''))
+              : '—') +
       '</div>' +
       '<h5>The model</h5>' +
       '<p>' + esc(st.blurb || '') + '</p>' +
