@@ -34,7 +34,13 @@
           background:#fffdf7;border-radius:9px;padding:10px 13px;font-size:13px;
           color:var(--ink2)}
   .banner b{color:var(--warn)}
-  .banner[hidden]{display:none}
+  /* The `hidden` attribute hides an element through the UA rule
+     [hidden]{display:none} -- and ANY author rule that sets display beats a UA
+     rule, so `.infoback{display:flex}` kept a full-screen modal backdrop on
+     screen permanently: a dimmed page, an empty white dialog, and every click
+     swallowed by a z-index:60 overlay. Guard it once, globally, instead of
+     per-class: a later `.foo{display:...}` would otherwise reintroduce it. */
+  [hidden]{display:none !important}
 
   /* ONE grid for every tile, not a grid per venue. Grouping by venue gave
      each group its own track sizing, so a group of four and a group of
