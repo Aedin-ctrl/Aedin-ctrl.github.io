@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cathode Desk — why there are two tides a day</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&family=VT323&family=Inter:wght@400;600;800&display=block">
+<link rel="stylesheet" href="../desk.css?v=2c89dcbe69">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="back"><a href="../">&lt; back to the library</a></p>
+  <h1>WHY THERE ARE TWO<br>TIDES A DAY</h1>
+  <p class="sub">The Moon is only ever on one side, and there are two high tides a day. The answer is not the pull -- it is the pull minus its own average, which points one way at the front of the Earth and the other way at the back.</p>
+  <div class="tags" style="margin-top:12px"><span class="">EARTH</span><span class="b">SPACE</span><span style="background:#332e40;color:#b6afc2">#024</span><span style="background:#332e40;color:#b6afc2">106s</span></div>
+  <p class="sub" style="margin-top:14px">It starts paused. Press <b>PLAY</b> and the sound comes on with it —
+  the voice, the effects and the bed; browsers will not start audio before that first click, which is the only
+  reason it waits. The gear at the bottom right sets speed and size, and both carry to the next video.
+  <br>Built in <a href="../">Cathode Desk</a>, the house style; the four layers and the rules are described there.</p>
+  
+</header>
+
+<div class="player">
+  <a class="nav prev" href="../berry/" title="Previous video — #023 how many r&#x27;s are in strawberry" aria-label="Previous video — #023 how many r&#x27;s are in strawberry"><span class="g">&#8249;</span><span class="n">#023</span></a>
+  <div class="stage">
+    <canvas id="tv" width="864" height="1536"></canvas>
+    <div class="bar">
+      <button id="pp">PLAY</button>
+      <button id="snd" title="The voice, the effects and the bed">AUDIO ON</button>
+      <input id="scrub" type="range" min="0" max="1000" value="0">
+      <span class="t" id="time">0.00 / 106.0</span>
+      <label><input type="checkbox" id="loop" checked> LOOP</label>
+      <span class="fx">
+        <button id="fxb" aria-expanded="false" aria-controls="fxp" aria-label="settings"
+                title="speed and size"><svg viewBox="0 0 11 11" aria-hidden="true"
+          ><path fill="currentColor" d="M4 0h3v1h1v1h1V1h1v1h1v1H9v1h1v3H9v1h1v1H9v1H8V9H7v1H6v1H5v-1H4V9H3v1H2v1H1v-1H0V8h1V7H0V4h1V3H0V0h1v1h1V0h1v1h1zM4 4v3h3V4z"
+          /></svg></button>
+        <span class="fxpop" id="fxp" hidden>
+          <span class="fxrow"><b>SPEED</b><span class="fxopts" id="fxrate"></span></span>
+          <span class="fxrow"><b>SIZE</b><span class="fxopts" id="fxsize"></span></span>
+        </span>
+      </span>
+    </div>
+  </div>
+  <a class="nav next" href="../map/" title="Next video — #025 the map that lies about greenland" aria-label="Next video — #025 the map that lies about greenland"><span class="g">&#8250;</span><span class="n">#025</span></a>
+</div>
+</div>
+<script src="../cathode-lib.js?v=e7650aa2e9"></script>
+<script src="piece.js?v=5064da0b92"></script>
+<script src="../cathode-run.js?v=a83a051680"></script>
+</body>
+</html>
