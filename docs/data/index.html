@@ -69,6 +69,25 @@
   .pos{color:var(--good);font-weight:600} .neg{color:var(--bad)}
   .dim{color:var(--muted)}
   .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  .tilehead{display:flex;align-items:center;justify-content:space-between;
+    gap:10px;margin:18px 0 0}
+  .sortbox{position:relative}
+  .sortbtn{font:inherit;font-size:11px;padding:3px 9px;border-radius:7px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink2);
+    cursor:pointer;white-space:nowrap}
+  .sortbtn:hover,.sortbtn:focus-visible{color:var(--fg);border-color:var(--fg)}
+  .sortbtn .arr{font-size:8px;opacity:.6;margin-left:2px}
+  .sortmenu{position:absolute;right:0;top:calc(100% + 5px);z-index:20;
+    min-width:172px;background:var(--card);border:1px solid var(--line);
+    border-radius:9px;padding:4px;box-shadow:0 8px 26px rgba(0,0,0,.28)}
+  .sortmenu button{display:flex;justify-content:space-between;gap:10px;
+    width:100%;font:inherit;font-size:12px;text-align:left;padding:5px 8px;
+    border:0;border-radius:6px;background:transparent;color:var(--ink2);
+    cursor:pointer}
+  .sortmenu button:hover,.sortmenu button:focus-visible{
+    background:var(--line);color:var(--fg)}
+  .sortmenu button[aria-selected="true"]{color:var(--fg);font-weight:600}
+  .sortmenu .tick{opacity:.6;font-size:9px}
   .tblhead{display:flex;align-items:baseline;justify-content:space-between;
     gap:10px;margin:18px 0 6px;flex-wrap:wrap}
   .tblttl{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
@@ -174,6 +193,14 @@
     </p>
   </section>
 
+  <div class="tilehead">
+    <span class="tblttl" id="tileCount">Paper markets</span>
+    <div class="sortbox">
+      <button class="sortbtn" id="tileSortBtn" aria-haspopup="listbox"
+              aria-expanded="false">sort: amount <span class="arr">▼</span></button>
+      <div class="sortmenu" id="tileSortMenu" role="listbox" hidden></div>
+    </div>
+  </div>
   <div class="grid" id="accountCards"></div>
 
   <div class="tblhead">
@@ -516,11 +543,104 @@
     });
   }
 
+  // ------------------------------------------------- tile sort
+  // The quick-glance orderings. Each returns a number or a string; blanks
+  // always sort last whichever direction is chosen, so an account that has
+  // never traded never sits at the top of "most recent".
+  var TSORT = {key:'equity', dir:-1};
+  var TOPTS = [
+    {k:'equity', t:'amount owned', v:function(t){ return t.equity; }},
+    {k:'pnl',    t:'profit',       v:function(t){ return t.pnl; }},
+    {k:'edge',   t:'edge per trade',
+     v:function(t){ return t.settled ? (t.pnl||0)/t.settled : null; }},
+    {k:'hit',    t:'wins ratio',   v:function(t){ return t.hit; }},
+    {k:'taken',  t:'trades taken',
+     v:function(t){ return (t.open||0)+(t.settled||0); }},
+    {k:'last',   t:'last traded',  v:function(t){ return t.last_trade; }},
+    {k:'seconds',t:'window length',v:function(t){ return t.seconds; }},
+    {k:'venue',  t:'book',         v:function(t){ return t.venue; }},
+    {k:'name',   t:'strategy',     v:function(t,a){ return strat(a).name || 'base'; }}
+  ];
+
+  function tileOpt(){
+    return TOPTS.filter(function(o){ return o.k===TSORT.key; })[0] || TOPTS[0];
+  }
+
+  function tileSorted(){
+    var o = tileOpt();
+    return Object.keys(D.accounts||{}).sort(function(x,y){
+      var a = o.v(D.accounts[x], x), b = o.v(D.accounts[y], y);
+      if(a==null && b==null) return 0;
+      if(a==null) return 1;               // blanks last, both directions
+      if(b==null) return -1;
+      if(typeof a==='string'||typeof b==='string'){
+        a=String(a); b=String(b);
+        return a===b ? 0 : (a<b ? -TSORT.dir : TSORT.dir);
+      }
+      return (a-b)*TSORT.dir;
+    });
+  }
+
+  function tileSortUI(){
+    var btn = el('tileSortBtn'), menu = el('tileSortMenu');
+    if(!btn || !menu) return;
+    btn.innerHTML = 'sort: ' + esc(tileOpt().t) +
+      ' <span class="arr">' + (TSORT.dir<0 ? '\u25BC' : '\u25B2') + '</span>';
+    menu.innerHTML = TOPTS.map(function(o){
+      var on = o.k===TSORT.key;
+      return '<button role="option" data-k="' + o.k + '" aria-selected="' +
+        (on?'true':'false') + '">' + esc(o.t) +
+        (on ? '<span class="tick">' + (TSORT.dir<0?'high first':'low first') +
+              '</span>' : '') + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(menu.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){
+        var k = b.getAttribute('data-k');
+        // Same option again flips the direction; a new one starts with the
+        // interesting end first, which for every column here is "more".
+        if(TSORT.key===k) TSORT.dir = -TSORT.dir;
+        else { TSORT.key = k; TSORT.dir = (k==='venue'||k==='name') ? 1 : -1; }
+        closeTileMenu();
+        cards();
+        btn.focus();
+      });
+    });
+    if(!btn.dataset.bound){
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = !menu.hidden;
+        if(open) closeTileMenu(); else openTileMenu();
+      });
+      document.addEventListener('click', function(e){
+        if(menu.hidden) return;
+        if(!menu.contains(e.target) && e.target !== btn) closeTileMenu();
+      });
+      document.addEventListener('keydown', function(e){
+        if(e.key === 'Escape' && !menu.hidden){ closeTileMenu(); btn.focus(); }
+      });
+    }
+  }
+
+  function openTileMenu(){
+    el('tileSortMenu').hidden = false;
+    el('tileSortBtn').setAttribute('aria-expanded','true');
+    var f = el('tileSortMenu').querySelector('button');
+    if(f) f.focus();
+  }
+  function closeTileMenu(){
+    el('tileSortMenu').hidden = true;
+    el('tileSortBtn').setAttribute('aria-expanded','false');
+  }
+
   function cards(){
     // One flat grid, one tile per paper market, numbers only. With fifty
     // markets the tile is a glance -- what it is, what it is worth, how it
     // is doing -- and the table below carries everything else.
-    var ks = acctList();
+    tileSortUI();
+    var ks = tileSorted();
+    var tc = el('tileCount');
+    if(tc) tc.textContent = ks.length + ' paper markets';
     if(!ks.length){
       el('accountCards').innerHTML =
         '<div class="m"><div class="k">accounts</div><div class="v">\u2014</div>' +
