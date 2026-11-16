@@ -40,7 +40,7 @@
      each group its own track sizing, so a group of four and a group of
      seven produced tiles of different widths that did not line up down the
      page -- the tiles were fine, the nesting was the problem. */
-  .grid{display:grid;gap:6px;margin-top:16px;
+  .grid{display:grid;gap:5px;margin-top:10px;
         grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
   .m{background:var(--card);border:1px solid var(--line);border-radius:8px;
      padding:7px 8px;min-width:0}
@@ -54,11 +54,12 @@
         overflow:hidden;text-overflow:ellipsis}
 
   section{background:var(--card);border:1px solid var(--line);
-          border-radius:13px;padding:18px 20px;margin-top:18px}
+          border-radius:13px;padding:14px 16px;margin-top:12px}
   h2{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.07em;
      color:var(--muted);margin-bottom:11px}
   h2 span{text-transform:none;letter-spacing:0;font-weight:400;color:var(--muted)}
-  .note{font-size:12.5px;color:var(--ink2);margin:-4px 0 12px;max-width:74ch}
+  .note{font-size:12.5px;color:var(--ink2);margin:-2px 0 9px;max-width:72ch;
+        line-height:1.5}
 
   table{width:100%;border-collapse:collapse;font-size:13px}
   th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -69,8 +70,14 @@
   .pos{color:var(--good);font-weight:600} .neg{color:var(--bad)}
   .dim{color:var(--muted)}
   .wrap{overflow-x:auto;margin:0 -4px;padding:0 4px}
+  /* A table of 228 rows added 7,600px to the page -- nearly half of it --
+     for data almost nobody scrolls to the end of. Capping the height keeps
+     every row reachable without making the page a mile long. */
+  .wrap.scroll{max-height:380px;overflow-y:auto}
+  .wrap.scroll.short{max-height:232px}
+  .wrap.scroll thead th{position:sticky;top:0;z-index:2;background:var(--card)}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
-    gap:10px;margin:18px 0 0}
+    gap:10px;margin:14px 0 0}
   .sortbox{position:relative}
   .sortbtn{font:inherit;font-size:11px;padding:3px 9px;border-radius:7px;
     border:1px solid var(--line);background:var(--card);color:var(--ink2);
@@ -89,7 +96,7 @@
   .sortmenu button[aria-selected="true"]{color:var(--fg);font-weight:600}
   .sortmenu .tick{opacity:.6;font-size:9px}
   .tblhead{display:flex;align-items:baseline;justify-content:space-between;
-    gap:10px;margin:18px 0 6px;flex-wrap:wrap}
+    gap:10px;margin:14px 0 5px;flex-wrap:wrap}
   .tblttl{font-size:12px;text-transform:uppercase;letter-spacing:.06em;
     color:var(--muted);font-weight:600}
   th.sortable{cursor:pointer;user-select:none}
@@ -102,8 +109,11 @@
     background:transparent;color:var(--muted);font-size:10px;line-height:1;
     cursor:pointer;margin-left:6px;padding:0;font-family:inherit}
   .ibtn:hover,.ibtn:focus-visible{color:var(--fg);border-color:var(--fg)}
-  .infopanel{margin-top:10px;background:var(--card);border:1px solid var(--line);
-    border-radius:11px;padding:13px 15px}
+  .infoback{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);
+    display:flex;align-items:flex-start;justify-content:center;
+    padding:min(12vh,90px) 16px 24px;overflow-y:auto}
+  .infopanel{background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:15px 17px;max-width:520px;width:100%}
   .infopanel h4{margin:0 0 4px;font-size:14px}
   .infopanel p{margin:6px 0;font-size:12.5px;line-height:1.55;color:var(--muted)}
   .infopanel .rule{font-size:11.5px;color:var(--muted)}
@@ -114,7 +124,7 @@
     letter-spacing:.05em;border:1px solid var(--line);border-radius:999px;
     padding:1px 6px;margin-left:6px;color:var(--muted);vertical-align:1px}
 
-  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
   /* min-width:0 is what actually lets these shrink: a flex item will not
      go below the intrinsic width of a <select>'s widest option without
      it, so a long coin name pushed the whole page 13px sideways on a
@@ -164,32 +174,15 @@
   <div class="banner" id="staleBanner" hidden></div>
 
   <section>
-    <h2>The rule being tested</h2>
-    <p class="note" id="ruleNote">
-      Wait until the last fifth of the window — minute 4 of 5, minute 12 of
-      15. Look at which way the coin is moving right then. Buy that side,
-      cross the spread, pay the venue's real fee, hold to settlement.
-      One contract a time.
-    </p>
+    <h2>How this works</h2>
     <p class="note">
-      <strong>What it actually buys, which was not what I expected.</strong>
-      The prediction here was that the rule would pay 80–90¢ for the side
-      already winning. It does the opposite: in the first hour,
-      <strong>22 of 23 trades bought the underdog, at an average of 24¢</strong>.
-      Because "trending" means the coin's <em>direction of travel</em> and not
-      "is it above the window's open", the rule mostly fires when the price
-      rose early and is now drifting back — so it buys the cheap side, betting
-      the drift continues. That is a bet on short-term reversal against the
-      window's position, which is a different and more interesting thing than
-      backing the favourite.
-    </p>
-    <p class="note">
-      It still has to clear a real cost: the spread on these venues gets
-      <em>wider</em> near the close, not tighter, and fills here cross it and
-      pay the venue's fee. Prices below 2¢ and above 97¢ are refused — at
-      those ends the market is saying the window is already over, and a 0.1¢
-      contract that happens to win pays a thousandfold and would swamp every
-      other trade in the record.
+      Every crypto up/down window on three venues is recorded every few
+      seconds — the quotes on both sides, the coin price, and how it
+      settled. <strong>59 paper accounts</strong> of $100 each then trade
+      different rules against that record. Fills cross the spread and pay
+      the venue's real fee; prices below 2¢ and above 97¢ are refused.
+      Tap <span class="ibtn" aria-hidden="true">i</span> on any market to
+      see its rule.
     </p>
   </section>
 
@@ -214,8 +207,11 @@
     <div class="ctl"><label for="mkCoin">Coin</label><select id="mkCoin"></select></div>
     <div class="ctl"><label for="mkSize">Basket</label><select id="mkSize"></select></div>
   </div>
-  <div class="wrap"><table id="acctTable"></table></div>
-  <div id="infoPanel" class="infopanel" hidden></div>
+  <div class="wrap scroll"><table id="acctTable"></table></div>
+  <div id="infoBack" class="infoback" hidden>
+    <div id="infoPanel" class="infopanel" role="dialog" aria-modal="true"
+         aria-labelledby="infoTitle"></div>
+  </div>
 
   <section>
     <h2>Does the way it is going tell you how it finishes?
@@ -243,79 +239,35 @@
   </section>
 
   <section>
-    <h2>Each account, broken down <span>— filter it any way you like</span></h2>
+    <h2>By coin <span>— inside one account</span></h2>
     <p class="note">
-      There is <strong>one account per venue per timeframe</strong>, $100 each.
-      A 5-minute window and an hourly one are different bets with different
-      spreads and different amounts of noise to cut through, so averaging them
-      into one number answers neither question. Splitting by coin as well
-      would be seventy-odd accounts of a handful of trades each, so coins stay
-      as a filter inside an account rather than as accounts of their own.
-    </p>
-    <p class="note">
-      Two further accounts now run <em>beside</em> the original rule rather
-      than replacing it, so its record stays continuous:
-    </p>
-    <ul class="note">
-      <li><strong>fade_e450_l360_k20</strong> — promoted by the sweep's own
-      gate at <strong>p&nbsp;=&nbsp;0.003</strong>. With seven and a half
-      minutes left on a 15-minute window, and the price still within 20 basis
-      points of where it opened, it buys the side the last six minutes moved
-      <em>against</em>. It is right about half the time and pays about 41¢ for
-      it, so the money comes from the price, not from being right. It trades
-      every coin and every venue.</li>
-      <li><strong>basket5</strong> — the same rule on the five coins that made
-      money in <em>both</em> halves of the record (bnb, btc, xrp, eth, doge).
-      <strong>This one did not earn its place.</strong> Running the identical
-      coin-picking procedure on a coin-flip world beats it 7.6% of the time,
-      so the coins were chosen by hindsight and the basket is here only to be
-      settled forward. It is marked a challenger, not a promotion.</li>
-    </ul>
-    <p class="note">
-      Both were chosen on roughly <strong>one day</strong> of recorded windows.
-      That is the real caveat, and no control can fix it — only more days can.
+      The table above is one row per account. This is one account split by
+      coin. <code>ROI</code> is profit over what was risked; <code>hit</code>
+      is how often the side bought won.
     </p>
     <div class="controls">
       <div class="ctl"><label for="fVenue">Account</label><select id="fVenue"></select></div>
       <div class="ctl"><label for="fTf">Timeframe</label><select id="fTf"></select></div>
       <div class="ctl"><label for="fCoin">Coin</label><select id="fCoin"></select></div>
     </div>
-    <div class="wrap"><table id="breakdown"></table></div>
-    <p class="foot">
-      <code>ROI</code> is profit over what was actually risked — the honest
-      denominator for a contract bought at 85¢. <code>Hit</code> is how often
-      the side bought was the side that won.
-    </p>
+    <div class="wrap scroll"><table id="breakdown"></table></div>
   </section>
 
   <section>
-    <h2>The sweep <span>— every rule variant, replayed against the record</span></h2>
+    <h2>The sweep <span>— every rule variant, replayed</span></h2>
     <p class="note">
-      The accounts above test <em>one</em> rule, chosen by guesswork. This
-      replays the same recorded windows against thousands of variants: when
-      to jump in, how far back to look, <strong>follow or fade</strong>, and
-      how much the price's <strong>distance from the open</strong> should
-      matter. It trades nothing — it prices each variant against the real
-      book that was quoted at the time.
+      Thousands of variants priced against the book that was really quoted
+      at the time. <strong>Read the control, not the profit.</strong> A big
+      grid finds a spectacular winner in pure noise, so the whole grid is
+      re-scored against a no-signal world and only a rule that beats that
+      gets a live account.
     </p>
     <p class="note">
-      <strong>Read the control column, not the profit column.</strong> A grid
-      of thousands produces a spectacular winner from pure noise — that is
-      what a grid does. So the whole grid is re-scored against a no-signal
-      world and the best of <em>that</em> is recorded. If the no-signal world
-      wins as often as this one, there is nothing here. Nothing is promoted
-      to a live account unless that test passes.
-    </p>
-    <p class="note">
-      <strong>The no-signal world is built by flipping the side, not by
-      shuffling the outcomes.</strong> Shuffling outcomes while leaving prices
-      alone breaks the link between the two — a 10¢ ticket starts winning half
-      the time — so the no-signal world comes out wildly profitable and
-      <em>every</em> rule looks worthless against it. That is what this sweep
-      did for its first several days, and it reads exactly like "there is no
-      edge". The honest null leaves the market untouched and randomises only
-      the thing the rule claims to know: which side to buy, at the same
-      instant, paying the same book.
+      The no-signal world <strong>flips the side</strong>, it does not
+      shuffle the outcomes. Shuffling breaks the link between price and
+      result — a 10¢ ticket starts winning half the time — which made the
+      null wildly profitable and every rule look worthless. That bug hid
+      every result here for days.
     </p>
     <div id="sweepBox"></div>
     <p class="foot" id="sweepFoot"></p>
@@ -324,69 +276,40 @@
   <section>
     <h2>Why trades were not taken <span>— the denominator</span></h2>
     <p class="note">
-      A strategy that logs only its fills reports the average of the trades it
-      was <em>able</em> to get, which is a different and much more flattering
-      number. Every refusal is recorded with its reason.
+      A strategy that logs only its fills reports a flattering average.
+      <strong>No offer on that side</strong> means nothing was resting on
+      the book — filling would invent liquidity. <strong>Below 2¢ / above
+      97¢</strong> means the market has already called it.
+      <strong>No signal</strong> is the rule standing down, not a miss.
     </p>
-    <p class="note">
-      <strong>These are not failed paper fills.</strong> A paper account
-      <em>could</em> fill everything — that is exactly what would make it
-      useless. <em>No offer on that side</em> means there was no ask resting
-      on the book at all, so filling would be inventing liquidity that did
-      not exist. <em>Price below 0.02 / above 0.97</em> are this project's own
-      bounds: at those ends the market is saying the window is over.
-      <em>No signal</em> is different again — the coin barely moved, so the
-      rule had no view and never tried. It is counted separately from the
-      buy rate on the cards above for that reason.
-    </p>
-    <div class="wrap"><table id="skipTable"></table></div>
+    <div class="wrap scroll"><table id="skipTable"></table></div>
   </section>
 
   <section>
-    <h2>Can you even buy it? <span>— offers by how far through the window</span></h2>
+    <h2>Can you even buy it? <span>— offers by point in the window</span></h2>
     <p class="note">
-      How often each side has an offer resting on it, by tenth of the window
-      (<em>up / down</em>, as percentages). Offers thin out sharply towards
-      the close, and once a window is effectively <strong>decided</strong> —
-      the favourite bid at 99¢ — its ask disappears completely: you can buy
-      the loser for a penny, but the side the rule wants cannot be bought at
-      any price. Measured at 73 seconds left on a window that was <em>not</em>
-      yet decided, the favourite still had 509 contracts offered at 97¢, so
-      this is about the decided case specifically, not a blanket rule.
-      Either way the rule is unbuyable exactly when it is most confident,
-      which is the refusal that shows up most often below.
+      How often each side has an offer resting on it, by tenth of the
+      window. Offers thin sharply towards the close: once a window is
+      decided, the favourite's ask disappears entirely — you can buy the
+      loser for a penny and the winner at no price at all.
     </p>
-    <div class="wrap"><table id="offerTable"></table></div>
+    <div class="wrap scroll"><table id="offerTable"></table></div>
   </section>
 
   <section>
     <h2>Recent paper trades</h2>
-    <div class="wrap"><table id="tradeTable"></table></div>
+    <div class="wrap scroll"><table id="tradeTable"></table></div>
   </section>
 
   <section>
-    <h2>What exists to trade <span>— checked against all three venues</span></h2>
+    <h2>What exists to trade <span>— all three venues</span></h2>
     <p class="note">
-      No venue runs an hourly or daily <em>up/down</em> market any more.
-      Kalshi and Gemini list <strong>strike ladders</strong> at those lengths
-      ("BTC $64,400 or above" — 10 rungs on Gemini, up to 188 on Kalshi);
-      Polymarket's hourly and daily up/down windows were discontinued after
-      2025.
-    </p>
-    <p class="note">
-      A ladder becomes the same bet by taking <strong>the rung nearest the
-      price at the window's open</strong>: "above that strike at the close"
-      is then "finished higher than it started". That is how the hourly and
-      daily accounts trade. It is an approximation — the strike is a round
-      number and the opening price is not — so how far off centre each one
-      sits is recorded per window in basis points, and anything more than 60
-      bps off is refused rather than traded as if the question had not
-      changed. On a $100 grid at a $64,800 coin the offset is at most ~7.7 bps.
-    </p>
-    <p class="note">
-      Weekly and monthly ladders are listed by the venues and are deliberately
-      <em>not</em> traded: a window measured in weeks cannot be tested by a
-      rule about its last few minutes inside any sensible run.
+      No venue runs hourly or daily <em>up/down</em> any more. Kalshi and
+      Gemini list strike ladders instead, so the hourly and daily accounts
+      take the rung nearest the price at the window's open — "above that
+      strike" becomes "finished higher than it started". The offset is
+      recorded per window and anything beyond 60bps is dropped. Weekly and
+      monthly ladders are recorded, never traded.
     </p>
     <div class="wrap"><table id="venueTable"></table></div>
   </section>
@@ -491,6 +414,11 @@
     var out = '';
     tfs.forEach(function(t){
       var sig = (t.p_reality != null && t.p_reality <= 0.05);
+      // Clearing the control is NOT the same as making money. A best
+      // variant that beats a coin flip and still loses on every trade
+      // must not be announced as a pass -- that reads as a result when
+      // it is a smaller loss than chance would produce.
+      var pays = (t.best_per_trade != null && t.best_per_trade > 0);
       out += '<div class="sub">' + esc(tfName(t.seconds)) + ' — ' +
         t.windows + ' settled windows, ' + (t.variants||0).toLocaleString() +
         ' variants</div>';
@@ -498,12 +426,14 @@
         out += '<p class="empty">Nothing clears the minimum fill yet.</p>';
         return;
       }
-      out += '<div class="verdict ' + (sig ? 'ok' : 'no') + '">' +
-        (sig
-          ? '<b>Clears the control.</b> '
-          : '<b>Does not clear the control — treat as noise.</b> ') +
+      out += '<div class="verdict ' + (sig && pays ? 'ok' : 'no') + '">' +
+        (!sig
+          ? '<b>Does not clear the control — treat as noise.</b> '
+          : pays
+            ? '<b>Clears the control.</b> '
+            : '<b>Clears the control but still loses money.</b> ') +
         'Best variant ' + (t.best_per_trade*100).toFixed(2) + '¢/trade; ' +
-        'a shuffled world with no signal at all finds ' +
+        'a coin flip into the same book finds ' +
         (t.null_median*100).toFixed(2) + '¢ typically and ' +
         (t.null_p95*100).toFixed(2) + '¢ at the 95th. ' +
         'p = ' + t.p_reality.toFixed(3) + '.' +
@@ -511,7 +441,7 @@
           ? ' <b>Promoted:</b> ' + t.promoted.map(esc).join(', ')
           : (t.why_not ? ' Nothing promoted.' : '')) +
         '</div>';
-      out += '<div class="wrap"><table><thead><tr><th>Variant</th>' +
+      out += '<div class="wrap scroll short"><table><thead><tr><th>Variant</th>' +
         '<th>Enter</th><th>Look back</th><th>Mode</th><th>Distance gate</th>' +
         '<th>Signals</th><th>Filled</th><th>Hit</th><th>¢/trade</th>' +
         '</tr></thead><tbody>';
@@ -875,7 +805,7 @@
              : 'the original rule';
     el('infoPanel').innerHTML =
       '<button class="cls" id="infoClose">close</button>' +
-      '<h4>' + esc(st.name || 'base') +
+      '<h4 id="infoTitle">' + esc(st.name || 'base') +
         '<span class="badge">' + esc(orig) + '</span></h4>' +
       '<p>' + esc(st.blurb || '') + '</p>' +
       (st.detail ? '<p>' + esc(st.detail) + '</p>' : '') +
@@ -885,11 +815,36 @@
                       : ' \u2014 did not beat its control') + '</p>' : '') +
       '<p class="rule">' + esc(t.label || a) + ' \u00b7 ' +
         (t.settled||0) + ' settled \u00b7 ' + money(t.equity) + '</p>';
-    el('infoPanel').hidden = false;
-    el('infoClose').addEventListener('click', function(){
-      el('infoPanel').hidden = true; });
-    el('infoPanel').scrollIntoView({block:'nearest', behavior:'smooth'});
+    openInfo();
+    el('infoClose').addEventListener('click', closeInfo);
   }
+
+  // The card sits ON TOP of the page. Anywhere outside it closes, so does
+  // Escape -- a panel that can only be dismissed by finding its own small
+  // button is a panel people leave open.
+  var infoReturn = null;
+  function openInfo(){
+    infoReturn = document.activeElement;
+    el('infoBack').hidden = false;
+    document.body.style.overflow = 'hidden';
+    var c = el('infoClose'); if(c) c.focus();
+  }
+  function closeInfo(){
+    el('infoBack').hidden = true;
+    document.body.style.overflow = '';
+    if(infoReturn && infoReturn.focus) infoReturn.focus();
+    infoReturn = null;
+  }
+  (function(){
+    var back = el('infoBack');
+    if(!back) return;
+    back.addEventListener('click', function(e){
+      if(e.target === back) closeInfo();      // the backdrop, not the card
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && !back.hidden) closeInfo();
+    });
+  })();
 
   function opts(sel, vals, labels, keep){
     var cur = keep && sel.value;
