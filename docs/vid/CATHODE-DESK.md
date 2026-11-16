@@ -1,6 +1,33 @@
-# CATHODE DESK — house style v4.19
+# CATHODE DESK — house style v4.20
 
-**Locked 2026-11-13. This file is the authority. If a build disagrees with this file, the build is wrong.**
+**Locked 2026-11-16. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.20 (2026-11-16)** — **two faults found while building #024–#030, both of
+> them invisible to all fifteen sweeps, and both of them in the parts of a
+> piece the sweeps do not read: the score, and a registration.**
+>
+> **1. A sound that does not exist is silent, and nothing says so.** All seven
+> pieces scored a **`thump`** at the cold open. There is no `thump`. The bank
+> is a **closed list** — `click snap open blip knock tag draw zap mos crack
+> crumble splash sub buzz moo note bass` — and both players wrap every event in
+> `try{ SFX[e.k](...) }catch(err){}`, so an invented name is simply a beat with
+> no sound on it. The only signal anywhere is the render's own
+> `audio: 468 score events (1 failed)`, which names nothing and had been read
+> and ignored on every render since #024. **A render that prints anything other
+> than `(0 failed)` does not ship**, and `render/_snd2.mjs <slug>` re-runs the
+> same mixing loop with the catch opened up and prints the offending event.
+>
+> **2. A rising curve's bounding box is a claim about an empty frame.** #030
+> filed its probability curve as one box from the first point to the last.
+> That rectangle is the whole plot, nearly all of it empty, so every label put
+> in the empty corner read as a collision and `checkOverlap` was right to say
+> so. A polyline is registered **segment by segment**, as the thin bands it
+> actually inks — the same rule #028 learned on a lightning channel
+> (*register the rectangle you fill*), and it belongs to any path that is not
+> axis-aligned.
+>
+> **#024–#030 were built under v4.19 and both faults are fixed in all seven**;
+> nothing earlier in the library carries either one.
 
 > **v4.19 (2026-11-13)** — **four faults found by WATCHING #017 `ruler`, none
 > of which any of the fifteen sweeps could see.** The user asked what was wrong
