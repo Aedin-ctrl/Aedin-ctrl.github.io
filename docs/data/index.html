@@ -99,6 +99,18 @@
   :root[data-theme="dark"] .m.real .tag{color:#7aa2f7}
   :root:not([data-theme="light"]) .m.mimic .tag,
   :root[data-theme="dark"] .m.mimic .tag{color:#f08080}
+  /* THE RULE UNDER WATCH. Orange marks "Fade a 3-minute drift" -- the
+     original look180 rule, not a child bred off it -- on the two venues
+     it is being judged on, kalshi and polymarket. The outline says look
+     here; it is a marker, not a verdict. The numbers inside the tile
+     still say what the rule actually did. */
+  .m.watch{outline:3px solid #c2410c;outline-offset:-3px;
+           box-shadow:inset 0 0 0 1px rgba(194,65,12,.35)}
+  :root:not([data-theme="light"]) .m.watch,
+  :root[data-theme="dark"] .m.watch{outline-color:#f97316}
+  .m.watch .k{color:#c2410c;font-weight:700}
+  :root:not([data-theme="light"]) .m.watch .k,
+  :root[data-theme="dark"] .m.watch .k{color:#fdba74}
   .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
@@ -647,6 +659,10 @@
     el('tileSortBtn').setAttribute('aria-expanded','false');
   }
 
+  // Orange boxes: which rule, and on which books.
+  var WATCH_RULE = 'look180';            // "Fade a 3-minute drift"
+  var WATCH_VENUES = ['kalshi', 'polymarket'];
+
   function cards(){
     // One flat grid, one tile per paper market, numbers only. With fifty
     // markets the tile is a glance -- what it is, what it is worth, how it
@@ -663,6 +679,11 @@
     }
     el('accountCards').innerHTML = realPairs() + ks.map(function(a){
       var t = D.accounts[a], st = strat(a);
+      // Matched on the VARIANT, never on the account key. The key carries
+      // the window ('kalshi|900|look180'), so hard-coding it would silently
+      // stop marking anything the day the rule is run at another timeframe.
+      var watch = t.variant === WATCH_RULE &&
+                  WATCH_VENUES.indexOf(t.venue) !== -1;
       var pnl = t.pnl == null ? 0 : t.pnl;
       var cls = pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'dim');
       var n = (t.open||0) + (t.settled||0);
@@ -672,7 +693,8 @@
                    .replace('Fade at halfway','Fade mid')
                    .replace('Follow at halfway','Follow mid')
                    .replace('The champion','Champion');
-      return '<div class="m tap" role="button" tabindex="0" data-a="' +
+      return '<div class="m tap' + (watch ? ' watch' : '') +
+          '" role="button" tabindex="0" data-a="' +
           esc(a) + '" title="' + esc((st.name||'') + ' \u00b7 ' +
                (t.label||a)) + '">' +
         '<div class="k">' + esc(t.venue.slice(0,4)) + ' \u00b7 ' +
