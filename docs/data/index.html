@@ -432,7 +432,8 @@
       .reduce(function(t,r){ return t + (r.tried||0); }, 0);
     el('evoFoot').textContent = ruleLine(e) + ' ' +
       'Generation ' + (e.gen||0) + ', last turned over ' + ago(e.ran) +
-      '. ' + born + ' born, ' + (log.length-born) + ' retired' +
+      '. Since the board started: ' + born + ' born, ' +
+      (log.length-born) + ' retired' +
       (rej ? ', ' + rej + ' parent' + (rej>1?'s':'') + ' passed over after ' +
              tried + ' variants failed the record' : '') +
       (e.empty ? ', ' + e.empty + ' tile(s) left empty' : '') +
@@ -524,8 +525,11 @@
     {k:'gen',    t:'this generation', v:function(t){ return t.gen_pnl; }},
     {k:'equity', t:'amount owned', v:function(t){ return t.equity; }},
     {k:'pnl',    t:'profit',       v:function(t){ return t.pnl; }},
-    {k:'edge',   t:'edge per trade',
-     v:function(t){ return t.settled ? (t.pnl||0)/t.settled : null; }},
+    // Per CONTRACT, not per trade: pnl/settled carries whatever stake the
+    // account happened to be betting, so it sorts by size as much as skill.
+    {k:'edge',   t:'edge / contract', v:function(t){ return t.edge; }},
+    {k:'ep',     t:'p', v:function(t){ return t.edge_p; }},
+    {k:'strikes',t:'strikes', v:function(t){ return t.strikes||0; }},
     {k:'hit',    t:'wins ratio',   v:function(t){ return t.hit; }},
     {k:'taken',  t:'trades taken',
      v:function(t){ return (t.open||0)+(t.settled||0); }},
