@@ -113,9 +113,9 @@
   :root:not([data-theme="light"]) .m.watch .k,
   :root[data-theme="dark"] .m.watch .k{color:#c4b5fd}
   /* THE ORIGINAL RULE, "Follow, late" -- the one every other rule on this
-     board was bred off. It has no variant id of its own: it IS the
-     fallback the page calls 'base', so it is matched on a MISSING
-     variant, not on a name. Gold rather than a true yellow: #eab308 on
+     board was bred off, at 15 minutes on both books. It has no variant id
+     of its own: it IS the fallback the page calls 'base', so it is
+     matched on a MISSING variant, not on a name. Gold rather than a true yellow: #eab308 on
      the card background is a 1.9:1 outline, which is not a line anyone
      can see. */
   .m.watch2{outline:3px solid #ca8a04;outline-offset:-3px;
@@ -679,15 +679,20 @@
   // marking anything the day the rule is run at another timeframe.
   // A rule of null is the ORIGINAL, "Follow, late" -- it has no variant
   // of its own, it is the fallback every other tile is bred off.
+  // `secs` narrows a mark to one window; leave it off to mark every
+  // window the rule runs at. The original runs at 5 min, 15 min, 1 hour
+  // and 1 day; only the 15-min pair is marked, so the gold and the purple
+  // are the same comparison -- same two books, same clock.
   var MARKS = [
-    {cls:'watch',  rule:'look180', venues:['kalshi','polymarket']}, // purple
-    {cls:'watch2', rule:null,      venues:['kalshi','polymarket']}  // gold
+    {cls:'watch',  rule:'look180', venues:['kalshi','polymarket']},
+    {cls:'watch2', rule:null,      venues:['kalshi','polymarket'], secs:900}
   ];
   function markOf(t){
     for(var i = 0; i < MARKS.length; i++){
       var m = MARKS[i];
       if((t.variant || null) === m.rule &&
-         m.venues.indexOf(t.venue) !== -1) return ' ' + m.cls;
+         m.venues.indexOf(t.venue) !== -1 &&
+         (m.secs == null || t.seconds === m.secs)) return ' ' + m.cls;
     }
     return '';
   }
