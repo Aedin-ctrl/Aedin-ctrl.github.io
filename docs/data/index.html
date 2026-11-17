@@ -378,14 +378,27 @@
   // Every eight hours the eight worst tiles are retired and eight new ones
   // take their place. CULLING THE WORST MAKES THE BOARD LOOK BETTER whether
   // or not anything improved, so what died is shown next to what lives.
+  // THE RULE, STATED WHEREVER THE SECTION IS. A board that culls on three
+  // consecutive last-place finishes looks, on any single afternoon, exactly
+  // like a board that is not culling at all -- so the condition has to be
+  // on the page next to the result, not only in the code.
+  function ruleLine(e){
+    var n = e.bottom_n || 20, k = e.strikes_needed || 3,
+        h = Math.round((e.every_s||14400)/3600);
+    return 'Every ' + h + ' hours the worst ' + n + ' tiles take a strike; ' +
+           k + ' strikes in a row retires a rule, and one generation out of ' +
+           'the bottom ' + n + ' clears the count. The board is held at ' +
+           (e.target || 136) + ' tiles' +
+           (e.live != null ? ' (currently ' + e.live + ')' : '') +
+           ', so rules are bred only to fill tiles that just came free.';
+  }
+
   function drawEvolution(){
     var e = D.evolution || {}, log = e.log || [];
     if(!log.length){
       el('evoTable').innerHTML = '<tbody><tr><td class="empty">' +
         'No generation has turned over yet.</td></tr></tbody>';
-      el('evoFoot').textContent = e.every_s ?
-        ('Every ' + Math.round(e.every_s/3600) + ' hours: the 8 worst ' +
-         'tiles retire, 8 mutations of the best replace them.') : '';
+      el('evoFoot').textContent = e.every_s ? ruleLine(e) : '';
       return;
     }
     var h = '<thead><tr><th>Gen</th><th>When</th><th>What</th>' +
@@ -417,7 +430,7 @@
     var born = log.filter(function(r){ return r.action==='breed'; }).length;
     var rej = (e.rejected||[]).length, tried = (e.rejected||[])
       .reduce(function(t,r){ return t + (r.tried||0); }, 0);
-    el('evoFoot').textContent =
+    el('evoFoot').textContent = ruleLine(e) + ' ' +
       'Generation ' + (e.gen||0) + ', last turned over ' + ago(e.ran) +
       '. ' + born + ' born, ' + (log.length-born) + ' retired' +
       (rej ? ', ' + rej + ' parent' + (rej>1?'s':'') + ' passed over after ' +
@@ -691,17 +704,53 @@
     {k:'avg',    t:'avg price', v:function(a){ return D.accounts[a].avg_price; },
      f:function(a){ var x=D.accounts[a].avg_price;
        return x==null?'—':(x*100).toFixed(1)+'c'; }},
-    {k:'edge',   t:'edge per trade',
-     // What one trade made on average. This is the number that decides
-     // whether a strategy works; the hit rate only says how often it was
-     // right, which is not the same thing and is usually the opposite.
+    // THE EDGE, PER CONTRACT. This column used to be pnl divided by the
+    // number of trades, which is dollars at whatever stake the account
+    // happened to be betting -- so an account that had grown enough to bet
+    // 7 contracts showed seven times the "edge" of an identical rule still
+    // betting 1. That is a size, not an edge. This is the real thing:
+    // what one contract made, which is exactly the win rate minus the
+    // break-even rate the prices demanded.
+    {k:'edge',   t:'edge / contract',
+     v:function(a){ return D.accounts[a].edge; },
+     f:function(a){ var x=D.accounts[a].edge;
+       if(x==null) return '—';
+       return '<span class="'+(x>0?'pos':x<0?'neg':'dim')+'">'+
+              cents(x)+'</span>'; }},
+    {k:'right',  t:'right',
+     v:function(a){ return D.accounts[a].edge_hit; },
+     f:function(a){ var x=D.accounts[a].edge_hit;
+       return x==null?'—':(x*100).toFixed(1)+'%'; }},
+    {k:'be',     t:'needed',
+     // The win rate the prices paid demanded. Right minus needed IS the
+     // edge, so these three columns can be read across and checked.
+     v:function(a){ return D.accounts[a].breakeven; },
+     f:function(a){ var x=D.accounts[a].breakeven;
+       return x==null?'—':(x*100).toFixed(1)+'%'; }},
+    {k:'et',     t:'t',
+     v:function(a){ return D.accounts[a].edge_t; },
+     f:function(a){ var x=D.accounts[a].edge_t;
+       return x==null?'—':(x>0?'+':'')+x.toFixed(2); }},
+    {k:'ep',     t:'p',
+     v:function(a){ return D.accounts[a].edge_p; },
+     f:function(a){ var x=D.accounts[a].edge_p;
+       return x==null?'—':'<span class="'+(x<=0.05?'pos':'dim')+'">'+
+              x.toFixed(3)+'</span>'; }},
+    {k:'dollars', t:'$ / trade',
+     // Kept, but no longer called an edge: this one DOES carry the stake.
      v:function(a){ var t=D.accounts[a], n=(t.settled||0);
        return n ? (t.pnl||0)/n : null; },
      f:function(a){ var t=D.accounts[a], n=(t.settled||0);
        if(!n) return '—';
-       var x=(t.pnl||0)/n*100;
+       var x=(t.pnl||0)/n;
        return '<span class="'+(x>0?'pos':x<0?'neg':'dim')+'">'+
-              (x>0?'+':'')+x.toFixed(2)+'c</span>'; }},
+              (x>0?'+':'')+x.toFixed(3)+'</span>'; }},
+    {k:'strikes', t:'strikes',
+     v:function(a){ return D.accounts[a].strikes||0; },
+     f:function(a){ var t=D.accounts[a], k=t.strikes||0,
+                        nd=t.strikes_needed||3;
+       if(!k) return '<span class="dim">—</span>';
+       return '<span class="'+(k>=nd-1?'neg':'')+'">'+k+'/'+nd+'</span>'; }},
     {k:'fill',   t:'bought', v:function(a){ return D.accounts[a].fill_rate; },
      f:function(a){ return pct(D.accounts[a].fill_rate,0); }},
     {k:'stood',  t:'stand-downs',
@@ -1062,12 +1111,39 @@
         esc(tfName(t.seconds)) + '<span class="badge">' + esc(orig) + '</span></div>' +
       curve(D.history ? D.history[a] : null, 158) +
       '<div class="stats">' +
+        // THE EDGE, SPELLED OUT. A contract pays $1 or nothing, so the
+        // average price paid is the win rate the bet needed to break even,
+        // and the profit per contract is exactly the difference between
+        // them. Shown as three numbers rather than one because they say
+        // WHERE an edge went: calling direction badly and overpaying for
+        // good calls look the same in the profit and need different fixes.
+        stat('right', t.edge_hit==null ? '—' :
+             (t.edge_hit*100).toFixed(1) + '%') +
+        stat('needed to break even', t.breakeven==null ? '—' :
+             (t.breakeven*100).toFixed(1) + '%') +
+        stat('EDGE / contract', cents(t.edge),
+             t.edge==null ? 'dim' : (t.edge>0?'pos':'neg')) +
+        stat('give or take', t.edge_se==null ? '—' :
+             '±' + (t.edge_se*100).toFixed(2) + '¢') +
+        stat('t', t.edge_t==null ? '—' :
+             (t.edge_t>0?'+':'') + t.edge_t.toFixed(2)) +
+        stat('p', t.edge_p==null ? '—' : t.edge_p.toFixed(3),
+             t.edge_p==null ? 'dim' : (t.edge_p<=0.05 ? 'pos' : '')) +
+        stat('made in total', t.total==null ? '—' :
+             (t.total>0?'+':'') + '$' + Math.abs(t.total).toFixed(2),
+             t.total==null ? 'dim' : (t.total>0?'pos':'neg')) +
+        stat('on', t.edge_n==null ? '—' : String(t.edge_n) + ' trades') +
         stat('fitness', cents(t.fit),
              t.fit==null ? 'dim' : (t.fit>0?'pos':'neg')) +
         stat('vs coin flip', cents(t.lift),
              t.lift==null ? 'dim' : (t.lift>0?'pos':'neg')) +
         stat('the coin flip earned', cents(t.flip)) +
-        stat('t', t.t==null ? '—' : (t.t>0?'+':'') + t.t.toFixed(2)) +
+        stat('t on the coin flip',
+             t.t==null ? '—' : (t.t>0?'+':'') + t.t.toFixed(2)) +
+        stat('strikes', (t.strikes==null ? '—' :
+             t.strikes + ' of ' + (t.strikes_needed||3)),
+             !t.strikes ? 'dim' :
+             (t.strikes >= (t.strikes_needed||3)-1 ? 'neg' : '')) +
         stat('this generation', t.gen_pnl==null ? '—' :
              ((t.gen_pnl>0?'+':'') + t.gen_pnl.toFixed(2) +
               ' \u00b7 ' + (t.gen_n||0)),
