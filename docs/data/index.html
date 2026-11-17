@@ -99,18 +99,19 @@
   :root[data-theme="dark"] .m.real .tag{color:#7aa2f7}
   :root:not([data-theme="light"]) .m.mimic .tag,
   :root[data-theme="dark"] .m.mimic .tag{color:#f08080}
-  /* THE RULE UNDER WATCH. Orange marks "Fade a 3-minute drift" -- the
+  /* THE RULE UNDER WATCH. Purple marks "Fade a 3-minute drift" -- the
      original look180 rule, not a child bred off it -- on the two venues
-     it is being judged on, kalshi and polymarket. The outline says look
-     here; it is a marker, not a verdict. The numbers inside the tile
-     still say what the rule actually did. */
-  .m.watch{outline:3px solid #c2410c;outline-offset:-3px;
-           box-shadow:inset 0 0 0 1px rgba(194,65,12,.35)}
+     it is being judged on, kalshi and polymarket. A third hue, kept well
+     clear of the blue real box and the red copying box beside it. The
+     outline says look here; it is a marker, not a verdict. The numbers
+     inside the tile still say what the rule actually did. */
+  .m.watch{outline:3px solid #6d28d9;outline-offset:-3px;
+           box-shadow:inset 0 0 0 1px rgba(109,40,217,.35)}
   :root:not([data-theme="light"]) .m.watch,
-  :root[data-theme="dark"] .m.watch{outline-color:#f97316}
-  .m.watch .k{color:#c2410c;font-weight:700}
+  :root[data-theme="dark"] .m.watch{outline-color:#a78bfa}
+  .m.watch .k{color:#6d28d9;font-weight:700}
   :root:not([data-theme="light"]) .m.watch .k,
-  :root[data-theme="dark"] .m.watch .k{color:#fdba74}
+  :root[data-theme="dark"] .m.watch .k{color:#c4b5fd}
   .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
@@ -659,7 +660,7 @@
     el('tileSortBtn').setAttribute('aria-expanded','false');
   }
 
-  // Orange boxes: which rule, and on which books.
+  // Purple boxes: which rule, and on which books.
   var WATCH_RULE = 'look180';            // "Fade a 3-minute drift"
   var WATCH_VENUES = ['kalshi', 'polymarket'];
 
