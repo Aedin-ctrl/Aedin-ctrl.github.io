@@ -390,7 +390,19 @@
            'the bottom ' + n + ' clears the count. The board is held at ' +
            (e.target || 136) + ' tiles' +
            (e.live != null ? ' (currently ' + e.live + ')' : '') +
-           ', so rules are bred only to fill tiles that just came free.';
+           ', so rules are bred only to fill tiles that just came free. ' +
+           // WHY A DRAW AND NOT THE TOP. Measured by selecting on the
+           // first 60% of the record and judging on the last 40%: the top
+           // 8 by fitness bred children worth +0.23c later and 3% worth
+           // keeping; 8 drawn from the best quarter bred +1.77c and 21%.
+           // The top 8 lost to picking parents at random from anywhere.
+           'Parents are drawn at RANDOM from the best ' +
+           (e.parent_pool != null && e.parent_of
+             ? e.parent_pool + ' of ' + e.parent_of + ' rules'
+             : 'quarter of the board') +
+           ', not taken from the top of it \u2014 the very top of a large ' +
+           'search is the luckiest rather than the best, and mutating luck ' +
+           'returns nothing.';
   }
 
   function drawEvolution(){
