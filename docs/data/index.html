@@ -112,6 +112,19 @@
   .m.watch .k{color:#6d28d9;font-weight:700}
   :root:not([data-theme="light"]) .m.watch .k,
   :root[data-theme="dark"] .m.watch .k{color:#c4b5fd}
+  /* THE ORIGINAL RULE, "Follow, late" -- the one every other rule on this
+     board was bred off. It has no variant id of its own: it IS the
+     fallback the page calls 'base', so it is matched on a MISSING
+     variant, not on a name. Gold rather than a true yellow: #eab308 on
+     the card background is a 1.9:1 outline, which is not a line anyone
+     can see. */
+  .m.watch2{outline:3px solid #ca8a04;outline-offset:-3px;
+            box-shadow:inset 0 0 0 1px rgba(202,138,4,.35)}
+  :root:not([data-theme="light"]) .m.watch2,
+  :root[data-theme="dark"] .m.watch2{outline-color:#facc15}
+  .m.watch2 .k{color:#a16207;font-weight:700}
+  :root:not([data-theme="light"]) .m.watch2 .k,
+  :root[data-theme="dark"] .m.watch2 .k{color:#fde047}
   .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
@@ -660,9 +673,24 @@
     el('tileSortBtn').setAttribute('aria-expanded','false');
   }
 
-  // Purple boxes: which rule, and on which books.
-  var WATCH_RULE = 'look180';            // "Fade a 3-minute drift"
-  var WATCH_VENUES = ['kalshi', 'polymarket'];
+  // THE MARKED RULES: which rule, in which colour, on which books.
+  // Matched on the VARIANT, never on the account key. The key carries the
+  // window ('kalshi|900|look180'), so hard-coding it would silently stop
+  // marking anything the day the rule is run at another timeframe.
+  // A rule of null is the ORIGINAL, "Follow, late" -- it has no variant
+  // of its own, it is the fallback every other tile is bred off.
+  var MARKS = [
+    {cls:'watch',  rule:'look180', venues:['kalshi','polymarket']}, // purple
+    {cls:'watch2', rule:null,      venues:['kalshi','polymarket']}  // gold
+  ];
+  function markOf(t){
+    for(var i = 0; i < MARKS.length; i++){
+      var m = MARKS[i];
+      if((t.variant || null) === m.rule &&
+         m.venues.indexOf(t.venue) !== -1) return ' ' + m.cls;
+    }
+    return '';
+  }
 
   function cards(){
     // One flat grid, one tile per paper market, numbers only. With fifty
@@ -680,11 +708,7 @@
     }
     el('accountCards').innerHTML = realPairs() + ks.map(function(a){
       var t = D.accounts[a], st = strat(a);
-      // Matched on the VARIANT, never on the account key. The key carries
-      // the window ('kalshi|900|look180'), so hard-coding it would silently
-      // stop marking anything the day the rule is run at another timeframe.
-      var watch = t.variant === WATCH_RULE &&
-                  WATCH_VENUES.indexOf(t.venue) !== -1;
+      var mark = markOf(t);
       var pnl = t.pnl == null ? 0 : t.pnl;
       var cls = pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'dim');
       var n = (t.open||0) + (t.settled||0);
@@ -694,7 +718,7 @@
                    .replace('Fade at halfway','Fade mid')
                    .replace('Follow at halfway','Follow mid')
                    .replace('The champion','Champion');
-      return '<div class="m tap' + (watch ? ' watch' : '') +
+      return '<div class="m tap' + mark +
           '" role="button" tabindex="0" data-a="' +
           esc(a) + '" title="' + esc((st.name||'') + ' \u00b7 ' +
                (t.label||a)) + '">' +
