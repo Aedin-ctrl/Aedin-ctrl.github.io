@@ -83,12 +83,22 @@
      actual money on a venue; red is the paper rule it is copying. They sit
      next to each other so the pair can be read as one thing: what the
      strategy says, and what the account actually did. */
-  .m.real{outline:2px solid #3b82f6;outline-offset:-2px}
-  .m.mimic{outline:2px solid #ef4444;outline-offset:-2px}
+  .m.real{outline:3px solid #1d4ed8;outline-offset:-3px;
+          box-shadow:inset 0 0 0 1px rgba(29,78,216,.35)}
+  .m.mimic{outline:3px solid #b91c1c;outline-offset:-3px;
+           box-shadow:inset 0 0 0 1px rgba(185,28,28,.35)}
+  :root:not([data-theme="light"]) .m.real,
+  :root[data-theme="dark"] .m.real{outline-color:#3b6fe0}
+  :root:not([data-theme="light"]) .m.mimic,
+  :root[data-theme="dark"] .m.mimic{outline-color:#d33a3a}
   .m .tag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
           font-weight:700;margin-bottom:2px}
-  .m.real .tag{color:#3b82f6}
-  .m.mimic .tag{color:#ef4444}
+  .m.real .tag{color:#1d4ed8}
+  .m.mimic .tag{color:#b91c1c}
+  :root:not([data-theme="light"]) .m.real .tag,
+  :root[data-theme="dark"] .m.real .tag{color:#7aa2f7}
+  :root:not([data-theme="light"]) .m.mimic .tag,
+  :root[data-theme="dark"] .m.mimic .tag{color:#f08080}
   .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
@@ -673,7 +683,11 @@
     }).join('');
     Array.prototype.forEach.call(
       el('accountCards').querySelectorAll('.m.tap'), function(c){
-        function go(){ showInfo(c.getAttribute('data-a')); }
+        function go(){
+          var v = c.getAttribute('data-real');
+          if(v){ showReal(v); return; }
+          showInfo(c.getAttribute('data-a'));
+        }
         c.addEventListener('click', go);
         c.addEventListener('keydown', function(e){
           if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
@@ -697,7 +711,8 @@
       var stale = r.balance_ts
           ? (Date.now()/1000 - r.balance_ts > 3600) : true;
       var box =
-        '<div class="m real' + (r.balance == null ? ' waiting' : '') + '"' +
+        '<div class="m real tap' + (r.balance == null ? ' waiting' : '') +
+            '" role="button" tabindex="0" data-real="' + esc(r.venue) + '"' +
             ' title="your real ' + esc(r.venue) + ' account">' +
           '<div class="tag">real \u00b7 ' + esc(r.venue) + '</div>' +
           '<div class="v">' + (r.balance == null ? '\u2014'
@@ -1167,6 +1182,76 @@
   function stat(k, v, cls){
     return '<div class="sv"><div class="sk">' + esc(k) + '</div>' +
            '<div class="svv' + (cls?' '+cls:'') + '">' + v + '</div></div>';
+  }
+
+  // THE REAL ACCOUNT'S OWN PANEL. A blue box has no paper trades of its
+  // own, so it opens into the things it does have: the balance over time,
+  // what it is copying right now, and every time that changed. The switch
+  // history matters because Aedin mirrors each switch by hand -- a change
+  // he cannot see afterwards is a change he cannot check he made.
+  function showReal(venue){
+    var r = (D.real || []).filter(function(x){ return x.venue === venue; })[0];
+    if(!r) return;
+    var t = r.follows ? (D.accounts || {})[r.follows] : null;
+    var st = r.follows ? strat(r.follows) : {};
+    var profit = (r.balance != null && r.start_bal != null)
+        ? r.balance - r.start_bal : null;
+    // curve() plots PROFIT and forces zero onto the chart, so it wants
+    // balance minus what the account started with -- handing it raw
+    // balances would draw a line that never crosses its own zero and
+    // make a loss look like a rise.
+    var base = r.start_bal == null ? 0 : r.start_bal;
+    var pts = (r.curve || []).map(function(p){ return [p[0], p[1] - base]; });
+    el('infoPanel').innerHTML =
+      '<button class="cls" id="infoClose" aria-label="close">close</button>' +
+      '<h4 id="infoTitle">Your real ' + esc(venue) + ' account</h4>' +
+      '<div class="sublab">' + (r.balance == null
+          ? 'not connected yet'
+          : (r.source === 'api' ? 'read from ' + esc(venue)
+                                : 'balance typed in by hand')) +
+        '<span class="badge">real money</span></div>' +
+      (pts.length > 1 ? curve(pts, 158) : '') +
+      '<div class="stats">' +
+        stat('balance now', r.balance == null ? '\u2014' : money(r.balance),
+             r.balance == null ? 'dim' : '') +
+        stat('started at', r.start_bal == null ? '\u2014'
+             : money(r.start_bal)) +
+        stat('profit', profit == null ? '\u2014' :
+             (profit > 0 ? '+' : '') + profit.toFixed(2),
+             profit == null ? 'dim' : (profit > 0 ? 'pos' : 'neg')) +
+        stat('last read', r.balance_ts ? ago(r.balance_ts) : '\u2014') +
+        stat('copying', r.follows ? esc(st.name || r.follows) : 'nothing') +
+        stat('its fitness', t ? cents(t.fit) : '\u2014',
+             !t || t.fit == null ? 'dim' : (t.fit > 0 ? 'pos' : 'neg')) +
+        stat('switches so far', String((r.log || []).length)) +
+      '</div>' +
+      '<h5>What it has copied</h5>' +
+      ((r.log || []).length
+        ? '<table class="mini"><tbody>' + r.log.map(function(x){
+            return '<tr><td>' + esc(ago(x.ts)) + '</td><td>' +
+              (x.action === 'drop'
+                ? '<span class="neg">stopped copying</span> ' +
+                  esc(String(x.from || ''))
+                : '<span class="pos">started copying</span> ' +
+                  esc(String(x.to || ''))) +
+              '</td><td>' + (x.t == null ? '' : 't ' + x.t.toFixed(2)) +
+              '</td></tr>'; }).join('') + '</tbody></table>'
+        : '<p class="dim">It has not copied anything yet. A rule needs ' +
+          '60+ settled trades, positive fitness and t of at least 2.5 ' +
+          'before real money is pointed at it \u2014 at that bar the ' +
+          'chance of copying a worthless rule, picked as the best of ' +
+          'about 62, is around 0.7%. At the looser bar of "positive ' +
+          'fitness" alone it was 27%.</p>') +
+      (r.balance == null
+        ? '<p class="rule">No balance yet. Kalshi is read from the venue; ' +
+          'Polymarket has no credential here, so it needs a wallet ' +
+          'address or a figure typed in.</p>'
+        : '') +
+      '<p class="rule">Nothing in this project can place an order. The ' +
+      'blue box watches this account; it never moves it.</p>';
+    openInfo();
+    wireCurve();
+    el('infoClose').addEventListener('click', closeInfo);
   }
 
   // Opened by clicking a tile OR a row's info button -- one view, so the
