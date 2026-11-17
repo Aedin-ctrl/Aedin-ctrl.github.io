@@ -831,10 +831,27 @@
      v:function(a){ return D.accounts[a].breakeven; },
      f:function(a){ var x=D.accounts[a].breakeven;
        return x==null?'—':(x*100).toFixed(1)+'%'; }},
+    // THE t THAT DECIDES REAL MONEY is the clustered one. Every rule
+    // fires on every coin in the same pass and crypto moves together, so
+    // the trade-level t counts one market move as seven or eight pieces
+    // of evidence. Across the board that inflates it 1.2x; among the
+    // leaders, which is the only part the crown looks at, 1.5 to 2.1x.
+    // The raw t is kept beside it so the gap is visible rather than
+    // quietly corrected.
     {k:'et',     t:'t',
-     v:function(a){ return D.accounts[a].edge_t; },
-     f:function(a){ var x=D.accounts[a].edge_t;
-       return x==null?'—':(x>0?'+':'')+x.toFixed(2); }},
+     v:function(a){ return D.accounts[a].edge_t_clustered; },
+     f:function(a){ var x=D.accounts[a].edge_t_clustered,
+                        r=D.accounts[a].edge_t;
+       if(x==null) return '<span class="dim">—</span>';
+       var raw = (r==null) ? '' :
+         ' <span class="dim">(' + (r>0?'+':'') + r.toFixed(1) + ' raw)</span>';
+       return (x>0?'+':'')+x.toFixed(2)+raw; }},
+    {k:'passes', t:'moves',
+     v:function(a){ return D.accounts[a].passes; },
+     f:function(a){ var x=D.accounts[a].passes, n=D.accounts[a].settled;
+       if(x==null) return '—';
+       return x + (n ? ' <span class="dim">\u00b7 ' +
+         (n/x).toFixed(1) + '/move</span>' : ''); }},
     {k:'ep',     t:'p',
      v:function(a){ return D.accounts[a].edge_p; },
      f:function(a){ var x=D.accounts[a].edge_p;
@@ -1300,8 +1317,11 @@
              t.edge==null ? 'dim' : (t.edge>0?'pos':'neg')) +
         stat('give or take', t.edge_se==null ? '—' :
              '±' + (t.edge_se*100).toFixed(2) + '¢') +
-        stat('t', t.edge_t==null ? '—' :
-             (t.edge_t>0?'+':'') + t.edge_t.toFixed(2)) +
+        stat('t (market moves)', t.edge_t_clustered==null ? '—' :
+             (t.edge_t_clustered>0?'+':'') +
+             t.edge_t_clustered.toFixed(2)) +
+        stat('t (raw, inflated)', t.edge_t==null ? '—' :
+             (t.edge_t>0?'+':'') + t.edge_t.toFixed(2), 'dim') +
         stat('p', t.edge_p==null ? '—' : t.edge_p.toFixed(3),
              t.edge_p==null ? 'dim' : (t.edge_p<=0.05 ? 'pos' : '')) +
         // THE SIGN GOES OUTSIDE THE DOLLAR, NOT NOWHERE. Math.abs here
