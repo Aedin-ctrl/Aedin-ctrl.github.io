@@ -1,0 +1,848 @@
+{
+  "date": "2026-11-17",
+  "generated": "2026-11-17T16:06:15.128Z",
+  "articles": [
+    {
+      "id": "2026-11-17-science-corp-a-brain-tech-startup-from-neuralinks",
+      "headline": "Science Corp, a brain-tech startup from Neuralink's ex-president, raises $400M at a reported $3.5B value",
+      "summary": "Science Corporation announced a $400M Series D. A person familiar with the deal put its value at $3.5B. Its PRIMA retinal implant is approved in Europe, and it is designing human trials of a sensor that joins cultured neurons to silicon.",
+      "impacts": [
+        "Brain-interface companies are raising money at a pace that could outrun the rules on neural data.",
+        "A living-neuron sensor would blur the line between a medical device and engineered tissue.",
+        "PRIMA shows brain-adjacent implants can reach patients, but only some vision comes back."
+      ],
+      "details": [
+        "Science Corporation, founded in 2021 by Max Hodak, a former president of Neuralink, announced a $400 million Series D round on November 17, 2026. The $3.5 billion valuation is not from the company. TechCrunch attributes it to a person familiar with the deal.",
+        "Investors named in the report include Khosla Ventures, Ackman Oxman Institute, Tenet Healthcare, 885 Capital, Y Combinator and PLC Neurotech. The company says its goal is to understand and interact with the brain using new technologies.",
+        "Its current product is PRIMA, a wearable and implantable chip that helps people with age-related macular degeneration recover some vision. PRIMA is approved in Europe and available in Germany. It is also being trialed for Stargardt's disease, another cause of blindness, according to what Hodak said at TechCrunch Disrupt.",
+        "For the US, Science plans to use the FDA's Humanitarian Device Exemption, a route for devices that treat rare conditions. The company argues that advanced macular degeneration in both eyes is rare enough to qualify. That approval has not been granted, and the Stargardt's application is still in trial.",
+        "The part that makes this story feel like science fiction is the long-term goal: a bio-hybrid sensor that combines cultured neurons with silicon to connect directly to the brain. The company is designing first human trials with Yale neurosurgeon Murat Gunel, who says it could eventually help treat Parkinson's disease and other brain injuries and illnesses.",
+        "Keep the claims in proportion. The sensor is at the design stage, so any benefit for Parkinson's is potential and not proven. PRIMA restores only some vision, not full sight. The valuation is unconfirmed by the company. What the round shows is investor appetite: money is flowing into devices that read from or write to the brain, while the legal protections for brain data are still patchy.",
+        "What to watch next: whether the FDA accepts the humanitarian-device argument, when the first human trial of the living-neuron sensor starts, and what consent and data-ownership terms participants are given."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "bci",
+        "implant",
+        "neuroscience",
+        "science corp",
+        "vision",
+        "neural data"
+      ],
+      "date": "2026-11-17",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/17/science-corporations-brain-tech-is-worth-3-5-billion-after-new-funding/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-a-hijacked-optimizely-tool-put-card-skimmers-and",
+      "headline": "A hijacked Optimizely tool put card skimmers and iPhone exploit code on sites like CNN and the BBC",
+      "summary": "An attacker used a flaw in Optimizely's web-testing product to insert malicious JavaScript into projects run by at least 178 organizations. The code included a card skimmer, a crypto-address swapper and iPhone exploit kits.",
+      "impacts": [
+        "Visitors who typed card details on an affected site on Monday may have had them copied.",
+        "One vendor flaw reached unrelated companies at once, because they all load its script.",
+        "Unpatched iPhones (iOS 18.6 or earlier) were sent exploit code, though no confirmed takeover is reported."
+      ],
+      "details": [
+        "The Hacker News reported on November 17, 2026 that an attacker exploited a vulnerability in Optimizely Web Experimentation and added malicious JavaScript to customer projects. Researchers at Report URI and Cynet found the code on sites run by at least 178 organizations. Named victims include CNN, the BBC, Zoom, Salesforce, GitLab, IKEA, HSBC, Equifax and Air France-KLM. Optimizely's own site and login page also carried it.",
+        "The attacker put a small loader in each project's JavaScript field, which runs every time the snippet loads. Because the snippets still came from Optimizely's own domain and certificate, they looked legitimate. Per the report, the first injection appeared at 04:21 UTC on the BBC's snippet, a card skimmer was added at 13:43, and a mass cleanup began around 20:40.",
+        "The payload did three things. A crypto clipper replaced wallet addresses with the attacker's. A skimmer captured card number, expiry and CVV typed into a site's own form fields; it could not read cards entered in cross-origin payment frames such as Stripe's hosted fields. Cookies and screenshots were also sent out when the clipper fired, except for HttpOnly cookies.",
+        "For iPhone visitors, the code loaded exploit kits that Google researchers have documented as Coruna (iOS 13 to 17) and DarkSword (iOS 18). The kits' own comments mark iOS 18.7.3 and later, and iOS 26.3 and later, as patched. Cynet used an emulated iPhone browser and described conditional delivery, not a successful compromise of a physical device.",
+        "The money taken looks small so far: about $7,040 reached the attacker's wallets in roughly nine hours, according to the researchers, and StepSecurity put its own total at about $6,600. Some of that may not have come from victims. The number of exposed cards is unknown, and the affected-site count is a floor because researchers could only check snippets they found in time.",
+        "Optimizely says it fixed the flaw, removed the code, secured accounts and added protections. Its notice does not explain how the flaw worked, how many projects were changed or whether the attacker still has access. One company's script was cleaned and then re-infected, which the researchers say suggests access continued for a time.",
+        "Researchers advise site owners to search project JavaScript for the known strings, rotate credentials and keep third-party tags off checkout pages. Visitors should update to iOS 18.7.3 or later, or iOS 26.3 or later, check crypto payments made Monday and watch card statements."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "supply chain",
+        "skimmer",
+        "optimizely",
+        "ios",
+        "data breach",
+        "payment cards",
+        "javascript"
+      ],
+      "date": "2026-11-17",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/hijacked-optimizely-scripts-served-card.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-nvidia-creates-a-board-committee-on-national-security",
+      "headline": "Nvidia creates a board committee on national security as its CEO exits over an alleged spy link",
+      "summary": "Nvidia formed a standing board committee for national security and export-control oversight. It comes days after Jensen Huang resigned, reportedly over an affair with a suspected Chinese spy who had links to a customer.",
+      "impacts": [
+        "Chip export policy is now a board-level risk at the company that supplies much of the world's AI hardware.",
+        "Commerce plans new rules to stop remote use of AI chips abroad by China-linked firms.",
+        "Leadership turmoil at a key AI supplier can ripple through customers and markets."
+      ],
+      "details": [
+        "Nvidia announced on Tuesday, November 17, 2026 that it has created a standing board committee to oversee national security policy, export-control compliance and global trade risks, TechCrunch reported. The company's existing national security and trade compliance teams will report to the committee and to interim CEO Colette Kress for daily operations.",
+        "The committee is chaired by director Suzanne Nora Johnson. Directors Stephen C. Neal and John O. Dabiri are members. It will meet at least quarterly.",
+        "The timing matters. Jensen Huang resigned abruptly as CEO, reported on November 12, 2026. The reported reason was allegations of an affair with a suspected Chinese spy who had links to one of Nvidia's customers. These are allegations; the article does not confirm them and does not name the suspected spy or the customer. Colette Kress, the CFO, became interim CEO.",
+        "Lawmakers have increased scrutiny of Huang's alleged ties and of his advocacy for easing restrictions on advanced AI chip exports to China. Huang has agreed to testify before Congress later this month, per the report.",
+        "There is also a government move. On Monday, November 16, the Commerce Department said it plans new export controls on AI chips and data centers located outside the US. The aim is to stop China-linked companies from getting around existing rules by remotely using AI infrastructure abroad. The article says an interim rule responding to the chip-smuggling scandal at Nvidia is part of this effort.",
+        "What is unknown: the article gives no financial figures and no detail on how the committee will operate. Related headlines it lists say President Trump said the affair did not threaten national security, and that Sam Altman said the industry will be fine without Huang. Nvidia's third-quarter earnings call was due hours after the announcement, where analysts expected questions about the controversy.",
+        "Watch for Huang's congressional testimony, the text of the Commerce rule, and whether customers change how they buy or host Nvidia chips."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "nvidia",
+        "jensen huang",
+        "china",
+        "export controls",
+        "chips",
+        "espionage",
+        "ai"
+      ],
+      "date": "2026-11-17",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/17/nvidias-first-big-move-after-jensen-huangs-exit-targets-national-security/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-acronis-one-person-ran-a-mesh-of-12",
+      "headline": "Acronis: one person ran a mesh of 12 AI agents against hundreds of organizations in 11 countries",
+      "summary": "Acronis researchers describe an operator in Taiwan who used 12 AI agents to scan and attack targets, breaching about 10 of them. The agents made many mistakes, but the operator found weak basics at scale.",
+      "impacts": [
+        "Old, basic flaws such as exposed databases and default passwords are now found faster across many targets.",
+        "Commercial AI models refused attacks, but helped build the infrastructure.",
+        "Obscure, small organizations can no longer count on being overlooked."
+      ],
+      "details": [
+        "Acronis's Threat Research Unit published a report on November 4, 2026 about a campaign it calls BOSSAI. It assesses with high confidence that one operator, based in Hualien City, Taiwan, used a mesh of AI agents to attack hundreds of organizations in 11 countries. The researchers noticed it when what looked like a misconfigured development environment exposed more than 90,000 files totaling 9 GB.",
+        "There were 12 agents, nine active and three set up but unused. Builder agents (including Grok, OpenClaw, Claude Code and Codex) set up infrastructure. Attack agents, led by one called Hermes, scanned targets and built exploits. The agents did not talk to each other; the operator copied output between them by hand. Attack agents ran mostly on 'abliterated' open-source models, which have safety refusals removed.",
+        "Confirmed breaches or data exfiltration hit about 10 targets in three countries, and about 15 more were attacked without a confirmed compromise. Taiwan was targeted most heavily. Reported exposures included a fire-department patient-care platform with ECG and ambulance video, a 119 dispatch system's case records, and a lending firm's database with 16 SQL injection points. In Mexico, about 206,800 residential phone records were collected.",
+        "Acronis says weak basics drove most successes: exposed legacy services, unpatched databases and missing authentication. Systems with enforced authentication or filtering held up. The new part is speed and scale, since agents can scan hundreds of targets in parallel.",
+        "It was not smooth. Commercial models such as Grok and MiniMax M3 refused attack requests, and MiniMax told the operator that giving commands does not equal authorization. The abliterated local models were weaker. One scanner agent flagged a failed connection as a critical remote-code-execution bug, and over half of its high and critical findings were false positives. An agent also judged a Honduran military target out of scope on its own and dropped it.",
+        "Acronis traced the operator to one person through reused identities, including a GitHub handle and an SSH key identity, and hardcoded keys left in the environment. Caveats: some outputs could not be independently verified, the report's target counts are approximate and differ between sections, and the researchers are unsure whether commercial models would have complied if given a fake engagement letter.",
+        "The takeaway is not a super-hacker. It is that one low-skill operator with free tools reached many targets, which raises the cost of leaving old systems exposed."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai agents",
+        "cyberattack",
+        "taiwan",
+        "acronis",
+        "penetration testing",
+        "llm",
+        "exploit"
+      ],
+      "date": "2026-11-04",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Acronis Threat Research Unit",
+          "url": "https://www.acronis.com/en/tru/posts/bossai-inside-the-ai-attack-mesh-that-targeted-taiwans-emergency-services/"
+        },
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/weekly-recap-sshole-exploited-apt-root.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-science-study-earths-ice-snow-and-permafrost-have",
+      "headline": "Science study: Earth's ice, snow and permafrost have moved beyond a 'safe operating space'",
+      "summary": "More than 30 scientists, writing in Science at COP31, say the cryosphere (ice sheets, glaciers, sea ice, snow cover and permafrost) is already outside a precautionary safe range, and propose adding it to the planetary boundaries.",
+      "impacts": [
+        "Faster ice loss means more sea-level rise and flooding for coastal and low-lying places.",
+        "Melting mountain glaciers and snow threaten the freshwater many people depend on.",
+        "Thawing permafrost and shrinking ice can feed back into more warming."
+      ],
+      "details": [
+        "A study published in Science on November 12, 2026, titled 'The Cryosphere Beyond a Planetary Safe Operating Space,' says the cryosphere has already exceeded its safe operating space. It was released at the COP31 climate summit in Antalya, Turkiye. The lead author is Bo Su of the Stockholm Resilience Centre and Beijing Normal University, and more than 30 scientists contributed, including researchers from the Potsdam Institute for Climate Impact Research.",
+        "The assessment covers four variables: land ice (including loss that is already committed), sea ice, snow cover and permafrost. The boundaries use the Holocene, the last 11,700 years, as a reference. That was a fairly stable period in which human civilizations developed. Current and committed changes push the cryosphere further from those conditions.",
+        "The authors say degradation may trigger reinforcing feedback loops that accelerate further loss and make a return to earlier conditions harder. They name human-caused climate change as the main driver, with regional contributions from black carbon and industrial and infrastructure expansion. Risks include faster warming, sea-level rise, ecosystem decline, catastrophic floods and droughts, and freshwater shortages, especially in polar, high-mountain, coastal and low-lying regions.",
+        "Johan Rockstrom of the Potsdam Institute, co-chair of the Earth Commission, pointed to recent floods in Nepal as an example of cryosphere risks unfolding. John Pomeroy of the University of Saskatchewan said the study issues a clear warning about cryosphere collapse.",
+        "The authors recommend that policymakers use the proposed safe operating space as a scientific basis for precautionary targets, limit greenhouse gas and black carbon emissions, and reduce local human disturbances. They propose adding the cryosphere to the planetary boundaries framework.",
+        "A caution on what is known: the source here is a press release, not the paper itself, and the release gives few numbers. It states no figures for ice loss, sea-level change or threshold values, so how far past the boundary things are cannot be checked from it. The framing of a 'safe operating space' is a scientific proposal for precaution, not a measured tipping point.",
+        "What to watch is whether COP31 negotiators reference the proposal, and whether other researchers adopt the boundary values the paper uses."
+      ],
+      "category": "Climate",
+      "tags": [
+        "climate",
+        "permafrost",
+        "glaciers",
+        "sea ice",
+        "cop31",
+        "planetary boundaries",
+        "ice loss"
+      ],
+      "date": "2026-11-12",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "EurekAlert (Stockholm Resilience Centre release)",
+          "url": "https://www.eurekalert.org/news-releases/1150844"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-white-house-staff-devices-were-renting-out-the",
+      "headline": "White House staff devices were renting out the government's internet address to proxy services",
+      "summary": "Security firm Layer3 Intel found residential-proxy software running on White House network devices. Proxy exit traffic came through the network 236 times from Oct. 5 to Nov. 3, through 28 services.",
+      "impacts": [
+        "Strangers could route traffic through a government network address, hiding who they are.",
+        "Free apps with proxy code can turn personal devices into exit points, including ones used at work.",
+        "Residential proxies are widely used for fraud, scraping and account takeovers."
+      ],
+      "details": [
+        "KrebsOnSecurity reported on November 4, 2026 that several White House staffers are using computers or phones that run residential-proxy software. Such software lets outside parties rent a device's internet address to anonymize traffic or fake their location. The security firm Layer3 Intel saw proxy nodes beaconing from AS2650, the network block reserved for the Executive Office of the President.",
+        "The numbers: proxy exit traffic came through the White House network 236 times between October 5 and November 3, 2026, through six internet addresses active on 26 of 30 days. Most activity was between 5 p.m. and midnight, and 28 separate residential proxy services could exit through the network.",
+        "Synthient linked the traffic to Windows 11 installations of Infatica, a proxy service often bundled into free mobile and desktop apps. Infatica's founder is Vladimir Fomenko, a Russian national whose hosting company King Servers hosted six of eight addresses Russian state security used to breach election systems in 2016. Krebs gives that as background only and does not claim a direct link to Infatica's current activity.",
+        "Layer3 says it did not target the White House. It noticed the access by chance while requesting rotating global addresses through public proxy services, which anyone can subscribe to for a few dollars. Proxy software development kits pay app developers per install, which is how they spread onto devices, including employees' own devices brought into work.",
+        "The wider context in the article is that residential proxies are a major source of malicious traffic. A January 2026 Spur webinar found them on nearly 300 government networks, 318 utilities, 166 healthcare organizations and 141 banks and finance firms, and Infoblox said 65% of its customers queried at least one proxy-related domain.",
+        "Limits to keep in mind: the White House did not respond to a request for comment, and the article does not name the staffers or say what the devices were. Layer3's data shows the network was used, not what proxy customers did with it. Infatica's role comes from Synthient's analysis, which the article does not detail.",
+        "What to watch next is whether the White House or other agencies say how they will keep proxy software off devices that touch government networks."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "residential proxies",
+        "white house",
+        "privacy",
+        "infatica",
+        "government",
+        "krebs",
+        "network"
+      ],
+      "date": "2026-11-04",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "KrebsOnSecurity",
+          "url": "https://krebsonsecurity.com/2026/11/want-to-rent-an-internet-address-at-the-white-house/"
+        },
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/weekly-recap-sshole-exploited-apt-root.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-who-marks-six-months-of-congos-ebola-emergency",
+      "headline": "WHO marks six months of Congo's Ebola emergency: over 11,000 cases and 5,400 deaths",
+      "summary": "On the sixth-month mark of the emergency declaration, WHO's Tedros said the Bundibugyo outbreak is Congo's largest and deadliest Ebola outbreak on record. Transmission is slowing in several early hot spots, but access is hampered.",
+      "impacts": [
+        "Attacks and insecurity keep health workers from reaching some communities.",
+        "No broadly proven vaccine for Bundibugyo means control rests on contact tracing and care.",
+        "Funding gaps could stall a response that is showing early signs of working."
+      ],
+      "details": [
+        "The World Health Organization's Director-General, Tedros Adhanom Ghebreyesus, marked six months since he declared the outbreak a Public Health Emergency of International Concern, according to a Sahara Reporters article published November 15, 2026. More than 11,000 cases and 5,400 deaths have been recorded across eight provinces of the Democratic Republic of the Congo.",
+        "The outbreak is caused by Bundibugyo virus and is the country's largest and deadliest Ebola outbreak on record. Children bear a significant share of the burden, and communities already facing armed conflict, displacement and food insecurity are struggling.",
+        "There is some progress. Transmission is slowing in several of the early epicentres, and about 3,000 people have recovered and gone home. Clinical trials, including one called Tumaini, and new vaccine candidates are advancing, according to the report.",
+        "Tedros praised nurses, doctors, community health workers, contact tracers and burial teams. He made three calls: build community trust through early detection, treatment and engagement ('Trust cannot be demanded'); ensure safe humanitarian access and a stop to hostilities so health workers can reach affected areas; and have donors close critical funding gaps.",
+        "WHO pledged to keep working with the Congolese government, Africa CDC and partners until 'zero cases remain.'",
+        "This follows earlier coverage on this site of the outbreak reaching 11,145 cases amid armed attacks on responders. The newer facts here are the six-month marker, the 5,400 death count and the report of slowing transmission in early epicentres.",
+        "What is uncertain: this is a single news report relaying WHO's statement, so it gives no detail on how the case count is confirmed or how fast new cases are appearing now. Counts from other agencies can differ by date and by whether they count confirmed or probable cases. What to watch: whether a vaccine candidate shows results in trials and whether security improves enough for teams to reach the areas that are still hard to reach."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "congo",
+        "bundibugyo",
+        "who",
+        "outbreak",
+        "public health",
+        "vaccine"
+      ],
+      "date": "2026-11-15",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Sahara Reporters",
+          "url": "https://saharareporters.com/2026/11/15/who-confirms-over-11000-ebola-cases-5400-deaths-dr-congo-six-months-says-children-worst"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-bitdefender-a-school-ransomware-attack-looked-like-a",
+      "headline": "Bitdefender: a school ransomware attack looked like a language model retrying commands, but not proven",
+      "summary": "Bitdefender analyzed a 3AM ransomware intrusion on a UK school estate that showed signs of an AI model writing commands and retrying on a loop. The firm says a human may still have been relaying them.",
+      "impacts": [
+        "Schools with flat networks and reachable backups face fast, hard-to-undo encryption.",
+        "AI-written attack commands leave mistakes, such as wrong ports and Unix habits, that defenders can hunt for.",
+        "Backup-server credentials and new domain trusts are high-value alerts."
+      ],
+      "details": [
+        "Bitdefender published an analysis on November 3, 2026 of an attack by an affiliate of the ThreeAM (3AM) ransomware group on a UK school estate. The attacker used built-in Windows tools, a few public tools and a commodity encryptor. Bitdefender calls the operation hybrid: parts look like a human operator, and parts behave like an agentic loop in which a language model reads each result and chooses a retry. It presents this as a working model, not an established fact.",
+        "The intrusion ran from September 10 to September 19. The attacker stole backup credentials from three backup servers with a modified public Veeam script, ran Mimikatz renamed as sysmon64.exe, created backdoor accounts, built trusts among three domains and pushed access to about 40 machines. On September 19, tools to remove Sophos and Bitdefender endpoint protection were blocked by anti-tampering, and the encryptor ran from 05:07 to 05:33, deleting system-state backups.",
+        "The estate had 47 systems, about 50 machines were reached from an unmanaged host, and about 37 were encrypted, at 12 to 13 seconds per machine. Forty finance files were also staged and sent out.",
+        "The evidence for AI involvement, ranked by Bitdefender, includes errors typical of writing commands from memory (a wrong port and authentication method for the Veeam API), Unix habits in Windows commands, a probe-confirm-label-revise pattern with retries 40 to 101 seconds apart, and pacing of minutes between tasks versus under two minutes between retries.",
+        "The counter-evidence is just as important. The encryptor and tools are conventional, bespoke code has no natural-language comments, and no decision cycle was faster than about 40 to 60 seconds. Bitdefender says 'no human involved' is unsupported, and a human copy-pasting is not excluded.",
+        "Unknowns: the initial access method is not established, the staging host sat outside the firm's telemetry so the model and its location cannot be identified, and logs only capture detected events. Bitdefender says this is a single case, that AI-built 'vibeware' makes up about 0.07% of monthly malware samples, and that most intrusions still look conventional.",
+        "Its advice: alert on backup-database credential reads, registry hive saves and new domain trusts; restrict WMI and scheduled-task creation to management hosts; separate domain-admin credentials; and keep isolated, immutable backups."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "ransomware",
+        "ai agents",
+        "schools",
+        "bitdefender",
+        "3am",
+        "backups",
+        "uk"
+      ],
+      "date": "2026-11-03",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Bitdefender Business Insights",
+          "url": "https://www.bitdefender.com/en-us/blog/businessinsights/3am-ransomware-hybrid-ai-attack"
+        },
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/weekly-recap-sshole-exploited-apt-root.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-europes-hera-probe-has-reached-the-asteroid-pair",
+      "headline": "Europe's Hera probe has reached the asteroid pair NASA hit in 2022, and no model may match what it finds",
+      "summary": "ESA's Hera is about 25 to 30 km from Didymos and Dimorphos and has begun surveying them. Scientists want to know why NASA's 2022 impact changed the moonlet's orbit more than simulations predicted.",
+      "impacts": [
+        "Planetary defense plans depend on knowing how a kinetic impact pushes an asteroid.",
+        "If none of the impact models is right, deflection estimates for a real threat need rework.",
+        "Hera's data will show what rubble-pile asteroids are made of."
+      ],
+      "details": [
+        "ESA's Hera spacecraft, roughly the size of a small car, has arrived near the Didymos asteroid system and is about 25 to 30 km away, ScienceDaily reported on November 17, 2026. It has begun an early characterization phase, a broad survey of the two asteroids. Next month it is expected to move closer, to about 20 km, on bowtie-shaped trajectories.",
+        "Didymos is about 780 m across and Dimorphos is 151 m wide. Gravity is so weak, about 40,000 times weaker than Earth's at Didymos and about 200,000 times weaker at Dimorphos, that Hera cannot hold a conventional orbit. It moves at about 12 cm/s and fires thrusters every three or four days in 'rectangular orbits.'",
+        "The reason for the visit is NASA's DART mission. On September 26, 2022, the 580 kg spacecraft hit Dimorphos at about 6.1 km/s. The debris cloud spread across about 10,000 km, and the impact shortened Dimorphos's orbit around Didymos by about 33 minutes, showing that a kinetic impact can change an asteroid's path.",
+        "Open questions include whether the impact dug a large crater or reshaped the asteroid, what Dimorphos is made of and how it is built inside, and why the orbital change was much larger than simulations predicted. Mission scientist Michael Kueppers said earlier predictions suggested many different ways the body might react, and Hera will reveal which forecast was correct, 'if any.'",
+        "Hera is about 196.5 million km from Earth, and controllers at ESA's operations center in Darmstadt have contact about eight hours a day. Over the coming months it will release two shoebox-sized CubeSats, Juventas and Milani, to take closer measurements, and the mission is meant eventually to move toward landing operations.",
+        "A Space Brief from November 4 noted Hera's first image of Dimorphos, and ScienceDaily lists a separate November 16 item about crater-covered terrain on Didymos, which I did not open, so I do not use it here.",
+        "Caveat: this article describes what Hera is looking for, not results about Dimorphos's crater or shape. The impact models are untested against this data. Detailed images are the next milestone."
+      ],
+      "category": "Space",
+      "tags": [
+        "hera",
+        "dart",
+        "asteroid",
+        "planetary defense",
+        "esa",
+        "dimorphos",
+        "didymos"
+      ],
+      "date": "2026-11-17",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (ESA)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261115085545.htm"
+        },
+        {
+          "name": "KeepTrack Space Brief",
+          "url": "https://keeptrack.space/space-brief/space-brief-2026-11-04"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-brain-implants-that-restore-speech-and-typing-head",
+      "headline": "Brain implants that restore speech and typing head to a major neuroscience meeting, one running on an iPhone",
+      "summary": "The Society for Neuroscience previewed three brain-computer interface studies for its Washington meeting: a synthetic voice that carries pitch, a locked-in patient communicating for over a year, and a brain-to-text decoder on an iPhone.",
+      "impacts": [
+        "Speech and text decoders could return communication to people with paralysis.",
+        "A decoder that runs on a phone suggests these systems could leave the lab.",
+        "Devices that decode intended speech raise open questions about who owns neural data."
+      ],
+      "details": [
+        "The Society for Neuroscience, a group of nearly 30,000 scientists, released a preview on November 14, 2026 of brain-computer interface work to be presented at Neuroscience 2026 in Washington, D.C. The press event was set for November 17. Presenters are Maitreyee Wairagkar of UC Davis, Daniel Rubin of Massachusetts General Hospital and Chethan Pandarinath of Georgia Tech and Emory.",
+        "The release describes three findings. First, a BCI with a synthetic voice that can capture pitch variation helped paralyzed patients communicate more expressively, improved listener comprehension and let one patient sing. Second, a person in a completely locked-in state used a BCI that decodes intended movement to communicate independently for more than a year. Third, a portable brain-to-text BCI decoded activity into written words accurately, efficiently and reliably, and it ran on an iPhone.",
+        "Cynthia Chestek of the University of Michigan, the event's moderator, said the work brings brain-to-voice and brain-to-text technologies closer to reaching people outside of clinical trials, which she called extremely exciting.",
+        "The release gives no trial sizes, accuracy rates or other performance numbers. It calls the technology still largely experimental, and does not say whether these results are peer reviewed. They are conference presentations from clinical trials.",
+        "The release also cites a World Economic Forum figure that the global BCI market is projected to grow from $1.7 billion in 2022 to $6.2 billion by 2030. That projection comes from a third party, not the researchers, and the release is a promotional announcement from the society.",
+        "Why it can feel unsettling: a decoder that turns brain activity into speech is, by design, reading intended words from a person's brain. Today it is used with consent in medical trials by people who have lost the ability to speak. But the same technique will raise questions about who holds that neural data and how it can be used once devices leave clinics.",
+        "Next to watch: the full data from the presentations, independent accuracy numbers, and any regulatory path for a phone-based decoder."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "brain",
+        "bci",
+        "implant",
+        "speech",
+        "als",
+        "neural data",
+        "neuroscience"
+      ],
+      "date": "2026-11-14",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "EurekAlert (Society for Neuroscience)",
+          "url": "https://www.eurekalert.org/news-releases/1149828"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-isomorphic-labs-the-ai-drug-design-firm-from",
+      "headline": "Isomorphic Labs, the AI drug-design firm from DeepMind, raises $5B, with only preclinical results so far",
+      "summary": "Isomorphic Labs raised a $5 billion Series C to keep building its AI drug-design engine. It reports positive preclinical results in cancer and immune disease, names no drug candidates and gives no trial dates.",
+      "impacts": [
+        "Huge sums are betting that AI can cut the time and cost of discovering drugs.",
+        "Preclinical success often fails in people, so the payoff is far from certain.",
+        "Concentrating drug design in a few AI firms raises questions about access and oversight."
+      ],
+      "details": [
+        "Isomorphic Labs, spun out of Google DeepMind in 2021, announced a $5 billion Series C round on November 17, 2026, TechCrunch reported. It follows a $2.1 billion Series B in May 2026. The round was co-led by Greenoaks and Sequoia Capital, with new investor Andreessen Horowitz and backers including GV, CapitalG, Thrive Capital, MGX, Temasek and the UK Sovereign AI Fund.",
+        "Isomorphic did not disclose its valuation. Bloomberg reported in early November that it was seeking funding at a $50 billion valuation, but the TechCrunch article does not confirm that figure.",
+        "The company says the money will go to developing its drug-design engine and expanding into more types of medicine. Its platform uses AI simulation models to explore chemistry and design drugs, building on DeepMind's AlphaFold protein-structure model. Partners include Eli Lilly, Novartis and Johnson & Johnson.",
+        "Demis Hassabis, the founder and CEO, stepped back from leading DeepMind to focus on drug discovery and became its chairman. Hassabis and John Jumper won the Nobel Prize in chemistry for AlphaFold.",
+        "On results, the company reports 'positive preclinical results' in oncology and immunology. The article names no specific drug candidates, and although the headline says the aim is to move candidates into clinical trials, it gives no dates.",
+        "This is the key caveat. Preclinical results come from lab and animal experiments and do not show that a drug is safe or works in people. Many drug candidates fail in clinical trials, so a big round does not show that AI-designed drugs will succeed.",
+        "What to watch: the first named candidate entering human trials, what safety data comes out, and whether the pharma partners disclose milestones."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "isomorphic labs",
+        "deepmind",
+        "drug discovery",
+        "ai",
+        "alphafold",
+        "clinical trial",
+        "biotech"
+      ],
+      "date": "2026-11-17",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/17/isomorphic-labs-raises-5b-as-it-looks-to-take-drug-candidates-to-clinical-trials/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-an-iphone-flaw-let-apps-record-audio-even",
+      "headline": "An iPhone flaw let apps record audio even after users tapped 'Don't Allow' on the microphone",
+      "summary": "Researchers detailed a now-patched Apple audio-service bug (CVE-2026-65339) that let an installed app impersonate the system and skip the microphone permission check. No attacks in the wild have been reported.",
+      "impacts": [
+        "A permission prompt is only as strong as the service that enforces it.",
+        "Recording could continue in the background and after the phone locked.",
+        "Updating is the only fix; no setting blocks it."
+      ],
+      "details": [
+        "The Hacker News reported on November 17, 2026 that researchers published details of a now-patched flaw in Apple's audio service, audiomxd, tracked as CVE-2026-65339. It let apps on iPhones and iPads record audio after the user tapped 'Don't Allow' on the microphone prompt.",
+        "The service accepted an app's claim about which process was asking. An app could supply an audit token naming audiomxd itself, so the service treated the app as itself and skipped the permission check, known as Transparency, Consent, and Control. The bypass covered microphone capture through that service only, not other privacy permissions.",
+        "Preconditions: the malicious app had to already be installed, was sandboxed with no extra entitlements, and needed only a microphone usage description. Recording had to start in the foreground, and it then continued in the background and after the device locked. The researchers' test apps were installed from Xcode and never went through App Review, so it is unknown whether review would have caught them.",
+        "The flaw was found by Nik Tsytsarkin of Meta Red Team X, and separately by security engineer Mustafa Calap, who both published analyses around November 9. On an earlier test build the orange microphone indicator stayed off while the app recorded. A later build appears to have restored it, and the article does not say which build Calap tested.",
+        "Fixes shipped across Apple's platforms, including iOS 26.6.1 and iPadOS 26.6.1 (August 17) and iOS 18.7.11 and iPadOS 18.7.11 (October 26), with macOS, tvOS, watchOS and visionOS fixes listed. CISA rates the bug 5.0 out of 10, and it is not in CISA's Known Exploited Vulnerabilities catalog. The fix makes the service check the real caller, and outside callers now need a private entitlement that apps cannot grant themselves.",
+        "Limits: neither Apple nor the researchers report real-world use. There is no way for users to check whether an app recorded them before the fix, and Apple's notes describe the issue only as one that may let an app leak sensitive information.",
+        "Practical step: install current iOS and iPadOS updates, and remove apps you do not recognize."
+      ],
+      "category": "Tech",
+      "tags": [
+        "ios",
+        "apple",
+        "microphone",
+        "privacy",
+        "vulnerability",
+        "permissions",
+        "surveillance"
+      ],
+      "date": "2026-11-17",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/researchers-detail-iphone-flaw-that-let.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-uk-watchdog-police-cant-show-facial-recognition-searches",
+      "headline": "UK watchdog: police can't show facial recognition searches help, and many officers misread the law",
+      "summary": "HMICFRS inspected police use of retrospective facial recognition, which handles over 300,000 search requests a year in the UK. It found forces could not clearly show benefits and had gaps in training and oversight.",
+      "impacts": [
+        "Officers who treat a face match as evidence risk wrongful identification and arrest.",
+        "Deleted custody images were still searchable, which weakens privacy safeguards.",
+        "Without national rules, forces use the tool in very different ways."
+      ],
+      "details": [
+        "His Majesty's Inspectorate of Constabulary and Fire & Rescue Services published a 58-page inspection with 16 recommendations on police and National Crime Agency use of retrospective facial recognition (RFR), Biometric Update reported on November 12, 2026. Home Secretary Shabana Mahmood commissioned it in November 2025.",
+        "The inspectors found forces 'couldn't clearly show performance improvements from using RFR' and often lacked management data to judge how much it helped investigations. UK law enforcement makes more than 300,000 RFR search requests a year, up from about 250,000 in 2024, and two forces made over 25,000 requests from April 2025 to March 2026 while several made fewer than 1,000.",
+        "On training and understanding: in a Home Office survey of 779 Police National Database users (13% of those eligible), nearly two-thirds could not recall any facial recognition training in the past year. Roughly one-third were wrong or unsure whether a match meets the legal requirement for evidence of identification. It does not. Investigators did not always corroborate possible matches before acting, increasing the risk of wrongful identification and arrest.",
+        "On bias: in 2024 the National Physical Laboratory found the database's algorithm produced more false positives for some demographic groups at the threshold then in use. The threshold was raised, which cut both false positives and true matches, and the National Police Chiefs' Council lowered it again later in November 2024 after operational feedback. HMICFRS 'couldn't establish with certainty' whether the bias contributed to any wrongful arrests.",
+        "Custody images that should have been deleted remained available for searches. The report also notes positives: internal monitoring is improving, West Yorkshire's FaceReveal software was singled out for case management, and a planned national system will use Idemia's algorithm, which is expected to address bias concerns.",
+        "Recommendations include data protection impact assessments, force-level policies and training reviews by June 30, 2027, and a national facial recognition system, mandatory training and an independent oversight framework by the end of 2027.",
+        "The picture is a mismatch between fast adoption and slow governance. A planned government law for police facial recognition and other biometrics is expected to address some of this."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "facial recognition",
+        "police",
+        "uk",
+        "biometrics",
+        "surveillance",
+        "bias",
+        "privacy"
+      ],
+      "date": "2026-11-12",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Biometric Update",
+          "url": "https://www.biometricupdate.com/202611/uk-police-dont-know-how-much-retrospective-facial-recognition-helps-inspection"
+        },
+        {
+          "name": "State of Surveillance daily briefing",
+          "url": "https://stateofsurveillance.org/news/daily-surveillance-briefing-november-13-2026/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-fourteen-governments-back-the-first-voluntary-guidelines-for",
+      "headline": "Fourteen governments back the first voluntary guidelines for spyware vendors, with no penalties",
+      "summary": "The UK and France launched Pall Mall Process guidelines in Paris asking spyware makers to vet customers and stop sales when misuse is likely. Of 43 attending countries, fewer than half endorsed them.",
+      "impacts": [
+        "Voluntary rules with no penalties leave much commercial spyware abuse unchecked.",
+        "Enforcement depends mainly on governments that buy and license these tools.",
+        "The guidelines leave states' own national-security uses untouched."
+      ],
+      "details": [
+        "Fourteen governments in the Pall Mall Process, a diplomatic effort led by Britain and France, adopted their first guidelines for commercial hacking firms, The Record reported around November 11, 2026. France's foreign ministry called them 'the first global standard of responsible conduct.' They were launched at a conference in Paris.",
+        "The guidelines are non-binding. They ask companies that develop, sell or finance these tools to vet customers, put technical safeguards against misuse in place, monitor for and report abuses, halt sales and support when serious misuse is a credible risk, and consider remedies for victims of human rights abuses.",
+        "Of the 43 countries whose representatives attended the third conference, fewer than half signed on. Signatories include the UK, France, the US, Germany, Italy and Japan. Governments, not industry groups, endorse the guidelines. Twenty-seven countries signed last year's code of practice, and 15 of those did not endorse the new guidelines; the article does not say why.",
+        "Critics say enforcement is weak: there are no penalties for non-compliance, and pressure is expected to come mainly from governments that buy and license the tools. The initiative has struggled to change how the tools are traded and used, and the launch event did not include the controversial companies whose products have been linked to abuses. Some critics note that Britain and France want to restrict other states' access to these tools while promoting their own spyware industries.",
+        "The French ministry says the guidelines are voluntary but not optional, and that they do not challenge uses states consider legitimate for national security, defense, crime fighting or cybersecurity.",
+        "Why it matters: commercial spyware has been tied in earlier reporting to attacks on phones of journalists and activists. A standard that asks vendors to police themselves is a first step, but it has no way to compel anyone who does not want to follow it.",
+        "What to watch: how many more countries endorse it, whether any vendor publicly adopts it, and whether buyers write it into procurement rules."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "spyware",
+        "pall mall process",
+        "surveillance",
+        "regulation",
+        "uk",
+        "france",
+        "privacy"
+      ],
+      "date": "2026-11-11",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/britain-france-set-out-guidelines-for-commercial-hacking-firms"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-judge-certifies-class-action-over-amazon-photos-face",
+      "headline": "Judge certifies class action over Amazon Photos face scanning in Illinois, covering 339,847 accounts",
+      "summary": "A federal judge certified a class of Illinois residents whose faces were processed by Amazon Photos between 2016 and 2023. Statutory damages under Illinois law run $1,000 to $5,000 per violation.",
+      "impacts": [
+        "Hidden face scanning in consumer apps can carry large legal costs.",
+        "Illinois's biometric law gives people a path to sue even without proven harm to them.",
+        "The court declined to certify non-users whose faces appeared in other people's uploads."
+      ],
+      "details": [
+        "In Hogan v. Amazon.com, Inc., a federal judge certified a class action alleging that Amazon Photos collected facial biometric data without the consent Illinois's Biometric Information Privacy Act (BIPA) requires, Biometric Update reported on November 12, 2026. The case has been going for more than five years.",
+        "The class covers Illinois residents whose faces were processed in photos uploaded to their own Amazon Photos accounts between October 18, 2016 and January 31, 2023. Amazon identified 339,847 Illinois-linked accounts with image recognition enabled in that period, though not all necessarily qualify.",
+        "Amazon pointed to its Terms of Service. The court found the terms did not include phrases like 'biometric identifier,' 'biometric information' or 'facial recognition,' and that users could turn on image recognition without seeing the notices the law requires. The judge declined to certify a separate class of non-users whose faces appeared in photos uploaded by others.",
+        "BIPA provides statutory damages of $1,000 per negligent violation and $5,000 per intentional or reckless one. The article says potential exposure could reach hundreds of millions of dollars or more, depending on how many people qualify, whether Amazon is found liable and how damages are applied. Class counsel is Wexler Boley & Elgersma LLP.",
+        "Amazon also faces BIPA suits over its Just Walk Out store technology and Alexa voice biometrics. Separately, AWS and partner Pindrop mostly defeated a BIPA suit, with a single charge remaining as of August.",
+        "Certification is not a ruling that Amazon broke the law. It means the case can proceed as a group and that a finding of liability would apply to everyone in the class. Amazon can contest liability, damages and the class itself.",
+        "What to watch: whether Amazon appeals the certification, any settlement, and how other companies change their consent notices for photo features."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "facial recognition",
+        "amazon",
+        "biometrics",
+        "privacy",
+        "illinois",
+        "lawsuit",
+        "photos"
+      ],
+      "date": "2026-11-12",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Biometric Update",
+          "url": "https://www.biometricupdate.com/202611/amazon-photos-biometric-privacy-lawsuit-certified-as-class-action"
+        },
+        {
+          "name": "State of Surveillance daily briefing",
+          "url": "https://stateofsurveillance.org/news/daily-surveillance-briefing-november-13-2026/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-six-unpatched-flaws-in-danfoss-store-freezer-controllers",
+      "headline": "Six unpatched flaws in Danfoss store-freezer controllers could allow remote takeover without a login",
+      "summary": "Dutch firm Midnight Blue found six flaws in Danfoss AK-SM800A refrigeration controllers. No patch exists, and European agencies say to take them off the internet, amid recent attacks on such devices.",
+      "impacts": [
+        "A hijacked controller could change temperatures or defrost cycles and hide its activity in logs.",
+        "Without secure boot, planted code can survive a factory reset and firmware update.",
+        "The fix is network isolation, which some maintenance contracts depend on."
+      ],
+      "details": [
+        "The Hacker News reported on November 16, 2026 that Midnight Blue found six flaws in Danfoss AK-SM800A controllers, which run store fridges and freezers and are often managed remotely by maintenance firms. No patch exists. Five flaws are in web request handlers that need no login and run in a program with root privileges. The sixth is in a gateway that enforces 'Strict mode.'",
+        "The researchers ran code as root through one of the web flaws on firmware 3.3.0 and found the same bugs in 5.3.2. They say versions up to and including 5.3.2 are affected and that the newer 5.4.0 does not fix them. Germany's BSI first said 5.4.0 was not affected, then corrected that to say it cannot rule it out for now. The controllers lack secure boot, so planted code could persist, and an attacker could make a unit unusable until replaced.",
+        "If exploited, an attacker could change settings, start defrost cycles and hide activity from logs. The article gives no CVSS scores and no CVE numbers have been assigned. The researchers withheld technical details during coordinated disclosure, and they say they found the six flaws in under an hour of manual review.",
+        "Belgium's CCB, Ireland's NCSC and Germany's BSI advise taking management interfaces off the internet now, without waiting for a patch, including for devices reachable through 4G or 5G modems. Allowing only a service company's addresses through a firewall is a short-term fallback. BSI advises changing all credentials if compromise is suspected. Danfoss's own guide says the controller should not be directly reachable from the public internet on any version.",
+        "There is context: attacks on these controllers in France began on October 11, followed by a second wave across Europe that began the week before the article. France also blamed Iran-linked hackers earlier for freezer attacks that sparked fires, covered earlier on this site.",
+        "Important caveat: the article reports no evidence that these six flaws were used in those attacks, and BSI has no information on exploitation. Danfoss told Cooling Post that most units hit in France were older models that no longer receive updates, or current units on outdated firmware. Several claims rest on the researchers' own testing and have not been independently verified.",
+        "The researchers argue the code likely contains more bugs like these. What to watch: Danfoss's advisory, a patch date, and any link to the European attacks."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "refrigeration",
+        "critical infrastructure",
+        "vulnerability",
+        "danfoss",
+        "iot",
+        "europe",
+        "zero-day"
+      ],
+      "date": "2026-11-16",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/six-unpatched-danfoss-refrigeration.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-researchers-found-43-us-government-domains-that-trust",
+      "headline": "Researchers found 43 US government domains that trust mistyped or expired domains to send or route email",
+      "summary": "SH Consulting scanned 25,964 government domains and found 43 with DNS records pointing at mistyped, expired or repurposed domains. A typo in one county's record authorized over 32,000 IP addresses to send mail as it.",
+      "impacts": [
+        "Anyone who registers a typo domain can inherit a government's trust, enough to send convincing fake email.",
+        "Expired nameserver domains could let a third party change where a government site resolves.",
+        "Missing DMARC policies on thousands of domains make spoofing easier."
+      ],
+      "details": [
+        "SH Consulting's Alex Shakhov published research on November 5, 2026 (updated November 11) on 'dangling' DNS records in US state and local government domains. It scanned 25,964 government-related domains, 16,984 of them .gov, twice, in June and October 2026, and checked SPF, MX, NS and DMARC records for expired, misspelled or repurposed external domains.",
+        "It found 43 government domains that depend on external domains they do not control. The best-known example: Livingston County, Michigan's SPF record included a misspelled Amazon SES domain, 'amzonses.com,' which authorized 32,066 or more unique IPv4 addresses to send email as the county. Pikeville, Kentucky authorized 75 addresses through 'amasonses.com.' The count is the number of addresses authorized, not the number that abused it.",
+        "Other examples include Arizona domains that still authorize a retired medical-board mail server, a Heyburn, Idaho city name whose old domain now serves a casino page with nameservers controlled by others that also handle its email, and MX records pointing at misspelled domains. At least one, 'oulook.com,' is registered by a third party and accepts mail.",
+        "The risks the author lists are spoofing (the controller of an SPF dependency can authorize their own senders), mail interception through typo MX domains, DNS takeover through expired nameserver domains, and reconnaissance from DMARC reports sent to unregistered addresses. The firm registered 17 dependencies defensively (3 SPF, 6 MX and 8 DMARC) and reported findings to CISA and MS-ISAC.",
+        "Of all scanned domains, 12,252 have no DMARC policy. Among .gov domains, 7,223 have none, 3,156 enforce 'reject' and 3,174 'quarantine.'",
+        "Caveats from the article: there is no confirmed interception or abuse in most cases, remediation is partial (Livingston County has removed the bad include and Waynesboro, Tennessee fixed an MX typo, while others were pending), and some findings are low risk, such as parked non-sending domains. The author sells email security and DNS audit services, and the domain list came from public sources.",
+        "A simple fix for any organization is to audit its DNS records for domains it does not control and to enforce a DMARC policy."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "dns",
+        "email",
+        "spoofing",
+        "government",
+        "dmarc",
+        "phishing",
+        "supply chain"
+      ],
+      "date": "2026-11-05",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "SH Consulting",
+          "url": "https://www.sh.consulting/blog/government-dangling-dns-records"
+        },
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/weekly-recap-sshole-exploited-apt-root.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-eu-sanctions-the-kremlin-linked-firm-behind-the",
+      "headline": "EU sanctions the Kremlin-linked firm behind the 'Doppelganger' fake-news campaign and 24 of its staff",
+      "summary": "The EU added 31 names to its Russia destabilization sanctions, including the Social Design Agency and 24 staff, and put the pro-Russian hacktivist group NoName057(16) on its cyber sanctions list.",
+      "impacts": [
+        "Cloned news sites and fake outlets aim to shape European elections and opinion.",
+        "Hacktivist denial-of-service attacks target critical infrastructure and candidates.",
+        "Many targets were already sanctioned elsewhere, so the direct effect may be limited."
+      ],
+      "details": [
+        "The EU added 31 names to its regime targeting Russian destabilization activities, The Record reported on November 16, 2026. They include the Social Design Agency (SDA), the propaganda firm behind the 'Doppelganger' campaign, and 24 of its staff, including Andrey Perla, described as its chief ideologue. Six other pro-Kremlin figures were named, including Irish RT correspondent Chay Bowes and Sputnik journalist Aleksey Stefanov.",
+        "Separately, the Council added NoName057(16), a pro-Russian hacktivist group, to its cyber sanctions list. The EU accuses that group of denial-of-service attacks on critical infrastructure and election candidates.",
+        "The EU accuses SDA of cloning news websites, creating Wikipedia-style platforms and staging physical provocations, including around the 2024 European Parliament elections. It formally alleges that major operations need sign-off from Kremlin official Sergey Kiriyenko, with Sofia Zakharova overseeing daily work. Those roles are the Council's allegations, and the article does not present supporting evidence.",
+        "Bowes is accused of amplifying Storm-1516, a disinformation operation that has impersonated European journalists. Stefanov was listed over funding for his Baltic Telegram channels from Pravfond, which the EU sanctioned in April. Military blogger Yurii Podoliaka is said to have raised over 1 billion rubles (about $12 million) for Russian forces, per the EU.",
+        "Many of the people were already sanctioned elsewhere: Britain had sanctioned 22 SDA employees and Canada two of the media figures, and the SDA has been under other EU sanctions since 2023. The new regime gives the EU extra tools, such as bans on transactions involving servers and network equipment, which could later be used against SDA.",
+        "The article quotes no new statements from Russia or the sanctioned individuals. Researchers have linked NoName057(16) to a campaign that published personal information of senior European officials on the dark web and offered crypto rewards for more details about them and their families.",
+        "What to watch: whether the new server and equipment powers get used, and whether cloned-site operations move to new domains and brands."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "russia",
+        "eu",
+        "sanctions",
+        "disinformation",
+        "doppelganger",
+        "hacktivists",
+        "election"
+      ],
+      "date": "2026-11-16",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Record",
+          "url": "https://therecord.media/russia-europe-sanctions-doppelganger"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-science-review-glp-1-drugs-may-help-thinking",
+      "headline": "Science review: GLP-1 drugs may help thinking in people with obesity, but they don't treat Alzheimer's",
+      "summary": "A Science review by Gothenburg and Copenhagen researchers says GLP-1 drugs might help some people with obesity or diabetes keep attention and planning skills. Semaglutide failed to slow early Alzheimer's in two trials.",
+      "impacts": [
+        "Millions take these drugs, so any effect on the brain, good or bad, matters.",
+        "Rapid weight loss can cut muscle, which may harm frail or older adults.",
+        "Dementia-risk links from patient records may not show cause and effect."
+      ],
+      "details": [
+        "Researchers from the University of Gothenburg and the University of Copenhagen published a review, 'Obesity pharmacotherapies and cognition,' in Science (volume 394, issue 6824, page 633), written at the journal's invitation, ScienceDaily reported on November 17, 2026. It is a review of existing evidence, not a new clinical study, and it reports no new participant data.",
+        "The authors say animal studies show GLP-1 medications can influence learning and memory, but human findings are less consistent. Some analyses of patient records link GLP-1 treatment to a lower risk of dementia in people with type 2 diabetes. Those are observational, so they cannot show that the drugs cause the lower risk.",
+        "In Novo Nordisk's EVOKE and EVOKE+ trials, semaglutide did not slow early Alzheimer's progression. It changed several Alzheimer's-related biomarkers, but those changes did not produce a measurable slowing of the disease. The authors say the drugs should not be viewed as Alzheimer's treatments.",
+        "They suggest the drugs may help people with obesity or type 2 diabetes preserve attention, planning and processing speed, abilities linked to metabolic and blood-vessel health. Any cognitive effect could come from better metabolic health, direct action in the brain, or both, and the mechanism is unknown.",
+        "The authors also warn that rapid weight loss can reduce muscle mass, which may harm physical function, especially in older or frail adults. They call for trials that measure memory, attention and other cognitive abilities from the start of treatment and track them over time, and for work to identify which patients would benefit most.",
+        "The page gives no participant counts, effect sizes or percentages. Treat this as a map of what is and isn't known: promising signals, a clear negative result in Alzheimer's, and a request for better trials.",
+        "What to watch: trials that track cognition directly in people with obesity or diabetes, and any safety signals reported as use keeps growing."
+      ],
+      "category": "Health",
+      "tags": [
+        "glp-1",
+        "semaglutide",
+        "brain",
+        "dementia",
+        "obesity",
+        "alzheimers",
+        "clinical trial"
+      ],
+      "date": "2026-11-17",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Gothenburg / Science)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261116023401.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-possible-rotation-in-the-oldest-light-gets-a",
+      "headline": "Possible rotation in the oldest light gets a calibration test, but it does not confirm the effect",
+      "summary": "UC San Diego researchers built a test to tell a real twist in the cosmic microwave background from detector misalignment. Applied to Planck data it gave 0.37 +/- 0.12 degrees, matching earlier work, without confirming the rotation.",
+      "impacts": [
+        "A real rotation could hint at new physics such as axion-like particles tied to dark matter or dark energy.",
+        "The same calibration errors could contaminate searches for gravitational waves from the early universe.",
+        "Instrument error remains a simple explanation until independent checks agree."
+      ],
+      "details": [
+        "Researchers at UC San Diego developed a consistency test for relative polarization-angle calibration across groups of detectors, ScienceDaily reported on November 17, 2026. The aim is to separate a real rotation of the polarization of the cosmic microwave background (CMB), called cosmic birefringence, from instrumental misalignment. The paper appeared in The Astrophysical Journal Letters (2026, volume 1009, issue 1, L12).",
+        "The team applied the test to eight polarization maps made from observations by the European Space Agency's Planck satellite. The estimated birefringence angle was 0.37 +/- 0.12 degrees, consistent with the established Minami-Komatsu analysis. The article does not state a significance level. If the uncertainty is one standard deviation, that is roughly three sigma, but that is an inference, not a figure from the article.",
+        "The researchers are explicit about the limits. 'This agreement does not independently confirm that the ancient light has actually rotated,' they say. A tiny misalignment in detector polarization angles can produce a signal nearly identical to cosmic birefringence. And the method removes rotation shared by all maps, so it cannot measure the overall polarization angle or the universe's absolute rotation. That would need an independent calibration reference.",
+        "Anto Lonappan said we have to be certain we are seeing the universe and not our instrument. The link to new physics is theoretical: axion-like particles, which are unconfirmed and would not necessarily explain dark matter, are one proposed cause.",
+        "There is a second stake. Brian Keating noted that detecting primordial B modes would transform our understanding of the early universe, and the same calibration errors could contaminate searches for those signals.",
+        "So the story is one of caution. The result shows the method reproduces previous results and gives researchers a way to check their own detectors. It does not show the light rotated, and it does not point to what would cause it.",
+        "What to watch: independent calibration of polarization angles from other telescopes, and whether newer CMB experiments see the same angle."
+      ],
+      "category": "Space",
+      "tags": [
+        "cosmology",
+        "cmb",
+        "dark energy",
+        "planck",
+        "dark matter",
+        "physics",
+        "universe"
+      ],
+      "date": "2026-11-17",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (UC San Diego)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261116023348.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-upside-foods-says-it-can-now-make-a",
+      "headline": "Upside Foods says it can now make a million pounds of cultivated chicken a year",
+      "summary": "Upside Foods says it has scaled up 10,000-fold and can produce over one million pounds of lab-grown chicken annually, with new FDA and USDA approvals and sales at some California restaurants. Most claims come from the company.",
+      "impacts": [
+        "Cultivated meat could eventually change how chicken is produced, if costs and scale hold.",
+        "A million pounds is small next to roughly 8 billion US chickens eaten a year.",
+        "Safety and price-parity claims have not been independently verified."
+      ],
+      "details": [
+        "Upside Foods said it can now produce over one million pounds of edible cultivated chicken per year, TechCrunch reported on November 17, 2026. The company describes this as a 10,000-fold scale-up over about 11 years. The article gives no earlier-year output or future targets.",
+        "The company says it has secured its next set of regulatory approvals from the FDA and USDA, though the article does not say which ones. The chicken will be sold at several restaurants in California, which the article does not name.",
+        "On cost, CEO Uma Valeti says the product can match the price range of 'really high quality organic chicken,' but the article gives no actual prices. For comparison, the first lab-grown hamburger in 2013 cost about $300,000.",
+        "The article cites Americans eating roughly 8 billion chickens a year (a 2021 estimate), a UN projection that the global population approaches 10 billion by 2050, and a Good Food Institute estimate that conventional meat would take about 5.5 Earths to feed that population in 2050. Valeti says cultivated meat uses less water, land and energy.",
+        "Health and quality claims come from the company: that cultivation lowers E. coli, Salmonella and antibiotic-resistance risk, and lowers cholesterol and saturated fat. The product includes soy protein isolate, pea fiber and olive oil. YouTuber MrBeast taste-tested cultivated and conventional chicken sandwiches in an informal comparison and could not tell them apart.",
+        "The caveats are large: the article includes no independent verification of performance, cost or health claims, and it notes the industry 'still has a long way to go,' with scale as its biggest obstacle. Why list it here? A food supply built around grown cells instead of animals is a big shift, and the safety and economics are still mostly company-reported.",
+        "What to watch: independent price data, third-party safety reviews, and whether output grows well beyond a million pounds."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "cultivated meat",
+        "lab-grown",
+        "food",
+        "fda",
+        "usda",
+        "upside foods",
+        "biotech"
+      ],
+      "date": "2026-11-17",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "TechCrunch",
+          "url": "https://techcrunch.com/2026/11/17/upside-foods-can-now-make-one-million-pounds-of-chicken-each-year-without-killing-a-single-animal/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-17-jacobin-ai-data-center-debt-is-under-strain",
+      "headline": "Jacobin: AI data-center debt is under strain, with nearly half this year's tech bonds rated junk",
+      "summary": "An October opinion piece argues investors are hedging against an AI bust. It cites distressed neocloud bonds, a quadrupling of credit-default-swap trading and Oracle's downgrade, but mostly relies on other outlets' reporting.",
+      "impacts": [
+        "Heavy borrowing for data centers could pass stress to lenders, insurers and taxpayers if revenue lags.",
+        "AI chips used as loan collateral may become obsolete faster than planned.",
+        "Local opposition has blocked data-center projects worth about $198 billion."
+      ],
+      "details": [
+        "Jacobin staff writer Branko Marcetic argued in an October 23, 2026 piece that investors are quietly hedging against an AI bubble bursting. This is an opinion article with a skeptical view, and much of its data is secondhand from other outlets, so each number is the author's report of someone else's claim.",
+        "On credit markets, it says bond prices for data-center financing and for 'neocloud' firms that rent computing power have dropped sharply. CoreWeave's bonds entered distressed territory (citing Bloomberg, October 14). Nearly half the bonds raised this year by major tech firms for data centers are rated junk (citing Forbes), and credit-default-swap trading tied to major AI firms more than quadrupled between July and September. Oracle has been downgraded to just above junk.",
+        "On revenue needs, it cites Brookings as saying US consumers and businesses would need to generate about $3.5 trillion in revenue by 2032 to justify the buildout, which it puts at about $10.3 trillion in cost, and Gartner as saying owners must generate about $8.5 trillion through 2030. It also reports that Character.ai filed for bankruptcy and cites a WSJ report of Anthropic's prospectus showing a loss of more than $80 billion this year with demand exceeding capacity.",
+        "Other claims: activists and residents blocked more than 100 data-center projects worth about $198 billion in the first half of the year, and more than 500 counties and municipalities restrict or ban them. About $3 trillion of private credit is in the sector. OpenAI delayed its IPO and cut its valuation, according to the piece. The Bank of England and the IMF have flagged AI economics as a financial-stability risk.",
+        "The author compares AI project financing to pre-2008 subprime mortgages (a view attributed to Carlyle's Jason Thomas) and warns taxpayers could face a bailout. He acknowledges a 2008-style crisis is not inevitable, that the debate over systemic risk continues, and that some experts think AI's economic contribution is overstated. The piece does not say how long a boom or downturn might last.",
+        "A balanced reading: these are signs of strain in financing, not proof of a crash, and several claims rest on single sources or paywalled documents. They are still worth watching because the money involved is large.",
+        "What to watch: Oracle's rating, CoreWeave's bonds, and whether AI revenue growth closes the gap with the cost of the buildout."
+      ],
+      "category": "Economy",
+      "tags": [
+        "ai bubble",
+        "data centers",
+        "debt",
+        "oracle",
+        "bonds",
+        "credit",
+        "economy"
+      ],
+      "date": "2026-10-23",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Jacobin",
+          "url": "https://jacobin.com/2026/10/artificial-intelligence-investors-finance-bubble"
+        }
+      ]
+    }
+  ]
+}
