@@ -1133,8 +1133,11 @@
              (t.edge_t>0?'+':'') + t.edge_t.toFixed(2)) +
         stat('p', t.edge_p==null ? '—' : t.edge_p.toFixed(3),
              t.edge_p==null ? 'dim' : (t.edge_p<=0.05 ? 'pos' : '')) +
-        stat('made in total', t.total==null ? '—' :
-             (t.total>0?'+':'') + '$' + Math.abs(t.total).toFixed(2),
+        // THE SIGN GOES OUTSIDE THE DOLLAR, NOT NOWHERE. Math.abs here
+        // with a '+' only on the positive branch rendered a loss of
+        // $10.23 as "$10.25" -- the same mistake the chart hover made.
+        stat('made in total, 1 contract each', t.total==null ? '—' :
+             (t.total<0?'−$':'+$') + Math.abs(t.total).toFixed(2),
              t.total==null ? 'dim' : (t.total>0?'pos':'neg')) +
         stat('on', t.edge_n==null ? '—' : String(t.edge_n) + ' trades') +
         stat('fitness', cents(t.fit),
