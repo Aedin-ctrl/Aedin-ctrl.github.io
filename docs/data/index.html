@@ -725,9 +725,14 @@
               : (r.source === 'api' ? 'read from the venue'
                                     : 'typed in') +
                 (stale ? ' \u00b7 stale' : '')) + '</div>' +
-          '<div class="n dim">' + (r.follows ? 'copying \u2193' : 'copying nothing')
+          '<div class="n dim">' + (r.traded === false ? 'balance only \u00b7 not traded'
+              : r.follows ? 'copying \u2193' : 'copying nothing')
           + '</div>' +
         '</div>';
+      // A VENUE THAT IS NEVER TRADED GETS NO PARTNER BOX. Gemini is read
+      // for its balance only, so an empty "copying" tile beside it would
+      // promise a strategy that is never coming.
+      if(r.traded === false) return box;
       var mim;
       if(!r.follows || !t){
         mim = '<div class="m mimic waiting">' +
@@ -1220,7 +1225,9 @@
              (profit > 0 ? '+' : '') + profit.toFixed(2),
              profit == null ? 'dim' : (profit > 0 ? 'pos' : 'neg')) +
         stat('last read', r.balance_ts ? ago(r.balance_ts) : '\u2014') +
-        stat('copying', r.follows ? esc(st.name || r.follows) : 'nothing') +
+        stat('copying', r.traded === false ? 'not traded'
+             : r.follows ? esc(st.name || r.follows) : 'nothing',
+             r.traded === false ? 'dim' : '') +
         stat('its fitness', t ? cents(t.fit) : '\u2014',
              !t || t.fit == null ? 'dim' : (t.fit > 0 ? 'pos' : 'neg')) +
         stat('switches so far', String((r.log || []).length)) +
@@ -1236,12 +1243,17 @@
                   esc(String(x.to || ''))) +
               '</td><td>' + (x.t == null ? '' : 't ' + x.t.toFixed(2)) +
               '</td></tr>'; }).join('') + '</tbody></table>'
-        : '<p class="dim">It has not copied anything yet. A rule needs ' +
+        : (r.traded === false
+          ? '<p class="dim">Nothing, and nothing ever will. This account ' +
+            'is read for its balance only \u2014 its round trip costs ' +
+            'about 9c against Kalshi\u2019s 1c, which is more than any ' +
+            'edge measured here, so no paper rule trades it.</p>'
+          : '<p class="dim">It has not copied anything yet. A rule needs ' +
           '60+ settled trades, positive fitness and t of at least 2.5 ' +
           'before real money is pointed at it \u2014 at that bar the ' +
           'chance of copying a worthless rule, picked as the best of ' +
           'about 62, is around 0.7%. At the looser bar of "positive ' +
-          'fitness" alone it was 27%.</p>') +
+          'fitness" alone it was 27%.</p>')) +
       (r.balance == null
         ? '<p class="rule">No balance yet. Kalshi is read from the venue; ' +
           'Polymarket has no credential here, so it needs a wallet ' +
