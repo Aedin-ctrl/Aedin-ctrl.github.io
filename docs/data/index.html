@@ -125,6 +125,37 @@
   .m.watch2 .k{color:#a16207;font-weight:700}
   :root:not([data-theme="light"]) .m.watch2 .k,
   :root[data-theme="dark"] .m.watch2 .k{color:#fde047}
+  /* THE MARK CARRIES INTO THE PANEL. Clicking a marked tile opens the
+     panel that explains it, and the panel was plain -- so the colour that
+     made you click vanished exactly when you started reading the numbers.
+     Border, title and the origin badge, nothing else: the panel's own
+     pos/neg colouring has to stay readable underneath. */
+  .infopanel.watch{border-color:#6d28d9;
+                   box-shadow:0 0 0 2px rgba(109,40,217,.16)}
+  .infopanel.watch h4,
+  .infopanel.watch .badge{color:#6d28d9}
+  .infopanel.watch .badge{border-color:#6d28d9}
+  :root:not([data-theme="light"]) .infopanel.watch,
+  :root[data-theme="dark"] .infopanel.watch{border-color:#a78bfa;
+                   box-shadow:0 0 0 2px rgba(167,139,250,.22)}
+  :root:not([data-theme="light"]) .infopanel.watch h4,
+  :root[data-theme="dark"] .infopanel.watch h4,
+  :root:not([data-theme="light"]) .infopanel.watch .badge,
+  :root[data-theme="dark"] .infopanel.watch .badge{color:#c4b5fd;
+                   border-color:#a78bfa}
+  .infopanel.watch2{border-color:#ca8a04;
+                    box-shadow:0 0 0 2px rgba(202,138,4,.16)}
+  .infopanel.watch2 h4,
+  .infopanel.watch2 .badge{color:#a16207}
+  .infopanel.watch2 .badge{border-color:#ca8a04}
+  :root:not([data-theme="light"]) .infopanel.watch2,
+  :root[data-theme="dark"] .infopanel.watch2{border-color:#facc15;
+                    box-shadow:0 0 0 2px rgba(250,204,21,.22)}
+  :root:not([data-theme="light"]) .infopanel.watch2 h4,
+  :root[data-theme="dark"] .infopanel.watch2 h4,
+  :root:not([data-theme="light"]) .infopanel.watch2 .badge,
+  :root[data-theme="dark"] .infopanel.watch2 .badge{color:#fde047;
+                    border-color:#facc15}
   .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
@@ -1276,6 +1307,7 @@
     // make a loss look like a rise.
     var base = r.start_bal == null ? 0 : r.start_bal;
     var pts = (r.curve || []).map(function(p){ return [p[0], p[1] - base]; });
+    el('infoPanel').className = 'infopanel';
     el('infoPanel').innerHTML =
       '<button class="cls" id="infoClose" aria-label="close">close</button>' +
       '<h4 id="infoTitle">Your real ' + esc(venue) + ' account</h4>' +
@@ -1342,12 +1374,24 @@
     if(ru.mode) bits.push(ru.mode);
     if(ru.k_bps != null) bits.push('only within ' + ru.k_bps + 'bps of the open');
     bits.push(st.coins ? 'coins: ' + st.coins : 'every coin');
+    // ONE BADGE PER ORIGIN, and "the original rule" means ONLY the rule
+    // this board started from. It used to be the else-branch, so 40 of
+    // the 67 strategies -- every registered question and every bred
+    // child -- introduced themselves as the original. Exactly one rule
+    // can be the original, and it is the builtin.
     var orig = st.origin==='gate' ? 'promoted by the control'
              : st.origin==='challenger' ? 'hand-picked — did NOT clear the control'
              : st.origin==='champion' ? 'the rolling champion'
              : st.origin==='family' ? 'run for comparison'
-             : 'the original rule';
+             : st.origin==='idea' ? 'a question, registered'
+             : st.origin==='evolved' ? 'bred on the board'
+             : st.origin==='builtin' ? 'the original rule'
+             : 'origin not recorded';
 
+    // The same mark the tile carries, so the colour survives the click.
+    // Set every time, never toggled: a panel reopened on an unmarked
+    // account would otherwise keep the last one's colour.
+    el('infoPanel').className = 'infopanel' + markOf(t);
     el('infoPanel').innerHTML =
       '<button class="cls" id="infoClose" aria-label="close">close</button>' +
       '<h4 id="infoTitle">' + esc(st.name || 'base') + '</h4>' +
