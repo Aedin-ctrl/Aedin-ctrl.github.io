@@ -1,6 +1,46 @@
-# CATHODE DESK — house style v4.20
+# CATHODE DESK — house style v4.21
 
-**Locked 2026-11-16. This file is the authority. If a build disagrees with this file, the build is wrong.**
+**Locked 2026-11-17. This file is the authority. If a build disagrees with this file, the build is wrong.**
+
+> **v4.21 (2026-11-17)** — **a piece declares its STRAND, and the strand is a
+> different QUESTION, not a different subject.** Thirty pieces are built and all
+> thirty are the same form: *why does this happen?*, answered with two
+> mechanisms, one charted, and a turn that corrects a folk belief. That form is
+> written into the gate — *name the second independent mechanism* — so the gate
+> is not a quality filter, it is **a quality filter for one genre**, and it has
+> been doing its job so well that the genre was never named. Run a teardown or a
+> post-mortem through it and it scores 1 of 5 and dies, which is not the gate
+> working. The full argument, the four axes and the strand list are in
+> `FORMATS.md`; what belongs here is the three things that change in a build:
+>
+> 1. **`PIECE.strand`**, a THIRD CLOSED FIELD — not a third tag, the two-tag
+>    rule stands. `MECHANISM HOW WOULD YOU KNOW WHAT IS IN THIS WHAT WENT WRONG
+>    RUN IT HOW IT WAS DONE THE DOCUMENT`, validated by `checkPiece()` exactly
+>    as `tags` is. **The field may be absent and absent means MECHANISM**, so
+>    every piece built before this is correctly labelled by saying nothing.
+> 2. **The program window's title bar is the badge** — the same slot a series
+>    part puts its series question in. `winTitle('<slug>.exe')` returns the
+>    fallback for a MECHANISM piece and the strand name for anything else, so
+>    **nothing already rendered changes by one pixel** and a strand is visible
+>    from the first frame without a new piece of furniture.
+> 3. **Each strand brings its own five gate lines**, in the same `GATE.md`. The
+>    three constants across all of them are the channel's, not the genre's: a
+>    TURN, a HERO NUMBER on a spoken word, and it CLOSES. The other two are the
+>    strand's own — `HOW WOULD YOU KNOW` asks IMPOSSIBLE and INDIRECT, the
+>    teardown asks IN YOUR HOUSE and ONE PART CARRIES IT, the post-mortem asks
+>    ONE HINGE and THE HINGE IS BORING.
+>
+> **And one layout rule that every new strand hit, which belongs in *Vertical
+> composition*: A WIDE OBJECT CANNOT HAVE ANYTHING BESIDE IT.** A log line needs
+> 776 of the 864 output pixels, so a counterfactual **stacks** rather than
+> sitting side by side; an exploded teardown labels its layers **above and
+> below**, not to the right, because the 230px left over clipped the one label
+> the piece was about. Two NARROW objects side by side are fine and always were
+> — the library's two-voxel-stack comparison is exactly that. The test is not
+> *is it beside something* but **how wide is the widest element, and does
+> everything else still clear the legibility floor.** Corollary: *above* means
+> above the object's DRAWN extent, not above its origin — a parallel-projection
+> slab occupies `depth` pixels above its own `y`.
 
 > **v4.20 (2026-11-16)** — **two faults found while building #024–#030, both of
 > them invisible to all fifteen sweeps, and both of them in the parts of a

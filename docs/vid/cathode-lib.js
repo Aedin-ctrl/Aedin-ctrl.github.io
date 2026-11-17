@@ -453,6 +453,29 @@ const stackMid=(ox,bx,by)=>ox+(bx-by)*CWv;
 const TAGS=['FOOD','BIOLOGY','CHEMISTRY','PHYSICS','SPACE','EARTH','WEATHER',
             'NATURE','WILDLIFE','BODY','TECH','HISTORY','MONEY','NEWS'];
 const pieceTag=()=>'#'+String(PIECE.no).padStart(3,'0')+'  '+PIECE.tags.slice(0,2).join(' / ');
+/* ===== THE STRAND =====
+   `tags` say what a piece is ABOUT. `strand` says what SHAPE it is, which is
+   the axis thirty pieces never varied: all of them answered "why does this
+   happen?", and the gate in CATHODE-DESK.md is a quality filter for that one
+   genre. A strand is a different QUESTION -- how would anyone know, what is
+   inside this, what went wrong -- with its own five gate lines in its own
+   GATE.md.
+
+   Closed, like the tags and the palette, and for the same reason: a library
+   stops being browsable the moment one video invents its own vocabulary.
+   DEFAULT IS MECHANISM and the field may simply be absent, so all thirty
+   pieces built before this are correctly labelled by saying nothing -- and,
+   because a strand piece names its own program window, nothing already
+   rendered changes by one pixel. */
+const STRANDS=['MECHANISM','HOW WOULD YOU KNOW','WHAT IS IN THIS',
+               'WHAT WENT WRONG','RUN IT','HOW IT WAS DONE','THE DOCUMENT'];
+const pieceStrand=()=>(PIECE.strand||'MECHANISM');
+/* The program window's title bar is the badge -- the same slot a series part
+   puts its series question in. A MECHANISM piece keeps `<slug>.exe`. */
+const winTitle=(fallback)=>{
+  const st=pieceStrand();
+  return (st==='MECHANISM')?fallback:st.toLowerCase();
+};
 /* A SERIES is three pieces that answer one question between them. Each part is
    still a complete video -- you can watch #008 cold -- but it is numbered, so
    PIECE.part={n,of,first,series}. `first` is there because the palette rotates

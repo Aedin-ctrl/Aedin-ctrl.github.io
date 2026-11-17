@@ -118,6 +118,11 @@ window.checkPiece=function(){
     bad.push({field:'tags',got:PIECE.tags,need:'1 or 2'});
   else for(const t of PIECE.tags)
     if(TAGS.indexOf(t)<0) bad.push({field:'tag',got:t,need:'one of '+TAGS.join(',')});
+  /* The STRAND is a third closed field, not a third tag -- the two-tag rule
+     stays. It may be absent, which means MECHANISM, which is what all thirty
+     pieces built before strands existed are. */
+  if(PIECE.strand!==undefined && STRANDS.indexOf(PIECE.strand)<0)
+    bad.push({field:'strand',got:PIECE.strand,need:'one of '+STRANDS.join(' | ')});
   /* A standalone is 65-78s. A part of a series is allowed to be longer, and has
      to be: it spends its first four seconds on the part card and its recap, and
      it is carrying a third of an argument rather than a whole one. */
