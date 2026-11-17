@@ -79,6 +79,17 @@
   .wrap.scroll{max-height:380px;overflow-y:auto}
   .wrap.scroll.short{max-height:232px}
   .wrap.scroll thead th{position:sticky;top:0;z-index:2;background:var(--card)}
+  /* THE REAL ACCOUNTS, pinned to the front of the board. Blue is Aedin's
+     actual money on a venue; red is the paper rule it is copying. They sit
+     next to each other so the pair can be read as one thing: what the
+     strategy says, and what the account actually did. */
+  .m.real{outline:2px solid #3b82f6;outline-offset:-2px}
+  .m.mimic{outline:2px solid #ef4444;outline-offset:-2px}
+  .m .tag{font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+          font-weight:700;margin-bottom:2px}
+  .m.real .tag{color:#3b82f6}
+  .m.mimic .tag{color:#ef4444}
+  .m.waiting{opacity:.55}
   .tilehead{display:flex;align-items:center;justify-content:space-between;
     gap:10px;margin:14px 0 0}
   .sortbox{position:relative}
@@ -636,7 +647,7 @@
         '<div class="n">nothing yet</div></div>';
       return;
     }
-    el('accountCards').innerHTML = ks.map(function(a){
+    el('accountCards').innerHTML = realPairs() + ks.map(function(a){
       var t = D.accounts[a], st = strat(a);
       var pnl = t.pnl == null ? 0 : t.pnl;
       var cls = pnl > 0 ? 'pos' : (pnl < 0 ? 'neg' : 'dim');
@@ -667,6 +678,63 @@
         c.addEventListener('keydown', function(e){
           if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
       });
+  }
+
+  // THE FOUR PINNED BOXES: for each venue, Aedin's real account and the
+  // paper rule it is copying, side by side. Real first in blue, then the
+  // one it mimics in red, then the next venue. A real account with no
+  // balance yet still gets its box, greyed, because an account that is
+  // missing from the board reads as an account that does not exist.
+  function realPairs(){
+    var rs = D.real || [];
+    if(!rs.length) return '';
+    return rs.map(function(r){
+      var t = (D.accounts||{})[r.follows] || null;
+      var st = r.follows ? strat(r.follows) : {};
+      var profit = (r.balance != null && r.start_bal != null)
+          ? r.balance - r.start_bal : null;
+      var pc = profit == null ? 'dim' : (profit > 0 ? 'pos' : 'neg');
+      var stale = r.balance_ts
+          ? (Date.now()/1000 - r.balance_ts > 3600) : true;
+      var box =
+        '<div class="m real' + (r.balance == null ? ' waiting' : '') + '"' +
+            ' title="your real ' + esc(r.venue) + ' account">' +
+          '<div class="tag">real \u00b7 ' + esc(r.venue) + '</div>' +
+          '<div class="v">' + (r.balance == null ? '\u2014'
+                               : money(r.balance)) + '</div>' +
+          '<div class="n"><span class="' + pc + '">' +
+            (profit == null ? 'no starting balance set'
+             : (profit>0?'+':'') + profit.toFixed(2)) + '</span></div>' +
+          '<div class="n dim">' + (r.balance == null
+              ? 'not connected yet'
+              : (r.source === 'api' ? 'read from the venue'
+                                    : 'typed in') +
+                (stale ? ' \u00b7 stale' : '')) + '</div>' +
+          '<div class="n dim">' + (r.follows ? 'copying \u2193' : 'copying nothing')
+          + '</div>' +
+        '</div>';
+      var mim;
+      if(!r.follows || !t){
+        mim = '<div class="m mimic waiting">' +
+          '<div class="tag">copying</div>' +
+          '<div class="v">\u2014</div>' +
+          '<div class="n dim">no strategy chosen yet</div></div>';
+      } else {
+        var pnl = t.pnl == null ? 0 : t.pnl;
+        mim = '<div class="m mimic tap" role="button" tabindex="0" data-a="' +
+            esc(r.follows) + '">' +
+          '<div class="tag">copying</div>' +
+          '<div class="v">' + money(t.equity) + '</div>' +
+          '<div class="n"><span class="' + (pnl>0?'pos':pnl<0?'neg':'dim') +
+            '">' + (pnl>0?'+':'') + pnl.toFixed(2) + '</span> \u00b7 ' +
+            ((t.open||0)+(t.settled||0)) + '</div>' +
+          '<div class="n ' + (t.fit==null?'dim':(t.fit>0?'pos':'neg')) +
+            '">fit ' + cents(t.fit) + '</div>' +
+          '<div class="n dim">' + esc(st.name || r.follows) + '</div>' +
+        '</div>';
+      }
+      return box + mim;
+    }).join('');
   }
 
   // ---------------------------------------------------------------- table
