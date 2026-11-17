@@ -707,7 +707,8 @@
       var st = r.follows ? strat(r.follows) : {};
       var profit = (r.balance != null && r.start_bal != null)
           ? r.balance - r.start_bal : null;
-      var pc = profit == null ? 'dim' : (profit > 0 ? 'pos' : 'neg');
+      var pc = profit == null ? 'dim'
+          : (profit > 0 ? 'pos' : profit < 0 ? 'neg' : 'dim');
       var stale = r.balance_ts
           ? (Date.now()/1000 - r.balance_ts > 3600) : true;
       var box =
@@ -1223,7 +1224,8 @@
              : money(r.start_bal)) +
         stat('profit', profit == null ? '\u2014' :
              (profit > 0 ? '+' : '') + profit.toFixed(2),
-             profit == null ? 'dim' : (profit > 0 ? 'pos' : 'neg')) +
+             profit == null || profit === 0 ? 'dim'
+             : (profit > 0 ? 'pos' : 'neg')) +
         stat('last read', r.balance_ts ? ago(r.balance_ts) : '\u2014') +
         stat('copying', r.traded === false ? 'not traded'
              : r.follows ? esc(st.name || r.follows) : 'nothing',
