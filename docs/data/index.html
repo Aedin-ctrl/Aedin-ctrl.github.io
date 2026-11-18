@@ -40,6 +40,22 @@
   .banner.bad b{color:var(--bad)}
   .banner.bad ul{margin:5px 0 0 16px;padding:0}
   .banner.bad li{font-size:12.5px;line-height:1.5}
+  /* WHEN THE ANSWERS ARRIVE. Two pre-registered reads refuse to report
+     before their mark, so how far along they are is the most relevant
+     fact about this board -- and a progress bar is the honest way to
+     show a number that is deliberately not available yet. */
+  .prereg{margin-top:12px;border:1px solid var(--line);border-radius:9px;
+          padding:10px 13px;background:var(--card)}
+  .prereg h6{margin:0 0 7px;font-size:10px;text-transform:uppercase;
+             letter-spacing:.06em;color:var(--muted);font-weight:650}
+  .pr{display:grid;grid-template-columns:1fr auto;gap:2px 10px;
+      align-items:baseline;margin:6px 0 0;font-size:12px}
+  .pr .pn{color:var(--ink2)}
+  .pr .pv{font-variant-numeric:tabular-nums;color:var(--muted);
+          font-size:11.5px}
+  .prbar{grid-column:1/-1;height:5px;border-radius:3px;
+         background:var(--line);overflow:hidden;margin-top:3px}
+  .prbar i{display:block;height:100%;background:var(--s1);border-radius:3px}
   /* The `hidden` attribute hides an element through the UA rule
      [hidden]{display:none} -- and ANY author rule that sets display beats a UA
      rule, so `.infoback{display:flex}` kept a full-screen modal backdrop on
@@ -308,6 +324,7 @@
   </header>
   <div class="banner" id="staleBanner" hidden></div>
   <div class="banner bad" id="invBanner" hidden></div>
+  <div class="prereg" id="preregBar" hidden></div>
 
   <div class="tilehead">
     <span class="tblttl" id="tileCount">Paper markets</span>
@@ -497,6 +514,30 @@
         }).join('') + '</ul>';
     } else {
       el('invBanner').hidden = true;
+    }
+
+    // The only evidence this project has left is two pre-registered
+    // reads that will not report before their mark. Showing the
+    // PROGRESS is the honest way to present a number that is
+    // deliberately unavailable -- the alternative is a page that looks
+    // finished and quietly is not.
+    var pr = h.preregistered || [];
+    if(pr.length){
+      el('preregBar').hidden = false;
+      el('preregBar').innerHTML =
+        '<h6>Waiting on evidence</h6>' +
+        pr.map(function(p){
+          var f = Math.max(0, Math.min(1, (p.have || 0) / (p.need || 1)));
+          return '<div class="pr"><span class="pn">' + esc(p.name) +
+                 '</span><span class="pv">' + (p.have || 0) + ' / ' +
+                 (p.need || 0) + '</span>' +
+                 '<span class="prbar"><i style="width:' +
+                 (f * 100).toFixed(1) + '%"></i></span>' +
+                 '<span class="pv" style="grid-column:1/-1">' +
+                 esc(p.unit || '') + '</span></div>';
+        }).join('');
+    } else {
+      el('preregBar').hidden = true;
     }
 
     cards();
