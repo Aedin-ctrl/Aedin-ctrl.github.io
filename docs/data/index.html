@@ -563,11 +563,24 @@
   function ruleLine(e){
     var n = e.bottom_n || 20, k = e.strikes_needed || 3,
         h = Math.round((e.every_s||14400)/3600);
+    // "CURRENTLY" MUST MEAN CURRENTLY. `e.live` is a stored snapshot
+    // written by the LAST generation, up to four hours old -- and on
+    // 2026-11-18 it read 126 against a board of 120 for three hours
+    // after the count was corrected, because nothing rewrites that
+    // record until the next generation runs. The page has the real
+    // number in front of it; counting the tiles it is about to draw is
+    // both current and impossible to disagree with.
+    //
+    // The old fallback here was 136, a board size two rebuilds out of
+    // date, which would have been printed as fact had the feed ever
+    // omitted the target.
+    var now = D.accounts ? Object.keys(D.accounts).length : null;
     return 'Every ' + h + ' hours the worst ' + n + ' tiles take a strike; ' +
            k + ' strikes in a row retires a rule, and one generation out of ' +
            'the bottom ' + n + ' clears the count. The board is held at ' +
-           (e.target || 136) + ' tiles' +
-           (e.live != null ? ' (currently ' + e.live + ')' : '') +
+           (e.target != null ? e.target : (now != null ? now : '\u2014')) +
+           ' tiles' +
+           (now != null ? ' (currently ' + now + ')' : '') +
            ', so rules are bred only to fill tiles that just came free. ' +
            // WHY A DRAW AND NOT THE TOP. Measured by selecting on the
            // first 60% of the record and judging on the last 40%: the top
