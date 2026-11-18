@@ -220,6 +220,24 @@
   .ax.end{text-anchor:end}
   .readout{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
            font-size:12px;margin:2px 0 6px;padding-left:44px;min-height:16px}
+  /* The day-on-day overlay. Same skeleton as .curve so one scroller and
+     one y-axis gutter serve both charts and they line up down the panel. */
+  .days{display:block;max-width:none;flex:0 0 auto}
+  .days .zero{stroke:var(--line);stroke-width:1;stroke-dasharray:3 3}
+  .days .gx{stroke:var(--line);stroke-width:1;opacity:.45}
+  .days .hitline{stroke-width:1;stroke-dasharray:2 3;opacity:.55}
+  .ax.rk{font-size:8.5px;font-weight:650}
+  .dayhead{font-size:11.5px;color:var(--muted);margin:2px 0 7px;line-height:1.55}
+  .dleglist{display:flex;flex-wrap:wrap;gap:5px 15px;margin:7px 0 2px;
+            padding-left:44px;font-size:11.5px}
+  .dleg{display:inline-flex;align-items:center;gap:5px;
+        font-variant-numeric:tabular-nums;background:transparent;border:0;
+        border-radius:6px;padding:2px 4px;margin:-2px -4px;color:inherit;
+        font:inherit;font-size:11.5px;cursor:pointer;text-align:left}
+  .dleg:hover,.dleg:focus-visible{background:var(--line);outline:none}
+  .dleg i{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
+  .dleg b{font-weight:650}
+  .dleg em{font-style:normal;color:var(--muted);font-size:10.5px}
   .readout .rt{font-variant-numeric:tabular-nums;color:var(--ink2)}
   .readout .rv{font-weight:650;font-variant-numeric:tabular-nums}
   .readout .rh{color:var(--muted);font-size:11px}
@@ -1153,6 +1171,7 @@
   // scale disappears with it, which is how a reader loses track of
   // whether the line is at +$5 or +$500.
   var CURVE = null;
+  var DAYSCROLL = null;
 
   function niceStep(span, want){
     var S = [900, 1800, 3600, 7200, 10800, 21600, 43200, 86400, 172800];
@@ -1182,6 +1201,49 @@
       '<span class="rh">total since this account opened</span>';
   }
 
+  // SMOOTH, AND IT CAN NEVER CROSS ITSELF. Every segment is a cubic whose
+  // two control points are offset along x ONLY -- x therefore rises
+  // strictly from one knot to the next, so the path is a function of x
+  // and no part of it can double back over another part. The slopes use
+  // the Fritsch-Carlson limiter, which keeps the bend gentle but stops
+  // the curve overshooting a turning point: without it a smoothed line
+  // dips to a profit the account never actually had, which is a lie the
+  // raw polyline never told. Takes SCREEN coordinates, so every chart on
+  // the page can hand it whatever its own scales produced.
+  function smoothPath(px, py){
+    var n = Math.min(px.length, py.length), i;
+    if(n < 2) return '';
+    var out = 'M' + px[0].toFixed(1) + ' ' + py[0].toFixed(1);
+    if(n === 2) return out + ' L' + px[1].toFixed(1) + ' ' + py[1].toFixed(1);
+    var d = [], m = [];
+    for(i = 0; i < n - 1; i++){
+      var dx = px[i+1] - px[i];
+      d.push(dx > 1e-9 ? (py[i+1] - py[i]) / dx : 0);
+    }
+    m.push(d[0]);
+    for(i = 1; i < n - 1; i++){
+      m.push(d[i-1] * d[i] <= 0 ? 0 : (d[i-1] + d[i]) / 2);
+    }
+    m.push(d[n-2]);
+    for(i = 0; i < n - 1; i++){
+      if(d[i] === 0){ m[i] = 0; m[i+1] = 0; continue; }
+      var a = m[i] / d[i], b = m[i+1] / d[i], ss = a*a + b*b;
+      if(ss > 9){
+        var tau = 3 / Math.sqrt(ss);
+        m[i] = tau * a * d[i];
+        m[i+1] = tau * b * d[i];
+      }
+    }
+    for(i = 0; i < n - 1; i++){
+      var h3 = (px[i+1] - px[i]) / 3;
+      out += ' C' + (px[i] + h3).toFixed(1) + ' ' + (py[i] + m[i]*h3).toFixed(1) +
+             ' ' + (px[i+1] - h3).toFixed(1) + ' ' +
+                   (py[i+1] - m[i+1]*h3).toFixed(1) +
+             ' ' + px[i+1].toFixed(1) + ' ' + py[i+1].toFixed(1);
+    }
+    return out;
+  }
+
   function curve(pts, h){
     if(!pts || pts.length < 2){
       CURVE = null;
@@ -1203,9 +1265,11 @@
     var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
     var X = function(v){ return pad.l + (x1===x0 ? pw : (v-x0)/(x1-x0)*pw); };
     var Y = function(v){ return pad.t + ph - (v-lo)/(hi-lo)*ph; };
-    var d = pts.map(function(p,i){
-      return (i?'L':'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1);
-    }).join(' ');
+    var sx = [], sy = [];
+    for(var pi = 0; pi < pts.length; pi++){
+      sx.push(X(pts[pi][0])); sy.push(Y(pts[pi][1]));
+    }
+    var d = smoothPath(sx, sy);
     var last = ys[ys.length-1];
     var col = last > 0 ? 'var(--good)' : last < 0 ? 'var(--bad)' : 'var(--muted)';
     var zy = Y(0).toFixed(1);
@@ -1397,6 +1461,259 @@
 
   // Opened by clicking a tile OR a row's info button -- one view, so the
   // two can never drift into describing the same account differently.
+  // Distinct hues rather than one fading ramp: the question this chart
+  // answers is "does the SAME shape come back tomorrow", and tracing one
+  // day through a crossing is easier when the days are different colours
+  // than when they are different strengths of the same one. Checked
+  // against both themes.
+  // Darkened from the obvious mid-tones: the rank labels on the bands are
+  // 8.5px, and six of the first eight colours tried came in under 4.5:1
+  // on this page's paper. Ordered so two days that follow each other are
+  // as far apart in hue as the set allows.
+  var DAYCOL = ['#2563eb','#be123c','#0f766e','#c2410c',
+                '#a21caf','#4d7c0f','#0e7490','#4338ca'];
+
+  function hhmm(s){
+    s = ((s % 86400) + 86400) % 86400;
+    return String(Math.floor(s/3600)).padStart(2,'0') + ':' +
+           String(Math.floor(s/60) % 60).padStart(2,'0');
+  }
+  // Cycles closer together than this are the same spell in the top 8.
+  // Generous enough to bridge a publish that was skipped or slow, short
+  // enough that the morning and the afternoon stay two separate visits.
+  var TOP8_GAP = 1500;
+
+  // Takes EITHER shape. The feed now ships spells already merged,
+  // [from, to, best, cycles], but a page can be live minutes before the
+  // board that feeds it redeploys, and the older shape is one entry per
+  // cycle, [second, rank]. Reading only the new one would blank the
+  // marks for exactly as long as that gap lasts.
+  function top8Runs(marks){
+    if(!marks || !marks.length) return [];
+    var ms = marks.map(function(m){
+      return m.length >= 4
+        ? {from:m[0], to:m[1], best:m[2], n:m[3]}
+        : {from:m[0], to:m[0], best:m[1], n:1};
+    }).sort(function(p, q){ return p.from - q.from; });
+    var out = [], cur = null;
+    ms.forEach(function(m){
+      if(cur && m.from - cur.to <= TOP8_GAP){
+        if(m.to > cur.to) cur.to = m.to;
+        cur.n += m.n;
+        if(m.best < cur.best) cur.best = m.best;
+      } else {
+        cur = {from:m.from, to:m.to, best:m.best, n:m.n};
+        out.push(cur);
+      }
+    });
+    return out;
+  }
+
+  function daychip(iso){
+    var p = String(iso).split('-');
+    return p.length === 3 ? (+p[1]) + '/' + (+p[2]) : String(iso);
+  }
+
+  // EVERY DAY LAID OVER ITSELF. The long curve above answers "is this
+  // account up"; this one answers "WHEN does it earn and when does it
+  // give it back". Each day starts at zero at its own first trade and is
+  // drawn against the clock, not against elapsed time, so 09:00 on Monday
+  // sits directly above 09:00 on Tuesday -- the only way a pattern that
+  // repeats at a time of day is visible at all. The rings mark every
+  // cycle this account was inside the top 8, which is why it is in here.
+  function dayOverlay(a){
+    // Cleared on every open: a panel for an account with no day data
+    // must not inherit the last account's scroll position.
+    DAYSCROLL = null;
+    var ds = ((D.days || {})[a] || []).slice();
+    var hit = (D.top8 || {})[a] || null;
+    if(!ds.length) return '';
+    ds.sort(function(p, q){ return p.day < q.day ? -1 : p.day > q.day ? 1 : 0; });
+
+    var h = 196, pad = {l:6, r:14, t:14, b:18};
+    var x0 = Infinity, x1 = -Infinity, lo = 0, hi = 0;
+    ds.forEach(function(dd){
+      (dd.pts || []).forEach(function(p){
+        if(p[0] < x0) x0 = p[0];
+        if(p[0] > x1) x1 = p[0];
+        if(p[1] < lo) lo = p[1];
+        if(p[1] > hi) hi = p[1];
+      });
+      top8Runs(dd.top8 || []).forEach(function(r){
+        if(r.from < x0) x0 = r.from;
+        if(r.to > x1) x1 = r.to;
+      });
+    });
+    if(!isFinite(x0) || !isFinite(x1)) return '';
+    // Snap the window to whole hours. Starting it at the first trade would
+    // line the days up on when each happened to begin, which is exactly
+    // the comparison this chart is not for.
+    x0 = Math.floor(x0 / 3600) * 3600;
+    x1 = Math.ceil(x1 / 3600) * 3600;
+    if(x1 <= x0) x1 = x0 + 3600;
+    if(hi - lo < 1){ hi += 0.5; lo -= 0.5; }
+    var span = x1 - x0;
+    // 76px to the hour while there is room, squeezed down once the
+    // window approaches a full day so the whole clock is at most a
+    // couple of panel-widths of scrolling rather than ten.
+    var w = Math.max(440, Math.min(1300,
+              Math.round(span / 3600 * 76) + pad.l + pad.r));
+    var pw = w - pad.l - pad.r, ph = h - pad.t - pad.b;
+    var X = function(v){ return pad.l + (v - x0) / span * pw; };
+    var Y = function(v){ return pad.t + ph - (v - lo) / (hi - lo) * ph; };
+
+    var step = niceStep(span, Math.max(3, Math.floor(pw / 74)));
+    var grid = '';
+    for(var t = Math.ceil(x0 / step) * step; t <= x1; t += step){
+      var gx = X(t).toFixed(1);
+      grid += '<line class="gx" x1="' + gx + '" y1="' + pad.t + '" x2="' + gx +
+              '" y2="' + (pad.t + ph) + '"/>' +
+              '<text class="ax mid" x="' + gx + '" y="' + (h - 5) + '">' +
+              hhmm(t) + '</text>';
+    }
+
+    function at(pts, x){
+      if(!pts.length) return null;
+      if(x <= pts[0][0]) return pts[0][1];
+      for(var i = 1; i < pts.length; i++){
+        if(x <= pts[i][0]){
+          var dx = pts[i][0] - pts[i-1][0];
+          if(dx <= 0) return pts[i][1];
+          return pts[i-1][1] +
+                 (x - pts[i-1][0]) / dx * (pts[i][1] - pts[i-1][1]);
+        }
+      }
+      return pts[pts.length-1][1];
+    }
+
+    var lines = '', marks = '', legend = '', alt = [];
+    ds.forEach(function(dd, i){
+      var col = DAYCOL[i % DAYCOL.length];
+      var newest = i === ds.length - 1;
+      var pts = dd.pts || [];
+      if(!pts.length) return;
+      var px = [], py = [];
+      pts.forEach(function(p){ px.push(X(p[0])); py.push(Y(p[1])); });
+      if(px.length > 1){
+        lines += '<path d="' + smoothPath(px, py) + '" fill="none" stroke="' +
+          col + '" stroke-width="' + (newest ? 2.1 : 1.5) +
+          '" stroke-linecap="round" opacity="' + (newest ? 1 : 0.74) + '"/>';
+      }
+      lines += '<circle cx="' + px[px.length-1].toFixed(1) + '" cy="' +
+        py[py.length-1].toFixed(1) + '" r="' + (newest ? 3 : 2.4) +
+        '" fill="' + col + '"/>';
+
+      // A SPELL IN THE TOP 8 IS ONE BAND, NOT ONE LINE PER CYCLE. The
+      // board republishes every minute or so, so an account that stays up
+      // there for an hour produces sixty marks; drawn individually they
+      // merge into a solid block of colour that says nothing about when
+      // it arrived or how long it lasted. Consecutive cycles are joined
+      // into a run and the run is shaded, labelled with its best rank.
+      // The run is drawn as a band rather than a dot on the line because
+      // the line is a cubic between knots -- a dot placed by straight-line
+      // interpolation sits just off it and reads as a value the curve
+      // does not show.
+      var runs = top8Runs(dd.top8 || []);
+      var lastLab = -1e9;
+      runs.forEach(function(r){
+        var ax = X(r.from), bx = X(r.to);
+        if(bx - ax < 2.4){ var mid = (ax+bx)/2; ax = mid - 1.2; bx = mid + 1.2; }
+        marks += '<rect x="' + ax.toFixed(1) + '" y="' + pad.t + '" width="' +
+          (bx-ax).toFixed(1) + '" height="' + ph.toFixed(1) +
+          '" fill="' + col + '" opacity=".13"/>' +
+          '<line class="hitline" x1="' + ax.toFixed(1) + '" y1="' + pad.t +
+          '" x2="' + ax.toFixed(1) + '" y2="' + (pad.t+ph) +
+          '" stroke="' + col + '"/>' +
+          '<line class="hitline" x1="' + bx.toFixed(1) + '" y1="' + pad.t +
+          '" x2="' + bx.toFixed(1) + '" y2="' + (pad.t+ph) +
+          '" stroke="' + col + '"/>';
+        var cx = (ax + bx) / 2;
+        if(cx - lastLab >= 20){
+          marks += '<text class="ax mid rk" x="' + cx.toFixed(1) + '" y="' +
+            (pad.t - 4) + '" fill="' + col + '">#' + r.best + '</text>';
+          lastLab = cx;
+        }
+      });
+
+      var end = pts[pts.length-1][1];
+      var worst = pts.reduce(function(acc, p){
+        return p[1] < acc[1] ? p : acc; }, pts[0]);
+      var best = pts.reduce(function(acc, p){
+        return p[1] > acc[1] ? p : acc; }, pts[0]);
+      // The window can be a whole day wide, so a day that traded in the
+      // evening sits off the right of the panel. Its chip scrolls the
+      // chart to it -- a legend entry for a line you cannot find is worse
+      // than no legend entry.
+      var cf = (px[0] + px[px.length-1]) / 2 / w;
+      legend += '<button type="button" class="dleg" data-f="' + cf.toFixed(4) +
+        '" title="scroll the chart to ' + esc(daychip(dd.day)) + '">' +
+        '<i style="background:' + col + '"></i>' +
+        esc(daychip(dd.day)) +
+        ' <b class="' + (end > 0 ? 'pos' : end < 0 ? 'neg' : 'dim') + '">' +
+        (end > 0 ? '+' : end < 0 ? '\u2212' : '') + '$' +
+        Math.abs(end).toFixed(2) + '</b>' +
+        '<em>low ' + hhmm(worst[0]) + ' \u00b7 high ' + hhmm(best[0]) +
+        (runs.length
+          ? ' \u00b7 top 8 ' +
+            runs.slice(0, 4).map(function(r){
+              return hhmm(r.from) +
+                     (r.to - r.from >= 60 ? '\u2013' + hhmm(r.to) : '') +
+                     ' #' + r.best;
+            }).join(', ') +
+            (runs.length > 4 ? ' +' + (runs.length - 4) + ' more' : '')
+          : '') +
+        '</em></button>';
+      alt.push(daychip(dd.day) + ' ending ' + end.toFixed(2) + ' dollars');
+    });
+    if(!lines) return '';
+
+    var zy = Y(0).toFixed(1);
+    var ylab = '<text class="ax end" x="40" y="' + (Y(hi)+4).toFixed(1) + '">' +
+        (hi > 0 ? '+' : '') + hi.toFixed(2) + '</text>' +
+      '<text class="ax end" x="40" y="' + (Y(lo)+4).toFixed(1) + '">' +
+        (lo > 0 ? '+' : '') + lo.toFixed(2) + '</text>';
+    if(Math.min(Math.abs(Y(0)-Y(hi)), Math.abs(Y(0)-Y(lo))) > 11){
+      ylab += '<text class="ax end" x="40" y="' + (Y(0)+4).toFixed(1) +
+              '">0.00</text>';
+    }
+
+    // Where the newest day actually traded, so the panel opens on today
+    // rather than on an empty 03:00. Kept as a fraction of the chart so
+    // it survives the clamped width.
+    var newestPts = ds[ds.length-1].pts || [];
+    DAYSCROLL = newestPts.length
+      ? (X(newestPts[0][0]) + X(newestPts[newestPts.length-1][0])) / 2 / w
+      : null;
+
+    var head = hit
+      ? 'In the top 8 on ' + hit.cycles + ' cycle' +
+        (hit.cycles === 1 ? '' : 's') + ' \u00b7 best #' + hit.best_rank +
+        ' \u00b7 first ' + stamp(hit.first) + ' \u00b7 last ' + stamp(hit.last)
+      : 'Each day starts again at zero.';
+
+    return '<h5>Day on day</h5>' +
+      '<p class="dayhead">' + esc(head) + '<br>' +
+      'Every day this account has traded, drawn against the clock and ' +
+      'started at zero at its own first trade \u2014 so the same hour sits ' +
+      'in the same place on all of them. Dashed guides mark each cycle it ' +
+      'was inside the top 8.' +
+      (ds.length > 1 ? ' Tap a day below to scroll the chart to it.' : '') +
+      '</p>' +
+      '<div class="chart">' +
+      '<svg class="yax" viewBox="0 0 44 ' + h + '" width="44" height="' + h +
+        '" aria-hidden="true">' + ylab + '</svg>' +
+      '<div class="plot" id="daysPlot" style="cursor:default">' +
+      '<svg class="days" width="' + w + '" height="' + h + '" viewBox="0 0 ' +
+        w + ' ' + h + '" role="img" aria-label="profit by time of day, ' +
+        'one line per day: ' + esc(alt.join('; ')) + '">' +
+      grid +
+      '<line x1="' + pad.l + '" y1="' + zy + '" x2="' + (w - pad.r) +
+        '" y2="' + zy + '" class="zero"/>' +
+      marks + lines +
+      '</svg></div></div>' +
+      '<div class="dleglist">' + legend + '</div>';
+  }
+
   function showInfo(a){
     var t = D.accounts[a] || {}, st = strat(a), ru = t.rule || {};
     var pnl = t.pnl == null ? 0 : t.pnl;
@@ -1506,6 +1823,7 @@
                  (t.last_contracts > 1 ? 's' : ''))
               : '—') +
       '</div>' +
+      dayOverlay(a) +
       '<h5>The model</h5>' +
       '<p>' + esc(st.blurb || '') + '</p>' +
       '<p class="rule">' + esc(bits.join(' · ')) + '</p>' +
@@ -1517,7 +1835,25 @@
       (st.detail ? '<p>' + esc(st.detail) + '</p>' : '');
     openInfo();
     wireCurve();
+    wireDays();
     el('infoClose').addEventListener('click', closeInfo);
+  }
+
+  function wireDays(){
+    var p = el('daysPlot');
+    if(!p || DAYSCROLL == null) return;
+    function go(f){
+      p.scrollTo({left: Math.max(0, f * p.scrollWidth - p.clientWidth / 2),
+                  behavior: 'smooth'});
+    }
+    p.scrollLeft = Math.max(0,
+      DAYSCROLL * p.scrollWidth - p.clientWidth / 2);
+    var chips = document.querySelectorAll('.dleglist .dleg');
+    for(var i = 0; i < chips.length; i++){
+      (function(c){
+        c.addEventListener('click', function(){ go(+c.getAttribute('data-f')); });
+      })(chips[i]);
+    }
   }
 
   // The card sits ON TOP of the page. Anywhere outside it closes, so does
@@ -1623,17 +1959,18 @@
          '" stroke="var(--rule)" stroke-dasharray="3 3"/>';
 
     function path(key, col, dash){
-      var pts = [], dots = '';
+      var px = [], py = [], dots = '';
       fracs.forEach(function(f){
         var r = h.fracs[f]; var v = r && r[key];
         if(v == null) return;
-        pts.push(x(f).toFixed(1) + ',' + y(v).toFixed(1));
+        px.push(x(f)); py.push(y(v));
         dots += '<circle cx="'+x(f).toFixed(1)+'" cy="'+y(v).toFixed(1)+
                 '" r="3.4" fill="'+col+'"/>';
       });
-      if(pts.length < 2) return dots;
-      return '<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+col+
-             '" stroke-width="2" '+(dash?'stroke-dasharray="5 4" ':'')+'/>' + dots;
+      if(px.length < 2) return dots;
+      return '<path d="'+smoothPath(px, py)+'" fill="none" stroke="'+col+
+             '" stroke-width="2" stroke-linecap="round" '+
+             (dash?'stroke-dasharray="5 4" ':'')+'/>' + dots;
     }
 
     // Mark where the rule actually trades.
