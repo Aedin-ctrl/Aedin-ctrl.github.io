@@ -33,6 +33,13 @@
           background:#fffdf7;border-radius:9px;padding:10px 13px;font-size:13px;
           color:var(--ink2)}
   .banner b{color:var(--warn)}
+  /* A FAILED INVARIANT IS NOT ORDINARY STALENESS. Three defects reached
+     production looking perfectly healthy; when one is caught the page
+     has to say so in a way that cannot be mistaken for a slow feed. */
+  .banner.bad{border-left-color:var(--bad);background:#fff7f6}
+  .banner.bad b{color:var(--bad)}
+  .banner.bad ul{margin:5px 0 0 16px;padding:0}
+  .banner.bad li{font-size:12.5px;line-height:1.5}
   /* The `hidden` attribute hides an element through the UA rule
      [hidden]{display:none} -- and ANY author rule that sets display beats a UA
      rule, so `.infoback{display:flex}` kept a full-screen modal backdrop on
@@ -300,6 +307,7 @@
     <span class="tag" id="stamp">loading…</span>
   </header>
   <div class="banner" id="staleBanner" hidden></div>
+  <div class="banner bad" id="invBanner" hidden></div>
 
   <div class="tilehead">
     <span class="tblttl" id="tileCount">Paper markets</span>
@@ -467,6 +475,28 @@
         'the record up to that point, not a live picture.';
     } else {
       el('staleBanner').hidden = true;
+    }
+
+    // THE CROSS-MODULE INVARIANTS. Everything this board reports rests on
+    // facts kept in two places agreeing -- what may be culled, what gets
+    // archived, how big the board is. Three of those drifted apart in
+    // three days and none failed loudly. If one is broken now, nothing
+    // below this line can be taken at face value, so it is said here
+    // rather than left in a log nobody reads.
+    var inv = h.invariants || {}, bad = h.invariants_failed || [];
+    if(bad.length){
+      el('invBanner').hidden = false;
+      el('invBanner').innerHTML =
+        '<b>' + bad.length + ' internal check' +
+        (bad.length > 1 ? 's are' : ' is') + ' failing.</b> ' +
+        'Something this board relies on has drifted. Treat what follows ' +
+        'as suspect until it clears.<ul>' +
+        bad.map(function(k){
+          return '<li><b>' + esc(k) + '</b> \u2014 ' +
+                 esc((inv[k] || {}).detail || 'no detail') + '</li>';
+        }).join('') + '</ul>';
+    } else {
+      el('invBanner').hidden = true;
     }
 
     cards();
