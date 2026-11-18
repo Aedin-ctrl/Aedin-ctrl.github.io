@@ -1881,8 +1881,20 @@
         stat('settled', String(t.settled||0)) +
         stat('avg price', t.avg_price==null ? '—' :
              (t.avg_price*100).toFixed(1) + 'c') +
-        stat('bought', pct(t.fill_rate, 0)) +
-        stat('stood down', String(t.stood_down||0)) +
+        // THREE NUMBERS THAT COULD NOT BE ADDED UP. "bought" divides by
+        // every refusal EXCEPT "no signal"; "stood down" counted ONLY
+        // the "no signal" ones. So a tile read "trades 35 / stood down
+        // 15 / bought 8%" and invited 35/50 = 70%, when the rule had
+        // actually faced about 450 decisions and stood down about 415
+        // of them. Each figure was right by its own definition and the
+        // three together said something false.
+        //
+        // Now the denominator is printed with the percentage, and the
+        // other counter says which refusal it counts.
+        stat('bought', t.fill_rate == null ? '\u2014' :
+             (pct(t.fill_rate, 0) +
+              (t.signals ? ' of ' + t.signals : ''))) +
+        stat('no view (no signal)', String(t.stood_down||0)) +
         stat('last traded', t.last_trade ? ago(t.last_trade) : '—') +
         stat('bet size', t.stake_frac
               ? ((t.stake_frac*100).toFixed(0) + '% of itself')
