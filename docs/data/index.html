@@ -122,6 +122,13 @@
             box-shadow:inset 0 0 0 1px rgba(202,138,4,.35)}
   :root:not([data-theme="light"]) .m.watch2,
   :root[data-theme="dark"] .m.watch2{outline-color:#facc15}
+  /* A BOARD CHANGE THAT WAS NOT A MEASUREMENT. Neither green nor red:
+     a wipe is not a rule doing well or badly, it is a decision taken off
+     the board, and colouring it like a cull is the exact conflation the
+     log exists to prevent. */
+  .warn{color:#a16207;font-weight:650}
+  :root:not([data-theme="light"]) .warn,
+  :root[data-theme="dark"] .warn{color:#fde047}
   .m.watch2 .k{color:#a16207;font-weight:700}
   :root:not([data-theme="light"]) .m.watch2 .k,
   :root[data-theme="dark"] .m.watch2 .k{color:#fde047}
@@ -500,13 +507,24 @@
       '<th>vs coin flip</th><th>Profit/trade</th><th>Trades</th>' +
       '<th class="lft">From</th></tr></thead><tbody>';
     log.forEach(function(r){
-      var born = r.action === 'breed';
+      // FOUR THINGS CAN HAPPEN TO A TILE, and they are not two. 'cull'
+      // is evolve.py retiring a rule for finishing last three
+      // generations running -- a measurement. 'removed' is a rule
+      // deleted by hand, at any rank, which reconcile.py notices by
+      // comparing the board against the last time it looked. Reading
+      // the second as the first is how the board said nothing at all
+      // when its 2nd-best rule was wiped on 17 Nov.
+      var born = r.action === 'breed' || r.action === 'restored';
+      var act = r.action === 'breed' ? 'born'
+              : r.action === 'restored' ? 'put back'
+              : r.action === 'removed' ? 'wiped by hand'
+              : 'retired';
+      var acls = r.action === 'removed' ? 'warn' : (born ? 'pos' : 'neg');
       var nm = (D.strategies||{})[r.variant||''] || {};
       h += '<tr>' +
         '<td>' + (r.gen==null?'—':r.gen) + '</td>' +
         '<td>' + esc(ago(r.ts)) + '</td>' +
-        '<td><span class="' + (born?'pos':'neg') + '">' +
-          (born ? 'born' : 'retired') + '</span></td>' +
+        '<td><span class="' + acls + '">' + act + '</span></td>' +
         '<td class="lft">' + esc(nm.name || r.note || r.variant || '—') +
           '</td>' +
         '<td class="lft">' + esc(String(r.account||'').split('|')[0]) +
@@ -522,12 +540,17 @@
     });
     el('evoTable').innerHTML = h + '</tbody>';
     var born = log.filter(function(r){ return r.action==='breed'; }).length;
+    var wiped = log.filter(function(r){ return r.action==='removed'; }).length;
+    var backn = log.filter(function(r){ return r.action==='restored'; }).length;
     var rej = (e.rejected||[]).length, tried = (e.rejected||[])
       .reduce(function(t,r){ return t + (r.tried||0); }, 0);
     el('evoFoot').textContent = ruleLine(e) + ' ' +
       'Generation ' + (e.gen||0) + ', last turned over ' + ago(e.ran) +
       '. Since the board started: ' + born + ' born, ' +
-      (log.length-born) + ' retired' +
+      (log.length - born - wiped - backn) + ' retired' +
+      (wiped ? ', ' + wiped + ' wiped by hand (not retired on the ' +
+               'numbers)' : '') +
+      (backn ? ', ' + backn + ' put back' : '') +
       (rej ? ', ' + rej + ' parent' + (rej>1?'s':'') + ' passed over after ' +
              tried + ' variants failed the record' : '') +
       (e.empty ? ', ' + e.empty + ' tile(s) left empty' : '') +
