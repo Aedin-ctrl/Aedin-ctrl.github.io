@@ -421,6 +421,13 @@
     <p class="foot" id="evoFoot"></p>
   </section>
 
+  <section id="keptSec" hidden>
+    <h2>Kept, not trading <span>— rules that were deleted, put back as a
+      record</span></h2>
+    <div class="wrap scroll"><table id="keptTable"></table></div>
+    <p class="foot" id="keptFoot"></p>
+  </section>
+
   <section>
     <h2>The sweep <span>— every variant, replayed</span></h2>
     <div id="sweepBox"></div>
@@ -587,6 +594,7 @@
     drawVenues();
     drawSweep();
     drawEvolution();
+    drawKept();
   }
 
   // Every eight hours the eight worst tiles are retired and eight new ones
@@ -704,6 +712,62 @@
       ' Every rule born here was positive in both halves of the whole ' +
       'record before it got a tile \u2014 in-sample by construction; only ' +
       'the forward record settles it.';
+  }
+
+  // KEPT, NOT TRADING. Every rule here was deleted by hand -- trades,
+  // refusals and all -- and has been put back from the archive as a
+  // record: it holds no tile, it cannot trade, and nothing about it can
+  // be deleted again. It is a separate section from the retirement log
+  // on purpose. A cull is a measurement the board made; this is a loss
+  // the board suffered and has since undone, and showing them in one
+  // list ordered by date would have buried all eleven real culls under
+  // a hundred and sixty restorations from a single afternoon.
+  function drawKept(){
+    var k = ((D.evolution || {}).kept) || [];
+    if(!k.length) return;
+    el('keptSec').hidden = false;
+    var h = '<thead><tr><th class="lft">Rule</th><th class="lft">Book</th>' +
+      '<th>Trades</th><th>Won</th><th>Profit</th><th>Best hour</th>' +
+      '</tr></thead><tbody>';
+    var C = (D.clock || {}).accounts || {};
+    k.forEach(function(r){
+      var a = r.account || '', vid = a.split('|').pop();
+      // The name and the best hour come WITH the row. `D.strategies` and
+      // `D.clock.accounts` are both built for the accounts on the board,
+      // and every rule in this table is by definition not on it -- read
+      // from there, the column was a hundred and sixty raw ids and a
+      // column of dashes.
+      var nm = {name: r.name};
+      var best = r.best || ((C[a] || {}).best);
+      h += '<tr>' +
+        '<td class="lft">' + esc(nm.name || vid) + '</td>' +
+        '<td class="lft">' + esc(a.split('|')[0]) + ' \u00b7 ' +
+          esc(tfName(+a.split('|')[1])) + '</td>' +
+        '<td>' + (r.n == null ? '\u2014' : r.n) + '</td>' +
+        '<td>' + (r.wins == null ? '\u2014' : r.wins) + '</td>' +
+        '<td class="' + (r.pnl > 0 ? 'pos' : r.pnl < 0 ? 'neg' : 'dim') +
+          '">' + (r.pnl == null ? '\u2014'
+                  : (r.pnl > 0 ? '+$' : '\u2212$') +
+                    Math.abs(r.pnl).toFixed(2)) + '</td>' +
+        '<td>' + (best
+                  ? ((best[0] < 10 ? '0' : '') + best[0] + ':00 ' +
+                     (best[1] > 0 ? '+$' : '\u2212$') +
+                     Math.abs(best[1]).toFixed(2))
+                  : '\u2014') + '</td>' +
+      '</tr>';
+    });
+    el('keptTable').innerHTML = h + '</tbody>';
+    var win = k.filter(function(r){ return r.pnl > 0; }).length;
+    var won = k.filter(function(r){ return (r.wins || 0) > 0; }).length;
+    el('keptFoot').textContent =
+      k.length + ' rules were deleted by hand and have been put back as ' +
+      'records. ' + win + ' of them finished ahead overall and ' + won +
+      ' won at least one trade \u2014 which is the point: a rule that ' +
+      'wins sometimes is exactly what the strike system is there to ' +
+      'measure, and none of these was ever measured out. They hold no ' +
+      'tile and cannot trade; their trades, refusals and hour-by-hour ' +
+      'record are on the file, and the database now refuses to delete ' +
+      'any of it.';
   }
 
   function drawSweep(){
