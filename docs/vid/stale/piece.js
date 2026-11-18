@@ -54,6 +54,7 @@
    has a rate that is not monotonic in temperature, which is what this one
    is about. */
 const PIECE={ no:34, slug:'stale', tags:['FOOD','CHEMISTRY'],
+  strand:'MECHANISM',
   verbatim:[0],
   myth:"not drying out",
   title:"why bread goes stale faster in the fridge",

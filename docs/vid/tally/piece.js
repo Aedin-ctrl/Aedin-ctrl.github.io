@@ -149,6 +149,11 @@ const PES_BLACK='3.3', PES_RES='5.6';
   if(SHY_NHAT<=NHAT) bad.push('the shy case must come out BIGGER, not '+SHY_NHAT);
   if(M2>=N2) bad.push('more marked fish recaught than fish caught');
   if(PES_BLACK!=='3.3'||PES_RES!=='5.6') bad.push('census figures do not match the voice');
+  /* This line was missing. Five assertions were being computed into `bad` and
+     then thrown away, so the piece could have been wrong in any of five ways
+     and the sweeps would still have read zero. An assertion nothing reads is
+     not an assertion. */
+  if(bad.length) console.error('TALLY: '+bad.join('  '));
 })();
 
 /* ===== LAYOUT -- every vertical anchor written from MIDY ===== */
@@ -644,10 +649,15 @@ function explainer(ctx,W2,Hh,t){
       const dx=Q.v.dx+Math.round(pull*10);
       const shown=Math.round(H.lerp(M2,SHY_M2,pull));
       vennDraw(dx,1,1,'CATCH ONE','CATCH TWO',shown,1);
-      const nn=Math.round(N1*N2/Math.max(1,shown));
-      px(M2+' OF '+N2+' IS 1 IN '+SHARE,Q.cx,Q.rows[0],20,
-         H.rgba(H.mix(P.bone,P.ink,pull>0.5?0.62:0.18)),'center','"Silkscreen"');
-      px(N1+' X '+Math.round(N2/Math.max(1,shown))+' = '+nn,Q.cx,Q.rows[1],20,
+      /* Both lines read off the SAME overlap. They used to disagree: the
+         ratio line stayed frozen at "8 of 120 is 1 in 15" while the answer
+         under it had already become 100 x 30 = 3000, so the one step that
+         connects them contradicted both ends of itself. One ratio, used
+         twice, is also the only way 100 X r = n stays true mid-drag. */
+      const rat=Math.max(1,Math.round(N2/Math.max(1,shown)));
+      px(shown+' OF '+N2+' IS 1 IN '+rat,Q.cx,Q.rows[0],20,
+         H.rgba(H.mix(P.bone,P.ink,0.18)),'center','"Silkscreen"');
+      px(N1+' X '+rat+' = '+(N1*rat),Q.cx,Q.rows[1],20,
          H.rgba(pull>0.5?P.red:P.gold),'center','"Silkscreen"');
       if(after(10,17)) px('SAME FISH. BIGGER LAKE.',Q.cx,Q.rows[2],14,
                           H.rgba(P.red),'center','"Silkscreen"');
