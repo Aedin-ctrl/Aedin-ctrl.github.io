@@ -261,6 +261,42 @@
   .dleg i{width:9px;height:9px;border-radius:2px;flex:0 0 auto}
   .dleg b{font-weight:650}
   .dleg em{font-style:normal;color:var(--muted);font-size:10.5px}
+  /* WHEN IT EARNS. Twenty-four columns, one per hour of the board's
+     own clock, each trade filed under the hour its DECISION was taken
+     -- the hour a gate could act on, not the hour the money arrived.
+     A column is solid only when the hour went the same way on EVERY
+     day it traded; faded otherwise, because a total cannot tell one
+     good Tuesday from a habit and this chart exists to answer "every
+     single day". The ledger behind it is a table of its own, so
+     deleting the trades does not delete the answer. */
+  .hours{margin:10px 0 2px}
+  .hgrid{display:grid;grid-template-columns:repeat(24,1fr);gap:1px;
+         height:76px}
+  .hcol{display:grid;grid-template-rows:1fr 1fr;border-radius:2px}
+  .hcol:hover{background:var(--line)}
+  .hcol .up{display:flex;align-items:flex-end;
+            border-bottom:1px solid var(--rule)}
+  .hcol .dn{display:flex;align-items:flex-start}
+  .hcol i{display:block;width:100%;border-radius:1px}
+  .hcol .up i{background:var(--good)}
+  .hcol .dn i{background:var(--bad)}
+  /* .72 AND NOT LESS. A faded bar still has to be a visible bar: at
+     38% the green came out at 1.6:1 against the card, under the 3:1
+     WCAG asks of a graphic that carries meaning. 72% measures 3.2:1
+     (green) and 3.3:1 (red). The fade is therefore a weak cue on its
+     own, which is why the dot row below carries the same distinction
+     in a second, unambiguous way. */
+  .hcol.mixed i{opacity:.72}
+  .hdot{display:grid;grid-template-columns:repeat(24,1fr);height:5px;
+        margin-top:2px}
+  .hdot i{display:block;width:3px;height:3px;border-radius:50%;
+          background:var(--ink2);margin:1px auto}
+  .hax{display:grid;grid-template-columns:repeat(24,1fr);margin-top:2px;
+       font-size:8px;color:var(--muted);text-align:center;
+       font-variant-numeric:tabular-nums}
+  .hnote{font-size:11.5px;color:var(--muted);margin:7px 0 0;
+         line-height:1.5}
+  .hnote b{color:var(--ink2);font-weight:650}
   .readout .rt{font-variant-numeric:tabular-nums;color:var(--ink2)}
   .readout .rv{font-weight:650;font-variant-numeric:tabular-nums}
   .readout .rh{color:var(--muted);font-size:11px}
@@ -656,7 +692,16 @@
       (rej ? ', ' + rej + ' parent' + (rej>1?'s':'') + ' passed over after ' +
              tried + ' variants failed the record' : '') +
       (e.empty ? ', ' + e.empty + ' tile(s) left empty' : '') +
-      '. Every rule born here was positive in both halves of the whole ' +
+      '.' +
+      // WHAT THE CLOCK KEPT. The hour-by-hour ledger is written into its
+      // own table and never deleted from, so a wipe takes the trades and
+      // leaves the reading. Saying how many is the only way that promise
+      // is visible from the page rather than only true in the database.
+      (((D.clock||{}).kept||[]).length
+        ? ' The hour-by-hour record of ' + (D.clock.kept||[]).length +
+          ' rule(s) whose trades have been deleted is kept anyway.'
+        : '') +
+      ' Every rule born here was positive in both halves of the whole ' +
       'record before it got a tile \u2014 in-sample by construction; only ' +
       'the forward record settles it.';
   }
@@ -1798,6 +1843,110 @@
       '<div class="dleglist">' + legend + '</div>';
   }
 
+  // WHEN IT EARNS AND WHEN IT GIVES IT BACK, on the wall clock.
+  //
+  // The curve above is cumulative, so every day starts wherever the
+  // last one ended and an intraday shape is buried under the running
+  // total. The overlay below shows the clock but only for the few
+  // accounts that have been inside the top 8. This is the one every
+  // tile has, over its whole record.
+  //
+  // THE DAY COUNT IS THE POINT. "Profitable from 4 to 5" is a claim
+  // about a repeat, and a total of dollars cannot tell a repeat from
+  // one good afternoon. So a column is only drawn solid when the hour
+  // went the same way on EVERY day it traded, and the page refuses to
+  // call anything a pattern under the ledger's own floor.
+  function hourStrip(a){
+    var C = D.clock || {}, d = (C.accounts || {})[a];
+    if(!d || !(d.h || []).length) return '';
+    var floor = C.min_days || 4;
+    var tz = (d.tz && d.tz.length) ? d.tz.join('/') : (C.tz || 'local');
+    var by = {}, mx = 0;
+    d.h.forEach(function(r){
+      by[r[0]] = r;
+      if(Math.abs(r[2]) > mx) mx = Math.abs(r[2]);
+    });
+    if(!mx) mx = 1;
+
+    function reading(r){
+      var p = r[2], n = r[1], up = r[3], days = r[5];
+      return pad2(r[0]) + ':00 — ' + (p>0?'+':p<0?'\u2212':'') + '$' +
+        Math.abs(p).toFixed(2) + ' over ' + n + ' trade' +
+        (n === 1 ? '' : 's') + ', up on ' + up + ' of ' + days + ' day' +
+        (days === 1 ? '' : 's');
+    }
+    function pad2(n){ return (n < 10 ? '0' : '') + n; }
+
+    var cols = '', ax = '', dots = '', alt = [];
+    for(var hr = 0; hr < 24; hr++){
+      var r = by[hr];
+      ax += '<span>' + (hr % 3 === 0 ? pad2(hr) : '') + '</span>';
+      if(!r){
+        cols += '<div class="hcol" title="' + pad2(hr) +
+                ':00 — no trades"></div>';
+        dots += '<span></span>';
+        continue;
+      }
+      var p = r[2], up = r[3], dn = r[4], days = r[5];
+      // Two pixels for a non-zero hour that rounds to nothing: an hour
+      // that traded and came out flat is not the same as an hour that
+      // never traded, and a bar of zero height says the second.
+      var px = Math.max(p === 0 ? 0 : 2,
+                        Math.round(Math.min(1, Math.abs(p) / mx) * 37));
+      var every = days > 1 && (p > 0 ? up === days : p < 0 ? dn === days : false);
+      var txt = reading(r);
+      alt.push(txt);
+      cols += '<div class="hcol' + (every ? '' : ' mixed') + '" title="' +
+        esc(txt) + '">' +
+        '<div class="up">' +
+          (p > 0 ? '<i style="height:' + px + 'px"></i>' : '') + '</div>' +
+        '<div class="dn">' +
+          (p < 0 ? '<i style="height:' + px + 'px"></i>' : '') + '</div>' +
+        '</div>';
+      dots += '<span>' + (every ? '<i></i>' : '') + '</span>';
+    }
+
+    var b = d.best, w = d.worst;
+    // The day count travels WITH the dollars, always. "+$4 at 16:00"
+    // alone is the sentence this chart exists to stop anyone writing.
+    function phrase(x){
+      if(!x) return '';
+      return '<b>' + pad2(x[0]) + ':00</b> (' +
+        (x[1] > 0 ? '+' : '\u2212') + '$' + Math.abs(x[1]).toFixed(2) +
+        ', up on ' + x[2] + ' of ' + x[3] +
+        ' day' + (x[3] === 1 ? '' : 's') + ')';
+    }
+    var verdict;
+    if(d.days < floor){
+      verdict = '<b>' + d.days + ' day' + (d.days === 1 ? '' : 's') +
+        ' of record \u2014 not a pattern yet.</b> An hour needs ' + floor +
+        ' days behind it before this page will call it one: green on ' +
+        'two afternoons is a coin landing twice the same way.';
+    } else {
+      var solid = d.h.filter(function(r){
+        return r[5] > 1 && (r[2] > 0 ? r[3] === r[5] : r[4] === r[5]);
+      }).length;
+      verdict = 'Best hour ' + (phrase(b) || '\u2014 it has no winning hour') +
+        (w ? '; worst ' + phrase(w) : '') + '. ' + solid +
+        ' of the ' + d.h.length + ' hours it trades went the same way on ' +
+        'every day it traded them \u2014 those are the ones carrying a dot.';
+    }
+
+    return '<h5>When it earns</h5>' +
+      '<p>Every settled trade filed under the hour it was <b>decided</b>, ' +
+      'on the board\u2019s own clock (' + esc(tz) + ') \u2014 the hour a ' +
+      'trading-hours gate could actually act on, not the hour the money ' +
+      'arrived. ' + d.days + ' day' + (d.days === 1 ? '' : 's') + ', ' +
+      d.n + ' settled trades. Kept in a table of its own, so deleting ' +
+      'the trades does not delete this.</p>' +
+      '<div class="hours">' +
+      '<div class="hgrid" role="img" aria-label="profit by hour of day: ' +
+        esc(alt.join('; ')) + '">' + cols + '</div>' +
+      '<div class="hdot" aria-hidden="true">' + dots + '</div>' +
+      '<div class="hax">' + ax + '</div></div>' +
+      '<p class="hnote">' + verdict + '</p>';
+  }
+
   function showInfo(a){
     var t = D.accounts[a] || {}, st = strat(a), ru = t.rule || {};
     var pnl = t.pnl == null ? 0 : t.pnl;
@@ -1919,6 +2068,7 @@
                  (t.last_contracts > 1 ? 's' : ''))
               : '—') +
       '</div>' +
+      hourStrip(a) +
       dayOverlay(a) +
       '<h5>The model</h5>' +
       '<p>' + esc(st.blurb || '') + '</p>' +
