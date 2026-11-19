@@ -619,6 +619,26 @@
     // date, which would have been printed as fact had the feed ever
     // omitted the target.
     var now = D.accounts ? Object.keys(D.accounts).length : null;
+
+    // A FROZEN BOARD MUST NOT DESCRIBE ITSELF AS A BREEDING ONE. From
+    // 2026-11-18 the board grows to its size once and then stops: no
+    // culls, no births, every tile left alone to build a record. The
+    // paragraph below is then simply untrue, and a page that explains a
+    // mechanism that is no longer running is worse than one that says
+    // nothing -- it is the same empty cull list either way.
+    if(e.frozen){
+      return 'The board is CLOSED at ' +
+        (e.target != null ? e.target : (now != null ? now : '\u2014')) +
+        ' tiles' + (now != null ? ' (currently ' + now + ')' : '') +
+        '. Nothing is bred and nothing is culled: this is the final set ' +
+        'of rules, and every one of them now spends its cycles ' +
+        'collecting the record it will be judged on. Breeding kept the ' +
+        'board permanently full of rules too young to judge, which is a ' +
+        'fine way to search and a poor way to measure \u2014 and ' +
+        'measuring is what was short. A rule that runs out of money is ' +
+        'still retired, and its tile is not refilled.';
+    }
+
     return 'Every ' + h + ' hours the worst ' + n + ' tiles take a strike; ' +
            k + ' strikes in a row retires a rule, and one generation out of ' +
            'the bottom ' + n + ' clears the count. The board is held at ' +
@@ -1671,6 +1691,57 @@
     return String(Math.floor(s/3600)).padStart(2,'0') + ':' +
            String(Math.floor(s/60) % 60).padStart(2,'0');
   }
+  // WHEN IT ACTUALLY MADE THE MONEY.
+  //
+  // The shading on this chart used to mark the spells a rule spent inside
+  // the top 8. That is a fact about the leaderboard, not about earning:
+  // a rule ARRIVES in the top 8 after it has climbed and stays there
+  // while it sits flat, so the band covered the plateau and missed the
+  // part that paid for it -- "it has the peak but not the come up".
+  //
+  // A run here is a climb: it opens at the low the curve set off from,
+  // and it CLOSES AT THE HIGH, not at the end of the plateau that
+  // follows. A giveback of more than a third of what the run has gained
+  // ends it, because by then the climb is over and what comes next is a
+  // different question. Runs smaller than a fifteenth of the day's best
+  // are dropped: a band on every tick is confetti, not an answer.
+  // STALL is what tells a climb from a plateau, and the first version of
+  // this had only the giveback test: a day that climbed to +$3 by 11:30
+  // and then sat there until 16:00, wobbling by pennies, came back as ONE
+  // band across the whole day -- the exact complaint this was written to
+  // fix, reproduced. A plateau gives nothing back; it simply stops making
+  // new highs, so that is what is measured.
+  var STALL_S = 1200;
+
+  function earnRuns(pts, floor, stall){
+    if(!pts || pts.length < 2) return [];
+    stall = stall || STALL_S;
+    var runs = [], i, v;
+    var si = 0, start = pts[0][1], pi = 0, peak = pts[0][1];
+    function close(){
+      if(peak > start)
+        runs.push({from: pts[si][0], to: pts[pi][0], gain: peak - start});
+    }
+    for(i = 1; i < pts.length; i++){
+      v = pts[i][1];
+      if(v > peak){ peak = v; pi = i; }
+      else if(peak - v > Math.max(floor, (peak - start) * 0.34)
+              || pts[i][0] - pts[pi][0] >= stall){
+        close();
+        si = pi = i; start = peak = v;
+      }
+      // At or below where this run began with nothing gained yet: that is
+      // not a drawdown inside a climb, it is a later place to start from.
+      // `<=` and not `<`, or a flat morning is shaded as part of the
+      // afternoon's climb.
+      if(v <= start && pi <= si){ si = pi = i; start = peak = v; }
+    }
+    close();
+    var big = runs.reduce(function(m, r){ return Math.max(m, r.gain); }, 0);
+    return runs.filter(function(r){
+      return r.gain >= Math.max(floor, big * 0.15); });
+  }
+
   // Cycles closer together than this are the same spell in the top 8.
   // Generous enough to bridge a publish that was skipped or slow, short
   // enough that the morning and the afternoon stay two separate visits.
@@ -1806,9 +1877,13 @@
       // the line is a cubic between knots -- a dot placed by straight-line
       // interpolation sits just off it and reads as a value the curve
       // does not show.
-      var runs = top8Runs(dd.top8 || []);
-      var lastLab = -1e9;
-      runs.forEach(function(r){
+      // THE FULL-HEIGHT SHADING IS THE EARNING, and nothing else. The
+      // floor scales with the panel so a day that moved cents and a day
+      // that moved dollars are both read at their own size.
+      var earn = earnRuns(pts, Math.max(0.02, (hi - lo) * 0.04));
+      var made = earn.reduce(function(m, r){
+        return !m || r.gain > m.gain ? r : m; }, null);
+      earn.forEach(function(r){
         var ax = X(r.from), bx = X(r.to);
         if(bx - ax < 2.4){ var mid = (ax+bx)/2; ax = mid - 1.2; bx = mid + 1.2; }
         marks += '<rect x="' + ax.toFixed(1) + '" y="' + pad.t + '" width="' +
@@ -1820,6 +1895,19 @@
           '<line class="hitline" x1="' + bx.toFixed(1) + '" y1="' + pad.t +
           '" x2="' + bx.toFixed(1) + '" y2="' + (pad.t+ph) +
           '" stroke="' + col + '"/>';
+      });
+
+      // THE TOP 8 IS STILL THE REASON THIS ACCOUNT HAS A PANEL, so its
+      // spells are kept -- as a strip along the very top, where they
+      // cannot be mistaken for the earning they used to be drawn as.
+      var runs = top8Runs(dd.top8 || []);
+      var lastLab = -1e9;
+      runs.forEach(function(r){
+        var ax = X(r.from), bx = X(r.to);
+        if(bx - ax < 2.4){ var mid = (ax+bx)/2; ax = mid - 1.2; bx = mid + 1.2; }
+        marks += '<rect x="' + ax.toFixed(1) + '" y="' + pad.t + '" width="' +
+          (bx-ax).toFixed(1) + '" height="3.5" fill="' + col +
+          '" opacity=".62"/>';
         var cx = (ax + bx) / 2;
         if(cx - lastLab >= 20){
           marks += '<text class="ax mid rk" x="' + cx.toFixed(1) + '" y="' +
@@ -1845,7 +1933,13 @@
         ' <b class="' + (end > 0 ? 'pos' : end < 0 ? 'neg' : 'dim') + '">' +
         (end > 0 ? '+' : end < 0 ? '\u2212' : '') + '$' +
         Math.abs(end).toFixed(2) + '</b>' +
-        '<em>low ' + hhmm(worst[0]) + ' \u00b7 high ' + hhmm(best[0]) +
+        '<em>' +
+        (made
+          ? 'made ' + hhmm(made.from) +
+            (made.to - made.from >= 60 ? '\u2013' + hhmm(made.to) : '') +
+            ' +$' + made.gain.toFixed(2) + ' \u00b7 '
+          : '') +
+        'low ' + hhmm(worst[0]) + ' \u00b7 high ' + hhmm(best[0]) +
         (runs.length
           ? ' \u00b7 top 8 ' +
             runs.slice(0, 4).map(function(r){
@@ -1856,7 +1950,9 @@
             (runs.length > 4 ? ' +' + (runs.length - 4) + ' more' : '')
           : '') +
         '</em></button>';
-      alt.push(daychip(dd.day) + ' ending ' + end.toFixed(2) + ' dollars');
+      alt.push(daychip(dd.day) + ' ending ' + end.toFixed(2) + ' dollars' +
+               (made ? ', earned between ' + hhmm(made.from) + ' and ' +
+                       hhmm(made.to) : ''));
     });
     if(!lines) return '';
 
@@ -1888,8 +1984,12 @@
       '<p class="dayhead">' + esc(head) + '<br>' +
       'Every day this account has traded, drawn against the clock and ' +
       'started at zero at its own first trade \u2014 so the same hour sits ' +
-      'in the same place on all of them. Dashed guides mark each cycle it ' +
-      'was inside the top 8.' +
+      'in the same place on all of them. <b>The shading is where the money ' +
+      'was made</b>: each climb, from the low it set off from to the high ' +
+      'it reached, and it stops at the high rather than running on through ' +
+      'the flat part after it. The thin strip along the top marks the ' +
+      'spells inside the top 8, which is a different thing and arrives ' +
+      'later.' +
       (ds.length > 1 ? ' Tap a day below to scroll the chart to it.' : '') +
       '</p>' +
       '<div class="chart">' +
