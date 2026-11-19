@@ -272,14 +272,29 @@
   .hours{margin:10px 0 2px}
   .hgrid{display:grid;grid-template-columns:repeat(24,1fr);gap:1px;
          height:76px}
-  .hcol{display:grid;grid-template-rows:1fr 1fr;border-radius:2px}
+  .hcol{display:flex;align-items:flex-end;border-radius:2px;
+        border-bottom:1px solid var(--rule)}
   .hcol:hover{background:var(--line)}
-  .hcol .up{display:flex;align-items:flex-end;
-            border-bottom:1px solid var(--rule)}
-  .hcol .dn{display:flex;align-items:flex-start}
-  .hcol i{display:block;width:100%;border-radius:1px}
-  .hcol .up i{background:var(--good)}
-  .hcol .dn i{background:var(--bad)}
+  .hcol i{display:block;width:100%;border-radius:1px;
+          background:var(--good)}
+  /* A LOSING HOUR IS NOT A BLANK ONE. Only earning hours get a bar now,
+     so without this an hour that gave back $8 and an hour that never
+     traded would render identically -- and the second is the stronger
+     claim. The loss keeps its magnitude in the climb line above; down
+     here it needs only to say "this hour traded and did not earn". */
+  .hcol.lost i{background:var(--rule);height:2px}
+  /* THE CLIMB. Twenty-four bars answer "which hour earned"; they cannot
+     answer "when does the money actually arrive", because a tall bar at
+     09:00 and a tall bar at 20:00 look the same whether the account
+     spent the afternoon giving it back or not. The running total does,
+     and its SLOPE is the answer: flat means nothing is happening, and
+     the peak is wherever the climb stops. */
+  .hclimb{display:block;width:100%;height:46px;margin-bottom:1px;
+          overflow:visible}
+  .hclimb .cl{fill:none;stroke:var(--good);stroke-width:1.6;
+              stroke-linejoin:round;stroke-linecap:round}
+  .hclimb .cl.down{stroke:var(--muted)}
+  .hclimb .z{stroke:var(--rule);stroke-width:1;stroke-dasharray:2 2}
   /* .72 AND NOT LESS. A faded bar still has to be a visible bar: at
      38% the green came out at 1.6:1 against the card, under the 3:1
      WCAG asks of a graphic that carries meaning. 72% measures 3.2:1
@@ -2060,15 +2075,46 @@
       var every = days > 1 && (p > 0 ? up === days : p < 0 ? dn === days : false);
       var txt = reading(r);
       alt.push(txt);
-      cols += '<div class="hcol' + (every ? '' : ' mixed') + '" title="' +
-        esc(txt) + '">' +
-        '<div class="up">' +
-          (p > 0 ? '<i style="height:' + px + 'px"></i>' : '') + '</div>' +
-        '<div class="dn">' +
-          (p < 0 ? '<i style="height:' + px + 'px"></i>' : '') + '</div>' +
+      cols += '<div class="hcol' + (every ? '' : ' mixed') +
+        (p > 0 ? '' : ' lost') + '" title="' + esc(txt) + '">' +
+        (p > 0 ? '<i style="height:' + px + 'px"></i>' : '<i></i>') +
         '</div>';
       dots += '<span>' + (every ? '<i></i>' : '') + '</span>';
     }
+
+    // THE CLIMB: the running total across the 24 hours, so the SLOPE
+    // shows where the money is actually made. A segment that falls is
+    // drawn grey rather than red -- the loss is already unmistakable
+    // from the direction, and a second alarm colour on a paper board
+    // trains a daily habit of reading yesterday's noise as news.
+    var CW = 240, CH = 46, run = 0, cum = [];
+    for(var q = 0; q < 24; q++){
+      var rq = by[q];
+      run += (rq ? rq[2] : 0);
+      cum.push(run);
+    }
+    var lo = Math.min(0, Math.min.apply(null, cum));
+    var hi = Math.max(0, Math.max.apply(null, cum));
+    var span = (hi - lo) || 1;
+    function CY(v){ return (CH - 3) - ((v - lo) / span) * (CH - 6); }
+    function CX(i){ return (i + 0.5) * (CW / 24); }
+    var segs = '', prev = 0;
+    for(var q2 = 0; q2 < 24; q2++){
+      var x1 = q2 === 0 ? 0 : CX(q2 - 1), y1 = CY(prev);
+      var x2 = CX(q2), y2 = CY(cum[q2]);
+      segs += '<path class="cl' + (cum[q2] < prev ? ' down' : '') +
+        '" d="M' + x1.toFixed(1) + ' ' + y1.toFixed(1) +
+        'L' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '"/>';
+      prev = cum[q2];
+    }
+    var peak = cum.indexOf(Math.max.apply(null, cum));
+    var climbSvg =
+      '<svg class="hclimb" viewBox="0 0 ' + CW + ' ' + CH + '" ' +
+      'preserveAspectRatio="none" role="img" aria-label="running total ' +
+      'through the day, ending ' + (run >= 0 ? 'up ' : 'down ') + '$' +
+      Math.abs(run).toFixed(2) + '">' +
+      '<line class="z" x1="0" y1="' + CY(0).toFixed(1) + '" x2="' + CW +
+        '" y2="' + CY(0).toFixed(1) + '"/>' + segs + '</svg>';
 
     var b = d.best, w = d.worst;
     // The day count travels WITH the dollars, always. "+$4 at 16:00"
@@ -2103,7 +2149,7 @@
       'arrived. ' + d.days + ' day' + (d.days === 1 ? '' : 's') + ', ' +
       d.n + ' settled trades. Kept in a table of its own, so deleting ' +
       'the trades does not delete this.</p>' +
-      '<div class="hours">' +
+      '<div class="hours">' + climbSvg +
       '<div class="hgrid" role="img" aria-label="profit by hour of day: ' +
         esc(alt.join('; ')) + '">' + cols + '</div>' +
       '<div class="hdot" aria-hidden="true">' + dots + '</div>' +
