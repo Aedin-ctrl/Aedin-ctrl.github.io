@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.21
+# CATHODE DESK — house style v4.22
 
 **Locked 2026-11-17. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -985,6 +985,108 @@ spreads backwards while every dot still runs forwards"*, the caption is
 `SCRIPT.md` in the build dir, written **after the gate and before `script.json`**,
 and it is the thing to read when the storyboard looks thin. The voice is built
 from `script.json`; `SCRIPT.md` is what proves `script.json` was worth building.
+
+## The picture must MOVE, not just BE — and the sweep that proves it
+
+**Added v4.22, after the viewer stopped watching at #035.** The note was
+*"it also feels too still -- remember, for almost every sentence there should
+be something happening. Words being typed doesn't help. There always needs to
+be movement and that's not happening."* It is correct, and it was true of
+nearly every piece in the library, not just that one.
+
+**The paired script above is about the SCRIPT. This is about the RENDER, and
+passing the first does not give you the second.** `SCRIPT.md` can honestly say
+*"the two kept shares pour into two buckets"* and the built beat can still
+fill both buckets in a third of a second at the top of the beat and then hold
+a dead picture for the next seven. The script promised an event; the render
+delivered a slide.
+
+### How it happened
+
+Beats are gated on booleans — `after(beat,line)`, `T>=BEAT.X.sc` — and a
+boolean has two states and no middle. So the built pattern became: **one eased
+arrival at the top of the beat, then nothing until the next boolean flips.**
+Measured over the drawing area of twenty five pieces, sampling eight times a
+second and diffing consecutive frames:
+
+| piece | median change between frames, while a sentence is being spoken |
+|---|---|
+| **jam** (#014) | **0.56%** |
+| bike (#022) | 0.39% |
+| tides · planes · pairs · blank · inside · tally · mask · most of the rest | **0.00%** |
+
+`jam` is the outlier because its content is a running simulation — twenty two
+cars that are *always* moving — so it could not go still even when the script
+stopped asking it to. **Everything else is a slideshow that the voice walks
+through.** That is the defect, stated in a number, and no sweep reported it
+because every sweep was counting *things present*, never *things changing*.
+
+### The rules
+
+1. **Every spoken sentence owns at least one visual event**, and the event
+   starts at or just before its first word and is still running when the
+   sentence is halfway through. One event per *beat* is not enough; a beat is
+   five to ten seconds and a sentence is three.
+2. **Nothing appears instantly.** Anything arriving travels in, grows in, or
+   eases in over **≥ 0.35s**, from somewhere the viewer can see it come from.
+   A shape that goes from absent to present between two frames reads as a
+   glitch, and it is what the viewer described as *"it does nothing and then
+   snaps back"*.
+3. **Text is not motion.** A caption typing, a label landing, a number
+   appearing and the status line changing are all explicitly excluded — the
+   sweep below measures the **drawing area only**, with the caption band and
+   the chrome outside its window, precisely so that typing cannot be mistaken
+   for an event. This is the same rule the paired script already states,
+   enforced where it was being lost.
+4. **The pointer is motion, it is free, and it is under-used.** Route it to
+   the thing the sentence is about and let it travel; a cursor crossing the
+   panel is a real event in a format whose whole conceit is someone operating
+   a program. If a sentence has no other event, it has the pointer.
+5. **Where the subject is genuinely continuous, let it run.** Fibres drift,
+   particles stream, a wave keeps travelling, a queue keeps orbiting. A thing
+   that would really be moving must not be frozen just because the sentence
+   about it has finished. This is what makes `jam` the only piece that passes.
+6. **Hold is allowed where there is no voice.** Silence may be still; speech
+   may not. The end card holds on purpose and is exempt.
+
+### The sweep
+
+```
+node render/_motion.mjs <slug> [--all]
+```
+
+It drives the real player, seeks eight times a second, reads the pixels of the
+drawing area only, and diffs consecutive frames. It reports:
+
+- **STILL UNDER SPEECH** — every stretch ≥ 1.0s in which under 0.2% of the
+  picture changed *while a line was being spoken*, attributed to the exact
+  sentence, so the fix has an address.
+- **SNAPS** — a frame in which over 9% of the picture changed after ≥ 0.6s of
+  nothing. Every snap is a failure of rule 2.
+
+**The bar: no still span over 2.5s while a line is being spoken, zero snaps,
+and a median change under speech of at least 0.15% as a floor.** The SPAN
+test is the one that decides — `jam` scores the library's best median, 0.56%,
+and still holds a 4.25s hole, and it is the hole a viewer notices, not the
+average. Two things are exempt and only two: the cold open while the dialog
+types the question, and the end card. The sweep names both separately rather
+than dropping them, so defining the problem away would be visible. A piece that does not clear it
+is not finished, however many of the fifteen sweeps read 0 — which is the
+whole lesson, again: *a rule that nothing measures is a rule that is not
+being followed.*
+
+## Say it the way the voice will read it
+
+**Added v4.22, from #031.** The narration said *lead*, meaning the metal, six
+times, and edge-tts read all six as the verb — *lead a horse*. The spoken text
+in `script.json` is **fed to the synthesiser verbatim and transcribed back by
+whisper for the word onsets**, so it is not a transcript, it is an instruction
+to a machine that cannot see context. Spell the sound, not the spelling:
+`led`. Captions and titles keep the real word, because those are read by eyes.
+
+Check every heteronym before synthesis — *lead · read · live · bow · wind ·
+close · minute · tear · row · object · present · desert · invalid · August* —
+and listen to the line rather than trusting the page.
 
 ## How it is displayed — what the evidence actually says
 
