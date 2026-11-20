@@ -241,7 +241,7 @@ function swatch(x,col,lab,sub){
              'center','"Silkscreen"');
 }
 /* --- the two levels and the gap between them --- */
-function levels(x,dLift,sDrop,lab,gapLab,col){
+function levels(x,dLift,sDrop,lab,gapLab,col,M){
   const L=Q.lev, w=L.w;
   /* the two levels start 160px apart and end 40 apart: they must never
      cross, or the picture says the 6s fell below the 5d. */
@@ -254,6 +254,20 @@ function levels(x,dLift,sDrop,lab,gapLab,col){
   linePix([[mx,dY],[mx,sY2+4]],H.rgba(H.mix(P.bone,P.ink,0.52)),2);
   linePix([[mx-5,sY2+14],[mx,sY2+4],[mx+5,sY2+14]],
           H.rgba(H.mix(P.bone,P.ink,0.52)),2);
+  /* THE JUMP IS NOT A DIAGRAM, IT IS A RATE. In a lit metal electrons are
+     being promoted out of the d shell continuously, and the arrow between
+     the two levels was a drawing of a thing that happens rather than the
+     thing happening. Two packets run it at opposite phases, and because they
+     run between the LEVELS they get shorter as the gap closes -- which is
+     the beat's whole claim, made by something moving. Phase from the column
+     and the packet index, never from Math.random. */
+  for(let k=0;k<2;k++){
+    const u=((M*0.70)+k*0.5+(x*0.0021))%1;
+    const py=Math.round(H.lerp(dY,sY2+4,u));
+    disc(mx,py,4,H.rgba(H.mix(col,P.paper,0.22)));
+    disc(mx,Math.round(H.lerp(dY,sY2+4,Math.max(0,u-0.055))),2,
+         H.rgba(H.mix(col,P.ink,0.46)));
+  }
   px(lab,x+w/2,L.bot+16,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
      'center','"Silkscreen"');
   if(gapLab) px(gapLab,x+w-4,Math.round((dY+sY2)/2)-7,14,
@@ -470,6 +484,70 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* ===== NOTHING IN THIS PIECE IS STILL =====
+       Two things are running for the whole ninety seconds of this subject
+       and both of them were drawn as photographs: the electrons, which are
+       going round at a measurable fraction of the speed of light and never
+       stop, and the daylight, which is landing on this metal and being
+       handed back minus its blue end for every second it is lit. One orbit
+       helper and one photon helper carry the whole piece: in SPEED the
+       outer electrons are slow and the inner one is a streak, in MASS the
+       same two s electrons ride the shell as it contracts, in GAP the blue
+       photons go in and do not come out, and in SILVER the identical stream
+       comes back whole. Nothing is invented to fill a gap -- these are the
+       two things the sources are about.
+       Deterministic: phases come from the element's index, never from
+       Math.random. */
+    const jit=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+    const orbit=(cx,cy,r,n,spd,col,sz,seed,tr)=>{
+      const dir=spd<0?-1:1;
+      for(let i=0;i<n;i++){
+        const a0=M*spd+i*(Math.PI*2/n)+jit(seed+i)*0.5;
+        /* the trail is not decoration: at this speed an electron IS a streak
+           over any exposure a person could take, and it is also what makes a
+           ten pixel dot read as moving rather than as being somewhere. */
+        for(let k=(tr||0);k>0;k--){
+          const a=a0-dir*k*0.115;
+          disc(Math.round(cx+Math.cos(a)*r),Math.round(cy+Math.sin(a)*r),
+               Math.max(2,sz-Math.ceil(k*0.7)),
+               H.rgba(H.mix(col,P.ink,Math.min(0.9,k*0.17))));
+        }
+        disc(Math.round(cx+Math.cos(a0)*r),Math.round(cy+Math.sin(a0)*r),
+             sz,H.rgba(col));
+      }
+    };
+    /* --- DAYLIGHT, ARRIVING AND LEAVING. Each photon carries a real
+       wavelength, so its x is where that wavelength sits on the bar below and
+       its colour is wl2rgb of it; whether it comes back is survive() against
+       the same cut the bar is drawn with. The picture cannot disagree with
+       the spectrum under it because both read the same function. --- */
+    const PHN=22, PHTOP=132;
+    const photons=(cut,lit)=>{
+      const S=Q.spec;
+      for(let i=0;i<PHN;i++){
+        const w=VIS_LO+(VIS_HI-VIS_LO)*((i+0.5)/PHN);
+        const x=nmX(w)-2, c=wl2rgb(w);
+        const ph=((M*0.26)+jit(i+5))%1;
+        let y, dim=0;
+        /* 0.5, not 0.45: survive() is 0.5 exactly AT the cut, so the last
+           photon that goes in and the first that comes back out straddle the
+           dashed line the beat prints 539 NM against. At 0.45 the boundary
+           sat about three nanometres to the red of its own label. */
+        if(lit&&survive(w,cut)<0.5){
+          /* in, and not out again: it spent itself lifting a d electron */
+          const deep=S.y+12+jit(i+61)*24, u=ph*1.7;
+          if(u>1) continue;
+          y=H.lerp(PHTOP,deep,u);
+          dim=H.clamp((u-0.76)/0.24);
+        }else{
+          y = ph<0.5 ? H.lerp(PHTOP,S.y-3,ph*2)
+                     : H.lerp(S.y-3,PHTOP,(ph-0.5)*2);
+        }
+        rect(x,Math.round(y),5,7,
+             H.rgba([c[0]*(1-dim),c[1]*(1-dim),c[2]*(1-dim)]));
+      }
+    };
+
     /* ============ SPEED -- how fast the inner electrons go ============= */
     if(T>=BEAT.SPEED.sc&&T<BEAT.MASS.sc){
       px('ONE GOLD ATOM',Q.cx,110,14,
@@ -479,6 +557,14 @@ function explainer(ctx,W2,Hh,t){
         disc(A.cx,A.cy,26,H.rgba(H.mix(P.red,P.ink,0.30)));
         if(GBOX)GBOX.push({x:A.cx-26,y:A.cy-26,w:52,h:52,k:'nucbox'});
         px('+'+Z_AU,A.cx,A.cy-9,20,H.rgba(P.paper),'center','"Silkscreen"');
+        /* the other seventy eight do not wait for their sentence. They are in
+           their shells and they are going round, and they are going round
+           SLOWLY -- which is the comparison the next line is about to make
+           with the one that is not. */
+        ringPix(A.cx,A.cy,90,H.rgba(H.mix(P.bone,P.ink,0.80)),1);
+        ringPix(A.cx,A.cy,116,H.rgba(H.mix(P.bone,P.ink,0.82)),1);
+        orbit(A.cx,A.cy,90,5,0.54,H.mix(P.cyan,P.ink,0.50),3,11);
+        orbit(A.cx,A.cy,116,7,-0.40,H.mix(P.cyan,P.ink,0.56),3,29);
       }
       if(after(1,6)){
         /* the innermost shell, and one electron running round it fast
@@ -524,27 +610,34 @@ function explainer(ctx,W2,Hh,t){
              H.rgba(c),null,'"Silkscreen"');
         });
       }
-      if(after(4,0)){
-        /* the shell it sits in, before and after */
-        const cy=350, r0=78;
-        ringPix(A.cx,cy,r0,H.rgba(H.mix(P.bone,P.ink,0.60)),2,'shell0');
-        if(after(4,13)){
-          const g=H.ease.inOut(H.clamp((M-wordAt(4,13))/1.2));
-          const r1=Math.round(r0*(1-SHRINK*g));
-          ringPix(A.cx,cy,r1,H.rgba(P.cyan),3,'shell1');
-          linePix([[A.cx+r1,cy],[A.cx+r0,cy]],H.rgba(P.red),2);
-          px('-'+Math.round(SHRINK*100)+'%',A.cx+r0+8,cy-7,20,
-             H.rgba(P.red),null,'"Silkscreen"');
-        }
+      /* THE SHELL, AND THE TWO ELECTRONS IN IT, from the top of the beat --
+         an s shell holds exactly two and they are going round it the whole
+         time this beat is on screen. It used to arrive with its label on
+         sentence four and then hold a photograph of itself for nine seconds
+         while the narrator explained what it was doing. */
+      const SCY=350, R0=78, lit4=after(4,0);
+      ringPix(A.cx,SCY,R0,H.rgba(H.mix(P.bone,P.ink,lit4?0.60:0.76)),2,'shell0');
+      orbit(A.cx,SCY,R0,2,2.3,H.mix(P.cyan,P.ink,lit4?0.20:0.46),6,3,5);
+      if(after(4,13)){
+        const g=H.ease.inOut(H.clamp((M-wordAt(4,13))/1.2));
+        const r1=Math.round(R0*(1-SHRINK*g));
+        ringPix(A.cx,SCY,r1,H.rgba(P.cyan),3,'shell1');
+        /* and a smaller orbit is a faster one, at the same speed */
+        orbit(A.cx,SCY,r1,2,2.3*(R0/Math.max(1,r1)),P.cyan,6,17,5);
+        linePix([[A.cx+r1,SCY],[A.cx+R0,SCY]],H.rgba(P.red),2);
+        px('-'+Math.round(SHRINK*100)+'%',A.cx+R0+8,SCY-7,20,
+           H.rgba(P.red),null,'"Silkscreen"');
       }
       if(after(5,1)){
         /* and every s shell above it comes in too */
-        const cy=350, g=H.clamp((M-wordAt(5,1))/2.0);
+        const g=H.clamp((M-wordAt(5,1))/2.0);
         [100,118,134].forEach((r,i)=>{
           const f=H.clamp(g*3-i);
           if(f<=0) return;
           const rr=Math.round(r*(1-SHRINK*H.ease.inOut(f)));
-          ringPix(A.cx,cy,rr,H.rgba(H.mix(P.cyan,P.ink,0.30+i*0.12)),2);
+          ringPix(A.cx,SCY,rr,H.rgba(H.mix(P.cyan,P.ink,0.30+i*0.12)),2);
+          /* two apiece, because they are s shells too */
+          orbit(A.cx,SCY,rr,2,1.5-i*0.28,H.mix(P.cyan,P.ink,0.30+i*0.12),4,40+i*7,3);
         });
         if(after(5,13)) px('UP TO THE OUTERMOST',Q.cx,Q.rows[0],14,
                            H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
@@ -564,21 +657,38 @@ function explainer(ctx,W2,Hh,t){
         const EL=['CS','LA','HF','W','PT','AU','HG','TL','PB'];
         const Vq=[0.30,0.40,0.62,0.74,0.88,1.00,0.92,0.80,0.72];
         Vq.forEach((v,i)=>{
+          /* the row arrives ACROSS, one element at a time, which is the
+             direction the sentence reads it in */
+          const gb=H.clamp((M-wordAt(6,0)-i*0.17)/0.42);
+          if(gb<=0) return;
           const x=bx+Math.round(i*(bw/(EL.length-1)))-7;
-          const h=Math.round(bh*v);
+          const h=Math.max(1,Math.round(bh*v*gb));
           rect(x,by+bh-h,14,h,H.rgba(i===5?P.gold:H.mix(P.bone,P.ink,0.56)));
-          if(i===5) px('AU',x+7,by+bh+6,14,H.rgba(P.gold),'center','"Silkscreen"');
+          if(i===5&&gb>=0.999)
+            px('AU',x+7,by+bh+6,14,H.rgba(P.gold),'center','"Silkscreen"');
         });
         if(GBOX)GBOX.push({x:bx-10,y:by,w:bw+20,h:bh+6,k:'peakbox'});
+        /* and a read-head runs the row, back and forth, for as long as it is
+           up: a trend across a period is a thing you read ACROSS, and the
+           dot is on the curve, so the peak at gold is something the picture
+           arrives at rather than something it labels. It ping-pongs -- a
+           head that jumps back to caesium is a cut, not a sweep. */
+        { const u=Math.abs(((M*0.30)%2)-1);
+          const sx=bx+Math.round(u*bw);
+          const fi=u*(Vq.length-1), i0=Math.min(Vq.length-2,Math.floor(fi));
+          const vv=H.lerp(Vq[i0],Vq[i0+1],fi-i0);
+          rect(sx,by-10,3,bh+18,H.rgba(H.mix(P.bone,P.ink,0.44)));
+          disc(sx+1,by+bh-Math.round(bh*vv),5,H.rgba(H.mix(P.gold,P.paper,0.24)));
+        }
       }
       if(after(7,0)){
         const drop=after(7,24)?Math.round(70*H.ease.inOut(
                       H.clamp((M-wordAt(7,24))/1.3))):0;
         const lift=after(7,12)?Math.round(30*H.ease.inOut(
                       H.clamp((M-wordAt(7,12))/1.3))):0;
-        levels(L.x1,0,0,'NO RELATIVITY',null,H.mix(P.bone,P.ink,0.46));
+        levels(L.x1,0,0,'NO RELATIVITY',null,H.mix(P.bone,P.ink,0.46),M);
         levels(L.x2,lift,drop,'WITH IT',
-               after(8,1)?EV_AU+' EV':null,P.gold);
+               after(8,1)?EV_AU+' EV':null,P.gold,M);
       }
     }
 
@@ -587,7 +697,14 @@ function explainer(ctx,W2,Hh,t){
       px('WHAT GOLD DOES TO DAYLIGHT',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const S=Q.spec;
-      if(after(9,0)) spectrum(after(10,11)?NM_AU:0,after(10,11));
+      if(after(9,0)){
+        spectrum(after(10,11)?NM_AU:0,after(10,11));
+        /* BEFORE the cut goes in, every photon comes back. After it, the ones
+           with more than 2.3 eV go in and stay in -- and this is the one
+           thing in the beat that is a PROCESS rather than a reading, so it is
+           the thing that runs under the sentence that explains it. */
+        photons(after(10,11)?NM_AU:0,after(10,11));
+      }
       if(after(10,2)){
         const x=nmX(NM_AU);
         for(let y=S.y-16;y<S.y+S.h+16;y+=8) rect(x,y,2,5,H.rgba(P.paper));
@@ -611,6 +728,11 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const S=Q.spec;
       spectrum(after(13,2)?NM_AG:NM_AU,true);
+      /* the identical stream against the identical function, with one number
+         changed: once the cut moves into the ultraviolet, every visible
+         photon on screen comes back out, which is the comparison the piece
+         has spent ninety seconds earning. */
+      photons(after(13,2)?NM_AG:NM_AU,true);
       if(after(13,2)){
         const x=nmX(NM_AG);
         for(let y=S.y-16;y<S.y+S.h+16;y+=8) rect(x,y,2,5,H.rgba(P.paper));

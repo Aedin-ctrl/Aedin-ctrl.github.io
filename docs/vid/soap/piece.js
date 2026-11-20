@@ -169,7 +169,7 @@ function arrow(x0,y0,x1,y1,col,th){
 /* --- ONE MOLECULE. A head and one tail is soap; a head and two tails is a
    membrane lipid. Nothing else about them differs anywhere in this piece,
    which is the argument. --- */
-function mol(x,y,ang,len,two,hcol,tcol){
+function mol(x,y,ang,len,two,hcol,tcol,ph){
   const mx=Math.cos(ang), my=Math.sin(ang), nx=-my, ny=mx;
   /* two tails have to be TELLABLE from one at thirteen pixels across, so
      they leave the head from opposite sides and splay as they go */
@@ -178,7 +178,12 @@ function mol(x,y,ang,len,two,hcol,tcol){
     const a=ang+(two?(k===0?-0.13:0.13):0);
     const cx=Math.cos(a), cy=Math.sin(a);
     const sx=x+nx*o, sy=y+ny*o, pts=[];
-    for(let i=0;i<=5;i++){ const u=i/5, w=(i%2?1.7:-1.7)*(i===0?0:1);
+    /* a hydrocarbon chain is not a rigid zigzag -- it writhes, which is the
+       whole reason it will not sit in water -- so when a caller passes a
+       phase the kinks travel down it instead of standing still. */
+    for(let i=0;i<=5;i++){ const u=i/5;
+      const w=(ph===undefined?(i%2?1.7:-1.7):Math.sin(u*8.2+ph+k*1.9)*1.9)
+              *(i===0?0:1);
       pts.push([sx+cx*len*u+nx*w, sy+cy*len*u+ny*w]); }
     linePix(pts,H.rgba(tcol),2);
   });
@@ -196,9 +201,33 @@ const WDOT=(()=>{ const r=H.rng(5051), o=[];
   for(let i=0;i<260;i++) o.push([130+r()*270, 328+r()*82, r()]);
   return o; })();
 function waterBody(y0,y1,x0,x1,T){
-  WDOT.forEach(d=>{ const x=x0+((d[0]-130)/270)*(x1-x0);
-    const y=y0+((d[1]-328)/82)*(y1-y0)+Math.sin(T*0.9+d[2]*9)*1.2;
+  /* water at twenty five degrees is not a still photograph of water. The
+     old rate was 0.9 rad/s against a 1.2 px swing -- about a tenth of a
+     pixel between frames, which is a picture of nothing. */
+  WDOT.forEach(d=>{ const x=x0+((d[0]-130)/270)*(x1-x0)
+                            +Math.cos(T*5.1+d[2]*27)*1.6;
+    const y=y0+((d[1]-328)/82)*(y1-y0)+Math.sin(T*6.4+d[2]*19)*2.0;
     rect(Math.round(x),Math.round(y),1,1,H.rgba(watC(0.66+d[2]*0.14))); });
+}
+/* deterministic jitter -- Math.random is forbidden, the render must come out
+   the same frame for frame */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+/* --- A SURFACE IS NOT A SETTLED PLACE. Soap at a water surface is in
+   constant exchange with the bulk: molecules arrive from below, stand up,
+   and are knocked back down, every second of both beats that are about it.
+   When the surface is FULL they get to just under it and are turned back --
+   which is the next beat's claim, drawn before anybody says it. --- */
+function arrivals(m,n,full){
+  const W=Q.wat, top=W.y+12, bot=W.deep-16;
+  for(let i=0;i<n;i++){
+    const p=((m*0.50)+jit(i*5+3))%1;
+    const x=W.x0+26+jit(i*7+11)*(W.x1-W.x0-52);
+    const u=full?(p<0.5?p*2:(1-p)*2):p;
+    const y=full?H.lerp(bot,top+14,H.ease.inOut(u)):H.lerp(bot,top,u);
+    const ang=(full&&p>=0.5)?Math.PI/2:-Math.PI/2;
+    mol(Math.round(x),Math.round(y),ang+Math.sin(m*3.1+i*2.2)*0.20,16,false,
+        H.mix(soapH(),P.ink,0.34),H.mix(soapT(),P.ink,0.32),m*5.6+i*2.4);
+  }
 }
 /* --- THE GAUGE. One bar, and the earlier reading stays on it as a line, so
    the fall is a comparison and not a memory. --- */
@@ -237,19 +266,24 @@ function dial(conc,show){
    three of them soap IS 6000 in 32000, exactly, so the sheet on screen is
    drawn at the fraction the experiment measured and never at a prettier one. */
 const SUBN=3;
-function bilayer(T,subs,bow,tear){
-  const Bl=Q.bil, step=(Bl.x1-Bl.x0)/(Bl.n-1), half=28;
+function bilayer(T,subs,bow,tear,fade){
+  const Bl=Q.bil, step=(Bl.x1-Bl.x0)/(Bl.n-1), half=28, f=fade||0;
   const yoff=(x)=>bow*Math.exp(-Math.pow((x-Q.cx)/92,2));
   for(let i=0;i<Bl.n;i++){
-    const x0=Bl.x0+i*step, x=x0+(x0<Q.cx?-1:1)*tear*0.5;
-    const o=yoff(x), wob=Math.sin(T*1.1+i*0.7)*0.8;
+    const x0=Bl.x0+i*step;
+    /* A MEMBRANE UNDULATES. Bilayer bending fluctuations are real and they
+       are the reason the thing is a liquid and not a wall; the old swing was
+       0.8 px at 1.1 rad/s, which between two frames is nothing at all. */
+    const x=x0+(x0<Q.cx?-1:1)*tear*0.5+Math.cos(T*3.1+i*1.3)*1.5;
+    const o=yoff(x), wob=Math.sin(T*4.4+i*0.7)*2.6;
     const isS=subs.indexOf(i)>=0;
+    const hc=isS?soapH():lipH(), tc=isS?soapT():lipT();
     mol(x,Bl.up-o+wob,Math.PI/2,half,!isS,
-        isS?soapH():lipH(), isS?soapT():lipT());
-    mol(x,Bl.dn+o+wob,-Math.PI/2,half,!isS,
-        isS?soapH():lipH(), isS?soapT():lipT());
+        H.mix(hc,P.ink,f),H.mix(tc,P.ink,f),T*5.2+i*1.1);
+    mol(x,Bl.dn+o-wob,-Math.PI/2,half,!isS,
+        H.mix(hc,P.ink,f),H.mix(tc,P.ink,f),T*5.2+i*1.1+2.6);
   }
-  if(GBOX)GBOX.push({x:Bl.x0-10-tear,y:Bl.up-bow-14,
+  if(GBOX&&f<0.5)GBOX.push({x:Bl.x0-10-tear,y:Bl.up-bow-14,
                      w:Bl.x1-Bl.x0+20+tear*2,
                      h:(Bl.dn+bow+14)-(Bl.up-bow-14),k:'sheetbox'});
 }
@@ -258,10 +292,14 @@ function bilayer(T,subs,bow,tear){
    both. The ball in the BALL beat is soap and nothing else; drawing it in
    lipid colours would have the piece contradict its own argument. */
 function micelle(cx,cy,r,n,T,kind){
-  for(let i=0;i<n;i++){ const a=i/n*Math.PI*2+T*0.08;
+  /* A MICELLE TUMBLES. Its real rotational correlation time is nanoseconds,
+     so anything drawable is already a slowdown -- T*0.08 was a photograph of
+     a ball, which is not what a ball of soap in water is. */
+  for(let i=0;i<n;i++){ const a=i/n*Math.PI*2+T*0.85;
     const s = kind==='soap' ? true : kind==='lipid' ? false : (i%3===0);
-    mol(cx+Math.cos(a)*r, cy+Math.sin(a)*r, a+Math.PI, r-7, !s,
-        s?soapH():lipH(), s?soapT():lipT()); }
+    mol(cx+Math.cos(a)*r, cy+Math.sin(a)*r, a+Math.PI,
+        Math.max(4,r-7), !s,
+        s?soapH():lipH(), s?soapT():lipT(), T*5.0+i*1.6); }
 }
 /* --- THE VIRUS. Spikes, a membrane, a coiled genome. The END beat draws the
    same object twice: once whole, once with the membrane gone and nothing
@@ -281,7 +319,7 @@ function virus(cx,cy,r,membrane,T,loose){
     ringPix(cx,cy,r-6,H.rgba(lipT()),2);
   }
   const g=[];
-  for(let i=0;i<=70;i++){ const u=i/70, a=u*Math.PI*6.4, rr=4+u*(r-20);
+  for(let i=0;i<=70;i++){ const u=i/70, a=u*Math.PI*6.4+T*0.40, rr=4+u*(r-20);
     g.push([cx+Math.cos(a)*rr, cy+Math.sin(a)*rr*0.86]); }
   linePix(g,H.rgba(P.red),2);
 }
@@ -520,9 +558,16 @@ function explainer(ctx,W2,Hh,t){
       /* one molecule stands up in the surface, then eleven more */
       if(after(2,13)){
         const n=Math.min(12,1+Math.floor((M-wordAt(2,13))/0.30));
+        /* standing at a surface is not standing still: the heads bob in the
+           water line and the tails wave about above it, which is what the
+           tails are doing every second they are up there. */
         for(let i=0;i<n;i++)
-          mol(SURFX(i),W.y+4,-Math.PI/2,20,false,soapH(),soapT());
+          mol(SURFX(i),W.y+4+Math.sin(M*3.3+i*1.9)*1.5,
+              -Math.PI/2+Math.sin(M*4.1+i*2.3)*0.21,20,false,
+              soapH(),soapT(),M*5.4+i*1.4);
       }
+      /* and the surface is being topped up from below, continuously */
+      if(after(2,0)) arrivals(M,5,false);
       px('MILLINEWTONS PER METRE',Q.cx,Q.under,14,dim(0.34),
          'center','"Silkscreen"');
       if(after(1,12))
@@ -544,7 +589,14 @@ function explainer(ctx,W2,Hh,t){
       gauge(SIG_S,SIG_W);
       px(SIG_S.toFixed(1),78,gy(SIG_S)-16,14,dim(0.40),null,'"Silkscreen"');
       for(let i=0;i<12;i++)
-        mol(SURFX(i),W.y+4,-Math.PI/2,20,false,soapH(),soapT());
+        mol(SURFX(i),W.y+4+Math.sin(M*3.3+i*1.9)*1.5,
+            -Math.PI/2+Math.sin(M*4.1+i*2.3)*0.21,20,false,
+            soapH(),soapT(),M*5.4+i*1.4);
+      /* THE SURFACE IS FULL, so the ones coming up get to just under it and
+         are turned back. That is the sentence, running, for the whole beat
+         -- the three scripted arrivals are still the event the words land
+         on, they just are not the only thing on screen any more. */
+      arrivals(M,6,true);
       /* three arrivals bounce off a full surface, then the rejects curl up */
       const snap=H.ease.inOut(H.clamp((M-wordAt(5,14))/1.30));
       if(after(4,2)&&snap<0.02){
@@ -573,10 +625,23 @@ function explainer(ctx,W2,Hh,t){
       px('THE SAME SHAPE, SOLVED TWICE',Q.cx,Q.head,14,dim(0.28),
          'center','"Silkscreen"');
       /* side by side: one tail, and two */
-      mol(140,196,Math.PI/2,44,false,soapH(),soapT());
+      /* and they are IN WATER, which is the half of the sentence the beat
+         was drawing nothing for -- "a water liking head on oily tails" with
+         no water anywhere on screen. It is also the only thing in this part
+         of the beat with enough of it to be seen moving. */
+      waterBody(164,246,106,334,T+5);
+      /* A FREE AMPHIPHILE IN WATER TUMBLES. These two are not specimens
+         pinned to a card -- they are molecules in solution, so they sway and
+         their chains writhe, which is also why neither of them can leave its
+         tails in the water and why the next beat happens at all. */
+      const sway=(ph)=>Math.PI/2+Math.sin(M*2.9+ph)*0.40
+                                +Math.sin(M*5.3+ph*1.7)*0.12;
+      mol(140,196+Math.sin(M*2.1)*5,sway(0),44,false,
+          soapH(),soapT(),M*7.0);
       px('SOAP',140,250,14,H.rgba(P.cyan),'center','"Silkscreen"');
       if(after(6,6)){
-        mol(292,196,Math.PI/2,44,true,lipH(),lipT());
+        mol(292,196+Math.sin(M*2.1+2.4)*5,sway(1.9),44,true,
+            lipH(),lipT(),M*7.0+1.3);
         px('MEMBRANE LIPID',292,250,14,H.rgba(P.gold),
            'center','"Silkscreen"');
       }
@@ -632,31 +697,41 @@ function explainer(ctx,W2,Hh,t){
                     :'UNTIL IT CANNOT HOLD ITS SHAPE',Q.cx,Q.head,14,dim(0.28),
          'center','"Silkscreen"');
       const Bl=Q.bil;
-      if(!after(13,3)){
+      /* THE SHEET DOES NOT CUT TO MICELLES. It used to vanish between two
+         frames with three balls in its place -- eleven percent of the
+         picture changing in an eighth of a second, which is exactly the
+         "it does nothing and then snaps back" the viewer complained of.
+         It comes apart instead: the sheet tears further and fades while the
+         micelles grow out of where it was. */
+      const go=after(13,3)?H.clamp((M-wordAt(13,3))/0.95):0;
+      if(go<0.995){
         const COLS=[9,4,13];
         const bow=24*H.ease.inOut(H.clamp((M-wordAt(10,2))/2.20));
         const tear=34*H.ease.inOut(H.clamp((M-wordAt(10,11))/1.10));
         waterBody(Bl.up-56,Bl.up-18,Bl.x0,Bl.x1,T+7);
-        bilayer(T,COLS,bow,tear);
+        bilayer(T,COLS,bow,tear+16*go,go);
         waterBody(Bl.dn+34,Bl.dn+70,Bl.x0,Bl.x1,T+3);
-      } else {
-        /* what is left of the sheet drifts off as mixed micelles */
+      }
+      if(after(13,3)){
+        /* what is left of the sheet drifts off as mixed micelles, and they
+           tumble, because a micelle in water does nothing else */
         const g=H.clamp((M-wordAt(13,3))/3.00);
         for(let i=0;i<3;i++){
           const cxm=H.lerp(216,96+i*120,g), cym=300+Math.sin(g*4+i*2)*14;
-          micelle(cxm,cym,24,10,T+i,'mixed');
+          micelle(cxm,cym,9+15*H.ease.out(go),10,T+i,'mixed');
         }
       }
       /* the one measurement this piece has for when it breaks */
-      if(after(11,11)&&!after(13,3)){
+      if(after(11,11)&&go<0.995){
         const B0=140, B1=400, w6=Math.round((B1-B0)*BOUND/MEMB);
-        px('SOAP',130,432,14,H.rgba(P.cyan),'right','"Silkscreen"');
-        rect(B0,434,w6,10,H.rgba(P.cyan));
-        px(BOUND+'',B0+w6+8,430,14,H.rgba(P.cyan),null,'"Silkscreen"');
+        const cy2=H.mix(P.cyan,P.ink,go), go2=H.mix(P.gold,P.ink,go);
+        px('SOAP',130,432,14,H.rgba(cy2),'right','"Silkscreen"');
+        rect(B0,434,Math.max(1,Math.round(w6*(1-go))),10,H.rgba(cy2));
+        px(BOUND+'',B0+w6+8,430,14,H.rgba(cy2),null,'"Silkscreen"');
         if(after(12,6)){
-          px('MEMBRANE',130,462,14,H.rgba(P.gold),'right','"Silkscreen"');
-          rect(B0,464,B1-B0,10,H.rgba(P.gold));
-          px(MEMB+'',B1,452,14,H.rgba(P.gold),'right','"Silkscreen"');
+          px('MEMBRANE',130,462,14,H.rgba(go2),'right','"Silkscreen"');
+          rect(B0,464,Math.max(1,Math.round((B1-B0)*(1-go))),10,H.rgba(go2));
+          px(MEMB+'',B1,452,14,H.rgba(go2),'right','"Silkscreen"');
         }
       }
       if(after(11,11))

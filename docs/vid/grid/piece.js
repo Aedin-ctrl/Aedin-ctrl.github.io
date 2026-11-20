@@ -147,6 +147,11 @@ function boardStats(g,N){
 function runSim(N,k,emptyFrac,seed,maxRounds){
   const r=mulberry32(seed), g=startBoard(N,emptyFrac,r);
   const hist=[Int8Array.from(g)];
+  /* WHO went WHERE, kept round by round. The board states alone cannot say
+     that -- and without it a round is a cut between two pictures instead of
+     a set of squares travelling, which is what the rule actually says
+     happens. moves[i] takes hist[i] to hist[i+1]. */
+  const moves=[];
   for(let round=0;round<maxRounds;round++){
     const un=[], em=[];
     for(let i=0;i<g.length;i++){
@@ -155,18 +160,30 @@ function runSim(N,k,emptyFrac,seed,maxRounds){
     if(!un.length) break;
     for(const a of [un,em]) for(let i=a.length-1;i>0;i--){
       const j=Math.floor(r()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
-    let moved=0;
+    let moved=0; const mv=[];
     for(const u of un){ const me=g[u]; let dest=-1;
       for(let q=0;q<em.length;q++){ const e=em[q];
         if(e===u||g[e]) continue;
         g[u]=0; const ok=content(g,N,e,me,k); g[u]=me;
         if(ok){ dest=e; em.splice(q,1); break; } }
       if(dest<0) continue;
-      g[dest]=me; g[u]=0; em.push(u); moved++; }
-    hist.push(Int8Array.from(g));
+      g[dest]=me; g[u]=0; em.push(u); moved++; mv.push([u,dest,me]); }
+    hist.push(Int8Array.from(g)); moves.push(mv);
     if(!moved) break;
   }
-  return {hist, ...boardStats(g,N)};
+  return {hist, moves, ...boardStats(g,N)};
+}
+/* Which squares FAIL the rule on a given board at a given k. The pass that
+   runs on screen rings exactly these, so "unhappy" is never a decoration:
+   it is the same predicate the engine moves on, asked again at draw time. */
+const UNH=new Map();
+function unhappy(cells,k){
+  let m=UNH.get(cells); if(!m){ m={}; UNH.set(cells,m); }
+  if(m[k]) return m[k];
+  const u=new Uint8Array(cells.length);
+  for(let i=0;i<cells.length;i++){
+    if(cells[i]&&!content(cells,GN,i,cells[i],k)) u[i]=1; }
+  return (m[k]=u);
 }
 const SIM={};
 SIM.a=runSim(GN,KA,GEMPTY,GSEED,400);
@@ -203,11 +220,12 @@ const gx=(c)=>Q.g.x+c*Q.g.s, gy=(r)=>Q.g.y+r*Q.g.s;
 
 /* --- THE BOARD. One call; which board and which round is the only thing any
    beat changes, because the board is the piece. --- */
-function board(cells,lit){
+function board(cells,lit,gone){
   const G=Q.g, S=G.s;
   rect(G.x-3,G.y-3,GN*S+6,GN*S+6,H.rgba(H.mix(P.bone,P.ink,0.84)));
   for(let i=0;i<cells.length;i++){
     const v=cells[i]; if(!v) continue;
+    if(gone&&gone.has(i)) continue;        // this one is in the air right now
     const c=i%GN, r=(i/GN)|0;
     rect(G.x+c*S,G.y+r*S,S-1,S-1,
          H.rgba(v===1?H.mix(P.cyan,P.ink,0.06):H.mix(P.gold,P.ink,0.06)));
@@ -227,6 +245,68 @@ function board(cells,lit){
                H.rgba(P.paper),2);
   }
 }
+/* --- A ROUND IS A TRAVEL, NOT A CUT. Every square that moves this round is
+   drawn between the cell it left and the cell it is taking, so the board
+   never teleports from one photograph to the next -- which is both what the
+   rule describes ("I move") and the reason the old build snapped twelve per
+   cent of the picture in a single frame. The stagger is derived from the
+   square's own index: no Math.random anywhere near a frame. --- */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+function flyers(sim,i0,f){
+  const G=Q.g, S=G.s, mv=sim.moves[i0]||[];
+  for(let q=0;q<mv.length;q++){
+    const a=mv[q][0], b2=mv[q][1], v=mv[q][2];
+    const e=H.ease.inOut(H.clamp((f-0.22*jit(a))/0.78));
+    const ax=G.x+(a%GN)*S, ay=G.y+((a/GN)|0)*S;
+    const bx=G.x+(b2%GN)*S, by=G.y+((b2/GN)|0)*S;
+    const x=H.lerp(ax,bx,e), y=H.lerp(ay,by,e)-Math.sin(e*Math.PI)*4;
+    rect(Math.round(x),Math.round(y),S-1,S-1,
+         H.rgba(v===1?H.mix(P.cyan,P.paper,0.30):H.mix(P.gold,P.paper,0.30)));
+  }
+}
+/* the board at a FRACTIONAL round index, so a beat can hold the run mid-move
+   instead of only between moves. Returns the settled cells it drew. */
+function runBoard(sim,rr,lit){
+  const n=sim.hist.length;
+  const i0=Math.max(0,Math.min(n-1,Math.floor(rr)));
+  const f=(rr<=0)?0:(rr>=n-1?1:(rr-i0));
+  const mv=(f>0&&f<1&&sim.moves[i0]&&sim.moves[i0].length)?sim.moves[i0]:null;
+  board(sim.hist[i0],lit,mv?new Set(mv.map(m=>m[0])):null);
+  if(mv) flyers(sim,i0,f);
+  return sim.hist[i0];
+}
+
+/* --- THE PASS THAT NEVER STOPS. The model does not sit still between
+   rounds: it tests every square, every round, and the rounds end only
+   because one whole pass found nobody left to move. So the pass is on the
+   screen for as long as the board is -- it sweeps, and it rings every
+   square it finds failing the rule. It argues the piece for free: at two of
+   eight the sweep comes back almost empty, at three of eight it lights up,
+   and the frame in which the rule changes from two to three is a settled
+   board filling with rings without a single square having moved. --- */
+const SCAN_PER=4.0, SCAN_TAIL=6;
+function scan(cells,k,m){
+  const G=Q.g, S=G.s, W2=GN*S-1;
+  const u=unhappy(cells,k);
+  const yr=((m/SCAN_PER)%1)*GN, row=Math.floor(yr);
+  for(let d=SCAN_TAIL;d>=1;d--){
+    const r=row-d; if(r<0||r>=GN) continue;
+    rect(G.x,G.y+r*S,W2,S-1,H.rgba(P.paper,0.13*(1-(d-1)/SCAN_TAIL)));
+  }
+  if(row>=0&&row<GN) rect(G.x,G.y+row*S,W2,S-1,H.rgba(P.paper,0.22));
+  rect(G.x,Math.round(G.y+yr*S),W2,2,H.rgba(H.mix(P.bone,P.paper,0.55)));
+  for(let d=0;d<=SCAN_TAIL;d++){
+    const r=row-d; if(r<0||r>=GN) continue;
+    const a=1-d/(SCAN_TAIL+1);
+    for(let c=0;c<GN;c++){
+      if(!u[r*GN+c]) continue;
+      strokePoly([[G.x+c*S-1,G.y+r*S-1],[G.x+(c+1)*S-1,G.y+r*S-1],
+                  [G.x+(c+1)*S-1,G.y+(r+1)*S-1],[G.x+c*S-1,G.y+(r+1)*S-1]],
+                 H.rgba(P.red,a),2);
+    }
+  }
+}
+
 /* --- the scoreboard. It persists across the second run, because the piece is
    a comparison and the first number has to still be there. --- */
 function score(y,label,pct,col,on){
@@ -476,15 +556,21 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
-    /* --- which board, and which round of it. The only thing a beat changes. */
-    const roundAt=(sim,t0,per)=>sim.hist[Math.max(0,Math.min(sim.hist.length-1,
-                                 Math.floor((M-t0)/per)))];
+    /* --- which board, and how far into which round of it. A fractional
+       round index, so the squares that move are caught in the air rather
+       than between two photographs. --- */
+    const ROUND=0.52;
+    const roundAt=(sim,t0)=>(M-t0)/ROUND;
 
     /* ============ RULES -- the board, and the one rule ================== */
     if(T>=BEAT.RULES.sc&&T<BEAT.RUNA.sc){
       px(GN+' BY '+GN+'. ONE IN TEN EMPTY.',Q.cx,118,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       board(SIM.a.hist[0],after(2,0)?10*GN+10:-1);
+      /* the rule is not a caption here: the pass is already running over the
+         untouched board, ringing every square that fails the sentence being
+         spoken. */
+      scan(SIM.a.hist[0],KA,M);
       if(after(2,5)) px('IF FEWER THAN '+KA+' OF MY NEIGHBOURS',Q.cx,Q.rows[0],14,
                         H.rgba(H.mix(P.bone,P.ink,0.30)),'center','"Silkscreen"');
       if(after(2,13)) px('ARE THE SAME COLOUR AS ME, I MOVE',Q.cx,Q.rows[1],14,
@@ -496,7 +582,7 @@ function explainer(ctx,W2,Hh,t){
       px('WANTS '+KA+' OF 8',Q.cx,118,20,
          H.rgba(P.cyan),'center','"Silkscreen"');
       const t0=wordAt(3,13)+0.35;
-      board(M<t0?SIM.a.hist[0]:roundAt(SIM.a,t0,0.52));
+      scan(runBoard(SIM.a,roundAt(SIM.a,t0)),KA,M);
       if(after(4,2)) score(Q.rows[0],KA+' OF 8',P_A,P.cyan,1);
       if(after(4,13)) px('STARTED AT '+P_START,Q.cx,Q.rows[2],14,
                          H.rgba(H.mix(P.bone,P.ink,0.44)),'center','"Silkscreen"');
@@ -507,7 +593,12 @@ function explainer(ctx,W2,Hh,t){
       const flip=H.clamp((M-wordAt(5,4))/1.0);
       px('WANTS '+(flip>0.55?KB:KA)+' OF 8',Q.cx,118,20,
          H.rgba(flip>0.55?P.red:P.cyan),'center','"Silkscreen"');
-      board(SIM.a.hist[SIM.a.hist.length-1]);
+      const settled=SIM.a.hist[SIM.a.hist.length-1];
+      board(settled);
+      /* THE BEAT, WITHOUT A SQUARE MOVING. Same board, and the pass is now
+         asking it the new question: every ring that appears is a square that
+         was content a second ago and is not any more. */
+      scan(settled,flip>0.55?KB:KA,M);
       score(Q.rows[0],KA+' OF 8',P_A,P.cyan,1);
       if(flip>0.55) px('ONE NEIGHBOUR',Q.cx,Q.rows[2],20,
                        H.rgba(P.red),'center','"Silkscreen"');
@@ -518,7 +609,7 @@ function explainer(ctx,W2,Hh,t){
       px('WANTS '+KB+' OF 8',Q.cx,118,20,
          H.rgba(P.red),'center','"Silkscreen"');
       const t0=wordAt(6,9)+0.35;
-      board(M<t0?SIM.b.hist[0]:roundAt(SIM.b,t0,0.52));
+      scan(runBoard(SIM.b,roundAt(SIM.b,t0)),KB,M);
       score(Q.rows[0],KA+' OF 8',P_A,H.mix(P.cyan,P.ink,0.46),1);
       if(after(7,3)) score(Q.rows[1],KB+' OF 8',P_B,P.red,1);
       if(after(7,8)) px(P_ISO+' PERCENT SEE NO OTHER COLOUR',Q.cx,Q.rows[2],14,
@@ -530,6 +621,9 @@ function explainer(ctx,W2,Hh,t){
       px('WANTS '+KB+' OF 8',Q.cx,118,20,
          H.rgba(P.red),'center','"Silkscreen"');
       board(SIM.b.hist[SIM.b.hist.length-1],after(9,1)?WITNESS:-1);
+      /* the pass keeps going and comes back empty, which is the sentence:
+         every one of them is content. */
+      scan(SIM.b.hist[SIM.b.hist.length-1],KB,M);
       score(Q.rows[0],KA+' OF 8',P_A,H.mix(P.cyan,P.ink,0.46),1);
       score(Q.rows[1],KB+' OF 8',P_B,P.red,1);
       if(after(9,10)) px('CONTENT, AND OUTNUMBERED 5 TO 3',
@@ -542,6 +636,7 @@ function explainer(ctx,W2,Hh,t){
       px('WHAT THIS BOARD DOES NOT HAVE',Q.cx,118,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       board(SIM.b.hist[SIM.b.hist.length-1]);
+      scan(SIM.b.hist[SIM.b.hist.length-1],KB,M);
       /* struck through on the board itself: the thing the model is missing is
          not a footnote, it is the board */
       const miss=['NO MONEY','NO HISTORY','NO LAW','NO LANDLORDS'];

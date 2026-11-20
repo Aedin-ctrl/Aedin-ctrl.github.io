@@ -179,11 +179,17 @@ function wheelset(dx,lit,flangeHot,spin){
     const cx=x0+dx, cy=rail-F.wr;
     ringPix(cx,cy,F.wr,H.rgba(col),3,'wheel'+side);
     ringPix(cx,cy,10,H.rgba(H.mix(col,P.ink,0.30)),2);
-    if(spin!==undefined){                        // one tick per wheel, in step
-      const a=spin;
-      linePix([[cx+Math.cos(a)*12,cy+Math.sin(a)*12],
-               [cx+Math.cos(a)*(F.wr-4),cy+Math.sin(a)*(F.wr-4)]],
-              H.rgba(H.mix(P.gold,P.ink,0.10)),3);
+    /* THE WHEELS NEVER STOP. A wheelset under a train is turning for every
+       second this piece is talking about it, so the spokes run in every beat
+       the front view is on screen -- four of them, because one mark on a
+       52 px rim is under the noise floor of anything, a viewer included. */
+    if(spin!==undefined){                        // in step: one axle, one rate
+      for(let s=0;s<4;s++){
+        const a=spin+s*Math.PI/2, hot=(s===0);
+        linePix([[cx+Math.cos(a)*12,cy+Math.sin(a)*12],
+                 [cx+Math.cos(a)*(F.wr-4),cy+Math.sin(a)*(F.wr-4)]],
+                H.rgba(H.mix(P.gold,P.ink,hot?0.10:0.56)),hot?3:2);
+      }
     }
     /* the coned tread, exaggerated: high on the inside, low on the outside */
     const inner=cx-side*F.tread, outer=cx+side*F.tread;
@@ -218,11 +224,11 @@ function setAt(x,off,yaw,col){
   disc(x+8,cy+V.h/2-10+dy,4,H.rgba(col));
 }
 /* --- the weave, as a sine of the wavelength the formula gives --- */
-function weave(x0,x1,lam,amp,col,k){
+function weave(x0,x1,lam,amp,col,k,phase){
   const S=Q.sine, pts=[];
   const pxPerM=S.w/60;                       // the trail is 60 m of track
   for(let x=x0;x<=x1;x++){
-    const m=(x-S.x)/pxPerM;
+    const m=(x-S.x)/pxPerM+(phase||0);       // the view runs with the vehicle
     pts.push([x,S.y+Math.sin(m/lam*Math.PI*2)*amp]);
   }
   if(pts.length>1){ linePix(pts,H.rgba(col),2); if(k) polyReg(pts,k); }
@@ -445,7 +451,7 @@ function explainer(ctx,W2,Hh,t){
       px('ONE WHEELSET, FROM THE FRONT',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const F=Q.fv;
-      if(after(1,0)) wheelset(0,true,false,after(1,10)?M*2.2:undefined);
+      if(after(1,0)) wheelset(0,true,false,M*2.2);
       if(after(1,10)){
         /* both ticks come up together, and the counters stay equal */
         const n=Math.floor((M-wordAt(1,10))*2.2/(Math.PI*2));
@@ -476,9 +482,14 @@ function explainer(ctx,W2,Hh,t){
       px('SHIFT IT SIDEWAYS',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const F=Q.fv;
-      const sh=after(4,0)?Math.round(EXAG*2*H.ease.inOut(
-                  H.clamp((M-wordAt(4,0))/1.1))):0;
-      wheelset(-sh,true,false,undefined);
+      /* "AND THE WHEELSET CAN SLIDE BETWEEN THEM" -- so it slides, for as
+         long as that is the sentence, inside the clearance the bracket under
+         it is measuring. The beat then COMMITS to one side and holds it,
+         because the shifted picture is the claim of the next line. The
+         wheels turn through both, which is the thing that never stops. */
+      const lock=after(4,0)?H.ease.inOut(H.clamp((M-wordAt(4,0))/1.1)):0;
+      const sh=Math.round(H.lerp(Math.sin(M*1.15)*EXAG*1.15,EXAG*2,lock));
+      wheelset(-sh,true,false,M*2.2);
       if(after(3,2)){
         const y=F.rail+42;
         linePix([[F.xl,y],[F.xr,y]],H.rgba(H.mix(P.bone,P.ink,0.50)),2);
@@ -487,7 +498,7 @@ function explainer(ctx,W2,Hh,t){
         px(GAUGE+' MM',Q.cx,y+8,14,H.rgba(H.mix(P.bone,P.ink,0.44)),
            'center','"Silkscreen"');
       }
-      if(after(4,2)&&sh>0){
+      if(after(4,2)&&lock>0.34){
         /* the radius each wheel is actually rolling on */
         /* the readouts sit in a row ABOVE the wheels: anything printed
            beside a rim lands on the rim. */
@@ -509,6 +520,16 @@ function explainer(ctx,W2,Hh,t){
           ([L,dy,c])=>{
             const w=Math.round(L*SC2*g);
             rect(x0,y+dy,w,16,H.rgba(H.mix(c,P.ink,0.26)));
+            /* the ground under each wheel is GOING PAST, each at its own
+               wheel's speed: same turn rate, so the ribbon whose turn is
+               longer runs faster. The two speeds differ by three parts in a
+               thousand and nobody can see that -- which is the honest reason
+               the x50 magnifier exists, and the moving ground is why the
+               beat is not a photograph of itself while it is being said. */
+            const sp=L*SC2*0.17, gap=22, off=(M*sp)%gap;
+            for(let x=x0+gap-off;x<x0+w-3;x+=gap)
+              rect(Math.round(x),y+dy+3,2,10,
+                   H.rgba(H.mix(P.bone,P.ink,0.34)));
             if(GBOX)GBOX.push({x:x0,y:y+dy,w:Math.max(3,w),h:16,
                                k:'rib'+dy+'box'});
           });
@@ -540,19 +561,32 @@ function explainer(ctx,W2,Hh,t){
       planFrame();
       const V=Q.pv;
       if(after(6,0)){
-        const g=H.clamp((M-wordAt(6,0))/4.2);
-        const path=[];
-        for(let i=0;i<=60;i++){
-          const u=i/60; if(u>g) break;
-          const x=V.x+10+u*(V.w-20);
-          path.push([x,V.y+V.h/2-34*Math.cos(u*6.5)*Math.exp(-u*1.1)]);
-        }
-        if(path.length>1){ linePix(path,H.rgba(P.gold),2); polyReg(path,'path'); }
-        const p=path[path.length-1];
-        if(p){
-          const yaw=path.length>2?(p[1]-path[path.length-3][1])*0.08:0;
-          setAt(p[0],p[1]-(V.y+V.h/2),yaw,H.mix(P.gold,P.ink,0.10));
-        }
+        /* THE CORRECTION IS NOT AN EVENT, IT IS WHAT THE SET DOES. Drawing
+           it once and then holding the picture for ten seconds was the lie:
+           a wheelset is knocked off centre and recentres again and again all
+           day. So the pass repeats -- the dim trail is the record, the
+           bright head and the set are it happening now -- and when the beat
+           reaches the curve the whole weave migrates off the centreline and
+           stays there, which is what "rides fifteen millimetres out" means
+           and is also the one event line 8 previously had no picture for. */
+        const el=M-wordAt(6,0), LAPT=5.0;
+        const rev=H.clamp(el/4.2);
+        const run=el<4.2?rev:((el-4.2)%LAPT)/LAPT;
+        const eq=after(8,0)?-20*H.ease.inOut(H.clamp((M-wordAt(8,0))/1.6)):0;
+        const pt=(u)=>[V.x+10+u*(V.w-20),
+                       V.y+V.h/2+eq-34*Math.cos(u*6.5)*Math.exp(-u*1.1)];
+        const seg=(a,b,col,th)=>{
+          const p=[];
+          for(let i=0;i<=60;i++){ const u=i/60;
+            if(u<a) continue; if(u>b) break; p.push(pt(u)); }
+          if(p.length>1) linePix(p,H.rgba(col),th);
+          return p;
+        };
+        const trail=seg(0,rev,H.mix(P.gold,P.ink,0.54),2);
+        if(trail.length>1) polyReg(trail,'path');
+        seg(Math.max(0,run-0.30),run,P.gold,3);
+        const p=pt(run), q=pt(Math.max(0,run-0.034));
+        setAt(p[0],p[1]-(V.y+V.h/2),(p[1]-q[1])*0.08,H.mix(P.gold,P.ink,0.10));
       }
       if(after(7,0)){
         /* the same shift, on wheels that are not coned */
@@ -589,7 +623,17 @@ function explainer(ctx,W2,Hh,t){
       let pxm=S.w/60;
       if(after(9,0)){
         const g=H.clamp((M-wordAt(9,0))/2.6);
-        pxm=weave(S.x,S.x+Math.round(S.w*g),LK,S.amp,P.gold,'weave');
+        /* THE WEAVE IS HAPPENING, not finished. The view runs with the
+           vehicle, so the track slides past underneath and the set bobs on
+           it -- the wavelength being measured is a property of the track and
+           does not change while it slides, which is the whole of Klingel. */
+        const ph=M*5.2;                          // metres of track per second
+        pxm=weave(S.x,S.x+Math.round(S.w*g),LK,S.amp,P.gold,'weave',ph);
+        const mx=S.x+Math.round(S.w*0.70);
+        if(S.x+Math.round(S.w*g)>mx+2){
+          const my=S.y+Math.sin(((mx-S.x)/pxm+ph)/LK*Math.PI*2)*S.amp;
+          disc(mx,Math.round(my),5,H.rgba(H.mix(P.gold,P.ink,0.06)));
+        }
       }
       if(after(10,0)){
         px('L  =  2 PI  X  ROOT ( B X R / CONICITY )',Q.cx,180,14,
@@ -621,7 +665,7 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const F=Q.fv;
       const sh=Math.round(Math.sin(M*1.6)*EXAG*1.4);
-      wheelset(sh,true,true,undefined);
+      wheelset(sh,true,true,M*2.2);
       if(after(13,0)){
         /* the gap is between the INNER face of the rail head and the flange,
            and across a whole weave it never closes. */

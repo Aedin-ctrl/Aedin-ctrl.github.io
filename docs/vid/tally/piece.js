@@ -233,6 +233,47 @@ function lilFish(x,y,s,col,mark){
   rect(x+2*s,  y-s,   s,   s,   H.rgba(P.ink));
   if(mark){ rect(x-s,y-2*s,s,s,H.rgba(P.red)); rect(x,y-s,s,s,H.rgba(P.red)); }
 }
+/* --- ONE PERSON, the people-shaped twin of lilFish and the same size, so the
+   turn into the census beats swaps the population and nothing else. --- */
+function lilPerson(x,y,s,col){
+  rect(x-s,  y-3*s, 2*s, 2*s, col);          // head
+  rect(x-s,  y-s,   2*s, 2*s, col);          // body
+  rect(x-2*s,y-s,   s,   s,   col);          // arms
+  rect(x+s,  y-s,   s,   s,   col);
+  rect(x-s,  y+s,   s,   s,   col);          // legs
+  rect(x,    y+s,   s,   s,   col);
+}
+/* --- THE POPULATION NEVER HOLDS STILL, and that is the method's one
+   assumption. A lake is not a diagram: the fish keep swimming and keep
+   MIXING, which is precisely what has to be true for the second catch to be
+   a fair sample of the first -- and it is the thing the SHY beat says stops
+   being true. So the water goes on moving under the Venn for all five of its
+   beats; the two circles are the only places anyone ever looked, and nothing
+   in the lake stops while they are drawn. The census beats are the same
+   picture with people in it, who also do not hold still, which is a large
+   part of why a census misses them.
+
+   Deterministic: every lane, speed and phase is read off the index, never
+   from Math.random, and it is a PING-PONG rather than a wrap so nothing ever
+   pops into existence at an edge. Unregistered on purpose -- it is decoration
+   that moves, and a moving box fights checkOverlap on some frames only. --- */
+const POPN=26;
+const popJit=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+function livePop(M,kind){
+  const b=Q.box, x0=b[0]+16, x1=b[0]+b[2]-16;
+  for(let i=0;i<POPN;i++){
+    const spd=0.024+popJit(i)*0.026;          // half-laps per second
+    const q=((M*spd)+popJit(i+17))%1;
+    const u=q<0.5?q*2:2-q*2;
+    const x=Math.round(H.lerp(x0,x1,u));
+    const y=Math.round(b[1]+22+popJit(i+41)*(b[3]-50)
+                       +Math.sin(M*1.6+i*2.3)*6);
+    if(kind==='person') lilPerson(x,y,2,H.rgba(H.mix(P.bone,P.ink,0.66)));
+    /* one in thirteen carries a mark, which is the order the piece works out
+       on screen -- not a third of the lake gold three beats early. */
+    else lilFish(x,y,2,H.rgba(H.mix(P.grass,P.ink,0.60)),i%13===5);
+  }
+}
 /* --- a shoal, seeded, so it is the same shoal every frame --- */
 function shoal(bx,by,bw,bh,n,seed,s,col,markEvery,drift){
   /* A JITTERED GRID, not a scatter. Pure random put four fish on top of each
@@ -246,8 +287,13 @@ function shoal(bx,by,bw,bh,n,seed,s,col,markEvery,drift){
     const c=i%cols, rw=Math.floor(i/cols);
     const x=Math.round(bx+(c+0.5)/cols*bw+(r()-0.5)*(bw/cols)*0.55);
     const y=Math.round(by+(rw+0.5)/rows*bh+(r()-0.5)*(bh/rows)*0.55);
-    const dx=drift?Math.round(Math.sin(drift*0.7+i*1.7)*3):0;
-    lilFish(x+dx,y,s,col,markEvery&&(i%markEvery===0));
+    /* A fish in water is never a photograph of a fish. The old drift was
+       +/-3px on a 0.7 rad/s sine -- about a quarter of a pixel per eighth of
+       a second, which is under the noise floor of both the probe and the eye.
+       It swims now. */
+    const dx=drift?Math.round(Math.sin(drift*1.45+i*1.7)*9):0;
+    const dy=drift?Math.round(Math.sin(drift*1.05+i*2.6)*3):0;
+    lilFish(x+dx,y+dy,s,col,markEvery&&(i%markEvery===0));
   }
 }
 
@@ -312,15 +358,23 @@ function lakeBox(label){
    the point: one number moves and the answer moves with it. The count in the
    lens is labelled on a LEADER rather than inside it -- the lens is sixteen
    pixels wide at its widest and a label in it is a label on it. --- */
+/* s1 and s2 are FRACTIONS, not flags. A catch is a thing that gets made, so
+   its ring grows out of the water and colours up over a third of a second
+   rather than existing between two frames -- rule 2 of the motion pass, and
+   the only places this picture ever arrived instantly. */
 function vennDraw(dx,s1,s2,l1,l2,lapN,nums){
   const V=Q.v, lx=Q.cx-dx, rx=Q.cx+dx;
-  if(s1&&s2) lens(lx,rx,V.cy,V.r,H.rgba(H.mix(P.red,P.ink,0.22)),'lens');
-  if(s1){ ringPix(lx,V.cy,V.r,H.rgba(P.cyan),3,'c1');
+  if(s1>=1&&s2>=1) lens(lx,rx,V.cy,V.r,H.rgba(H.mix(P.red,P.ink,0.22)),'lens');
+  if(s1>0){ ringPix(lx,V.cy,V.r*(0.82+0.18*s1),
+                    H.rgba(H.mix(P.cyan,P.ink,(1-s1)*0.82)),3,'c1');
+          if(s1>0.6){
           px(l1,lx-14,V.cy-V.r-20,14,H.rgba(P.cyan),'center','"Silkscreen"');
-          if(nums) px(N1+'',lx-V.r*0.55,V.cy-10,20,H.rgba(P.cyan),'center','"Silkscreen"'); }
-  if(s2){ ringPix(rx,V.cy,V.r,H.rgba(P.gold),3,'c2');
+          if(nums) px(N1+'',lx-V.r*0.55,V.cy-10,20,H.rgba(P.cyan),'center','"Silkscreen"'); } }
+  if(s2>0){ ringPix(rx,V.cy,V.r*(0.82+0.18*s2),
+                    H.rgba(H.mix(P.gold,P.ink,(1-s2)*0.82)),3,'c2');
+          if(s2>0.6){
           px(l2,rx+14,V.cy-V.r-20,14,H.rgba(P.gold),'center','"Silkscreen"');
-          if(nums) px(N2+'',rx+V.r*0.55,V.cy-10,20,H.rgba(P.gold),'center','"Silkscreen"'); }
+          if(nums) px(N2+'',rx+V.r*0.55,V.cy-10,20,H.rgba(P.gold),'center','"Silkscreen"'); } }
   if(lapN!==undefined){
     /* the leader starts where the lens actually ends, so it never floats */
     const half=Math.sqrt(Math.max(4,V.r*V.r-dx*dx));
@@ -615,8 +669,12 @@ function explainer(ctx,W2,Hh,t){
       px('TWO CATCHES',Q.cx,Q.box[1]-26,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       lakeBox('THE LAKE');
-      vennDraw(Q.v.dx, after(5,3)?1:0, after(5,11)?1:0,
-               'CATCH ONE','CATCH TWO', after(5,11)?M2:undefined,1);
+      /* a week passes and the marked hundred mix back through the lake --
+         which is the assumption the SHY beat is about to take away. */
+      livePop(M,'fish');
+      const c1=H.clamp((M-wordAt(5,3))/0.45), c2=H.clamp((M-wordAt(5,11))/0.45);
+      vennDraw(Q.v.dx, c1, c2,
+               'CATCH ONE','CATCH TWO', c2>=1?M2:undefined,1);
       if(after(5,16)) px('ALREADY MARKED',Q.cx,Q.rows[0],14,
                          H.rgba(H.mix(P.bone,P.ink,0.44)),'center','"Silkscreen"');
     }
@@ -626,6 +684,7 @@ function explainer(ctx,W2,Hh,t){
       px('TWO CATCHES',Q.cx,Q.box[1]-26,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       lakeBox('THE LAKE');
+      livePop(M,'fish');
       vennDraw(Q.v.dx,1,1,'CATCH ONE','CATCH TWO',M2,1);
       capLine(M2+' OF '+N2+' IS 1 IN '+SHARE,6,2,
               U.mid(M2+' OF '+N2+' IS 1 IN '+SHARE,20),Q.rows[0],20,
@@ -645,7 +704,17 @@ function explainer(ctx,W2,Hh,t){
       /* THE PULL. The second catch slides away, the lens closes to half, and
          the answer -- which has the lens in its denominator -- doubles. One
          drag, and the whole of the beat's claim is in it. */
-      const pull=H.ease.inOut(H.clamp((M-wordAt(10,3))/1.6));
+      livePop(M,'fish');
+      const rise=H.ease.inOut(H.clamp((M-wordAt(10,3))/1.6));
+      /* ...and it is PUT BACK before the beat hands over. The drag is a
+         hypothetical -- what if the marked ones learned -- and leaving the
+         lens at four while the next beat redraws it at eight made the whole
+         Venn jump ten pixels on the cut with the answer flicking 3000 -> 1500
+         in one frame. That is the "it does nothing and then snaps back" the
+         viewer named. It travels back instead, through the gap where nobody
+         is talking, so the cut lands on a picture that already matches. */
+      const rel=H.ease.inOut(H.clamp((M-(VO[10].z+0.30))/1.10));
+      const pull=rise*(1-rel);
       const dx=Q.v.dx+Math.round(pull*10);
       const shown=Math.round(H.lerp(M2,SHY_M2,pull));
       vennDraw(dx,1,1,'CATCH ONE','CATCH TWO',shown,1);
@@ -659,8 +728,10 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.18)),'center','"Silkscreen"');
       px(N1+' X '+rat+' = '+(N1*rat),Q.cx,Q.rows[1],20,
          H.rgba(pull>0.5?P.red:P.gold),'center','"Silkscreen"');
-      if(after(10,17)) px('SAME FISH. BIGGER LAKE.',Q.cx,Q.rows[2],14,
-                          H.rgba(P.red),'center','"Silkscreen"');
+      /* it goes with the drag it describes -- the caption stack keeps
+         "A SHY FISH INFLATES IT." for anyone who looks up later. */
+      if(after(10,17)&&rel<0.92) px('SAME FISH. BIGGER LAKE.',Q.cx,Q.rows[2],14,
+                          H.rgba(H.mix(P.red,P.ink,rel)),'center','"Silkscreen"');
     }
 
     /* ============ PEOPLE -- the same arithmetic, on two lists ========== */
@@ -669,10 +740,20 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       lakeBox('EVERYONE');
       /* the part of the box in NEITHER disc. Dotted, because it is the one
-         region of this picture nobody has ever observed. */
-      if(after(13,11)) outside(VL(),VR(),Q.v.cy,Q.v.r,
-                               H.rgba(H.mix(P.red,P.ink,0.34)),11,'neither',
-                               Q.box[1]+Q.box[3]-38,Q.box[1]+Q.box[3]-12);
+         region of this picture nobody has ever observed -- and it FILLS IN
+         over three quarters of a second rather than arriving whole between
+         two frames, which is the only way the sentence that calls for it
+         gets an event instead of a cut. */
+      if(after(13,11)){
+        const h=H.clamp((M-wordAt(13,11))/0.80);
+        outside(VL(),VR(),Q.v.cy,Q.v.r,
+                H.rgba(H.mix(P.red,P.ink,0.34+(1-h)*0.34)),
+                Math.round(H.lerp(27,11,h)),'neither',
+                Q.box[1]+Q.box[3]-38,Q.box[1]+Q.box[3]-12);
+      }
+      /* the same lake, with people in it. They do not hold still either, and
+         the ones who move are a large part of what a census misses. */
+      livePop(M,'person');
       vennDraw(Q.v.dx,1,1,'CENSUS','SURVEY');
       if(after(13,11)) px('ON NEITHER LIST',Q.cx,Q.box[1]+Q.box[3]-30,14,
                           H.rgba(P.red),'center','"Silkscreen"');
@@ -705,6 +786,7 @@ function explainer(ctx,W2,Hh,t){
       outside(Q.cx-dx,Q.cx+dx,Q.v.cy,Q.v.r,
               H.rgba(H.mix(P.red,P.ink,0.34-lean*0.20)),11,'neither',
               Q.box[1]+Q.box[3]-38,Q.box[1]+Q.box[3]-12);
+      livePop(M,'person');
       vennDraw(dx,1,1,'CENSUS','SURVEY');
       px('ON NEITHER LIST',Q.cx,Q.box[1]+Q.box[3]-30,14,
          H.rgba(P.red),'center','"Silkscreen"');

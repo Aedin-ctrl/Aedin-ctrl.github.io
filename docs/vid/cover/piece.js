@@ -169,12 +169,38 @@ function binary(x,y,n,bits,col,sc){
   }
   return v.length*(w+gap);
 }
+/* --- THE FOUR CORNERS ARE FOUR RUNNING MACHINES, and the plate is still a
+   plate. Every one of these diagrams is an instruction to do something that
+   TAKES TIME -- turn this, scan this, listen to these, wait for this -- so
+   the thing each corner describes runs for as long as the corner is on
+   screen, at whatever scale it is drawn at. Nothing here is invented motion:
+   the record turns at the speed written beside it, the raster is painted one
+   line at a time because that is what 512 lines means, the pulsars pulse
+   because that is what a pulsar is, and the hydrogen flips because the flip
+   IS the unit. Every phase is derived from an index or from t -- no
+   Math.random reaches a frame. --- */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+
 /* --- quadrant 0: the record, the stylus, and which way round --- */
-function dPlay(x,y,w,h,col,sc){
+function dPlay(x,y,w,h,col,sc,m){
   const cx=x+w*0.42, cy=y+h*0.42, r=Math.min(w,h)*0.30;
+  /* ONE TURN EVERY RPM_S SECONDS -- the number written in binary under it.
+     A still picture of a record is the piece telling the viewer to spin it
+     while refusing to. */
+  const ph=((m||0)/RPM_S)*Math.PI*2;
+  const sp=[];
+  for(let i=0;i<=96;i++){ const u=i/96;
+    const a=ph+u*Math.PI*5.2, rr=r*(0.90-u*0.24);
+    sp.push([cx+Math.cos(a)*rr, cy+Math.sin(a)*rr]); }
+  linePix(sp,H.rgba(H.mix(P.bone,P.ink,0.50)),Math.max(1,Math.round(sc)));
   ringPix(cx,cy,r,col,2*sc);
   ringPix(cx,cy,r*0.62,H.rgba(H.mix(P.bone,P.ink,0.46)),1*sc);
   disc(cx,cy,r*0.12,col);
+  // the one mark on the label, which is how a turn is a thing you can SEE
+  const mk=ph;
+  linePix([[cx+Math.cos(mk)*r*0.20,cy+Math.sin(mk)*r*0.20],
+           [cx+Math.cos(mk)*r*0.56,cy+Math.sin(mk)*r*0.56]],
+          H.rgba(P.gold),Math.max(1,Math.round(1.6*sc)));
   // the stylus, down on the outer edge
   linePix([[cx+r*1.5,cy-r*1.1],[cx+r*0.92,cy-r*0.08]],col,2*sc);
   disc(cx+r*0.92,cy-r*0.08,2*sc,col);
@@ -186,12 +212,22 @@ function dPlay(x,y,w,h,col,sc){
   binary(x+w*0.12,y+h*0.80,Math.round(RPM_S*10),8,col,sc);
 }
 /* --- quadrant 1: the raster, and the first picture --- */
-function dRaster(x,y,w,h,col,sc){
+function dRaster(x,y,w,h,col,sc,m){
   const bx=x+w*0.10, by=y+h*0.16, bw=w*0.46, bh=h*0.50;
   strokePoly([[bx,by],[bx+bw,by],[bx+bw,by+bh],[bx,by+bh]],col,2*sc);
-  for(let i=0;i<14;i++) rect(Math.round(bx+3+i*(bw-6)/14),by+3,
-                             Math.max(1,Math.round(sc)),bh-6,
-                             H.rgba(H.mix(P.bone,P.ink,0.40)));
+  /* THE RASTER IS PAINTED, over and over. "Five hundred and twelve lines,
+     one after another" is a process, and the head that is drawing them now
+     is the only honest way to show a picture being rebuilt from a sound. */
+  const u=(((m||0)/2.6)%1), head=bx+3+u*(bw-6), band=Math.max(6,(bw-6)*0.17);
+  rect(Math.round(Math.max(bx+2,head-band)),by+3,
+       Math.round(Math.min(band,head-bx-2)),bh-6,H.rgba(P.paper,0.13));
+  for(let i=0;i<14;i++){
+    const lx=Math.round(bx+3+i*(bw-6)/14), live=(lx<=head&&lx>head-band);
+    rect(lx,by+3,Math.max(1,Math.round(live?2*sc:sc)),bh-6,
+         H.rgba(live?P.gold:H.mix(P.bone,P.ink,0.40)));
+  }
+  rect(Math.round(head),by+3,Math.max(1,Math.round(1.6*sc)),bh-6,
+       H.rgba(H.mix(P.paper,P.gold,0.35)));
   // the first picture: a circle, which is how you set the aspect ratio
   const px2=x+w*0.68, py2=by, pw=w*0.24, ph=bh;
   strokePoly([[px2,py2],[px2+pw,py2],[px2+pw,py2+ph],[px2,py2+ph]],
@@ -200,9 +236,9 @@ function dRaster(x,y,w,h,col,sc){
   binary(x+w*0.10,y+h*0.76,LINES,10,col,sc);
 }
 /* --- quadrant 2: fourteen lines from one point --- */
-function dPulsar(x,y,w,h,col,sc){
+function dPulsar(x,y,w,h,col,sc,m){
   const cx=x+w*0.46, cy=y+h*0.50;
-  const r=H.rng(9);
+  const r=H.rng(9), t=(m||0);
   for(let i=0;i<PULSARS;i++){
     const a=(i/PULSARS)*Math.PI*2+0.21;
     const L=Math.min(w,h)*(0.22+r()*0.26);
@@ -210,8 +246,17 @@ function dPulsar(x,y,w,h,col,sc){
     linePix([[cx,cy],[ex,ey]],col,Math.max(1,Math.round(sc)));
     // each line carries that pulsar's period, in the cover's own binary
     const bx=ex+Math.cos(a)*3, by=ey+Math.sin(a)*3-5*sc;
-    binary(Math.round(bx),Math.round(by),(i*37)%64,5,
+    const per=(i*37)%64;
+    binary(Math.round(bx),Math.round(by),per,5,
            H.rgba(H.mix(P.bone,P.ink,0.30)),sc*0.5);
+    /* AND THE LINE IS A SIGNAL ARRIVING. Fourteen beacons, each with its own
+       period -- the number written on its own line -- and a pulse running in
+       from each one at that rate. It is what makes the map an address: you
+       are not meant to look at it, you are meant to listen for them. */
+    const pp=0.74+(per/63)*1.9;
+    const u=1-(((t/pp)+jit(i+5))%1);
+    disc(cx+Math.cos(a)*L*u,cy+Math.sin(a)*L*u,Math.max(1.6,2.2*sc),
+         H.rgba(P.gold));
   }
   disc(cx,cy,3*sc,H.rgba(P.gold));
 }
@@ -228,7 +273,7 @@ function arrowV(x,y,dy,col,sc){
     rect(Math.round(x-hw+i),Math.round(hy+d*i),Math.round((hw-i)*2),
          Math.max(1,Math.round(sc)),col);
 }
-function dHydrogen(x,y,w,h,col,sc){
+function dHydrogen(x,y,w,h,col,sc,tt){
   const m=Math.min(w,h), cy=y+h*0.44, r=m*0.20, gap=m*0.36;
   [0,1].forEach(k=>{
     const cx=x+w*0.5+(k?1:-1)*gap;
@@ -242,12 +287,26 @@ function dHydrogen(x,y,w,h,col,sc){
            H.rgba(k?P.cyan:P.gold),sc);
   });
   linePix([[x+w*0.5-gap+r,cy],[x+w*0.5+gap-r,cy]],col,2*sc);
+  /* THE FLIP, WHICH IS THE WHOLE POINT OF THE CORNER. The two circles are the
+     two states and they do not move -- what moves is the transition between
+     them, and the photon it throws off, which is the thing that happens at
+     the same rate everywhere in the universe and is therefore the only
+     ruler a stranger and we are guaranteed to share. */
+  const x0=x+w*0.5-gap+r, x1=x+w*0.5+gap-r;
+  const u=(((tt||0)/1.45)%2), p=(u<1)?u:(2-u), e=(u<1)?u:(u-1);
+  disc(H.lerp(x0,x1,p),cy,Math.max(1.8,2.8*sc),H.rgba(P.cyan));
+  /* three thin wavefronts off the PAIR, not off either circle: a ring the
+     size of an atom hanging on one of them read as a third state. */
+  for(let k=0;k<3;k++){
+    const q=(e+k/3)%1;
+    ringPix(x+w*0.5,cy,3+q*m*0.46,H.rgba(P.cyan,0.34*(1-q)),1);
+  }
   binary(Math.round(x+w*0.5-5*sc),Math.round(cy+m*0.12),1,1,
          H.rgba(P.gold),sc);
 }
 const DRAW=[dPlay,dRaster,dPulsar,dHydrogen];
 /* --- THE WHOLE PLATE. `lit` is the quadrant being read, or -1. --- */
-function cover(x,y,s,lit,sc){
+function cover(x,y,s,lit,sc,m){
   rect(x,y,s,s,H.rgba(H.mix(P.gold,P.ink,0.62)));
   rect(x,y,s,2,H.rgba(H.mix(P.gold,P.paper,0.30)));
   strokePoly([[x,y],[x+s,y],[x+s,y+s],[x,y+s]],
@@ -258,18 +317,32 @@ function cover(x,y,s,lit,sc){
     const qx=x+(i%2)*q, qy=y+((i/2)|0)*q;
     const on=(lit<0||lit===i);
     DRAW[i](qx+4,qy+4,q-8,q-8,
-            H.rgba(on?H.mix(P.ink,P.paper,0.10):H.mix(P.gold,P.ink,0.46)),sc);
+            H.rgba(on?H.mix(P.ink,P.paper,0.10):H.mix(P.gold,P.ink,0.46)),sc,m);
     if(lit===i) strokePoly([[qx+1,qy+1],[qx+q-1,qy+1],[qx+q-1,qy+q-1],
                             [qx+1,qy+q-1]],H.rgba(P.red),2);
   }
 }
 /* --- the uranium clock: a plated disc and what is left of it --- */
-function uranium(x,y,w,h,g){
+function uranium(x,y,w,h,g,m,full){
   const cx=x+w*0.26, cy=y+h*0.40, r=Math.min(w,h)*0.22;
   ringPix(cx,cy,r,H.rgba(H.mix(P.bone,P.ink,0.30)),2);
   disc(cx,cy,r-3,H.rgba(H.mix(P.green,P.ink,0.40)));
+  /* IT IS DECAYING WHILE YOU WATCH IT, and that is not decoration -- it is
+     the entire reason the disc is on the cover. A clock you can read by
+     measuring what is left has to be losing something, continuously, and a
+     frozen disc is a frozen clock. */
+  for(let i=0;i<16;i++){
+    const u=(((m||0)*0.34)+jit(i*3+1))%1;
+    const a=jit(i*3+2)*Math.PI*2;
+    const d=r*0.45+u*(r*1.05);        // kept inside the panel it is drawn in
+    disc(cx+Math.cos(a)*d,cy+Math.sin(a)*d,Math.max(1,2.2*(1-u)),
+         H.rgba(P.green,Math.max(0,0.85-u*0.85)));
+  }
   px(U_CM+' CM',cx,cy-r-20,14,H.rgba(H.mix(P.bone,P.ink,0.40)),
      'center','"Silkscreen"');
+  /* the disc and its decay are on the plate from the top of the beat -- the
+     curve is what the sentence after it introduces. */
+  if(!full) return;
   // the decay curve, halving every half-life
   const gx=x+w*0.50, gy2=y+h*0.12, gw=w*0.44, gh=h*0.52;
   /* linePix, not strokePoly: strokePoly CLOSES the path and two axes drawn
@@ -385,7 +458,7 @@ function COLDOPEN(U,gag){
       const qx=x+(i%2)*qw, qy=y+((i/2)|0)*q;
       if(qw<24) continue;
       DRAW[i](qx+3,qy+3,qw-6,q-6,H.rgba(H.mix(P.ink,P.paper,0.10)),
-              Math.max(0.5,wNow/s));
+              Math.max(0.5,wNow/s),M);
     }
   }
   if(SCENE)SCENE.push({x:cx-s/2-4,y:y-4,w:s+8,h:s+8,k:'plate'});
@@ -511,7 +584,7 @@ function explainer(ctx,W2,Hh,t){
        being read is drawn large underneath: the strand's "whole and illegible,
        then read in passes", with the whole thing always still on screen. --- */
     const pass=(q,title,drawFn)=>{
-      cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,q,0.30);
+      cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,q,0.30,M);
       px(title,Q.cx,Q.thumb.y+Q.thumb.s+10,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const D=Q.det;
@@ -520,14 +593,14 @@ function explainer(ctx,W2,Hh,t){
                  H.rgba(H.mix(P.gold,P.ink,0.26)),2);
       if(GBOX)GBOX.push({x:D.x,y:D.y,w:D.w,h:D.h,k:'detailbox'});
       if(drawFn) drawFn(D.x+16,D.y+14,D.w-32,D.h-28,
-                        H.rgba(H.mix(P.ink,P.paper,0.10)),2);
+                        H.rgba(H.mix(P.ink,P.paper,0.10)),2,M);
     };
 
     /* ============ LID -- the whole plate, and what it is not ============ */
     if(T>=BEAT.LID.sc&&T<BEAT.PLAY.sc){
       px('THE COVER OF THE RECORD',Q.cx,76,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      cover(Q.big.x,Q.big.y,Q.big.s,-1,1.0);
+      cover(Q.big.x,Q.big.y,Q.big.s,-1,1.0,M);
       if(after(1,7)) px('MUSIC. GREETINGS. WHALE SONG.',Q.cx,Q.rows[0],14,
                         H.rgba(H.mix(P.bone,P.ink,0.46)),'center','"Silkscreen"');
       if(after(2,7)) px('NONE OF THAT IS ON HERE',Q.cx,Q.rows[1],20,
@@ -546,7 +619,7 @@ function explainer(ctx,W2,Hh,t){
     /* ============ UNIT -- bottom right, and it comes first =============== */
     if(T>=BEAT.UNIT.sc&&T<BEAT.PICTURE.sc){
       if(!after(6,2)){
-        cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,-1,0.30);
+        cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,-1,0.30,M);
         px('SECONDS IN WHAT ?',Q.cx,Q.thumb.y+Q.thumb.s+10,14,
            H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
         const D=Q.det;
@@ -554,6 +627,11 @@ function explainer(ctx,W2,Hh,t){
         strokePoly([[D.x,D.y],[D.x+D.w,D.y],[D.x+D.w,D.y+D.h],[D.x,D.y+D.h]],
                    H.rgba(H.mix(P.gold,P.ink,0.26)),2);
         if(GBOX)GBOX.push({x:D.x,y:D.y,w:D.w,h:D.h,k:'detailbox'});
+        /* THE RECORD IS STILL TURNING while the question is asked, which is
+           what makes the question a question: the number beside it is real
+           and a turn is a real event, and neither of them means anything
+           until the unit under them does. */
+        dPlay(Q.cx-96,D.y+2,192,124,H.rgba(H.mix(P.ink,P.paper,0.10)),1.1,M);
         px(RPM_S+' SECONDS',Q.cx,D.y+D.h/2-30,32,
            H.rgba(H.mix(P.ink,P.paper,0.10)),'center','"Silkscreen"');
         px('? ? ?',Q.cx,D.y+D.h/2+20,32,
@@ -589,7 +667,7 @@ function explainer(ctx,W2,Hh,t){
 
     /* ============ WHEN -- and then a second clock, on purpose =========== */
     if(T>=BEAT.WHEN.sc&&(T<BEAT.END.sc||!after(16,0))){
-      cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,-1,0.30);
+      cover(Q.thumb.x,Q.thumb.y,Q.thumb.s,-1,0.30,M);
       px('URANIUM '+238,Q.cx,Q.thumb.y+Q.thumb.s+10,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const D=Q.det;
@@ -597,8 +675,8 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[D.x,D.y],[D.x+D.w,D.y],[D.x+D.w,D.y+D.h],[D.x,D.y+D.h]],
                  H.rgba(H.mix(P.gold,P.ink,0.26)),2);
       if(GBOX)GBOX.push({x:D.x,y:D.y,w:D.w,h:D.h,k:'detailbox'});
-      if(after(14,0)) uranium(D.x+16,D.y+14,D.w-32,D.h-28,
-                              H.clamp((M-wordAt(14,16))/1.6));
+      uranium(D.x+16,D.y+14,D.w-32,D.h-28,
+              H.clamp((M-wordAt(14,16))/1.6),M,after(14,0));
       if(after(15,9)) px('A LAUNCH DATE, TWICE',Q.cx,Q.rows[0],20,
                          H.rgba(P.gold),'center','"Silkscreen"');
       if(after(15,18)) px('BY TWO CLOCKS THAT DO NOT AGREE BY LUCK',

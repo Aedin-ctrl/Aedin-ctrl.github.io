@@ -467,6 +467,26 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* --- THE QUEUE IS A CONVEYOR, NOT A PICTURE. The executive was taking
+       jobs off the front of this thing every cycle for as long as the beat
+       lasts, and in the descent more were arriving behind them than it could
+       clear -- so the blocks march left at the rate the machine finishes
+       them, the ones that will not fit inside one cycle hang off the
+       right-hand end, and the overflow is something HAPPENING rather than a
+       word. Both schedulers in SHED are the same construction, which is the
+       only way the comparison means anything. --- */
+    const JP=26, JW=22;
+    const jobTrain=(bx,by,bw,bh,done,len,lim,paint)=>{
+      const n1=Math.floor(done+len);
+      for(let n=Math.max(0,Math.ceil(done)-1);n<=n1;n++){
+        let x=bx+4+(n-done)*JP, w=JW;
+        if(x<bx){ w=JW-(bx-x); x=bx; }        // this one is being finished
+        if(w<=1||x>bx+bw+24||x+JW>bx+lim) continue;
+        const c=paint(n,(x+JW>bx+bw),n-done);
+        if(c) rect(Math.round(x),by+6,Math.round(w),bh-12,H.rgba(c));
+      }
+    };
+
     /* --- the panel's state. Which key is down, what is in the fields, which
        lamps are lit: every beat is one of these and nothing else. --- */
     const keyDown=()=>{
@@ -554,14 +574,14 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[CY.x,CY.y],[CY.x+CY.w,CY.y],[CY.x+CY.w,CY.y+CY.h],
                   [CY.x,CY.y+CY.h]],H.rgba(H.mix(P.bone,P.ink,0.46)),2);
       if(GBOX)GBOX.push({x:CY.x,y:CY.y,w:CY.w,h:CY.h,k:'cyclebox'});
-      const g=H.clamp((M-wordAt(11,2))/2.6);
-      const jobs=Math.round(g*14);
-      for(let i=0;i<jobs;i++){
-        const x=CY.x+4+i*26, over=(x+22>CY.x+CY.w);
-        rect(x,CY.y+6,22,CY.h-12,
-             H.rgba(over?P.red:H.mix(P.cyan,P.ink,0.20)));
-      }
-      if(jobs>13) px('OVERFLOW',CY.x+CY.w,CY.y+CY.h+10,20,
+      /* the machine is already running when the beat opens -- it never
+         stopped -- so the train is clocked off the top of the beat and not
+         off a word, and the queue grows because the arrivals outrun it. */
+      const u=Math.max(0,M-BEAT.WHY.sc), done=u*1.85;
+      const len=Math.min(14.6,9+u*1.10);
+      jobTrain(CY.x,CY.y,CY.w,CY.h,done,len,CY.w+24,
+               (n,over)=>over?P.red:H.mix(P.cyan,P.ink,0.20));
+      if(len>13) px('OVERFLOW',CY.x+CY.w,CY.y+CY.h+10,20,
                      H.rgba(P.red),'right','"Silkscreen"');
       // and the job that should never have been queued
       if(after(12,1)){
@@ -572,6 +592,16 @@ function explainer(ctx,W2,Hh,t){
         if(GBOX)GBOX.push({x:RS.x,y:RS.y,w:RS.w,h:RS.h,k:'radarbox'});
         px('RENDEZVOUS RADAR',RS.x+12,RS.y+8,14,
            H.rgba(H.mix(P.bone,P.ink,0.22)),null,'"Silkscreen"');
+        /* THE THING THAT WAS ACTUALLY HAPPENING. The switch left the radar's
+           resolver running against a reference it was out of phase with, so
+           it never settled -- it sent a signal that kept changing, and every
+           change cost the executive a cycle. A still trace in this box would
+           have been the one lie in the beat. */
+        const TR=[];
+        for(let x=RS.x+12;x<=RS.x+196;x+=4)
+          TR.push([x,RS.y+34+Math.sin(x*0.085+M*3.1)*8
+                            +Math.sin(x*0.223-M*1.9)*3.5]);
+        linePix(TR,H.rgba(H.mix(P.gold,P.ink,0.28)),2);
         px(Math.sin(M*6)>0?'AUTO':'auto',RS.x+RS.w-12,RS.y+28,20,
            H.rgba(P.gold),'right','"Silkscreen"');
       }
@@ -585,27 +615,38 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       /* Both halves of the comparison are the SAME construction -- one bar of
          jobs, one rule for what to do when it will not fit. */
-      const g1=H.clamp((M-wordAt(13,3))/2.0), g2=H.clamp((M-wordAt(14,5))/2.0);
-      [['IN TURN',150,g1,0],['BY PRIORITY',320,g2,1]].forEach(([lb,y,g,pri])=>{
+      /* the row wipes in on the sentence's FIRST word, not its fourth: the
+         beat opened on an empty stage and held it for a second otherwise. */
+      const t1=wordAt(13,0), t2=wordAt(14,5);
+      const g1=H.clamp((M-t1)/2.0), g2=H.clamp((M-t2)/2.0);
+      [['IN TURN',150,g1,0,t1],['BY PRIORITY',320,g2,1,t2]].forEach(
+                                                   ([lb,y,g,pri,t0])=>{
         if(g<=0) return;
+        /* the row WIPES in from the left rather than appearing: a bar of
+           thirteen blocks arriving between two frames was two of this
+           piece's three snaps. */
+        const wl=Math.round(340*H.ease.out(H.clamp(g*3)));
         px(lb,46,y-22,14,H.rgba(pri?P.green:H.mix(P.bone,P.ink,0.34)),
            null,'"Silkscreen"');
-        rect(46,y,340,46,H.rgba(H.mix(P.bone,P.ink,0.84)));
-        strokePoly([[46,y],[386,y],[386,y+46],[46,y+46]],
+        rect(46,y,wl,46,H.rgba(H.mix(P.bone,P.ink,0.84)));
+        strokePoly([[46,y],[46+wl,y],[46+wl,y+46],[46,y+46]],
                    H.rgba(pri?P.green:H.mix(P.bone,P.ink,0.46)),2);
-        if(GBOX)GBOX.push({x:46,y:y,w:340,h:46,k:'sched'+pri+'box'});
-        for(let i=0;i<13;i++){
-          const x=50+i*26;
-          const keep=pri?(i<9):true;                    // priority sheds the tail
-          const late=pri?false:(g>0.6);
-          /* the green block is the LANDING job, and it only survives on the
-             priority row -- a green block on the in-turn row would say one of
-             them got done, which is the opposite of the label under it */
-          rect(x,y+6,22,34,
-               H.rgba(!keep?H.mix(P.bone,P.ink,0.76)
-                     :(i===0&&pri?P.green:(late?H.mix(P.red,P.ink,0.30)
-                                              :H.mix(P.cyan,P.ink,0.20)))));
-        }
+        if(GBOX&&wl>330)GBOX.push({x:46,y:y,w:340,h:46,k:'sched'+pri+'box'});
+        /* SAME CONVEYOR, TWO RULES. In turn: it clears them slowly, in
+           order, and the queue runs away from it until every block in the
+           bar is late. By priority: it clears them faster because it is not
+           doing all of them -- the back of the queue is dropped, and the
+           guidance job (every fifth one, because it is queued every cycle)
+           is kept wherever in the queue it happens to be sitting. */
+        const u=Math.max(0,M-t0);
+        const done=u*(pri?2.35:1.15);
+        const len=Math.min(14.6,9+u*1.25);
+        jobTrain(46,y,340,46,done,len,wl,(n,over,slot)=>{
+          if(pri) return (n%5===0)?P.green
+                        :(slot>=9?H.mix(P.bone,P.ink,0.76)
+                                 :H.mix(P.cyan,P.ink,0.20));
+          return (len>11.5)?H.mix(P.red,P.ink,0.30):H.mix(P.cyan,P.ink,0.20);
+        });
         px(pri?'LANDING KEPT':'ALL OF THEM LATE',386,y+56,14,
            H.rgba(pri?P.green:P.red),'right','"Silkscreen"');
       });

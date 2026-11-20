@@ -181,20 +181,26 @@ function ringPix(cx,cy,r,col,th,k){
 }
 /* --- AN ANIMAL AS A BOX, because the square-cube law is about a box and
    pretending otherwise is where this argument usually goes wrong. --- */
-function boxAt(cx,cyB,s,col,k){
-  const d=Math.round(s*0.36);
-  const x=Math.round(cx-s/2), y=Math.round(cyB-s);
-  rect(x+d,y-d,s,s,H.rgba(H.mix(col,P.ink,0.52)));
-  rect(x,y,s,s,H.rgba(H.mix(col,P.ink,0.26)));
+/* The three dimensions are separate because the sentence names them
+   separately -- "twice as long, twice as wide and twice as tall" -- and the
+   box now GROWS one of them per phrase instead of arriving already doubled.
+   That is three and a half seconds of the beat that used to be a photograph,
+   and it is the claim being made rather than asserted. */
+function boxAt(cx,cyB,w,h,dd,col,k){
+  const s=Math.round(w), hh=Math.round(h), d=Math.round(dd);
+  const x=Math.round(cx-s/2), y=Math.round(cyB-hh);
+  rect(x+d,y-d,s,hh,H.rgba(H.mix(col,P.ink,0.52)));
+  rect(x,y,s,hh,H.rgba(H.mix(col,P.ink,0.26)));
   linePix([[x,y],[x+d,y-d],[x+s+d,y-d],[x+s,y]],H.rgba(H.mix(col,P.ink,0.10)),2);
-  linePix([[x+s,y],[x+s+d,y-d],[x+s+d,y-d+s],[x+s,y+s]],
+  linePix([[x+s,y],[x+s+d,y-d],[x+s+d,y-d+hh],[x+s,y+hh]],
           H.rgba(H.mix(col,P.ink,0.10)),2);
-  strokePoly([[x,y],[x+s,y],[x+s,y+s],[x,y+s]],H.rgba(H.mix(col,P.paper,0.30)),2);
-  if(GBOX)GBOX.push({x:x,y:y-d,w:s+d,h:s+d,k:k+'box'});
+  strokePoly([[x,y],[x+s,y],[x+s,y+hh],[x,y+hh]],
+             H.rgba(H.mix(col,P.paper,0.30)),2);
+  if(GBOX)GBOX.push({x:x,y:y-d,w:s+d,h:hh+d,k:k+'box'});
 }
 /* --- a limb, as two segments and a foot. ANG is how far the knee is thrown
    out sideways: the whole piece is what that angle costs. --- */
-function limb(cx,ang,lit,k){
+function limb(cx,ang,lit,k,wideAng){
   const L=Q.limb, hip=[cx,L.y0], foot=[cx,L.y1];
   const half=(L.y1-L.y0)/2;
   const kneeX=cx+Math.round(Math.sin(ang)*half*0.92);
@@ -204,8 +210,13 @@ function limb(cx,ang,lit,k){
   linePix([[kneeX,kneeY],foot],col,5);
   disc(kneeX,kneeY,6,H.rgba(H.mix(P.gold,P.ink,lit?0.06:0.40)));
   rect(cx-16,L.y1,32,6,col);
-  if(GBOX)GBOX.push({x:Math.min(cx,kneeX)-20,y:L.y0-8,
-                     w:Math.abs(kneeX-cx)+40,h:L.y1-L.y0+20,k:k+'box'});
+  /* the box is the WIDEST the knee gets in this posture, not where it is on
+     this frame: the limb flexes through every stance and a box that flexes
+     with it is a moving box, which is a box that argues with checkOverlap on
+     some frames and not others. */
+  const wk=cx+Math.round(Math.sin(wideAng===undefined?ang:wideAng)*half*0.92);
+  if(GBOX)GBOX.push({x:Math.min(cx,wk)-20,y:L.y0-8,
+                     w:Math.abs(wk-cx)+40,h:L.y1-L.y0+20,k:k+'box'});
   return {kneeX:kneeX,kneeY:kneeY,hip:hip,foot:foot};
 }
 /* the ground force: straight up the leg's line of action, from the foot */
@@ -243,23 +254,31 @@ function stressAxis(){
    four bars, so it cannot say something the picture does not show. --- */
 const DUTY=0.62, PHASE=[0,0.5,0.25,0.75], FEET=['LH','LF','RH','RF'];
 const down=(u,i)=>{ const p=((u-PHASE[i])%1+1)%1; return p<DUTY; };
-function footfall(M){
-  const F=Q.foot, t0=W(13,0), u=((M-t0)*0.42)%1;
+function footfall(M,g){
+  /* the strip ARRIVES: four rows, each one drawing itself out to the right
+     over a third of a second, one after another. It used to be 264 by 72
+     pixels of chart appearing between two frames after five seconds of a
+     held picture, which is the snap the stillness sweep names. */
+  const F=Q.foot, t0=W(13,0), u=((M-t0)*0.42)%1, gg=(g===undefined)?1:H.clamp(g);
   let n=0;
   FEET.forEach((lab,i)=>{
     const y=F.y+i*17;
+    const row=H.clamp((gg-i*0.14)/0.34);
+    if(row<=0) return;
+    const bw=Math.max(2,Math.round(F.w*row));
     px(lab,F.x-8,y-1,14,H.rgba(H.mix(P.bone,P.ink,0.46)),
        'right','"Silkscreen"');
-    rect(F.x,y,F.w,12,H.rgba(H.mix(P.bone,P.ink,0.84)));
-    for(let k=0;k<F.w;k++){
+    rect(F.x,y,bw,12,H.rgba(H.mix(P.bone,P.ink,0.84)));
+    for(let k=0;k<bw;k++){
       const uu=((k/F.w)*2)%1;
       if(down(uu,i)) rect(F.x+k,y,1,12,H.rgba(H.mix(P.cyan,P.ink,0.30)));
     }
     if(GBOX)GBOX.push({x:F.x,y:y,w:F.w,h:12,k:'foot'+i+'box'});
     if(down((u*2)%1,i)) n++;
   });
+  if(gg<0.999) return;
   const cx=F.x+Math.round(F.w*u);
-  rect(cx,F.y-6,2,17*4+4,H.rgba(P.gold));
+  rect(cx-1,F.y-6,4,17*4+4,H.rgba(P.gold));
   px('FEET DOWN: '+n,F.x+F.w,F.y+17*4+8,14,
      H.rgba(n?P.gold:P.red),'right','"Silkscreen"');
 }
@@ -350,7 +369,7 @@ function blob(cx,cy,hw,hh,pw,col){
     rect(x,Math.round(cy-h),1,Math.max(1,Math.round(h*2)),col);
   }
 }
-function elephant(cx,gy,s,legFrac,col,edge){
+function elephant(cx,gy,s,legFrac,col,edge,gu){
   const U=(v)=>v*s, C=H.rgba(col);
   const bellyY=gy-U(46), backY=gy-U(98);
   blob(cx,(bellyY+backY)/2,U(46),(bellyY-backY)/2,4,C);       // body
@@ -368,12 +387,23 @@ function elephant(cx,gy,s,legFrac,col,edge){
        H.rgba(H.mix(col,P.ink,0.26)));                        // ear, on the join
   linePix([[cx+U(44),gy-U(86)],[cx+U(54),gy-U(58)]],C,
           Math.max(1,Math.round(U(3))));                      // tail
-  [-36,-14,16,36].forEach((dx,i)=>{                           // four columns
+  /* FOUR COLUMNS, WALKING. gu is the gait phase shared with the footfall
+     strip, so the animal on the chart and the bars under it are the same
+     walk: a foot is up only during its swing, and with a duty factor of
+     0.62 at least two of them are always down -- which is the sentence the
+     beat ends on, demonstrated instead of captioned. */
+  [-36,-14,16,36].forEach((dx,i)=>{
     const f=H.clamp(legFrac*4-i);
     if(f<=0) return;
-    rect(Math.round(cx+U(dx)-U(6)),Math.round(bellyY-U(4)),
+    let lift=0, fwd=0;
+    if(gu!==undefined&&f>=0.999){
+      const ph=((gu-PHASE[i])%1+1)%1;
+      if(ph>=DUTY){ const sp=(ph-DUTY)/(1-DUTY);
+                    lift=Math.sin(sp*Math.PI); fwd=(sp-0.5)*2; }
+    }
+    rect(Math.round(cx+U(dx)-U(6)+U(6)*fwd),Math.round(bellyY-U(4)),
          Math.max(2,Math.round(U(12))),
-         Math.max(1,Math.round((U(50))*f)),C);
+         Math.max(1,Math.round((U(50))*f-U(11)*lift)),C);
   });
   if(edge) rect(cx-U(46),backY-1,U(92),1,H.rgba(edge));
 }
@@ -503,13 +533,78 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* ===== THE GAIT CLOCK =====
+       Everything this piece measures is a LOCOMOTOR load. The 57 MPa in a
+       chipmunk is a galloping peak with a measured range of 31 to 86, the
+       240 MPa is where bone breaks under that kind of cycling, and the whole
+       argument about posture is about what a leg does while an animal is on
+       it. So one clock runs under the piece and the beats read it: the
+       chipmunk's stress rides its own published range, the ground force
+       rises and falls once a stride, the limb flexes through stance, and the
+       elephant on the chart walks in step with the footfall strip beneath
+       it. Nothing here is invented: the quantities that move are the ones
+       the sources report as cycling, and the CENTRE of each is still the
+       claim.
+       Deterministic, and derived from M alone -- no Math.random anywhere. */
+    const GAIT=0.82;                            // strides a second on screen
+    const gp=()=>(M*GAIT)%1;
+    const stance=()=>0.5-0.5*Math.cos(gp()*Math.PI*2);   // 0 .. 1 .. 0
+
+    /* --- THE LOAD, BEARING ON A SECTION. The same object in CUBE and in
+       BONES, because it is the same question in both: a bone section is a
+       thing something is standing on, and a load that is not being applied is
+       not a question. It presses once a step and lifts, on the one clock. --- */
+    const platen=(cx,r,topY,wid)=>{
+      const py=topY-11-Math.round(22*(1-stance()));
+      const w=(wid||r*2+14);
+      rect(cx-Math.round(w/2),py,w,8,H.rgba(H.mix(P.red,P.ink,0.26)));
+      rect(cx-4,py-26,8,20,H.rgba(H.mix(P.red,P.ink,0.40)));
+      linePix([[cx-11,py-10],[cx,py-2],[cx+11,py-10]],
+              H.rgba(H.mix(P.red,P.ink,0.40)),3);
+    };
+
     /* ============ CUBE -- the square-cube law, as a table ============== */
     if(T>=BEAT.CUBE.sc&&T<BEAT.LIMIT.sc){
       px('DOUBLE EVERY LENGTH',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const X1=Q.col.x1, X2=Q.col.x2, dim=H.rgba(H.mix(P.bone,P.ink,0.40));
-      if(after(1,0)) boxAt(X1,262,40,P.cyan,'bx1');
-      if(after(1,3)) boxAt(X2,262,80,P.cyan,'bx2');
+      /* --- THE WEIGHT IS GOING DOWN THE COLUMN, and there is eight times as
+         much of it on the right. One marker per unit of weight, running from
+         under the box to the stress bar, in a clear lane beside each column:
+         the count is COMPUTED from the box's own three dimensions, so as the
+         box doubles in length, then in width, then in height, the stream goes
+         one, two, four, eight. That is the square-cube law happening rather
+         than being asserted, and it is the only thing on this screen that is
+         genuinely continuous -- a bone holds an animal up every second it is
+         standing on it. --- */
+      const loadRun=(lane,vol,seed)=>{
+        const n=Math.max(1,Math.round(vol)), y0=270, y1=454;
+        for(let i=0;i<n;i++){
+          const ph=((M*0.62)+i/n)%1;
+          const y=Math.round(H.lerp(y0,y1,ph));
+          void seed;
+          const c=H.rgba(H.mix(P.cyan,P.ink,0.22+0.30*ph));
+          rect(lane-5,y,11,4,c);
+          linePix([[lane-6,y+4],[lane,y+11],[lane+6,y+4]],c,2);
+        }
+      };
+      if(after(1,0)){ boxAt(X1,262,40,40,14,P.cyan,'bx1'); loadRun(70,1,0); }
+      if(after(1,3)){
+        /* ONE DIMENSION PER PHRASE: long on "twice as long", wide on "twice
+           as wide", tall on "twice as tall". The box used to arrive already
+           doubled on the first of the three and then sit there for the other
+           two, which is three and a half seconds of held picture under the
+           sentence that is doing all the work. */
+        const gl=H.clamp((M-wordAt(1,3))/0.90);
+        const gw=H.clamp((M-wordAt(1,6))/0.90);
+        const gt=H.clamp((M-wordAt(1,10))/0.90);
+        boxAt(X2,262,H.lerp(40,80,gw),H.lerp(40,80,gt),H.lerp(14,29,gl),
+              P.cyan,'bx2');
+        /* the two rails sit OUTSIDE both columns, because the row labels are
+           centred on the panel and a lane between the columns runs straight
+           through WEIGHT, BONE SECTION and STRESS. */
+        loadRun(378,H.lerp(1,2,gw)*H.lerp(1,2,gt)*H.lerp(1,2,gl),7);
+      }
       if(after(1,3)){
         px('X1',X1,274,14,dim,'center','"Silkscreen"');
         px('X2 LENGTH',X2,274,14,dim,'center','"Silkscreen"');
@@ -548,10 +643,20 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       stressAxis();
       if(after(3,0)){
-        const x=mX(CHIP_KG), y=sY(CHIP_MPA);
-        rect(x-26,y-1,52,3,H.rgba(P.cyan));
-        disc(x,y,5,H.rgba(P.cyan));
-        px('CHIPMUNK '+CHIP_MPA,x+10,y+12,14,H.rgba(P.cyan),null,'"Silkscreen"');
+        /* THE NUMBER IS A RANGE BECAUSE THE LOAD IS A CYCLE. Biewener gives
+           -31 to -86 MPa with a mean of -57: bone stress rises and falls once
+           a stride, and holding the marker at the mean was drawing the
+           average of a thing that never sits at its average. The band and the
+           pale tick are the published range and the published mean, neither
+           of which moves; the marker is the stride. */
+        const x=mX(CHIP_KG), ym=sY(CHIP_MPA);
+        const ylo=sY(CHIP_LO), yhi=sY(CHIP_HI);
+        rect(x-15,yhi,30,ylo-yhi,H.rgba(H.mix(P.cyan,P.ink,0.80)));
+        const y=Math.round(H.lerp(ylo,yhi,stance()));
+        rect(x-30,y-2,60,5,H.rgba(P.cyan));
+        disc(x,y,6,H.rgba(P.cyan));
+        rect(x-26,ym-1,52,3,H.rgba(H.mix(P.cyan,P.paper,0.34)));
+        px('CHIPMUNK '+CHIP_MPA,x+10,ym+12,14,H.rgba(P.cyan),null,'"Silkscreen"');
       }
       if(after(3,9)){
         const y=sY(BREAK_MPA);
@@ -568,6 +673,14 @@ function explainer(ctx,W2,Hh,t){
           pts.push([mX(M2),sY(s2)]);
         }
         if(pts.length>1){ linePix(pts,H.rgba(P.gold),3); polyReg(pts,'curve'); }
+        /* and the prediction is a sweep, not a shape: three tracers climb it
+           from shrew to elephant for as long as it is on the wall. */
+        if(g>=0.999) for(let k=0;k<3;k++){
+          const u=((M*0.15)+k/3)%1;
+          const M2=MLO*Math.pow(MHI/MLO,u), s2=sigma(M2);
+          if(s2>SHI) continue;
+          disc(mX(M2),sY(s2),5,H.rgba(H.mix(P.gold,P.paper,0.26)));
+        }
         /* the condition lives UNDER the axis: everything inside the box is
            either the curve or a label the curve runs through. */
         if(g>0.5) px('IF NOTHING CHANGED',Q.ax.x+Q.ax.w,Q.ax.y+Q.ax.h+32,14,
@@ -592,16 +705,26 @@ function explainer(ctx,W2,Hh,t){
       px('TEN TIMES LONGER. HOW MUCH THICKER?',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const SC=5.4, BASE=430, dim=H.rgba(H.mix(P.bone,P.ink,0.40));
-      const circ=(cx,d,col,lab,on)=>{
-        if(!on) return;
-        const r=Math.round(d*SC/2);
-        disc(cx,BASE-r,r,H.rgba(col));
+      const circ=(cx,d,col,lab,n,i)=>{
+        if(!after(n,i)) return;
+        /* a section OPENS from the ground line it stands on, over 0.7s. The
+           NEEDED one is 170 pixels across and used to arrive between two
+           frames. */
+        const gg=H.clamp((M-wordAt(n,i))/0.70);
+        const r=Math.round(d*SC/2), rr=Math.max(2,Math.round(r*gg));
+        disc(cx,BASE-rr,rr,H.rgba(col));
+        /* registered at FULL size whatever gg is -- see limb() */
         if(GBOX)GBOX.push({x:cx-r,y:BASE-r*2,w:r*2,h:r*2,k:lab+'box'});
         px(lab,cx,BASE+(lab==='MEASURED'?28:10),14,dim,'center','"Silkscreen"');
+        /* THE SAME LOAD, ONCE A STEP, ON ALL THREE. The beat's question is
+           how thick a bone has to be to carry it, and a load that is not
+           being applied is not a question. One clock, so the three arrows
+           press together: the sections differ, the load does not. */
+        if(gg>=0.999) platen(cx,r,BASE-r*2);
       };
-      circ(300,D_NEED,H.mix(P.red,P.ink,0.34),'NEEDED',after(5,0));
-      circ(176,D_MEAS,H.mix(P.cyan,P.ink,0.20),'MEASURED',after(5,8));
-      circ(96, D_GEO, H.mix(P.bone,P.ink,0.30),'SCALED UP',after(6,0));
+      circ(300,D_NEED,H.mix(P.red,P.ink,0.34),'NEEDED',5,0);
+      circ(176,D_MEAS,H.mix(P.cyan,P.ink,0.20),'MEASURED',5,8);
+      circ(96, D_GEO, H.mix(P.bone,P.ink,0.30),'SCALED UP',6,0);
       if(after(5,0)) px('FOR THE SAME STRESS',300,BASE+46,14,
                         H.rgba(H.mix(P.red,P.ink,0.20)),'center','"Silkscreen"');
       if(after(6,6)) capLine('L ~ D^'+EXP_LD,6,6,U.mid('L ~ D^'+EXP_LD,20),
@@ -617,13 +740,23 @@ function explainer(ctx,W2,Hh,t){
       const L=Q.limb, cx=Q.cx;
       const BENT=0.62, UP=0.09;
       const sw=after(9,0)?H.ease.inOut(H.clamp((M-wordAt(9,0))/1.3)):0;
-      const ang=H.lerp(BENT,UP,sw);
-      if(sw>0.02){ /* where it was, left behind */
+      const base=H.lerp(BENT,UP,sw);
+      /* THE LEG IS NOT A POSE, IT IS A STANCE. A limb carrying an animal
+         flexes as the body passes over the foot and extends again, once a
+         step; the knee is thrown furthest out at mid-stance, which is where
+         the ground arm this beat is about is longest. The posture -- how bent
+         it is at all -- is still the claim, and that is `base`, which the
+         stride multiplies rather than replaces. */
+      const ang=base*(0.64+0.36*stance());
+      if(sw>0.02){ /* where it was, left behind -- and it stays where it was */
         const gh=limb(cx,BENT,false,'ghost');
         void gh;
       }
-      const J=limb(cx,ang,true,'limb');
-      if(after(7,13)) groundForce(cx,L.y0+40,P.cyan);
+      const J=limb(cx,ang,true,'limb',base);
+      /* THE GROUND FORCE IS A CYCLE TOO: the ground does not push with a
+         constant force, it pushes hardest at mid-stance and hands the animal
+         back to the air. The arrow's LENGTH is that force. */
+      if(after(7,13)) groundForce(cx,L.y0+110-Math.round(90*stance()),P.cyan);
       /* R: how far the knee is thrown out of the force's line. Both arms
          are labelled in WORDS, not in r and R: Silkscreen has no lower
          case, so the two labels would have been the same letter. */
@@ -645,8 +778,11 @@ function explainer(ctx,W2,Hh,t){
       }
       /* and what it costs the bone */
       if(after(10,4)){
+        /* and the stress follows the force, because it is the force: this
+           bar is the one quantity on screen that is a consequence, so it
+           cycles with the step like everything upstream of it. */
         const f=Math.abs(J.kneeX-cx)/Math.abs(Math.sin(BENT)*(L.y1-L.y0)/2*0.92);
-        const w=Math.round(40+150*f);
+        const w=Math.round(40+150*f*(0.55+0.45*stance()));
         px('BONE STRESS',Q.cx,Q.rows[0]-22,14,
            H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
         rect(Q.cx-w/2,Q.rows[0],w,20,H.rgba(H.mix(P.red,P.ink,0.20)));
@@ -679,12 +815,46 @@ function explainer(ctx,W2,Hh,t){
         if(g>0.5) px('MEASURED: FLAT',Q.ax.x+6,y+10,14,
                      H.rgba(P.cyan),null,'"Silkscreen"');
       }
+      /* READ IT ACROSS. The prediction climbs with body mass and the
+         measurement does not, and that is a comparison you make by running
+         your eye from a shrew to an elephant -- so the piece runs it, back
+         and forth, for as long as the chart is on the wall. The two dots are
+         where the sweep crosses each line; the gap between them opening up IS
+         the beat. It ping-pongs rather than wrapping, because a line that
+         jumps back to the left is a cut and not a sweep. It starts with the
+         beat: the prediction and the break line are already up, and the
+         measured line draws itself at three pixels tall, which is not an
+         event however long it takes. */
+      { const A=Q.ax, u=Math.abs(((M*0.21)%2)-1), fy=sY(CHIP_MPA);
+        const sx=A.x+Math.round(A.w*u);
+        const M2=MLO*Math.pow(MHI/MLO,u), s2=sigma(M2);
+        for(let yy=A.y;yy<A.y+A.h;yy+=8){
+          if(yy>fy+2&&yy<fy+26) continue;          // the MEASURED label is here
+          rect(sx,yy,2,5,H.rgba(H.mix(P.bone,P.ink,0.58)));
+        }
+        if(s2<=SHI) disc(sx,sY(s2),5,H.rgba(H.mix(P.gold,P.paper,0.22)));
+        if(after(11,2)&&sx<=A.x+Math.round(A.w*H.clamp((M-wordAt(11,2))/2.0)))
+          disc(sx,fy,5,H.rgba(H.mix(P.cyan,P.paper,0.22)));
+      }
       if(after(12,0)){
         const g=H.clamp((M-wordAt(12,0))/1.2);
+        /* AND IT WALKS. The gait phase is the footfall strip's own clock, so
+           the animal and the bars under it are one walk and not two -- and an
+           elephant standing dead still under "at full speed it never has all
+           four feet off the ground at once" was the piece arguing against
+           itself. */
+        /* (u*2)%1, not u: the strip lays TWO gait cycles across its width
+           (uu=((k/F.w)*2)%1), so the playhead at fraction u of the strip is
+           reading gait phase (u*2)%1 -- and that is the phase the printed
+           "FEET DOWN: n" is counted at. Walking the elephant at u instead
+           put a number on screen that counted a different animal from the
+           one above it. */
+        const u13=((((M-wordAt(13,0))*0.42)%1)+1)%1;
+        const gu=(u13*2)%1;
         elephant(mX(ELE_KG)-16,Q.ax.y+Q.ax.h-4,0.9,g,
-                 H.mix(P.bone,P.ink,0.30),null);
+                 H.mix(P.bone,P.ink,0.30),null,g>=0.999?gu:undefined);
       }
-      if(after(13,0)) footfall(M);
+      if(after(13,0)) footfall(M,H.clamp((M-wordAt(13,0))/0.95));
     }
 
     /* ============ END ================================================= */

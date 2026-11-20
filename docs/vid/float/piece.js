@@ -190,6 +190,83 @@ function digitStrip(x,y,digits,repFrom,repLen,col,hot,sz){
                      k:'digitsbox'});
   return Math.round(digits.length*w);
 }
+/* ===== THINGS THAT DO NOT STOP =====
+   This piece is about a division that has no end, and every beat of it was
+   drawing that fact as a row of digits with an ellipsis after it. An
+   ellipsis is a PROMISE that something continues; the only honest way to
+   make the claim is to let it continue. Nothing below is typed: the digits
+   come out of the same long division the engine above runs, from whatever
+   index the tape has reached, so what is on screen is always the real
+   expansion and never a string. */
+
+/* long division from an arbitrary digit index, in any base */
+function tapeDigits(num,den,base,from,count){
+  let r=num%den;
+  for(let i=0;i<from;i++) r=(r*base)%den;
+  let o='';
+  for(let i=0;i<count;i++){ r*=base; o+=Math.floor(r/den).toString(base); r%=den; }
+  return o;
+}
+/* A TAPE STILL COMING OUT OF THE MACHINE. Digits at a steady rate, the block
+   creeping up to make room for the next line, for as long as the panel is on
+   screen. `grp` bands the repeating block so a reader can see the loop --
+   a drawn box cannot follow a tape that moves, and one px() call per
+   character is text-on-text to checkOverlap, so the marking is a background
+   band and the row stays a single string. */
+function tapeDraw(x,y,w,h,num,den,base,t0,rate,m,col,hot,grp){
+  /* the advance is MEASURED, not assumed: a guessed 0.6667 em ran the first
+     row of every tape past the right-hand edge of its own panel. */
+  const S=14, pitch=glyph('00000000',S,'"Silkscreen"').w/8, lead=20;
+  const cols=Math.max(6,Math.floor(w/pitch));
+  const prod=Math.max(0,(m-t0))*rate;
+  const LN=Math.floor(prod/cols), yOff=(prod/cols-LN)*lead;
+  const rows=Math.floor(h/lead);
+  for(let L=Math.max(0,LN-rows);L<=LN;L++){
+    const ly=Math.round(y+h-lead-yOff-(LN-L)*lead);
+    if(ly<y||ly>y+h-lead+4) continue;
+    const n=(L===LN)?Math.max(0,Math.floor(prod)-L*cols):cols;
+    if(n<=0) continue;
+    if(grp) for(let i=0;i<n;i++){
+      if(Math.floor((L*cols+i-1)/grp)%2) continue;
+      rect(Math.round(x+i*pitch)-1,ly-3,Math.ceil(pitch)+1,S+5,H.rgba(hot));
+    }
+    px(tapeDigits(num,den,base,L*cols,n),Math.round(x),ly,S,col,
+       null,'"Silkscreen"');
+  }
+  if(GBOX)GBOX.push({x:x-4,y:y-4,w:w+8,h:h+8,k:'tapebox'});
+}
+
+/* THE SAME ANSWER, IN MACHINE AFTER MACHINE, FOR AS LONG AS YOU CARE TO
+   WATCH. "Type it into anything" is a claim about REPETITION, so the console
+   repeats: it keeps evaluating the expression, keeps printing the identical
+   thing, and scrolls to keep up. That is also the BLAME beat's argument --
+   a bug is intermittent and this is not. */
+const ENVS=[['BROWSER','> 0.1 + 0.2'],['SPREADSHEET','=0.1+0.2'],
+            ['PYTHON','>>> 0.1+0.2'],['PHONE','0.1 + 0.2 =']];
+function replDraw(x,y,w,h,t0,per,m){
+  const lead=36, S=20;
+  const u=Math.max(0,(m-t0))/per;
+  const LN=Math.floor(u), off=(u-LN)*lead;
+  const rows=Math.floor(h/lead);
+  for(let i=Math.max(0,LN-rows);i<=LN;i++){
+    const ly=Math.round(y+h-lead-off-(LN-i)*lead);
+    if(ly<y+2||ly>y+h-lead+2) continue;
+    const ans=(i%2===1);
+    const e=ENVS[(((i/2)|0))%ENVS.length];
+    /* the quantised fade keeps a line from popping out at the top without
+       making a new baked glyph on every frame */
+    const a=Math.round(H.clamp((ly-y-2)/16)*4)/4;
+    if(a<=0) continue;
+    px(ans?PRINTED:(e[0]+'  '+e[1]),x+14,ly,S,
+       ans?H.rgba(P.red,a):H.rgba(H.mix(P.bone,P.ink,0.10),a),null,'"VT323"');
+  }
+}
+/* the first column in which the sum and nought point three disagree -- found,
+   not asserted, because that is the beat's whole claim */
+const DIFF_AT=(()=>{ const a=EX.sum, b=EX.target;
+  for(let i=0;i<Math.max(a.length,b.length);i++) if(a[i]!==b[i]) return i;
+  return -1; })();
+
 function polyReg(pts,k){
   if(!GBOX) return;
   for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i];
@@ -429,15 +506,12 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[C.x,C.y],[C.x+C.w,C.y],[C.x+C.w,C.y+C.h],[C.x,C.y+C.h]],
                  H.rgba(H.mix(P.bone,P.ink,0.56)),2);
       if(GBOX)GBOX.push({x:C.x,y:C.y,w:C.w,h:C.h,k:'conbox'});
-      const typ=H.clamp((M-wordAt(1,0))/1.4);
-      const expr='0.1 + 0.2';
-      px('>',C.x+14,C.y+20,20,H.rgba(H.mix(P.bone,P.ink,0.40)),null,'"VT323"');
-      px(expr.slice(0,Math.round(typ*expr.length)),C.x+34,C.y+20,20,
-         H.rgba(H.mix(P.bone,P.ink,0.06)),null,'"VT323"');
-      if(after(2,0)){
-        px(PRINTED,C.x+34,C.y+56,20,H.rgba(P.red),null,'"VT323"');
-        px('>',C.x+14,C.y+92,20,H.rgba(H.mix(P.bone,P.ink,0.40)),null,'"VT323"');
-      }
+      /* a session that does not end: browser, spreadsheet, Python, phone,
+         then round again, every one of them printing the same thing. The
+         old build typed the expression once and then held a photograph of a
+         console for five seconds under a sentence about doing it
+         everywhere. */
+      replDraw(C.x,C.y,C.w,C.h,wordAt(1,0),0.78,M);
       if(after(2,5)) px('FIFTEEN ZEROS AND A FOUR',Q.cx,Q.rows[0],20,
                         H.rgba(P.red),'center','"Silkscreen"');
     }
@@ -460,6 +534,10 @@ function explainer(ctx,W2,Hh,t){
         if(!last){ const g=H.clamp((M-wordAt(3,i?9:2))/0.7);
           rect(Q.cx-w2/2-10,y+16,Math.round((w2+20)*g),3,H.rgba(P.red)); }
       });
+      /* AND THE CONSOLE IS STILL GOING. "Not a bug" is a claim that it is not
+         intermittent -- so the session that started in TRY keeps running
+         underneath the verdict, printing the same number every time. */
+      replDraw(40,418,352,112,wordAt(1,0),0.78,M);
     }
 
     /* ============ THIRD -- base ten already does this ================== */
@@ -471,16 +549,13 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[B2.x,B2.y],[B2.x+B2.w,B2.y],[B2.x+B2.w,B2.y+B2.h],
                   [B2.x,B2.y+B2.h]],H.rgba(H.mix(P.bone,P.ink,0.52)),2);
       if(GBOX)GBOX.push({x:B2.x,y:B2.y,w:B2.w,h:B2.h,k:'tenbox'});
-      px('ONE THIRD',B2.x+14,B2.y+14,14,
+      px('ONE THIRD  =  0.',B2.x+14,B2.y+14,14,
          H.rgba(H.mix(P.bone,P.ink,0.34)),null,'"Silkscreen"');
-      if(after(5,6)){
-        const n=Math.min(15,Math.round(H.clamp((M-wordAt(5,6))/2.4)*17));
-        px('0.',B2.x+14,B2.y+56,20,H.rgba(H.mix(P.bone,P.ink,0.06)),
-           null,'"Silkscreen"');
-        if(n>0) digitStrip(B2.x+42,B2.y+56,
-                           THIRD_D.slice(0,n)+(n>=15?'...':''),0,1,
-                           H.rgba(H.mix(P.bone,P.ink,0.06)),H.rgba(P.gold));
-      }
+      /* the division is RUNNING, and it does not stop when the sentence
+         about it does -- which is the only way a piece can say "it never
+         stops" without an ellipsis doing the work. */
+      tapeDraw(B2.x+14,B2.y+38,B2.w-28,64,1,3,10,wordAt(5,2),34,M,
+               H.rgba(H.mix(P.bone,P.ink,0.06)),null,0);
       if(after(6,0)) px('10 = 2 X 5.  3 IS NEITHER.',B2.x+14,B2.y+110,14,
                         H.rgba(H.mix(P.bone,P.ink,0.30)),null,'"Silkscreen"');
     }
@@ -496,12 +571,12 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[B2.x,B2.y],[B2.x+B2.w,B2.y],[B2.x+B2.w,B2.y+B2.h],
                   [B2.x,B2.y+B2.h]],H.rgba(H.mix(P.bone,P.ink,0.66)),2);
       if(GBOX)GBOX.push({x:B2.x,y:B2.y,w:B2.w,h:B2.h,k:'tenbox'});
-      px('ONE THIRD',B2.x+14,B2.y+14,14,
+      px('ONE THIRD  =  0.',B2.x+14,B2.y+14,14,
          H.rgba(H.mix(P.bone,P.ink,0.52)),null,'"Silkscreen"');
-      px('0.',B2.x+14,B2.y+56,20,H.rgba(H.mix(P.bone,P.ink,0.46)),
-         null,'"Silkscreen"');
-      digitStrip(B2.x+42,B2.y+56,THIRD_D.slice(0,15)+'...',0,1,
-                 H.rgba(H.mix(P.bone,P.ink,0.46)),H.rgba(H.mix(P.gold,P.ink,0.46)));
+      /* it never stopped, so it is still going -- same division, same start
+         time, two beats later. */
+      tapeDraw(B2.x+14,B2.y+38,B2.w-28,64,1,3,10,wordAt(5,2),34,M,
+               H.rgba(H.mix(P.bone,P.ink,0.46)),null,0);
       px('10 = 2 X 5.  3 IS NEITHER.',B2.x+14,B2.y+110,14,
          H.rgba(H.mix(P.bone,P.ink,0.60)),null,'"Silkscreen"');
 
@@ -509,16 +584,13 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[T2.x,T2.y],[T2.x+T2.w,T2.y],[T2.x+T2.w,T2.y+T2.h],
                   [T2.x,T2.y+T2.h]],H.rgba(P.cyan),2);
       if(GBOX)GBOX.push({x:T2.x,y:T2.y,w:T2.w,h:T2.h,k:'twobox'});
-      px('ONE TENTH',T2.x+14,T2.y+14,14,
+      px('ONE TENTH  =  0.',T2.x+14,T2.y+14,14,
          H.rgba(P.cyan),null,'"Silkscreen"');
-      if(after(8,5)){
-        const n=Math.min(20,Math.round(H.clamp((M-wordAt(8,5))/2.6)*23));
-        px('0.',T2.x+14,T2.y+56,14,H.rgba(H.mix(P.bone,P.ink,0.06)),
-           null,'"Silkscreen"');
-        if(n>0) digitStrip(T2.x+42,T2.y+56,
-                           TENTH_B.slice(0,n)+(n>=20?'...':''),3,4,
-                           H.rgba(H.mix(P.bone,P.ink,0.06)),H.rgba(P.cyan),14);
-      }
+      /* the same loop in base two, banded in fours because that is the
+         block that repeats -- 0001 1001 1001 1001 ... for ever */
+      if(after(8,5)) tapeDraw(T2.x+14,T2.y+38,T2.w-28,64,1,10,2,wordAt(8,5),34,M,
+                              H.rgba(H.mix(P.bone,P.ink,0.06)),
+                              H.mix(P.cyan,P.ink,0.80),4);
       if(after(8,4)) px('2 = 2.  10 NEEDS A 5.',T2.x+14,T2.y+110,14,
                         H.rgba(H.mix(P.bone,P.ink,0.30)),null,'"Silkscreen"');
     }
@@ -550,10 +622,16 @@ function explainer(ctx,W2,Hh,t){
         px('AND THEN IT STOPS',cx2,S.y-26,14,
            H.rgba(P.red),'right','"Silkscreen"');
       }
+      /* THE DIGITS DO NOT STOP ARRIVING; THE BOX STOPS TAKING THEM. The
+         same tape that started two beats ago is still running under the
+         strip, and the strip beside it holds sixty four of them. That is
+         the whole of "and then it has to stop", shown instead of said. */
+      tapeDraw(46,288,300,64,1,10,2,wordAt(8,5),34,M,
+               H.rgba(H.mix(P.bone,P.ink,0.46)),H.mix(P.cyan,P.ink,0.84),4);
       if(after(10,10)){
-        px('0.1 IS HELD AS',Q.cx,330,14,
+        px('0.1 IS HELD AS',Q.cx,372,14,
            H.rgba(H.mix(P.bone,P.ink,0.34)),'center','"Silkscreen"');
-        longNum(EX.a,Q.cx-172,356,H.rgba(P.gold));
+        longNum(EX.a,Q.cx-172,396,H.rgba(P.gold));
       }
     }
 
@@ -566,12 +644,46 @@ function explainer(ctx,W2,Hh,t){
                   [EX.b,'0.2 HOLDS',P.gold,after(11,5)],
                   [EX.sum,'THEIR SUM, ROUNDED',P.red,after(11,17)],
                   [EX.target,'AND 0.3 HOLDS',P.cyan,after(12,3)]];
+      const seen=[];
       show.forEach(([v,lb,col,on],i)=>{
         if(!on) return;
         px(lb,Q.cx-172,rowsY[i],14,H.rgba(H.mix(P.bone,P.ink,0.40)),
            null,'"Silkscreen"');
         longNum(v,Q.cx-172,rowsY[i]+20,H.rgba(col));
+        seen.push(i);
       });
+      /* THE COMPARISON, DONE RATHER THAN ASSERTED. Two numbers differ when
+         some column differs, so a head walks the columns -- and the column
+         where the sum and nought point three come apart keeps its mark
+         once the head has been past it. */
+      if(seen.length){
+        /* the head walks the COLUMNS, so its travel is the measured width
+           of a row of them and not a guess that overshoots into blank. */
+        const X0=Q.cx-172, PER=3.6;
+        const WID=glyph(EX.sum.slice(0,WRAP),14,'"VT323"').w;
+        const u=((M-wordAt(11,0))/PER)%1;
+        const hx=Math.round(X0+u*WID);
+        seen.forEach(i=>{
+          /* the head is a band, not a hairline: two pixels of travel over
+             forty of height is under the floor the probe can see and under
+             the one a viewer can. */
+          rect(Math.max(X0-6,hx-22),rowsY[i]+12,
+               Math.min(22,hx-X0+6),48,H.rgba(P.paper,0.10));
+          linePix([[hx,rowsY[i]+12],[hx,rowsY[i]+60]],
+                  H.rgba(H.mix(P.bone,P.paper,0.40)),2);
+        });
+        /* and the mark stays once the head has been past it -- but only once
+           nought point three is on screen to be disagreed with. */
+        if(DIFF_AT>=0&&seen.indexOf(3)>=0){
+          const row=Math.floor(DIFF_AT/WRAP), cc=DIFF_AT%WRAP;
+          const dx=Math.round(X0+glyph(EX.sum.slice(row*WRAP,row*WRAP+cc),14,
+                                       '"VT323"').w);
+          if(hx>=dx){
+            linePix([[dx,rowsY[2]+16+row*18],[dx,rowsY[3]+16+row*18]],
+                    H.rgba(P.red),2);
+          }
+        }
+      }
       if(after(12,5)) px('NOT THE SAME NUMBER',Q.cx,Q.rows[1],20,
                          H.rgba(P.red),'center','"Silkscreen"');
     }

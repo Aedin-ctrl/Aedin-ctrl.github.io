@@ -194,13 +194,84 @@ function ladder(marks,floorOn){
     px(label,L.x+L.w,y+6,14,H.rgba(col),'right','"Silkscreen"');
   });
 }
+/* --- THE PULSES NEVER STOPPED. This is the one thing in the story that was
+   genuinely continuous: for nine months the spacecraft dumped momentum out
+   of its wheels with small thruster pulses, and every single one of them was
+   written down in the wrong unit. So the pulses run for as long as the beat
+   does -- it is the subject, not decoration, and it is the reason the error
+   compounded instead of staying a rounding difference. Deterministic: every
+   phase comes from the puff's index. --- */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+function pulseLane(x,y,w,m,col,lab){
+  rect(x,y-8,7,16,H.rgba(H.mix(P.bone,P.ink,0.46)));     // the nozzle
+  for(let i=0;i<9;i++){
+    const ph=((m/1.9)+jit(i*7+3))%1;
+    disc(Math.round(x+10+ph*(w-16)),
+         Math.round(y+Math.sin(m*1.7+i*2.1)*2),
+         Math.max(1,Math.round(2+ph*7)),
+         H.rgba(col,Math.max(0,0.80-ph*0.80)));
+  }
+  if(lab) px(lab,x,y+16,14,H.rgba(H.mix(P.bone,P.ink,0.52)),
+             null,'"Silkscreen"');
+}
+/* --- THE APPROACH PROFILE. Altitude against time, filled down to the
+   ground, so the leading edge sweeps a tall column and the beat cannot be a
+   photograph of a finished chart. Solid while they were still hearing it,
+   ghosted after loss of signal -- which is exactly what "reconstructed
+   afterwards" means. --- */
+function profile(g,losU){
+  const L=Q.lad, N=96;
+  const alt=(u)=>ACTUAL_KM+(PLAN_KM-ACTUAL_KM)*Math.pow(2*u-1,2);
+  const xs=(u)=>L.x+6+u*(L.w-12), step=Math.ceil((L.w-12)/N);
+  for(let i=0;i<=N;i++){
+    const u=i/N; if(u>g) break;
+    const xx=Math.round(xs(u)), yy=kmY(alt(u));
+    /* THE GHOSTING COMES ON GRADUALLY, AND THAT IS THE POINT. Every other
+       figure in this piece is quoted -- the planned, the hour-out and the
+       actual altitude, and the seconds the carrier went early. Where on
+       this curve the signal was lost is NOT quoted, and a hard step from
+       solid to dashed drew a measured instant that no source gives. So the
+       picture stops asserting a moment: the dashes come in over a span, and
+       the viewer reads "somewhere around here it stopped being tracked and
+       started being reconstructed", which is all anyone can say. */
+    const fade=H.clamp((u-(losU-0.10))/0.20);
+    if((i%2)&&fade>0&&(((i*7)%10)/10)<fade) continue;
+    /* the wash has to be VISIBLE. At nine per cent over this background the
+       newly filled column was under the luminance step the probe counts,
+       which is the same step a viewer needs: a fill nothing can see is not
+       a fill. */
+    /* the COLOUR crosses over on the same gradual fade, for the same
+       reason: a hard cyan-to-red step is the same unmeasured instant drawn
+       a second way. */
+    rect(xx,yy,step,L.y+L.h-yy,
+         H.rgba(H.mix(P.cyan,P.red,fade),H.lerp(0.19,0.13,fade)));
+  }
+  // the leading edge: the column being filled right now, which is what moves
+  if(g>0){
+    const uu=Math.min(g,1), xx=Math.round(xs(uu)), yy=kmY(alt(uu));
+    const ef=H.clamp((uu-(losU-0.10))/0.20);
+    rect(xx,yy,3,L.y+L.h-yy,H.rgba(H.mix(P.cyan,P.red,ef),0.40));
+  }
+  const pts=[];
+  for(let i=0;i<=N;i++){ const u=i/N; if(u>g) break;
+    pts.push([xs(u),kmY(alt(u))]); }
+  if(pts.length>1) linePix(pts,H.rgba(H.mix(P.bone,P.ink,0.26)),2);
+  if(g>0&&g<=1){ const u=Math.min(g,1);
+    disc(Math.round(xs(u)),kmY(alt(u)),4,
+         H.rgba(u>losU?H.mix(P.red,P.bone,0.30):P.cyan)); }
+}
+
 /* --- the file row: one number, two readings of it --- */
-function fileRow(y,val,unit,col,lit){
-  const F=Q.file;
-  rect(F.x,y,F.w,F.h,H.rgba(H.mix(P.bone,P.ink,lit?0.74:0.86)));
-  strokePoly([[F.x,y],[F.x+F.w,y],[F.x+F.w,y+F.h],[F.x,y+F.h]],
+function fileRow(y,val,unit,col,lit,wipe){
+  const F=Q.file, g=(wipe===undefined)?1:H.clamp(wipe);
+  const w2=Math.max(4,Math.round(F.w*g));
+  rect(F.x,y,w2,F.h,H.rgba(H.mix(P.bone,P.ink,lit?0.74:0.86)));
+  strokePoly([[F.x,y],[F.x+w2,y],[F.x+w2,y+F.h],[F.x,y+F.h]],
              H.rgba(lit?col:H.mix(P.bone,P.ink,0.58)),2);
   if(GBOX)GBOX.push({x:F.x,y:y,w:F.w,h:F.h,k:'file'+y+'box'});
+  /* the legends land once the row has finished arriving -- a right-aligned
+     unit drawn into a half-open box sits outside it */
+  if(g<0.98) return;
   px('impulse',F.x+12,y+10,14,H.rgba(H.mix(P.bone,P.ink,0.42)),null,'"VT323"');
   px(val,F.x+12,y+30,20,H.rgba(H.mix(P.bone,P.ink,0.08)),null,'"Silkscreen"');
   px(unit,F.x+F.w-12,y+28,20,H.rgba(col),'right','"Silkscreen"');
@@ -438,17 +509,35 @@ function explainer(ctx,W2,Hh,t){
       px(LAUNCH,x0,y+12,14,H.rgba(H.mix(P.bone,P.ink,0.40)),null,'"Silkscreen"');
       px('MARS',x1,y+12,14,H.rgba(H.mix(P.bone,P.ink,0.40)),'right','"Silkscreen"');
       const g=H.clamp((M-wordAt(1,3))/4.4);
-      disc(Math.round(H.lerp(x0,x1,g)),y,5,H.rgba(P.cyan));
-      // the flywheel, and what it costs to slow it
-      if(after(2,2)){
-        const wx=Q.cx, wy=MIDY+40, r=58;
-        ringPix(wx,wy,r,H.rgba(H.mix(P.bone,P.ink,0.34)),3,'wheel');
-        ringPix(wx,wy,r*0.30,H.rgba(H.mix(P.bone,P.ink,0.50)),2);
+      const cxn=H.lerp(x0,x1,g);
+      /* it is FLYING, and it is already doing the thing the next sentence
+         names: little puffs astern, all the way. The cruise used to be a
+         five-pixel dot sliding along a line, which measured as a still
+         frame and looked like one. */
+      for(let i=0;i<9;i++){
+        const ph=((M/1.5)+jit(i*5+1))%1, sx=cxn-ph*104;
+        if(sx<x0-8) continue;
+        disc(Math.round(sx),Math.round(y+Math.sin(M*2.1+i*1.7)*2),
+             Math.max(1,Math.round(2+ph*6)),
+             H.rgba(P.gold,Math.max(0,0.75-ph*0.75)));
+      }
+      disc(Math.round(cxn),y,5,H.rgba(P.cyan));
+      /* THE WHEEL WAS ALREADY TURNING. It spun from launch -- that is what a
+         momentum wheel is for -- so the object arrives with the beat and
+         only its NAME waits for the sentence that names it. Holding it back
+         left the first three seconds of the cruise as a dot inching along a
+         line, which is a photograph. */
+      const wOn=H.clamp((M-(BEAT.WHEELS.sc+0.15))/0.9);
+      if(wOn>0){
+        const wx=Q.cx, wy=MIDY+40, r=58*H.ease.out(wOn);
+        const named=after(2,2), dim=named?0:0.30;
+        ringPix(wx,wy,r,H.rgba(H.mix(P.bone,P.ink,0.34+dim)),3,'wheel');
+        ringPix(wx,wy,r*0.30,H.rgba(H.mix(P.bone,P.ink,0.50+dim)),2);
         for(let i=0;i<6;i++){ const a=M*2.2+i/6*Math.PI*2;
           linePix([[wx+Math.cos(a)*r*0.30,wy+Math.sin(a)*r*0.30],
                    [wx+Math.cos(a)*r,wy+Math.sin(a)*r]],
-                  H.rgba(H.mix(P.bone,P.ink,0.50)),2); }
-        px('FLYWHEEL',wx,wy+r+14,14,
+                  H.rgba(H.mix(P.bone,P.ink,0.50+dim)),2); }
+        if(named) px('FLYWHEEL',wx,wy+r+14,14,
            H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
         if(after(2,12)){
           const ph=(M*2.2)%1;
@@ -463,8 +552,16 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.UNITS.sc&&T<BEAT.ACCUM.sc){
       px('THE SAME FILE, TWICE',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      if(after(3,1)) fileRow(MIDY-130,'1.00','LB-SEC',P.gold,after(3,10));
-      if(after(4,0)) fileRow(MIDY+20,'1.00','N-SEC',P.cyan,after(4,6));
+      /* the rows WIPE in. A 352x60 panel arriving between two frames was
+         eleven per cent of the picture in one eighth of a second, three
+         times in this beat -- all three of the piece's snaps. */
+      if(after(3,1)) fileRow(MIDY-130,'1.00','LB-SEC',P.gold,after(3,10),
+                             H.ease.out(H.clamp((M-wordAt(3,1))/0.55)));
+      if(after(4,0)) fileRow(MIDY+20,'1.00','N-SEC',P.cyan,after(4,6),
+                             H.ease.out(H.clamp((M-wordAt(4,0))/0.55)));
+      /* and while the file is being written and read, the thing the file is
+         a record OF has not stopped happening. */
+      pulseLane(Q.file.x+6,448,Q.file.w-12,M,P.gold,'PULSES, STILL FIRING');
       if(after(3,1)) px('WRITTEN BY THE GROUND SOFTWARE',Q.file.x,MIDY-148,14,
                         H.rgba(H.mix(P.bone,P.ink,0.40)),null,'"Silkscreen"');
       if(after(4,0)) px('READ BY THE NAVIGATION SOFTWARE',Q.file.x,MIDY+2,14,
@@ -489,10 +586,29 @@ function explainer(ctx,W2,Hh,t){
       [['EXPECTED',MIDY-120,1,P.cyan],
        ['ACTUAL',MIDY-20,AMD_HI,P.red]].forEach(([lb,y,n,col],i)=>{
         px(lb,px0,y-22,14,H.rgba(H.mix(P.bone,P.ink,0.34)),null,'"Silkscreen"');
-        const g=H.clamp((M-wordAt(6,i?7:0))/2.2);
+        /* A BURST, THEN ANOTHER, THEN ANOTHER. The comparison is a RATE --
+           this many against that many in the same interval -- so both rows
+           fill, empty and fill again for as long as the beat lasts, which
+           is what "ten to fourteen times more" is a statement about. */
+        /* ONE clock for both rows. Phasing them off their own sentences put
+           the expected row nearly full while the actual row was two blocks
+           in, which draws a ratio of three against a narrator saying
+           fourteen -- the picture has to agree with the number at every
+           instant, not only when both rows happen to be full. */
+        const CYC=2.6, u0=(M-wordAt(6,0))/CYC;
+        if(u0<0||(i&&!after(6,7))) return;
+        const ph=u0%1;
+        /* FAST IN, LONG HOLD, FAST OUT, off one clock for both rows. A
+           strictly proportional fill is arithmetically right and reads
+           WRONG: a viewer counts blocks, and two and a half blocks beside
+           a sliver argues three to one under a sentence saying fourteen.
+           So the burst is quick and the picture spends three quarters of
+           every cycle in the state the narration actually claims. */
+        const a=(ph<0.15)?ph/0.15:((ph<0.90)?1:1-(ph-0.90)/0.10);
         for(let k=0;k<n;k++){
-          if(k/n>g&&n>1) break;
-          rect(px0+k*pitch,y,14,34,H.rgba(H.mix(col,P.ink,0.14)));
+          const hh=Math.round(34*H.clamp(n*a-k));
+          if(hh<1) continue;
+          rect(px0+k*pitch,y+34-hh,14,hh,H.rgba(H.mix(col,P.ink,0.14)));
         }
         if(GBOX)GBOX.push({x:px0,y:y,w:n*pitch,h:34,k:'pulses'+i});
       });
@@ -500,6 +616,7 @@ function explainer(ctx,W2,Hh,t){
                         H.rgba(P.red),'center','"Silkscreen"');
       if(after(6,17)) px('A LOPSIDED SOLAR PANEL, AND SUNLIGHT',Q.cx,MIDY+78,14,
                          H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
+      pulseLane(56,452,320,M,P.red,'AND IT KEPT DOING IT');
       if(after(7,0)) px('NOBODY GOT THE PHYSICS WRONG',Q.cx,Q.rows[0],14,
                         H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
       if(after(7,12)) capLine('IT COMPOUNDED FOR '+MONTHS+' MONTHS',7,12,
@@ -517,7 +634,19 @@ function explainer(ctx,W2,Hh,t){
       if(GBOX)GBOX.push({x:gx,y:gy,w:gw,h:gh,k:'solutions'});
       px('DOWN = CLOSER TO MARS',gx,gy-36,14,
          H.rgba(H.mix(P.bone,P.ink,0.40)),null,'"Silkscreen"');
-      const g=H.clamp((M-wordAt(8,4))/3.2);
+      /* the solutions were re-run as tracking data came in, and the gap
+         between them grew for months -- so the curves draw across the whole
+         beat and not in the first three seconds of it. */
+      const g=H.clamp((M-wordAt(8,4))/10.0);
+      // THE GAP IS THE SIGN. Shade it, so the thing that was ignored has a
+      // size on screen and that size is growing while it is being ignored.
+      for(let u=0;u<=g;u+=0.02){
+        const xx=Math.round(gx+u*gw);
+        const y1=gy+24+gh*0.10+u*gh*0.30*0.78;
+        const y2=gy+24+gh*0.10+u*gh*0.74*0.78;
+        rect(xx,Math.round(y1),Math.ceil(gw*0.02)+1,Math.round(y2-y1),
+             H.rgba(P.red,0.10));
+      }
       [[0.30,P.cyan,'DOPPLER AND RANGE'],
        [0.74,P.gold,'DOPPLER ONLY']].forEach(([dip,col,lb],i)=>{
         const pts=[];
@@ -530,6 +659,9 @@ function explainer(ctx,W2,Hh,t){
           rect(gx,ly+3,18,8,H.rgba(col));
           px(lb,gx+26,ly,14,H.rgba(col),null,'"Silkscreen"'); }
       });
+      /* bone, not gold: the lane sits directly under the DOPPLER ONLY key
+         and a gold puff train there reads as belonging to that curve. */
+      pulseLane(56,470,320,M,H.mix(P.bone,P.ink,0.30),null);
       if(after(9,2)){
         const q='"THESE DISCREPANCIES WERE NOT RESOLVED."';
         const w2=glyph(q,14,'"Silkscreen"').w;
@@ -555,6 +687,30 @@ function explainer(ctx,W2,Hh,t){
                H.mix(P.gold,P.bone,0.30),after(11,0)],
               [HOUR_KM,'AN HOUR OUT  '+HOUR_KM,P.gold,after(11,10)]],
              after(12,0));
+      /* THE NUMBER WAS NOT A SEQUENCE OF THREE SLIDES. It was one estimate,
+         recomputed as the tracking came in, walking down the axis the whole
+         time -- so the live mark moves and the three quoted values are the
+         fixed lines it passes. */
+      {
+        /* LINEAR within each leg, and the last leg runs to the end of the
+           beat. An inOut curve stands still at both ends of every leg, so
+           an estimate that is always falling measured as a still picture
+           for a second at each quoted value and for two and a half at the
+           end -- the easing was hiding the one thing the beat is. */
+        const t0=wordAt(10,0), t1=wordAt(11,5), t2=BEAT.GONE.sc-0.15;
+        const km=(M<t1)?H.lerp(PLAN_KM,WEEK_HI,H.clamp((M-t0)/(t1-t0)))
+                       :H.lerp(WEEK_HI,HOUR_KM,H.clamp((M-t1)/(t2-t1)));
+        const yy=kmY(km), L=Q.lad;
+        rect(L.x+2,yy-1,L.w-4,3,H.rgba(H.mix(P.bone,P.paper,0.20)));
+        disc(L.x+10,yy,4,H.rgba(P.bone));
+        /* the legend is PARKED. Riding it on the moving mark walked it
+           through every fixed label on the ladder, which checkOverlap is
+           right to refuse -- a label that collides on some frames and not
+           others is worse than one that never moves. */
+        rect(L.x+2,137,16,3,H.rgba(H.mix(P.bone,P.paper,0.20)));
+        px('LIVE ESTIMATE',L.x+24,132,14,
+           H.rgba(H.mix(P.bone,P.ink,0.30)),null,'"Silkscreen"');
+      }
       if(after(12,4)) px('THEY WENT ANYWAY',Q.cx,Q.rows[1],20,
                          H.rgba(P.gold),'center','"Silkscreen"');
     }
@@ -563,6 +719,15 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.GONE.sc&&(T<BEAT.END.sc||!after(15,0))){
       px('WHAT ACTUALLY HAPPENED',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
+      /* the pass itself, altitude against time, filled to the ground and
+         drawn while it is being described. It is solid while they could
+         still hear it and ghosted after the carrier went -- which is the
+         difference between the two sentences in this beat. It goes UNDER
+         the ladder: a wash strong enough to be seen is strong enough to
+         dull the labels it covers, and the marks are the thing being read.
+         It is also paced to reach the right-hand edge as the beat closes,
+         so the chart is never finished early and then sat on. */
+      profile(H.clamp((M-BEAT.GONE.sc)/13.7),0.42);
       ladder([[PLAN_KM,'PLANNED  '+PLAN_KM,H.mix(P.cyan,P.bone,0.34),1],
               [HOUR_KM,'AN HOUR OUT  '+HOUR_KM,
                H.mix(P.gold,P.bone,0.34),1],

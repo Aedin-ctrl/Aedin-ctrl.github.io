@@ -220,17 +220,32 @@ function absBar(i,lab,val,ref,col,g){
 
 /* --- THE SKIN BLOCK. One cross-section, drawn once, reused by three beats:
    the depth axis is linear in millimetres so 1.6 and 5 are where they are. */
-function skinBlock(){
+function skinBlock(g){
   const S=Q.skin;
+  /* g: the block OPENS downward from the surface over 0.7s the first time it
+     is used. It used to appear whole between two frames -- 43% of the picture
+     in one frame, which is the snap the stillness sweep names. Light arrives
+     at a surface before it is deep, so opening downward is also the right
+     direction. Callers that already have the block pass nothing. */
+  const gg=(g===undefined)?1:H.clamp(g);
+  /* LINEAR on purpose: an eased open puts 45% of a 272 by 300 block into the
+     first frame, which is the snap all over again. Linear over a second is
+     12% a frame and reads as a thing opening. */
+  const hh=Math.round(S.h*gg);
   for(let i=0;i<6;i++){
     const y=S.y+Math.round(S.h*i/6);
-    rect(S.x,y,S.w,Math.round(S.h/6),
-         H.rgba(H.mix(P.earth,P.ink,0.30+i*0.07)));
+    const cut=Math.min(Math.round(S.h/6),S.y+hh-y);
+    if(cut<=0) continue;
+    rect(S.x,y,S.w,cut,H.rgba(H.mix(P.earth,P.ink,0.30+i*0.07)));
   }
   rect(S.x,S.y,S.w,4,H.rgba(H.mix(P.bone,P.ink,0.34)));
+  /* the box is registered at FULL size whatever g is: a box that grows is a
+     moving box, and a moving box fights checkOverlap on some frames and not
+     others. The block is going to be there; say so once. */
   if(GBOX)GBOX.push({x:S.x,y:S.y,w:S.w,h:S.h,k:'skinbox'});
   for(let mm=0;mm<=MM_MAX;mm++){
     const y=mmY(mm);
+    if(y>S.y+hh+2) continue;
     rect(S.x-6,y,8,1,H.rgba(H.mix(P.bone,P.ink,0.58)));
     px(mm+'',S.x-12,y-7,14,H.rgba(H.mix(P.bone,P.ink,0.56)),
        'right','"Silkscreen"');
@@ -489,6 +504,72 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* ===== LIGHT NEVER STOPS, AND NEITHER DOES THE PICTURE =====
+       The subject of this piece is a process that is running every second a
+       body is in a lit room: light falls on skin, goes in, is absorbed by
+       depth and by colour, and some of it comes back out. Holding that still
+       between sentences was a lie as well as dull, so ONE photon stream runs
+       through every beat and is read five ways -- through the two tubes it is
+       the ten-fold difference, in SKIN it is the scatter walk, in DEPTH it is
+       where each colour stops, in VEIN it is the red that does not come back.
+       Nothing here is decoration: every dot is light doing the thing the
+       sentence over it is describing.
+       Deterministic: every phase and every lane comes from the photon's own
+       index, never from Math.random -- a render has to be reproducible frame
+       for frame. */
+    const jit=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+
+    /* --- A BEAM THROUGH A TUBE. This is how the extinction figures under the
+       tubes were measured in the first place, so the two beams ARE the two
+       bars: about ten times as many photons are taken out of the right hand
+       tube, and the ones that get through are the colour you see. --- */
+    const beam=(x0,x1,tx0,tx1,absorb,seed)=>{
+      for(let i=0;i<20;i++){
+        const ph=((M*0.19)+jit(i+seed))%1;
+        const y=Math.round(Q.tube.y+56+Math.floor(jit(i+seed+11)*6)*11);
+        const u=jit(i+seed+29);
+        const x=H.lerp(x0,x1,ph);
+        let dim=0.16;
+        if(u<absorb&&x>tx0){
+          const dx=H.lerp(tx0+5,tx1-5,u/absorb);
+          dim=H.lerp(0.16,1,H.clamp((x-tx0)/Math.max(1,dx-tx0)));
+        }
+        if(dim>=0.995) continue;
+        rect(Math.round(x),y,9,3,
+             H.rgba(H.mix(H.mix(P.red,P.paper,0.42),P.ink,dim)));
+      }
+    };
+
+    /* --- INTO THE SKIN. Photons arrive at the surface continuously; each one
+       has a colour, so it has a depth, and a fraction of them come back out
+       from above that depth. One helper, four beats: the only things that
+       change between them are where the stream enters and how deep it gets,
+       which is the entire argument of the episode. --- */
+    const rayStream=(o)=>{
+      const S=Q.skin, yIn=S.y-18, base=mmY(o.mm), seed=o.seed, fz=o.fuzz||0;
+      for(let i=0;i<o.n;i++){
+        const ph=((M*(o.spd||0.20))+jit(i+seed))%1;
+        const x=Math.round(H.lerp(o.x0,o.x1,jit(i+seed+17)));
+        const yStop=base-(base-yIn)*fz*jit(i+seed+61);
+        let y,dim;
+        if(jit(i+seed+83)<(o.back||0)){
+          y = ph<0.54 ? H.lerp(yIn,yStop,ph/0.54)
+                      : H.lerp(yStop,yIn,(ph-0.54)/0.46);
+          dim = 0.14;
+        }else{
+          /* a photon is ABSORBED, not dimmed: it is there, and then it is
+             not. The depth is the claim, so it holds full brightness until
+             the last fifth of its run and goes out over that -- and it is the
+             COUNT of photons that get down there, not their brightness, that
+             says how much light is left. */
+          y = H.lerp(yIn,yStop,ph);
+          dim = 0.14+0.86*H.clamp((ph-0.80)/0.20);
+        }
+        if(dim>=0.99) continue;
+        rect(x,Math.round(y),7,4,H.rgba(H.mix(o.col,P.ink,dim)));
+      }
+    };
+
     /* ============ VIAL -- it is red. It was always red. ================== */
     if(T>=BEAT.VIAL.sc&&T<BEAT.SKIN.sc){
       px('TWO TUBES OF YOUR OWN BLOOD',Q.cx,110,14,
@@ -497,6 +578,12 @@ function explainer(ctx,W2,Hh,t){
         const g=H.clamp((M-wordAt(1,0))/1.1);
         tube(Q.tube.x1,'OUT',H.mix(P.red,P.paper,0.10),g,'tubeA');
         tube(Q.tube.x2,'BACK',H.mix(P.red,P.ink,0.62),g,'tubeB');
+        /* AFTER the tubes, never before: drawn first they paint over it and
+           the beam only shows in the gaps. Both beams are red light, the two
+           tubes are the same depth of the same liquid, and the only thing
+           that differs is how many photons come out the far side. */
+        if(g>0.25){ beam(42,198,Q.tube.x1,Q.tube.x1+Q.tube.w,0.08,3);
+                    beam(204,384,Q.tube.x2,Q.tube.x2+Q.tube.w,0.80,91); }
       }
       if(after(1,3)){
         const bx=Q.tube.x2+Q.tube.w+16, by=Q.tube.y+36;
@@ -537,7 +624,16 @@ function explainer(ctx,W2,Hh,t){
         if(after(3,11)){
           [[NM_RED,P.red,0],[NM_IR,H.mix(P.bone,P.ink,0.26),1]].forEach(([nm,c,i])=>{
             const yy=fy0+12+i*18;
-            for(let k=0;k<8;k++) rect(x+34+k*12,yy,7,3,H.rgba(c));
+            /* the two wavelengths are not sitting there: they are crossing
+               the finger, continuously, which is the only reason the clip has
+               a number to report at all. They run in opposite directions so
+               the pair cannot be mistaken for one striped bar. */
+            const off=Math.round((((M*26)+i*6)%12)*(i?-1:1));
+            for(let k=-1;k<9;k++){
+              const bx=x+34+k*12+off;
+              if(bx<x+30||bx>x+134) continue;
+              rect(bx,yy,7,3,H.rgba(c));
+            }
             px(nm+' NM',x+146,yy-6,14,H.rgba(c),null,'"Silkscreen"');
           });
         }
@@ -550,7 +646,14 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.SKIN.sc&&T<BEAT.DEPTH.sc){
       px('LIGHT INTO SKIN',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      if(after(4,2)) skinBlock();
+      const SS=Q.skin;
+      if(after(4,2)){
+        skinBlock(H.clamp((M-wordAt(4,2))/1.05));
+        /* it is being lit for every second it is on screen, and the beat's
+           whole claim is that the light does not stop at the surface. */
+        rayStream({n:26,seed:300,x0:SS.x+8,x1:SS.x+SS.w-10,mm:3.6,
+                   col:P.bone,back:0.45,fuzz:0.46,spd:0.19});
+      }
       /* one ray, one seeded scatter walk, one shorter ray back out. The walk
          is seeded so it is the same walk in every frame and every render. */
       if(after(5,8)){
@@ -566,6 +669,16 @@ function explainer(ctx,W2,Hh,t){
         const seg=w.slice(0,n);
         if(seg.length>1){ linePix(seg,H.rgba(H.mix(P.bone,P.ink,0.14)),2);
                           polyReg(seg,'walk'); }
+        /* and once the path is drawn, photons RUN it, over and over: "it goes
+           in, scatters, and some of it comes back out" is a process, not a
+           diagram, and the line on its own was the deadest frame in the beat. */
+        if(g>=0.999) for(let k=0;k<3;k++){
+          const u=((M*0.21)+k/3)%1, f=u*(w.length-1);
+          const vi=Math.min(w.length-2,Math.floor(f)), fr=f-vi;
+          rect(Math.round(H.lerp(w[vi][0],w[vi+1][0],fr))-2,
+               Math.round(H.lerp(w[vi][1],w[vi+1][1],fr))-2,5,5,
+               H.rgba(H.mix(P.bone,P.paper,0.30)));
+        }
       }
       if(after(6,1)){
         const S=Q.skin;
@@ -585,10 +698,21 @@ function explainer(ctx,W2,Hh,t){
       [[BLUE_NM,P.cyan,40],[DEEP_NM,P.red,170]].forEach(([nm,c,dx])=>{
         px(nm+' NM',S.x+dx,S.y-26,14,H.rgba(c),null,'"Silkscreen"');
       });
-      if(after(7,0)) column(S.x+40,46,BLUE_MM,P.cyan,
-                            H.clamp((M-wordAt(7,0))/1.5),BLUE_MM+' MM');
-      if(after(8,0)) column(S.x+170,46,DEEP_MM,P.red,
-                            H.clamp((M-wordAt(8,0))/1.5),DEEP_MM.toFixed(0)+' MM');
+      /* the columns are where the light STOPS; the stream is the light, and
+         it keeps arriving while the number is being read out. Drawn after the
+         column so it is not painted over by its own fill. */
+      if(after(7,0)){
+        column(S.x+40,46,BLUE_MM,P.cyan,
+               H.clamp((M-wordAt(7,0))/1.5),BLUE_MM+' MM');
+        rayStream({n:11,seed:410,x0:S.x+43,x1:S.x+83,mm:BLUE_MM,
+                   col:H.mix(P.cyan,P.paper,0.45),spd:0.30});
+      }
+      if(after(8,0)){
+        column(S.x+170,46,DEEP_MM,P.red,
+               H.clamp((M-wordAt(8,0))/1.5),DEEP_MM.toFixed(0)+' MM');
+        rayStream({n:11,seed:530,x0:S.x+173,x1:S.x+213,mm:DEEP_MM,
+                   col:H.mix(P.red,P.paper,0.45),spd:0.21});
+      }
       if(after(8,5)) capLine('THREE TIMES AS DEEP',8,5,
                              U.mid('THREE TIMES AS DEEP',20),Q.rows[1],20,
                              H.rgba(P.red),null,'"Silkscreen"',0.8);
@@ -611,6 +735,12 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.cyan,P.ink,0.14)),null,'"Silkscreen"');
       px('RED STOPS',S.x+6,mmY(DEEP_MM)-18,14,
          H.rgba(H.mix(P.red,P.ink,0.14)),null,'"Silkscreen"');
+      /* THE BLUE IS STILL ARRIVING. It is not absent from this beat -- it is
+         arriving and stopping, every second, above where the vein is, and
+         about half of it comes back out, which is what makes the skin on
+         either side look like skin. That is the sentence, running. */
+      rayStream({n:15,seed:707,x0:S.x+8,x1:S.x+S.w-8,mm:BLUE_MM,
+                 col:H.mix(P.cyan,P.paper,0.26),back:0.52,spd:0.26});
       if(after(9,5)){
         const g=H.clamp((M-wordAt(9,5))/0.9);
         ell(vx,vy,Math.round(42*g),Math.round(15*g),
@@ -621,16 +751,17 @@ function explainer(ctx,W2,Hh,t){
           if(GBOX)GBOX.push({x:vx-44,y:vy-17,w:88,h:34,k:'veinbox'});
         }
       }
-      /* the red arrives and is taken: four rays, each one dying in the vein */
+      /* the red arrives and is taken -- and it does not do that once. Four
+         standing bars have been replaced by the stream that made them: red
+         photons coming down over the vein and ending in it, continuously,
+         which is what "the blood takes it" means. */
       if(after(10,1)){
         const g=H.clamp((M-wordAt(10,1))/1.6);
-        for(let i=0;i<4;i++){
-          const x=vx-30+i*20, f=H.clamp(g*4-i);
-          if(f<=0) continue;
-          const y1=S.y+6, y2=vy-8;
-          rect(x,y1,3,Math.round((y2-y1)*f),H.rgba(H.mix(P.red,P.ink,0.18)));
-          if(f>=0.999&&after(10,7)) rect(x-3,vy-10,9,5,H.rgba(P.gold));
-        }
+        rayStream({n:Math.max(1,Math.round(14*g)),seed:611,
+                   x0:vx-34,x1:vx+34,mm:VEIN_MM-0.10,
+                   col:H.mix(P.red,P.paper,0.42),spd:0.23});
+        if(after(10,7)) for(let i=0;i<4;i++)
+          rect(vx-33+i*20,vy-10,9,5,H.rgba(P.gold));
       }
       /* and what leaves the skin, in two places */
       if(after(11,2)){
@@ -645,6 +776,14 @@ function explainer(ctx,W2,Hh,t){
             linePix([[x+26,S.y+2],[x+26,S.y-18]],
                     H.rgba(H.mix(P.bone,P.ink,0.54)),2);
             rect(x+22,S.y-18,9,2,H.rgba(H.mix(P.bone,P.ink,0.54)));
+            /* the swatch is not a reading taken once: light is leaving the
+               skin at both places for as long as the lamp is on, and the two
+               streams carry the two colours up into their own swatches. */
+            for(let k=0;k<3;k++){
+              const u=((M*0.46)+k/3)%1;
+              rect(x+23,Math.round(H.lerp(S.y+2,S.y-18,u)),7,3,
+                   H.rgba(H.mix(c,P.paper,0.22)));
+            }
             px(lab,x+26,S.y-72,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
                'center','"Silkscreen"');
           });
@@ -659,14 +798,28 @@ function explainer(ctx,W2,Hh,t){
       [[X1,skinCol(),'SKIN AROUND IT',0],[X2,greyCol(),'NOTHING AROUND IT',1]]
         .forEach(([x,sur,lab,i])=>{
           if(!after(12,i?4:0)) return;
-          rect(x,CY,CW,CH,H.rgba(sur));
-          strokePoly([[x,CY],[x+CW,CY],[x+CW,CY+CH],[x,CY+CH]],
+          /* the cell OPENS from its own centre line over half a second. It
+             used to be 160 by 260 pixels of flat colour appearing between two
+             frames, which is a glitch, not an arrival. */
+          const ga=H.clamp((M-wordAt(12,i?4:0))/0.80);   // linear: see skinBlock
+          const ch=Math.max(2,Math.round(CH*ga)), cy=Math.round(CY+(CH-ch)/2);
+          rect(x,cy,CW,ch,H.rgba(sur));
+          strokePoly([[x,cy],[x+CW,cy],[x+CW,cy+ch],[x,cy+ch]],
                      H.rgba(H.mix(P.bone,P.ink,0.52)),2);
+          /* registered at full size, always: a growing box is a moving box. */
           if(GBOX)GBOX.push({x:x,y:CY,w:CW,h:CH,k:'cell'+i+'box'});
           if(after(12,7)){
             const g=H.clamp((M-wordAt(12,7))/0.8);
             const s=Math.round(80*g);
-            rect(x+CW/2-s/2,CY+CH/2-s/2,s,s,H.rgba(veinCol()));
+            /* THE PATCH DOES NOT SIT STILL, and it is the same patch, so both
+               of them move together. Carrying it around its surround is the
+               honest form of this demonstration -- the reading follows the
+               surround, not the position, and a viewer who thinks the two
+               patches are different colours can watch them travel in step. */
+            const dx=Math.round(Math.sin(M*1.22)*26*g);
+            const dy=Math.round(Math.sin(M*0.81+1.1)*16*g);
+            rect(x+CW/2-s/2+dx,CY+CH/2-s/2+dy,s,s,H.rgba(veinCol()));
+
           }
           if(after(13,0)) px(lab,x+CW/2,CY+CH+10,14,
                              H.rgba(H.mix(P.bone,P.ink,0.34)),

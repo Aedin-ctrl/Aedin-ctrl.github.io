@@ -290,16 +290,25 @@ function barTrack(x,base,w,max,f,col,k){
 }
 
 /* --- a starch chain: a loose wiggle, or a straight bar once it has set --- */
-function chainAt(x,y,len,set,seed,col){
+/* `crawl` is a PHASE IN RADIANS, usually M times a rate, and it is the whole
+   point of this piece drawn rather than asserted: a chain that has not set is
+   moving, every second, and that movement is one of the two things the WHY
+   beat says setting needs. A chain that HAS set is straight and still,
+   because that is what setting is -- so the undulation dies with (1-set) and
+   the lattice at the end of CHAINS is motionless on purpose. The static
+   wobble is kept exactly as it was, and the crawl is added on top of it, so
+   the shape a viewer already read does not change underneath them. */
+function chainAt(x,y,len,set,seed,col,crawl,noreg){
   const r=H.rng(seed), pts=[];
-  const n=7;
+  const n=7, cw=crawl||0;
   for(let i=0;i<=n;i++){
     const u=i/n;
     const wob=(r()-0.5)*17*(1-set);
-    pts.push([x+len*u, y+wob+Math.sin(u*Math.PI*2+seed)*9*(1-set)]);
+    pts.push([x+len*u, y+wob+Math.sin(u*Math.PI*2+seed)*9*(1-set)
+                        +Math.sin(u*4.1+cw+seed)*5*(1-set)]);
   }
   linePix(pts,H.rgba(col),3);
-  polyReg(pts,'chain');
+  if(!noreg) polyReg(pts,'chain');
   return pts;
 }
 
@@ -590,12 +599,33 @@ function explainer(ctx,W2,Hh,t){
             rect(L.cx-nk-3,y0-9,nk*2+6,2,H.rgba(H.mix(P.ice,P.paper,0.40)));
             px('SEALED',L.cx,y0-32,14,H.rgba(P.ice),'center','"Silkscreen"'); }
         }
-        // the folk answer, drawn: water leaving, while it still can
+        /* THE FOLK ANSWER, DRAWN: water leaving, while it still can. Nine
+           two-pixel ticks were under the noise floor of the probe and of the
+           eye both -- a loaf drying out is the thing this sentence is about
+           and it was the quietest picture in the piece. */
         const esc=1-H.clamp((M-wordAt(4,1))/0.9);
-        if(esc>0.02){ const r2=H.rng(7);
-          for(let i=0;i<9;i++){ const ph=(M*0.6+i*0.37)%1;
-            rect(Math.round(L.cx-74+i*18), Math.round(ly-Q.hh-6-ph*34), 2,
-                 Math.round(3+ph*3), H.rgba(H.mix(P.ice,P.ink,0.20+ph*0.5))); } }
+        if(esc>0.02){
+          for(let i=0;i<20;i++){ const ph=(M*0.52+i*0.173)%1;
+            rect(Math.round(L.cx-80+i*8.4), Math.round(ly-Q.hh-4-ph*46), 4,
+                 Math.round(4+ph*3),
+                 H.rgba(H.mix(P.ice,P.ink,0.18+ph*0.58+(1-esc)*0.30))); } }
+        /* ...and once it is SEALED, the water is still moving: it cannot
+           leave, so it circulates, condenses on the bag and runs back down.
+           That is why a bagged loaf goes leathery rather than dry, and it is
+           what "it cannot lose a gram" leaves out. The loaf stales anyway. */
+        if(seal>0.55){
+          const Bg2=Q.bag;
+          for(let i=0;i<18;i++){
+            const jj=(k)=>{const v=Math.sin((i+k)*12.9898)*43758.5453;return v-Math.floor(v);};
+            const sp=0.19+jj(3)*0.24, dir=(i%2)?1:-1;
+            const q=((M*sp)+jj(11))%1, u=dir>0?q:1-q;
+            /* in the two gutters between the loaf and the bag, not across the
+               crumb -- specks ON the bread read as mould, not as moisture. */
+            const x3=Math.round(L.cx+(dir)*(62+jj(29)*16));
+            const y3=Math.round(Bg2[1]+10+u*(Bg2[3]-20));
+            rect(x3,y3,4,4,H.rgba(H.mix(P.ice,P.ink,0.30+jj(41)*0.32)));
+          }
+        }
       }
       // GAUGE ONE: the scale, which stops and then never moves again
       const S=Q.scale;
@@ -633,6 +663,21 @@ function explainer(ctx,W2,Hh,t){
                   H.rgba(H.mix(P.orange,P.ink,0.20+burst*0.5)),3);
         }
         if(GBOX)GBOX.push({x:Gr[0]-rr2-4,y:Gr[1]-rr2-4,w:rr2*2+8,h:rr2*2+8,k:'granule'});
+        /* WHAT IS INSIDE IT, and it is not holding still. The granule used to
+           be an empty ring for the first four seconds of the beat, under the
+           sentence that says what is in it -- so the chains are drawn coiled
+           inside it, moving, before the word "burst" lets them out. Nothing
+           is claimed that the next shot does not then show. */
+        for(let c=0;c<13;c++){
+          const a3=c/13*Math.PI*2+0.4, rad=Gr[2]*(0.22+((c*5)%7)/7*0.56);
+          const cx3=Gr[0]+Math.cos(a3)*rad, cy3=Gr[1]+Math.sin(a3)*rad;
+          const ln=Math.round(16+((c*3)%5)*5);
+          const ps=[];
+          for(let k3=0;k3<=4;k3++){ const u3=k3/4;
+            ps.push([cx3-ln/2+ln*u3,
+                     cy3+Math.sin(u3*5.4+M*2.1+c*1.7)*4.5*(1-burst)]); }
+          linePix(ps,H.rgba(H.mix(P.cyan,P.ink,0.44+burst*0.5)),2);
+        }
         if(burst<0.1) px('ONE STARCH GRANULE',L.cx,Gr[1]+Gr[2]+26,14,
                          H.rgba(H.mix(P.bone,P.ink,0.46)),'center','"Silkscreen"');
       }
@@ -656,9 +701,14 @@ function explainer(ctx,W2,Hh,t){
         const x=H.lerp(lx0,A.x,H.ease.inOut(si));
         const y=H.lerp(ly0,A.y+(i-(A.n-1)/2)*A.pitch,H.ease.inOut(si));
         const col=H.mix(H.mix(P.cyan,P.ink,0.30),P.gold,si*0.85);
+        /* and they CRAWL while they are loose. Heat is movement, so the
+           crawl speeds up with `hot` -- which is the sentence "heat melts the
+           stacks apart" and the sentence "enough movement to get there",
+           both, in one rate. */
         if(burst>0.04||inHeat)
           chainAt(Math.round(x),Math.round(y),A.w,si,i*7+3,
-                  hot>0.2?H.mix(col,P.red,hot*0.5):col);
+                  hot>0.2?H.mix(col,P.red,hot*0.5):col,
+                  M*(1.9+hot*2.6));
       }
       // the firmness that the count IS, locked to it
       if(inHeat){
@@ -666,10 +716,15 @@ function explainer(ctx,W2,Hh,t){
         barTrack(Hb[0],Hb[1],Hb[2],Hb[3],set,hot>0.3?P.red:P.gold,'setbar');
         px('SET',Hb[0]+Hb[2]/2,Hb[1]+12,14,
            H.rgba(H.mix(P.bone,P.ink,0.30)),'center','"Silkscreen"');
-        if(hot>0.2){ for(let i=0;i<5;i++){ const ph=M*2.4+i*1.1;
-          linePix([[A.x+16+i*38,A.y+96],[A.x+16+i*38+Math.sin(ph)*6,A.y+78],
-                   [A.x+16+i*38-Math.sin(ph)*6,A.y+62]],
-                  H.rgba(H.mix(P.red,P.ink,0.40)),2); } }
+        /* the heat coming off it. Nine wisps rather than five, taller and
+           travelling further sideways: this is the only continuously moving
+           thing in the beat where the lattice has locked solid, and five
+           two-pixel zigzags were under the probe's floor. */
+        if(hot>0.2){ for(let i=0;i<9;i++){ const ph=M*2.6+i*0.9;
+          const x4=A.x+6+i*21;
+          linePix([[x4,A.y+104],[x4+Math.sin(ph)*11,A.y+84],
+                   [x4-Math.sin(ph)*11,A.y+64],[x4+Math.sin(ph)*8,A.y+46]],
+                  H.rgba(H.mix(P.red,P.ink,0.38)),2); } }
       } else if(set>0.06){
         px('THEY LINE UP AND LOCK',L.cx,A.y+A.pitch*10+22,14,
            H.rgba(H.mix(P.bone,P.ink,0.46)),'center','"Silkscreen"');
@@ -689,11 +744,25 @@ function explainer(ctx,W2,Hh,t){
          H.rgba(H.mix(P.bone,P.ink,0.52)),'right','"Silkscreen"');
       px('MEASURED RANGE',L.cx,CHT[1]+CHT[3]+34,14,
          H.rgba(H.mix(P.bone,P.ink,0.52)),'center','"Silkscreen"');
+      /* THE READOUT SWEEPS THE RANGE, over and over, for as long as the beat
+         is on screen. It is the one honest continuous thing a finished plot
+         has in it -- the program reading its own measurement -- and it says
+         what the beat says in the only way a static curve cannot: run the
+         cursor from the cold end to the warm end and the height under it
+         falls, every time, without exception. Not registered in GBOX: it
+         moves, and a moving box fights checkOverlap on some frames only. */
       const g=H.clamp((M-wordAt(11,6))/2.6);
       const pts=[];
       for(let i=0;i<=60;i++){ const u=i/60; if(u>g) break;
         const Tc=T_LO+(T_HI-T_LO)*u; pts.push([cX(Tc),cY(nrate(Tc))]); }
       if(pts.length>1){ linePix(pts,H.rgba(P.gold),2); polyReg(pts,'curve'); }
+      if(g>0.04){
+        const q=((M-BEAT.COLD.sc)*0.30)%1, u2=(q<0.5?q*2:2-q*2)*g;
+        const Tc2=T_LO+(T_HI-T_LO)*u2;
+        const hx=Math.round(cX(Tc2)), hy=Math.round(cY(nrate(Tc2)));
+        rect(hx,hy,2,CHT[1]+CHT[3]-hy,H.rgba(H.mix(P.gold,P.ink,0.64)));
+        rect(hx-3,hy-3,7,7,H.rgba(P.paper));
+      }
       // the two readings: DOTTED ON the line, NAMED OFF it, in the corner the
       // curve leaves empty by construction (it falls left to right)
       [[T_FRIDGE,'FRIDGE  4°C',12,10,P.gold],
@@ -729,6 +798,21 @@ function explainer(ctx,W2,Hh,t){
       const gd=H.clamp((M-wordAt(13,6))/1.9), gm=H.clamp((M-wordAt(13,12))/1.9);
       line(drive,gd,H.mix(P.ice,P.paper,0.20),'drive');
       line(mobil,gm,H.mix(P.bone,P.ink,0.20),'mobil');
+      /* and the same readout sweeping the same axis, now carrying a dot on
+         each curve: the two things the sentence names, moving in opposite
+         directions as the cursor goes, which is the whole of what "a warm
+         kitchen gives them one and not the other" means. */
+      const swq=((M-BEAT.WHY.sc)*0.26)%1;
+      const su=(swq<0.5?swq*2:2-swq*2)*Math.max(gd,gm);
+      if(su>0.02){
+        const Tc3=W_LO+(W_HI-W_LO)*su, hx3=Math.round(wX(Tc3));
+        rect(hx3,CHT[1]+10,2,CHT[1]+CHT[3]-(CHT[1]+10),
+             H.rgba(H.mix(P.bone,P.ink,0.68)));
+        if(su<=gd) rect(hx3-3,Math.round(cY(drive(Tc3)*0.92))-3,7,7,
+                        H.rgba(H.mix(P.ice,P.paper,0.20)));
+        if(su<=gm) rect(hx3-3,Math.round(cY(mobil(Tc3)*0.92))-3,7,7,
+                        H.rgba(P.paper));
+      }
       /* THE LEGEND IS OUTSIDE THE PLOT. Both corners of this chart are taken:
          drive owns the top-left and the bottom-right, movement owns the other
          two, because that is what two curves crossing MEANS. A label in any
@@ -785,6 +869,16 @@ function explainer(ctx,W2,Hh,t){
           const ly=Math.round(D.loafy-(1-show)*90);
           loafDraw(x,ly,D.hw,D.hh,0,P.orange,'loaf'+k,false);
           loafSlash(x,ly,D.hw,D.hh,0,P.orange);
+          /* THE WINDOW WHERE THE CHAINS CAN STILL CRAWL, which is the last
+             sentence of the piece. Three crumbs, three crawl rates, taken
+             straight off the one-day ordering the bars are drawn from -- so
+             the fridge loaf is visibly busy, the shelf one slower, and the
+             frozen one all but stopped. Nothing is registered: it is three
+             moving lines on a loaf that is already filed. */
+          for(let c=0;c<5;c++)
+            chainAt(x-26,ly-14+c*9,52,0.45,c*5+1,
+                    H.mix(P.cyan,P.ink,0.34+c*0.07),
+                    M*(0.9+v*4.2)+c*2.1,true);
         }
         barTrack(x-D.w/2,D.base,D.w,D.max,v*g,
                  k===1?P.gold:H.mix(P.bone,P.ink,0.26),'daybar'+k);

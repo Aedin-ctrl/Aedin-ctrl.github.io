@@ -179,7 +179,7 @@ function arcPix(cx,cy,r,d0,d1,col,th,k){
 }
 /* --- ONE SERVER, as a front panel: two drive bays and a status lamp. It is
    the smallest thing that reads as a machine rather than a box. --- */
-function server(x,y,w,h,tone,lamp,key){
+function server(x,y,w,h,tone,lamp,key,act){
   rect(x,y,w,h,H.rgba(H.mix(tone,P.ink,0.46)));
   rect(x,y,w,3,H.rgba(H.mix(tone,P.paper,0.22)));
   rect(x,y+h-3,w,3,H.rgba(H.mix(tone,P.ink,0.72)));
@@ -187,6 +187,19 @@ function server(x,y,w,h,tone,lamp,key){
                             H.rgba(H.mix(tone,P.ink,0.66)));
   for(let i=0;i<2;i++) rect(x+10,y+13+i*16,w-40,4,
                             H.rgba(H.mix(tone,P.ink,0.30)));
+  /* THE DRIVE LIGHTS. Eight machines that are UP are the premise of the whole
+     beat -- including the eighth, which is not broken and never was: it is
+     running perfectly, on last week's build. A rack is never a photograph of
+     a rack, so each bay carries activity, de-phased off the server's index
+     so it is deterministic and so the eight do not blink in unison. */
+  if(act!==undefined){
+    const bw2=w-40;
+    for(let i=0;i<2;i++) for(let k=0;k<3;k++){
+      const u=((act*(1.10+i*0.42)+k*0.333+((i*7+k)%5)*0.11)%1+1)%1;
+      rect(Math.round(x+10+u*(bw2-7)),y+13+i*16,7,4,
+           H.rgba(H.mix(tone,P.paper,0.26)));
+    }
+  }
   if(lamp) rect(x+w-16,y+12,8,8,H.rgba(lamp));
   strokePoly([[x,y],[x+w,y],[x+w,y+h],[x,y+h]],
              H.rgba(H.mix(tone,P.ink,0.18)),2);
@@ -195,7 +208,12 @@ function server(x,y,w,h,tone,lamp,key){
 /* --- A TERMINAL. Not a winFrame: this is screen content, not chrome, and the
    piece's whole comparison lives inside two of them. Sized to its line count
    (v34-clock, finding 4) so it is never a window with a third of it empty. --- */
-function term(x,y,w,title,lines,shown,splitAt,flash){
+/* `prog` is a FLOAT now, not a line count: line i is due at prog === i and
+   colours up over a third of a line-interval instead of existing between two
+   frames. Two 360px terminals both putting a whole log line on screen in one
+   frame was a 10% jump out of three quarters of a second of nothing -- a snap
+   by the letter of rule 2, and the one the viewer could actually point at. */
+function term(x,y,w,title,lines,prog,splitAt,flash){
   const W=Q.win, th=18, bh=lines.length*W.lh+W.pad*2;
   rect(x,y,w,th,H.rgba(H.mix(P.ice,P.ink,0.46)));
   px(title,x+6,y+3,14,H.rgba(H.mix(P.paper,P.ink,0.06)),null,'"Silkscreen"');
@@ -204,13 +222,16 @@ function term(x,y,w,title,lines,shown,splitAt,flash){
              H.rgba(H.mix(P.bone,P.ink,0.60)),2);
   if(GBOX)GBOX.push({x:x,y:y,w:w,h:th+bh,k:'termbox'});
   lines.forEach(([txt,stat,tone],i)=>{
-    if(i>=shown) return;
+    const a=H.clamp((prog-i)/0.32);
+    if(a<=0.01) return;
     const ly=y+th+W.pad+i*W.lh;
     const hot=(i===splitAt&&flash>0);
     if(hot) rect(x+3,ly-3,w-6,W.lh-2,H.rgba(H.mix(P.ink,P.paper,0.30+flash*0.60)));
-    const col=hot?P.ink:H.mix(P[tone],P.ink,tone==='bone'?0.30:0.02);
+    const col=hot?P.ink:H.mix(H.mix(P[tone],P.ink,tone==='bone'?0.30:0.02),
+                              P.ink,(1-a)*0.92);
     px(txt,x+8,ly,14,H.rgba(col),null,'"VT323"');
-    px(stat,x+w-8,ly,14,H.rgba(hot?P.ink:P[tone]),'right','"VT323"');
+    px(stat,x+w-8,ly,14,
+       H.rgba(hot?P.ink:H.mix(P[tone],P.ink,(1-a)*0.92)),'right','"VT323"');
   });
   return y+th+bh;
 }
@@ -460,7 +481,8 @@ function explainer(ctx,W2,Hh,t){
         const miss=(i===GOT)&&after(2,13);
         server(x,y,S.w,S.h,P.bone,
                got?P.green:(miss?(Math.sin(M*9)>0?P.red:H.mix(P.red,P.ink,0.6))
-                                :H.mix(P.bone,P.ink,0.70)),'srv'+i);
+                                :H.mix(P.bone,P.ink,0.70)),'srv'+i,
+               M+i*0.19);
         px('srv '+(i+1),x+2,y+S.h+6,14,
            H.rgba(H.mix(P.bone,P.ink,miss?0.06:0.58)),null,'"VT323"');
       }
@@ -475,18 +497,26 @@ function explainer(ctx,W2,Hh,t){
       px('ONE ORDER. FLAG SET.',Q.cx,150,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const F=Q.fl;
-      [[F.y1,'SERVERS 1-7','NEW CODE','RETAIL LIQUIDITY',P.green,after(4,0)],
-       [F.y2,'SERVER 8','OLD CODE','POWER PEG',P.red,after(4,7)]]
+      /* `on` is a RAMP, not a boolean. A 312x52 panel changing its fill and
+         its border between two frames was a 9% jump out of stillness -- the
+         biggest snap in the piece and exactly what rule 2 forbids. Over half
+         a second the same change is under the eye's threshold for a cut and
+         the stream below carries the motion. */
+      [[F.y1,'SERVERS 1-7','NEW CODE','RETAIL LIQUIDITY',P.green,
+        H.clamp((M-wordAt(4,0))/0.50)],
+       [F.y2,'SERVER 8','OLD CODE','POWER PEG',P.red,
+        H.clamp((M-wordAt(4,7))/0.50)]]
        .forEach(([y,who,build,ran,col,on])=>{
-        rect(F.x,y,F.w,F.h,H.rgba(H.mix(P.bone,P.ink,on?0.72:0.84)));
+        rect(F.x,y,F.w,F.h,H.rgba(H.mix(P.bone,P.ink,0.84-0.12*on)));
         strokePoly([[F.x,y],[F.x+F.w,y],[F.x+F.w,y+F.h],[F.x,y+F.h]],
-                   H.rgba(on?col:H.mix(P.bone,P.ink,0.62)),2);
+                   H.rgba(H.mix(H.mix(P.bone,P.ink,0.62),col,on)),2);
         if(GBOX)GBOX.push({x:F.x,y:y,w:F.w,h:F.h,k:'panel'+y+'box'});
         px(who,F.x+10,y-20,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
            null,'"Silkscreen"');
         px(build,F.x+12,y+8,14,H.rgba(H.mix(P.bone,P.ink,0.44)),
            null,'"VT323"');
-        if(on) px(ran,F.x+12,y+28,14,H.rgba(col),null,'"Silkscreen"');
+        if(on>0.02) px(ran,F.x+12,y+28,14,
+                       H.rgba(H.mix(col,P.ink,(1-on)*0.92)),null,'"Silkscreen"');
       });
       // the flag itself, arriving and forking
       if(after(3,3)){
@@ -500,6 +530,33 @@ function explainer(ctx,W2,Hh,t){
                   H.rgba(H.mix(P.gold,P.ink,0.34)),2);
           linePix([[Q.cx,MIDY-4],[Q.cx,F.y2-6]],
                   H.rgba(H.mix(P.gold,P.ink,0.34)),2);
+          /* IT WAS NOT ONE ORDER. The router took orders all morning and
+             every one of them carrying that flag went both ways at once --
+             so the stream runs for the whole beat, in along the wire and
+             then out to both builds, instead of one box sliding in and
+             sitting there for five seconds. Deterministic: each packet's
+             phase is its own index. Not registered: it moves. */
+          for(let i=0;i<14;i++){
+            /* EACH PACKET GETS ITS OWN SPEED. Evenly spaced marks all moving
+               at one speed is a stroboscope: packet i lands almost exactly
+               where packet i-1 was, so the frame is identical to the last one
+               and a stream that is plainly moving measures as a still
+               picture. Jittered off the index, so it stays deterministic. */
+            const jf=(k)=>{const v=Math.sin((i+k)*12.9898)*43758.5453;
+                           return v-Math.floor(v);};
+            const ph=((M*(0.38+jf(3)*0.34))+jf(17))%1;
+            if(ph<0.52){
+              const u=ph/0.52;
+              rect(Math.round(H.lerp(44,Q.cx-36,u)),MIDY-19,7,7,
+                   H.rgba(H.mix(P.gold,P.ink,0.16)));
+            } else {
+              const u=(ph-0.52)/0.48, up=(i%2===0);
+              const y2=up?H.lerp(MIDY-30,F.y1+F.h-14,u)
+                        :H.lerp(MIDY-2,F.y2+16,u);
+              rect(Q.cx-3,Math.round(y2),7,7,
+                   H.rgba(H.mix(up?P.green:P.red,P.ink,0.12)));
+            }
+          }
         }
       }
       if(after(4,16)) px('THE FLAG DID WHAT IT USED TO DO',Q.cx,Q.rows[0],14,
@@ -519,6 +576,31 @@ function explainer(ctx,W2,Hh,t){
       B.closePath(); B.fill();
       px('SEND A CHILD ORDER',L.cx,L.cy-L.r-22,14,
          H.rgba(H.mix(P.bone,P.ink,0.26)),'center','"Silkscreen"');
+      /* THE LOOP RUNS. This is the one beat in the library where the subject
+         IS a thing going round and round, and it was drawn as a still circle
+         with a label on it for fourteen seconds. A head chases the ring from
+         the first frame of the beat and never stops -- it does not slow when
+         the stop condition slides out, because nothing about it changed; what
+         changed is that there is no longer anywhere for it to leave. And the
+         child orders it is sending go out to the market on every pass, which
+         is the sentence the ring is labelled with. Deterministic, and
+         unregistered: it is geometry that moves. */
+      const lapA=(M-BEAT.PEG.sc)*0.50*Math.PI*2-Math.PI/2;
+      for(let k=0;k<16;k++){
+        const a2=lapA-k*0.052;
+        rect(Math.round(L.cx+Math.cos(a2)*L.r)-3,
+             Math.round(L.cy+Math.sin(a2)*L.r)-3,6,6,
+             H.rgba(H.mix(P.cyan,P.ink,0.06+k/16*0.80)));
+      }
+      for(let i=0;i<14;i++){
+        const ph=((M-BEAT.PEG.sc)*0.60+i/14)%1;
+        const a2=-0.60+((i*2.39)%2.00);        // out to the right, where the
+        const rr=L.r+ph*58;                    // arrowhead already points
+        const fade=Math.min(1,ph/0.10,(1-ph)/0.24);
+        rect(Math.round(L.cx+Math.cos(a2)*rr)-2,
+             Math.round(L.cy+Math.sin(a2)*rr)-2,5,5,
+             H.rgba(H.mix(P.red,P.ink,0.18+(1-fade)*0.76)));
+      }
       /* THE 2005 MOVE. The stop condition slides out of the loop and nothing
          replaces it, which is the entire defect and it is one drag. */
       const out=H.ease.inOut(H.clamp((M-wordAt(7,5))/1.6));
@@ -547,29 +629,40 @@ function explainer(ctx,W2,Hh,t){
       strokePoly([[C.x,C.y],[C.x+C.w,C.y],[C.x+C.w,C.y+C.h],[C.x,C.y+C.h]],
                  H.rgba(H.mix(P.bone,P.ink,0.46)),2);
       if(GBOX)GBOX.push({x:C.x,y:C.y,w:C.w,h:C.h,k:'clockbox'});
-      const run=H.clamp((M-wordAt(8,1))/5.6);
-      const mins=Math.round(run*MINUTES);
+      /* THE CLOCK RUNS, to the second. It used to tick a minute at a time
+         off a clamp that finished in five and a half seconds and then held
+         "00:45:00" for the rest of the beat -- a clock, stopped, in the one
+         beat whose whole construction is "the same clock, two servers". The
+         seconds digit is the same character count either way, so nothing
+         below it moves. */
+      const run=H.clamp((M-wordAt(8,1))
+                        /Math.max(2.0,BEAT.RUN.sc-0.40-wordAt(8,1)));
+      const secs=Math.round(run*MINUTES*60);
+      const mins=Math.floor(secs/60);
       px('T +',C.x+12,C.y+12,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
          null,'"Silkscreen"');
-      px('00:'+String(mins).padStart(2,'0')+':00',C.x+C.w-12,C.y+7,32,
-         H.rgba(P.red),'right','"Silkscreen"');
+      px('00:'+String(mins).padStart(2,'0')+':'+String(secs%60).padStart(2,'0'),
+         C.x+C.w-12,C.y+7,32,H.rgba(P.red),'right','"Silkscreen"');
       /* Explicit per-line times, so the phosphor flash can fire ON THE LINE
          ARRIVING. Derived from a clamp the flash was on for five seconds
          before the line it was flashing had even been spoken about. */
       const t0=wordAt(8,1), per=1.15, l3=t0+2*per;
-      const shown=Math.max(0,Math.min(4,Math.floor((M-t0)/per)+1));
-      const fl=Math.max((M>=l3)?H.clamp(1-(M-l3)/0.55):0,
-                        after(9,11)?H.clamp(1-(M-wordAt(9,11))/0.55):0);
-      const b1=term(W2.x,W2.y1,W2.w,'WHAT HAPPENED',LOGA,shown,2,fl);
+      const prog=Math.max(0,Math.min(4,(M-t0)/per));
+      /* the flash RAMPS UP as well as down. A 354x22 phosphor block arriving
+         whole, on the frame line three arrives, is most of a 10% jump. */
+      const ramp=(t1)=>Math.min(H.clamp((M-(t1-0.24))/0.24),
+                                H.clamp(1-(M-t1)/0.55));
+      const fl=Math.max(ramp(l3),after(9,11)?ramp(wordAt(9,11)):0);
+      const b1=term(W2.x,W2.y1,W2.w,'WHAT HAPPENED',LOGA,prog,2,fl);
       px('-$'+LOSS_M+',000,000',W2.x+W2.w,b1+8,20,
          H.rgba(P.red),'right','"Silkscreen"');
-      const b2=term(W2.x,W2.y2,W2.w,'IF IT HAD BEEN DELETED',LOGB,shown,2,fl);
+      const b2=term(W2.x,W2.y2,W2.w,'IF IT HAD BEEN DELETED',LOGB,prog,2,fl);
       px('$0',W2.x+W2.w,b2+8,20,H.rgba(P.green),'right','"Silkscreen"');
       /* The bracket draws itself down the margin AS the split happens --
          not there from the start (v34-clock, finding 3). Its word goes on the
          row BETWEEN the two windows: the margin is eight pixels wide and a
          label in it runs off the frame. */
-      if(shown>2){
+      if(prog>=2){
         const g=H.clamp((M-wordAt(9,0))/1.4);
         const ty=W2.y1+18+W2.pad+2*W2.lh, by2=W2.y2+18+W2.pad+2*W2.lh+16;
         linePix([[28,ty],[28,H.lerp(ty,by2,g)]],H.rgba(P.gold),3);
@@ -582,6 +675,28 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.RUN.sc&&T<BEAT.EMAIL.sc){
       px('IN, AND OUT',Q.cx,150,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
+      /* WHAT WENT IN AND WHAT CAME OUT, as flux rather than as two numbers
+         that land and sit. Both run down the two gutters either side of the
+         figures -- the only columns of this beat that no text occupies -- and
+         the whole claim of the beat is the RATIO between them, which two
+         still numbers can state and only two streams can show. Four million
+         executions in forty five minutes is about fifteen hundred a second;
+         two hundred and twelve orders went in over the same forty five
+         minutes. Deterministic, unregistered. */
+      const gut=(n,spd,col,seed,sz)=>{
+        for(let i=0;i<n;i++){
+          const jj=(k)=>{const v=Math.sin((i+seed+k)*12.9898)*43758.5453;
+                         return v-Math.floor(v);};
+          const sp=spd*(0.70+jj(3)*0.70);
+          const ph=((M*sp)+jj(11))%1;
+          const x=Math.round((jj(29)<0.5?44:322)+jj(41)*62);
+          const y=Math.round(MIDY-166+ph*342);
+          const fade=Math.min(1,ph/0.08,(1-ph)/0.12);
+          rect(x,y,sz,sz,H.rgba(H.mix(col,P.ink,0.20+(1-fade)*0.74)));
+        }
+      };
+      gut(16,0.26,H.mix(P.bone,P.ink,0.22),5,5);
+      if(after(11,0)) gut(46,0.78,P.red,901,5);
       px('ORDERS IN',Q.cx,MIDY-150,14,
          H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
       px(PARENTS+'',Q.cx,MIDY-126,32,
@@ -610,22 +725,35 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.EMAIL.sc&&(T<BEAT.END.sc||!after(16,0))){
       px('SENT BEFORE THE MARKET OPENED',Q.cx,150,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      const g=H.clamp((M-wordAt(13,2))/5.0), N=10;
+      const N=10;
       const bx=44, by=MIDY-124, bw=344, rh=30;
       rect(bx,by,bw,N*rh+8,H.rgba(H.mix(P.ink,P.paper,0.04)));
       strokePoly([[bx,by],[bx+bw,by],[bx+bw,by+N*rh+8],[bx,by+N*rh+8]],
                  H.rgba(H.mix(P.bone,P.ink,0.62)),2);
       if(GBOX)GBOX.push({x:bx,y:by,w:bw,h:N*rh+8,k:'inboxbox'});
-      for(let i=0;i<N;i++){
-        if(i/N>g) break;
-        const y=by+4+i*rh;
+      /* THE FEED NEVER STOPS, which is why nobody read it. Ten rows that
+         filled once and then held for eight seconds was a list of ninety
+         seven alerts drawn as a photograph of ten. It scrolls: a new one
+         arrives at the bottom, the oldest leaves the top, and it is still
+         doing it when the narrator says nobody read them -- which is the
+         only honest way to draw a channel that was never an alert channel.
+         The timestamps are generated from the row index and run from eight
+         in the morning to the opening bell, the way the ninety seven did. */
+      const prog=Math.max(0,(M-wordAt(13,2))*0.42);
+      B.save(); B.beginPath(); B.rect(bx+2,by+2,bw-4,N*rh+4); B.clip();
+      for(let i=Math.max(0,Math.ceil(prog)-N);i<=Math.floor(prog)+1;i++){
+        const y=Math.round(by+4+(N-1-(prog-i))*rh);
+        if(y<by-rh+2||y>by+N*rh-4) continue;
+        const tot=8*60+1+Math.round(i*0.92);
         rect(bx+2,y,bw-4,rh-2,H.rgba(H.mix(P.ink,P.paper,i%2?0.03:0.07)));
         rect(bx+10,y+10,8,8,H.rgba(P.gold));
-        px('08:'+String(1+i*6).padStart(2,'0'),bx+26,y+8,14,
+        px(String(Math.floor(tot/60)).padStart(2,'0')+':'
+           +String(tot%60).padStart(2,'0'),bx+26,y+8,14,
            H.rgba(H.mix(P.bone,P.ink,0.58)),null,'"VT323"');
         px('SMARS: Power Peg disabled',bx+86,y+8,14,
            H.rgba(H.mix(P.bone,P.ink,0.24)),null,'"VT323"');
       }
+      B.restore();
       if(after(14,0)) px(EMAILS+' OF THESE',bx+bw,by+N*rh+28,20,
                          H.rgba(P.gold),'right','"Silkscreen"');
       if(after(15,7)) px('NOBODY READ THEM',Q.cx,by+N*rh+70,20,

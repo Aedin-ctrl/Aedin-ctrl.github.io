@@ -144,6 +144,87 @@ function disc(cx,cy,r,col){
   for(let y=-r;y<=r;y++){ const hw=Math.sqrt(Math.max(0,r*r-y*y));
     rect(Math.round(cx-hw),Math.round(cy+y),Math.max(1,Math.round(hw*2)),1,col); }
 }
+/* deterministic jitter. Math.random is forbidden -- a render has to come out
+   the same frame for frame -- so every phase here comes from an index. */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+
+/* ===== THE SUN DOES NOT STOP WHILE THE TABLE IS BEING READ =============
+   Every row of this table is a RATE -- watts per square metre, now, and the
+   next second, and the next -- and the beat drew it as five lines of type
+   over a still picture. So the light runs. ONE stream, left to right past
+   Mercury and on to Venus (which is the order they are in, and the reason
+   Venus gets less), and the SPACING IS THE FLUX: nothing here is
+   decoration, the gaps are 9083 and 2601 W/m2 to scale. ==================*/
+function lightLane(x0,x1,xend,flux,ys,m,col){
+  const spc=109000/flux;
+  ys.forEach((y,li)=>{
+    for(let x=x0+((m*44+li*spc*0.37)%spc);x<=x1;x+=spc){
+      if(x>xend) break;
+      rect(Math.round(x),y,6,3,H.rgba(col));
+    }
+  });
+}
+/* the share that is thrown straight back out, leaving upward: the count is
+   albedo x flux, so Venus's outgoing stream is the thick one even though it
+   is the planet less light reaches. That is the whole of the MIRROR beat,
+   running, instead of two percentages sitting still in a row. */
+function albedoOut(x0,y0,x1,y1,rate,m,g,col,seed){
+  const n=Math.max(1,Math.round(rate/260));
+  for(let i=0;i<n;i++){
+    const p=((m*0.42)+jit(seed+i*7))%1;
+    if(p>H.clamp(g)) continue;        // the stream grows out of the planet
+    rect(Math.round(H.lerp(x0,x1,p))-2,Math.round(H.lerp(y0,y1,p))-2,4,5,
+         H.rgba(col));
+  }
+}
+function sunMark(cx,cy,g){
+  const r=Math.round(9*g);
+  if(r<2) return;
+  disc(cx,cy,r,H.rgba(H.mix(P.gold,P.paper,0.18)));
+  for(let i=0;i<8;i++){ const a=i/8*Math.PI*2;
+    linePix([[cx+Math.cos(a)*(r+2),cy+Math.sin(a)*(r+2)],
+             [cx+Math.cos(a)*(r+5),cy+Math.sin(a)*(r+5)]],
+            H.rgba(H.mix(P.gold,P.paper,0.06)),2); }
+  if(GBOX)GBOX.push({x:cx-15,y:cy-15,w:30,h:30,k:'sunbox'});
+}
+/* ===== AND THE AIR IS NEVER IDLE ======================================
+   Infrared leaves the ground, goes a few metres, is absorbed, is radiated
+   again, is absorbed again -- which is sentence 13 word for word, and was
+   previously a caption typed over a photograph. Each quantum's hops come
+   from its own index, so the ladder is reproducible. ====================*/
+function irLadder(m,g){
+  const S=Q.sec, N=18, HOPS=7, yG=S.ground-12, yC=S.cloud+34;
+  for(let i=0;i<N;i++){
+    if(i/N>g) break;
+    const p=((m*0.115)+jit(i*3+1))%1, u=p*HOPS, k=Math.floor(u), fr=u-k;
+    const h=(j)=>yG+(yC-yG)*(j/HOPS)*(0.58+0.42*jit(i*11+j*7));
+    const e=H.clamp((fr-0.24)/0.54);
+    const y=H.lerp(h(k),h(k+1),H.ease.inOut(e));
+    /* kept to the right of the two big readouts, so a quantum never
+       crosses a number the viewer is in the middle of reading */
+    const x=S.x+104+Math.round(jit(i*5+2)*(S.w-146)
+                               +Math.sin((p*HOPS+i)*1.7)*6);
+    disc(x,Math.round(y),3,H.rgba(H.mix(P.red,P.ink,(e<=0||e>=1)?0.02:0.36)));
+  }
+}
+/* and the only way out: the cloud tops, continuously */
+function irEscape(m,g){
+  const S=Q.sec;
+  for(let i=0;i<5;i++){
+    const p=((m*0.32)+jit(i*9+5))%1;
+    rect(S.x+S.w-74+Math.round(jit(i*13+2)*54),
+         Math.round(S.cloud-4-p*50*H.clamp(g)),3,5,
+         H.rgba(H.mix(P.cyan,P.ink,0.10)));
+  }
+}
+/* quanta travelling along one of the beams the beat already draws */
+function beamDots(x0,y0,x1,y1,n,spd,col,m,seed){
+  for(let i=0;i<n;i++){
+    const p=((m*spd)+(i/n)+jit(seed+i)*0.10)%1;
+    rect(Math.round(H.lerp(x0,x1,p))-2,Math.round(H.lerp(y0,y1,p))-2,4,4,
+         H.rgba(col));
+  }
+}
 /* --- one row of the table: a label on the left and a value under each
    planet. Everything in this piece is a comparison, so nothing is ever
    drawn for one planet without the other beside it. --- */
@@ -177,13 +258,19 @@ function planet(cx,cy,r,kind){
   if(GBOX)GBOX.push({x:cx-r,y:cy-r,w:r*2,h:r*2,k:kind+'box'});
 }
 /* --- the section through Venus's air, for the last mechanism beat --- */
-function venusSection(){
+function venusSection(m){
   const S=Q.sec;
   rect(S.x,S.cloud,S.w,26,H.rgba(H.mix(P.gold,P.paper,0.30)));
   rect(S.x,S.ground,S.w,6,H.rgba(H.mix(P.earth,P.ink,0.20)));
-  for(let y=S.cloud+30;y<S.ground;y+=12)
-    for(let x=S.x+6;x<S.x+S.w;x+=22)
-      rect(x,y,3,3,H.rgba(H.mix(P.bone,P.ink,0.70)));
+  /* ninety two bars at seven hundred and thirty seven kelvin is not a
+     photograph of a gas. Every one of these is moving, always, and for the
+     first sentence of this beat it is the only thing on screen that is. */
+  let n=0;
+  for(let y=S.cloud+32;y<S.ground;y+=12)
+    for(let x=S.x+6;x<S.x+S.w;x+=22,n++)
+      rect(Math.round(x+Math.sin(m*5.5+jit(n)*6.283)*3.0),
+           Math.round(y+Math.cos(m*4.3+jit(n+97)*6.283)*2.6),3,3,
+           H.rgba(H.mix(P.bone,P.ink,0.70)));
   if(GBOX)GBOX.push({x:S.x,y:S.top,w:S.w,h:S.ground-S.top+8,k:'secbox'});
   px('CLOUD',S.x+6,S.cloud+6,14,H.rgba(H.mix(P.ink,P.paper,0.20)),
      null,'"Silkscreen"');
@@ -403,8 +490,34 @@ function explainer(ctx,W2,Hh,t){
       px(hd,Q.cx,110,14,H.rgba(H.mix(P.bone,P.ink,0.28)),
          'center','"Silkscreen"');
       const Tb=Q.tab;
+      /* ---- THE LIGHT IS ARRIVING, for every second of this table ----
+         The sun is off to the left, Mercury is in front of Venus, and the
+         spacing of the stream IS the flux: dense before Mercury, thin past
+         it, because Venus is further out. That is line 1 and line 2, drawn,
+         and it does not stop when they are finished being said. */
+      const LY=[158,168,178];
+      if(after(1,0)){
+        const g1=H.clamp((M-wordAt(1,0))/0.9);
+        sunMark(54,Tb.y[0]-6,H.ease.out(g1));
+        lightLane(70,Tb.me-15,H.lerp(70,Tb.me-15,H.ease.out(g1)),S_ME,LY,M,
+                  H.mix(P.gold,P.paper,0.16));
+      }
+      if(after(2,0)){
+        const g2=H.clamp((M-wordAt(2,0))/0.9);
+        lightLane(Tb.me+20,Tb.ve-22,H.lerp(Tb.me+20,Tb.ve-22,H.ease.out(g2)),
+                  S_VE,LY,M,H.mix(P.gold,P.paper,0.16));
+      }
       planet(Tb.me,Tb.y[0]-6,13,'me');
       planet(Tb.ve,Tb.y[0]-6,20,'ve');
+      /* ---- and most of what reaches Venus is thrown straight back ----
+         the count is albedo x flux, so the outgoing stream over Venus is
+         the thick one even though it is the planet less light reaches. */
+      if(after(3,7)) albedoOut(Tb.ve+23,160,382,134,A_VE*S_VE,M,
+                               (M-wordAt(3,7))/1.0,
+                               H.mix(P.cyan,P.paper,0.30),7);
+      if(after(4,7)) albedoOut(Tb.me+15,162,256,136,A_ME*S_ME,M,
+                               (M-wordAt(4,7))/1.0,
+                               H.mix(P.bone,P.ink,0.30),41);
       px('MERCURY',Tb.me,Tb.y[0]+22,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
          'center','"Silkscreen"');
       px('VENUS',Tb.ve,Tb.y[0]+22,14,H.rgba(H.mix(P.bone,P.ink,0.34)),
@@ -443,7 +556,7 @@ function explainer(ctx,W2,Hh,t){
       px('ONE SLICE OF THAT AIR',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       const S=Q.sec;
-      venusSection();
+      venusSection(M);
       if(after(10,2)){
         px(BAR_VE+' BARS',S.x+6,S.cloud+40,20,H.rgba(P.gold),
            null,'"Silkscreen"');
@@ -454,8 +567,16 @@ function explainer(ctx,W2,Hh,t){
       if(after(11,0)){
         arrow(S.x+40,S.top-24,S.x+62,S.cloud-4,P.paper,3);
         arrow(S.x+66,S.cloud-4,S.x+96,S.top-24,H.mix(P.paper,P.ink,0.30),2);
-        if(after(11,8)) arrow(S.x+64,S.cloud+28,S.x+72,S.ground-16,
-                              P.paper,3);
+        /* the beams are not pipes, they are traffic: light is going down
+           them the whole time the beat is talking about what the air does
+           to it. */
+        beamDots(S.x+40,S.top-24,S.x+62,S.cloud-4,3,0.34,P.paper,M,11);
+        beamDots(S.x+66,S.cloud-4,S.x+96,S.top-24,3,0.34,
+                 H.mix(P.paper,P.ink,0.30),M,31);
+        if(after(11,8)){
+          arrow(S.x+64,S.cloud+28,S.x+72,S.ground-16,P.paper,3);
+          beamDots(S.x+64,S.cloud+28,S.x+72,S.ground-16,3,0.26,P.paper,M,51);
+        }
         px('SUNLIGHT',S.x+34,S.top-42,14,H.rgba(P.paper),null,'"Silkscreen"');
       }
       /* the ground answers in infrared, and the air will not pass it */
@@ -471,6 +592,11 @@ function explainer(ctx,W2,Hh,t){
         px('INFRARED',S.x+134,S.ground-84,14,H.rgba(P.red),
            null,'"Silkscreen"');
       }
+      /* ABSORBED, RADIATED AGAIN, ABSORBED AGAIN -- the sentence, running,
+         for as long as the beat is about it. It starts under line 12 and it
+         is still going under line 14, because that is what the air does. */
+      if(after(12,9)) irLadder(M,H.clamp((M-wordAt(12,9))/2.4));
+      if(after(14,0)) irEscape(M,H.clamp((M-wordAt(14,0))/1.0));
       if(after(13,0)){
         const n=Math.min(6,1+Math.floor((M-wordAt(13,0))*2.2));
         px('ABSORBED AND RE-RADIATED: '+n,Q.cx,Q.rows[0],14,

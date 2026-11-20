@@ -138,11 +138,17 @@ function ringPix(cx,cy,r,col,th,k){
 }
 /* --- A CUT BANANA, end on: the ring of flesh, the three-part core, and
    whatever is down the middle of it. --- */
-function section(cx,cy,r,seeds,lit){
+/* rot: the section TURNS, slowly, the way anything in a viewer gets turned.
+   A cut fruit is the one thing in this piece that is genuinely not doing
+   anything, so this is the diagram idle the spec allows and not a claim: the
+   ring is a circle, so only the core and the seeds move, and the picture
+   says exactly what it said before. */
+function section(cx,cy,r,seeds,lit,rot){
+  const R=rot||0;
   disc(cx,cy,r,H.rgba(H.mix(P.gold,P.paper,lit?0.52:0.34)));
   ringPix(cx,cy,r,H.rgba(H.mix(P.gold,P.ink,0.40)),3);
   for(let i=0;i<3;i++){
-    const a=i/3*Math.PI*2-Math.PI/2;
+    const a=i/3*Math.PI*2-Math.PI/2+R;
     linePix([[cx,cy],[cx+Math.cos(a)*r*0.92,cy+Math.sin(a)*r*0.92]],
             H.rgba(H.mix(P.gold,P.ink,0.22)),2);
   }
@@ -150,39 +156,59 @@ function section(cx,cy,r,seeds,lit){
   const rnd=H.rng(7);
   if(seeds==='specks'){
     for(let i=0;i<9;i++){
-      const a=rnd()*Math.PI*2, d=rnd()*r*0.26;
+      const a=rnd()*Math.PI*2+R, d=rnd()*r*0.26;
       rect(Math.round(cx+Math.cos(a)*d),Math.round(cy+Math.sin(a)*d),3,3,
            H.rgba(H.mix(P.earth,P.ink,0.10)));
     }
   } else if(seeds==='seeds'){
     for(let i=0;i<22;i++){
-      const a=rnd()*Math.PI*2, d=Math.sqrt(rnd())*r*0.62;
+      const a=rnd()*Math.PI*2+R, d=Math.sqrt(rnd())*r*0.62;
       disc(cx+Math.cos(a)*d,cy+Math.sin(a)*d,5,H.rgba(H.mix(P.ink,P.bone,0.14)));
     }
   }
 }
 /* --- CHROMOSOMES, as rods in sets. The whole piece is whether the sets can
    be dealt into two equal hands. --- */
-function chromSet(x,y,n,col,k){
+/* mm: the rods DRIFT. Chromosomes are in a cell, not in a filing cabinet,
+   and a stack of 33 rods holding perfectly still for six seconds under the
+   sentence that says what they are about to fail to do was the second
+   deadest beat in the piece. Each rod's phase comes from its index, so the
+   drift is the same drift in every render. The BOX does not move: a box that
+   moves is a box that argues with checkOverlap on some frames and not on
+   others. */
+function chromSet(x,y,n,col,k,mm,seed){
   for(let i=0;i<n;i++){
     const xx=x+i*9;
-    rect(xx,y,5,18,H.rgba(col));
-    rect(xx,y+7,5,3,H.rgba(H.mix(col,P.ink,0.40)));
+    const dy=mm===undefined?0:Math.round(Math.sin(mm*2.6+(i+(seed||0))*0.8)*4);
+    rect(xx,y+dy,5,18,H.rgba(col));
+    rect(xx,y+7+dy,5,3,H.rgba(H.mix(col,P.ink,0.40)));
   }
   if(GBOX)GBOX.push({x:x-2,y:y-2,w:n*9+4,h:22,k:k+'box'});
   return x+n*9;
 }
 /* --- ONE PLANT, drawn from ONE seed, and therefore the same plant every
    time it is drawn. That is not a shortcut: it is the argument. --- */
-function plant(cx,gy,s,col,sucker){
+/* sw: the breeze. A banana plantation is a field of three metre leaves and
+   it is never still; each plant gets its own phase from its position in the
+   row, so the row moves as a field and not as one object. The stem is drawn
+   as a two segment bend rather than a sliding rectangle, because a plant
+   that translates sideways is a plant on a trolley. */
+function plant(cx,gy,s,col,sucker,sw){
   const r=H.rng(3);
   const h=Math.round(62*s);
-  rect(Math.round(cx-3*s),gy-h,Math.max(2,Math.round(6*s)),h,H.rgba(col));
+  const bend=sw||0;
+  const tw=Math.max(2,Math.round(6*s));
+  for(let j=0;j<h;j++){
+    const f=j/h;                       // 0 at the top, 1 at the ground
+    const dx=Math.round(bend*(1-f)*(1-f));
+    rect(Math.round(cx-3*s)+dx,gy-h+j,tw,1,H.rgba(col));
+  }
+  const tx=cx+bend;
   for(let i=0;i<5;i++){
     const a=(-0.1+(i-2)*0.42), L=Math.round((30+((i*53)%17))*s);
-    const bx=cx+Math.round(Math.cos(a-Math.PI/2)*L);
+    const bx=tx+Math.round(Math.cos(a-Math.PI/2)*L)+Math.round(bend*0.9);
     const by=gy-h+Math.round(Math.sin(a-Math.PI/2)*L*0.62)+Math.round(6*s);
-    linePix([[cx,gy-h+Math.round(4*s)],[bx,by]],H.rgba(col),
+    linePix([[tx,gy-h+Math.round(4*s)],[bx,by]],H.rgba(col),
             Math.max(2,Math.round(4*s)));
     void r;
   }
@@ -237,9 +263,10 @@ const ACTS=(()=>{
   A.push({t0:+(W(4,8)).toFixed(3), t1:+(W(4,8)+1.10).toFixed(3),
           a:[Q.sets.x+120,Q.sets.y+2*Q.sets.pitch], b:[Q.sets.x+250,Q.sets.y+16],
           r:PARK});
-  // CLONE -- cut the sucker off
+  // CLONE -- cut the sucker off the plant, which is at twice the scale and
+  // near the middle of the stage until the row arrives
   A.push({t0:+(W(6,9)).toFixed(3), t1:+(W(6,9)+0.90).toFixed(3),
-          a:[R.x+34,R.y-20], b:[R.x+74,R.y-20], r:PARK});
+          a:[138,R.y+52], b:[182,R.y+52], r:PARK});
   return A;
 })();
 
@@ -429,16 +456,62 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* ===== WHAT IS ACTUALLY RUNNING IN THIS PIECE =====
+       Two things, and the built piece drew both of them as photographs. The
+       first is the propagation itself: every Cavendish on Earth is a cutting
+       taken off the side of another one, and that has been happening without
+       a break since about 1960 -- so the row of plants is a wave of cuttings
+       moving down it, and the clone bars on the timeline carry the same
+       cutting, over and over, through seventy years. The second is the
+       fungus, which is in the soil and is still moving.
+       Where nothing is genuinely running -- a cut fruit, a stack of
+       chromosomes -- the piece uses the idle the spec allows and claims
+       nothing by it: the section turns, the rods drift, and every number on
+       screen says exactly what it said before.
+       Deterministic: every phase is derived from an index. */
+    const breeze=(i)=>Math.round(Math.sin(M*1.45+i*0.7)*7+Math.sin(M*2.3+i*1.9)*3);
+
+    /* --- THE CROP, PROPAGATING THROUGH TIME. Identical marks running along a
+       clone bar: the bar is seventy years of one plant being cut and replanted
+       and cut again, which is the thing the beat is naming. A mark inside the
+       fungus's reach is drawn red, because that is what "it got into all of
+       them" means when every plant is the same plant. --- */
+    const cropFlow=(y,x0,x1,col,s0,s1,lab)=>{
+      const w=x1-x0-5;
+      if(w<10) return;
+      const n=Math.max(3,Math.round(w/18));
+      for(let i=0;i<n;i++){
+        const f=(((M*30)+i*(w/n))%w)/w;
+        const x=Math.round(x0+f*w);
+        /* A MARK IS NOT A DATE. It fades in at the left and out at the right
+           instead of wrapping in one frame: this is a time axis, and a mark
+           that jumps from 1960 back to 1900 reads as a claim about time
+           rather than as the crop being replanted along it. */
+        const edge=Math.min(1,Math.min(f,1-f)/0.08);
+        /* red exactly where the fungus has reached, computed from the same
+           expression that draws the hatching, so the two cannot disagree on
+           any frame -- the front is the piece's one moving claim. */
+        const sick=(s1!==undefined&&x>=s0&&x<=s1);
+        rect(x,y+3,4,16,H.rgba(H.mix(sick?P.red:H.mix(col,P.paper,0.44),
+                                     col,1-edge)));
+      }
+      /* and the bar's name goes back on TOP of the conveyor: clonebar draws
+         it first, so without this the marks run straight through it. */
+      if(lab) px(lab,x0+6,y+4,14,H.rgba(H.mix(P.ink,P.paper,0.16)),
+                 null,'"Silkscreen"');
+    };
+
     /* ============ SEEDS -- what the specks are ======================== */
     if(T>=BEAT.SEEDS.sc&&T<BEAT.TRIPLOID.sc){
       px('ONE CUT ACROSS',Q.cx,110,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      if(after(1,0)) section(136,250,72,after(1,4)?'specks':null,true);
+      if(after(1,0)) section(136,250,72,after(1,4)?'specks':null,true,M*0.30);
       if(after(1,4)) px('WHAT YOU BUY',136,344,14,
                         H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
       if(after(2,1)){
         const g=H.clamp((M-wordAt(2,1))/0.8);
-        section(300,250,Math.round(72*g),g>0.98?'seeds':null,false);
+        section(300,250,Math.round(72*g),g>0.98?'seeds':null,false,
+                -M*0.26);
         if(g>0.98) px('WILD',300,344,14,H.rgba(H.mix(P.bone,P.ink,0.40)),
                       'center','"Silkscreen"');
       }
@@ -454,7 +527,8 @@ function explainer(ctx,W2,Hh,t){
       const group=(x,n,lab,col,on)=>{
         if(!on) return;
         px(lab,x,152,14,H.rgba(H.mix(P.bone,P.ink,0.36)),null,'"Silkscreen"');
-        for(let r=0;r<n;r++) chromSet(x,S.y+r*S.pitch,X_SET,col,'set'+x+r);
+        for(let r=0;r<n;r++) chromSet(x,S.y+r*S.pitch,X_SET,col,'set'+x+r,
+                                     M,r*3+(x>200?17:0));
         px(n*X_SET+'',x+X_SET*9+10,S.y+(n-1)*S.pitch+2,20,
            H.rgba(col),null,'"Silkscreen"');
       };
@@ -502,20 +576,50 @@ function explainer(ctx,W2,Hh,t){
          it a converted string and H.hex cannot parse it: every plant comes
          out black. (It did, twice -- see the orbiter ladder.) */
       const col=H.mix(P.grass,P.paper,0.16);
-      if(after(6,0)) plant(R.x+34,gy,1.2,col,true);
-      if(after(6,9)){
-        const g=H.clamp((M-wordAt(6,9))/1.0);
-        for(let i=0;i<5;i++) rect(R.x+40+i*4,gy-22,2,6,H.rgba(P.red));
-        if(g>0.5) px('CUT',R.x+58,gy-44,14,H.rgba(P.red),null,'"Silkscreen"');
+      /* THE ONE THAT ALREADY EXISTS is the only thing on screen for the
+         first six seconds of this beat, so it is on screen at the size that
+         deserves -- and then the camera pulls back onto the row as the next
+         sentence starts. A plant drawn at a sixth of the stage, in a breeze,
+         moves a sixth of the ink; the same plant at twice the scale moves
+         enough to be a picture rather than a diagram of one. */
+      const g7=after(7,0)?H.ease.inOut(H.clamp((M-wordAt(7,0))/1.0)):0;
+      const ps=H.lerp(2.0,1.2,g7), pcx=Math.round(H.lerp(150,R.x+34,g7));
+      if(after(6,0)) plant(pcx,gy,ps,col,true,breeze(0));
+      /* the cut belongs to the moment before the pull-back: once the row is
+         up, its marks and its label are sitting on the second plant in the
+         row and naming the wrong thing. */
+      if(after(6,9)&&g7<0.92){
+        const g=H.clamp((M-wordAt(6,9))/1.0), fade=H.clamp(g7/0.92);
+        const sx=Math.round(pcx+9*ps), sy=Math.round(gy-18*ps);
+        const c=H.rgba(H.mix(P.red,P.ink,fade));
+        for(let i=0;i<5;i++) rect(sx+Math.round(i*3*ps),sy,2,6,c);
+        if(g>0.5) px('CUT',sx+Math.round(16*ps),sy-22,14,c,null,'"Silkscreen"');
       }
       /* and then the same plant, drawn by the same function, six times */
       if(after(7,0)){
         const g=H.clamp((M-wordAt(7,0))/2.2);
+        let made=0;
         for(let i=1;i<R.n;i++){
           if(i/R.n>g+0.16) break;
-          plant(R.x+34+i*R.pitch,gy,1.2,col,false);
+          plant(R.x+34+i*R.pitch,gy,1.2,col,false,breeze(i));
+          made=i;
         }
         if(GBOX)GBOX.push({x:R.x,y:gy-96,w:R.pitch*R.n,h:104,k:'rowbox'});
+        /* AND IT DOES NOT STOP. A cutting walks from each plant to the next
+           place in the row, over and over, because that is the only way this
+           plant has reproduced for sixty years -- "a cutting of a cutting of
+           a cutting" is a process, and it was drawn as six photographs of a
+           plant. Drawn AFTER the plants so it is not painted over by them. */
+        /* i<made, not i<=made: a cutting from the LAST plant has nowhere in
+           the row to walk to, so it walked off the right edge of the panel.
+           Every cutting now travels between two plants that exist. */
+        for(let i=0;i<made;i++){
+          const u=((M*0.62)+i*0.21)%1;
+          const x=Math.round(R.x+34+i*R.pitch+u*R.pitch);
+          const hh=Math.round(10+16*u);
+          rect(x-3,gy-hh,6,hh,H.rgba(H.mix(col,P.paper,0.30)));
+          rect(x-7,gy-hh-4,14,4,H.rgba(H.mix(col,P.paper,0.30)));
+        }
       }
       if(after(7,8)) px('ONE PLANT, COPIED',Q.cx,gy+18,14,
                         H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
@@ -530,9 +634,9 @@ function explainer(ctx,W2,Hh,t){
          Q.cx,110,14,H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
       timeline();
       const L=Q.tl;
+      const gmG=after(9,4)?H.clamp((M-wordAt(9,4))/1.4):0;
       if(after(9,4)) clonebar(L.gm,1900,1960,'GROS MICHEL',
-                              H.mix(P.gold,P.ink,0.44),
-                              H.clamp((M-wordAt(9,4))/1.4));
+                              H.mix(P.gold,P.ink,0.44),gmG);
       /* the fungus, walking along the bar it can reach */
       if(after(10,0)){
         const g=H.clamp((M-wordAt(10,0))/2.6);
@@ -542,9 +646,20 @@ function explainer(ctx,W2,Hh,t){
         if(after(10,4)) px('PANAMA DISEASE',x0,L.gm-30,14,
                            H.rgba(P.red),null,'"Silkscreen"');
       }
+      if(gmG>0) cropFlow(L.gm,yx(1900),yx(1900)+(yx(1960)-yx(1900))*gmG,
+                         H.mix(P.gold,P.ink,0.44),yx(1935),
+                         after(10,0)?yx(1935)+(yx(1960)-yx(1935))*
+                           H.clamp((M-wordAt(10,0))/2.6):undefined,
+                         'GROS MICHEL');
+      const cavG=after(11,0)?H.clamp((M-wordAt(11,0))/1.4):0;
       if(after(11,0)) clonebar(L.cav,1960,2030,'CAVENDISH',
-                               H.mix(P.grass,P.ink,0.34),
-                               H.clamp((M-wordAt(11,0))/1.4));
+                               H.mix(P.grass,P.ink,0.34),cavG);
+      if(cavG>0) cropFlow(L.cav,yx(1960),yx(1960)+(yx(2030)-yx(1960))*cavG,
+                          H.mix(P.grass,P.ink,0.34),yx(TR4_FOUND),
+                          after(12,12)?yx(TR4_FOUND)+
+                            (yx(TR4_AMERICAS)-yx(TR4_FOUND))*
+                            H.clamp((M-wordAt(12,12))/1.6):undefined,
+                          'CAVENDISH');
       if(after(12,0)){
         const x=yx(TR4_FOUND);
         rect(x,L.cav-14,2,L.h+28,H.rgba(P.red));

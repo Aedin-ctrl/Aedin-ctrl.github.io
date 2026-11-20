@@ -74,39 +74,39 @@ const PIECE={ no:31, slug:'blank', tags:['EARTH','HISTORY'],
    off the wav files, and word onsets come from transcribing the rendered
    audio back with whisper.cpp. 90% of words matched a transcribed token
    directly; the rest are interpolated between matched anchors. */
-const DUR=108.1, VOHASH="d7a5b1e06e27";
+const DUR=107.7, VOHASH="9f13c7d59a1d";
 // one entry per spoken sentence: start, end, words, absolute word onsets
 const VO=[
   {b:'HOOK',a:0.8,z:2.31,w:["How", "do", "you", "measure", "the", "age", "of", "a", "planet?"],t:[0.82, 0.98, 1.1, 1.28, 1.7, 1.9, 2.06, 2.18, 2.23]},
   {b:'ROCK',a:5.81,z:8.007,w:["You", "would", "date", "the", "oldest", "rock", "you", "can", "find."],t:[5.81, 6.05, 6.32, 6.58, 6.77, 7.16, 7.45, 7.67, 7.8]},
   {b:'ROCK',a:8.757,z:15.12,w:["But", "the", "Earth", "remakes", "its", "own", "surface,", "and", "always", "has.", "Every", "rock", "on", "it", "is", "younger", "than", "the", "planet."],t:[8.757, 9.007, 9.257, 9.667, 10.247, 10.497, 10.737, 11.357, 11.777, 13.047, 13.077, 13.367, 13.597, 13.707, 13.817, 13.927, 14.337, 14.567, 14.727]},
   {b:'METEOR',a:16.97,z:23.899,w:["So", "you", "date", "something", "that", "stopped", "changing.", "A", "meteorite,", "left", "over", "from", "the", "same", "formation,", "and", "never", "touched", "since."],t:[17.04, 17.08, 17.25, 17.48, 18.0, 18.23, 19.1, 19.13, 19.23, 20.17, 20.55, 21.25, 21.26, 21.49, 21.81, 22.53, 22.73, 23.06, 23.55]},
-  {b:'CLOCK',a:25.749,z:30.431,w:["The", "uranium", "inside", "it", "turns", "to", "lead", "at", "a", "rate", "nothing", "alters."],t:[25.759, 26.079, 26.749, 27.049, 27.349, 27.749, 28.149, 28.559, 28.729, 28.809, 29.209, 29.789]},
-  {b:'CLOCK',a:31.181,z:34.596,w:["But", "a", "clock", "only", "tells", "you", "the", "time", "if", "you", "know", "what", "it", "read", "at", "the", "start."],t:[31.181, 31.286, 31.391, 31.741, 32.051, 32.371, 32.581, 32.781, 33.121, 33.231, 33.401, 33.621, 33.841, 33.991, 34.171, 34.281, 34.451]},
-  {b:'START',a:36.446,z:43.08,w:["So", "you", "find", "a", "mineral", "with", "no", "uranium", "in", "it.", "Its", "lead", "never", "grew.", "That", "is", "day", "one,", "measured", "instead", "of", "assumed."],t:[36.496, 36.646, 36.826, 37.136, 37.206, 37.756, 38.066, 38.216, 38.916, 39.116, 39.146, 39.446, 39.756, 40.146, 40.706, 41.006, 41.156, 41.386, 41.796, 42.216, 42.586, 42.676]},
-  {b:'DIRT',a:44.93,z:51.564,w:["Clair", "Patterson", "ran", "it", "and", "got", "nonsense.", "More", "lead", "than", "any", "rock", "could", "hold,", "and", "a", "different", "answer", "every", "time."],t:[44.93, 45.33, 45.92, 46.13, 46.26, 46.47, 46.65, 47.41, 47.78, 48.15, 48.51, 48.79, 49.15, 49.87, 49.995, 50.12, 50.17, 50.7, 51.05, 51.34]},
-  {b:'BLANK',a:53.414,z:56.902,w:["So", "he", "took", "the", "sample", "out,", "and", "the", "reading", "did", "not", "go", "to", "zero."],t:[53.464, 53.584, 53.824, 54.104, 54.364, 55.134, 55.174, 55.294, 55.414, 55.734, 56.004, 56.274, 56.454, 56.624]},
-  {b:'BLANK',a:57.652,z:60.532,w:["He", "was", "not", "measuring", "the", "rock.", "He", "was", "measuring", "the", "room."],t:[57.662, 57.782, 57.982, 58.182, 58.772, 58.962, 59.462, 59.512, 59.662, 60.122, 60.272]},
-  {b:'CLEAN',a:62.382,z:66.863,w:["So", "he", "built", "a", "laboratory", "cleaner", "than", "any", "that", "existed,", "and", "asked", "again."],t:[62.442, 62.532, 62.692, 63.052, 63.122, 63.872, 64.402, 64.692, 64.912, 65.332, 66.062, 66.282, 66.542]},
-  {b:'CLEAN',a:67.613,z:74.979,w:["Four", "point", "five", "five", "billion", "years,", "give", "or", "take", "seventy", "million.", "Seventy", "years", "later", "it", "has", "barely", "moved."],t:[67.613, 67.863, 68.113, 68.363, 68.613, 69.203, 69.823, 70.163, 70.603, 71.053, 71.503, 72.283, 73.063, 73.363, 73.853, 73.993, 74.193, 74.803]},
-  {b:'TURN',a:76.829,z:80.876,w:["Which", "leaves", "the", "question", "he", "had", "not", "gone", "looking", "for.", "Where", "was", "all", "that", "lead", "coming", "from?"],t:[76.829, 77.039, 77.319, 77.429, 77.789, 77.889, 78.039, 78.189, 78.429, 79.429, 79.469, 79.669, 79.869, 80.039, 80.269, 80.499, 80.839]},
-  {b:'TURN',a:81.626,z:88.775,w:["Greenland", "ice", "keeps", "a", "layer", "for", "every", "year,", "and", "the", "lead", "in", "it", "climbs", "two", "hundred", "fold,", "steepest", "after", "nineteen", "forty."],t:[81.646, 82.506, 82.706, 83.246, 83.296, 83.696, 83.966, 84.776, 84.806, 85.016, 85.226, 85.506, 85.686, 85.806, 86.158, 86.511, 86.863, 87.216, 87.956, 88.275, 88.595]},
-  {b:'TURN',a:89.525,z:97.03,w:["And", "it", "reached", "into", "its", "own", "answer.", "Some", "of", "the", "early", "readings", "of", "natural", "lead", "turned", "out", "to", "be", "contamination", "too."],t:[89.525, 89.775, 89.935, 90.515, 90.845, 91.115, 91.345, 91.885, 92.135, 92.255, 92.435, 92.745, 93.265, 93.435, 94.245, 94.485, 94.945, 95.225, 95.325, 95.475, 96.695]},
-  {b:'END',a:98.88,z:101.055,w:["He", "set", "out", "to", "measure", "how", "old", "the", "world", "is."],t:[98.88, 99.08, 99.28, 99.41, 99.54, 100.0, 100.2, 100.4, 100.6, 100.93]},
-  {b:'END',a:101.805,z:103.528,w:["What", "he", "measured", "was", "what", "we", "had", "done", "to", "it."],t:[101.805, 101.995, 102.085, 102.475, 102.615, 102.805, 102.895, 103.065, 103.215, 103.315]},
+  {b:'CLOCK',a:25.749,z:30.264,w:["The", "uranium", "inside", "it", "turns", "to", "led", "at", "a", "rate", "nothing", "alters."],t:[25.759, 26.059, 26.679, 27.019, 27.359, 27.702, 28.046, 28.389, 28.579, 28.669, 29.159, 29.619]},
+  {b:'CLOCK',a:31.014,z:34.429,w:["But", "a", "clock", "only", "tells", "you", "the", "time", "if", "you", "know", "what", "it", "read", "at", "the", "start."],t:[31.014, 31.119, 31.224, 31.574, 31.884, 32.204, 32.414, 32.614, 32.954, 33.064, 33.234, 33.454, 33.674, 33.824, 34.004, 34.114, 34.284]},
+  {b:'START',a:36.279,z:42.98,w:["So", "you", "find", "a", "mineral", "with", "no", "uranium", "in", "it.", "Its", "led", "never", "grew.", "That", "is", "day", "one,", "measured", "instead", "of", "assumed."],t:[36.329, 36.439, 36.679, 36.999, 37.079, 37.649, 38.029, 38.129, 38.859, 39.079, 39.099, 39.374, 39.649, 39.999, 40.499, 40.849, 41.019, 41.279, 41.739, 42.149, 42.509, 42.609]},
+  {b:'DIRT',a:44.83,z:51.222,w:["Clair", "Patterson", "ran", "it", "and", "got", "nonsense.", "More", "led", "than", "any", "rock", "could", "hold,", "and", "a", "different", "answer", "every", "time."],t:[44.83, 45.27, 45.93, 46.15, 46.29, 46.51, 46.75, 47.37, 47.69, 48.01, 48.32, 48.57, 48.89, 49.3, 49.54, 49.78, 49.83, 50.34, 50.71, 50.99]},
+  {b:'BLANK',a:53.072,z:56.56,w:["So", "he", "took", "the", "sample", "out,", "and", "the", "reading", "did", "not", "go", "to", "zero."],t:[53.122, 53.242, 53.482, 53.762, 54.022, 54.792, 54.832, 54.952, 55.072, 55.392, 55.662, 55.932, 56.112, 56.282]},
+  {b:'BLANK',a:57.31,z:60.19,w:["He", "was", "not", "measuring", "the", "rock.", "He", "was", "measuring", "the", "room."],t:[57.32, 57.44, 57.64, 57.84, 58.43, 58.62, 59.12, 59.17, 59.32, 59.78, 59.93]},
+  {b:'CLEAN',a:62.04,z:66.521,w:["So", "he", "built", "a", "laboratory", "cleaner", "than", "any", "that", "existed,", "and", "asked", "again."],t:[62.1, 62.19, 62.35, 62.71, 62.78, 63.53, 64.06, 64.35, 64.57, 64.99, 65.72, 65.94, 66.2]},
+  {b:'CLEAN',a:67.271,z:74.637,w:["Four", "point", "five", "five", "billion", "years,", "give", "or", "take", "seventy", "million.", "Seventy", "years", "later", "it", "has", "barely", "moved."],t:[67.271, 67.521, 67.771, 68.021, 68.271, 68.861, 69.481, 69.821, 70.261, 70.711, 71.161, 71.941, 72.721, 73.021, 73.511, 73.651, 73.851, 74.461]},
+  {b:'TURN',a:76.487,z:80.883,w:["Which", "leaves", "the", "question", "he", "had", "not", "gone", "looking", "for.", "Where", "was", "all", "that", "led", "coming", "from?"],t:[76.487, 76.737, 77.037, 77.187, 77.617, 77.757, 77.977, 78.187, 78.487, 79.267, 79.287, 79.487, 79.687, 79.857, 80.137, 80.417, 80.667]},
+  {b:'TURN',a:81.633,z:88.873,w:["Greenland", "ice", "keeps", "a", "layer", "for", "every", "year,", "and", "the", "led", "in", "it", "climbs", "two", "hundred", "fold,", "steepest", "after", "nineteen", "forty."],t:[81.663, 82.463, 82.753, 83.193, 83.363, 83.743, 84.013, 84.853, 84.873, 85.073, 85.308, 85.543, 85.673, 85.873, 86.208, 86.543, 86.878, 87.213, 88.073, 88.383, 88.693]},
+  {b:'TURN',a:89.623,z:96.65,w:["And", "it", "reached", "into", "its", "own", "answer.", "Some", "of", "the", "early", "readings", "of", "natural", "led", "turned", "out", "to", "be", "contamination", "too."],t:[89.623, 89.863, 90.023, 90.593, 90.923, 91.173, 91.403, 91.963, 92.183, 92.293, 92.453, 92.733, 93.203, 93.373, 93.868, 94.363, 94.823, 95.083, 95.203, 95.353, 96.583]},
+  {b:'END',a:98.5,z:100.675,w:["He", "set", "out", "to", "measure", "how", "old", "the", "world", "is."],t:[98.5, 98.7, 98.9, 99.03, 99.16, 99.62, 99.82, 100.02, 100.22, 100.55]},
+  {b:'END',a:101.425,z:103.148,w:["What", "he", "measured", "was", "what", "we", "had", "done", "to", "it."],t:[101.425, 101.615, 101.705, 102.095, 102.235, 102.425, 102.515, 102.685, 102.835, 102.935]},
 ];
 // beat boundaries and the frame each scene changes on
 const BEAT={
   HOOK:{sc:0.0,a:0.8,z:2.31},
   ROCK:{sc:5.41,a:5.81,z:15.12},
   METEOR:{sc:16.57,a:16.97,z:23.899},
-  CLOCK:{sc:25.35,a:25.749,z:34.596},
-  START:{sc:36.05,a:36.446,z:43.08},
-  DIRT:{sc:44.53,a:44.93,z:51.564},
-  BLANK:{sc:53.01,a:53.414,z:60.532},
-  CLEAN:{sc:61.98,a:62.382,z:74.979},
-  TURN:{sc:76.43,a:76.829,z:97.03},
-  END:{sc:98.48,a:98.88,z:103.528},
+  CLOCK:{sc:25.35,a:25.749,z:34.429},
+  START:{sc:35.88,a:36.279,z:42.98},
+  DIRT:{sc:44.43,a:44.83,z:51.222},
+  BLANK:{sc:52.67,a:53.072,z:60.19},
+  CLEAN:{sc:61.64,a:62.04,z:74.637},
+  TURN:{sc:76.09,a:76.487,z:96.65},
+  END:{sc:98.1,a:98.5,z:103.148},
 };
 const SENT={
   HOOK:[0],
@@ -219,6 +219,91 @@ function lump(cx,cy,hw,hh,seed,base,key,inScene){
             w:Math.max(...xs)-Math.min(...xs)+6,h:Math.max(...ys)-Math.min(...ys)+6};
   if(GBOX)GBOX.push({x:bx.x,y:bx.y,w:bx.w,h:bx.h,k:key});
   return bx;
+}
+
+/* ===== THE THINGS THAT NEVER STOP =====
+   Every one of these is something the subject is genuinely doing for every
+   second the narrator talks about it, drawn so the beat cannot become a
+   photograph of itself. Deterministic throughout: the spec forbids
+   Math.random and a render has to be reproducible frame for frame, so every
+   phase, lane and speed is read off the element's index. None of them is
+   registered in GBOX -- they are decoration that MOVES, and a moving box
+   fights checkOverlap on some frames and not on others. */
+const jitB=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+
+/* --- DECAY DOES NOT STOP, which is the sentence word for word: "at a rate
+   nothing alters". A uranium-bearing mineral throws particles out of itself
+   every second it exists. One stream, two readings: it runs over the uranium
+   lattice, and it DIES OUT over the mineral with no uranium in it -- which is
+   that beat's entire claim, made by the picture instead of by a label. --- */
+function decayStream(M,amt,G){
+  if(amt<=0.01) return;
+  for(let i=0;i<24;i++){
+    if(jitB(i+5)>amt) continue;
+    const life=1.05+jitB(i+31)*0.60;
+    const ph=((M/life)+jitB(i))%1;
+    const a=jitB(i+17)*Math.PI*2;
+    const ox=G.x+jitB(i+41)*(G.cols-1)*G.px;
+    const oy=G.y+(0.5+jitB(i+59)*(G.rows-2))*G.py;
+    const d=8+ph*48;
+    const x=Math.round(ox+Math.cos(a)*d), y=Math.round(oy+Math.sin(a)*d*0.42);
+    const fade=Math.min(1,ph/0.12,(1-ph)/0.22);
+    rect(x-1,y-1,3,3,H.rgba(H.mix(P.cyan,P.ink,0.20+(1-fade)*0.74)));
+  }
+}
+
+/* --- IT IS STILL COMING DOWN. The piece's subject is lead arriving out of
+   the air, and the air does not pause between sentences. One helper, three
+   readings: the room Patterson is standing in, the blank he threw away, and
+   the Greenland snow that answers where it was coming from. --- */
+function fallStream(M,x0,x1,yTop,yFloor,n,col,seed,spd,sz){
+  const drop=Math.max(8,yFloor-yTop), s=sz||3;
+  for(let i=0;i<n;i++){
+    const sp=(spd||0.30)+jitB(i+seed)*(spd||0.30)*1.4;
+    const ph=((M*sp)+jitB(i+seed+700))%1;
+    const x=Math.round(H.lerp(x0,x1,jitB(i+seed+1300)));
+    const y=Math.round(yTop+ph*drop);
+    const fade=Math.min(1,ph/0.10,(1-ph)/0.14);
+    rect(x,y,s,s,H.rgba(H.mix(col,P.ink,0.22+(1-fade)*0.72)));
+  }
+}
+
+/* --- A READING THAT WILL NOT SIT STILL. The beat's claim is "a different
+   answer every time", and four finished bars say that once and then stop
+   saying it. So each run RE-RUNS on its own cycle: the bar travels while the
+   instrument reads and then lands -- and in DIRT it lands somewhere else
+   every time. The four values it visits are the four in RUNS, permuted, so
+   no number is invented and the disagreement on screen is exactly the
+   disagreement in the data. In CLEAN the sweep is the same and every landing
+   is the SAME number, which is "seventy years later the number has not
+   moved" drawn rather than asserted. --- */
+const RUNCYC=2.35, RUNSWP=0.80;
+function runSweep(i,M,conv){
+  const u=M/RUNCYC+i*0.31, c=Math.floor(u), ph=u-c;
+  const pick=(k)=>RUNS[((k%4)+4)%4];
+  const sw=H.clamp(ph*RUNCYC/RUNSWP);
+  /* The travel is from the LAST value to the NEXT one, so the cycle boundary
+     is continuous: this cycle's `from` is the previous cycle's `to`. An
+     earlier cut lerped the two ends toward different constants as the runs
+     converged, which left the converged bar dropping a hundred and eleven
+     pixels between two frames, three times, in the beat about agreement --
+     the exact "it does nothing and then snaps back" this pass exists to
+     remove. CONVERGED, THE BAR DOES NOT MOVE AT ALL: the sentence is
+     "seventy years later the number has not moved", and a bar that is still
+     travelling under it argues against the figure printed beside it. The
+     motion in that beat is the read head, which is a separate thing. */
+  const dirty=H.lerp(pick(i+c*3),pick(i+(c+1)*3),H.ease.inOut(sw));
+  return H.lerp(dirty,0.72,conv);
+}
+/* --- THE READ HEAD. What is genuinely continuous in CLEAN is that the
+   measurement kept being MADE -- for seventy years, by other people, with
+   better instruments -- and kept landing in the same place. So a bright tick
+   runs along each track, over and over, while the length of the bar (which
+   is the answer) does not change by a pixel. --- */
+function runHead(M,i,x,y,w,h,col){
+  const u=((M*0.46)+i*0.23)%1;
+  const e=(u<0.5?u*2:2-u*2);                   // across and back: nothing pops
+  rect(Math.round(x+e*(w-6)),y-2,6,h+4,H.rgba(col));
 }
 
 /* ===== the pointer ===== */
@@ -490,9 +575,24 @@ function explainer(ctx,W2,Hh,t){
         const cx2=G.x+(i%G.cols)*G.px, cy2=G.y+Math.floor(i/G.cols)*G.py;
         const isPb=(inStart?false:i<nf);
         if(inStart&&i>=NATOM-6) continue;            // the mineral has fewer
-        rect(cx2-6,cy2-6,12,12,H.rgba(isPb?P.cyan:H.mix(P.gold,P.ink,0.10)));
+        /* A LATTICE IS NOT A PHOTOGRAPH OF A LATTICE. Every atom here is
+           vibrating about its site for as long as the mineral is above
+           absolute zero, so each one keeps a small independent orbit read off
+           its index -- the diagram idle, and the only thing holding the
+           START beat up, because the one thing that is NOT happening in it
+           is decay. Drawn displaced; REGISTERED at its site, because a box
+           that moves fights checkOverlap on some frames and not on others. */
+        const jx=Math.round(Math.sin(M*3.1+i*1.27)*3);
+        const jy=Math.round(Math.sin(M*2.6+i*2.11+1.7)*3);
+        rect(cx2-6+jx,cy2-6+jy,12,12,H.rgba(isPb?P.cyan:H.mix(P.gold,P.ink,0.10)));
         if(GBOX)GBOX.push({x:cx2-6,y:cy2-6,w:12,h:12,k:'atom'});
       }
+      /* and the decay itself, which is what the sentence says cannot be
+         altered -- running over the uranium, dying out over the mineral that
+         has none. The hand-over is EASED, so "no uranium" is an event the
+         viewer watches happen rather than a cut between two pictures. */
+      decayStream(M,inStart?1-H.clamp((M-BEAT.START.sc)/0.90)
+                           :H.clamp((M-wordAt(4,1))/0.70),G);
       px(inStart?'NO URANIUM':'URANIUM',G.x-8,G.y+G.py*G.rows-6,14,
          H.rgba(inStart?H.mix(P.bone,P.ink,0.34):P.gold),null,'"Silkscreen"');
       if(!inStart&&nf>0) px('LEAD',G.x+G.px*(G.cols-1)+10,G.y+G.py*G.rows-6,14,
@@ -525,12 +625,16 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.DIRT.sc&&T<BEAT.BLANK.sc){
       px('ONE ROCK, RUN FOUR TIMES',Q.cx,RX.y-40,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
+      /* the four tracks arrive staggered, and then they KEEP RUNNING: the
+         beat's claim is "a different answer every time", and a picture of
+         four finished bars says that once and holds a photograph for the
+         remaining six seconds. */
       RUNS.forEach((v,i)=>{
         const y=RX.y+i*RX.pitch;
-        const g=H.ease.out(H.clamp((M-wordAt(7,7)-i*0.36)/1.1));
+        const g=H.ease.out(H.clamp((M-BEAT.DIRT.sc-0.25-i*0.34)/1.0));
         px('RUN '+(i+1),RX.x-12,y+2,14,
            H.rgba(H.mix(P.bone,P.ink,0.40)),'right','"Silkscreen"');
-        hTrack(RX.x,y,RX.w,18,v*g,P.red,'run'+i);
+        hTrack(RX.x,y,RX.w,18,runSweep(i,M,0)*g,P.red,'run'+i);
       });
       px('AGE',RX.x+RX.w/2,RX.y+RUNS.length*RX.pitch+6,14,
          H.rgba(H.mix(P.bone,P.ink,0.46)),'center','"Silkscreen"');
@@ -545,9 +649,12 @@ function explainer(ctx,W2,Hh,t){
       const rw=Math.round(RG.w*sc), rh=Math.round(RG.h*sc);
       px('THE SAME READING, EITHER WAY',Q.cx,RG.y-26,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      /* the room, drawn around it once the view pulls back */
-      if(back>0.02){
-        const pad=Math.round(18+back*54);
+      /* the room, drawn around it once the view pulls back. The padding grows
+         from NOTHING: it used to open at 18px on the first frame past the
+         threshold, which painted a 286x216 wall into existence between two
+         frames and measured as a 12% snap. */
+      if(back>0.001){
+        const pad=Math.round(back*72);
         const lit=H.mix(H.mix(P.bone,P.ink,0.88),P.red,back*0.46);
         rect(rx-pad,ry-pad,rw+pad*2,rh+pad*2,H.rgba(lit));
         strokePoly([[rx-pad,ry-pad],[rx+rw+pad,ry-pad],
@@ -584,6 +691,28 @@ function explainer(ctx,W2,Hh,t){
            H.mix(P.earth,P.bone,0.26),'chip',false);
       if(pull>0.75) px('OUT',sx,ry+rh+16,14,
                        H.rgba(H.mix(P.bone,P.ink,0.34)),'center','"Silkscreen"');
+      /* WHAT IS STILL ARRIVING AT THE DETECTOR. A mass spectrometer does not
+         stop counting because you took the sample out -- it goes on reading
+         whatever is in it, and that is the whole of this beat. The stream is
+         drawn AFTER the analyser body it passes through (the trap `mask` hit:
+         put under the solid, it only showed in the gaps) and it does not
+         thin when the chip leaves, which is the claim the needle makes. */
+      for(let i=0;i<15;i++){
+        const life=0.80+jitB(i+9)*0.55;
+        const ph=((M/life)+jitB(i+61))%1;
+        const ix=H.lerp(rx+rw*(0.26+jitB(i+23)*0.48),dcx,H.ease.out(ph));
+        const iy=H.lerp(ry+rh-14,dcy,ph);
+        const fade=Math.min(1,ph/0.12,(1-ph)/0.18);
+        rect(Math.round(ix),Math.round(iy),3,3,
+             H.rgba(H.mix(P.red,P.ink,0.24+(1-fade)*0.70)));
+      }
+      /* and the air of the room itself, once the room is on screen: the
+         sentence is "he was measuring the room", and a room that holds
+         perfectly still while that is said is arguing the opposite. */
+      if(back>0.25)
+        fallStream(M,rx-Math.round(back*66),rx+rw+Math.round(back*66),
+                   ry-Math.round(back*60),ry+rh+Math.round(back*60),
+                   18,P.red,311,0.26);
     }
 
     /* ============ CLEAN -- strip the room, ask again ==================== */
@@ -608,17 +737,34 @@ function explainer(ctx,W2,Hh,t){
       /* and the four runs, collapsing onto one. Same track, same geometry,
          same construction as DIRT -- the viewer has already read it once. */
       const conv=H.ease.inOut(H.clamp((M-wordAt(11,0))/2.2));
+      /* the SAME four tracks, still re-running on the same cycle -- but now
+         every re-run lands on the same number, which is the sentence the
+         beat ends on. Holding them still instead would have been the one
+         place in the piece where a frozen picture and the claim agreed, and
+         it was five dead seconds. */
       RUNS.forEach((v,i)=>{
         const y=RX.y+i*RX.pitch;
         px('RUN '+(i+1),RX.x-12,y+2,14,
            H.rgba(H.mix(P.bone,P.ink,0.40)),'right','"Silkscreen"');
-        hTrack(RX.x,y,RX.w,18,H.lerp(v,0.72,conv),conv>0.5?P.gold:P.red,'run'+i);
+        hTrack(RX.x,y,RX.w,18,runSweep(i,M,conv),conv>0.5?P.gold:P.red,'run'+i);
+        /* and once they have converged the BAR stops and the READING does
+           not: the head keeps crossing the track and keeps landing on the
+           same mark, which is the sentence, drawn. */
+        if(conv>0.35) runHead(M,i,RX.x,y,RX.w,18,
+                              H.mix(P.paper,P.gold,0.30));
       });
       if(after(11,4)){
+        /* it COLOURS UP out of the bars rather than existing between two
+           frames: 40px of gold lettering arriving whole was a 10% jump after
+           four seconds of nothing, which is a snap by the letter of rule 2. */
+        const ar=H.clamp((M-wordAt(11,4))/0.75);
         const hy=RX.y+RUNS.length*RX.pitch+26;
-        px(AGE_TXT,Q.cx,hy,40,H.rgba(P.gold),'center','"Silkscreen"');
+        px(AGE_TXT,Q.cx,hy,40,H.rgba(H.mix(P.gold,P.ink,(1-ar)*0.90)),
+           'center','"Silkscreen"');
         if(after(11,5)) px('BILLION YEARS',Q.cx,hy+52,20,
-                           H.rgba(P.gold),'center','"Silkscreen"');
+                           H.rgba(H.mix(P.gold,P.ink,
+                             (1-H.clamp((M-wordAt(11,5))/0.60))*0.90)),
+                           'center','"Silkscreen"');
         if(after(11,9)) px('GIVE OR TAKE '+ERR_TXT,Q.cx,hy+84,14,
                            H.rgba(H.mix(P.bone,P.ink,0.40)),'center','"Silkscreen"');
       }
@@ -635,9 +781,18 @@ function explainer(ctx,W2,Hh,t){
         const w2=64, x0=Q.cx-w2/2, h2=200, y0=MIDY+70;
         rect(x0,y0-h2,w2,h2,H.rgba(H.mix(P.bone,P.ink,0.86)));
         const g=H.ease.out(H.clamp((M-wordAt(12,1))/1.6));
-        rect(x0,y0-Math.round(h2*0.86*g),w2,Math.round(h2*0.86*g),H.rgba(P.red));
+        const top=y0-Math.round(h2*0.86*g);
+        rect(x0,top,w2,Math.round(h2*0.86*g),H.rgba(P.red));
         if(GBOX)GBOX.push({x:x0,y:y0-h2,w:w2,h:h2,k:'blank'});
         px('THE BLANK',Q.cx,y0+10,14,H.rgba(P.red),'center','"Silkscreen"');
+        /* AND IT IS STILL FILLING. The sentence is "where was all that lead
+           coming from?", and the bar is a reading of the air in the room
+           while it is being asked. It comes down out of the top of the frame
+           into the bar, which is the answer two sentences early in geometry
+           and not in words -- and it is the same fall that lands on the
+           Greenland snow once the ice core is on screen. */
+        fallStream(M,x0-26,x0+w2+26,MIDY-206,Math.max(MIDY-200,top-4),
+                   28,P.red,55,0.34,4);
       } else {
         /* the core, and the trace beside it */
         const dn=H.ease.out(H.clamp((M-wordAt(13,1))/2.0));
@@ -665,6 +820,16 @@ function explainer(ctx,W2,Hh,t){
           pts.push([tx+f*tw, yy]);
         }
         if(pts.length>1){ linePix(pts,H.rgba(P.red),3); polyReg(pts,'trace'); }
+        /* THE SAME FALL, now landing on the top of the core. Greenland takes
+           a layer every year and it is taking one while this sentence is
+           spoken -- the lead in the air did not stop in 1940 and the record
+           of it does not stop either. Drawn after the core so it lands ON it
+           rather than behind it. */
+        fallStream(M,CO.x-16,CO.x+CO.w+12,CO.y-34,CO.y+4,26,P.red,55,1.05,4);
+        /* and on the trace's own side of the picture, because the climb the
+           trace draws is made of this and it did not stop being made of it
+           when the line finished drawing. */
+        fallStream(M,tx,tx+tw-78,CO.y-34,CO.y+4,26,P.red,909,1.05,4);
         /* named ABOVE the plot. At the top right it sat on the one part of
            the trace the beat exists to show -- the kick. */
         if(after(13,17)) px('AFTER 1940',tx+tw,CO.y-24,14,
@@ -776,7 +941,8 @@ function buildScore(){
   for(let i=0;i<8;i++) add(w(4,4)+i*0.30,'blip',i%3);
   add(w(5,2),'zap'); add(w(6,4),'draw'); add(w(6,13),'tag');
   // DIRT
-  for(let i=0;i<4;i++) add(w(7,7)+i*0.36,'knock',i%3);
+  // the four runs arrive at the top of the beat now and then keep re-running
+  for(let i=0;i<4;i++) add(BEAT.DIRT.sc+0.25+i*0.34,'knock',i%3);
   // BLANK -- the shot
   add(w(8,2),'draw'); add(w(8,13),'zap'); add(w(8,13)+0.06,'tag'); add(w(8,13)+0.12,'sub');
   add(w(9,2),'mos'); add(w(9,10),'zap'); add(w(9,10)+0.06,'tag');

@@ -181,7 +181,7 @@ function arrow(x0,y0,x1,y1,col,th){
 }
 /* --- THE DIAL. True north is always straight up; the needle sits wherever
    the declination puts it, and the wedge between the two is the answer. --- */
-function dial(decl,lab,showWedge){
+function dial(decl,lab,showWedge,wob){
   const D=Q.dial;
   ringPix(D.cx,D.cy,D.r,H.rgba(H.mix(P.bone,P.ink,0.46)),2,'dial');
   if(GBOX)GBOX.push({x:D.cx-D.r,y:D.cy-D.r,w:D.r*2,h:D.r*2,k:'dialbox'});
@@ -194,8 +194,13 @@ function dial(decl,lab,showWedge){
   px('TRUE N',D.cx,D.cy-D.r-20,14,H.rgba(H.mix(P.bone,P.ink,0.30)),
      'center','"Silkscreen"');
   linePix([[D.cx,D.cy],[D.cx,D.cy-D.r+4]],H.rgba(H.mix(P.bone,P.ink,0.40)),2);
-  /* the needle */
-  const a=decl*Math.PI/180;
+  /* THE NEEDLE. A magnet in a field is an oscillator: displace it and the
+     field's torque brings it back past the mark and back again, and a hand
+     holding the thing re-excites it every couple of seconds -- which is why
+     a real needle never stands still. The CENTRE is the claim, and the
+     centre does not move: the printed angle, the gold wedge and the station
+     label are all on `decl`, never on `wob`. */
+  const a=(decl+(wob||0))*Math.PI/180;
   const tip=[D.cx+Math.sin(a)*(D.r-10), D.cy-Math.cos(a)*(D.r-10)];
   const tail=[D.cx-Math.sin(a)*(D.r-10), D.cy+Math.cos(a)*(D.r-10)];
   const sideA=[D.cx+Math.cos(a)*9, D.cy+Math.sin(a)*9];
@@ -242,6 +247,82 @@ function polarMap(){
 function diamond(x,y,r,col){
   for(let dy=-r;dy<=r;dy++){ const w=r-Math.abs(dy);
     rect(Math.round(x-w),Math.round(y+dy),Math.max(1,w*2+1),1,col); }
+}
+
+/* ===== THINGS THAT DO NOT STOP ========================================
+   deterministic only: no Math.random anywhere, every phase comes from an
+   index or from the clock. */
+const jit=(i)=>{ const v=Math.sin(i*12.9898)*43758.5453; return v-Math.floor(v); };
+
+/* a needle, small, anywhere, at any bearing -- red end leading */
+function miniNeedle(x,y,ang,L,W,hot,cold){
+  const c=Math.cos(ang), s=Math.sin(ang);
+  const ax=x-s*W, ay=y+c*W, bx=x+s*W, by=y-c*W;
+  B.fillStyle=H.rgba(hot); B.beginPath();
+  B.moveTo(x+c*L,y+s*L); B.lineTo(ax,ay); B.lineTo(bx,by);
+  B.closePath(); B.fill();
+  B.fillStyle=H.rgba(cold); B.beginPath();
+  B.moveTo(x-c*L,y-s*L); B.lineTo(ax,ay); B.lineTo(bx,by);
+  B.closePath(); B.fill();
+}
+/* arc length along a polyline, so a thing walking it moves at a steady
+   rate on screen however the points are spaced */
+function alongPath(pts,u){
+  const seg=[]; let tot=0;
+  for(let i=0;i<pts.length-1;i++){
+    const l=Math.hypot(pts[i+1][0]-pts[i][0],pts[i+1][1]-pts[i][1]);
+    seg.push(l); tot+=l;
+  }
+  let d=H.clamp(u)*tot;
+  for(let i=0;i<seg.length;i++){
+    if(d<=seg[i]||i===seg.length-1){
+      const f=seg[i]?H.clamp(d/seg[i]):0;
+      return [H.lerp(pts[i][0],pts[i+1][0],f),H.lerp(pts[i][1],pts[i+1][1],f),
+              Math.atan2(pts[i+1][1]-pts[i][1],pts[i+1][0]-pts[i][0])];
+    }
+    d-=seg[i];
+  }
+  return [pts[0][0],pts[0][1],0];
+}
+/* A WALK IS A WALK. Needles set off along a line one after another and keep
+   setting off, each one lying along the line where IT is -- which for the
+   field line is the beat's whole claim, said once in words and then drawn
+   for as long as the beat lasts. */
+function procession(path,m,lapT,n,L,W,hot,cold){
+  if(path.length<2) return;
+  for(let k=0;k<n;k++){
+    const u=((m/lapT)+k/n)%1, f=H.clamp(Math.min(u,1-u)/0.07);
+    if(f<0.03) continue;
+    const p=alongPath(path,u);
+    miniNeedle(p[0],p[1],p[2]+Math.sin(m*5.8+k*2.1)*0.055,L,W,
+               H.mix(hot,P.ink,0.06+(1-f)*0.90),
+               H.mix(cold,P.ink,0.34+(1-f)*0.62));
+  }
+}
+/* AND THE POLE IS STILL GOING. The century runs on a loop: the dip pole
+   walks its own published track at a steady rate on screen, and the dashed
+   circle is the latitude it is on, closing in on the true pole. The decade
+   diamonds it passes are what carry the pace -- bunched where it crawled,
+   stretched where it ran. */
+function poleRun(TP,el,lap){
+  const Mp=Q.map, u=(Math.max(0,el)/(lap||4.2))%1, p=alongPath(TP,u);
+  const rr=Math.hypot(p[0]-Mp.cx,p[1]-Mp.cy);
+  const n=Math.max(60,Math.round(rr*3));
+  for(let i=0;i<n;i++){
+    if(i%4>1) continue;
+    const a=i/n*Math.PI*2;
+    rect(Math.round(Mp.cx+Math.cos(a)*rr),Math.round(Mp.cy+Math.sin(a)*rr),
+         2,2,H.rgba(H.mix(P.cyan,P.ink,0.46)));
+  }
+  /* the meridian it is sitting on, as a tick just outside it: the latitude
+     circle stalls where the pole turned east, and the bearing is what moves
+     there -- which is "then it turned for Siberia". */
+  const a2=Math.atan2(p[1]-Mp.cy,p[0]-Mp.cx);
+  linePix([[p[0]+Math.cos(a2)*11,p[1]+Math.sin(a2)*11],
+           [p[0]+Math.cos(a2)*34,p[1]+Math.sin(a2)*34]],
+          H.rgba(H.mix(P.cyan,P.ink,0.34)),2);
+  ringPix(p[0],p[1],7,H.rgba(P.cyan),2);
+  diamond(Math.round(p[0]),Math.round(p[1]),4,H.rgba(P.cyan));
 }
 
 /* ===== the pointer ===== */
@@ -474,10 +555,21 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.OFF.sc&&T<BEAT.FIELD.sc){
       px('THE SAME NEEDLE, TWO PLACES',Q.cx,Q.head,14,dim(0.28),
          'center','"Silkscreen"');
-      /* the needle swings from one station to the other on the word */
+      /* the needle swings from one station to the other on the word, and then
+         keeps a small residual hunt -- a magnetised needle on a pivot does not
+         stop dead. The amplitude was +/-6.6 deg re-exciting every 2.4s, which
+         on a 15.09 deg declination swung the needle between 8.5 and 21.7 and
+         argued against the one number the piece exists to state. It is now
+         +/-3.2 on a slower cycle. 2.1 was an overcorrection -- it left 2.6s
+         of near-stillness under the sentence that states the headline number
+         -- and 3.2 swings between 11.9 and 18.3, which is still "about
+         fifteen degrees" as the narrator says it. The printed 15.09 is the
+         DECLINATION, a property of the place, not an instantaneous reading,
+         so a small hunt around it is physically right. */
       const sw=H.ease.inOut(H.clamp((M-wordAt(3,0))/0.90));
       const decl=H.lerp(SEA_DEC,CPT_DEC,sw);
-      dial(decl,sw<0.5?'SEATTLE':'CAPE TOWN',after(1,8));
+      dial(decl,sw<0.5?'SEATTLE':'CAPE TOWN',after(1,8),
+           Math.sin(M*5.4)*3.2*Math.exp(-((M*0.31)%1)*1.5));
       if(after(1,8))
         px(Math.abs(decl).toFixed(2)+(decl>0?' EAST':' WEST'),Q.cx,150,20,
            H.rgba(P.gold),'center','"Silkscreen"');
@@ -503,10 +595,10 @@ function explainer(ctx,W2,Hh,t){
       linePix([[215,252],[dp[0]-2,dp[1]-6]],
               H.rgba(H.mix(P.gold,P.ink,0.40)),1);
       /* the line everyone assumes: straight from where you stand to the pole */
-      if(after(4,6)){
+      if(after(4,4)){
         const kill=after(5,0);
         dottedArrow([[st[0],st[1]],[dp[0],dp[1]]],
-                    H.clamp((M-wordAt(4,6))/1.10),
+                    H.clamp((M-wordAt(4,4))/1.10),
                     H.rgba(kill?H.mix(P.bone,P.ink,0.56):P.paper));
         if(GBOX){ const sd=[];
           for(let i=0;i<=16;i++) sd.push([H.lerp(st[0],dp[0],i/16),
@@ -517,6 +609,14 @@ function explainer(ctx,W2,Hh,t){
           linePix([[mx-11,my-11],[mx+11,my+11]],H.rgba(P.red),3);
           linePix([[mx+11,my-11],[mx-11,my+11]],H.rgba(P.red),3);
         }
+        /* and somebody is WALKING it: "you would think the needle is aiming
+           at the pole" is a journey, so the journey runs -- needles set off
+           from southern Europe down the straight line, again and again,
+           until line 6 takes the line away from them. */
+        if(!after(6,9))
+          procession([[st[0],st[1]],[dp[0],dp[1]]],M,2.4,4,13,5,
+                     kill?H.mix(P.bone,P.ink,0.44):P.paper,
+                     H.mix(P.bone,P.ink,kill?0.66:0.40));
       }
       /* what it really does: lie along the field it is sitting in, and that
          path does not end at the pole */
@@ -525,6 +625,12 @@ function explainer(ctx,W2,Hh,t){
         const path=bez([st[0],st[1]],[300,353],[we[0],we[1]],40);
         const n=Math.max(2,Math.round(path.length*g));
         linePix(path.slice(0,n),H.rgba(P.cyan),2);
+        /* the same walk, on the line it really follows: a needle at every
+           point of it, each lying along the field where IT is, which is the
+           sentence. It keeps going under lines 7 and 8, because a walk does
+           not stop when the sentence about it does. */
+        procession(path.slice(0,n),M,2.6,4,13,5,P.cyan,
+                   H.mix(P.bone,P.ink,0.40));
       }
       if(after(7,8)){
         px('ABOUT 90% OF IT IS A DIPOLE',Q.cx,Q.rows[0],14,dim(0.24),
@@ -534,7 +640,7 @@ function explainer(ctx,W2,Hh,t){
              'center','"Silkscreen"');
       }
       /* ONE line under the map at a time -- the newest thing said */
-      if(after(4,6)){
+      if(after(4,4)){
         const u = after(8,9) ? ['A WALK NORTH FROM SOUTHERN EUROPE',dim(0.30)]
                 : after(6,9) ? ['IT LIES ALONG THE FIELD',H.rgba(P.cyan)]
                 : after(5,0) ? ['IT IS NOT',H.rgba(P.red)]
@@ -594,6 +700,7 @@ function explainer(ctx,W2,Hh,t){
       if(after(12,9))
         px(DIST_KM+' KM IN TWENTY YEARS',Q.cx,Q.rows[1],14,H.rgba(P.cyan),
            'center','"Silkscreen"');
+      if(after(9,0)) poleRun(TRACK.map((r,i)=>trackPt(i)),M-wordAt(9,0),4.2);
     }
 
     /* ============ MODEL -- the date line, and a model reissued ======= */
@@ -611,6 +718,7 @@ function explainer(ctx,W2,Hh,t){
       /* the date line is the ray straight up from the geographic pole */
       linePix([[Q.cx,Q.map.cy],[Q.cx,Q.map.cy-Q.map.r]],H.rgba(P.cyan),1);
       px('DATE LINE',222,200,14,H.rgba(P.cyan),null,'"Silkscreen"');
+      poleRun(pts,M-wordAt(13,0),3.4);
       if(after(13,6)){
         const rr=Q.map.r*(CROSS_KM/KM_PER_DEG)/(90-Q.map.lat0);
         ringPix(Q.cx,Q.map.cy,rr,H.rgba(P.red),1);
@@ -625,25 +733,30 @@ function explainer(ctx,W2,Hh,t){
       } else {
         /* the model that aviation, phones and the military read declination
            out of could not keep up, and was reissued mid-cycle */
+        /* THE PLATE SLIDES UP FROM UNDER THE PANEL. It used to appear
+           between two frames, which is the one snap this piece had: seventeen
+           percent of the picture changing at once after three seconds of
+           nothing. Nothing arrives instantly. */
         const L=Q.plate;
-        rect(L.x,L.y,L.w,L.h,H.rgba(H.mix(P.ink,P.bone,0.10)));
-        rect(L.x,L.y,L.w,1,dim(0.40)); rect(L.x,L.y+L.h-1,L.w,1,dim(0.40));
-        rect(L.x,L.y,1,L.h,dim(0.40)); rect(L.x+L.w-1,L.y,1,L.h,dim(0.40));
-        if(GBOX)GBOX.push({x:L.x,y:L.y,w:L.w,h:L.h,k:'platebox'});
-        px('WORLD MAGNETIC MODEL',Q.cx,L.y+4,14,dim(0.22),
+        const LY=L.y+Math.round(62*(1-H.ease.out(H.clamp((M-wordAt(14,0))/0.55))));
+        rect(L.x,LY,L.w,L.h,H.rgba(H.mix(P.ink,P.bone,0.10)));
+        rect(L.x,LY,L.w,1,dim(0.40)); rect(L.x,LY+L.h-1,L.w,1,dim(0.40));
+        rect(L.x,LY,1,L.h,dim(0.40)); rect(L.x+L.w-1,LY,1,L.h,dim(0.40));
+        if(GBOX)GBOX.push({x:L.x,y:LY,w:L.w,h:L.h,k:'platebox'});
+        px('WORLD MAGNETIC MODEL',Q.cx,LY+4,14,dim(0.22),
            'center','"Silkscreen"');
         const bx0=76, bx1=340, mk=Math.round(bx0+(bx1-bx0)*(2019.09-2015)/5);
-        rect(bx0,L.y+46,bx1-bx0,5,dim(0.44));
-        rect(bx0,L.y+42,1,13,dim(0.30)); rect(bx1-1,L.y+42,1,13,dim(0.30));
-        px('2015',bx0,L.y+62,14,dim(0.44),null,'"Silkscreen"');
-        px('2020',bx1,L.y+62,14,dim(0.44),'right','"Silkscreen"');
+        rect(bx0,LY+46,bx1-bx0,5,dim(0.44));
+        rect(bx0,LY+42,1,13,dim(0.30)); rect(bx1-1,LY+42,1,13,dim(0.30));
+        px('2015',bx0,LY+62,14,dim(0.44),null,'"Silkscreen"');
+        px('2020',bx1,LY+62,14,dim(0.44),'right','"Silkscreen"');
         const g=H.clamp((M-wordAt(14,17))/0.60);
         if(g>0){
-          rect(mk,L.y+40,2,Math.round(17*g),H.rgba(P.red));
-          px('FEB 2019',mk,L.y+22,14,H.rgba(P.red),'center','"Silkscreen"');
+          rect(mk,LY+40,2,Math.round(17*g),H.rgba(P.red));
+          px('FEB 2019',mk,LY+22,14,H.rgba(P.red),'center','"Silkscreen"');
         }
         if(after(14,18))
-          px('OUT OF CYCLE',Q.cx,L.y+84,14,H.rgba(P.red),
+          px('OUT OF CYCLE',Q.cx,LY+84,14,H.rgba(P.red),
              'center','"Silkscreen"');
       }
     }
@@ -652,7 +765,8 @@ function explainer(ctx,W2,Hh,t){
     if(T>=BEAT.END.sc){
       px('WHAT THE NEEDLE WAS SAYING',Q.cx,Q.head,14,dim(0.28),
          'center','"Silkscreen"');
-      dial(SEA_DEC,'SEATTLE',true);
+      dial(SEA_DEC,'SEATTLE',true,
+           Math.sin(M*5.4)*3.2*Math.exp(-((M*0.31)%1)*1.5));
       px(SEA_DEC.toFixed(2)+' EAST',Q.cx,150,20,H.rgba(P.gold),
          'center','"Silkscreen"');
       px('EPOCH '+EPOCH,Q.cx,430,14,dim(0.52),'center','"Silkscreen"');

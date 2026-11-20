@@ -436,6 +436,60 @@ function explainer(ctx,W2,Hh,t){
     rect(CX,CY,CWd,CHd,P.ink);bevel(CX,CY,CWd,CHd,'field');
     statusBar(r,T,BEATLABEL(T));
     B.save();B.beginPath();B.rect(CX+2,CY+2,CWd-4,CHd-4);B.clip();
+    /* ===== THE AIR IS NEVER NOT MOVING =====
+       This is the one subject in the library that cannot honestly be drawn
+       still: a Hadley cell is a loop of air that has been turning over for
+       as long as the planet has had an atmosphere, and the beat that had the
+       longest dead span in the library -- twelve seconds -- was the beat
+       about it coming back down. One parcel crawling a keyframe schedule was
+       the circulation drawn as a slideshow of itself.
+       So the whole traced loop now carries a stream, at a constant speed
+       along the path, with the red parcel still marking where the narration
+       has got to. And the latitude strip in MAP carries the cloud it is
+       about to explain: thick over the equator, thick again toward sixty,
+       and ABSENT over the two bands the deserts sit in -- which is the
+       observation the next four beats exist to account for, running rather
+       than asserted.
+       Deterministic: every phase comes from the element's index. */
+    const jit=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+
+    /* --- the cloud belt, on the latitude strip. Latitudes are chosen, not
+       random: dense at the equator, dense again in the mid latitudes, and
+       nothing between fifteen and thirty five, which is where the gold bands
+       land. --- */
+    const CLOUDLAT=[2,-5,9,-12,14,-14,6,-3,11,-8,
+                    48,-46,53,-55,43,-41,58,-59,45,-51];
+    const clouds=()=>{
+      const L=Q.lat, span=L.w+44;
+      CLOUDLAT.forEach((d,i)=>{
+        const sp=30+jit(i)*16;
+        const w=16+Math.round(jit(i+9)*14);
+        const x=L.x-22+(((M*sp)+jit(i+21)*span)%span);
+        const x0=Math.max(L.x,Math.round(x)), x1=Math.min(L.x+L.w,Math.round(x)+w);
+        if(x1<=x0) return;
+        rect(x0,my(d)-4,x1-x0,9,
+             H.rgba(H.mix(P.bone,P.ink,0.44+jit(i+33)*0.20)));
+      });
+    };
+
+    /* --- the cell, running. N scales with how much of the loop has been
+       traced so the spacing between parcels is the same at every stage, and
+       the speed along the path is constant, because the air's speed does not
+       depend on how much of the story has been told. --- */
+    const flow=(u)=>{
+      if(u<=0.015) return;
+      const N=Math.max(3,Math.round(18*u));
+      for(let i=0;i<N;i++){
+        const f=(((M*0.085)+i/N*u)%u);
+        const p=cellPt(f);
+        /* it fades out at the leading edge rather than popping, because the
+           edge is only where the TRACE has got to, not a wall. */
+        const fade=H.clamp((f-u*0.90)/Math.max(0.001,u*0.10));
+        disc(p[0],p[1],5,H.rgba(H.mix(H.mix(P.cyan,P.paper,0.20),P.ink,
+                                      0.18+0.80*fade)));
+      }
+    };
+
     /* ============ MAP -- six deserts on one axis ======================= */
     if(T>=BEAT.MAP.sc&&T<BEAT.RISE.sc){
       px('WHERE THEY ACTUALLY ARE',Q.cx,110,14,
@@ -444,6 +498,7 @@ function explainer(ctx,W2,Hh,t){
       /* the latitude strip: a piece of the planet, equator in the middle */
       rect(L.x,L.y,L.w,L.h,H.rgba(H.mix(P.ice,P.ink,0.72)));
       if(GBOX)GBOX.push({x:L.x,y:L.y,w:L.w,h:L.h,k:'stripbox'});
+      clouds();
       if(after(2,11)){
         const g=H.clamp((M-wordAt(2,11))/1.2);
         [1,-1].forEach(s=>{
@@ -503,6 +558,10 @@ function explainer(ctx,W2,Hh,t){
         break;
       }
       const pts=cellPath(u,H.mix(P.cyan,P.ink,0.30));
+      /* AFTER the path, never before: drawn first the line is painted over
+         its own stream. The red parcel is still drawn last of all, so where
+         the narration has got to stays the brightest thing on the loop. */
+      flow(u);
       /* the sun, and what it does */
       if(after(3,4)){
         /* the sun, and three arrows of heat going DOWN into the equator --
@@ -512,11 +571,26 @@ function explainer(ctx,W2,Hh,t){
         for(let i=0;i<8;i++){ const a=i/8*Math.PI*2+0.3;
           linePix([[sx+Math.cos(a)*12,sy+Math.sin(a)*12],
                    [sx+Math.cos(a)*16,sy+Math.sin(a)*16]],H.rgba(P.gold),2); }
-        [-14,0,14].forEach(dx=>{
-          const x=sx+dx, y0=sy+22, y1=sy+52;
-          linePix([[x,y0],[x,y1]],H.rgba(H.mix(P.gold,P.ink,0.26)),2);
-          linePix([[x-4,y1-6],[x,y1],[x+4,y1-6]],
-                  H.rgba(H.mix(P.gold,P.ink,0.26)),2);
+        /* THE HEAT IS ARRIVING, not arrived. Three static arrows under a
+           sun were the one thing on this screen that is running every second
+           of daylight drawn as a symbol of itself, and they sat over the
+           four and a half seconds it takes to say the sentence. The lanes
+           stop above the rain's column so the two downward things on this
+           beat never share a pixel. */
+        /* two lanes, one either side of the rising column: the air goes UP
+           the middle of this picture and the heat comes DOWN, and they must
+           not be drawn on top of each other or the beat reads as one
+           scribble. */
+        [-17,17].forEach((dx,k)=>{
+          const x=sx+dx, y0=sy+22, y1=sy+104;
+          linePix([[x,y0],[x,y1]],H.rgba(H.mix(P.gold,P.ink,0.80)),1);
+          for(let j=0;j<2;j++){
+            const ph=((M*1.20)+j*0.5+k*0.23)%1;
+            const y=Math.round(H.lerp(y0,y1,ph));
+            const c=H.rgba(H.mix(P.gold,P.ink,0.18+0.48*ph));
+            rect(x-6,y,13,3,c);
+            linePix([[x-6,y+3],[x,y+9],[x+6,y+3]],c,2);
+          }
         });
       }
       /* the rain it makes, under the rising column */

@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.22
+# CATHODE DESK — house style v4.23
 
 **Locked 2026-11-17. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -1244,6 +1244,45 @@ takeaway (1 beat) = **9–11 beats · 190–240 spoken words**. A piece standing
 one mechanism runs 30s and then repeats itself; if the second leg cannot be
 named before storyboarding, the episode does not exist yet. `IDEAS.md`
 annotates every entry with the legs it stands on for exactly this reason.
+
+### What running time actually tracks — measured, not reasoned
+
+**Added v4.23.** Two independent storyboard passes predicted #051–#070 would
+land at 116–118s and recommended cutting a row from every script. Both got
+there the same way: 240 words of speech, plus 1.85s for every beat boundary.
+**That arithmetic is wrong, and a regression over all 38 builds in the tree
+says so:**
+
+```
+DUR = 0.324 * words + 0.43 * beats + 20.0      (mean |error| 3.5s)
+```
+
+A beat boundary costs about **0.4s**, not 1.85 — because `gap_beat` REPLACES
+a `gap_sentence`, so the marginal cost is 1.1s at most, and in the fit it is
+less than that. Beat count is not a lever on running time worth pulling.
+
+The clearest way to see it is pieces at the same word count:
+
+| build | words | beats | DUR |
+|---|---|---|---|
+| compass | 242 | 6 | 97.7s |
+| banana | 240 | 7 | 98.2s |
+| jam | 242 | 9 | 98.9s |
+| ireland | 240 | **10** | 103.7s |
+| venus | 240 | 7 | **112.5s** |
+
+**At identical words the spread is 14.8s, and the ten-beat piece is faster
+than one of the seven-beat ones.** What varies is per-piece pacing — sentence
+length, how many figures are spelled out digit by digit, how the voice handles
+a long clause. So:
+
+- **Do not trim a script on a predicted duration.** `DURATION` is an output.
+  Synthesise, measure, and only then decide.
+- If a finished piece overshoots 115s, the lever is **one row**, or merging
+  one beat boundary. Never narrower gaps — they are already a third of the
+  running time and widening or narrowing them is dead air either way.
+- A piece made of spelled-out digits reads slower per word than one made of
+  prose. Expect those at the top of the range.
 
 **`SPD` is the one speed knob**, at module scope so the picture and the score
 read the same value. Every motion duration is written at **natural rate** and

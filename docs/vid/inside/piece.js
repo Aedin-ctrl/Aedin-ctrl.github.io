@@ -206,6 +206,72 @@ function arcPix(cx,cy,r,d0,d1,col,th,k){
   return pts;
 }
 
+/* ===== THE PLANET IS NEVER QUIET =====
+   An earthquake is the only thing that has ever been down there, and the
+   fronts it sends are the instrument this whole piece is about -- so they
+   RUN, in every beat that shows the globe, instead of being drawn once at the
+   top of a beat and photographed for the next seven seconds.
+
+   One helper, four readings. In WAVES two fronts at two speeds. In RING the
+   shake front is BARRED FROM THE LIQUID CORE, so it simply cannot reach the
+   far side and the silence draws itself -- which is the beat's entire claim,
+   made by the picture rather than by a label. In LEHMANN and LEFT a dim push
+   front keeps crossing, because it does.
+
+   Deterministic: the phase is a function of M alone, never of Math.random.
+   NOT registered in GBOX -- it is geometry that moves, and a moving box
+   fights checkOverlap on some frames and not on others. */
+function frontArc(M,ep,ph,sp,col,solid,rInner){
+  const rr=GL.r*2*ph*sp;
+  if(rr<4) return;
+  const runs=[[]];
+  for(let i=0;i<=56;i++){
+    /* CENTRED DOWNWARD: the epicentre is on the top rim, so the middle of the
+       sweep has to point INTO the planet. */
+    const a=Math.PI/2+(i/56-0.5)*Math.PI*1.9;
+    const x=ep[0]+Math.cos(a)*rr, y=ep[1]+Math.sin(a)*rr;
+    const d=Math.hypot(x-GL.cx,y-GL.cy);
+    /* samples outside the planet -- or inside the core it cannot enter --
+       BREAK the polyline. Skipping them and carrying on joined the two ends
+       of the arc with a chord straight across the planet, which read as a
+       mouth. */
+    if(d>GL.r||(rInner&&d<rInner)){
+      if(runs[runs.length-1].length) runs.push([]);
+      continue; }
+    runs[runs.length-1].push([x,y]); }
+  runs.forEach(pts=>{
+    if(pts.length<2) return;
+    if(solid) linePix(pts,H.rgba(col),3);
+    /* every sample, not every second one: at half density the visible arc of
+       a front crossing the far half of the planet was nine small squares,
+       and nine small squares moving is under the probe's noise floor AND
+       under the viewer's. It still reads as dotted against the solid P line
+       -- the marks are sixteen pixels apart, which is the distinction. */
+    else for(let i=0;i<pts.length;i++)
+           rect(Math.round(pts[i][0])-2,Math.round(pts[i][1])-2,5,5,H.rgba(col)); });
+}
+/* --- a travelling pulse on a path that has already been drawn: the ray is
+   the route and this is the thing going down it, which is what makes a ray
+   diagram a measurement instead of a picture of one. --- */
+function pathPulse(pts,u,col,s){
+  if(pts.length<2) return;
+  let L=0; const seg=[];
+  for(let i=1;i<pts.length;i++){
+    const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
+    seg.push(d); L+=d; }
+  let want=H.clamp(u)*L;
+  for(let i=0;i<seg.length;i++){
+    if(want<=seg[i]||i===seg.length-1){
+      const f=seg[i]>0?want/seg[i]:0;
+      const x=H.lerp(pts[i][0],pts[i+1][0],Math.min(1,f));
+      const y=H.lerp(pts[i][1],pts[i+1][1],Math.min(1,f));
+      rect(Math.round(x)-(s>>1),Math.round(y)-(s>>1),s,s,H.rgba(col));
+      return; }
+    want-=seg[i];
+  }
+}
+const jitI=(i)=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v);};
+
 /* ===== the pointer ===== */
 const SPOTS=[
   {n:0,  x:DLG[0]+54, y:DLG[1]+18, s:16, r:[216,560]},
@@ -475,6 +541,21 @@ function explainer(ctx,W2,Hh,t){
       rect(C.x,C.y,C.w,C.h,H.rgba(H.mix(P.earth,P.ink,0.46)));
       for(let i=0;i<9;i++) rect(C.x,C.y+18+i*40,C.w,2,
                                 H.rgba(H.mix(P.earth,P.ink,0.60)));
+      /* AND IT IS NOT SITTING STILL IN THERE. The one thing that can be said
+         about the inside of the planet without giving away a single layer is
+         that it MOVES: the mantle creeps and the outer core convects hard
+         enough to run a magnetic field. So the fill churns, formlessly and
+         dimly -- no boundary, no structure, nothing the next five beats have
+         to earn -- and the column stops being a photograph of a question.
+         Deterministic: every blob's lane and speed comes from its index. */
+      for(let i=0;i<24;i++){
+        const sp=0.050+jitI(i)*0.055, dir=(i%2)?1:-1;
+        const q=((M*sp)+jitI(i+23))%1, u=dir>0?q:1-q;
+        const bx2=Math.round(C.x+5+jitI(i+47)*(C.w-16)
+                             +Math.sin(M*0.9+i*1.9)*4);
+        const by2=Math.round(C.y+6+u*(C.h-16));
+        rect(bx2,by2,8,8,H.rgba(H.mix(P.earth,(i%3)?P.ink:P.paper,0.30)));
+      }
       px('?',C.x+C.w/2,C.y+C.h*0.60,44,
          H.rgba(H.mix(P.bone,P.ink,0.62)),'center','"Silkscreen"');
       strokePoly([[C.x,C.y],[C.x+C.w,C.y],[C.x+C.w,C.y+C.h],[C.x,C.y+C.h]],
@@ -513,30 +594,14 @@ function explainer(ctx,W2,Hh,t){
       if(GBOX)GBOX.push({x:ep[0]-14,y:ep[1]-14,w:28,h:28,k:'quake'});
       /* two fronts at different speeds, from M -- they are MOTION and motion
          is never ticked. P is solid, S is dotted: one picture, two readings. */
-      const go=H.clamp((M-wordAt(4,3))/0.6);
-      if(go>0){
-        const ph=((M-wordAt(4,3))*0.30)%1;
-        [[1.0,P.cyan,1,'pfront'],[0.56,P.gold,0,'sfront']].forEach(([sp,col,solid,k])=>{
-          const rr=GL.r*2*ph*sp;
-          if(rr<4) return;
-          /* The front is clipped to the globe, and the samples that fall
-             outside it BREAK THE POLYLINE. Skipping them and carrying on
-             joined the two ends of the arc with a chord straight across the
-             planet, which read as a mouth. */
-          const runs=[[]];
-          for(let i=0;i<=56;i++){ const a=Math.PI/2+(i/56-0.5)*Math.PI*1.9;  /* CENTRED DOWNWARD: the epicentre is on the top rim, so the middle of the sweep has to point INTO the planet. Centred up, the two ends of the range met at the bottom and left a gap there. */
-            const x=ep[0]+Math.cos(a)*rr, y=ep[1]+Math.sin(a)*rr;
-            if(Math.hypot(x-GL.cx,y-GL.cy)>GL.r){
-              if(runs[runs.length-1].length) runs.push([]);
-              continue; }
-            runs[runs.length-1].push([x,y]); }
-          runs.forEach(pts=>{
-            if(pts.length<2) return;
-            if(solid){ linePix(pts,H.rgba(col),3); polyReg(pts,k); }
-            else { for(let i=0;i<pts.length;i+=2) rect(Math.round(pts[i][0])-2,
-                     Math.round(pts[i][1])-2,4,4,H.rgba(col)); } });
-        });
-      }
+      /* THE FRONTS RUN FROM THE FIRST FRAME OF THE BEAT. They used to wait
+         for the fourth word of the second sentence, which left the beat's
+         first five seconds as a photograph of a globe with a star on it --
+         and the beat's subject is an earthquake, which does not wait to be
+         introduced. Two speeds, one quake; P solid, S dotted. */
+      const ph=((M-BEAT.WAVES.sc)*0.30)%1;
+      frontArc(M,ep,ph,1.00,P.cyan,1);
+      frontArc(M,ep,ph,0.56,P.gold,0);
       if(after(4,12)){ rect(GL.cx-108,GL.cy+GL.r+28,12,8,H.rgba(P.cyan));
         px('PUSH',GL.cx-88,GL.cy+GL.r+26,14,H.rgba(P.cyan),null,'"Silkscreen"'); }
       if(after(4,15)){ rect(GL.cx+38,GL.cy+GL.r+28,12,8,H.rgba(P.gold));
@@ -548,8 +613,13 @@ function explainer(ctx,W2,Hh,t){
       const S=Q.shear;
       px('SHEAR NEEDS SOMETHING TO HOLD',Q.cx,S.y-96,14,
          H.rgba(H.mix(P.bone,P.ink,0.28)),'center','"Silkscreen"');
-      const shove=H.clamp((M-wordAt(5,1))/1.6);
-      const sw=Math.sin(shove*Math.PI*3)*18*H.clamp(shove*2);
+      /* A SHAKE IS A PERIODIC THING, so it is drawn as one. The shove used to
+         run for 1.6 seconds and stop, which left the comparison frozen for
+         the next seven -- under the one sentence in the piece that says what
+         a shear wave IS. It oscillates now, because that is what the wave
+         does, and the amplitude eases in rather than starting at full tilt. */
+      const t0s=wordAt(5,1), on=H.clamp((M-t0s)/0.80);
+      const sw=Math.sin((M-t0s)*2.7)*18*on;
       /* LEFT: a solid. The same push leans the whole block and it springs
          back, which is what carrying a shear wave is. */
       const bx=S.lx, by=S.y;
@@ -570,14 +640,20 @@ function explainer(ctx,W2,Hh,t){
          grains beside a ruled block is two different pictures and the beat
          is a comparison. Same rows, same push: the top row slides and what
          is under it never feels a thing, and nothing comes back. */
+      /* and the same drive on the liquid NEVER COMES BACK. Each row slides at
+         its own rate -- a velocity gradient, which is what shear in a fluid
+         is -- and a grain that runs off the right re-enters on the left, so
+         the flow keeps going for as long as the push does. Nothing here
+         oscillates, which is the whole of why there is no wave. */
       const rx=S.rx;
       [0,1,2].forEach(r2=>{
         const y=by-S.h/2+r2*S.h/3, g=H.rng(31+r2*7);
-        const slip=(r2===0)?shove*30:0;
-        for(let i=0;i<24;i++)
-          rect(Math.round(rx-S.w/2+g()*S.w+slip),
-               Math.round(y+2+g()*(S.h/3-6)),4,4,
+        const slip=on*(M-t0s)*[27,15,6][r2];
+        for(let i=0;i<24;i++){
+          const x0=g()*S.w, yy=Math.round(y+2+g()*(S.h/3-6));
+          rect(Math.round(rx-S.w/2+((x0+slip)%S.w)),yy,4,4,
                H.rgba(H.mix(P.orange,P.ink,0.18+r2*0.16)));
+        }
       });
       if(GBOX)GBOX.push({x:rx-S.w/2,y:by-S.h/2,w:S.w+36,h:S.h,k:'liquid'});
       px('LIQUID',rx,by+S.h/2+16,14,H.rgba(P.orange),'center','"Silkscreen"');
@@ -595,6 +671,16 @@ function explainer(ctx,W2,Hh,t){
         linePix([[ep[0]+Math.cos(a)*5,ep[1]+Math.sin(a)*5],
                  [ep[0]+Math.cos(a)*13,ep[1]+Math.sin(a)*13]],H.rgba(P.red),3); }
       if(GBOX)GBOX.push({x:ep[0]-14,y:ep[1]-14,w:28,h:28,k:'quake'});
+      /* THE SHAKE KEEPS ARRIVING, and keeps not arriving. One front, running
+         from the first frame of the beat and barred from the liquid core --
+         so it sweeps the mantle, finds the core in its way and is simply
+         absent on the far side. The silence draws itself, every three
+         seconds, for as long as the narrator is describing it. */
+      /* TWO of them, half a cycle apart. One front alone leaves a second of
+         empty planet every time it runs off the rim and restarts at the
+         epicentre, and a quake sends a train rather than a single pulse. */
+      [0,0.5].forEach(o=>frontArc(M,ep,((M-BEAT.RING.sc)*0.32+o)%1,0.72,
+               H.mix(P.gold,P.ink,0.10+o*0.44),0,GL.r*fCORE));
       /* the detectors, both ways round, lighting as the arrival reaches them
          -- and simply never lighting past 103 degrees */
       const sweep=H.clamp((M-wordAt(7,0))/2.8)*180;
@@ -671,6 +757,13 @@ function explainer(ctx,W2,Hh,t){
         }
         linePix(pts,H.rgba(hits?H.mix(P.cyan,P.ink,0.30):P.cyan),2);
         polyReg(pts,'ray');
+        /* AND SOMETHING IS GOING DOWN THEM. A ray diagram with nothing
+           travelling on it is a picture of a measurement; the quake does not
+           stop sending pushes while the narrator reads the ring off it, so a
+           pulse runs every ray, offset by the ray's index so the family
+           reads as a wavefront and not as a chorus line. */
+        pathPulse(pts,((M*0.46)+i*0.045)%1,
+                  hits?H.mix(P.paper,P.cyan,0.40):P.paper,4);
       }
       if(after(11,0)){
         const g2=H.clamp((M-wordAt(11,0))/1.4);
@@ -694,6 +787,11 @@ function explainer(ctx,W2,Hh,t){
       [1,-1].forEach(sg=>arcPix(GL.cx,GL.cy,GL.r+13,
         sg>0?SHADOW_LO:-SHADOW_HI, sg>0?SHADOW_HI:-SHADOW_LO,
         H.rgba(H.mix(P.red,P.ink,0.40)),5,'shadow'));
+      /* the pushes are still crossing, dimly, behind the whole beat -- the
+         ring is a thing that keeps being measured, not a thing that was
+         measured once in 1936. */
+      [0,0.5].forEach(o=>frontArc(M,surf(0),((M-BEAT.LEHMANN.sc)*0.30+o)%1,1.00,
+               H.mix(P.cyan,P.ink,0.42+o*0.22),0));
       // the arrivals nobody expected
       const g=H.clamp((M-wordAt(13,8))/1.8);
       [112,122,132].forEach((d,i)=>{
@@ -709,10 +807,17 @@ function explainer(ctx,W2,Hh,t){
         const g2=H.clamp((M-wordAt(14,2))/1.4);
         ringPix(GL.cx,GL.cy,GL.r*fINNER*g2,H.rgba(P.gold),3,'inner');
         if(g2>0.7){
-          [112,122,132].forEach(d=>{
+          [112,122,132].forEach((d,bi)=>{
             const pth=bounceTo(d);
             linePix(pth,H.rgba(H.mix(P.gold,P.ink,0.30)),2);
             polyReg(pth,'bounce');
+            /* THE FAINT ONES KEEP ARRIVING. What Lehmann found was a signal
+               that was there every time, in record after record, and three
+               static gold lines say that once. Two pulses per path, offset
+               by path and by index, so the beat ends on something that is
+               still happening. */
+            for(let k2=0;k2<2;k2++)
+              pathPulse(pth,((M*0.40)+bi*0.21+k2*0.5)%1,P.gold,5);
           });
           /* Outside the globe. Inside it the label had the bounce rays
              running through it, and the gold ring is the only gold ring. */
@@ -729,6 +834,11 @@ function explainer(ctx,W2,Hh,t){
       ringPix(GL.cx,GL.cy,GL.r,H.rgba(H.mix(P.bone,P.ink,0.52)),2,'globe');
       ringPix(GL.cx,GL.cy,GL.r*fCORE,H.rgba(H.mix(P.orange,P.ink,0.20)),3,'core');
       ringPix(GL.cx,GL.cy,GL.r*fINNER,H.rgba(H.mix(P.gold,P.ink,0.20)),3,'inner');
+      /* the measuring has not stopped either. The beat's claim is that the
+         DEPTHS are known and the recipe is not, and a front still crossing
+         the planet under "MADE OF ?" is that sentence in one picture. */
+      [0,0.5].forEach(o=>frontArc(M,surf(0),((M-BEAT.LEFT.sc)*0.30+o)%1,1.00,
+               H.mix(P.cyan,P.ink,0.40+o*0.22),0));
       const g=H.clamp((M-wordAt(15,9))/2.0);
       if(g>0.1) px('MADE OF ?',GL.cx,GL.cy+GL.r+26,20,
                    H.rgba(P.red),'center','"Silkscreen"');
