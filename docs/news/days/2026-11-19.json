@@ -1,0 +1,843 @@
+{
+  "date": "2026-11-19",
+  "generated": "2026-11-20T00:38:00.250Z",
+  "articles": [
+    {
+      "id": "2026-11-19-follow-up-european-commission-fights-a-cyberattack-that",
+      "headline": "Follow-up: European Commission fights a cyberattack that reportedly used an AI hacking framework",
+      "summary": "The Commission has had HR and medical-reimbursement systems disrupted for over 10 days. Politico's sources say defenders saw ARTEX, a public AI penetration-testing tool. Whether staff data was accessed is still unknown.",
+      "impacts": [
+        "Open-source AI hacking tools are now showing up in attacks on government institutions, not just in lab demos.",
+        "Anyone on EU staff systems may have had payroll or medical-claim data exposed; the Commission hasn't said.",
+        "Shared tooling makes it harder to tell state-backed hackers from ordinary criminals.",
+        "Defenders face attackers that can go from target to privileged access in hours, per FBI cases."
+      ],
+      "details": [
+        "The European Commission is working to contain a cyberattack on internal IT systems, The Register reported on 19 November, citing Politico's original story. The disruption has reportedly lasted more than 10 days. Spokesperson Thomas Regnier said the Commission 'has taken the necessary steps in response to a detected cyber campaign,' and that individual systems were targeted and the people concerned were informed.",
+        "Affected systems include Sysper, which staff use for payslips, timesheets and vacation requests, and MyPMO, which handles medical reimbursements. Both were restored earlier in the week, but Sysper went down again on Wednesday 18 November. Translation services were also affected. Per Politico, salaries were paid on time, though some staff could not book time off or submit timesheets. Tech commissioner Henna Virkkunen briefed fellow commissioners on Wednesday, and an emergency meeting of the Corporate Management Board was held earlier in November.",
+        "The AI angle comes from Politico's sources, not from an official statement. They say Commission defenders detected hackers using ARTEX, a publicly available AI-powered penetration-testing framework. CERT-EU, which protects EU institutions, warned on 5 November that it had seen what it believed were ARTEX-assisted attacks against organizations it oversees. ARTEX's developer deleted the project's GitHub repository in October after reports of hacker use, but the code was already public and several forks exist.",
+        "The FBI warned last week that researchers had found more than 1,600 ARTEX consoles exposed to the internet. In some cases the FBI described, attackers went from identifying a target to gaining privileged access in under three hours. Snehal Antani, CEO of Horizon3.ai, said such tools let one actor run fleets of agents that plan, probe, exploit and move sideways with little human input once the goal is set. He added that wide availability could make attribution harder.",
+        "Much is unknown. The Commission has not said whether attackers reached employees' personal data or viewed payslips, whether systems were shut down as a precaution or because of confirmed compromise, or who is behind the campaign. It did not answer The Register's questions. Watch for an official statement on data exposure, and for whether other EU bodies report similar activity."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai agents",
+        "european commission",
+        "artex",
+        "cyberattack",
+        "government",
+        "fbi",
+        "espionage"
+      ],
+      "date": "2026-11-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/cyber-crime/2026/11/19/european-commission-scrambles-to-contain-ai-assisted-cyberattack/5311103"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-equinor-europes-biggest-gas-supplier-battles-a-cyberattack",
+      "headline": "Equinor, Europe's biggest gas supplier, battles a cyberattack with no recovery date",
+      "summary": "The Norwegian energy company disclosed the attack on Tuesday evening. It says oil and gas production is unaffected and it found no sign of stolen data, but staff have trouble reaching some systems and email was reportedly down.",
+      "impacts": [
+        "Europe leans heavily on Norwegian gas, so any attack on Equinor draws attention far beyond one company.",
+        "Attackers reaching corporate IT is not the same as reaching production gear, but the line is worth watching.",
+        "Norway's security authority had already raised its national cyber risk level before the attack.",
+        "Staff and partners may face days of degraded email and internal tools."
+      ],
+      "details": [
+        "Equinor, the Norwegian energy company that The Register calls Europe's largest natural gas supplier, is responding to a cyberattack on its IT systems. It first disclosed the attack on Tuesday 17 November in the evening, saying it had brought in resources to deal with the intrusion and had found no sign data was stolen.",
+        "On Wednesday it said it better understood how the attack was carried out and which systems were compromised, but did not share either detail. On Thursday 19 November it said the attack was ongoing but did not appear to target the company specifically. Production continued normally, with no sign of data stolen or altered, and the incident was reported to police.",
+        "Equinor says the attack is not a virus, so 'there is no risk of the attack spreading.' It found nothing suggesting employees, partners or suppliers would be affected. A spokesperson told Norwegian agency NTB the company has not lost access to its IT systems, though staff may struggle to open some corporate applications. Reuters reported that Equinor's internal email system was down.",
+        "The company is about 67 percent state-owned, employs about 25,000 people and works in more than 20 countries, with most production off Norway's coast and some in the UK, US, Brazil and Canada. Europe has relied more on Norwegian gas since Russia's full-scale invasion of Ukraine in 2022.",
+        "Weeks before the attack, Norway's National Security Authority raised the national cyber risk level to four on a five-point scale. It said successful cyber operations against Norwegian businesses tripled over the previous six months and warned of possible disruption to essential services such as water and electricity. Separately, France blamed an Iran-linked unit for October attacks on refrigeration systems at more than 700 retail sites; The Register does not link that to Equinor.",
+        "Still unknown: the type of attack, who is responsible, whether there are any demands, whether UK operations are affected, whether attackers got past the corporate network, and when systems will be fully restored. The Register notes nothing suggests these attackers have access to the equipment that extracts and moves oil and gas, but says more detail from Equinor would help."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "equinor",
+        "norway",
+        "gas",
+        "energy",
+        "cyberattack",
+        "critical infrastructure",
+        "europe"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/cyber-crime/2026/11/19/europes-biggest-gas-supplier-battling-cyberattack-with-no-timeline-for-recovery/5311026"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-a-chinese-spy-group-used-a-vmware-vcenter",
+      "headline": "A Chinese spy group used a VMware vCenter zero-day for over two months before a patch",
+      "summary": "Google's Mandiant says a suspected China-linked group exploited a critical vCenter authentication bypass, CVE-2026-123890, starting around early September. Broadcom patched it Thursday. Version 7.0 gets no fix.",
+      "impacts": [
+        "vCenter manages whole fleets of virtual machines, so an admin takeover can expose everything it controls.",
+        "Anyone still running vCenter 7.0 has no public patch and must rely on other protections.",
+        "The attackers got in through a different zero-day first, showing how one flaw chains into the next.",
+        "Patching is not enough: Mandiant urges checking systems for signs of past compromise."
+      ],
+      "details": [
+        "SecurityWeek reported on 19 November that a critical VMware vCenter flaw, CVE-2026-123890 (CVSS 9.8), was exploited as a zero-day by a suspected Chinese espionage group. Mandiant found the flaw and reported it to Broadcom. Attackers used it for more than two months before Broadcom shipped a patch on Thursday.",
+        "The flaw sits in VMware Directory Service. A remote, unauthenticated attacker could obtain an authenticated session with administrator privileges. Mandiant tied the activity to a group it calls Armory Castle, previously tracked as UNC5221 and also known as Warp Panda.",
+        "Mandiant describes the chain this way. The attackers first entered through CVE-2026-102764, a recently patched zero-day in BeyondTrust Remote Support. They moved to Linux appliances on the internal network and went after vCenter in early September 2026. A custom tool called Bonesaw exploited the flaw to steal the vCenter database, extract SAML signing material and create a single sign-on administrator account. A second tool forged SAML tokens, and the attackers installed backdoors, took the vCenter master encryption key and database credentials, then moved to an ESXi host and extracted more data.",
+        "Mandiant has evidence the group knew about this bug before a separate vCenter authentication bypass, CVE-2026-59309, was disclosed on 29 July 2026. Bonesaw was used against a vCenter server already patched for that earlier bug. Fixed versions are 9.1.1.0200, 9.0.2.0200 and 8.0 U3m. Bonesaw works against vCenter 7.x and 8.x, but 7.0 reached end of general support in October 2025 and has no public fix.",
+        "Mandiant CTO Charles Carmakal said on LinkedIn that Mandiant has investigated multiple incidents involving this exploitation and urged organizations to patch and look for compromise. Broadcom's advisory does not mention attacks in the wild.",
+        "Unknown: how many organizations were hit, the exact start date beyond 'more than two months,' whether the BeyondTrust bug belongs to the same campaign, and whether vCenter 7.0 users have any interim mitigation."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "vmware",
+        "vcenter",
+        "zero-day",
+        "china",
+        "espionage",
+        "mandiant",
+        "vulnerability",
+        "exploited"
+      ],
+      "date": "2026-11-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "SecurityWeek",
+          "url": "https://www.securityweek.com/newly-patched-vmware-vcenter-flaw-exploited-as-zero-day-by-chinese-apt/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-study-of-22-096-uncensored-ai-models-13",
+      "headline": "Study of 22,096 'uncensored' AI models: 13% carry any warning, and downloads run into the millions",
+      "summary": "Researchers mapped open models with safety filters removed across five hosting platforms. Growth is above 1,000 a month, one model has over 53 million downloads, and 27 flagged models were downloaded 136,000 times.",
+      "impacts": [
+        "Safety filters on commercial chatbots do not limit what freely downloadable models will do.",
+        "Users of apps and routers may not know which underlying model they are talking to.",
+        "Some flagged models carried malware-linked signatures or unsafe code-loading, a risk for developers who download them.",
+        "Regulating the tools that strip refusals is hard; researchers compare it to 1990s crypto fights."
+      ],
+      "details": [
+        "Researchers at the University of Illinois Urbana-Champaign and Nanyang Technological University studied what they call uncensored large language models: models whose refusal safeguards are absent, removed or weakened. The Register covered the paper, 'Characterizing the Ecosystem of Open-Source Uncensored Large Language Models,' on 19 November. Lead author Zilong Lin is at the University of Missouri-Kansas City.",
+        "They analyzed 22,096 such models from Hugging Face, Kaggle, John Snow Labs, OpenCSG and ModelScope. More than 11,000 appeared on multiple platforms. Volume has grown from roughly 100 a month in May 2023 to more than 1,000 a month now. The most popular, dolphin-2.9.1-yi-1.5-34b, has more than 53 million downloads, including over 4.8 million in the last month.",
+        "Models become uncensored two main ways: fine-tuning on data with no safety filtering, or 'abliteration,' a technique from 2024 that weakens a model's refusal behavior directly. Across 11 harmful-request categories, including fraud and illegal activity, uncensored models were generally more likely to comply than non-uncensored ones, though risk varies by model.",
+        "Only about 13% carried moderation warnings. Security scans flagged 27 models, downloaded 136,000 times in total, for malware-associated signatures, suspicious binary patterns or unsafe deserialization that could allow code execution. Many also violate the license terms of the base models they came from. Lin said 'models can travel more easily than the information needed to assess their risks.'",
+        "Caveats: the study covered text only, and it found models mainly through public metadata such as model cards, so undisclosed ones may be missed. The article also notes legitimate uses: less restrictive models can help security work stricter commercial models refuse, and Hugging Face used Z.ai's GLM-5.2 to analyze a hacking incident. The authors disclosed findings to the platforms; OpenCSG responded and committed to improving, while Hugging Face, Kaggle and John Snow Labs did not comment.",
+        "Lin called it difficult to predict whether abliteration tools will face legal challenges, comparing the situation to 1990s limits on cryptographic code, and argued for more transparency and auditability, citing EU AI Act documentation rules."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai safety",
+        "open source",
+        "uncensored",
+        "hugging face",
+        "llm",
+        "malware",
+        "regulation"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/19/uncensored-ai-models-are-thriving-on-code-hosting-platforms/5310891"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-a-russian-man-is-accused-of-stalking-staff",
+      "headline": "A Russian man is accused of stalking staff of a Palo Alto defense-tech firm for suspected FSB handlers",
+      "summary": "An FBI affidavit says Igor D'iu entered the US illegally, took Telegram 'tasks,' photographed laptop screens and surveilled employees' homes, for $15,000. The firm is unnamed. These are allegations, and he is due in court Nov. 24.",
+      "impacts": [
+        "Foreign services appear to hire disposable, loosely vetted proxies to watch tech workers in person.",
+        "Employees of defense-linked firms may be tracked at cafes and homes, not just hacked online.",
+        "Public-space laptop use is a real exposure point for people working on sensitive projects.",
+        "The firm's identity and the FSB link are unconfirmed, so the story may change."
+      ],
+      "details": [
+        "The Register reported on 19 November that Igor D'iu, a Russian national, was indicted on two counts of spying offenses and one count related to fake identity documents. He is in federal custody and next due in court on 24 November. The case rests on an affidavit by FBI Special Agent Winston Wong. Almost everything below is allegation, not proven fact.",
+        "The target was an unnamed large technology and defense company with offices in Palo Alto. It has widely been reported as Palantir, but that is unconfirmed, and Palantir did not respond to The Register. Prosecutors say D'iu received 'tasks' from Telegram contacts he suspected were Russian government representatives, possibly the FSB. Asked who he worked for, handlers reportedly answered 'the Motherland.'",
+        "Alleged tasks included photographing employees' laptop screens in coffee shops, remotely accessing a laptop to capture data from nearby employee devices, and watching employees' homes. He allegedly followed two female employees by car, driving dangerously; he told police he was trying to ask one on a date. He allegedly received $15,000 in three payments between 12 August and 6 October.",
+        "Per the affidavit, he entered the US illegally in June or July 2026; his phone first appeared in the US on 31 July near McAllen, Texas. Surveillance allegedly began in mid-August, and police contacted him on 4 September about the car incident. A search on 8 October reportedly turned up forged IDs, two Russian passports, $18,035 in cash and profile packages on at least three employees.",
+        "The affidavit says he came to believe the company supplied weapons to Ukraine, and that he 'gradually began to understand he was doing something bad and that his actions were illegal.' Wong wrote that the activity matched Russian intelligence's use of 'criminal proxies, organized crime groups, and other disposable agents.' The FSB link is investigators' inference.",
+        "What to watch: the 24 November court date, whether the company is named, and whether prosecutors tie other handlers or targets to the case."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "russia",
+        "espionage",
+        "fsb",
+        "fbi",
+        "surveillance",
+        "palantir",
+        "telegram"
+      ],
+      "date": "2026-11-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/19/russian-national-accused-of-stalking-san-francisco-techie-in-plot-against-us-defense-tech-giant/5311126"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-anthropic-debuts-at-a-roughly-2-trillion-valuation",
+      "headline": "Anthropic debuts at a roughly $2 trillion valuation while disclosing about $900 billion in compute commitments",
+      "summary": "Shares priced at $83 and hit $111.50 after the opening auction, up 34%. A regulatory filing shows roughly $900 billion in infrastructure commitments, and critics point to cheaper open models.",
+      "impacts": [
+        "A company under six years old now carries a valuation near $2 trillion, tying many investors to AI spending.",
+        "Roughly $900 billion in commitments could weigh on profits if demand falls short.",
+        "Open-weight models, about a third of tokens in Mozilla's research, could pull away less demanding customers.",
+        "Retirement funds holding index funds may end up indirectly exposed to the AI build-out."
+      ],
+      "details": [
+        "The Register reported on 19 November that Anthropic went public, with shares priced at $83. They reached $111.50 by the end of the opening auction, a 34% gain over the offer price. The valuation was about $2 trillion once the 980 million shares offered to the public became available. The company is just under six years old.",
+        "The main risk the article flags is spending. In a regulatory filing, Anthropic disclosed roughly $900 billion in infrastructure and compute commitments, and The Register says the total could exceed $1 trillion soon. The article says those commitments could weigh on profitability in certain scenarios.",
+        "CEO Dario Amodei said compute needs are hard to predict and the company tends to plan on the low side. He defended the spending: 'We're willing to put into place these very large compute spends because, historically, we've seen that it pays off.' He also said Anthropic 'can compete both at and away from the frontier.'",
+        "A second risk is competition from open-weight models, which could draw customers away, particularly those with less demanding AI needs. Mozilla president Mark Surman said valuation does not guarantee long-term success and that developers want AI they can control, not rent from a frontier lab. Mozilla research found open-source models account for about a third of all tokens, with the gap to the best closed models at roughly 3.3%.",
+        "What is established: the offer price, the first-day jump, the stated valuation and the filing disclosure. What is opinion: whether the commitments will pay off. Watch for how the shares trade over coming weeks and how the compute commitments evolve."
+      ],
+      "category": "Economy",
+      "tags": [
+        "anthropic",
+        "ipo",
+        "ai bubble",
+        "valuation",
+        "compute",
+        "open source",
+        "economy"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/ai-and-ml/2026/11/19/anthropic-throws-open-doors-at-2t-valuation-as-shares-pop-34-in-initial-trading/5311143"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-uk-ai-testers-built-a-universal-jailbreak-for",
+      "headline": "UK AI testers built a universal jailbreak for pre-release GPT-6.2 with half the queries, then it was fixed",
+      "summary": "The UK AI Security Institute reported a 'substantial regression' in jailbreak robustness in two pre-release GPT-6.2 versions. OpenAI says it fixed this, and that both released models meet its 'Critical' cyber threshold.",
+      "impacts": [
+        "A model can get easier to jailbreak between versions even as its capabilities rise.",
+        "Pre-release testing by outside institutes caught a regression before launch, which is how it should work.",
+        "OpenAI classes both released models at its top 'Critical' cybersecurity tier, so misuse stakes are high.",
+        "Only a fix claim exists here; independent confirmation of the fix wasn't in the source."
+      ],
+      "details": [
+        "The Hacker News reported in its 19 November ThreatsDay roundup that the UK AI Security Institute (AISI) built a universal jailbreak against two pre-release versions of OpenAI's GPT-6.2 Astra. A universal jailbreak is a single prompting method that gets around a model's refusals across many requests.",
+        "AISI said the attack needed half the queries that GPT-6 Astra required, and reported a 'substantial regression in jailbreak robustness relative to GPT-6 Astra.' In plain terms, the newer pre-release models were easier to break than the previous generation.",
+        "OpenAI has since fixed the regression, according to the report. The roundup gives no detail on how the fix was checked or whether AISI retested the final models, so that claim comes from the report itself and is not independently confirmed here.",
+        "OpenAI released GPT-6.2 Astra and Sol with what the article calls a 'significant jump' in cyber capabilities. OpenAI says both meet the Critical cybersecurity threshold in its Preparedness Framework, its top tier for that risk.",
+        "Takeaways and caveats: the item is one paragraph in a roundup, so numbers beyond 'half the queries' are not given, and the pre-release versions are not the shipped models. The notable point is that capability and robustness do not always move together. Watch for any AISI statement on the final release and for other labs' pre-release results."
+      ],
+      "category": "AI",
+      "tags": [
+        "openai",
+        "ai safety",
+        "jailbreak",
+        "aisi",
+        "cyber capabilities",
+        "gpt",
+        "uk"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/threatsday-gpt-62-jailbreak-flaws.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-amazons-ring-unveils-patrol-robots-a-home-drone",
+      "headline": "Amazon's Ring unveils patrol robots: a home drone and a $1,000 wheeled business rover",
+      "summary": "The Ring Drone Cam flies pre-programmed indoor routes, and the Ring Rover Cam patrols businesses off hours. Both build floor plans using Amazon's AI Pilot, partly in the cloud. Amazon did not answer questions about floor-plan security.",
+      "impacts": [
+        "Robots that map the inside of homes and offices create new, sensitive data about where people live and work.",
+        "Cloud processing means some of that data leaves the building.",
+        "Ring's record includes a $5.8 million FTC settlement and a pending class action over face recognition.",
+        "The drone's January ship date depends on FCC approval."
+      ],
+      "details": [
+        "The Register reported on 10 November that Amazon's Ring launched two robots that move through homes and businesses to cover spots fixed cameras miss. Both run Amazon's AI Pilot system, which builds floor plans of interior spaces, suggests rooms to patrol and responds to alerts from Ring devices and alarm systems. Processing relies partly on Amazon's cloud.",
+        "The Ring Drone Cam is an indoor home-security drone that docks to charge. It flies pre-programmed routes with a 148-degree, 2K camera and LED night illumination. Amazon's release gives a 27 January 2027 date contingent on FCC approval, and Amazon told The Register it still plans to ship in January.",
+        "The Ring Rover Cam is a wheeled robot for businesses with a telescoping camera mast. It records up to 4K, does 360-degree scans, and has a siren, lights and two-way audio for off-hours patrols. It ships 16 December for about $1,000.",
+        "On privacy, Amazon says recordings are protected by its TAKE encryption, in which cloud services temporarily access keys held in a secure enclave before the keys are deleted; Amazon announced TAKE in August. A Ring spokesperson said customers decide where devices go and when. The Register's question about the security of floor plans went unanswered.",
+        "The article lists Ring's history: a 2023 $5.8 million FTC settlement over employee and contractor access to customer videos, an ended partnership with Flock Safety, criticism of the Search Party feature, and a proposed class action filed in June 2026 over the Familiar Faces facial-recognition feature. It also says Amazon's abandoned 2024 bid for iRobot raised similar mapping questions.",
+        "What to watch: FCC approval for the drone, any answer on floor-plan storage and law-enforcement access, and reviews once the rover ships."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "ring",
+        "amazon",
+        "drones",
+        "privacy",
+        "home security",
+        "robots",
+        "facial recognition"
+      ],
+      "date": "2026-11-10",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/offbeat/2026/11/10/ring-robots-ready-to-patrol-paranoids-pads/5308932"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-an-ancient-chimp-virus-may-have-switched-off",
+      "headline": "An ancient chimp virus may have switched off a gene that human brains keep on, Lund study suggests",
+      "summary": "Lund researchers found a viral insertion in chimpanzee DNA silences LINC00662, a gene active in early human brain development. Removing the insertion turned it back on in chimp cells. The evidence comes from lab organoids only.",
+      "impacts": [
+        "It hints that ancient viral DNA helped shape how human and chimp brains diverged.",
+        "The work used brain organoids, not whole brains or living animals.",
+        "It is unknown whether other viral remnants affect brain evolution or neurological disease.",
+        "Gene-switching by old viral DNA may matter for how we study brain disorders."
+      ],
+      "details": [
+        "Researchers at Lund University, led by Johan Jakobsson with first author Patricia Gerdes, published a study in Science Advances on 15 November (ScienceDaily reported it). It concerns an ancient virus called PTERV1, an endogenous retrovirus that infected chimpanzees millions of years ago and left viral DNA in their genome.",
+        "In chimpanzees, that viral insertion is methylated, meaning chemically silenced, which switches off the neighboring gene LINC00662. That gene is active during early human brain development. In brain organoids, which are miniature 3D models grown from stem cells, it was strongly expressed in human cells and inactive in chimpanzee cells. In the researchers' words, 'The gene was strongly expressed in the human organoids, but not at all in the chimpanzee organoids.'",
+        "To test cause, the team used CRISPR-Cas9 to remove the viral sequence from chimpanzee cells, and LINC00662 turned back on. They said this 'shows that it is in fact the viral insertion that is responsible for the gene being switched off in chimpanzees.' Switching the gene off in human organoids reduced activity of genes linked to nerve cell development and neuron connections.",
+        "Caveats are clear. The evidence comes from organoids, not whole brains or living animals. The article says the findings 'suggest' and 'raise an intriguing possibility' that viruses contributed to human-chimp brain differences, 'at least in part.'",
+        "The team has not determined whether other ancient viral remnants affect brain evolution or whether such sequences play a role in neurological disease; they plan to investigate both. The unsettling part is how much of our own genome is old viral material, and that it may still steer how our brains develop."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "virus",
+        "brain",
+        "evolution",
+        "crispr",
+        "organoids",
+        "genome",
+        "chimpanzee"
+      ],
+      "date": "2026-11-15",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Lund University)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261114202230.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-tfl-takes-oyster-photocard-site-offline-after-attackers",
+      "headline": "TfL takes Oyster photocard site offline after attackers compromise accounts of about 265,000 customers",
+      "summary": "Transport for London says attackers compromised customer accounts, possibly affecting around 265,000 people, many of them children, students and older Londoners. It says passwords and payment details were not taken. How attackers got in is undisclosed.",
+      "impacts": [
+        "Children as young as five, students, veterans and over-60s hold these accounts, so the affected group is vulnerable.",
+        "Reused passwords elsewhere are a risk; TfL tells all photocard customers to change passwords and security answers.",
+        "Renewals and journey history require customer service while the site is down.",
+        "TfL has already notified the ICO; this is a second big incident after the 2024 attack."
+      ],
+      "details": [
+        "The Register reported on 19 November that Transport for London took its Oyster photocard website offline after attackers compromised customer accounts. Around 265,000 customers are potentially affected. TfL became aware on 16 November when photocard customers began receiving emails asking them to create accounts they already had. TfL confirmed the emails came from its own systems and resulted from the compromise.",
+        "TfL says it took the website down immediately and has contained the incident. It has contacted those potentially affected and notified the Information Commissioner's Office. Shashi Verma, TfL's director of technology strategy and revenue, apologised. All photocard customers will be asked to change passwords, security questions and answers, and people who reuse passwords elsewhere are advised to change them there too.",
+        "Customers who may have had accounts compromised include Zip Oyster card holders (cards issued to children as young as five), students, apprentices, care leavers, veterans and Londoners aged 60 and over. TfL says passwords, bank or payment card details and customer journey information were not compromised, and it believes names and dates of birth of children with Zip Oyster cards were unaffected. Existing photocards still work at ticket barriers.",
+        "Unknown: how the attackers got in, the exact scope (265,000 is 'potentially' affected), who they are, what other account data was exposed, and when the site will return. TfL says there is no evidence yet that the data has been used.",
+        "Background: in March 2026 TfL said it notified more than 7 million customers about a September 2024 cyberattack, in which names, email addresses and home addresses were accessed and about 5,000 customers were contacted as a priority over possible bank details. Two teenagers were charged and authorities linked that attack to Scattered Spider. The ICO chose not to take enforcement action. The article says nothing currently suggests the two incidents are related."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "tfl",
+        "london",
+        "data breach",
+        "credentials",
+        "children",
+        "uk",
+        "privacy"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/19/tfl-takes-oyster-photocard-website-offline-after-attackers-compromise-customer-accounts/5310985"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-chase-visa-and-mastercard-confirm-third-party-breaches",
+      "headline": "Chase, Visa and Mastercard confirm third-party breaches after a gang claims all three",
+      "summary": "The extortion group n0n listed the three on its leak site. Each firm says vendors were hit and its own payment systems were not. Exposed data appears limited to names and emails, but vendors, dates and counts are undisclosed.",
+      "impacts": [
+        "Big firms are exposed through the small vendors they use, not their own systems.",
+        "Customers in a benefit program or marketing list may get phishing emails using real names.",
+        "None of the firms named the vendors, dates or number of people affected.",
+        "Gang claims can be exaggerated; only the companies' own statements are confirmed here."
+      ],
+      "details": [
+        "The Register reported on 19 November that JPMorgan Chase, Visa and Mastercard have each confirmed they are investigating third-party breaches that may involve customer information. The extortion group n0n claimed all three and posted them to its data-leak site on Monday. It is believed to be Russia-based, emerged in September and posted 108 victims in its first month, per a related Register article.",
+        "Visa said the claims involve 'a third-party service provider in Asia Pacific,' that its own systems were not involved or impacted, and that no payments data such as card numbers was affected. It said the incident is unrelated to the cross-industry disruptions of the previous week.",
+        "Mastercard SVP Seth Eisen said the company was told of an incident at a third-party provider that exposed 'a limited amount of email addresses,' not payments information, from a small subset of cardholders enrolled in a specific benefit program. Mastercard says the payment network and cardholders' ability to use their cards were not affected, that the exposure is contained, and that it is working with the provider.",
+        "Chase confirmed its investigation in a post on X and did not answer The Register. It said third parties that provide services to the firm were targeted and, from its investigation so far, believes attackers accessed certain marketing data at those vendors, which 'may include some customer names and email addresses.' It said its services were not disrupted and this is not connected to outages earlier in the week, which it attributed to a software bug in on-premise hardware systems.",
+        "Unknown: the identities of the vendors (all three declined to name them), when the breaches happened, exactly what was stolen, how many customers are affected, and whether n0n's claims go beyond what the companies admit. The Register says it will update the story."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "data breach",
+        "extortion",
+        "jpmorgan",
+        "visa",
+        "mastercard",
+        "third party",
+        "supply chain"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/19/chase-visa-mastercard-confirm-third-party-cyberattacks-that-may-have-exposed-customers-info/5311175"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-nginx2root-a-10-year-old-http-2-bug",
+      "headline": "'nginx2root': a 10-year-old HTTP/2 bug in NGINX can let unauthenticated attackers run code",
+      "summary": "CVE-2026-123007 has existed since NGINX 1.9.5 in 2015. Public proof-of-concept code exists, and no attacks have been reported. Code runs as the worker process; getting root needs a separate kernel bug.",
+      "impacts": [
+        "NGINX fronts a huge share of web servers, so a code-execution bug in HTTP/2 is worth patching quickly.",
+        "The demonstrated attack needs lots of traffic (about 128 GB) and specific CPU features, which limits easy exploitation.",
+        "Four related flaws were fixed in the same releases.",
+        "Ubuntu and Debian packages hadn't shipped fixes when reported."
+      ],
+      "details": [
+        "The Hacker News reported on 18 November on CVE-2026-123007, nicknamed 'nginx2root,' a flaw in NGINX's HTTP/2 support present in open-source code since version 1.9.5, released 22 September 2015. Wiz, Xint, Rapid7 and CIRCL (which issued response guidance) were involved in the research. F5 scored it 9.2 out of 10 on CVSS 4.0.",
+        "Affected are open-source versions 1.9.5 through 1.31.8 and NGINX Plus 37.x releases before the fixed builds, plus R34 to R36. Fixed open-source versions are 1.31.9 and 1.30.7, and NGINX Plus 37.3.0.1 or 37.0.8.1. For NGINX Plus R34 to R36, no fix is listed.",
+        "The attacker's code runs with the permissions of an NGINX worker process, which is possible where ASLR (a memory-randomisation defense) is off or can be bypassed. Wiz bypassed ASLR and ran code in tests, and Xint ran code with only a reachable HTTP/2 port. Getting root needs a second privilege escalation; Xint used a separate Linux kernel SCTP bug, even when NGINX ran in Docker.",
+        "Rapid7's version needs about 128 GB of HTTP/2 traffic, and its demo took two and a half minutes. On links slower than about 300 Mbit/s, the transfer exceeds NGINX's default one-hour connection limit and fails. The method depends on a glibc memory-copy routine chosen on x86-64 CPUs with avx512f and avx512vl features. Xint's attack worked against test servers on AWS, GCP and Azure, including over a public IP. Public proof-of-concept code is on GitHub, though its notes say it suits only a freshly started Docker container on the same machine.",
+        "Four other flaws fixed in the same releases can also lead to code execution under the same ASLR condition, each needing a specific setup. No attacks have been reported, per the vendor and researchers, and CISA's known-exploited list did not include it when the article ran. The article gives no count of exposed servers, and Ubuntu and Debian had not shipped fixed packages. Whether the attack works outside tested setups is not addressed."
+      ],
+      "category": "Tech",
+      "tags": [
+        "nginx",
+        "http2",
+        "vulnerability",
+        "rce",
+        "f5",
+        "linux",
+        "patch"
+      ],
+      "date": "2026-11-18",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Hacker News",
+          "url": "https://thehackernews.com/2026/11/10-year-old-nginx-http2-flaw-lets.html"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-japans-hayabusa2-loses-its-last-working-thruster-and",
+      "headline": "Japan's Hayabusa2 loses its last working thruster and drops its asteroid landing plan",
+      "summary": "JAXA says the last of four ion thrusters failed in mid-August. The 2031 rendezvous and landing at asteroid 1998 KY26 is cancelled. Hayabusa2 will instead fly past 2015 BM510 in April 2028.",
+      "impacts": [
+        "Aging deep-space probes can fail late in extended missions, forcing smaller goals.",
+        "A sensor also detected unexpected erosion of the spacecraft's surface during the voyage.",
+        "The flyby target is an organic-rich, comet-like D-type asteroid, still scientifically valuable.",
+        "Related asteroid missions, such as Destiny+, are unaffected by this decision per the article."
+      ],
+      "details": [
+        "Space.com reported on 19 November that JAXA is changing the final phase of Hayabusa2. The last working one of the spacecraft's four ion thrusters malfunctioned in mid-August, JAXA says. A sensor also detected unexpected erosion of the spacecraft's surface during its long voyage.",
+        "The old plan was to rendezvous with and land on 1998 KY26, an 11-meter near-Earth asteroid, in 2031. That is dropped. Instead Hayabusa2 will make a high-speed flyby of 2015 BM510, another small near-Earth asteroid, in April 2028, with no landing.",
+        "Key dates: launched 2014, returned samples to Earth in December 2020, and made a super-close flyby of the two-headed asteroid Torifune in July 2026. The decision was announced at a JAXA press conference on 17 November, one day after a Cabinet Office space policy subcommittee meeting.",
+        "Yuya Mimasu, team leader of the extended mission, said 'The deterioration of the onboard equipment ... is becoming increasingly evident,' as quoted by the Japan Times.",
+        "The new target, 2015 BM510, is the primary target of a proposal for ESA's mini-Fast mission series. Scientists describe it as a D-type asteroid, thought to be organic-rich and comet-like and possibly from the outer solar system. JAXA's Destiny+ is scheduled to launch around the time of the April 2028 flyby, alongside ESA's Ramses, and will fly past Apophis before its very close Earth approach in 2029, then head to asteroid 3200 Phaethon, parent of the Geminid meteor shower. This is a mission-health story rather than a danger to Earth."
+      ],
+      "category": "Space",
+      "tags": [
+        "hayabusa2",
+        "jaxa",
+        "asteroid",
+        "spacecraft",
+        "thruster",
+        "mission",
+        "japan"
+      ],
+      "date": "2026-11-17",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Space.com",
+          "url": "https://www.space.com/space-exploration/asteroid-comet-missions/no-more-asteroid-landing-engine-trouble-forces-japans-hayabusa2-probe-to-change-plans"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-all-212-plant-based-foods-tested-in-a",
+      "headline": "All 212 plant-based foods tested in a UK survey contained fungal toxins, but below EU guideline levels",
+      "summary": "Researchers found at least one of 19 mycotoxins in every meat alternative and plant-based drink tested. All were below recommended EU guideline levels, and the study does not show harm, but no rules monitor these newer foods.",
+      "impacts": [
+        "Fungal toxins are a natural, unavoidable part of the food supply, not unique to plant-based foods.",
+        "Cumulative exposure across many plant-based products is the open question researchers want studied.",
+        "No established regulations monitor mycotoxins in newer plant-based foods.",
+        "Occasional consumption at these levels is unlikely to cause problems, per the researchers."
+      ],
+      "details": [
+        "A study in Food Control, 'Mycotoxin contamination in plant-based beverages and meat alternatives: A survey of the UK market,' was reported by ScienceDaily on 19 November. It was led by the University of Parma in Italy with Cranfield University in the UK, and funded by the EU Horizon Europe FunShield4Med project.",
+        "The team sampled 212 vegan and vegetarian products sold in the UK, including plant-based meat alternatives and drinks such as oat, almond and soy milk. Every product contained at least one of the 19 mycotoxins tested, and many contained several.",
+        "All products had mycotoxin concentrations below recommended EU guideline levels. The researchers credited UK food industry quality standards. At high enough levels some mycotoxins can damage the liver and kidneys, impair immune function and raise cancer risk, but the study does not show the tested products cause these conditions.",
+        "The concern is cumulative: repeated exposure from several plant-based foods is something earlier studies have raised and that needs further research. Detecting a toxin does not automatically make a food unsafe, since risk depends on the toxin, its concentration and total intake. Occasional consumption is unlikely to cause problems at the levels reported.",
+        "No established regulations currently monitor mycotoxins in newer plant-based foods, and they cannot be completely eliminated from the food supply. Andrea Patriarca of Cranfield University said, 'Mycotoxins occur naturally in foods and cannot be completely avoided.' The headline 'every single one contained toxins' sounds alarming, but the finding is trace presence under guideline limits. Watch for studies on combined intake and for monitoring rules."
+      ],
+      "category": "Health",
+      "tags": [
+        "mycotoxins",
+        "food safety",
+        "plant-based",
+        "uk",
+        "toxins",
+        "nutrition"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261118073749.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-hims-hers-and-noom-move-into-peptide-prescriptions",
+      "headline": "Hims & Hers and Noom move into peptide prescriptions that lack FDA approval and human trials",
+      "summary": "Both telehealth firms announced peptide offerings this week. STAT says many compounded consumer peptides are experimental, unapproved by the FDA and untested in randomized human trials. Details on products and prices are paywalled.",
+      "impacts": [
+        "Mainstream telehealth gives experimental drugs a veneer of normality for a much larger audience.",
+        "Many consumer peptides lack randomized trials showing safety or effectiveness in humans.",
+        "Federal health officials, including the HHS secretary, have promoted these drugs.",
+        "Details on specific peptides and prices were not available in the visible article."
+      ],
+      "details": [
+        "STAT reported on 19 November that telehealth companies Hims & Hers and Noom both announced this week that they will offer peptide prescriptions to eligible patients. Smaller telehealth companies already offered peptides, and STAT calls the new announcements a pivotal moment for peptides in the US. Hims has a market cap above $3.5 billion, and private Noom is valued at $3.7 billion.",
+        "Synthetic peptides are a broad category of short chains of amino acids. They were first popular with bodybuilders and have since drawn a wider audience looking for muscle gain, more energy, higher libido or injury recovery.",
+        "On safety, STAT says many compounded peptides marketed to consumers are 'experimental.' They have not been approved by the FDA, and no randomized controlled trials have shown their safety and efficacy in humans. The article notes the Department of Health and Human Services has promoted these drugs under Secretary Robert F. Kennedy Jr., whom it describes as an avowed peptide enthusiast.",
+        "Important limits: only the opening of the article is visible without a STAT+ subscription. It does not list the specific peptides, product names or prices for either company, nor specific health risks beyond the absence of safety data. So this item rests on the headline facts: the announcements, the company valuations and the regulatory status as STAT describes it.",
+        "The reader-relevant takeaway is simple: a product being sold through a familiar app is not evidence that it has been tested. Watch for FDA statements, the product lists when they launch, and any adverse-event reports."
+      ],
+      "category": "Health",
+      "tags": [
+        "peptides",
+        "telehealth",
+        "fda",
+        "hims",
+        "noom",
+        "supplements",
+        "regulation"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/2026/11/19/hims-noom-enter-peptide-market-mainstream-products-health-risks/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-five-drugmakers-tell-congress-they-will-not-start",
+      "headline": "Five drugmakers tell Congress they will not start new trial sites at Chinese military-linked hospitals",
+      "summary": "Merck, Lilly, AbbVie, Pfizer and Bristol Myers Squibb told the House China committee they won't open new studies at People's Liberation Army-linked sites. A few also said they won't start sites in Xinjiang.",
+      "impacts": [
+        "Drug development and geopolitics are now tangled, with trial locations under national-security scrutiny.",
+        "The committee cites worries about intellectual property, military ties and ethics at some sites.",
+        "Trial-site choices can affect where and how fast new drugs are tested.",
+        "Only new sites are covered; the article gives no figures on existing ones."
+      ],
+      "details": [
+        "STAT reported on 19 November that several large drugmakers told a House committee they are limiting clinical trial work at certain Chinese hospitals. The companies are Merck, Eli Lilly, AbbVie, Pfizer and Bristol Myers Squibb. The House Select Committee on China opened investigations into all five last June. The article is partly paywalled, so this covers only the visible portion.",
+        "All five said they would not start new clinical studies at sites linked to the People's Liberation Army, which the committee describes as 'the military wing of the Chinese Communist Party.' A few of the largest drugmakers also said they do not plan to start new trial sites in China's Xinjiang region.",
+        "The investigations focus on intellectual property exposure, military entanglements and ethical standards at trial sites in sensitive regions. In letters to the companies, the committee noted 'rising concern' over possible security risks.",
+        "The article gives no figures beyond the five companies and the June launch of the investigations, so it is unclear how many existing sites are affected. The statements concern new sites, not current studies.",
+        "This is a policy story with an uneasy edge: medicine's supply chain and research pipeline are increasingly treated as a security domain. Other STAT items the same day cover lawmakers wanting US biotech to compete with China. Watch for committee follow-ups and whether other companies make similar commitments."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "china",
+        "pharma",
+        "clinical trials",
+        "congress",
+        "biotech",
+        "national security",
+        "xinjiang"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "STAT",
+          "url": "https://www.statnews.com/pharmalot/2026/11/19/china-pharma-biotech-clinical-trials-security-risk-patents-drug-development/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-heart-attacks-despite-low-ldl-swedish-proteomics-study",
+      "headline": "Heart attacks despite low LDL: Swedish proteomics study points to two other fat-carrying particles",
+      "summary": "Chalmers researchers analyzed nearly 3,000 blood proteins. Triglyceride-rich particles and lipoprotein(a) shared protein patterns linked to later heart disease and may promote artery inflammation. It does not yet yield a ready test.",
+      "impacts": [
+        "Low LDL cholesterol does not fully rule out heart risk, which fits a long-running puzzle.",
+        "Two other particle types may drive inflammation in artery walls.",
+        "The study did not test a treatment or a routine blood test.",
+        "Lead researchers say lowering LDL remains a cornerstone of prevention."
+      ],
+      "details": [
+        "Researchers at Chalmers University of Technology in Sweden published a study on 10 November in the European Heart Journal, 'Apolipoprotein B-containing lipoproteins: distinct roles in atherosclerosis revealed by plasma proteomic profiling.' Lead author Jakub Morze and senior author Clemens Wittenbecher worked with co-authors from Harvard, AstraZeneca, the University of Copenhagen, the University of Minnesota and the University of Glasgow.",
+        "Background: the WHO says cardiovascular diseases kill nearly 17.9 million people worldwide each year, and heart attacks and strokes account for more than 80% of those deaths.",
+        "The team used proteomics to study three particle types: LDL, triglyceride-rich lipoproteins (TRL) and lipoprotein(a), or Lp(a). They examined nearly 3,000 blood proteins and compared the results with genetic data and long-term health records. TRL and Lp(a) had substantially similar protein patterns, and those overlapping patterns were linked to later heart disease.",
+        "Those proteins can attract immune cells, which may promote inflammation and changes in artery walls. LDL's associated proteins were mainly tied to cholesterol buildup in artery walls. In an earlier study the group found that counting harmful lipoprotein particles was the best predictor of future heart disease risk.",
+        "Caveats: the study did not test a new treatment or establish a blood protein test for routine use, and more work is needed on whether measuring or targeting these processes improves prevention. TRL measurements mainly reflected liver-produced VLDL particles and their remnants. Morze called the TRL and Lp(a) overlap 'one of the most interesting findings.' Wittenbecher stressed that 'Lowering LDL cholesterol remains a cornerstone of prevention.' Watch for trials that test whether targeting these particles cuts events."
+      ],
+      "category": "Health",
+      "tags": [
+        "heart disease",
+        "cholesterol",
+        "ldl",
+        "proteomics",
+        "inflammation",
+        "sweden",
+        "lipoprotein"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Chalmers University)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261109205415.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-tumors-release-an-antioxidant-protein-that-starves-t",
+      "headline": "Tumors release an antioxidant protein that starves T cells of the oxygen species they need",
+      "summary": "Cambridge and OHSU researchers found tumors release PRDX1, which removes reactive oxygen species T cells use to attack. In mice, removing it boosted immunity and made some resistant tumors respond to immunotherapy. It's preclinical.",
+      "impacts": [
+        "It adds a new explanation for how cancers evade the immune system, and a possible drug target.",
+        "It may help explain why large antioxidant-supplement trials showed no cancer protection.",
+        "Nothing here shows supplements cause cancer; people with cancer should not change diet or supplements without advice.",
+        "The treatments are untested in patients."
+      ],
+      "details": [
+        "A study in Science, 'Tumor-derived antioxidants suppress immunity by depriving T cells of reactive oxygen species,' was reported by ScienceDaily on 10 November from a University of Cambridge release. Researchers from Cambridge and Oregon Health & Science University are involved, including Xan Wesolowski, Rahul Roychoudhuri and Robert Eil. Funding came from the Medical Research Council, European Research Council, Wellcome and NIH/National Cancer Institute.",
+        "T cells need small amounts of reactive oxygen species (ROS) to activate and attack tumor cells. The team found tumors release a natural antioxidant protein, Peroxiredoxin 1 (PRDX1), which removes the ROS that T cells need and so weakens the immune response.",
+        "In mice, CRISPR-edited tumor cells unable to make PRDX1 led to more active immune cells and reduced tumor growth. Blocking the mechanism improved responses to immunotherapy in experimental models, and some tumors that had resisted treatment became responsive. Three lines of human evidence supported the same mechanism: proteins released by human cancer cell lines, gene activity in thousands of human tumors, and fluid from surgically removed tumors.",
+        "Wesolowski noted that 'We tend to think of reactive oxygen species purely as damaging byproducts of metabolism.' Roychoudhuri said that when the process is blocked, 'tumors that don't respond to some immunotherapies start responding to treatment.' Eil suggested pro-oxidants could kickstart T cells, which the article treats as speculative.",
+        "Caveats are important. The findings are preclinical; although the mechanism was seen in human cancers, potential treatments have not been shown safe or effective in patients. The study does not establish that antioxidant supplements promote cancer. It offers one possible explanation for why large supplement trials have not shown protection and, in some cases, have linked them to worse outcomes. The article advises people with cancer not to change diet, supplements or treatment without consulting a healthcare professional."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "cancer",
+        "immunotherapy",
+        "t cells",
+        "antioxidants",
+        "crispr",
+        "science",
+        "cambridge"
+      ],
+      "date": "2026-11-10",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Cambridge)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261104084021.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-a-bacterium-living-under-deep-sea-sea-pigs",
+      "headline": "A bacterium living under deep-sea sea pigs' skin has a tiny genome and giant surface proteins",
+      "summary": "University of Tokyo researchers found a new bacterium that made up over 70% of bacterial sequences in the body wall of three sea pig species. Its genome is about seven times smaller than E. coli's, and what it does for its host is unknown.",
+      "impacts": [
+        "It shows how little is known about microbes living inside deep-sea animals.",
+        "Its giant surface proteins, some over 5,000 amino acids, have unknown functions.",
+        "It is not shown to help or harm the sea pig.",
+        "No known direct effect on people; this is basic biology."
+      ],
+      "details": [
+        "University of Tokyo researchers described a new bacterium living in the body wall of deep-sea sea cucumbers called sea pigs, in ISME Host Microbe (2026). ScienceDaily reported it on 19 November. Lead author Yu Yoshida is a PhD student at the university's Graduate School of Frontier Sciences, and Susumu Yoshizawa is also among the authors.",
+        "They examined eight sea pigs collected during deep-sea expeditions. Sea pigs are gelatinous echinoderms that can grow to about 15 cm. The team extracted DNA from multiple tissues, rebuilt the genomes of the most abundant bacterial groups, and used fluorescence imaging to find the bacteria in tissue.",
+        "The new bacterium, proposed as Candidatus Abyssoplasma scotoplanesicola, made up more than 70% of bacterial 16S rRNA sequences in body-wall samples from three sea pig species. Its genome is about 649,000 bases, roughly seven times smaller than E. coli's, and genes for some common bacterial energy-generating pathways were not detected.",
+        "About 27.6% of its genome encodes surface-associated proteins, including some over 5,000 amino acids; typical bacterial proteins average about 300. The researchers believe it depends heavily on its host for amino acids, nucleic acid precursors, lipids and minerals.",
+        "Open questions: whether the bacterium benefits the sea pig, for example by defending against pathogens, has not been shown; the functions of the giant proteins are unknown; and it is unclear how the bacterium became so dominant, what competition it faces and how it affects its host. Yoshida said they would like to understand these. Sea pig lifespans and the purpose of their antenna-like head projections also remain unknown."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "deep sea",
+        "microbiome",
+        "bacteria",
+        "genome",
+        "sea cucumber",
+        "ocean",
+        "evolution"
+      ],
+      "date": "2026-11-19",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (University of Tokyo)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261118065512.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-the-gentlemen-ransomware-gang-lists-nvidia-as-a",
+      "headline": "The Gentlemen ransomware gang lists Nvidia as a victim; Nvidia says it found no sign its systems were hit",
+      "summary": "The gang's leak site shows Nvidia with a countdown to Nov. 28 and 'data info soon,' but no stolen files. Nvidia says it is investigating a possible third-party incident and has found no sign its own systems were affected.",
+      "impacts": [
+        "Leak-site listings can precede proof, so a claim is not evidence of a breach.",
+        "Third-party partners are a common route into large companies.",
+        "The Gentlemen is the most prolific claim poster in a Trellix report, about 16% of posts.",
+        "Nvidia is already under other scrutiny this month, adding to uncertainty."
+      ],
+      "details": [
+        "SecurityWeek and The Register reported on 19 November that the Gentlemen ransomware group listed Nvidia on its data-leak website. The listing carries Nvidia's logo and a general company description but no explanation of the alleged attack. Nvidia first appeared on Wednesday with the message 'DATA INFO - SOON,' and no stolen files are shown. A countdown ends 28 November. The Register could not verify the claims, and SecurityWeek notes the listing does not establish that Nvidia was breached.",
+        "Nvidia says it is investigating an incident that may have affected a third-party partner. A spokesperson said, 'We have found no indication that Nvidia systems or networks were affected,' and that the company continues to monitor the situation. It did not identify the partner or say whether any Nvidia-related information may have been exposed.",
+        "The Gentlemen emerged around mid-2025, first as a closed group and then with an affiliate program. Microsoft tracks its operators as Storm-2697. It uses double extortion: stealing data and encrypting systems, then threatening to publish. Affiliates have targeted manufacturing, healthcare, transportation and financial services. Sophos reported affiliates used compromised credentials and legitimate admin tools, in one case deploying ransomware less than 24 hours after the first identified post-compromise activity.",
+        "Scale figures differ by source. SecurityWeek says the leak site lists more than 1,100 alleged victims. The Register says affiliates claimed more than 320 victims as of April, 240 of them in the first half of 2026, while Check Point researchers found telemetry showing more than 1,570 victims, mostly in the US. A Trellix operational-technology report says industrial ransomware claims rose nearly 51% to about 1,500 posts versus the previous quarter, with the Gentlemen about 16% of all posts.",
+        "The Register recalls a 2022 Nvidia breach in which employee credentials and proprietary code were exposed and the group Lapsus$ claimed responsibility. Unknown now: whether any real data exists, what the third party is, and whether a ransom was demanded. Watch for proof samples around the 28 November deadline."
+      ],
+      "category": "Tech",
+      "tags": [
+        "nvidia",
+        "ransomware",
+        "extortion",
+        "third party",
+        "data breach",
+        "gentlemen",
+        "leak site"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "SecurityWeek",
+          "url": "https://www.securityweek.com/nvidia-responds-to-gentlemen-ransomware-claim/"
+        },
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/19/nvidia-adds-possible-hack-to-list-of-very-bad-things-under-investigation/5311153"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-in-aging-mouse-hearts-inflammation-and-scarring-cluster",
+      "headline": "In aging mouse hearts, inflammation and scarring cluster around the aortic valve, not the muscle",
+      "summary": "Jackson Laboratory researchers mapped thousands of single cells in young and old mice. Aging changes concentrated near the aortic valves and root, differed between males and females, and overlapped with human heart data at the pathway level.",
+      "impacts": [
+        "It points to valves and large vessels, not just the muscle, as early sites of heart aging.",
+        "Findings are in mice and describe molecular activity, not proven changes in heart function.",
+        "Males and females aged differently, which may matter for future treatments.",
+        "No new treatment is identified."
+      ],
+      "details": [
+        "A study in Aging Cell from the Jackson Laboratory (JAX), with two co-authors from RWTH Aachen University, was reported by ScienceDaily on 16 November. The paper is titled 'Alterations in the Immune-Fibrotic Axis Are Spatially Localized in the Aging Heart.' Senior author Nadia Rosenthal is JAX's scientific director.",
+        "The researchers studied thousands of individual cells from young and old mouse hearts and mapped where they sat in the organ. Inflammation and scarring (fibrosis) were concentrated around the aortic valves and aortic root, rather than in the heart muscle. Aging macrophages became more active in genes tied to inflammation and tissue-structure changes, and aging fibroblasts increasingly showed features linked to fibrosis.",
+        "The genes Ccl8 and Cdkn1a (p21) became more active with age, especially in those same regions. Some senescence-associated markers were already present in young hearts, so they alone do not reliably show a cell is senescent; Rosenthal said 'These markers alone don't mean a cell is senescent.' Aging also differed by sex: in males, fibroblasts linked more strongly to fibrosis processes, while in females changes related more to heart development and protein production pathways.",
+        "Several aging-related pathways, including cellular stress responses, also appeared in previously published human heart data, which suggests relevance but does not prove it. Rosenthal said 'We really have to think of aging as something that is not linear.'",
+        "Caveats: the results describe molecular activity rather than demonstrated differences in heart function or disease risk, and mice shared the same environment and diet, which may not reflect people. The team is now testing whether exercise, diet and disease change the interactions between immune cells and connective tissue cells, aiming to separate normal aging from changes that raise vulnerability. Funding came from the NIH Common Fund and the National Cancer Institute."
+      ],
+      "category": "Health",
+      "tags": [
+        "heart",
+        "aging",
+        "inflammation",
+        "fibrosis",
+        "mice",
+        "cardiovascular",
+        "senescence"
+      ],
+      "date": "2026-11-16",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (Jackson Laboratory)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261115085550.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-review-of-350-studies-eating-less-protein-may",
+      "headline": "Review of 350 studies: eating less protein may slow aging, but doesn't prove longer human lives",
+      "summary": "Researchers at the University of Wisconsin-Madison reviewed more than 350 studies on protein and amino acid restriction. Lower protein extended lifespan in flies and rodents, but the authors say human lifespan benefits are not established.",
+      "impacts": [
+        "It cuts against the high-protein trend, but it is a review, not a new experiment.",
+        "Older adults and active people may still need more protein to protect muscle.",
+        "A hormone, FGF21, rises when protein is limited and may be part of the mechanism.",
+        "US guidance this year recommended 1.2 to 1.6 g per kg, nearly double the previous amount."
+      ],
+      "details": [
+        "ScienceDaily reprinted a Cell Press release on 10 November about a review in Cell Press Blue, 'The hallmarks of protein and amino acid restriction in aging and longevity.' Corresponding author Dudley Lamming of the University of Wisconsin-Madison and Bailey Knopf reviewed more than 350 studies. It is not a new experiment. Funding came from the National Institute on Aging, the Wisconsin Partnership Program and the university.",
+        "The review finds reducing protein intake may slow biological aging, improve metabolism and, under some conditions, extend lifespan. In flies and rodents, limiting protein extended lifespan even when total calories stayed the same. Several recent human trials found people who reduced protein lost weight and body fat and improved fasting blood sugar, even eating more calories overall.",
+        "One mechanism: the hormone FGF21 rises when dietary protein is limited. Mice with higher FGF21 lived longer, with a stronger effect in males, and lower protein intake also raises FGF21 in humans. The review highlights the amino acids methionine, isoleucine and valine as possible drivers of growth pathways linked to obesity and inflammation.",
+        "The authors say the findings do not establish that protein restriction extends human lifespan, and whether the human FGF21 response yields the same benefit seen in mice is unresolved. Higher protein still helps preserve muscle in older adults, especially active ones, and pregnant women, some older adults and regular exercisers may need more.",
+        "Lamming argues most people are sedentary and 'many people are likely consuming more protein than they actually need, which probably has negative health consequences,' and that recommendations should be personalized beyond age to activity level. The article notes US authorities recommended 1.2 to 1.6 g of protein per kg of body weight this year, nearly double the previous amount, which is the tension the review highlights."
+      ],
+      "category": "Biotech",
+      "tags": [
+        "protein",
+        "aging",
+        "longevity",
+        "nutrition",
+        "fgf21",
+        "review",
+        "metabolism"
+      ],
+      "date": "2026-11-10",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "ScienceDaily (Cell Press)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261108203714.htm"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-19-boosting-the-sorla-protein-cut-tau-tangles-brain",
+      "headline": "Boosting the SORLA protein cut tau tangles, brain shrinkage and synapse loss in Alzheimer's-like mice",
+      "summary": "Sanford Burnham Prebys researchers found extra SORLA reduced harmful tau and brain atrophy in mice, while deleting its gene made things worse. The work is mouse-only, and drugs aimed at a related receptor are a future idea.",
+      "impacts": [
+        "Tau tangles track closely with cognitive decline, so new levers on tau are of interest.",
+        "Only mice were tested; human effects are unknown.",
+        "Existing drugs aimed at the plexin-B receptor family might be tested later, but that isn't tried yet.",
+        "The article reports no effect sizes or sample numbers."
+      ],
+      "details": [
+        "ScienceDaily reprinted a Sanford Burnham Prebys release on 18 November about a Science Advances paper, 'SORLA up-regulation suppresses pathological effects in aged tauopathy mouse brain.' Lead author Huijie Huang and senior author Timothy Huang studied SORLA, a protein encoded by the Sorl1 gene, in mice that develop tau tangles, brain atrophy and cognitive impairment. Funding came from the NIH, the National Cancer Institute and the National Institute on Aging.",
+        "Extra SORLA reduced tau hyperphosphorylation and limited misfolded tau's ability to seed further clumping. It reduced brain atrophy and tau accumulation and helped preserve synapses and synaptic plasticity. Deleting the Sorl1 gene made these tau-related effects worse.",
+        "Single-cell and spatial analyses showed that more SORLA reduced abnormal gene activity in glial cells, the brain's support cells. Without SORLA, a plexin-B family receptor was turned up. Drugs targeting this receptor family already exist, so the researchers suggest testing them for tau-related dementia.",
+        "SORLA was already known to limit amyloid-beta buildup, another Alzheimer's hallmark, while its effects on tau had been poorly understood. The article reports no quantitative data such as percentages, effect sizes or sample sizes.",
+        "Caveats: protective effects were shown only in mice, and mouse and human cells differ. The team plans to transplant human neurons or glial cells into mouse brains to study SORLA mutations in a diseased environment. Repurposing plexin-B drugs is described as a possible future direction, not a tested approach."
+      ],
+      "category": "Neurotech",
+      "tags": [
+        "alzheimers",
+        "tau",
+        "dementia",
+        "mice",
+        "sorla",
+        "brain",
+        "neuroscience"
+      ],
+      "date": "2026-11-18",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "ScienceDaily (Sanford Burnham Prebys)",
+          "url": "https://www.sciencedaily.com/releases/2026/11/261114202233.htm"
+        }
+      ]
+    }
+  ]
+}
