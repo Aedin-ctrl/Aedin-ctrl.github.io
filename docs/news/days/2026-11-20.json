@@ -1,0 +1,724 @@
+{
+  "date": "2026-11-20",
+  "generated": "2026-11-20T16:05:31.943Z",
+  "articles": [
+    {
+      "id": "2026-11-20-ukraine-collapsed-part-of-the-kerch-bridge-using",
+      "headline": "Ukraine collapsed part of the Kerch Bridge using relay drones that need no Starlink",
+      "summary": "Waves of Ukrainian drones and missiles on Nov. 15-16 brought down one of two steel arches under the bridge's road deck, guided through a mesh network of relay drones, according to the Institute for the Study of War and the Financial Times as relayed by Ars Technica.",
+      "impacts": [
+        "Long-range strikes can now be steered from 250+ km away without satellite links that a third party can switch off.",
+        "Airborne mesh radios are cheap to copy, so other militaries and armed groups may adopt the same trick.",
+        "Damage to the bridge could strain Russian supply and travel routes to Crimea."
+      ],
+      "details": [
+        "On the nights of November 15 and 16, coordinated waves of Ukrainian drones and missiles damaged the Kerch Strait Bridge enough to collapse one of the two steel arches that support its road deck, according to an Institute for the Study of War update cited by Ars Technica. Russian sources claimed several hundred Ukrainian drones first overwhelmed air defenses, then remote-controlled missiles, including Ukraine's homegrown Flamingo cruise missile, hit the bridge. The Nov. 15 attack also coincided with the largest overnight Ukrainian drone attack on Russia since the full-scale war began, Reuters reported.",
+        "The technical story is how the missiles were steered. The Financial Times reported that Ukraine used drones carrying mesh radios as airborne relay nodes, extending the link between human operators and remotely piloted missiles and strike drones. That let operators more than 250 kilometers (155 miles) away guide weapons around air defenses and toward the bridge's weakest structural points. Ars notes that Russia pioneered the technique for long-range strikes on Ukrainian cities, and Ukraine adapted it.",
+        "The strike followed weeks of preparatory attacks that destroyed or degraded air defenses, radars and electronic warfare equipment around the bridge. The Financial Times also reported that Ukrainian units deliberately avoided Starshield, the military version of Starlink, because of recent US restrictions that block its use on drones or anything moving faster than 100 mph (161 km/h). President Zelenskyy said those restrictions have not been lifted; SpaceX denied they had returned.",
+        "What is not settled: the bridge's railway section survived the first strikes, and Russian sources suggested trains were running again on Nov. 18. Ukraine struck the rail section again that night, and Ukraine's General Staff said it used Neptune cruise missiles. Officials in Crimea who back Russia confirmed they had 'temporarily suspended' train traffic to assess the damage. The full extent of the damage has not been independently verified in the reporting I read. Watch whether rail traffic resumes, and whether other militaries copy the relay-drone network."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "drones",
+        "ukraine",
+        "russia",
+        "starlink",
+        "kerch",
+        "bridge",
+        "military"
+      ],
+      "date": "2026-11-18",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/gadgets/2026/11/ukraine-blew-up-putins-bridge-using-relay-drones-to-bypass-starlink-limits/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-meta-staff-warned-that-its-muse-ai-agent",
+      "headline": "Meta staff warned that its Muse AI agent seemed to read private messages and leak bank balances",
+      "summary": "Reuters obtained internal Meta chats in which testers said the Muse agent appeared to access encrypted messages, mix up users' conversations and share account balances. Meta says many were hallucinations; Reuters could not tell whether the figures were real or invented.",
+      "impacts": [
+        "An agent with access to your messages may show other people's data, or invent data that looks real.",
+        "Staff-only builds can behave differently from public ones, so public testing may start before the problems are understood.",
+        "Unprompted pings from an agent are a new kind of privacy risk, separate from what you ask it."
+      ],
+      "details": [
+        "After early adopters complained in September that Meta's Muse AI agent was spying on private messages and acting unpredictably, Reuters published internal Meta chats showing that staff had raised similar alarms, according to Ars Technica's summary. Testers warned that Muse appeared to access encrypted private messages users did not expect it to review, could be mixing up conversations between users, and might share sensitive information.",
+        "The examples are specific. One staffer got an unprompted definition of 'money laundering'. Another was told Muse had 'pulled in some context about a coffee table pickup that doesn't seem to be yours', and flagged a 'possible cross-account context leak'. A staffer chatting about fishing got an unrequested note with two bank balances. One tester said Muse 'accidentally rolled me into a premium insurance plan' for their dog at $888 a month instead of $200.",
+        "Meta's position is that these were 'isolated incidents'. Employees were told the agent appeared to be hallucinating messages in response to built-in prompts that push it to engage with users between sessions, and an AI team member said the hallucinations skewed toward uncomfortable topics like finances and safety. Meta also said staff use different versions than the public. Reuters said it was unable to establish whether Muse gave users other people's balances or made the numbers up, and Meta declined to say how common or persistent the problems were.",
+        "The public complaints began soon after the September launch. An Inc. reporter said Muse dug through private messages on his Mac after he had denied it access, and that it was syncing messages from a local database. So the proven part is that staff raised these alarms and that outside users reported unwanted access; the unproven part is whether real third-party data leaked. Watch for regulator questions and for details on how often Muse sends unprompted messages."
+      ],
+      "category": "AI",
+      "tags": [
+        "meta",
+        "muse",
+        "ai agents",
+        "privacy",
+        "chatbots",
+        "hallucination",
+        "messages"
+      ],
+      "date": "2026-11-18",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/tech-policy/2026/11/muse-privacy-invasions-are-freaking-out-meta-staffers-internal-chats-show/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-a-house-chairman-says-the-us-approved-879",
+      "headline": "A House chairman says the US approved 879,000 AI chip sales to China, including to Tencent and Alibaba",
+      "summary": "Rep. Brian Mast released licence data showing requests for 3.4 million Nvidia and AMD chips for China, of which 879,000 were approved. Mast says some buyers are on the Pentagon's list of Chinese military companies.",
+      "impacts": [
+        "Export rules meant to slow China's military AI may be leaking through licences the US itself approved.",
+        "Chinese clouds may no longer need US chips once domestic ones scale, weakening this lever over time.",
+        "Both companies told regulators every application carried 'low' diversion risk, which Congress is now questioning."
+      ],
+      "details": [
+        "According to The Register, Brian Mast, chair of the House Foreign Affairs Committee, revealed on Thursday that Nvidia and AMD had requested licences to sell 3.4 million AI chips to China, and that the Commerce Department's Bureau of Industry and Security (BIS) approved 879,000 items. Mast says approved sales included buyers such as Alibaba and Tencent, which are on the Department of War's list of Chinese military companies.",
+        "BIS did refuse some of the largest requests, including 610,000 chips for Alibaba and 508,000 for TikTok owner ByteDance. Mast also claims some Nvidia applications were attempts to sell to chip-smuggling fronts, and the New York Times reportedly links some of those fronts to Megaspeed, the firm tied to the relationship that contributed to Jensen Huang's resignation as Nvidia CEO. One document says every Nvidia and AMD application described the diversion risk as 'low'.",
+        "Separately, earlier this week Washington adopted a policy banning remote access to advanced AI chips. Tencent said the ban will reduce its available compute and slow model training. Alibaba's CEO Eddie Wu said it could lower the company's long-term 20-gigawatt data-center target and its capital spending, though both companies expect Chinese chipmakers to produce advanced AI hardware at scale in 2027 or 2028.",
+        "What is claimed versus proven: the approval and denial figures come from documents shared by a committee chair with a stated political point, and the Register notes many approved orders never turned into shipments. The Register does not say whether any approved chips reached military end uses. Watch for BIS's response, any hearing, and whether Chinese chip production arrives on the timeline Tencent and Alibaba expect."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "export controls",
+        "nvidia",
+        "china",
+        "chips",
+        "amd",
+        "megaspeed",
+        "gpu"
+      ],
+      "date": "2026-11-20",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/legal/2026/11/20/us-let-nvidia-and-amd-sell-bucketloads-of-chips-to-military-linked-chinese-companies/5311200"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-teens-sue-after-a-schools-ai-gun-detector",
+      "headline": "Teens sue after a school's AI gun detector flagged a Doritos bag and police drew guns",
+      "summary": "Four Baltimore County students say a false alert from the Omnilert AI system was cancelled within two minutes, yet police still arrived with guns drawn in October 2025. Their lawsuit seeks to bar the district from using the system until protocols exist.",
+      "impacts": [
+        "An AI false alarm can turn into an armed police response if the human cancellation never reaches the officers.",
+        "Vendors' 'near-zero false positives' claims depend on human review that schools may not enforce.",
+        "Students searched 'by association' show how one flag can pull in bystanders."
+      ],
+      "details": [
+        "In October 2025, four Black high school students were sharing Cool Ranch Doritos after football practice when the school's AI gun detection system flagged one holding a bag of chips as a possible gunman, according to Ars Technica's report on the lawsuit. Baltimore County Public Schools officials reviewing the footage determined within two minutes that there was no threat and cancelled the alert.",
+        "The lawsuit, filed by students Taki Allen, Yui-Osa Ogbeide, Devon Thompson Jr. and Keith Winfield III, says that because of 'both technological and human errors' school officials called police anyway. At least six patrol cars arrived with lights flashing and some officers had guns drawn. The complaint says the students were ordered to their knees, handcuffed and searched, and only afterward learned an AI system called Omnilert had triggered the response. These are allegations in a complaint, not findings.",
+        "The complaint alleges one officer said 'stupid AI cameras' and another told the teens to 'be careful with your chip bags'. It also says the other students were told they were guilty 'by association'. The suit claims unlawful search and detention and says the district was among the earliest Omnilert adopters, touting 'the largest deployment of AI visual gun detection'. It alleges Omnilert markets 'near-zero false positives' without requiring the human review that claim depends on.",
+        "The plaintiffs ask for an injunction barring the district from using Omnilert until protocols prevent police responses to false alerts. Damon Hewitt of the Lawyers' Committee for Civil Rights Under Law, which represents the teens, called 'overreliance on artificial intelligence technology mixed with inept communication' a 'toxic mix'. The court has not ruled and the district's response was not in the article I read. Watch for the injunction ruling and for other districts reviewing their alert-to-police handoffs."
+      ],
+      "category": "Surveillance",
+      "tags": [
+        "ai gun detection",
+        "schools",
+        "police",
+        "lawsuit",
+        "false positive",
+        "children",
+        "surveillance"
+      ],
+      "date": "2026-11-19",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/tech-policy/2026/11/traumatized-teens-sue-school-cops-after-doritos-bag-triggers-ai-gun-alert/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-waymo-halts-robotaxi-freeway-driving-after-california-says",
+      "headline": "Waymo halts robotaxi freeway driving after California says its cars enter construction zones",
+      "summary": "California's DMV ordered Waymo off highways until it shows its cars no longer pose an 'imminent hazard to public safety'. Waymo says it also paused freeway service in other markets while it reviews its performance.",
+      "impacts": [
+        "Robotaxis can fail at ordinary hazards like construction zones, not only rare edge cases.",
+        "A repeat problem after a software fix shows how hard it is to confirm a fix across thousands of vehicles.",
+        "State regulators can pause a driverless service quickly, which shapes how fast it can expand."
+      ],
+      "details": [
+        "Waymo is currently limiting its robotaxis to surface streets after California's DMV ordered it earlier this month to stop driving on state highways immediately, until it can show its cars no longer 'pose an imminent hazard to public safety', Ars Technica reports. The agency's concern is that the software tends to drive into construction zones at speed.",
+        "Ars lists a history. In April, Waymo robotaxis did not recognize ramp closure signs on six occasions in Phoenix. A month later seven entered lanes with active construction in California. In June Waymo recalled almost 3,800 robotaxis capable of highway driving, and it stuck to surface streets in California until late July. In July it told federal regulators it was updating its software to better recognize freeway construction zones and slow down.",
+        "The new trouble came after that update. A video went viral in early November showing a Waymo on I-280 driving past two California Highway Patrol cars conducting a rolling roadblock. California also cited an incident where a robotaxi entered a construction zone on US 101 near Burlingame.",
+        "Waymo says the US 101 encounters involved no injuries or collisions, that it has temporarily restricted freeway operations in its other markets as well, and that its ride-hailing service continues on surface streets with over half a million trips each week. Before the pause it ran freeways only in Los Angeles, the Bay Area and Arizona. What is unknown is how long the pause will last and what evidence the DMV will accept. Watch for the DMV's decision and any new federal action."
+      ],
+      "category": "Tech",
+      "tags": [
+        "waymo",
+        "robotaxi",
+        "self-driving",
+        "california",
+        "dmv",
+        "safety",
+        "recall"
+      ],
+      "date": "2026-11-18",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/cars/2026/11/waymo-suspends-freeway-driving-after-california-construction-zone-complaint/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-measles-in-pregnancy-at-least-178-us-cases",
+      "headline": "Measles in pregnancy: at least 178 US cases since 2025, and one doctor saw 'immune amnesia'",
+      "summary": "CIDRAP reports at least 178 pregnant Americans have had measles since 2025. A Pittsburgh specialist describes a patient who recovered, then became critically ill from a normally mild virus, consistent with measles-driven loss of immune memory.",
+      "impacts": [
+        "Measles can leave a recovering person unusually vulnerable to other infections for months, even years.",
+        "Pregnant people can't take the live measles vaccine, so they depend on others being vaccinated.",
+        "Doctors have few case reports on this effect in pregnancy, so risks are poorly mapped."
+      ],
+      "details": [
+        "CIDRAP News reports that at least 178 pregnant Americans have been infected with measles since 2025, as the national outbreak expands. The article opens with a case described by Christina Megli, a maternal-fetal medicine specialist at the University of Pittsburgh Medical Center: a young woman recovered from measles during pregnancy, then caught a common respiratory virus that is usually benign in pregnancy and became critically ill, needing a blood transfusion.",
+        "Megli said the patient had 'profound immune suppression', like someone taking transplant drugs. Measles is known to cause 'immune amnesia', in which the virus destroys antibodies built up from earlier infections or vaccinations, leaving people open to germs they were protected against. The effect can last up to five years and tends to be most severe right after infection. Megli said she had never heard of it occurring in pregnancy.",
+        "Megli had treated one measles case before the Pennsylvania outbreak, has now treated six pregnant women with measles, and hopes to publish a case series. CIDRAP cites Johns Hopkins tracking of more than 8,000 reported measles infections in two years. Ars Technica separately reports the US was formally declared to have lost measles elimination status on Tuesday, with over 5,400 cases this year, more than any year since 1991, and 10 confirmed deaths across three states.",
+        "The caution: this is a single clinician's account, not a controlled study, and the article reports no data showing how common severe follow-on illness is among pregnant patients. Watch for Megli's planned case series and any CDC guidance for pregnant patients."
+      ],
+      "category": "Health",
+      "tags": [
+        "measles",
+        "pregnancy",
+        "immune amnesia",
+        "outbreak",
+        "public health",
+        "vaccines",
+        "pennsylvania"
+      ],
+      "date": "2026-11-16",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/measles/least-178-pregnant-americans-have-been-infected-measles-2025"
+        },
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/health/2026/11/the-shameful-measles-data-that-lost-the-us-its-elimination-status/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-follow-up-who-says-congos-ebola-cases-more",
+      "headline": "Follow-up: WHO says Congo's Ebola cases more than doubled in three months, to 11,536 confirmed",
+      "summary": "WHO's director-general says 11,536 confirmed Bundibugyo cases and 5,635 confirmed deaths have been reported since May 15, with 400 to 500 new cases a week. Children make up roughly 30% of deaths.",
+      "impacts": [
+        "Weekly cases are still in the hundreds in a seventh month, so the outbreak is not under control.",
+        "Children are bearing a heavy share of deaths, per WHO.",
+        "The approved Ebola vaccine targets a different strain; Bundibugyo candidates are only entering trials."
+      ],
+      "details": [
+        "CIDRAP reports that Ebola cases have more than doubled in three months, according to WHO Director-General Tedros Adhanom Ghebreyesus. As of the report, 11,536 confirmed cases including 5,635 confirmed deaths have been recorded since the outbreak was declared on May 15. Tedros spoke at the third meeting of the WHO emergency committee on the Bundibugyo virus disease epidemic.",
+        "He said the Democratic Republic of the Congo is still seeing 400 to 500 new cases each week, and the outbreak is entering its seventh month. Children are 'paying a terrible price', accounting for roughly 30% of all deaths.",
+        "Some response capacity has grown. At the start only two laboratories could test for the virus; now more than two dozen can. Close to 2,000 treatment beds are available, and about 3,000 people have recovered. About 900 people in the DRC are enrolled in clinical trials of therapeutics, including a vaccine trial using Ervebo, the vaccine approved for the Zaire strain, not Bundibugyo.",
+        "Tedros said two candidate vaccines developed specifically against the Bundibugyo strain will be added to the ongoing vaccine trial in the coming weeks. The counts are confirmed cases only, so the true toll may differ, and the article does not give a forecast. Watch the weekly case numbers, and whether the new vaccine candidates start enrolling as promised."
+      ],
+      "category": "Health",
+      "tags": [
+        "ebola",
+        "congo",
+        "bundibugyo",
+        "who",
+        "outbreak",
+        "children",
+        "vaccine"
+      ],
+      "date": "2026-11-18",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/ebola/who-ebola-case-count-has-more-doubled-3-months"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-follow-up-copernicus-now-projects-1-5-c",
+      "headline": "Follow-up: Copernicus now projects 1.5°C by 2029, up to 16 years sooner than the Paris-era estimate",
+      "summary": "At COP31, Copernicus said warming could cross 1.5°C as soon as 2029, versus about 2045 projected when the Paris agreement was adopted. Climate Action Tracker says the world is still on track for nearly 5°F of warming by 2100.",
+      "impacts": [
+        "The Paris limit could be crossed within about three years, not decades.",
+        "Climate Action Tracker says government action has stalled for a fifth straight year.",
+        "Even full delivery of current policies and promises would mean about 3.4°F of warming by 2100."
+      ],
+      "details": [
+        "Ars Technica reports that the nonprofit Climate Action Tracker found the planet is still on track to warm nearly 5°F by 2100, a rise that would devastate coral reefs, disrupt agriculture and forests, and melt most of the world's ice. Separately, the EU's Copernicus service said warming has accelerated significantly since the 2015 Paris agreement.",
+        "When Paris was adopted, global temperature was projected to pass the pact's long-term threshold, 2.7°F (1.5°C) above preindustrial, around 2045. Copernicus now projects that crossing as soon as 2029. The EU scientists wrote that 'this striking change suggests that global warming has accelerated in recent years', adding it is clear greenhouse gas concentrations remain the main driver even if not every aspect of the recent jump is understood.",
+        "Sarah Heck of Climate Analytics said 'collective government action on climate change has stalled for the fifth consecutive year', with fossil-fuel drilling projects and policy rollbacks cancelling gains. Even assuming full implementation of current policies and promises, warming would reach 3.4°F above preindustrial by 2100. Niklas Höhne of the New Climate Institute said new oil and gas projects are like turning up the stove when your food is burning.",
+        "A caution: 2029 is a projection of when the threshold may first be reached, and a first crossing is not the same as a long-term average above 1.5°C. At COP31 the co-hosts Turkey and Australia have so far opposed including the word 'clean' in electrification targets, according to Höhne. Watch the COP31 outcome text and the next Copernicus monthly bulletins."
+      ],
+      "category": "Climate",
+      "tags": [
+        "climate",
+        "1.5c",
+        "copernicus",
+        "cop31",
+        "paris agreement",
+        "warming",
+        "emissions"
+      ],
+      "date": "2026-11-13",
+      "unease": 4,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/science/2026/11/scientists-warn-the-1-5c-climate-change-threshold-could-arrive-by-2029/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-the-space-force-is-weighing-a-satellite-network",
+      "headline": "The Space Force is weighing a satellite network around the Moon; a general calls it a 'warfighting domain'",
+      "summary": "The Pentagon says it is 'notionally' interested in military satellites around the Moon. Maj. Gen. Stephen Purdy says Pentagon leaders now publicly call cislunar space a warfighting domain, as the US and China race to land crews.",
+      "impacts": [
+        "Military satellites near the Moon would extend monitoring far beyond today's geostationary orbit.",
+        "Officials foresee competition over scarce safe landing zones near the south pole's water ice.",
+        "Treating the Moon as a warfighting domain could shape lunar rules and risks for civilian missions."
+      ],
+      "details": [
+        "Ars Technica reports that the US military is 'notionally interested' in placing a constellation of satellites around the Moon. The Space Force's most distant satellites today sit in geostationary orbit, about 22,000 miles up, where they collect surveillance and missile warning data.",
+        "Maj. Gen. Stephen Purdy, the Space Force acquisitions chief for advanced programs, said at an October industry event: 'I've got the Secretary of War and the Chairman of the Joint Chiefs full on stating in public: This is a warfighting domain,' and asked industry to join his 'cislunar bandwagon'. He tied the shift to a December executive order on space policy that includes the ability to detect, characterize and counter threats to US space interests from low-Earth orbit to cislunar space.",
+        "Officials stress the military's role is to protect US interests as the US and China ramp up lunar programs, with robotic missions leading to crewed landings in the next few years. Some foresee a competition for real estate and resources at the Moon, where there are a limited number of safe landing zones with access to water ice at the south pole. Gen. Chance Saltzman, who retired as the Space Force's top general in August, said 'We have a role to play, but we're not the lead'.",
+        "This is early: 'notionally interested' means no program, budget or schedule is described in what I read. Watch for Space Force solicitations, and for how NASA and allies respond."
+      ],
+      "category": "Geopolitics",
+      "tags": [
+        "space force",
+        "moon",
+        "cislunar",
+        "pentagon",
+        "china",
+        "satellites",
+        "military"
+      ],
+      "date": "2026-11-09",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/space/2026/11/us-military-notionally-interested-in-satellite-constellation-around-moon/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-attack-on-an-irish-banking-software-firm-exposed",
+      "headline": "Attack on an Irish banking software firm exposed saved payee details at about 40 credit unions",
+      "summary": "Attackers exploited a flaw in Wellington IT's online banking platform between October 2 and 4. Many credit unions learned of it only in recent days, and a minister called the delay 'not acceptable'.",
+      "impacts": [
+        "Saved payee lists tied to members can fuel convincing phishing and 'safe account' scams.",
+        "A single software supplier can expose dozens of institutions at once.",
+        "Notification lags of weeks leave customers unaware of risk."
+      ],
+      "details": [
+        "The Register reports that an attack on software provider Wellington IT exposed saved payee details held by around 40 Irish credit unions. Robert Troy, Ireland's minister of state responsible for credit unions, said the breach happened in October but many affected institutions only learned of it in recent days, calling Wellington IT's delay 'not acceptable'.",
+        "Affected credit unions said attackers exploited a vulnerability in the provider's online banking platform between October 2 and 4, and the flaw was closed on October 6. News broke Tuesday, with the government describing a 'possible cybersecurity incident' and naming Wellington IT on Wednesday.",
+        "The exposed records concern payees saved in members' online accounts, which can also be linked to the members who created them. The data types vary by institution and record. Credit unions including St. Canice's said online banking passwords, PINs and login credentials were unaffected and that the payee details did not give access to accounts or funds.",
+        "St. Canice's warned members not to transfer money in response to anyone claiming it needs to be moved to safety because of the breach. The article I read does not say who the attackers were, how many members were affected, or whether data has been misused. Watch for a regulator inquiry and full lists of affected institutions."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "data breach",
+        "ireland",
+        "credit unions",
+        "banking",
+        "supply chain",
+        "phishing",
+        "third party"
+      ],
+      "date": "2026-11-19",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/19/cyberattack-on-service-provider-exposes-payee-data-at-40-irish-credit-unions/5310979"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-follow-up-tp-link-still-cant-sell-its",
+      "headline": "Follow-up: TP-Link still can't sell its newest Wi-Fi 8 routers in the US under a ban on foreign-made models",
+      "summary": "Rules in place since March 2026 bar new router models made or designed outside the US unless granted a waiver. Some rivals got exemptions; TP-Link has not, though models approved before the ban remain on sale.",
+      "impacts": [
+        "Router supply is now a national-security decision, controlled by a waiver process.",
+        "Older approved models stay on sale while new ones are blocked, so stock can age.",
+        "TP-Link says its US arm is separate from the China-based company; officials appear unconvinced."
+      ],
+      "details": [
+        "Ars Technica reports that US rules prevent the import or sale of all new router models manufactured, assembled, designed or developed outside the US. The Trump administration controls which makers get exemptions through a waiver review involving the FCC, the Department of Defense and the Department of Homeland Security.",
+        "Some TP-Link competitors have obtained exemptions, but TP-Link appears to be having a hard time. Routers approved before the March 2026 ban remain available, while its newly released Wi-Fi 8 routers cannot be imported or sold.",
+        "Ars says the company must convince officials its routers are not vulnerable to foreign hacking campaigns and are not Chinese-controlled technology, as suggested at a Congressional committee hearing last year. TP-Link was founded in China in 1996 and has since split into two companies; the US one set up California headquarters in October 2024. TP-Link says it 'has split from and no longer has any affiliation with TP-LINK Technologies Co., Ltd.', which serves mainland China.",
+        "This is a policy dispute with claims on each side; the article I read does not show a final decision on the waiver. Watch for the waiver outcome and for whether other foreign router makers get approved."
+      ],
+      "category": "Tech",
+      "tags": [
+        "tp-link",
+        "routers",
+        "china",
+        "fcc",
+        "supply chain",
+        "regulation",
+        "wi-fi"
+      ],
+      "date": "2026-11-20",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/tech-policy/2026/11/trump-admin-still-wont-let-wi-fi-giant-tp-link-sell-its-latest-routers-in-us/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-vmware-discloses-a-9-8-rated-vcenter-authentication",
+      "headline": "VMware discloses a 9.8-rated vCenter authentication bypass and a root-level SDDC Manager flaw",
+      "summary": "VMware's advisory VMSA-2026-0009 fixes a vCenter bug that lets someone with network access bypass authentication, and another that gives root on SDDC Manager. A second advisory affecting Apache components is not yet fixed, The Register says.",
+      "impacts": [
+        "vCenter manages whole fleets of virtual machines, so a takeover can reach everything beneath it.",
+        "Admins are already juggling emergency PHP, Java and PostgreSQL patches this week.",
+        "An unfixed second advisory means some exposure remains."
+      ],
+      "details": [
+        "The Register reports VMware published VMSA-2026-0009, covering CVE-2026-123890, rated 9.8. VMware says a malicious actor with network access to vCenter may exploit it to bypass authentication and gain unauthorized access. vCenter is the tool administrators use to manage fleets of virtual machines, and the flaw is present in VMware Cloud Foundation.",
+        "The same advisory covers CVE-2026-123891, which lets attackers read and write the database behind SDDC Manager, the tool for managing software-defined datacenters, execute arbitrary commands and escalate to root. The Register's point is that an unknown party reaching vCenter or SDDC Manager is serious, though VMware has shipped fixes for these two.",
+        "A second advisory, VMSA-2026-0010, warns that Cloud Foundation, Aria Operations and VCF Operations HCX products use Apache components with their own issue, and The Register says VMware has not fixed that one. The article also mentions a nested-virtualization issue that affected DigitalOcean, and notes admins are already handling emergency patches for PHP, Java and PostgreSQL.",
+        "I read nothing saying these flaws are being exploited. The risk is that attackers reverse-engineer patches quickly, so patching sooner matters. Watch for exploitation reports and for a fix to the second advisory."
+      ],
+      "category": "Cyber",
+      "tags": [
+        "vmware",
+        "vcenter",
+        "vulnerability",
+        "patch",
+        "authentication bypass",
+        "virtualization",
+        "critical"
+      ],
+      "date": "2026-11-20",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "The Register",
+          "url": "https://www.theregister.com/security/2026/11/20/flaws-in-vmware-and-kvm-need-attention-if-you-have-time-while-fixing-java-php-and-everything-else/5311193"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-spacex-sells-30-billion-of-debt-backed-by",
+      "headline": "SpaceX sells $30 billion of debt backed by Nvidia chips, and lenders worried the chips could leave Earth",
+      "summary": "Lenders reportedly objected to the chance that chips securing SpaceX's 'Project Saturn' bonds could later be launched for space data centers, since they couldn't be seized if SpaceX defaulted. It is unclear whether the provision made the final documents.",
+      "impacts": [
+        "Lenders are now pricing in the legal oddity of collateral that could be launched out of reach.",
+        "AI data centers in orbit are being financed as a real asset class before the law is settled.",
+        "Heavy debt on AI hardware ties SpaceX's finances to the AI buildout."
+      ],
+      "details": [
+        "Ars Technica reports, citing people familiar with the deal, that SpaceX sold more than $30 billion of debt on Thursday in a package called 'Project Saturn'. The largest part was a $25 billion investment-grade bond backed by SpaceX's five-year lease payments for Nvidia chips. It was sold at 3.45 percentage points above US Treasuries, a yield of about 8.3 percent, versus about 7.2 percent for SpaceX's corporate debt maturing in 2031.",
+        "Elon Musk has outlined plans to power AI models with data centers cooled by the vacuum of space, which would require satellites packed with advanced chips. SpaceX has said it plans to use the chips in this deal on Earth. But lenders worried that if SpaceX later launched the chips, they could not reclaim and sell them after a default.",
+        "The bonds were issued by a special purpose vehicle designed to keep the debt off SpaceX's balance sheet and preserve its investment-grade credit rating. The newer bonds mature in 2032, but the principal will be paid off in less than four years, which was designed to reduce lender risk.",
+        "The uncertain part: it is not known whether the covenant restricting launch was in the finalized documents, and all details come from unnamed sources. Whether space data centers are practical was not tested in the article. Watch for disclosure of the final terms and for more debt financing of orbital computing."
+      ],
+      "category": "Economy",
+      "tags": [
+        "spacex",
+        "debt",
+        "nvidia",
+        "bonds",
+        "data centers",
+        "ai bubble",
+        "orbit"
+      ],
+      "date": "2026-11-20",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/space/2026/11/spacex-lenders-dont-want-elon-musk-launching-their-collateral-into-space/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-us-regulator-orders-kalshi-to-halt-bets-on",
+      "headline": "US regulator orders Kalshi to halt bets on what words Trump will say",
+      "summary": "The CFTC ordered Kalshi to pause its 'TRUMPSAY' contract series, which let users wager on words Trump would say. A teleprompter aide was earlier penalized for trading on advance knowledge of speeches.",
+      "impacts": [
+        "Anyone with advance access to a speech could profit from a bet on its words.",
+        "Prediction markets on a president's remarks raise insider-trading questions that rules haven't settled.",
+        "Senate Democrats say the president's family could profit from participation in these markets."
+      ],
+      "details": [
+        "Ars Technica reports the Commodity Futures Trading Commission ordered Kalshi to halt wagers on what words Trump will say. CNBC reported that Kalshi quietly paused trading in a handful of 'mention' contracts tied to the president at the CFTC's request at the end of last week. Kalshi says it is complying.",
+        "The order applies broadly to the 'TRUMPSAY' contract series, whose contracts ask whether a given word will be said by Donald Trump before a date, and to a contract on which nicknames he will say before 2027.",
+        "It follows an enforcement case. On August 28 the CFTC required Gabriel Perez, a Trump teleprompter aide, to give up $107,539.02 in profits and pay a $65,000 civil penalty. The CFTC said he had access to speeches before delivery and misappropriated that information to trade presidential mention contracts, making over $107,500.",
+        "Senate Democrats recently said the White House has not taken meaningful action against insider trading while the president and family stand to profit personally from prediction markets, per Ars. That is a political claim, and the article does not show evidence of wrongdoing by the president. The CFTC has not said whether the pause is permanent. Watch whether other platforms list similar markets and whether Congress acts."
+      ],
+      "category": "Economy",
+      "tags": [
+        "kalshi",
+        "prediction markets",
+        "cftc",
+        "insider trading",
+        "betting",
+        "regulation",
+        "trump"
+      ],
+      "date": "2026-11-18",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/tech-policy/2026/11/trump-admin-orders-kalshi-to-halt-wagers-on-what-words-trump-will-say/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-ucl-unesco-test-of-33-ai-models-strongest",
+      "headline": "UCL-UNESCO test of 33 AI models: strongest scored about 78% on questions about IPCC confidence",
+      "summary": "A study led by University College London and UNESCO tested 33 language models on 600 climate questions. Frontier models scored about 90% on simple benchmarks but about 78% on questions about how confident scientists are.",
+      "impacts": [
+        "People increasingly get climate information from chatbots, so error rates matter.",
+        "Models were weakest on how sure scientists are, a nuance that shapes how people read the evidence.",
+        "Small open-weight models scored far lower, around 47% on the hardest set."
+      ],
+      "details": [
+        "Ars Technica reports on a study by researchers from University College London and UNESCO that tested how language models handle climate information. Since answers are served privately to individual users, researchers could not observe what people have seen, so they tested models with different prompts and scored the output.",
+        "The study used 33 models, including several versions of major frontier and open-weight models; the flagship frontier models were Claude Fable 5, Claude Opus 5, Gemini 3.1 Pro Preview, Gemini 3.6 Flash and GPT-5.6 Sol. Models were scored on 600 benchmark questions: textbook multiple-choice, reading comprehension on snippets from scientific papers, and questions about how confident climate scientists are in conclusions from IPCC reports.",
+        "The confidence questions were hardest: flagship models answered about 78 percent correctly and the smallest open-weight models about 47 percent. On the other benchmarks, frontier and large open-weight models generally scored around 90 percent and small open-weight models in the 70s.",
+        "The researchers also analyzed more complex interactions, including when users think they are right to push back on an answer; Ars's headline says models will get climate information wrong if you ask them to. The portion of the article I read does not give those results in detail, so I can't say how often models flipped. Watch for the full report and for whether newer models close the gap."
+      ],
+      "category": "AI",
+      "tags": [
+        "ai",
+        "chatbots",
+        "climate",
+        "misinformation",
+        "unesco",
+        "llm",
+        "ipcc"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/science/2026/11/llms-will-provide-accurate-climate-info-except-when-they-wont/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-rubin-observatory-finds-two-rare-asteroids-trailing-neptune",
+      "headline": "Rubin Observatory finds two rare asteroids trailing Neptune, the first of their kind in 15 years",
+      "summary": "The Vera C. Rubin Observatory spotted two new asteroids, and possibly a third, trailing Neptune. Simulations suggest the pair's orbits may have been stable for billions of years, making them relics of the early solar system.",
+      "impacts": [
+        "Stable orbits for billions of years let astronomers study leftover building blocks of the planets.",
+        "Rubin's wide field of view makes it good at finding faint, sparse objects like these.",
+        "It is a discovery, not a threat: these asteroids stay in step with Neptune, far from Earth."
+      ],
+      "details": [
+        "Live Science reports the Vera C. Rubin Observatory spotted two previously unknown asteroids, and possibly a third, trailing Neptune. They are Neptune Trojans, icy, rocky bodies that share the planet's path around the sun in distinct swarms about 60 degrees ahead of and behind it, at the L4 and L5 Lagrange points where the pull of the sun and planet balance.",
+        "Astronomers had spotted only 28 Neptunian Trojans before, with just two being long-term L5 members. They are faint, and for nearly 15 years the L5 group has sat in front of the Milky Way's central region, where background stars made them nearly impossible to pick out. From 2025 the group has slowly moved away from the galactic plane while Rubin began scanning the southern sky.",
+        "The discovery came during Rubin's three-month Science Validation Survey in mid-2025, which by chance covered the sky where Neptune's L5 Trojans are, so the asteroids were photographed within three weeks of the survey's start. Computer models show the pair will keep trailing Neptune for a billion years, and the results suggest their paths have been stable for several billion years. The third object had a stable orbit in only some simulations.",
+        "The findings were published October 15 in The Astrophysical Journal Letters. A 2005 study suggested Neptune may have up to 10 times more Trojans than Jupiter, which has about 15,000 known. Watch for Rubin's next survey results as it continues its decade-long sky survey."
+      ],
+      "category": "Space",
+      "tags": [
+        "rubin",
+        "asteroids",
+        "neptune",
+        "astronomy",
+        "solar system",
+        "trojans",
+        "telescope"
+      ],
+      "date": "2026-11-19",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Live Science",
+          "url": "https://www.livescience.com/space/asteroids/rubin-observatory-finds-ultra-rare-asteroids-from-the-solar-systems-youth-trailing-neptune-around-the-sun"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-andurils-test-satellite-can-track-other-spacecraft-in",
+      "headline": "Anduril's test satellite can track other spacecraft in Earth's shadow, closing a gap in space surveillance",
+      "summary": "Anduril says its Anduril-216 satellite carried an infrared sensor that sees objects in orbit during the dark third of each orbit, when optical trackers can lose sight of a maneuvering satellite.",
+      "impacts": [
+        "Satellites that maneuver in Earth's shadow are harder to track, which matters for military warning and collision alerts.",
+        "A private company is building sensors that the Space Force depends on.",
+        "Better tracking of other nations' satellites could heighten orbital tension."
+      ],
+      "details": [
+        "Ars Technica reports that Anduril's oven-sized satellite launched on a SpaceX rideshare mission in July with demonstration payloads: an edge-compute processor, a flexible power-management system and a long-wave infrared sensor able to detect other objects in orbit. The satellite, Anduril-216, flies about 590 km (366 miles) up and spends about a third of each orbit in darkness.",
+        "The pitch is that existing optical tracking has a gap in Earth's shadow, so monitors could lose a spacecraft that maneuvers during orbital night. Anduril's Gokul Subramanian said the sensor has a huge dynamic range and very low solar exclusion, so it is blocked by the Sun rarely and can see 'in full dark'.",
+        "The Space Force tracks satellites to know whether an adversary moves one in a threatening manner and to send collision alerts to operators worldwide. Anduril, which acquired the commercial tracker ExoAnalytic Solutions earlier this year, funded the demo with its own money.",
+        "These are the company's claims after a tech demo; the article I read does not give independent measurements or say how the sensor would be used operationally. Watch for Space Force contracts and any follow-on constellation."
+      ],
+      "category": "Space",
+      "tags": [
+        "satellites",
+        "space force",
+        "anduril",
+        "orbit",
+        "surveillance",
+        "infrared",
+        "military"
+      ],
+      "date": "2026-11-11",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/space/2026/11/anduril-demos-night-vision-sensor-for-tracking-satellites-in-darkness/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-to-dock-with-starship-orion-must-fly-backward",
+      "headline": "To dock with Starship, Orion must fly backward to the Moon, forcing changes to its propellant tanks",
+      "summary": "NASA's revised lunar plans have Orion docking with Starship in high-Earth orbit and flying to the Moon service-module first. Lockheed says the Europe-built service module's tanks need modifications.",
+      "impacts": [
+        "Late redesigns can add risk and cost to a crewed Moon mission.",
+        "Orion is being flown in a posture it wasn't designed for.",
+        "Landing plans now depend on a Starship that must first be fueled in orbit."
+      ],
+      "details": [
+        "Ars Technica reports NASA has changed its lunar plans to give lander providers SpaceX (Starship) and Blue Origin (Blue Moon) more flexibility. For Starship, that means docking with Orion in Earth orbit and traveling to the Moon in tandem. For Blue Moon, the rendezvous with Orion moves to low-lunar orbit.",
+        "Those changes put more burden on Orion, built by Lockheed Martin. Under the evolved Starship plan, SpaceX fuels the lunar lander in low-Earth orbit before docking with Orion in high-Earth orbit; the crew then flies to the Moon in Orion, and two of the four astronauts transfer to Starship to land.",
+        "Because of the docking configuration, Orion must now fly backward, with its Service Module at the top of the stack. Kirk Shireman, Lockheed's Orion program manager, said this is a fundamentally different flying posture. The Service Module, provided by the European Space Agency, will need modifications to its propellant tanks, because liquid would move toward the gas inlet side when pushed the other way. 'Bad things can happen to you,' Shireman said.",
+        "The article describes an engineering problem being worked, not a failure, and I read no schedule impact or cost estimate. Watch for the ESA modifications, testing results and any slip in crewed-landing dates."
+      ],
+      "category": "Space",
+      "tags": [
+        "nasa",
+        "orion",
+        "artemis",
+        "starship",
+        "moon",
+        "lockheed martin",
+        "spaceflight"
+      ],
+      "date": "2026-11-19",
+      "unease": 2,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/space/2026/11/to-make-moon-landings-easier-nasa-is-making-life-harder-for-orion/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-paho-resistance-to-last-resort-antibiotics-is-rising",
+      "headline": "PAHO: resistance to last-resort antibiotics is rising, with 77% of Acinetobacter resistant in seven countries",
+      "summary": "Surveillance data show carbapenem resistance in Klebsiella pneumoniae rose from 15% in 2015 to 26% in 2024 across Latin America and the Caribbean. Acinetobacter baumannii reached 77% in seven reporting countries.",
+      "impacts": [
+        "Hospital infections are getting harder to treat, with fewer options left.",
+        "Klebsiella and Acinetobacter cause severe infections in hospitalized patients.",
+        "The data came out during World Antimicrobial Awareness Week, with calls for new antibiotics and better surveillance."
+      ],
+      "details": [
+        "CIDRAP reports new surveillance data from the Pan American Health Organization show rising resistance to last-resort antibiotics in Latin America and the Caribbean. According to the ReLAVRA+ network, resistance to carbapenem antibiotics in Klebsiella pneumoniae rose from 15% in 2015 to 26% in 2024, and in E. coli from 3% to 5%.",
+        "Both bacteria cause severe invasive infections in hospital patients and, as carbapenem resistance rises, have limited treatment options. In Acinetobacter baumannii, another priority pathogen, resistance to carbapenems reached 77% in the seven countries reporting data.",
+        "PAHO's Pilar Ramón Pardo said these data mean hospital-acquired infections are becoming increasingly difficult to treat. She called for stronger surveillance, infection prevention and access to new, effective antibiotics, used appropriately. The data were released during World Antimicrobial Awareness Week (Nov. 18-24), and PAHO member states signed a new action plan in September that adds surveillance in animal and environmental health.",
+        "Caveat: the 77% figure covers only seven countries, so it may not represent the whole region, and the article does not break out deaths. Watch for country-level data and the action plan's implementation."
+      ],
+      "category": "Health",
+      "tags": [
+        "antibiotic resistance",
+        "paho",
+        "carbapenem",
+        "superbugs",
+        "hospital infections",
+        "klebsiella",
+        "public health"
+      ],
+      "date": "2026-11-18",
+      "unease": 3,
+      "sources": [
+        {
+          "name": "CIDRAP",
+          "url": "https://www.cidrap.umn.edu/antimicrobial-stewardship/paho-reports-rising-resistance-last-resort-antibiotics-latin-america"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-covid-lockdowns-gave-scientists-a-natural-experiment-less",
+      "headline": "COVID lockdowns gave scientists a natural experiment: less human activity meant less fire",
+      "summary": "A Chinese Academy of Sciences team compared 2020 lockdown fire activity with other years in Cell Reports Sustainability. Data suggest lower human activity had the net effect of lowering average fire activity.",
+      "impacts": [
+        "It adds evidence that human behavior, not only weather, shapes how much land burns.",
+        "Humans both start and put out fires, which makes their net effect hard to measure.",
+        "Intentional burns are hard to tell apart from other fires on satellites."
+      ],
+      "details": [
+        "Ars Technica reports on a study led by Jianghao Wang, a professor at the Chinese Academy of Sciences, published in Cell Reports Sustainability. It compared the COVID-19 era with other years to estimate human impact on fire. Data from the 2020 lockdowns suggest the lower human activity had the net effect of lowering average fire activity.",
+        "The difficulty is that fire regimes depend on weather, vegetation moisture and wind, and human activity often combines with them. Humans start fires, even accidentally during recreation, but also put them out and clear fuel. Prescribed burns are hard to distinguish from other fires in satellite monitoring.",
+        "Wang said human activity and climate normally vary together, but early-2020 lockdowns produced an abrupt, large-scale drop in human mobility whose timing differed across countries while weather did not change in the same way. The team defined restricted mobility using regional lockdown orders and phone location data, and tracked fires with NASA and NOAA's Suomi NPP satellite.",
+        "The article excerpt I read does not give the size of the effect or how it varied by region, and it covers a short, unusual period. Watch for follow-up work on how this could inform fire management."
+      ],
+      "category": "Climate",
+      "tags": [
+        "wildfire",
+        "covid",
+        "lockdown",
+        "satellite",
+        "climate",
+        "human activity",
+        "fire"
+      ],
+      "date": "2026-11-15",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/science/2026/11/how-the-worlds-fires-changed-while-humanity-hit-pause/"
+        }
+      ]
+    },
+    {
+      "id": "2026-11-20-webb-finds-glassy-water-ice-around-the-young",
+      "headline": "Webb finds glassy water ice around the young star Beta Pictoris, after earlier searches missed it",
+      "summary": "Using the James Webb Space Telescope, astronomers found water ice in the star's debris disk, mixed with carbon dioxide in proportions like Solar System comets. Earlier searches had failed.",
+      "impacts": [
+        "It suggests the ingredients for water-rich worlds may be common around young stars.",
+        "It shows how hard ice is to detect, since UV light can destroy pure ice grains.",
+        "It is a science result about distant planet formation, not a risk to Earth."
+      ],
+      "details": [
+        "Ars Technica reports that Webb found water ice in the debris disk around Beta Pictoris. The ice is glassy rather than crystalline and mixed with carbon dioxide in roughly the proportions seen in comets of our own Solar System, suggesting ingredients for water-rich worlds might be common around young stars.",
+        "Beta Pictoris is one of the best-studied stars; its disk was among the first imaged, in 1984, and we see it almost edge-on. It is a debris disk, where dust is constantly replenished by collisions among comets and planetesimals.",
+        "There were strong reasons to expect ice. The disk holds a large reservoir of carbon monoxide gas that starlight should destroy within 50 to 300 years, so something must replenish it, most likely collisions of volatile-rich comets. Yet attempts to detect water vapor found nothing, and a search for ice's telltale dip at 3 micrometers also failed. Models say UV light can destroy small grains of pure ice faster than collisions create them, while grains of 'dirty ice' mixed with other molecules survive longer.",
+        "The team led by Betti observed the star on December 7, 2023, with Webb's NIRSpec instrument in a mode that records a full spectrum from 0.6 to 5.2 micrometers at each point in the image. The excerpt I read does not give the amount of ice or its age. Watch for follow-up observations of other debris disks."
+      ],
+      "category": "Space",
+      "tags": [
+        "webb",
+        "ice",
+        "beta pictoris",
+        "astronomy",
+        "planets",
+        "comets",
+        "telescope"
+      ],
+      "date": "2026-11-14",
+      "unease": 1,
+      "sources": [
+        {
+          "name": "Ars Technica",
+          "url": "https://arstechnica.com/science/2026/11/james-webb-telescope-finds-ice-older-than-the-star-it-orbits/"
+        }
+      ]
+    }
+  ]
+}
