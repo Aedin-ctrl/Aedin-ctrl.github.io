@@ -65,6 +65,22 @@
         min-height:200px;font-family:'VT323',monospace;font-size:18px;color:#5d5670;text-align:center;padding:16px;}
 
 
+  /* ---- section tabs: one library page per house style ----
+     /vid is Cathode Desk, /vid/mini is the second style. The tabs are the only
+     thing the two pages share. The current one is drawn pressed in, the other
+     raised, the same way the player's buttons are, so which page you are on is
+     readable without colour alone. */
+  .secnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+  .secnav a,.secnav span{font-family:'Press Start 2P',monospace;font-size:10px;line-height:1;
+     padding:10px 13px;background:var(--face);color:#000;text-decoration:none;
+     box-shadow:inset 1px 1px 0 var(--hi),inset -1px -1px 0 var(--dk),
+                inset 2px 2px 0 #dfdfdf,inset -2px -2px 0 var(--sh);}
+  .secnav span{background:var(--navy);color:var(--cyan);
+     box-shadow:inset 1px 1px 0 var(--dk),inset -1px -1px 0 var(--hi),
+                inset 2px 2px 0 var(--sh),inset -2px -2px 0 #dfdfdf;}
+  .secnav a:hover,.secnav a:focus-visible{color:var(--navy);}
+
+
   /* ---- a series: three pieces that answer one question between them ----
      The strip is navigation, not a gate. Every part is a complete video, so
      the current one is marked and the others are links -- nothing here tells

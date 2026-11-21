@@ -1,4 +1,4 @@
-# CATHODE DESK — house style v4.23
+# CATHODE DESK — house style v4.24
 
 **Locked 2026-11-17. This file is the authority. If a build disagrees with this file, the build is wrong.**
 
@@ -985,6 +985,30 @@ spreads backwards while every dot still runs forwards"*, the caption is
 `SCRIPT.md` in the build dir, written **after the gate and before `script.json`**,
 and it is the thing to read when the storyboard looks thin. The voice is built
 from `script.json`; `SCRIPT.md` is what proves `script.json` was worth building.
+
+## checkOverlap cannot see text sitting on a bar
+
+`checkOverlap()` compares text against text, and text against whatever is in
+`GBOX`. **Anything you draw and do not register is invisible to it.** Bars,
+discs, strips, scales and chains are usually not registered, so a label drawn
+on top of one passes all fifteen sweeps and looks wrong the moment you open a
+frame. #051 printed `ENZYME` across its own enzyme bar with every sweep at 0,
+twice: first under the bar, where it sat almost equidistant between its own bar
+and the next one down and so read as labelling the wrong one, then on the bar
+itself. A label belongs ABOVE its bar with real clearance (19px at size 14),
+and the groups want more space between them than within them.
+
+Two consequences worth holding on to:
+
+- **A GBOX key ending in `box` is exempt** -- `b.k.slice(-3)==='box'` -- because
+  an outline is a container and text inside it is the point. So name a frame
+  you draw with `boxPix` `...box` and name a filled surface anything else. Get
+  that backwards and you either drown in false positives or lose the check.
+- **Fifteen sweeps at 0 is not "it looks right".** It means nothing it can
+  measure is wrong. Pull a contact sheet and LOOK at the piece before shipping
+  it; every defect in #051 that mattered to a viewer -- an apple that read as
+  two white blobs, a colour scale laid across a socket label, a bar label on
+  its bar -- was found by looking, with all fifteen green.
 
 ## The picture must MOVE, not just BE — and the sweep that proves it
 
