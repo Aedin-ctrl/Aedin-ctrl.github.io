@@ -1,0 +1,986 @@
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Why a train wheel stays on the rail — mini</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f3f1ed; --panel:#fff; --fg:#1b1a19; --muted:#6f6b65;
+    --line:#ddd8d1; --accent:#b4502c; --accent-soft:#f1ddd4;
+    --display:'Space Grotesk',system-ui,sans-serif;
+    --body:'Inter',system-ui,-apple-system,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17161a; --panel:#201f24; --fg:#ece9e4; --muted:#9a948c;
+      --line:#302e35; --accent:#e07a50; --accent-soft:#3a2721; color-scheme:dark; }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17161a; --panel:#201f24; --fg:#ece9e4; --muted:#9a948c;
+    --line:#302e35; --accent:#e07a50; --accent-soft:#3a2721; color-scheme:dark; }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.55;margin:0}
+  .wrap{max-width:860px;margin:0 auto;
+        padding-left:max(16px,env(safe-area-inset-left,0px));
+        padding-right:max(16px,env(safe-area-inset-right,0px));
+        padding-block:26px 54px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(21px,4vw,28px);margin:0 0 5px;
+     letter-spacing:-.01em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 20px;max-width:60ch}
+  .frame{position:relative;width:min(100%,360px);aspect-ratio:9/16;margin:0 auto;
+         border-radius:12px;overflow:hidden;background:#cfc8bd;
+         box-shadow:0 10px 40px rgba(0,0,0,.22)}
+  .frame canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .bar{display:flex;gap:9px;align-items:center;justify-content:center;margin-top:14px;flex-wrap:wrap}
+  .bar button{font-family:var(--body);font-weight:500;font-size:13px;cursor:pointer;
+    padding:8px 15px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--fg)}
+  .bar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  #scrub{width:min(100%,320px);accent-color:var(--accent)}
+  .t{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:74px;text-align:center}
+  .beats{display:grid;gap:7px;margin:20px 0 0}
+  .beat{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:start;
+        padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel);
+        font-size:13.5px;transition:border-color .15s}
+  .beat.on{border-color:var(--accent);background:var(--accent-soft)}
+  .beat b{font-family:var(--display);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .beat.on b{color:var(--accent)}
+  .beat span{min-width:0}
+  .beat em{display:block;font-style:normal;color:var(--muted);font-size:12px;margin-top:2px}
+  .note{margin-top:22px;font-size:13px;color:var(--muted);border-left:2px solid var(--line);
+        padding-left:13px;max-width:60ch}
+  .note b{color:var(--fg);font-weight:600}
+  .note+.note{margin-top:12px}
+  a{color:var(--accent)}
+  @media (prefers-reduced-motion: reduce){.beat{transition:none}}
+</style>
+
+<div class="wrap">
+  <p style="margin:0 0 10px"><a href="../">&larr; MINI</a></p>
+  <h1>Why a train wheel stays on the rail</h1>
+  <p class="sub">Episode #047 rebuilt in the mini style. Every claim the narration makes has
+  a thing in the scene that proves it &mdash; a bar whose length is the quantity, a ghost of
+  where it started, an arrow that moves with the part. The words describe the picture; they
+  are never the only place the point exists.</p>
+
+  <div class="frame">
+    <canvas id="gl"></canvas>
+    <canvas id="ov"></canvas>
+  </div>
+  <audio id="vo" src="narration.mp3" preload="auto"></audio>
+
+  <div class="bar">
+    <button id="play" type="button">Pause</button>
+    <input id="scrub" type="range" min="0" max="1000" value="0" aria-label="Scrub">
+    <span class="t" id="time">0.0 / 24.0s</span>
+  </div>
+
+  <div class="beats" id="beats"></div>
+
+  <p class="note"><b>Nothing here is asserted.</b> Every number is built on screen: the
+  cone is two bars from one line with the difference in green; the shift is a gap against
+  a ghost; the two radii are measured up from the rail, the one line both wheels genuinely
+  touch, and then stood side by side; and the final distance is one turn of band wrapped
+  around each of those two circles and unrolled along the rail it runs on. If you cannot
+  see where a quantity came from, the beat is not finished. (The band sits 13&nbsp;mm proud
+  of the wheel, so each band is that much longer than its wheel's own circumference &mdash;
+  the <em>difference</em> between them, which is the thing being compared, is untouched.)</p>
+
+  <p class="note"><b>Declared exaggerations.</b> The cone is drawn about 12&times; real (a
+  real tread is coned 1 in 20) and the tread is widened to 200&nbsp;mm so the slope reads
+  without turning the wheel into a pulley. The sideways shift is 70&nbsp;mm; the real
+  flangeway is drawn at 30&nbsp;mm rather than 10, because the flangeway is the only thing
+  that limits the shift at all. <b>The flanges still retract on beat 3</b> &mdash; at
+  90&nbsp;mm even the widened flange would be inside the rail head, so the piece takes them
+  off and says so rather than quietly letting two solids share the same space. The spoken numbers
+  are the true ones.</p>
+
+  <p class="note"><b>Still missing:</b> narration, depth of field, and the MP4 path.</p>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+/* ===== THE STYLE: level 4+, pushed matte. No facets, no jitter, nothing glossy. ===== */
+const STYLE={ roughness:0.88, metalness:0, bevel:0.035, seg:96, flat:false };
+const PAL={ ballast:'#b9ae9c', sleeper:'#7d6552', rail:'#8d9299', railTop:'#b9bec4',
+            wheel:'#4a6b7c', axle:'#5d6a72', sky:'#cfc8bd',
+            /* annotation ink. Three colours only: one to point, one for "before",
+               one for the payoff. More than three and the diagram stops reading. */
+            ink:'#b4502c', was:'#38505e', gain:'#2f7d57' };
+
+/* ===== THE ADJUSTABLE TRUTHS =====
+   Every quantity the narration makes a claim about lives here, and ONLY here, so a
+   sweep can set it to the value that makes the claim false and diff the two frames.
+   If turning the claim off does not change the picture, the picture was not showing it. */
+/* The ceiling on the shift is not taste. Tilting the axle slides the contact point
+   along the tread by about r*sin(theta) ON TOP of the shift itself, so the usable
+   lateral travel is roughly TREAD/2 divided by (1 + r*s/WHEEL_CX). Push past it and the
+   rail runs off the end of the tread, which is a wheel derailing in slow motion. */
+const P={ taper:0.050, shiftMax:0.068, lock:1 };
+
+/* ===== TIMELINE — generated by emit_timeline.py from the rendered audio.
+   Do not hand-edit. Beat boundaries are the scene cues (0.40 s before the
+   first word); `sent` is every spoken sentence's measured start and end. ===== */
+const TL={dur:64.0, vo:'6179f87baa97', beats:[
+  {id:'AXLE',t:0.0,end:9.5,sent:[[0.55, 2.231], [2.681, 8.9]]},
+  {id:'CONE',t:9.5,end:19.8,sent:[[9.9, 12.438], [12.888, 19.199]]},
+  {id:'SHIFT',t:19.8,end:26.64,sent:[[20.199, 22.117], [22.567, 26.036]]},
+  {id:'RADII',t:26.64,end:35.13,sent:[[27.036, 29.106], [29.556, 34.528]]},
+  {id:'WRAPS',t:35.13,end:43.02,sent:[[35.528, 37.352], [37.802, 42.419]]},
+  {id:'WRAPB',t:43.02,end:48.54,sent:[[43.419, 44.454], [44.904, 47.935]]},
+  {id:'UNROLL',t:48.54,end:64.0,sent:[[48.935, 51.708], [52.158, 57.678], [58.128, 62.42]]},
+]};
+/* ===== END TIMELINE ===== */
+const DUR=TL.dur, OMEGA=1.15;
+const BT  = id => TL.beats.find(b=>b.id===id);              // a beat, by name
+const SEN = (id,i) => BT(id).sent[i];                       // [start, end] of one sentence
+const T_WRAP = BT('WRAPS').t;
+const BEATS=[
+  { id:'AXLE',  subject:'axle', lead:'Two wheels, one axle.',
+    body:'Pressed on \u2014 they cannot turn at different speeds. Watch the two markers.',
+    shows:['n_spokeL','n_spokeR'], reacts:['n_spokeL','n_spokeR'],
+    claim:{ param:'lock', alt:0, min:0.9, says:'the wheels cannot turn at different speeds' } },
+
+  { id:'CONE',  subject:'treadL', lead:'The tread is coned.',
+    body:'Two bars from one line. The green piece is how much longer the inside one is.',
+    shows:['n_radIn','n_radOut','n_extra'], reacts:['n_radIn','n_extra'],
+    claim:{ param:'taper', alt:0, min:1.2, says:'the tread is not a cylinder' } },
+
+  { id:'SHIFT', subject:'treadL', lead:'Now push it sideways.',
+    body:'The ghost is where it started. The gap between them is the shift.',
+    shows:['n_push','n_gap','n_ghostL'], reacts:['n_push','n_gap'],
+    ghosted:['flangeL','flangeR'],
+    claim:{ param:'shiftMax', alt:0, min:1.2, says:'the wheelset moved' } },
+
+  { id:'RADII', subject:'n_contactR', lead:'The two wheels are different sizes.',
+    body:'Measured up from the rail \u2014 the one line both of them touch \u2014 then stood side by side.',
+    shows:['n_contactL','n_contactR','n_extra2'], reacts:['n_contactR','n_extra2'], settle:1.4,
+    claim:{ param:'shiftMax', alt:0, min:0.5, says:'the two radii are different' } },
+
+  { id:'WRAPS', subject:'n_tapeL', lead:'Wrap one turn around the small one.',
+    body:'The band is the circle this wheel runs on \u2014 taken at the rail, where it touches.',
+    shows:['n_tapeL'], reacts:['n_tapeL'], settle:1.3,
+    claim:{ param:'taper', alt:0, min:0.4, says:'this is the circle a coned wheel runs on' } },
+
+  { id:'WRAPB', subject:'n_tapeR', lead:'And one around the big one.',
+    body:'Same band, same rule, other side of the axle.',
+    shows:['n_tapeR'], reacts:['n_tapeR'], settle:1.5,
+    claim:{ param:'taper', alt:0, min:0.4, says:'this circle is a different size' } },
+
+  { id:'UNROLL',subject:'n_tapeR', lead:'Lay them out, same speed.',
+    body:'The small one runs out. The green is everything the big one was still laying.',
+    hero:'9 mm / turn',
+    shows:['n_tapeL','n_tapeR','n_diff','n_xfer3'], reacts:['n_tapeR','n_diff'], settle:1.8,
+    claim:{ param:'taper', alt:0, min:0.8, says:'one turn of each covers a different distance' } },
+];
+/* Nothing above carries a time. Each beat takes its start and end, the moment its
+   second sentence begins, and the moment its number is spoken, from the audio. */
+for(const b of BEATS){
+  const m=BT(b.id);
+  b.t=m.t; b.end=m.end; b.sent=m.sent;
+  b.bodyAt = m.sent[1] ? m.sent[1][0]-0.25 : m.t;
+  if(b.hero) b.heroAt = (m.sent[2]||m.sent[m.sent.length-1])[0]-0.2;
+}
+
+/* ===== THE WINDOWS =====
+   Every animation window is anchored to a spoken sentence, because the one thing a
+   viewer notices is a diagram that finishes before the sentence describing it, or
+   starts after. These are the only times in the file, and none of them is a guess. */
+const WIN={};   // not W: that is the overlay canvas width
+const win=(k,a,z)=>{ WIN[k]=[+a.toFixed(3), +z.toFixed(3)]; };
+const sw =(t,k)=>seg(t,WIN[k][0],WIN[k][1]);
+function buildWindows(){
+  const A=id=>BT(id).t, Z=id=>BT(id).end, s0=(id,i)=>SEN(id,i)[0], s1=(id,i)=>SEN(id,i)[1];
+  win('camA',  A('AXLE')+1.2, s0('AXLE',1)+1.6);
+  win('camB',  A('CONE')+0.1, s1('CONE',0));
+  win('bars',  s0('CONE',1),  s0('CONE',1)+1.1);          // the two radius bars draw down
+  win('extra', s0('CONE',1)+1.4, s0('CONE',1)+3.0);       // then the green difference
+  win('camC',  A('SHIFT')+0.1, s0('SHIFT',0)+0.6);
+  win('flange',s0('SHIFT',0)+0.7, s0('SHIFT',0)+1.2);     // off before the shift starts
+  win('shift', s0('SHIFT',0)+1.3, s0('SHIFT',1));
+  win('camD',  A('RADII')+0.1, A('RADII')+1.2);
+  win('rads',  s0('RADII',0)+0.3, s1('RADII',0));         // measured while it is said
+  win('camD2', s0('RADII',1)+0.4, s0('RADII',1)+2.1);
+  win('cmp',   s0('RADII',1)+0.5, s0('RADII',1)+2.2);     // walk in together
+  win('extra2',s0('RADII',1)+2.6, s0('RADII',1)+3.9);
+  win('camE',  A('WRAPS')-0.2, A('WRAPS')+1.2);
+  win('camEd', A('WRAPS')+1.2, Z('WRAPS'));   // and keep creeping: a frozen hold is dead
+  win('wrapL', s0('WRAPS',0)+0.2, s1('WRAPS',0)+0.7);
+  win('camE2', A('WRAPB')-0.5, A('WRAPB')+1.1);
+  win('camE2d',A('WRAPB')+1.1, Z('WRAPB'));
+  win('wrapR', s0('WRAPB',0)+0.1, s1('WRAPB',0)+1.1);
+  win('camF',  A('UNROLL')-0.3, A('UNROLL')+1.5);
+  win('lay',   s0('UNROLL',1)-0.4, s1('UNROLL',1)-0.3);   // runs under its own sentence
+  win('camF2', A('UNROLL')+1.5, DUR);
+}
+
+/* ---------- rounded box (house implementation, compacted) ---------- */
+function roundedBox(w,h,d,r,seg){
+  r=Math.max(1e-4,Math.min(r,w/2,h/2,d/2));
+  const N=2*seg+1,g=new THREE.BoxGeometry(2,2,2,N,N,N),p=g.attributes.position,nr=g.attributes.normal;
+  const half=[w/2-r,h/2-r,d/2-r],v=new THREE.Vector3();
+  for(let i=0;i<p.count;i++){
+    const c=[p.getX(i),p.getY(i),p.getZ(i)],inner=[0,0,0],a=[0,0,0];
+    for(let k=0;k<3;k++){
+      const idx=Math.round((c[k]+1)*N/2),side=idx<=seg?-1:1;
+      a[k]=idx<=seg?-(1-idx/seg):(idx-seg-1)/seg; inner[k]=side*half[k];
+    }
+    v.set(Math.tan(a[0]*Math.PI/4),Math.tan(a[1]*Math.PI/4),Math.tan(a[2]*Math.PI/4)).normalize();
+    p.setXYZ(i,inner[0]+v.x*r,inner[1]+v.y*r,inner[2]+v.z*r); nr.setXYZ(i,v.x,v.y,v.z);
+  }
+  g.computeBoundingSphere(); return g;
+}
+const matte=(colour)=>new THREE.MeshStandardMaterial({
+  color:new THREE.Color(colour), roughness:STYLE.roughness, metalness:STYLE.metalness, flatShading:false });
+/* Annotation material. Still matte -- an arrow is part of the miniature, not a HUD -- but
+   lifted off the lighting a little so a pointer never disappears into a shadow. */
+const ink=(colour,opacity=1)=>new THREE.MeshStandardMaterial({
+  color:new THREE.Color(colour), roughness:0.95, metalness:0,
+  emissive:new THREE.Color(colour), emissiveIntensity:0.30,
+  transparent:opacity<1, opacity, depthWrite:opacity>=1 });
+
+/* ---------- renderer ---------- */
+const glc=document.getElementById('gl'), ovc=document.getElementById('ov');
+const renderer=new THREE.WebGLRenderer({canvas:glc,antialias:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.08;
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(PAL.sky);
+scene.fog=new THREE.Fog(PAL.sky,9,26);
+const camera=new THREE.PerspectiveCamera(40,9/16,0.05,80);
+
+const sun=new THREE.DirectionalLight('#fff2de',3.0);
+sun.position.set(-3.2,5.2,2.6); sun.castShadow=true;
+sun.shadow.mapSize.setScalar(4096);
+Object.assign(sun.shadow.camera,{left:-3.4,right:3.4,top:3.4,bottom:-3.4,near:0.5,far:22});
+sun.shadow.bias=-0.00035; sun.shadow.normalBias=0.055;   // > one texel of the tighter box
+scene.add(sun,sun.target);
+scene.add(new THREE.HemisphereLight('#c3dcff','#6d5d49',1.2));
+const fill=new THREE.DirectionalLight('#d6e6ff',0.78); fill.position.set(4.2,2.3,2.4); scene.add(fill);
+
+/* ---------- the track ---------- */
+/* The flangeway is drawn at 30 mm, not the real 10. The lateral shift the episode is
+   about cannot exceed RAIL_CX - WHEEL_CX + TREAD/2, which works out as FLANGEWAY +
+   HEAD_W/2 -- widening the tread does not help, because the wheel centre moves with it.
+   The flangeway is the only lever, so it is the one that gets exaggerated, and said. */
+const GAUGE=1.435, RAILZ=16, HEAD_W=0.15, FLANGEWAY=0.025;
+const R=0.46, TREAD=0.200;                    // tread widened from 135mm: declared on the page
+const RAIL_CX  = GAUGE/2 + HEAD_W/2;
+const WHEEL_CX = GAUGE/2 - FLANGEWAY + TREAD/2;
+const D_OFF    = WHEEL_CX - RAIL_CX;          // where the rail sits across the tread, nominal
+const BALLAST_H=0.34, SLEEPER_H=0.14, WEB_H=0.09, HEAD_H=0.15;  // taller head: it is crowned
+const SLEEPER_TOP = SLEEPER_H;
+const WEB_TOP     = SLEEPER_TOP + WEB_H - 0.005;
+const RAIL_TOP    = WEB_TOP + HEAD_H - 0.005;
+const track=new THREE.Group(); scene.add(track);
+
+const ballast=new THREE.Mesh(roundedBox(4.6,BALLAST_H,RAILZ,0.06,2),matte(PAL.ballast));
+ballast.name='ballast'; ballast.position.y=-BALLAST_H/2; ballast.receiveShadow=true;
+ballast.castShadow=false; track.add(ballast);
+
+for(let i=0;i<26;i++){
+  const s=new THREE.Mesh(roundedBox(2.5,SLEEPER_H,0.26,0.035,2),matte(PAL.sleeper));
+  s.name='sleeper'+i; s.position.set(0,SLEEPER_H/2-0.018,-RAILZ/2+0.3+i*0.62);
+  s.castShadow=Math.abs(s.position.z)<2.4; s.receiveShadow=true; track.add(s);  // sweep 7 sets this
+}
+for(const side of [-1,1]){
+  const web=new THREE.Mesh(roundedBox(0.09,WEB_H,RAILZ,0.022,2),matte(PAL.rail));
+  web.name='railweb'+(side>0?'R':'L');
+  web.position.set(side*RAIL_CX,WEB_TOP-WEB_H/2,0); web.castShadow=false; web.receiveShadow=true; track.add(web);
+  const head=new THREE.Mesh(roundedBox(HEAD_W,HEAD_H,RAILZ,HEAD_W/2,10),matte(PAL.railTop));
+  head.name='railhead'+(side>0?'R':'L');
+  head.position.set(side*RAIL_CX,RAIL_TOP-HEAD_H/2,0); head.castShadow=false; head.receiveShadow=true; track.add(head);
+}
+
+/* ---------- the wheelset ----------
+   The wheelset group origin is the AXLE CENTRE, not the rail plane. That matters: when
+   one wheel runs on a bigger radius the axle tilts, and a tilt has to pivot about the
+   axle or the wheels swing sideways out of the rails. */
+const wheelset=new THREE.Group(); scene.add(wheelset);
+
+const axle=new THREE.Mesh(new THREE.CylinderGeometry(0.075,0.075,2*WHEEL_CX-TREAD,STYLE.seg),matte(PAL.axle));
+axle.name='axle'; axle.rotation.z=Math.PI/2; axle.castShadow=true; wheelset.add(axle);
+
+const wheels={}, flanges={};
+for(const side of [-1,1]){
+  const tag=side>0?'R':'L', w=new THREE.Group(); w.name='wheel'+tag;
+  const tread=new THREE.Mesh(treadGeom(side),matte(PAL.wheel));
+  tread.name='tread'+tag;
+  tread.rotation.z=Math.PI/2; tread.castShadow=true; tread.receiveShadow=true; w.add(tread);
+  const fl=new THREE.Mesh(new THREE.CylinderGeometry(R+0.055,R+0.055,0.032,STYLE.seg),matte(PAL.wheel));
+  fl.name='flange'+tag;
+  fl.rotation.z=Math.PI/2; fl.position.x=-side*(TREAD/2+0.016); fl.castShadow=true; w.add(fl);
+  // the marker whose job is to prove the two wheels turn together
+  // The marker sits on the -X face of BOTH wheels, because the camera watches this
+  // beat from -X: a marker on the far face proves nothing to the viewer.
+  const sp=new THREE.Mesh(roundedBox(0.130,R*1.45,0.058,0.040,2),ink(PAL.ink));
+  sp.name='n_spoke'+tag;
+  sp.position.set(-(TREAD/2+0.030),R*0.28,0); sp.castShadow=false; w.add(sp);
+  w.position.set(side*WHEEL_CX,0,0);
+  wheelset.add(w); wheels[tag]=w; flanges[tag]=fl;
+}
+function treadGeom(side){
+  // frustum: bigger radius INBOARD. rotation.z=PI/2 sends the cylinder's top to -X,
+  // so which end carries the bigger radius depends on the side. Getting this backwards
+  // on one wheel is invisible in a still and inverts the whole explainer.
+  return new THREE.CylinderGeometry(
+    side>0?R+P.taper:R-P.taper, side>0?R-P.taper:R+P.taper, TREAD, STYLE.seg);
+}
+function rebuildTreads(){
+  for(const side of [-1,1]){ const tag=side>0?'R':'L';
+    const m=wheels[tag].getObjectByName('tread'+tag);
+    m.geometry.dispose(); m.geometry=treadGeom(side); }
+}
+
+/* ===== THE SHOW KIT =====
+   The only annotation primitives this style has. A piece may not invent a new kind of
+   pointer without adding it here, because the sweeps only know how to find these.
+   Every one is named n_* so the geometry sweeps can tell an annotation from a part:
+   an arrow is SUPPOSED to touch the thing it points at. */
+const notes=new THREE.Group(); notes.name='notes'; scene.add(notes);
+
+function mkVec(name,colour,{thick=0.018,head=0.085,both=false,opacity=1,wit=0}={}){
+  const g=new THREE.Group(); g.name=name;
+  const m=ink(colour,opacity);
+  const sh=new THREE.Mesh(new THREE.CylinderGeometry(thick,thick,1,16),m);
+  sh.name=name+'_shaft'; sh.position.y=0.5; g.add(sh);
+  const heads=[];
+  for(let k=0;k<(head>0?(both?2:1):0);k++){
+    const hd=new THREE.Mesh(new THREE.ConeGeometry(thick*2.7,head,20),m);
+    hd.name=name+'_head'+k; g.add(hd); heads.push(hd);
+  }
+  const wits=[];
+  for(let k=0;k<(wit>0?2:0);k++){
+    // local +X. For a HORIZONTAL arrow the group's rotation maps local +X to world -Y,
+    // so these hang straight down toward the thing being measured. Horizontal only.
+    const wl=new THREE.Mesh(new THREE.CylinderGeometry(thick*0.5,thick*0.5,1,10),m);
+    wl.name=name+'_wit'+k; wl.rotation.z=-Math.PI/2; g.add(wl); wits.push(wl);
+  }
+  const up=new THREE.Vector3(0,1,0), A=new THREE.Vector3(), B=new THREE.Vector3(), Dv=new THREE.Vector3();
+  g.userData.set=(from,to)=>{
+    A.fromArray(from); B.fromArray(to); Dv.subVectors(B,A);
+    const L=Dv.length();
+    g.position.copy(A);
+    if(L<0.004){ // collapse, do NOT just hide: a hidden object that keeps its old
+      g.visible=false; sh.scale.y=0.001; sh.position.y=0;   // size reports stale bounds
+      for(const h of heads) h.position.y=0;
+      for(const w of wits){ w.scale.y=0.001; w.position.set(0,0,0); }
+      return; }
+    g.visible=true;
+    g.quaternion.setFromUnitVectors(up,Dv.normalize());
+    const hd=Math.min(head,L*0.30), k=head>0?hd/head:1;   // a head is a fraction of the
+    for(const h of heads) h.scale.setScalar(k);           // arrow, never a fixed lump
+    const body=Math.max(0.002,L-hd*(both?2:1));
+    sh.scale.y=body; sh.position.y=(both?hd:0)+body/2;
+    if(heads[0]){ heads[0].position.y=(both?hd:0)+body+hd/2; heads[0].rotation.x=0; }
+    if(heads[1]){ heads[1].position.y=hd/2; heads[1].rotation.x=Math.PI; }
+    if(wits[0]){ wits[0].scale.y=wit; wits[0].position.set(wit/2,0,0);
+                 wits[1].scale.y=wit; wits[1].position.set(wit/2,L,0); }
+  };
+  g.userData.set([0,0,0],[0,1,0]);
+  notes.add(g); return g;
+}
+/* A measuring tape. One turn of a wheel, wrapped around the circle it actually runs
+   on, that then PEELS OFF onto the rail. This exists because two strips of different
+   length lying on the ground is an assertion -- the viewer has no idea where either
+   number came from. Watching the band come off the wheel is the derivation. */
+const TAPE_LIFT=0.013;      // the band sits proud of the wheel; see the page note
+function mkTape(name,colour,width=0.090,N=160){
+  const g=new THREE.BufferGeometry();
+  const pos=new Float32Array((N+1)*2*3), idx=[];
+  for(let i=0;i<N;i++){ const a=i*2; idx.push(a,a+1,a+2, a+1,a+3,a+2); }
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3)); g.setIndex(idx);
+  const m=new THREE.Mesh(g, ink(colour)); m.material.side=THREE.DoubleSide;
+  m.name=name; m.castShadow=false; m.frustumCulled=false;  // it is rebuilt every frame
+  /* x  - the plane it lives in (the rail's centreline)
+     cy - the wheel centre height, r - the radius it wraps
+     z0 - where it touches down, U - how much arc has peeled off, q - how much exists yet */
+  m.userData.lay=(x,cy,r0,z0,U,q=1)=>{
+    // A band drawn AT the contact radius is INSIDE the tread and invisible from every
+    // angle but an outboard one. It sits proud, like a real band -- and then its length
+    // is the circle IT makes, which is why the page says so.
+    const LIFT=TAPE_LIFT, r=r0+LIFT, C=2*Math.PI*r;
+    for(let i=0;i<=N;i++){
+      const sN=C*q*i/N, s=sN+C*(1-q);       // the tape grows from its free end
+      let y,z;
+      if(s<=U){ z=z0-(U-s); y=RAIL_TOP+LIFT; }
+      else { const phi=(s-U)/r; z=z0+r*Math.sin(phi); y=cy+LIFT-r*Math.cos(phi); } // cy is the wheel centre
+      const o=i*6;
+      pos[o]=x-width/2; pos[o+1]=y; pos[o+2]=z;
+      pos[o+3]=x+width/2; pos[o+4]=y; pos[o+5]=z;
+    }
+    g.attributes.position.needsUpdate=true;
+    g.computeVertexNormals(); g.computeBoundingSphere();
+    return C;
+  };
+  notes.add(m); return m;
+}
+function mkStrip(name,colour,w,h,opacity=1){
+  const m=new THREE.Mesh(roundedBox(w,h,1,Math.min(w,h)*0.4,2),ink(colour,opacity));
+  m.name=name; m.castShadow=false; m.receiveShadow=false;
+  m.userData.span=(z0,len,y)=>{ m.visible=len>0.01;
+    m.scale.z=Math.max(0.01,len); m.position.set(m.position.x,y,z0-len/2); };
+  notes.add(m); return m;
+}
+function mkGhost(name,side){
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(
+    side>0?R+P.taper:R-P.taper, side>0?R-P.taper:R+P.taper, TREAD, STYLE.seg),
+    ink(PAL.was,0.34));
+  m.name=name; m.rotation.z=Math.PI/2; m.castShadow=false; m.renderOrder=2;
+  notes.add(m); return m;
+}
+
+const nSpoke={L:wheels.L.getObjectByName('n_spokeL'), R:wheels.R.getObjectByName('n_spokeR')};
+const nRadIn =mkVec('n_radIn',  PAL.ink, {thick:0.016,head:0});
+const nRadOut=mkVec('n_radOut', PAL.ink, {thick:0.016,head:0});
+/* The comparison marks. The green bar is ALWAYS the difference and nothing else, and
+   it is always offset in front of the bars it compares -- the first version ran a slope
+   arrow between the two bar ends, in the same plane, so it was inside them and invisible. */
+const nXfer  =mkVec('n_xfer',   PAL.was, {thick:0.010,head:0,opacity:0.8});
+const nExtra =mkVec('n_extra',  PAL.gain,{thick:0.030,head:0});
+const nFlat  =mkVec('n_flat',   PAL.was, {thick:0.010,head:0,opacity:0.75});
+const nConL  =mkVec('n_contactL',PAL.ink,{thick:0.020,head:0});
+const nConR  =mkVec('n_contactR',PAL.ink,{thick:0.020,head:0});
+const nXfer2 =mkVec('n_xfer2',  PAL.was, {thick:0.010,head:0,opacity:0.8});
+const nExtra2=mkVec('n_extra2', PAL.gain,{thick:0.030,head:0});
+const nGhostR=mkGhost('n_ghostR', 1);
+const nGhostL=mkGhost('n_ghostL',-1);
+const nPush  =mkVec('n_push',   PAL.ink, {thick:0.024,head:0.11});
+const nGap   =mkVec('n_gap',    PAL.ink, {thick:0.026,head:0.060,both:true,wit:0.15});
+/* The two strips sit INSIDE the rails, side by side. Outside them they fell at the
+   edges of a 9:16 frame, where two lengths cannot be compared at all. */
+const nTapeL=mkTape('n_tapeL',PAL.ink), nTapeR=mkTape('n_tapeR',PAL.ink);
+const nXfer3=mkVec('n_xfer3',PAL.was,{thick:0.034,head:0});
+const nDiff =mkStrip('n_diff', PAL.gain,0.115,0.030,1); nDiff.position.x=RAIL_CX;
+
+/* ---------- caption layer ---------- */
+const ctx=ovc.getContext('2d');
+const TYPE={ lead:0.088, body:0.052, hero:0.118 };   // of frame width; the sweep reads these
+let W=0,H=0,fontsReady=false;
+document.fonts.ready.then(()=>{fontsReady=true;});
+
+function wrap(text,maxW,font){
+  ctx.font=font;
+  const words=String(text).split(' '),lines=[];let cur='';
+  for(const w of words){
+    const test=cur?cur+' '+w:w;
+    if(ctx.measureText(test).width>maxW&&cur){lines.push(cur);cur=w;} else cur=test;
+  }
+  if(cur)lines.push(cur);
+  return lines;
+}
+const nextT=i=>i+1<BEATS.length?BEATS[i+1].t:DUR;
+
+function drawOverlay(t){
+  ctx.clearRect(0,0,W,H);
+  if(!fontsReady) return;
+  let b=BEATS[0],i=0;
+  BEATS.forEach((x,k)=>{ if(t>=x.t){b=x;i=k;} });
+  const since=t-b.t;
+  const inT=0.28, outT=0.18, hold=nextT(i)-b.t-outT-0.06;
+  const fade=Math.min(1,since/inT)*(1-Math.max(0,Math.min(1,(since-hold)/outT)));
+  if(fade<=0.01) return;
+
+  const pad=Math.round(W*0.075);
+  const leadPx=Math.round(W*TYPE.lead), bodyPx=Math.round(W*TYPE.body), heroPx=Math.round(W*TYPE.hero);
+  const maxW=W-pad*2;
+
+  const leadLines=wrap(b.lead,maxW,`600 ${leadPx}px 'Space Grotesk', sans-serif`);
+  const bodyLines=wrap(b.body,maxW,`400 ${bodyPx}px Inter, sans-serif`);
+  const blockH=leadLines.length*leadPx*1.18+bodyLines.length*bodyPx*1.42+Math.round(W*0.055);
+  const top=H-blockH-Math.round(H*0.055);
+
+  ctx.save(); ctx.globalAlpha=fade;
+  const gTop=top-Math.round(W*0.22);
+  const g=ctx.createLinearGradient(0,gTop,0,H);
+  g.addColorStop(0,'rgba(18,16,15,0)');    g.addColorStop(0.30,'rgba(18,16,15,0.58)');
+  g.addColorStop(0.55,'rgba(18,16,15,0.76)'); g.addColorStop(1,'rgba(18,16,15,0.86)');
+  ctx.fillStyle=g; ctx.fillRect(0,gTop,W,H-gTop);
+
+  let y=top+leadPx*0.92;
+  ctx.textAlign='left'; ctx.fillStyle='#ffffff';
+  ctx.font=`600 ${leadPx}px 'Space Grotesk', sans-serif`;
+  for(const l of leadLines){ ctx.fillText(l,pad,y); y+=leadPx*1.18; }
+  y+=Math.round(W*0.022);
+  // the second line arrives when it is SPOKEN, not when the beat starts
+  const bodyIn=Math.max(0,Math.min(1,(t-b.bodyAt)/0.32));
+  ctx.fillStyle=`rgba(255,255,255,${(0.80*bodyIn).toFixed(3)})`;
+  ctx.font=`400 ${bodyPx}px Inter, sans-serif`;
+  for(const l of bodyLines){ ctx.fillText(l,pad,y); y+=bodyPx*1.42; }
+
+  if(b.hero && t>=b.heroAt){
+    const k=Math.min(1,(t-b.heroAt)/0.5), e=1-Math.pow(1-k,3);
+    ctx.save();
+    ctx.globalAlpha=fade*e;
+    ctx.translate(W/2,H*0.175);
+    ctx.scale(0.86+0.14*e,0.86+0.14*e);
+    ctx.textAlign='center';
+    let hp=heroPx;
+    ctx.font=`700 ${hp}px 'Space Grotesk', sans-serif`;
+    const avail=W-pad*2;
+    while(ctx.measureText(b.hero).width>avail && hp>W*0.075){
+      hp-=2; ctx.font=`700 ${hp}px 'Space Grotesk', sans-serif`; }
+    const tw=ctx.measureText(b.hero).width, px=hp*0.42, py=hp*0.30;
+    const bw=tw+px*2, bh=hp*1.02+py, rr=bh*0.30;
+    ctx.beginPath();
+    ctx.moveTo(-bw/2+rr,-bh*0.72); ctx.arcTo(bw/2,-bh*0.72,bw/2,bh*0.40,rr);
+    ctx.arcTo(bw/2,bh*0.40,-bw/2,bh*0.40,rr); ctx.arcTo(-bw/2,bh*0.40,-bw/2,-bh*0.72,rr);
+    ctx.arcTo(-bw/2,-bh*0.72,bw/2,-bh*0.72,rr); ctx.closePath();
+    ctx.fillStyle='rgba(20,17,15,0.74)'; ctx.fill();
+    ctx.fillStyle='#ffc9a6'; ctx.fillText(b.hero,0,0);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+/* ---------- staging ---------- */
+const lerp=(a,b,t)=>a+(b-a)*t;
+const seg=(t,a,b)=>Math.max(0,Math.min(1,(t-a)/(b-a)));
+const easeIO=t=>t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+
+buildWindows();
+const shiftAt = t => easeIO(sw(t,'shift'))*P.shiftMax;
+/* radius at the rail for each wheel. s is the cone's slope: the radius change per metre
+   of lateral position. This one function is the entire physics of the episode. */
+const radii = sh => { const s=2*P.taper/TREAD;
+  return { L: R + s*(D_OFF - sh), R: R + s*(D_OFF + sh), s }; };
+
+/* Place the wheelset by the formula, then MEASURE and correct. The closed form is a
+   small-angle approximation, and at an exaggerated cone it is out by about 11 mm -- the
+   contact point slides along the tread as the axle tilts. Eleven millimetres of wheel
+   inside a rail is exactly the class of error this suite exists for. */
+const DOWN=new THREE.Vector3(0,-1,0), RC=new THREE.Raycaster(new THREE.Vector3(),DOWN,0,9);
+function hitsAt(m,x){
+  const sd=m.material.side; m.material.side=THREE.DoubleSide;
+  RC.set(new THREE.Vector3(x,5,0),DOWN);
+  const h=RC.intersectObject(m,false); m.material.side=sd;
+  // fewer than two hits means the ray clipped an edge rather than passing through the
+  // solid. Returning that as a surface is how a solver chases its own tail.
+  return h.length>=2 ? h : null;
+}
+const PROBE=[-0.055,-0.030,-0.012,0,0.012,0.030,0.055];
+/* The smallest gap anywhere across the rail head, not the gap at its centreline. A
+   crowned head moves the contact point off centre, so solving at the centreline leaves
+   the tread 9 mm inside the rail at the place it actually touches. */
+function clearance(tag,railX){
+  const tm=wheels[tag].getObjectByName('tread'+tag), hm=track.getObjectByName('railhead'+tag);
+  let min=Infinity;
+  for(const dx of PROBE){
+    const a=hitsAt(tm,railX+dx), b=hitsAt(hm,railX+dx);
+    if(!a||!b) continue;
+    min=Math.min(min, a[a.length-1].point.y - b[0].point.y);   // tread underside - head top
+  }
+  return min===Infinity?null:min;
+}
+function settleOnRail(){
+  for(let i=0;i<4;i++){
+    wheelset.updateMatrixWorld(true);
+    const eL=clearance('L',-RAIL_CX), eR=clearance('R',RAIL_CX);
+    if(eL===null||eR===null) return;                   // ran off the head; sweep 2 says so
+    wheelset.position.y  -= (eL+eR)/2;
+    wheelset.rotation.z  -= (eR-eL)/(2*WHEEL_CX);
+  }
+}
+
+/* The bands are laid out side by side at ONE COMMON RATE, in metres, so the short one
+   runs out first and the long one carries on alone. Unrolling both to "done" together
+   is the one thing that cannot show a difference: it makes the green a colour you are
+   asked to take on trust rather than something you watched happen.
+   Eased OUT, not in-out, because the tail is where the difference lives and an ease-out
+   spends most of the time there -- the short band stops at 57% of the window. */
+const easeOut = x => 1 - Math.pow(1-x, 2.4);
+const laidOut = t => easeOut(sw(t,'lay'));
+// the wheels are not what unrolls the bands -- two tapes laid out side by side are.
+const rollAt  = t => t < T_WRAP ? -t*OMEGA : -T_WRAP*OMEGA;
+
+function stage(t){
+  /* --- the wheelset: shift, ride height, tilt. All three follow from the cone. --- */
+  const sh=shiftAt(t), r=radii(sh), rMean=(r.L+r.R)/2;
+  wheelset.position.set(sh, RAIL_TOP+rMean, 0);
+  wheelset.rotation.z = (r.R-r.L)/(2*WHEEL_CX);   // pivots about the AXLE, not the rail
+  const roll=rollAt(t);
+  wheels.L.rotation.x=roll;
+  wheels.R.rotation.x=roll*(P.lock?1:-0.45);      // lock=0 is the control: let them slip
+  /* The flanges come off for the exaggerated shift: at 68 mm a flange would be inside
+     the rail head, and the piece says so rather than letting two solids share space.
+     They FADE; shrinking them radially swept the flange's rim through the tread's rim --
+     two near-coincident curves, and the close-up shimmered with z-fighting. The retract
+     also finishes BEFORE the shift starts. */
+  const off=easeIO(sw(t,'flange'));
+  for(const tag of ['L','R']){
+    const m=flanges[tag].material;
+    m.transparent = off>0.001; m.opacity = 1-off; m.depthWrite = off<0.02;
+    flanges[tag].visible = off < 0.98;
+  }
+  settleOnRail();
+  wheelset.updateMatrixWorld(true);
+
+  /* --- beat 1: the two markers. They live in the wheels, so they just roll. --- */
+  const b1 = t<BT('CONE').t;                 // a marker outside its own beat is just more orange
+  nSpoke.L.visible=nSpoke.R.visible=b1;
+
+  /* --- beat 2: two bars from one datum, and a GREEN bar that is the difference. --- */
+  const b2 = t>=BT('CONE').t-0.25 && t<BT('CONE').end+0.35;
+  const zF = R+0.12, zG = zF+0.09;   // the green mark sits in FRONT of what it compares
+  const cx = -WHEEL_CX;              // left wheel, in wheelset space
+  const rIn=R+P.taper, rOut=R-P.taper;
+  const g1=easeIO(sw(t,'bars')), g2=easeIO(sw(t,'extra'));
+  nFlat  .userData.set([cx-TREAD/2,0,zF],[cx+TREAD/2,0,zF]);          // the common datum
+  nRadOut.userData.set([cx-TREAD/2,0,zF],[cx-TREAD/2,-rOut*g1,zF]);
+  nRadIn .userData.set([cx+TREAD/2,0,zF],[cx+TREAD/2,-rIn *g1,zF]);
+  nXfer  .userData.set([cx-TREAD/2,-rOut,zG],[cx+TREAD/2,-rOut,zG]);  // carry the short one across
+  nExtra .userData.set([cx+TREAD/2,-rOut,zG],[cx+TREAD/2,-rOut-(rIn-rOut)*g2,zG]);
+  for(const o of [nFlat,nRadOut,nRadIn,nXfer,nExtra]){
+    if(o.parent!==wheelset) wheelset.add(o);      // ride with the wheelset, do not roll
+    o.visible = b2;
+  }
+  nXfer.visible = b2 && g1>0.99; nExtra.visible = b2 && g2>0.01;
+
+  /* --- beat 3: where it was, and how far it came. --- */
+  const b3 = t>=BT('SHIFT').t-0.25 && t<BT('SHIFT').end+0.35;
+  const r0=radii(0), yGhost=RAIL_TOP+r0.R;
+  nGhostR.position.set( WHEEL_CX, yGhost, 0); nGhostR.visible=b3;
+  nGhostL.position.set(-WHEEL_CX, yGhost, 0); nGhostL.visible=b3;
+  const yG=RAIL_TOP+rMean+R+P.taper+0.17, yA=yG+0.24, ax=-WHEEL_CX+sh;
+  nPush.userData.set([ax-0.62,yA,0],[ax-0.15,yA,0]); nPush.visible=b3;
+  nGap.userData.set([-WHEEL_CX,yG,0],[-WHEEL_CX+sh,yG,0]);
+  nGap.visible = b3 && sh>0.004;
+
+  /* --- beat 4: the two radii, measured UP FROM THE RAIL, which is the one line both
+         wheels genuinely share. The green bar is again exactly the difference. --- */
+  const b4 = t>=BT('RADII').t-0.25 && t<T_WRAP;
+  const zB=0.66, zB2=zB+0.09;
+  const g3=easeIO(sw(t,'rads')),               // the bars draw up from the rail
+        cmp=easeIO(sw(t,'cmp')),                // then walk in to stand beside each other
+        g4=easeIO(sw(t,'extra2'));              // then the difference
+  const bxL=lerp(-RAIL_CX,-0.17,cmp), bxR=lerp(RAIL_CX,0.17,cmp);
+  nConL .userData.set([bxL,RAIL_TOP,zB],[bxL,RAIL_TOP+r.L*g3,zB]);
+  nConR .userData.set([bxR,RAIL_TOP,zB],[bxR,RAIL_TOP+r.R*g3,zB]);
+  nXfer2.userData.set([bxL,RAIL_TOP+r.L,zB2],[bxR,RAIL_TOP+r.L,zB2]);
+  nExtra2.userData.set([bxR,RAIL_TOP+r.L,zB2],[bxR,RAIL_TOP+r.L+(r.R-r.L)*g4,zB2]);
+  nConL.visible=nConR.visible=b4;
+  nXfer2.visible = b4 && cmp>0.02; nExtra2.visible = b4 && g4>0.01;
+
+  /* --- beat 5: wrap one turn around each circle, then unroll it onto the rail. --- */
+  const b5 = t>=T_WRAP;
+  const qL=easeIO(sw(t,'wrapL')), qR=easeIO(sw(t,'wrapR'));
+  const cyL=RAIL_TOP+r.L, cyR=RAIL_TOP+r.R;
+  const CL=2*Math.PI*(r.L+TAPE_LIFT), CR=2*Math.PI*(r.R+TAPE_LIFT);
+  const laid=laidOut(t)*CR;                       // metres off the reel, the same for both
+  const UL=Math.min(laid,CL), UR=Math.min(laid,CR);
+  nTapeL.userData.lay(-RAIL_CX, cyL, r.L, 0, UL, Math.max(1e-3,qL));
+  nTapeR.userData.lay( RAIL_CX, cyR, r.R, 0, UR, Math.max(1e-3,qR));
+  nTapeL.visible=b5&&qL>0.01; nTapeR.visible=b5&&qR>0.01;
+  const zEndL=-UL;                                 // where the short band ran out
+  nDiff.userData.span(zEndL, Math.max(0,UR-UL), RAIL_TOP+0.030);
+  nDiff.visible = b5 && (UR-UL) > 0.012;
+  // the same device as beats 2 and 4: carry the short measurement across, so "longer"
+  // is read against a line and not against the viewer's memory of the other strip.
+  nXfer3.userData.set([-RAIL_CX-0.12,RAIL_TOP+0.022,zEndL],[RAIL_CX+0.12,RAIL_TOP+0.022,zEndL]);
+  nXfer3.visible = b5 && laid > 0.10;
+
+  /* --- camera. Six stations, eased between. --- */
+  const a=easeIO(sw(t,'camA')), b=easeIO(sw(t,'camB')), c=easeIO(sw(t,'camC')),
+        d=easeIO(sw(t,'camD')), d2=easeIO(sw(t,'camD2')),
+        e=easeIO(sw(t,'camE')), ed=sw(t,'camEd'),
+        e2=easeIO(sw(t,'camE2')), e2d=sw(t,'camE2d'),
+        f=easeIO(sw(t,'camF')),
+        f2=sw(t,'camF2');                      // a slow creep: a frozen hold is a dead frame
+  // a wheel's FACE is only visible from well off to the side; both markers live on -X,
+  // so the opening station has to sit out there or neither of them reads.
+  let px=lerp(-3.30,-2.90,a), py=lerp(1.80,1.62,a), pz=lerp(3.00,2.55,a);
+  let tx=lerp(0.02,0.00,a), ty=lerp(0.50,0.48,a), tz=lerp(0,-0.15,a);
+  px=lerp(px,-0.84,b); py=lerp(py,0.66,b); pz=lerp(pz,2.25,b);
+  tx=lerp(tx,-0.82,b); ty=lerp(ty,0.50,b); tz=lerp(tz,0.30,b);
+  px=lerp(px,-0.80,c); py=lerp(py,1.32,c); pz=lerp(pz,3.05,c);
+  tx=lerp(tx,-0.80,c); ty=lerp(ty,1.00,c); tz=lerp(tz,0.05,c);
+  px=lerp(px,-0.30,d); py=lerp(py,1.35,d); pz=lerp(pz,5.30,d);
+  tx=lerp(tx, 0.00,d); ty=lerp(ty,0.72,d); tz=lerp(tz,0.35,d);
+  px=lerp(px,-0.14,d2); py=lerp(py,0.98,d2); pz=lerp(pz,2.55,d2);
+  tx=lerp(tx, 0.00,d2); ty=lerp(ty,0.70,d2); tz=lerp(tz,0.58,d2);
+  px=lerp(px,-2.95,e); py=lerp(py,1.18,e); pz=lerp(pz,2.30,e);
+  tx=lerp(tx,-0.84,e); ty=lerp(ty,0.70,e); tz=lerp(tz,-0.10,e);
+  px=lerp(px,-3.22,ed); py=lerp(py,1.26,ed); pz=lerp(pz,2.08,ed);
+  px=lerp(px, 3.10,e2); py=lerp(py,1.22,e2); pz=lerp(pz,2.35,e2);
+  tx=lerp(tx, 0.88,e2); ty=lerp(ty,0.76,e2); tz=lerp(tz,-0.10,e2);
+  px=lerp(px, 3.34,e2d); py=lerp(py,1.28,e2d); pz=lerp(pz,2.10,e2d);
+  // from the far end, looking BACK at the wheels: the bands then unroll TOWARD the
+  // camera, so the moving ends -- where the whole difference lives -- are the nearest
+  // thing in frame instead of the most foreshortened.
+  px=lerp(px,-0.30,f); py=lerp(py,4.45,f); pz=lerp(pz,-5.95,f);
+  tx=lerp(tx, 0.16,f); ty=lerp(ty,0.35,f); tz=lerp(tz,-2.70,f);
+  px=lerp(px,-0.30,f2); py=lerp(py,4.20,f2); pz=lerp(pz,-6.35,f2);
+  camera.position.set(px,py,pz); camera.lookAt(tx,ty,tz);
+}
+
+/* ---------- loop ---------- */
+let t=0,playing=true,last=performance.now();
+const playBtn=document.getElementById('play'), scrub=document.getElementById('scrub'),
+      timeEl=document.getElementById('time'), beatsEl=document.getElementById('beats');
+
+BEATS.forEach((b,i)=>{
+  const d=document.createElement('div'); d.className='beat'; d.id='b'+i;
+  d.innerHTML='<b>'+b.t.toFixed(1)+'s</b><span><strong>'+b.lead+'</strong> '+b.body
+            +'<em>shows: '+b.shows.join(', ')+'</em></span>';
+  d.addEventListener('click',()=>{t=b.t;});
+  beatsEl.appendChild(d);
+});
+
+function resize(){
+  const r=glc.getBoundingClientRect();
+  if(!r.width||!r.height) return;
+  const dpr=Math.min(devicePixelRatio,2);
+  renderer.setSize(r.width,r.height,false);
+  camera.aspect=r.width/r.height; camera.updateProjectionMatrix();
+  W=Math.round(r.width*dpr); H=Math.round(r.height*dpr);
+  ovc.width=W; ovc.height=H;
+}
+new ResizeObserver(resize).observe(glc);
+
+function frame(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  if(playing){
+    if(voOK && !vo.paused) t=vo.currentTime;    // the audio is the master clock
+    else t+=dt;
+    if(t>=DUR){ t=0; if(voOK) vo.currentTime=0; }
+  }
+  syncVoice();
+  stage(t); renderer.render(scene,camera); drawOverlay(t);
+  scrub.value=String(Math.round(t/DUR*1000));
+  timeEl.textContent=t.toFixed(1)+' / '+DUR.toFixed(1)+'s';
+  let cur=0; BEATS.forEach((b,i)=>{ if(t>=b.t) cur=i; });
+  [...beatsEl.children].forEach((el,i)=>el.classList.toggle('on',i===cur));
+  requestAnimationFrame(frame);
+}
+
+/* The voice is a media element with its own clock, and the visuals have another.
+   Two clocks drift, so the AUDIO is the master whenever it is actually playing and
+   the frame loop follows it; the frame loop only advances t on its own when the
+   audio cannot play (no file, no gesture yet, or a sweep driving seek()). */
+const vo=document.getElementById('vo');
+let voOK=false;
+vo.addEventListener('canplay',()=>{voOK=true;});
+vo.addEventListener('error',()=>{voOK=false;});
+function syncVoice(){
+  if(!voOK) return;
+  if(playing){ if(Math.abs(vo.currentTime-t)>0.25) vo.currentTime=t;
+               if(vo.paused) vo.play().catch(()=>{voOK=false;}); }
+  else if(!vo.paused) vo.pause();
+}
+playBtn.addEventListener('click',()=>{ playing=!playing; playBtn.textContent=playing?'Pause':'Play';
+  if(!playing&&voOK) vo.pause(); syncVoice(); });
+scrub.addEventListener('input',()=>{ t=Number(scrub.value)/1000*DUR; if(voOK) vo.currentTime=t; });
+
+/* ---- the hooks the sweeps drive ---- */
+function snap(w,h){
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(glc,0,0,w,h);
+  return x.getImageData(0,0,w,h).data;
+}
+function diffPct(a,b){
+  let n=0; for(let i=0;i<a.length;i+=4)
+    if(Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])>14) n++;
+  return n/(a.length/4)*100;
+}
+const DW=270, DH=480;
+
+window.__mini={
+  THREE, scene, camera, renderer, gl:glc, ov:ovc, DUR, BEATS, P, TYPE, TL, vo,
+  get fontsReady(){ return fontsReady; },
+  seek(tt){ t=tt; playing=false; if(voOK&&!vo.paused) vo.pause();
+            stage(t); renderer.render(scene,camera); drawOverlay(t);
+            return {t, cam:camera.position.toArray()}; },
+  setParam(k,v){ P[k]=v; if(k==='taper') rebuildTreads(); },
+
+  // an INVISIBLE mesh is not in the picture, so it is not in the geometry checks either.
+  // That is what lets a beat declare a part ghosted and stay honest about the rest.
+  boxes(){ const out=[]; const B=new THREE.Box3();
+    scene.traverse(o=>{ if(!o.isMesh||!o.visible) return;
+      let p=o, on=true; while(p){ if(!p.visible){on=false;break;} p=p.parent; }
+      if(!on) return;
+      o.updateWorldMatrix(true,false);
+      B.setFromObject(o,true);
+      out.push({name:o.name||'(unnamed)', min:B.min.toArray(), max:B.max.toArray()}); });
+    return out; },
+
+  project(name){ const o=scene.getObjectByName(name); if(!o) return null;
+    o.updateWorldMatrix(true,false);
+    const B=new THREE.Box3().setFromObject(o,true), v=new THREE.Vector3();
+    if(B.isEmpty()) return null;
+    const r=glc.getBoundingClientRect(), pts=[];
+    for(const x of [B.min.x,B.max.x]) for(const y of [B.min.y,B.max.y]) for(const z of [B.min.z,B.max.z]){
+      v.set(x,y,z).project(camera);
+      pts.push([(v.x*0.5+0.5)*r.width,(1-(v.y*0.5+0.5))*r.height,v.z]);
+    }
+    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]), zs=pts.map(p=>p[2]);
+    return {name, x0:Math.min(...xs), x1:Math.max(...xs), y0:Math.min(...ys), y1:Math.max(...ys),
+            visible: visibleInTree(o),
+            behind: zs.every(z=>z>1), w:r.width, h:r.height}; },
+
+  /* THE CLAIM DIFFERENTIAL. Set the quantity the narration is talking about to the value
+     that makes the claim false, render the same instant, and diff. If the two frames look
+     the same, the viewer is being told something the picture never showed them. */
+  claimDiff(tt,key,alt){
+    this.seek(tt); const a=snap(DW,DH);
+    const old=P[key]; this.setParam(key,alt);
+    this.seek(tt); const b=snap(DW,DH);
+    this.setParam(key,old); this.seek(tt);
+    return diffPct(a,b);
+  },
+  /* THE SHOW DIFFERENTIAL. Hide the annotations this beat declares and diff. An arrow
+     that is drawn but hidden behind the wheel changes nothing, and is not a show. */
+  showDiff(tt,names){
+    this.seek(tt); const a=snap(DW,DH);
+    const saved=names.map(n=>{ const o=scene.getObjectByName(n); return [o,o?o.visible:null]; });
+    for(const [o] of saved) if(o) o.visible=false;
+    // render WITHOUT re-staging: stage() reasserts every annotation's visibility, so a
+    // second seek() would quietly undo the hide and the sweep would always read 0.00%.
+    renderer.render(scene,camera); const b=snap(DW,DH);
+    for(const [o,v] of saved) if(o) o.visible=v;
+    renderer.render(scene,camera);
+    return { pct:diffPct(a,b), missing:saved.filter(([o])=>!o).length };
+  },
+  /* DID IT REACT. World transform of a named object at two instants. An annotation that
+     is supposed to track a moving part but was parented to the wrong group sits perfectly
+     still, which no still frame can show you. */
+  motion(name,t0,t1){
+    const o=scene.getObjectByName(name); if(!o) return null;
+    // the WORLD BOX, not the transform: a dimension bar that only grows has an
+    // unchanged position and an unchanged quaternion, and is plainly reacting.
+    const B=new THREE.Box3(), c=new THREE.Vector3(), z=new THREE.Vector3();
+    const read=tt=>{ this.seek(tt); o.updateWorldMatrix(true,false); B.setFromObject(o,true);
+      return B.isEmpty()?null:[B.getCenter(c).clone(), B.getSize(z).clone()]; };
+    const A=read(t0), Z=read(t1);
+    if(!A||!Z) return { dPos:0, dSize:0, absent:true };
+    return { dPos:A[0].distanceTo(Z[0]), dSize:A[1].distanceTo(Z[1]) };
+  },
+
+  /* What is stacked above this point on the ground, in order. A coned tread's bounding
+     box reaches below the running surface by a whole taper, legitimately, so a box test
+     can never answer "is the wheel sitting on the rail". A ray can. */
+  probeDown(x,z,fromY=6){
+    // DoubleSide for the duration: with FrontSide a ray reports only where it ENTERS a
+    // solid, so the underside of the wheel -- the surface that is supposed to be resting
+    // on the rail -- is the one face the probe would never see.
+    const flip=[];
+    scene.traverse(o=>{ if(o.isMesh){ flip.push([o.material,o.material.side]);
+                        o.material.side=THREE.DoubleSide; } });
+    const rc=new THREE.Raycaster(new THREE.Vector3(x,fromY,z), new THREE.Vector3(0,-1,0), 0, 40);
+    const out=rc.intersectObjects(scene.children,true)
+      .filter(h=>!/^n_/.test(h.object.name) && visibleInTree(h.object))
+      .map(h=>({name:h.object.name, y:+h.point.y.toFixed(5)}));
+    for(const [m,sd] of flip) m.side=sd;
+    return out;
+  },
+  /* How deep two solids actually share space, in metres, along the worst of n*n vertical
+     rays through the footprint their boxes share. A box test said a coned tread was 2.1
+     litres inside a rail web; they are nowhere near each other. A box around a cone is
+     mostly empty, so a box hit is a QUESTION, and this is the answer. */
+  overlapProbe(an,bn,n=6){
+    const A=scene.getObjectByName(an), B=scene.getObjectByName(bn);
+    if(!A||!B||!visibleInTree(A)||!visibleInTree(B)) return 0;
+    const BA=new THREE.Box3().setFromObject(A,true), BB=new THREE.Box3().setFromObject(B,true);
+    const x0=Math.max(BA.min.x,BB.min.x), x1=Math.min(BA.max.x,BB.max.x);
+    const z0=Math.max(BA.min.z,BB.min.z), z1=Math.min(BA.max.z,BB.max.z);
+    if(x1<=x0||z1<=z0) return 0;
+    const flip=[]; for(const o of [A,B]){ flip.push([o.material,o.material.side]);
+                                          o.material.side=THREE.DoubleSide; }
+    const top=Math.max(BA.max.y,BB.max.y)+0.5;
+    const rc=new THREE.Raycaster(new THREE.Vector3(),DOWN,0,40);
+    let worst=0;
+    for(let i=0;i<n;i++) for(let j=0;j<n;j++){
+      rc.set(new THREE.Vector3(x0+(x1-x0)*(i+0.5)/n, top, z0+(z1-z0)*(j+0.5)/n), DOWN);
+      const ya=rc.intersectObject(A,true).map(h=>h.point.y);   // sorted high -> low
+      const yb=rc.intersectObject(B,true).map(h=>h.point.y);
+      for(let k=0;k+1<ya.length;k+=2) for(let m=0;m+1<yb.length;m+=2){
+        const d=Math.min(ya[k],yb[m])-Math.max(ya[k+1],yb[m+1]);
+        if(d>worst) worst=d;
+      }
+    }
+    for(const [m,sd] of flip) m.side=sd;
+    return worst;
+  },
+  overlayPixels(){ return ovc.getContext('2d').getImageData(0,0,ovc.width,ovc.height).data; },
+  master(w=1080,h=1920){
+    renderer.setPixelRatio(1); renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+    W=w; H=h; ovc.width=w; ovc.height=h;
+    return [glc.width,glc.height];
+  },
+  colourProbe(){
+    const tm=renderer.toneMapping; renderer.toneMapping=THREE.NoToneMapping;
+    const sc=new THREE.Scene(), cam=new THREE.OrthographicCamera(-1,1,1,-1,0,2);
+    cam.position.z=1;
+    sc.add(new THREE.Mesh(new THREE.PlaneGeometry(4,4),
+      new THREE.MeshBasicMaterial({color:new THREE.Color(0x808080)})));
+    renderer.render(sc,cam);
+    const gl=renderer.getContext(), px=new Uint8Array(4);
+    gl.readPixels(Math.floor(glc.width/2),Math.floor(glc.height/2),1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);
+    renderer.toneMapping=tm;
+    return [px[0],px[1],px[2]];
+  },
+  health(){
+    return { contextLost: renderer.getContext().isContextLost(),
+             programs: renderer.info.programs.length,
+             calls: renderer.info.render.calls,
+             triangles: renderer.info.render.triangles,
+             width: renderer.domElement.width, height: renderer.domElement.height,
+             pixelRatio: renderer.getPixelRatio() };
+  },
+  finite(){
+    const bad=[];
+    scene.traverse(o=>{ if(!o.isMesh) return;
+      const g=o.geometry;
+      for(const k of Object.keys(g.attributes)){
+        const a=g.attributes[k];
+        for(let i=0;i<a.array.length;i++) if(!Number.isFinite(a.array[i])){ bad.push(`${o.name}.${k}[${i}]`); return; }
+      }
+      if(!g.boundingSphere) g.computeBoundingSphere();
+      if(!g.boundingSphere || !Number.isFinite(g.boundingSphere.radius) || g.boundingSphere.radius<=0)
+        bad.push(`${o.name} boundingSphere`);
+    });
+    return bad;
+  },
+  shadowFit(){
+    const out=[]; const L=sun, c=L.shadow.camera;
+    L.updateMatrixWorld(true); c.updateMatrixWorld(true);
+    const inv=new THREE.Matrix4().copy(c.matrixWorldInverse);
+    const B=new THREE.Box3(), v=new THREE.Vector3();
+    scene.traverse(o=>{ if(!o.isMesh||!o.castShadow||!visibleInTree(o)) return;
+      o.updateWorldMatrix(true,false); B.setFromObject(o,true);
+      for(const x of [B.min.x,B.max.x]) for(const y of [B.min.y,B.max.y]) for(const z of [B.min.z,B.max.z]){
+        v.set(x,y,z).applyMatrix4(inv);
+        if(v.x<c.left||v.x>c.right||v.y<c.bottom||v.y>c.top||-v.z<c.near||-v.z>c.far){
+          out.push(o.name); return;
+        }
+      }
+    });
+    return [...new Set(out)];
+  },
+  cullDiff(tt){
+    this.seek(tt); const a=glc.toDataURL('image/png');
+    const flags=[]; scene.traverse(o=>{ if(o.isMesh){ flags.push([o,o.frustumCulled]); o.frustumCulled=false; } });
+    this.seek(tt); const b=glc.toDataURL('image/png');
+    for(const [o,f] of flags) o.frustumCulled=f;
+    return a===b;
+  },
+  zFightDiff(tt){
+    const grab=()=>{ const c=document.createElement('canvas'); c.width=glc.width;c.height=glc.height;
+      const x=c.getContext('2d'); x.drawImage(glc,0,0); return x.getImageData(0,0,c.width,c.height).data; };
+    this.seek(tt); const a=grab();
+    const n=camera.near; camera.near=n*1.03; camera.updateProjectionMatrix();
+    this.seek(tt); const b=grab();
+    camera.near=n; camera.updateProjectionMatrix();
+    let c=0; for(let i=0;i<a.length;i+=4)
+      if(Math.abs(a[i]-b[i])+Math.abs(a[i+1]-b[i+1])+Math.abs(a[i+2]-b[i+2])>12) c++;
+    return {changed:c, total:a.length/4};
+  },
+};
+function visibleInTree(o){ let p=o; while(p){ if(!p.visible) return false; p=p.parent; } return true; }
+
+resize(); requestAnimationFrame(frame);
+</script>
