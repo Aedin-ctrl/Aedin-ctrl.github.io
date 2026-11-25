@@ -22,7 +22,7 @@ BASE_URL="${TYPR_BASE_URL:-https://www.aedinlai.com}"
 # carries its own rewriter, so it never needs the network after this.
 APP_URL="https://github.com/Aedin-ctrl/Aedin-ctrl.github.io/releases/download/typr-current/typr.zip"
 if [ -n "${TYPR_BASE_URL:-}" ]; then APP_URL="$BASE_URL/downloads/typr.zip"; fi
-APP_SHA256="034302e5d154a8939409a0fd38b47616b297fe7e83fd210ed443ad5c03456e9a"
+APP_SHA256="e187a5a7e657d93474ccdce307cb62c57e9f27a213fdc2c2e23282c7b07ca780"
 # The developer team that signs typr. Anyone who tampers with the
 # download can change the zip, but can't produce this signature.
 APP_TEAM_ID="N2XQ4P7AN5"
