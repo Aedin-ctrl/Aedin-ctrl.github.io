@@ -17,9 +17,11 @@ set -euo pipefail
 # against a local copy of the site before anything goes live.
 BASE_URL="${TYPR_BASE_URL:-https://www.aedinlai.com}"
 
-APP_URL="$BASE_URL/downloads/typr.zip"
-# Filled in by typr's scripts/release.sh each time a new build is
-# published, so it always matches the zip next to this script.
+# Both lines are rewritten by typr's scripts/release.sh on every release, so the
+# checksum always matches the zip the URL serves. The app is about 900 MB: it
+# carries its own rewriter, so it never needs the network after this.
+APP_URL="https://github.com/Aedin-ctrl/Aedin-ctrl.github.io/releases/download/typr-current/typr.zip"
+if [ -n "${TYPR_BASE_URL:-}" ]; then APP_URL="$BASE_URL/downloads/typr.zip"; fi
 APP_SHA256="034302e5d154a8939409a0fd38b47616b297fe7e83fd210ed443ad5c03456e9a"
 # The developer team that signs typr. Anyone who tampers with the
 # download can change the zip, but can't produce this signature.
