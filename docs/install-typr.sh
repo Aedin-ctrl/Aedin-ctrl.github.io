@@ -46,8 +46,8 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 [ "$(uname -s)" = "Darwin" ] || die "typr is macOS only."
 
 macos_major="$(sw_vers -productVersion | cut -d. -f1)"
-if [ "$macos_major" -lt 13 ]; then
-  die "typr needs macOS 13 (Ventura) or later.
+if [ "$macos_major" -lt 12 ]; then
+  die "typr needs macOS 12 (Monterey) or later.
        This Mac is running $(sw_vers -productVersion)."
 fi
 
