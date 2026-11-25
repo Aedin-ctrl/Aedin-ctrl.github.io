@@ -20,7 +20,7 @@ BASE_URL="${TYPR_BASE_URL:-https://www.aedinlai.com}"
 APP_URL="$BASE_URL/downloads/typr.zip"
 # Filled in by typr's scripts/release.sh each time a new build is
 # published, so it always matches the zip next to this script.
-APP_SHA256="dc082b455e4c8f48310e097612c4de08b14632dca3d088b0149e215308daab96"
+APP_SHA256="034302e5d154a8939409a0fd38b47616b297fe7e83fd210ed443ad5c03456e9a"
 # The developer team that signs typr. Anyone who tampers with the
 # download can change the zip, but can't produce this signature.
 APP_TEAM_ID="N2XQ4P7AN5"
