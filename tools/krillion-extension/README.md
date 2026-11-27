@@ -25,7 +25,7 @@ tier and points. **alt+k** types it into the box; you still press enter.
 
 ## Where the answers come from
 
-`https://aedinlai.com/krillion/days/<date>.json`, published by the nightly run
+`https://www.aedinlai.com/krillion/days/<date>.json`, published by the nightly run
 (`scripts/krillion-daily.sh` → `scripts/krillion.mjs probe`). The extension
 reads nothing else and sends nothing anywhere.
 

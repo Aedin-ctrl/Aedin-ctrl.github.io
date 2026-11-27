@@ -6,7 +6,10 @@
 // round it is on anywhere we can trust, but /api/today gives the exact wording
 // of all seven, and exactly one of them is on screen at a time.
 (() => {
-  const SOURCE = 'https://aedinlai.com/krillion';
+  // www, not the apex: aedinlai.com 301s to www.aedinlai.com, and a redirect
+  // across origins fails unless the extension is permitted for the one it
+  // lands on. Both are in host_permissions; this just skips the hop.
+  const SOURCE = 'https://www.aedinlai.com/krillion';
   const EVENT = 'krillion-deck:today';
   const HOTKEY = 'k';           // with Alt
   const TIER = { plankton:'Plankton', schooler:'Schooler', rare:'Rare', deepcut:'Deep Cut', krillion:'One in a Krillion' };
