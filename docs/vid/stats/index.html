@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Analytics - Cathode Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&family=VT323&family=Inter:wght@400;600;800&display=block">
+<link rel="stylesheet" href="../desk.css?v=617de10cb0">
+</head>
+<body>
+<div class="wrap">
+<nav class="secnav">
+  <a href="../">CATHODE DESK</a>
+  <a href="../mini/">MINI</a>
+  <span aria-current="page">ANALYTICS</span>
+</nav>
+<header>
+  <h1>ANALYTICS</h1>
+  <p class="sub">Every platform Cathode Desk posts to, and what each one has to show for it.
+  Collected on the machine that does the posting &mdash; these APIs will not talk to a browser &mdash;
+  so the numbers are as fresh as the last collection, stamped below.</p>
+</header>
+<style>
+  .asof{font:400 12px Inter,system-ui;opacity:.6;margin:0 0 18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:0 0 26px}
+  .card{border:1px solid rgba(127,127,127,.35);border-radius:10px;padding:14px 16px;min-width:0;overflow:hidden}
+  .card h3{font:800 13px Inter,system-ui;letter-spacing:.08em;text-transform:uppercase;margin:0 0 2px}
+  .card .at{font:400 12px Inter,system-ui;opacity:.6;margin:0 0 10px;word-break:break-all}
+  .card dl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:0}
+  .card dt{font:400 12px Inter,system-ui;opacity:.65}
+  .card dd{font:600 15px Inter,system-ui;margin:0;text-align:right;font-variant-numeric:tabular-nums}
+  .card.bad{border-color:#c0392b}
+  .card .err{font:400 12px/1.45 Inter,system-ui;color:#c0392b;overflow-wrap:anywhere;
+    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .note{font:400 11px/1.4 Inter,system-ui;opacity:.55;margin:8px 0 0;overflow-wrap:anywhere;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  table.an{width:100%;border-collapse:collapse;font:400 13px Inter,system-ui}
+  table.an th{text-align:right;font:800 11px Inter,system-ui;letter-spacing:.06em;text-transform:uppercase;opacity:.65;padding:6px 8px;border-bottom:1px solid rgba(127,127,127,.35)}
+  table.an th:first-child,table.an td:first-child{text-align:left}
+  table.an td{padding:6px 8px;border-bottom:1px solid rgba(127,127,127,.15);text-align:right;font-variant-numeric:tabular-nums}
+  table.an td.t{text-align:left;max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  table.an td.na{opacity:.35}
+  .wrapx{overflow-x:auto}
+</style>
+
+<section>
+  <h2>THE PLATFORMS</h2>
+  <p class="asof" id="asof">loading&hellip;</p>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section>
+  <h2>EVERY PIECE</h2>
+  <div class="wrapx"><table class="an" id="tbl"></table></div>
+  <p class="note" id="tnote"></p>
+</section>
+</div>
+<script>
+const PLATS=[['youtube','YouTube'],['facebook','Facebook'],['instagram','Instagram'],['tiktok','TikTok']];
+const n=v=>v==null?null:Number(v).toLocaleString();
+// "we could not ask" and "nobody watched" are different answers. Null prints as
+// a dash, zero prints as 0 -- conflating them is how a broken metric reads as a
+// real result.
+const cell=v=>v==null?'<td class="na">&mdash;</td>':'<td>'+n(v)+'</td>';
+const norm=s=>String(s||'').toLowerCase().replace(/[‘’“”]/g,"'").replace(/#[a-z0-9_]+/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
+
+fetch('../stats.json',{cache:'no-store'}).then(r=>{
+  if(!r.ok) throw new Error('stats.json '+r.status);
+  return r.json();
+}).then(d=>{
+  const when=new Date(d.generated);
+  document.getElementById('asof').textContent=
+    'collected '+when.toLocaleString()+' · '+d.library+' pieces in the library'
+    +(d.approved!=null&&d.approved!==d.library?' · '+d.approved+' cleared to post':'');
+
+  document.getElementById('cards').innerHTML=PLATS.map(([k,label])=>{
+    const p=d.platforms[k]||{ok:false,error:'not collected'};
+    const led=d.ledger&&d.ledger[k];
+    if(!p.ok) return '<div class="card bad"><h3>'+label+'</h3>'
+      +'<p class="at">not reporting</p><p class="err" title="'+esc(p.error||'')+'">'+esc(p.error||'unknown error')+'</p>'
+      +(led?'<p class="note">ledger says '+led.posted+' posted, '+led.owed+' still owed</p>':'')+'</div>';
+    const rows=[['followers',p.followersHidden?'hidden':n(p.followers)],
+                ['views',n(p.views)],
+                ['posts',n(p.videoCount)],
+                ['still owed',led?n(led.owed):null]];
+    return '<div class="card"><h3>'+label+'</h3><p class="at">'
+      +(p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.handle||'')+'</a>':esc(p.handle||''))
+      +'</p><dl>'+rows.map(([a,b])=>'<dt>'+a+'</dt><dd>'+(b==null?'&mdash;':b)+'</dd>').join('')+'</dl>'
+      +(p.viewsNote?'<p class="note" title="'+esc(String(p.viewsNote))+'">views unavailable: '+esc(String(p.viewsNote))+'</p>':'')+'</div>';
+  }).join('');
+
+  // One row per piece, matched across platforms on the normalised title. The
+  // titles all come from the same upload sheet, so this is an exact match after
+  // normalising -- never a similarity score.
+  const byTitle=new Map();
+  for(const [k] of PLATS){
+    const p=d.platforms[k]; if(!p||!p.ok) continue;
+    for(const v of p.videos||[]){
+      const key=norm(v.title); if(!key) continue;
+      if(!byTitle.has(key)) byTitle.set(key,{title:v.title,when:v.when,per:{}});
+      const row=byTitle.get(key);
+      row.per[k]=v;
+      if(v.when&&(!row.when||v.when<row.when)) row.when=v.when;
+    }
+  }
+  const live=PLATS.filter(([k])=>d.platforms[k]&&d.platforms[k].ok);
+  const rows=[...byTitle.values()].sort((a,b)=>String(b.when||'').localeCompare(String(a.when||'')));
+  document.getElementById('tbl').innerHTML=
+    '<thead><tr><th>piece</th><th>first posted</th>'
+    +live.map(([,l])=>'<th>'+l+' views</th>').join('')
+    +'<th>likes</th></tr></thead><tbody>'
+    +rows.map(r=>{
+      const likes=live.reduce((a,[k])=>{const v=r.per[k];return v&&v.likes!=null?a+v.likes:a;},null===null?0:0);
+      const anyLike=live.some(([k])=>r.per[k]&&r.per[k].likes!=null);
+      const first=live.map(([k])=>r.per[k]).find(v=>v&&v.url);
+      return '<tr><td class="t" title="'+esc(r.title)+'">'
+        +(first?'<a href="'+esc(first.url)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a>':esc(r.title))
+        +'</td><td>'+(r.when?new Date(r.when).toLocaleDateString():'&mdash;')+'</td>'
+        +live.map(([k])=>cell(r.per[k]?r.per[k].views:null)).join('')
+        +(anyLike?'<td>'+n(likes)+'</td>':'<td class="na">&mdash;</td>')+'</tr>';
+    }).join('')+'</tbody>';
+  document.getElementById('tnote').textContent=
+    rows.length+' pieces seen across '+live.length+' reporting platform'+(live.length===1?'':'s')
+    +'. A dash means the platform did not report that number, which is not the same as zero.';
+}).catch(e=>{
+  document.getElementById('asof').textContent='could not load stats.json — '+e.message;
+  document.getElementById('tnote').textContent='Run: node stats.mjs  (in ~/Desktop/Video/publish) then redeploy.';
+});
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+</script>
+</body>
+</html>
