@@ -52,10 +52,21 @@
   .al.degraded{border-color:#c98b1a}  .al.degraded h4{color:#c98b1a}
   .al.note{border-color:rgba(127,127,127,.4)} .al.note h4{opacity:.75}
   .allgood{font:400 13px Inter,system-ui;opacity:.7}
+  .statbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+  .statbar button{font:700 11px Inter,system-ui;letter-spacing:.07em;text-transform:uppercase;
+    padding:7px 13px;border-radius:7px;cursor:pointer;color:inherit;
+    border:1px solid rgba(127,127,127,.5);background:rgba(127,127,127,.12)}
+  .statbar button:hover:not(:disabled){background:rgba(127,127,127,.24)}
+  .statbar button:disabled{opacity:.5;cursor:default}
+  .statbar .age{font:400 12px Inter,system-ui;opacity:.65}
 </style>
 
 <section>
   <h2>STATUS</h2>
+  <div class="statbar">
+    <button id="refresh" type="button">Check for new numbers</button>
+    <span class="age" id="age"></span>
+  </div>
   <div id="run" class="run">loading&hellip;</div>
   <div id="alerts"></div>
 </section>
@@ -81,10 +92,36 @@ const n=v=>v==null?null:Number(v).toLocaleString();
 const cell=v=>v==null?'<td class="na">&mdash;</td>':'<td>'+n(v)+'</td>';
 const norm=s=>String(s||'').toLowerCase().replace(/[‘’“”]/g,"'").replace(/#[a-z0-9_]+/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
 
-fetch('../stats.json',{cache:'no-store'}).then(r=>{
-  if(!r.ok) throw new Error('stats.json '+r.status);
-  return r.json();
-}).then(d=>{
+// The button cannot collect anything: these APIs need a secret and refuse a
+// browser origin, so collection happens on the Mac (hourly) and this re-reads
+// what it published. Saying "refresh" without that distinction would promise
+// fresh numbers it has no way to fetch.
+let COLLECTED=null;
+function ago(t){
+  const s=Math.max(0,(Date.now()-t)/1000);
+  if(s<90) return 'just now';
+  if(s<5400) return Math.round(s/60)+' minutes ago';
+  if(s<172800) return Math.round(s/3600)+' hours ago';
+  return Math.round(s/86400)+' days ago';
+}
+function tick(){
+  if(!COLLECTED) return;
+  const stale=(Date.now()-COLLECTED)>3*3600*1000;
+  document.getElementById('age').innerHTML='collected '+ago(COLLECTED)
+    +(stale?' — <b>the hourly collector may have stopped</b>':'');
+}
+setInterval(tick,30000);
+
+function load(){
+  const b=document.getElementById('refresh');
+  if(b){b.disabled=true;b.textContent='checking…';}
+  // A cache-busting param as well as no-store: Pages serves assets with a long
+  // max-age, and a button that returns the cached copy is worse than no button.
+  return fetch('../stats.json?t='+Date.now(),{cache:'no-store'}).then(r=>{
+    if(!r.ok) throw new Error('stats.json '+r.status);
+    return r.json();
+  }).then(d=>{
+  COLLECTED=new Date(d.generated).getTime(); tick();
   const when=new Date(d.generated);
   document.getElementById('asof').textContent=
     'collected '+when.toLocaleString()+' · '+d.library+' pieces in the library'
@@ -152,10 +189,16 @@ fetch('../stats.json',{cache:'no-store'}).then(r=>{
   document.getElementById('tnote').textContent=
     rows.length+' pieces seen across '+live.length+' reporting platform'+(live.length===1?'':'s')
     +'. A dash means the platform did not report that number, which is not the same as zero.';
-}).catch(e=>{
-  document.getElementById('asof').textContent='could not load stats.json — '+e.message;
-  document.getElementById('tnote').textContent='Run: node stats.mjs  (in ~/Desktop/Video/publish) then redeploy.';
-});
+  }).catch(e=>{
+    document.getElementById('asof').textContent='could not load stats.json — '+e.message;
+    document.getElementById('tnote').textContent='Run: node stats.mjs  (in ~/Desktop/Video/publish) then redeploy.';
+  }).finally(()=>{
+    const b=document.getElementById('refresh');
+    if(b){b.disabled=false;b.textContent='Check for new numbers';}
+  });
+}
+document.getElementById('refresh').addEventListener('click',load);
+load();
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 </script>
 </body>
