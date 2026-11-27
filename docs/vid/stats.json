@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-27T23:41:27.072Z",
+  "generated": "2026-11-27T23:41:33.268Z",
   "library": 52,
   "approved": 50,
   "platforms": {
@@ -646,7 +646,7 @@
       "url": "https://www.instagram.com/good2knowtho/",
       "followers": 3,
       "views": null,
-      "viewsNote": "HTTP 400 https://graph.facebook.com/v27.0/18116358083603333/insights?metric=views&access_token=<redacted> -- {\"error\":{\"message\":\"(#10) Application does not have permission for this action\",\"code\":10,\"type\":\"OAuthException\",\"fbtrace_id\":\"A4UUJrk_gMlFvpAMATS6I-I\"}}",
+      "viewsNote": "HTTP 400 https://graph.facebook.com/v27.0/18116358083603333/insights?metric=views&access_token=<redacted> -- {\"error\":{\"message\":\"(#10) Application does not have permission for this action\",\"code\":10,\"type\":\"OAuthException\",\"fbtrace_id\":\"Aac9KnOr0f3m84gcUlZvB2a\"}}",
       "videoCount": 34,
       "videos": [
         {
@@ -960,7 +960,7 @@
     "tiktok": {
       "ok": false,
       "label": "TikTok",
-      "error": "HTTP 401 https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count,likes_count,video_count -- {\"data\":{},\"error\":{\"code\":\"<redacted>\",\"message\":\"The access token is invalid or not found in the request.\",\"log_id\":\"20261127234129EA2CA2B3F14C282D2067\"}}"
+      "error": "HTTP 401 https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count,likes_count,video_count -- {\"error\":{\"code\":\"<redacted>\",\"message\":\"The access token is invalid or not found in the request.\",\"log_id\":\"20261127234135EA2CA2B3F14C282D2264\"},\"data\":{}}"
     }
   },
   "ledger": {
