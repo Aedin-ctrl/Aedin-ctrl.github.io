@@ -5,6 +5,8 @@
 //   node scripts/krillion.mjs probe FILE.json [--date D]  grade candidates, write days/DATE.json
 //   node scripts/krillion.mjs try p1 cry umiak ...       what these inputs are worth, printed only
 //   node scripts/krillion.mjs sweep p7 krai [--limit N]  walk a seed's near-misses to find new answers
+//   node scripts/krillion.mjs across kray kris ...       one word against all 7, with coverage
+//   node scripts/krillion.mjs hunt SEED... [--words F] [--budget N]   a word covering several prompts
 //   node scripts/krillion.mjs rebuild                     rebuild docs/krillion/index.json from days/
 //   node scripts/krillion.mjs check                       validate every day file
 //   node scripts/krillion.mjs selfcheck                   run the scoring logic on fixtures, no network
@@ -345,14 +347,106 @@ async function sweep(promptId, seeds, limit){
   for(const s of scored) console.log(`${String(s.score).padStart(3)}  ${(s.tier||'rejected').padEnd(9)} ${s.answer.padEnd(24)} (via ${s.via})`);
 }
 
+// One word against all seven prompts. The grader checks an answer against the
+// prompt it was sent to, so the same input can repair to a different real
+// answer per prompt -- which is the only way one word could ever cover a whole
+// dive. This counts how many it actually covers.
+async function across(words){
+  if(!words.length) die('across needs at least one word');
+  const day = await getToday();
+  for(const w of words){
+    const row = [];
+    let covered = 0, points = 0;
+    for(const p of day.prompts){
+      const r = await grade(day.date, p.id, w);
+      if(r === null) die('krillion.io stopped answering');
+      if(r.accepted){
+        covered++; points += r.score;
+        row.push(`${p.id}:${r.score}${r.answer.toLowerCase() !== w.toLowerCase() ? '(' + r.answer + ')' : ''}`);
+      } else {
+        await sleep(GAP_MS);
+        const sug = await grade(day.date, p.id, w, true);
+        row.push(`${p.id}:${sug && sug.correction ? '~' + sug.correction : '-'}`);
+      }
+      await sleep(GAP_MS);
+    }
+    console.log(`${w.padEnd(12)} ${covered}/7  ${String(points).padStart(3)}pts  ${row.join('  ')}`);
+  }
+}
+
+// Hunt for one word that covers several prompts at once.
+//
+// Blind guessing is hopeless: a word only covers a prompt if it is about a
+// letter from one of that prompt's answers, and the hard prompts have small
+// answer sets. So the pool is not random -- it is the edit neighbourhood of
+// answers we already know, which is exactly the set of strings that stand any
+// chance. Then a gate: test the hardest prompts first and abandon a candidate
+// the moment it clears none of them, which costs a few requests instead of
+// seven. --order puts the tight prompts first; --gate says how many of those
+// a candidate gets before it has to show something.
+// A word list from a plain file or markdown: one candidate per line. Prose
+// lines are skipped by length -- a heading like "names and words to check" is
+// five words, a candidate is one or two.
+function wordsFromFile(file){
+  if(!existsSync(file)) die(`no such file: ${file}`);
+  return readFileSync(file, 'utf8').split('\n')
+    .map(l => l.replace(/^[-*>#\s]+/, '').trim())
+    .filter(l => l && l.split(/\s+/).length <= 2 && !l.endsWith(':'));
+}
+
+async function hunt(seeds, budget, order, gateSize, listed){
+  if(!seeds.length && !listed.length) die('hunt needs seed answers or a --words file');
+  const day = await getToday();
+  const ids = order.length ? order : day.prompts.map(q => q.id);
+  const unknown = ids.filter(id => !day.prompts.some(q => q.id === id));
+  if(unknown.length) die(`not prompts today: ${unknown.join(', ')}`);
+  // The words you asked for go first and are never gated away unseen -- a list
+  // you wrote is a question you want answered, not a lottery ticket. The
+  // scavenged pool is everything one edit from a seed, which is the only part
+  // of string space that can cover a tight prompt at all.
+  const named = [...new Set([...listed, ...seeds].map(w => w.trim()).filter(Boolean))];
+  const scavenged = shuffled([...new Set(seeds.flatMap(edits))].filter(w => !named.includes(w)), 0x51e3);
+  const pool = [...named, ...scavenged];
+  console.log(`${named.length} word(s) you named + ${scavenged.length} scavenged; order ${ids.join(' ')}; gate ${gateSize}; budget ${budget} requests\n`);
+
+  let spent = 0, best = 0;
+  for(const w of pool){
+    if(spent >= budget) break;
+    let cov = 0, pts = 0;
+    const hits = [];
+    for(let i = 0; i < ids.length; i++){
+      if(spent >= budget) break;
+      // Cleared nothing in the gate: this one cannot be the word. Words you
+      // named are exempt -- they get all seven either way.
+      if(i === gateSize && cov === 0 && !named.includes(w)) break;
+      const r = await grade(day.date, ids[i], w);
+      spent++;
+      if(r === null) die(`krillion.io stopped answering after ${spent} requests`);
+      if(r.accepted){ cov++; pts += r.score; hits.push(`${ids[i]}:${r.score}(${r.answer})`); }
+      await sleep(GAP_MS);
+    }
+    if(cov > best || named.includes(w)){
+      if(cov > best) best = cov;
+      console.log(`${String(cov)}/7  ${String(pts).padStart(3)}pts  ${w.padEnd(12)} ${hits.join('  ') || '-'}`);
+    }
+  }
+  console.log(`\nspent ${spent} requests; best coverage ${best}/7`);
+}
+
 const [cmd, ...rest] = process.argv.slice(2);
 const dateFlag = (() => { const i = rest.indexOf('--date'); return i < 0 ? null : rest[i + 1]; })();
 // Each sweep word is a request to someone else's server; keep the default
 // modest and make a big run something you ask for on purpose.
 const limitFlag = (() => { const i = rest.indexOf('--limit'); return i < 0 ? 120 : Math.max(1, Number(rest[i + 1]) || 120); })();
+const budgetFlag = (() => { const i = rest.indexOf('--budget'); return i < 0 ? 300 : Math.max(1, Number(rest[i + 1]) || 300); })();
+const gateFlag = (() => { const i = rest.indexOf('--gate'); return i < 0 ? 3 : Math.max(1, Number(rest[i + 1]) || 3); })();
+const orderFlag = (() => { const i = rest.indexOf('--order'); return i < 0 ? [] : String(rest[i + 1] || '').split(',').filter(Boolean); })();
+const wordsFlag = (() => { const i = rest.indexOf('--words'); return i < 0 ? null : rest[i + 1]; })();
 if(cmd === 'today') console.log(JSON.stringify(await getToday(), null, 2));
 else if(cmd === 'probe') await probe(rest[0] || die('probe needs a FILE.json'), dateFlag);
 else if(cmd === 'try') await tryWords(rest[0], rest.slice(1));
+else if(cmd === 'across') await across(rest);
+else if(cmd === 'hunt') await hunt(rest.filter(w => !w.startsWith('--') && w !== String(budgetFlag) && w !== orderFlag.join(',') && w !== String(gateFlag) && w !== wordsFlag), budgetFlag, orderFlag, gateFlag, wordsFlag ? wordsFromFile(wordsFlag) : []);
 else if(cmd === 'sweep') await sweep(rest[0], rest.slice(1).filter(w => !w.startsWith('--') && w !== String(limitFlag)), limitFlag);
 else if(cmd === 'rebuild') rebuild();
 else if(cmd === 'check') check();

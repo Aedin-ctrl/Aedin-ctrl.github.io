@@ -90,12 +90,25 @@ They cost 7 requests a day and the day file records what they were actually
 worth, which settles the trend rather than repeating it. Drop any that come
 back rejected for a week straight.
 
-As of 2026-11-27 the trend is dead on the evidence: `Krillion`, `Alex`, `James`,
-`bonos`, `sonos` and `ronos` were each tested against all seven prompts and
-rejected 56 times out of 56, with no suggestion offered. The grader checks that
-the answer answers the prompt, so no single token clears more than one category.
-Keep the test running anyway — it is three words a day and it is the only thing
-that would catch the rule changing.
+**That first reading was wrong, and the mistake is worth keeping written down.**
+The 56-out-of-56 rejection came from asking with `previewCorrection` ON, which
+reports a near-miss as a rejection and never scores it. Asked the way scoring
+actually works — flag off — the same words are among the strongest in the game.
+
+The repair runs against *each prompt's own answer set*, so one input lands on a
+different real answer per prompt. On 2026-11-27 `bonos` covered six of seven:
+
+    p1 85 Mono almond   p2 85 Monos   p3 85 Bongo
+    p4 85 Buno          p6 85 Boo!    p7 30 Borough   (p5 missed)
+
+455 points from one word. `ronos` took five including p5 (Rotoscope artist),
+`donos` and `banos` five apiece. `Alex` and `James` really do score nothing, so
+the nonsense words in that list were carrying it, not the names.
+
+Keep testing the list daily — tomorrow's prompts are different answer sets, so
+today's champion means nothing then. `hunt --words <file>` tests a named list in
+full and scavenges around known answers for better; `across WORD...` scores one
+word against all seven.
 
 ## 5. Probe and publish
 
