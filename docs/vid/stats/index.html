@@ -41,7 +41,24 @@
   table.an td.t{text-align:left;max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   table.an td.na{opacity:.35}
   .wrapx{overflow-x:auto}
+  .run{font:400 13px/1.5 Inter,system-ui;border:1px solid rgba(127,127,127,.35);border-radius:10px;padding:12px 14px;margin:0 0 14px}
+  .run b{font-weight:700}
+  .al{border:1px solid;border-radius:10px;padding:12px 14px;margin:0 0 10px}
+  .al h4{font:800 12px Inter,system-ui;letter-spacing:.07em;text-transform:uppercase;margin:0 0 5px}
+  .al p{font:400 13px/1.5 Inter,system-ui;margin:0;opacity:.85;overflow-wrap:anywhere}
+  .al code{display:block;margin:9px 0 0;padding:8px 10px;border-radius:6px;background:rgba(127,127,127,.14);
+    font:400 12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-x:auto;white-space:pre}
+  .al.down{border-color:#c0392b}      .al.down h4{color:#c0392b}
+  .al.degraded{border-color:#c98b1a}  .al.degraded h4{color:#c98b1a}
+  .al.note{border-color:rgba(127,127,127,.4)} .al.note h4{opacity:.75}
+  .allgood{font:400 13px Inter,system-ui;opacity:.7}
 </style>
+
+<section>
+  <h2>STATUS</h2>
+  <div id="run" class="run">loading&hellip;</div>
+  <div id="alerts"></div>
+</section>
 
 <section>
   <h2>THE PLATFORMS</h2>
@@ -72,6 +89,19 @@ fetch('../stats.json',{cache:'no-store'}).then(r=>{
   document.getElementById('asof').textContent=
     'collected '+when.toLocaleString()+' · '+d.library+' pieces in the library'
     +(d.approved!=null&&d.approved!==d.library?' · '+d.approved+' cleared to post':'');
+
+  const pipe=d.pipeline||{};
+  document.getElementById('run').innerHTML=
+    (pipe.armed?'<b>The nightly poster is armed</b> for '+String(pipe.hour==null?18:pipe.hour).padStart(2,'0')+':00 every day.'
+               :'<b style="color:#c0392b">Nothing is scheduled.</b> Nobody is posting.')
+    +(pipe.lastRun?'<br>Last run '+esc(pipe.lastRun)+' — '+esc(pipe.lastResult||'')
+                  :'<br>It has not run yet.');
+
+  const als=d.alerts||[];
+  document.getElementById('alerts').innerHTML = als.length
+    ? als.map(a=>'<div class="al '+esc(a.level)+'"><h4>'+esc(a.title)+'</h4><p>'+esc(a.detail)+'</p>'
+        +(a.fix?'<code>'+esc(a.fix)+'</code>':'')+'</div>').join('')
+    : '<p class="allgood">Nothing needs attention: every platform answered and the last run finished clean.</p>';
 
   document.getElementById('cards').innerHTML=PLATS.map(([k,label])=>{
     const p=d.platforms[k]||{ok:false,error:'not collected'};

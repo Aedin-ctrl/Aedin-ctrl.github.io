@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-27T23:06:08.060Z",
+  "generated": "2026-11-27T23:20:52.800Z",
   "library": 52,
   "approved": 50,
   "platforms": {
@@ -18,7 +18,7 @@
           "title": "Why does bread go stale faster in the fridge?",
           "url": "https://www.youtube.com/shorts/omdBXQbv5bQ",
           "when": "2026-11-27T23:04:24Z",
-          "views": 0,
+          "views": 3,
           "likes": 0,
           "comments": 0
         },
@@ -27,7 +27,7 @@
           "title": "How do you count the fish in a lake?",
           "url": "https://www.youtube.com/shorts/0rGLR5HktGc",
           "when": "2026-11-27T23:00:56Z",
-          "views": 0,
+          "views": 5,
           "likes": 0,
           "comments": 0
         },
@@ -646,7 +646,7 @@
       "url": "https://www.instagram.com/good2knowtho/",
       "followers": 3,
       "views": null,
-      "viewsNote": "views: HTTP 400 https://graph.facebook.com/v27.0/18116358083603333/insights?metric=views&access_token=<redacted> -- {\"error\":{\"message\":\"(#10) Application does not hav",
+      "viewsNote": "HTTP 400 https://graph.facebook.com/v27.0/18116358083603333/insights?metric=views&access_token=<redacted> -- {\"error\":{\"message\":\"(#10) Application does not have permission for this action\",\"code\":10,\"type\":\"OAuthException\",\"fbtrace_id\":\"Avh3841-UGfzoMw_JetaOUK\"}}",
       "videoCount": 34,
       "videos": [
         {
@@ -959,8 +959,8 @@
     },
     "tiktok": {
       "ok": false,
-      "label": "tiktok",
-      "error": "HTTP 401 https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count,likes_count,video_count -- {\"data\":{},\"error\":{\"code\":\"<redacted>\",\"message\":\"The access token is invalid or not found in the request.\",\"log_id\":\"202611272306221AEA8D76EA49222B2B4F\"}}"
+      "label": "TikTok",
+      "error": "HTTP 401 https://open.tiktokapis.com/v2/user/info/?fields=display_name,follower_count,likes_count,video_count -- {\"data\":{},\"error\":{\"code\":\"<redacted>\",\"message\":\"The access token is invalid or not found in the request.\",\"log_id\":\"202611272321063DBB091A7A22492BBE60\"}}"
     }
   },
   "ledger": {
@@ -980,5 +980,38 @@
       "posted": 23,
       "owed": 27
     }
-  }
+  },
+  "pipeline": {
+    "armed": true,
+    "hour": 18,
+    "lastRun": "2026-11-27 18:05:55",
+    "lastResult": "2/3 pieces posted clean, 1 with failures: #024",
+    "logPath": "/Users/aedinlai/Library/Logs/cathode-daily.log"
+  },
+  "alerts": [
+    {
+      "level": "note",
+      "title": "Facebook is posting but reaching nobody",
+      "detail": "34 posts are live and the API is healthy: 0 followers, 0 views. Nothing is broken. Whether the slot is worth keeping is a judgement call.",
+      "fix": null
+    },
+    {
+      "level": "degraded",
+      "title": "Instagram view counts are unavailable",
+      "detail": "HTTP 400 — (#10) Application does not have permission for this action. Posting still works -- only the numbers are missing.",
+      "fix": "cd ~/Desktop/Video/publish && node auth.mjs instagram   # re-consent with the insights scope"
+    },
+    {
+      "level": "down",
+      "title": "TikTok is not posting",
+      "detail": "HTTP 401 — The access token is invalid or not found in the request. It owes 27 pieces, and loses another every day this stays broken.",
+      "fix": "cd ~/Desktop/Video/publish && node auth.mjs tiktok"
+    },
+    {
+      "level": "degraded",
+      "title": "The last run did not finish clean",
+      "detail": "2026-11-27 18:05:55 -- 2/3 pieces posted clean, 1 with failures: #024",
+      "fix": null
+    }
+  ]
 }
