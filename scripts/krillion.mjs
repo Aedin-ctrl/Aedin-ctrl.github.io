@@ -1,0 +1,360 @@
+#!/usr/bin/env node
+// Finds the day's best Krillion answers (docs/krillion/) and rebuilds its index.
+//
+//   node scripts/krillion.mjs today                      print today's 7 prompts as JSON
+//   node scripts/krillion.mjs probe FILE.json [--date D]  grade candidates, write days/DATE.json
+//   node scripts/krillion.mjs try p1 cry umiak ...       what these inputs are worth, printed only
+//   node scripts/krillion.mjs sweep p7 krai [--limit N]  walk a seed's near-misses to find new answers
+//   node scripts/krillion.mjs rebuild                     rebuild docs/krillion/index.json from days/
+//   node scripts/krillion.mjs check                       validate every day file
+//   node scripts/krillion.mjs selfcheck                   run the scoring logic on fixtures, no network
+//
+// FILE is {"p1": ["durian", "rambutan", ...], "p2": [...], ...} -- one candidate
+// list per prompt id, ordered common to obscure. Claude writes it; see
+// scripts/krillion-routine.md.
+//
+// krillion.io grades a single answer at POST /api/submit and hands back a signed
+// receipt. It keeps no server-side state about the attempt, so a throwaway
+// playerId/runId grades any word without touching a real run -- that is what
+// makes this possible at all. Only the receipt the player presents at the end
+// counts, and we never present one: nothing here plays the game or submits a
+// score, it only reads the grader.
+import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const OUT = join(ROOT, 'docs/krillion');
+const DAYS = join(OUT, 'days');
+const INDEX = join(OUT, 'index.json');
+const API = 'https://krillion.io/api';
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+// Their tiers, worst to best. score comes from the API; this is for ordering
+// and for the page's labels.
+const TIERS = ['plankton', 'schooler', 'rare', 'deepcut', 'krillion'];
+const TIER_LABEL = { plankton:'Plankton', schooler:'Schooler', rare:'Rare', deepcut:'Deep Cut', krillion:'One in a Krillion' };
+
+// Be a polite guest: one answer at a time, a gap between them, and back off
+// hard the moment they push back. A day is ~7 x 40 answers, so this is a few
+// minutes of one-at-a-time traffic, not a flood.
+const GAP_MS = 700;
+const MAX_RETRIES = 3;
+
+function die(msg){ console.error('error: ' + msg); process.exit(1); }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// New York time: the dive resets at 05:00Z, which is midnight there.
+function todayET(){
+  return new Intl.DateTimeFormat('en-CA', { timeZone:'America/New_York', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+}
+
+async function getToday(){
+  const res = await fetch(`${API}/today`, { headers:{ 'Accept':'application/json' } });
+  if(!res.ok) die(`GET /today returned ${res.status}`);
+  const day = await res.json();
+  if(!DAY_RE.test(day.date || '') || !Array.isArray(day.prompts) || !day.prompts.length) die('GET /today gave a shape we do not understand');
+  return day;
+}
+
+// One graded answer. Returns null when they rate-limit us past our retries, so
+// the caller can stop the run rather than write a half-probed day as if it were
+// the real best.
+//
+// previewCorrection is the whole game here. With it ON, a near-miss comes back
+// {accepted:false, correction:"Cupuaçu"} -- no score, just the suggestion the
+// site would offer you. With it OFF, that same near-miss comes back accepted
+// and scored at the corrected answer's full value. So preview=true is for
+// asking "what does this correct to?", and preview=false is for scoring, which
+// is what probing wants: a typo that scores 85 really is worth 85.
+async function grade(date, promptId, answer, preview = false){
+  for(let attempt = 0; attempt <= MAX_RETRIES; attempt++){
+    let res;
+    try {
+      res = await fetch(`${API}/submit`, {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          date, promptId, answer,
+          previewCorrection: preview,
+          playerId: crypto.randomUUID(),
+          runId: crypto.randomUUID(),
+        }),
+      });
+    } catch(e){
+      if(attempt === MAX_RETRIES) return null;
+      await sleep(2000 * (attempt + 1));
+      continue;
+    }
+    if(res.status === 429 || res.status >= 500){
+      if(attempt === MAX_RETRIES) return null;
+      await sleep(5000 * (attempt + 1));
+      continue;
+    }
+    if(res.status === 400) return { answer, accepted:false, tier:null, score:0, correction:null };
+    if(!res.ok) return null;
+    const r = await res.json();
+    return {
+      answer: r.answer || answer,
+      accepted: r.accepted === true,
+      tier: r.accepted ? (r.tier || null) : null,
+      score: Number(r.score) || 0,
+      correction: r.correction || null,
+    };
+  }
+  return null;
+}
+
+// The pick: highest score among the answers they actually accepted. Ties go to
+// the earlier candidate, which is the more ordinary word -- a tie means the
+// obscurity bought nothing, so take the one a person would believe.
+function best(tried){
+  let top = null;
+  for(const t of tried){
+    if(!t.accepted) continue;
+    if(!top || t.score > top.score) top = t;
+  }
+  return top;
+}
+
+function rankOf(tier){ const i = TIERS.indexOf(tier); return i < 0 ? -1 : i; }
+
+async function probe(file, dateArg){
+  if(!existsSync(file)) die(`no such file: ${file}`);
+  let cands;
+  try { cands = JSON.parse(readFileSync(file, 'utf8')); } catch(e){ die(`${file} is not JSON: ${e.message}`); }
+  if(!cands || typeof cands !== 'object' || Array.isArray(cands)) die('FILE must be an object of promptId -> [answers]');
+
+  const day = await getToday();
+  const date = dateArg || day.date;
+  if(date !== day.date) die(`asked for ${date} but krillion.io is serving ${day.date}; the dive resets at midnight ET`);
+
+  const missing = day.prompts.filter(p => !Array.isArray(cands[p.id]) || !cands[p.id].length);
+  if(missing.length) die(`no candidates for ${missing.map(p => p.id).join(', ')}`);
+
+  const prompts = [];
+  for(const p of day.prompts){
+    // Same word twice is a wasted request; keep the first spelling of each.
+    const seen = new Set();
+    const list = cands[p.id].filter(a => typeof a === 'string' && a.trim())
+      .map(a => a.trim())
+      .filter(a => { const k = a.toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; });
+    const tried = [];
+    for(const a of list){
+      const r = await grade(date, p.id, a);
+      if(r === null) die(`krillion.io stopped answering while probing ${p.id} ("${a}"); nothing written`);
+      tried.push(r);
+      process.stderr.write(`${p.id} ${String(r.score).padStart(3)} ${r.accepted ? (r.tier||'?') : 'rejected'}  ${a}\n`);
+      await sleep(GAP_MS);
+    }
+    const top = best(tried);
+    if(!top) die(`every candidate for ${p.id} was rejected; the list needs real answers, not spelling variants`);
+    tried.sort((a, b) => b.score - a.score);
+    prompts.push({ id:p.id, text:p.text, best:top, tried });
+  }
+
+  mkdirSync(DAYS, { recursive:true });
+  const out = {
+    date,
+    dayNumber: day.dayNumber ?? null,
+    probedAt: new Date().toISOString(),
+    total: prompts.reduce((n, p) => n + p.best.score, 0),
+    prompts,
+  };
+  writeFileSync(join(DAYS, `${date}.json`), JSON.stringify(out, null, 2) + '\n');
+  rebuild();
+  console.log(`${date}: ${out.total}/700  ` + prompts.map(p => `${p.best.score}`).join(' '));
+}
+
+function dayFiles(){
+  if(!existsSync(DAYS)) return [];
+  return readdirSync(DAYS).filter(f => DAY_RE.test(f.replace(/\.json$/, '')) && f.endsWith('.json')).sort().reverse();
+}
+
+function rebuild(){
+  const days = dayFiles().map(f => {
+    const d = JSON.parse(readFileSync(join(DAYS, f), 'utf8'));
+    // word/tier are the day's single best answer, for the small box on the home
+    // page -- which reads index.json only, so it must not need a day file too.
+    const top = best(d.prompts.map(p => p.best));
+    return {
+      date:d.date, dayNumber:d.dayNumber, total:d.total,
+      word: top ? top.answer : null, tier: top ? top.tier : null,
+      tiers:d.prompts.map(p => p.best.tier),
+    };
+  });
+  mkdirSync(OUT, { recursive:true });
+  writeFileSync(INDEX, JSON.stringify({ updated:new Date().toISOString(), days }, null, 2) + '\n');
+  console.log(`index: ${days.length} day(s)`);
+}
+
+function check(){
+  const files = dayFiles();
+  if(!files.length) die('no day files');
+  let bad = 0;
+  for(const f of files){
+    const d = JSON.parse(readFileSync(join(DAYS, f), 'utf8'));
+    const p = [];
+    if(!DAY_RE.test(d.date || '')) p.push('date');
+    if(!Array.isArray(d.prompts) || d.prompts.length !== 7) p.push('prompts (want 7)');
+    for(const q of d.prompts || []){
+      if(!q.best || !q.best.accepted) p.push(`${q.id}: best is not an accepted answer`);
+      else if(rankOf(q.best.tier) < 0) p.push(`${q.id}: unknown tier ${q.best.tier}`);
+      if(Array.isArray(q.tried) && q.tried.some(t => t.accepted && t.score > (q.best?.score ?? 0))) p.push(`${q.id}: best is not the top score`);
+    }
+    if(p.length){ bad++; console.error(`${f}: ${p.join('; ')}`); }
+  }
+  if(bad) die(`${bad} day file(s) failed`);
+  console.log(`${files.length} day file(s) ok`);
+}
+
+// The only logic here worth a test is the pick, and it needs no network.
+function selfcheck(){
+  const cases = [
+    { name:'takes the top accepted score',
+      in:[{answer:'durian',accepted:true,score:10},{answer:'cupuacu',accepted:true,score:85},{answer:'soursop',accepted:true,score:60}],
+      want:'cupuacu' },
+    { name:'ignores rejected words however they score',
+      in:[{answer:'xyzzy',accepted:false,score:0},{answer:'rambutan',accepted:true,score:60}],
+      want:'rambutan' },
+    { name:'ties go to the earlier, more ordinary word',
+      in:[{answer:'soursop',accepted:true,score:60},{answer:'rambutan',accepted:true,score:60}],
+      want:'soursop' },
+    { name:'all rejected gives nothing to publish',
+      in:[{answer:'aaa',accepted:false,score:0}],
+      want:null },
+  ];
+  let bad = 0;
+  for(const c of cases){
+    const got = best(c.in);
+    const name = got ? got.answer : null;
+    if(name !== c.want){ bad++; console.error(`FAIL ${c.name}: wanted ${c.want}, got ${name}`); }
+  }
+  if(rankOf('deepcut') <= rankOf('rare')) { bad++; console.error('FAIL tier order: deepcut should outrank rare'); }
+  if(rankOf('nonsense') !== -1) { bad++; console.error('FAIL tier order: unknown tier should be -1'); }
+  const e = edits('krai');
+  if(!e.includes('kray')) { bad++; console.error('FAIL edits: substitution missing (kray)'); }
+  if(!e.includes('kra')) { bad++; console.error('FAIL edits: deletion missing (kra)'); }
+  if(!e.includes('krais')) { bad++; console.error('FAIL edits: insertion missing (krais)'); }
+  if(!e.includes('kria')) { bad++; console.error('FAIL edits: transposition missing (kria)'); }
+  if(e.includes('krai')) { bad++; console.error('FAIL edits: should not include the word itself'); }
+  if(e.some(w => w.length <= 2)) { bad++; console.error('FAIL edits: stubs shorter than 3 should be dropped'); }
+  if(shuffled([1,2,3,4,5], 7).join() !== shuffled([1,2,3,4,5], 7).join()) { bad++; console.error('FAIL shuffled: not deterministic'); }
+  if(shuffled([1,2,3,4,5], 7).slice().sort().join() !== '1,2,3,4,5') { bad++; console.error('FAIL shuffled: lost or duplicated items'); }
+  if(bad) die(`${bad} check(s) failed`);
+  console.log(`selfcheck: ${cases.length + 10} checks ok`);
+}
+
+// What a handful of raw inputs are worth, printed and not written anywhere.
+// The grader runs with previewCorrection on, so what it hands back is the
+// corrected answer -- which is the point: a short input that corrects onto a
+// long one is worth far more at a 25-second prompt than the long one is.
+async function tryWords(promptId, words){
+  if(!promptId || !words.length) die('try needs a prompt id and at least one word');
+  const day = await getToday();
+  const p = day.prompts.find(q => q.id === promptId);
+  if(!p) die(`${promptId} is not a prompt today (have ${day.prompts.map(q => q.id).join(', ')})`);
+  console.log(p.text + '\n');
+  for(const w of words){
+    const r = await grade(day.date, promptId, w);
+    if(r === null) die('krillion.io stopped answering');
+    const moved = r.accepted && r.answer.toLowerCase() !== w.toLowerCase();
+    // Rejected is the interesting case: ask what the site would have suggested,
+    // since a word with no suggestion at all is a different kind of dead end
+    // from one that was simply a letter off.
+    let note = '';
+    if(r.accepted) note = moved ? '-> ' + r.answer : '';
+    else {
+      await sleep(GAP_MS);
+      const sug = await grade(day.date, promptId, w, true);
+      note = sug && sug.correction ? 'rejected (suggests ' + sug.correction + ')' : 'rejected';
+    }
+    console.log(`${String(r.score).padStart(3)}  ${w.padEnd(22)} ${note}`);
+    await sleep(GAP_MS);
+  }
+}
+
+// Every string one edit away from `word`: substitutions, deletions, insertions
+// and transpositions. Pure, so selfcheck can hold it to account.
+function edits(word){
+  const a = 'abcdefghijklmnopqrstuvwxyz';
+  const out = new Set();
+  for(let i = 0; i < word.length; i++){
+    out.add(word.slice(0, i) + word.slice(i + 1));
+    for(const c of a) out.add(word.slice(0, i) + c + word.slice(i + 1));
+    if(i) out.add(word.slice(0, i - 1) + word[i] + word[i - 1] + word.slice(i + 1));
+  }
+  for(let i = 0; i <= word.length; i++) for(const c of a) out.add(word.slice(0, i) + c + word.slice(i));
+  out.delete(word);
+  return [...out].filter(w => w.length > 2);
+}
+
+// Deterministic shuffle, so a sweep that gets interrupted and re-run covers the
+// same ground in the same order instead of re-rolling a fresh random sample.
+function shuffled(list, seed){
+  let x = seed >>> 0 || 1;
+  const a = list.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0;
+    const j = x % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// The correction field is an oracle: ask with previewCorrection ON and a
+// near-miss tells you the real answer it was near, including answers you would
+// never have thought to try (krei -> Kreis). So walk the edit neighbourhood of
+// words we already know, collect what comes back, and score whatever is new.
+async function sweep(promptId, seeds, limit){
+  if(!promptId || !seeds.length) die('sweep needs a prompt id and at least one seed word');
+  const day = await getToday();
+  const p = day.prompts.find(q => q.id === promptId);
+  if(!p) die(`${promptId} is not a prompt today`);
+  console.log(p.text);
+
+  const known = new Set(seeds.map(w => w.toLowerCase()));
+  const pool = shuffled([...new Set(seeds.flatMap(edits))].filter(w => !known.has(w)), 0x5eed);
+  const budget = Math.min(limit, pool.length);
+  console.log(`${pool.length} neighbours of ${seeds.length} seed(s); asking about ${budget}\n`);
+
+  const found = new Map();  // corrected answer -> the input that revealed it
+  for(let i = 0; i < budget; i++){
+    const w = pool[i];
+    const r = await grade(day.date, promptId, w, true);
+    if(r === null) die(`krillion.io stopped answering after ${i} of ${budget}`);
+    const c = r.correction;
+    if(c && !known.has(c.toLowerCase()) && !found.has(c)){
+      found.set(c, w);
+      process.stderr.write(`  ${w} -> ${c}\n`);
+    }
+    await sleep(GAP_MS);
+  }
+
+  if(!found.size){ console.log('no answers found that the seeds did not already name'); return; }
+  console.log(`\nscoring ${found.size} new answer(s)`);
+  const scored = [];
+  for(const [answer, via] of found){
+    const r = await grade(day.date, promptId, answer);
+    if(r === null) die('krillion.io stopped answering while scoring');
+    scored.push({ answer: r.answer, score: r.score, tier: r.tier, via });
+    await sleep(GAP_MS);
+  }
+  scored.sort((a, b) => b.score - a.score);
+  console.log('');
+  for(const s of scored) console.log(`${String(s.score).padStart(3)}  ${(s.tier||'rejected').padEnd(9)} ${s.answer.padEnd(24)} (via ${s.via})`);
+}
+
+const [cmd, ...rest] = process.argv.slice(2);
+const dateFlag = (() => { const i = rest.indexOf('--date'); return i < 0 ? null : rest[i + 1]; })();
+// Each sweep word is a request to someone else's server; keep the default
+// modest and make a big run something you ask for on purpose.
+const limitFlag = (() => { const i = rest.indexOf('--limit'); return i < 0 ? 120 : Math.max(1, Number(rest[i + 1]) || 120); })();
+if(cmd === 'today') console.log(JSON.stringify(await getToday(), null, 2));
+else if(cmd === 'probe') await probe(rest[0] || die('probe needs a FILE.json'), dateFlag);
+else if(cmd === 'try') await tryWords(rest[0], rest.slice(1));
+else if(cmd === 'sweep') await sweep(rest[0], rest.slice(1).filter(w => !w.startsWith('--') && w !== String(limitFlag)), limitFlag);
+else if(cmd === 'rebuild') rebuild();
+else if(cmd === 'check') check();
+else if(cmd === 'selfcheck') selfcheck();
+else die(`usage: krillion.mjs today | probe FILE.json [--date D] | try PROMPT WORD... | sweep PROMPT SEED... [--limit N] | rebuild | check | selfcheck  (today ET is ${todayET()})`);

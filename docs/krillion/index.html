@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krillion</title>
+<meta name="description" content="The day's rarest accepted answers to each Krillion prompt, and what the common ones were worth.">
+<style>
+  @font-face{font-family:'Inter';font-style:normal;font-weight:400 600;font-display:swap;src:url('../fonts/Inter-latin.woff2') format('woff2');}
+  @font-face{font-family:'Space Grotesk';font-style:normal;font-weight:500 700;font-display:swap;src:url('../fonts/SpaceGrotesk-latin.woff2') format('woff2');}
+  :root{
+    --paper:#ffffff; --ink:#101114; --muted:#6b7280; --faint:#6f747c;
+    --line:#e6e7eb; --line-strong:#16171b; --wash:#f6f6f7;
+    --plankton:#9aa3ad; --schooler:#5b8db8; --rare:#3f6fa8; --deepcut:#2b4a7e; --krillion:#9a7322;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Inter',sans-serif; color:var(--ink); background:var(--paper); line-height:1.5;}
+  h1,h2,h3{font-family:'Space Grotesk',sans-serif; font-weight:600; letter-spacing:-0.01em;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:3px;}
+
+  .top{position:sticky; top:0; z-index:20; background:rgba(255,255,255,0.94); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  .top-inner{max-width:900px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px 24px; flex-wrap:wrap; padding:16px clamp(18px,4vw,48px);}
+  .title h1{font-size:22px; line-height:1.2;}
+  .title p{color:var(--muted); font-size:13px; margin-top:2px;}
+  select{font:inherit; font-size:13px; color:var(--ink); background:var(--paper); border:1px solid var(--line); border-radius:7px; padding:6px 10px;}
+  select:hover{border-color:var(--line-strong);}
+
+  main{max-width:900px; margin:0 auto; padding:28px clamp(18px,4vw,48px) 80px;}
+  .summary{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; padding-bottom:20px; margin-bottom:24px; border-bottom:1px solid var(--line);}
+  .total{font-family:'Space Grotesk',sans-serif; font-size:40px; font-weight:600; line-height:1; letter-spacing:-0.02em;}
+  .total span{font-size:18px; color:var(--faint); font-weight:500;}
+  .summary p{color:var(--muted); font-size:13px;}
+
+  .card{border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:12px;}
+  .prompt{font-size:13px; color:var(--muted); margin-bottom:10px;}
+  .answer-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
+  .answer{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:600; letter-spacing:-0.01em;}
+  .badge{font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:4px 9px; border-radius:999px; color:#fff; white-space:nowrap;}
+  .b-plankton{background:var(--plankton);} .b-schooler{background:var(--schooler);}
+  .b-rare{background:var(--rare);} .b-deepcut{background:var(--deepcut);} .b-krillion{background:var(--krillion);}
+  .pts{font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums;}
+
+  .toggle{margin-top:12px; font-size:12px; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:1px;}
+  .toggle:hover{color:var(--ink); border-color:var(--line-strong);}
+  .ladder{display:none; margin-top:14px; border-top:1px solid var(--line); padding-top:12px;}
+  .card.open .ladder{display:block;}
+  .rung{display:flex; align-items:center; gap:10px; font-size:13px; padding:3px 0;}
+  .rung .w{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .rung .s{font-variant-numeric:tabular-nums; color:var(--faint); width:34px; text-align:right;}
+  .rung .dot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+  .rung.no .w{color:var(--faint); text-decoration:line-through;}
+  .rung.no .dot{background:var(--line); border:1px solid #d7d9de;}
+
+  .note{color:var(--muted); font-size:13px; margin-top:28px; padding-top:20px; border-top:1px solid var(--line);}
+  .empty{color:var(--muted); font-size:14px; padding:40px 0;}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-inner">
+  <div class="title">
+    <h1>Krillion</h1>
+    <p>the rarest answer that still counts</p>
+  </div>
+  <select id="pick" aria-label="Pick a day"></select>
+</div></div>
+
+<main>
+  <div id="out"><p class="empty">Loading&hellip;</p></div>
+  <p class="note">
+    Each day's seven prompts, probed answer by answer against krillion.io's grader
+    at 12:05 AM &mdash; five minutes after the dive resets. The winner is the rarest
+    answer the grader still accepted. Open a prompt to see the whole ladder, including
+    what the obvious answer was worth.
+  </p>
+</main>
+
+<script>
+const TIERS = {plankton:'Plankton', schooler:'Schooler', rare:'Rare', deepcut:'Deep Cut', krillion:'One in a Krillion'};
+const out = document.getElementById('out'), pick = document.getElementById('pick');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pretty = d => new Date(d + 'T12:00:00Z').toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'});
+
+function render(day){
+  const cards = day.prompts.map((p, i) => {
+    const b = p.best, tier = b.tier || 'plankton';
+    // The ladder is the interesting part: it shows what the obvious answer was
+    // worth next to what won, so the gap is visible rather than claimed.
+    const rungs = (p.tried || []).map(t => `
+      <div class="rung${t.accepted ? '' : ' no'}">
+        <span class="dot" ${t.accepted ? `style="background:var(--${t.tier||'plankton'})"` : ''}></span>
+        <span class="w">${esc(t.answer)}</span>
+        <span class="s">${t.accepted ? t.score : '&mdash;'}</span>
+      </div>`).join('');
+    return `<div class="card" data-i="${i}">
+      <p class="prompt">${esc(p.text)}</p>
+      <div class="answer-row">
+        <span class="answer">${esc(b.answer)}</span>
+        <span class="badge b-${tier}">${TIERS[tier] || tier}</span>
+        <span class="pts">${b.score} pts</span>
+      </div>
+      ${rungs ? `<button class="toggle" type="button">${(p.tried||[]).length} answers tested</button>
+      <div class="ladder">${rungs}</div>` : ''}
+    </div>`;
+  }).join('');
+  out.innerHTML = `<div class="summary">
+      <span class="total">${day.total}<span>/700</span></span>
+      <p>${pretty(day.date)}${day.dayNumber ? ' &middot; dive #' + day.dayNumber : ''}</p>
+    </div>${cards}`;
+  out.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => {
+    const c = t.closest('.card'), open = c.classList.toggle('open');
+    t.textContent = open ? 'hide' : `${c.querySelectorAll('.rung').length} answers tested`;
+  }));
+}
+
+async function show(date){
+  out.innerHTML = '<p class="empty">Loading&hellip;</p>';
+  try {
+    const r = await fetch(`days/${date}.json`, {cache:'no-cache'});
+    if(!r.ok) throw new Error(r.status);
+    render(await r.json());
+  } catch(e){
+    out.innerHTML = '<p class="empty">That day could not be loaded.</p>';
+  }
+}
+
+(async () => {
+  let index;
+  try {
+    const r = await fetch('index.json', {cache:'no-cache'});
+    if(!r.ok) throw new Error(r.status);
+    index = await r.json();
+  } catch(e){
+    out.innerHTML = '<p class="empty">No days published yet. The first run lands at 12:05 AM.</p>';
+    pick.style.display = 'none';
+    return;
+  }
+  const days = index.days || [];
+  if(!days.length){
+    out.innerHTML = '<p class="empty">No days published yet. The first run lands at 12:05 AM.</p>';
+    pick.style.display = 'none';
+    return;
+  }
+  pick.innerHTML = days.map(d => `<option value="${d.date}">${pretty(d.date)}</option>`).join('');
+  pick.addEventListener('change', () => show(pick.value));
+  show(days[0].date);
+})();
+</script>
+</body>
+</html>

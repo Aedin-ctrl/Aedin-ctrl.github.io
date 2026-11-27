@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.aedinlai.krillion-daily</string>
+  <!-- Installed copy of scripts/krillion-daily.sh (launchd jobs can't read ~/Desktop). -->
+  <key>ProgramArguments</key>
+  <array><string>/bin/bash</string><string>/Users/aedinlai/Library/Application Support/krillion-daily/krillion-daily.sh</string></array>
+  <!-- 12:05 AM is the real run: the dive resets at midnight ET and these times
+       are local, so keep the Mac on New York time or this fires on the wrong
+       day. 9 AM and 6 PM are retries for a Mac that was asleep at midnight;
+       each exits at once if the day is already published. -->
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>5</integer></dict>
+    <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
+  </array>
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/aedinlai/Library/Logs/krillion-daily.log</string>
+  <key>StandardErrorPath</key><string>/Users/aedinlai/Library/Logs/krillion-daily.log</string>
+</dict>
+</plist>
