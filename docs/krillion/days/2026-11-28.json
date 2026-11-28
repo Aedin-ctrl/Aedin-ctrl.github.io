@@ -1,0 +1,2356 @@
+{
+  "date": "2026-11-28",
+  "dayNumber": 136,
+  "probedAt": "2026-11-28T05:14:05.571Z",
+  "total": 595,
+  "universal": {
+    "input": "canes",
+    "total": 465,
+    "covered": 7,
+    "deepcuts": 5,
+    "prompts": [
+      {
+        "id": "p1",
+        "answer": "Kale",
+        "accepted": true,
+        "tier": "schooler",
+        "score": 30
+      },
+      {
+        "id": "p2",
+        "answer": "Cane",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p3",
+        "answer": "J.J. Cale",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p4",
+        "answer": "Barry Cable",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p5",
+        "answer": "CAGE",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p6",
+        "answer": "Logan Cates",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p7",
+        "answer": "Cancer",
+        "accepted": true,
+        "tier": "plankton",
+        "score": 10
+      }
+    ],
+    "clearsBar": true
+  },
+  "prompts": [
+    {
+      "id": "p1",
+      "text": "Name a green fruit or vegetable",
+      "best": {
+        "input": "ronos",
+        "answer": "Noni leaves",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "ronos",
+          "answer": "Noni leaves",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Melinjo leaves",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Gano avocado",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Gano avocado",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "Noni leaves",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "Hoja santa",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "Lagos spinach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Leek",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "Key lime",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Bok choy",
+          "answer": "Bok choy",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Fennel",
+          "answer": "Fennel",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Tomatillo",
+          "answer": "Tomatillo",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Chayote",
+          "answer": "Chayote",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Gooseberry",
+          "answer": "Green gooseberry",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Kohlrabi",
+          "answer": "Kohlrabi",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Romanesco",
+          "answer": "Romanesco",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Breadfruit",
+          "answer": "Breadfruit",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Feijoa",
+          "answer": "Feijoa",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Soursop",
+          "answer": "Soursop",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Samphire",
+          "answer": "Samphire",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Kale",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Mint",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Zucchini",
+          "answer": "Zucchini",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Asparagus",
+          "answer": "Asparagus",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Honeydew",
+          "answer": "Honeydew",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Kale",
+          "answer": "Kale",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Okra",
+          "answer": "Okra",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Artichoke",
+          "answer": "Artichoke",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "Lime",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Cucumber",
+          "answer": "Cucumber",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Lime",
+          "answer": "Lime",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Kiwi",
+          "answer": "Kiwi",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Avocado",
+          "answer": "Avocado",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Broccoli",
+          "answer": "Broccoli",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Spinach",
+          "answer": "Spinach",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Celery",
+          "answer": "Celery",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Green bean",
+          "answer": "Green bean",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Cupuacu",
+          "answer": "Cupuacu",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Rambutan",
+          "answer": "Rambutan",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "text": "Name a city in South America, Central America, Mexico, or the Caribbean (towns count too)",
+      "best": {
+        "input": "lines",
+        "answer": "Lins",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "lines",
+          "answer": "Lins",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Cane",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Porto",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Banes",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Chichicastenango",
+          "answer": "Chichicastenango",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Ouro Preto",
+          "answer": "Ouro Preto",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Baños",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Baños",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Baños",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Montevideo",
+          "answer": "Montevideo",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Tegucigalpa",
+          "answer": "Tegucigalpa",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Managua",
+          "answer": "Managua",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Guayaquil",
+          "answer": "Guayaquil",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Oaxaca",
+          "answer": "Oaxaca",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Cusco",
+          "answer": "Cusco",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Arequipa",
+          "answer": "Arequipa",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Valparaíso",
+          "answer": "Valparaíso",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Maracaibo",
+          "answer": "Maracaibo",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Camagüey",
+          "answer": "Camagüey",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Tulum",
+          "answer": "Tulum",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Punta Arenas",
+          "answer": "Punta Arenas",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ushuaia",
+          "answer": "Ushuaia",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Potosí",
+          "answer": "Potosí",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Cienfuegos",
+          "answer": "Cienfuegos",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Sucre",
+          "answer": "Sucre",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Lima",
+          "answer": "Lima",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Bogotá",
+          "answer": "Bogotá",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Cancún",
+          "answer": "Cancún",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Havana",
+          "answer": "Havana",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Quito",
+          "answer": "Quito",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Santiago",
+          "answer": "Santiago",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Cartagena",
+          "answer": "Cartagena",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p3",
+      "text": "Name a musician who has passed away and still has at least 1 million monthly listeners on Spotify",
+      "best": {
+        "input": "lines",
+        "answer": "Brent Liles",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "lines",
+          "answer": "Brent Liles",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Rick Danko",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "J.J. Cale",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Denny Laine",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Roy Orbison",
+          "answer": "Roy Orbison",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Gustavo Cerati",
+          "answer": "Gustavo Cerati",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Jerry Garcia",
+          "answer": "Jerry Garcia",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ritchie Valens",
+          "answer": "Ritchie Valens",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Lemmy",
+          "answer": "Lemmy",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ronnie James Dio",
+          "answer": "Ronnie James Dio",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Sixto Rodriguez",
+          "answer": "Rodriguez",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Bob Marley",
+          "answer": "Bob Marley",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Kurt Cobain",
+          "answer": "Kurt Cobain",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Amy Winehouse",
+          "answer": "Amy Winehouse",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Notorious B.I.G.",
+          "answer": "The Notorious B.I.G.",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Freddie Mercury",
+          "answer": "Freddie Mercury",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Jimi Hendrix",
+          "answer": "Jimi Hendrix",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Whitney Houston",
+          "answer": "Whitney Houston",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Avicii",
+          "answer": "Avicii",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Juice WRLD",
+          "answer": "Juice WRLD",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Mac Miller",
+          "answer": "Mac Miller",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "XXXTentacion",
+          "answer": "XXXTENTACION",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Chester Bennington",
+          "answer": "Chester Bennington",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Johnny Cash",
+          "answer": "Johnny Cash",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Selena",
+          "answer": "Selena",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Michael Jackson",
+          "answer": "Michael Jackson",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Elvis Presley",
+          "answer": "Elvis Presley",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Tupac",
+          "answer": "2Pac",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "wanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Sade Adu",
+          "answer": "Sade Adu",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "text": "Name a player who won a league title in the NBA, Premier League, La Liga, AFL, or IPL (women’s equivalents count too)",
+      "best": {
+        "input": "wanos",
+        "answer": "Sandra Paños",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "wanos",
+          "answer": "Sandra Paños",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Sandra Paños",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Barry Cable",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Gordon Lane",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "Jeremy Lin",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Bobby Portis",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Jason Kidd",
+          "answer": "Jason Kidd",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Jos Buttler",
+          "answer": "Jos Buttler",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Kevon Looney",
+          "answer": "Kevon Looney",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Sue Bird",
+          "answer": "Sue Bird",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Alexia Putellas",
+          "answer": "Alexia Putellas",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Aitana Bonmatí",
+          "answer": "Aitana Bonmatí",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Virat Kohli",
+          "answer": "Virat Kohli",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "MS Dhoni",
+          "answer": "MS Dhoni",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Karim Benzema",
+          "answer": "Karim Benzema",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Kevin De Bruyne",
+          "answer": "Kevin De Bruyne",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Sergio Busquets",
+          "answer": "Sergio Busquets",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Gary Ablett",
+          "answer": "Gary Ablett Jr.",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Lance Franklin",
+          "answer": "Lance Franklin",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Rohit Sharma",
+          "answer": "Rohit Sharma",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Dennis Rodman",
+          "answer": "Dennis Rodman",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Jamie Vardy",
+          "answer": "Jamie Vardy",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Shane Warne",
+          "answer": "Shane Warne",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "LeBron James",
+          "answer": "LeBron James",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Michael Jordan",
+          "answer": "Michael Jordan",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Lionel Messi",
+          "answer": "Lionel Messi",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Cristiano Ronaldo",
+          "answer": "Cristiano Ronaldo",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Steph Curry",
+          "answer": "Stephen Curry",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Steven Gerrard",
+          "answer": "Steven Gerrard",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Leicester Danny Drinkwater",
+          "answer": "Leicester Danny Drinkwater",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Ross Lyon",
+          "answer": "Ross Lyon",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p5",
+      "text": "Name a first-person shooter game",
+      "best": {
+        "input": "lines",
+        "answer": "The Mines",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "lines",
+          "answer": "The Mines",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Wands",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "CAGE",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Post",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Hard Reset",
+          "answer": "Hard Reset",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Project Warlock",
+          "answer": "Project Warlock",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Selaco",
+          "answer": "Selaco",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Killing Floor",
+          "answer": "Killing Floor",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Metro 2033",
+          "answer": "Metro 2033",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Crysis",
+          "answer": "Crysis",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Superhot",
+          "answer": "Superhot",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ultrakill",
+          "answer": "Ultrakill",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Serious Sam",
+          "answer": "Serious Sam: The First Encounter",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Blood",
+          "answer": "Blood",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Duke Nukem 3D",
+          "answer": "Duke Nukem 3D",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Marathon",
+          "answer": "Marathon",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Dusk",
+          "answer": "Dusk",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Quake",
+          "answer": "Quake",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Half-Life",
+          "answer": "Half-Life",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Borderlands",
+          "answer": "Borderlands",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Titanfall",
+          "answer": "Titanfall",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Overwatch",
+          "answer": "Overwatch",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Battlefield",
+          "answer": "Battlefield 6",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Far Cry",
+          "answer": "Far Cry",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Bioshock",
+          "answer": "BioShock",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Wolfenstein",
+          "answer": "Wolfenstein",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Unreal Tournament",
+          "answer": "Unreal Tournament",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Left 4 Dead",
+          "answer": "Left 4 Dead",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Rainbow Six Siege",
+          "answer": "Rainbow Six Siege",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Turok",
+          "answer": "Turok",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Prey",
+          "answer": "Prey",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Call of Duty",
+          "answer": "Call of Duty",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Doom",
+          "answer": "Doom",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Halo",
+          "answer": "Halo",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Counter-Strike",
+          "answer": "Counter-Strike",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "lanes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p6",
+      "text": "Name a protagonist from a book that sold at least 500,000 copies (no manga)",
+      "best": {
+        "input": "lines",
+        "answer": "Lin (Shantaram)",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "lines",
+          "answer": "Lin (Shantaram)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Wang Lung",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Davos Seaworth",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Logan Cates",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Porta",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Lan Mandragoran",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Santiago",
+          "answer": "Santiago (The Alchemist)",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Pi Patel",
+          "answer": "Pi Patel",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Offred",
+          "answer": "Offred",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Lisbeth Salander",
+          "answer": "Lisbeth Salander",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ender Wiggin",
+          "answer": "Ender Wiggin",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Paul Atreides",
+          "answer": "Paul Atreides",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Anne Shirley",
+          "answer": "Anne Shirley",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Ishmael",
+          "answer": "Ishmael",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Siddhartha",
+          "answer": "Siddhartha",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Pippi Longstocking",
+          "answer": "Pippi Longstocking",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Lyra Belacqua",
+          "answer": "Lyra Belacqua",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Esperanza Cordero",
+          "answer": "Esperanza Cordero",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Holden Caulfield",
+          "answer": "Holden Caulfield",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Elizabeth Bennet",
+          "answer": "Elizabeth Bennet",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Scout Finch",
+          "answer": "Scout Finch",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Jay Gatsby",
+          "answer": "Jay Gatsby",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Frodo Baggins",
+          "answer": "Frodo Baggins",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Bilbo Baggins",
+          "answer": "Bilbo Baggins",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Jane Eyre",
+          "answer": "Jane Eyre",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Robert Langdon",
+          "answer": "Robert Langdon",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Hazel Grace Lancaster",
+          "answer": "Hazel Grace Lancaster",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Winston Smith",
+          "answer": "Winston Smith",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Tris Prior",
+          "answer": "Tris Prior",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Bella Swan",
+          "answer": "Bella Swan",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Harry Potter",
+          "answer": "Harry Potter",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "Katniss Everdeen",
+          "answer": "Katniss Everdeen",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "Sophie Zemmel",
+          "answer": "Sophie Zemmel",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    },
+    {
+      "id": "p7",
+      "text": "Name a term from astrology",
+      "best": {
+        "input": "Void of course",
+        "answer": "Void of course",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85,
+        "correction": null
+      },
+      "tried": [
+        {
+          "input": "Void of course",
+          "answer": "Void of course",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Yod",
+          "answer": "Yod",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Waning Moon",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Metal",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Midheaven",
+          "answer": "Midheaven",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Aspect",
+          "answer": "Aspect",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Conjunction",
+          "answer": "Conjunction",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Opposition",
+          "answer": "Opposition",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Trine",
+          "answer": "Trine",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Square",
+          "answer": "Square",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Sextile",
+          "answer": "Sextile",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Stellium",
+          "answer": "Stellium",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Chiron",
+          "answer": "Chiron",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Lilith",
+          "answer": "Black Moon Lilith",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Part of Fortune",
+          "answer": "Part of Fortune",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Descendant",
+          "answer": "Descendant",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Imum Coeli",
+          "answer": "Imum coeli",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Decan",
+          "answer": "Decan",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Dignity",
+          "answer": "Dignity",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Detriment",
+          "answer": "Detriment",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Exaltation",
+          "answer": "Exaltation",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Quincunx",
+          "answer": "Quincunx",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Mercury retrograde",
+          "answer": "Mercury retrograde",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Ascendant",
+          "answer": "Ascendant",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Rising sign",
+          "answer": "Ascendant",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Moon sign",
+          "answer": "Moon sign",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Sun sign",
+          "answer": "Star sign",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Natal chart",
+          "answer": "Natal chart",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Retrograde",
+          "answer": "Retrograde",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "House",
+          "answer": "House",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Cusp",
+          "answer": "Cusp",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Saturn return",
+          "answer": "Saturn return",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Cancer",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "lines",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        }
+      ]
+    }
+  ]
+}
