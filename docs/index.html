@@ -2270,7 +2270,11 @@
         const d = ((await res.json()).days || [])[0];
         if(!d || !d.word || d.date !== todayET) return;
         txt.textContent = d.word;
-        tierEl.textContent = LABEL[d.tier] || '';
+        // One input typed at all seven beats a tier label: the tier of a
+        // single prompt says nothing about a word that answers the day.
+        tierEl.textContent = d.universal
+          ? `${d.universal.total} pts \u00b7 ${d.universal.covered}/7`
+          : (LABEL[d.tier] || '');
         box.classList.add('on');
       }catch(e){ /* offline, blocked, or malformed: show nothing */ }
     })();

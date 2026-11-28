@@ -246,7 +246,11 @@ function rebuild(){
     const top = best(d.prompts.map(p => p.best));
     return {
       date:d.date, dayNumber:d.dayNumber, total:d.total,
-      word: top ? top.answer : null, tier: top ? top.tier : null,
+      // The day's word is the one input you type at all seven prompts. Only
+      // a day with no universal block falls back to its best single answer,
+      // which is what every day before this feature has.
+      word: d.universal ? d.universal.input : (top ? top.answer : null),
+      tier: d.universal ? null : (top ? top.tier : null),
       universal: d.universal ? { input:d.universal.input, total:d.universal.total, covered:d.universal.covered } : null,
       tiers:d.prompts.map(p => p.best.tier),
     };

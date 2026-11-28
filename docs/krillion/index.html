@@ -119,7 +119,7 @@ function render(day){
   // what to type, what it repairs to on each prompt, and what that is worth.
   const u = day.universal;
   const one = !u ? '' : `<div class="oneword">
-      <p class="ow-label">One word for all seven</p>
+      <p class="ow-label">Type this one word at all seven prompts</p>
       <p class="ow-word">${esc(u.input)}</p>
       <p class="ow-meta">${u.total} pts &middot; ${u.covered}/7 answered &middot; ${u.deepcuts} deep cut${u.deepcuts === 1 ? '' : 's'}${u.clearsBar ? '' : ' &middot; <span class="ow-under">under 420</span>'}</p>
       <div class="ow-grid">${u.prompts.map(t => `
@@ -128,10 +128,10 @@ function render(day){
           <span class="ow-s">${t.accepted ? t.score + ' pts' : '0'}</span>
         </span>`).join('')}</div>
     </div>`;
-  out.innerHTML = `<div class="summary">
+  out.innerHTML = `${one}<div class="summary">
       <span class="total">${day.total}<span>/700</span></span>
       <p>${pretty(day.date)}${day.dayNumber ? ' &middot; dive #' + day.dayNumber : ''}</p>
-    </div>${one}${cards}`;
+    </div>${cards}`;
   out.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => {
     const c = t.closest('.card'), open = c.classList.toggle('open');
     t.textContent = open ? 'hide' : `${c.querySelectorAll('.rung').length} answers tested`;

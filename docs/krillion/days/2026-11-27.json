@@ -1,14 +1,73 @@
 {
   "date": "2026-11-27",
   "dayNumber": 135,
-  "probedAt": "2026-11-28T01:30:17.378Z",
+  "probedAt": "2026-11-28T02:09:52.501Z",
   "total": 595,
+  "universal": {
+    "input": "cores",
+    "total": 485,
+    "covered": 6,
+    "deepcuts": 5,
+    "prompts": [
+      {
+        "id": "p1",
+        "answer": "Monkey's comb",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p2",
+        "answer": "Lore",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p3",
+        "answer": "Kitesurfing",
+        "accepted": true,
+        "tier": "rare",
+        "score": 60
+      },
+      {
+        "id": "p4",
+        "answer": "Turkmen goresh",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p5",
+        "answer": "cores",
+        "accepted": false,
+        "tier": null,
+        "score": 0
+      },
+      {
+        "id": "p6",
+        "answer": "Chores",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      },
+      {
+        "id": "p7",
+        "answer": "Côte",
+        "accepted": true,
+        "tier": "deepcut",
+        "score": 85
+      }
+    ],
+    "clearsBar": true
+  },
   "prompts": [
     {
       "id": "p1",
       "text": "Name a fruit that’s fuzzy, hairy, or spiky on the outside",
       "best": {
-        "answer": "Cupuaçu",
+        "input": "cores",
+        "answer": "Monkey's comb",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -16,6 +75,215 @@
       },
       "tried": [
         {
+          "input": "cores",
+          "answer": "Monkey's comb",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "rings",
+          "answer": "Water caltrop",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "forms",
+          "answer": "Fords peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Jane peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "modes",
+          "answer": "Model gooseberry",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "boats",
+          "answer": "Australian baobab fruit",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Jane peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "J.H. Hale peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "Water caltrop",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "zones",
+          "answer": "Jones peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "Water caltrop",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "J.H. Hale peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bonos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "Monthong durian",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "UFV Deno peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Wagō ume",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "UFV Deno peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "UFV Arano peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "UFV Deno peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "Mono almond",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "UFV Deno peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "BuenOs peach",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Cupuaçu",
           "answer": "Cupuaçu",
           "accepted": true,
           "tier": "deepcut",
@@ -23,6 +291,7 @@
           "correction": null
         },
         {
+          "input": "Bur oak acorn",
           "answer": "Bur oak acorn",
           "accepted": true,
           "tier": "deepcut",
@@ -30,6 +299,7 @@
           "correction": null
         },
         {
+          "input": "Medlar",
           "answer": "Medlar",
           "accepted": true,
           "tier": "deepcut",
@@ -37,6 +307,7 @@
           "correction": null
         },
         {
+          "input": "Breadnut",
           "answer": "Breadnut",
           "accepted": true,
           "tier": "deepcut",
@@ -44,6 +315,7 @@
           "correction": null
         },
         {
+          "input": "Chinese bayberry",
           "answer": "Chinese bayberry",
           "accepted": true,
           "tier": "deepcut",
@@ -51,6 +323,7 @@
           "correction": null
         },
         {
+          "input": "Cucumis hirsutus",
           "answer": "Cucumis hirsutus",
           "accepted": true,
           "tier": "deepcut",
@@ -58,104 +331,39 @@
           "correction": null
         },
         {
-          "answer": "Rambutan",
+          "input": "panes",
+          "answer": "Breadfruit",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Lychee",
+          "input": "banos",
+          "answer": "Donut peach",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Soursop",
+          "input": "kanos",
+          "answer": "Horse chestnut",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Chestnut",
+          "input": "panos",
+          "answer": "Breadfruit",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Horned melon",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Salak",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Pulasan",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Marang",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Santol",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Horned melon",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Langsat",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Sapodilla",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Soursop",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Salak",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
+          "input": "hoses",
           "answer": "Jackfruit",
           "accepted": true,
           "tier": "schooler",
@@ -163,119 +371,88 @@
           "correction": null
         },
         {
-          "answer": "Dragon fruit",
+          "input": "konos",
+          "answer": "Coconut",
           "accepted": true,
           "tier": "schooler",
           "score": 30,
           "correction": null
         },
         {
-          "answer": "Kiwi",
+          "input": "nanos",
+          "answer": "Pineapple",
           "accepted": true,
           "tier": "plankton",
           "score": 10,
           "correction": null
         },
         {
-          "answer": "Peach",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Durian",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "mangosteen",
+          "input": "bores",
+          "answer": "bores",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "longan",
+          "input": "races",
+          "answer": "races",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "cherimoya",
+          "input": "moons",
+          "answer": "moons",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "noni",
+          "input": "songs",
+          "answer": "songs",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "ackee",
+          "input": "roses",
+          "answer": "roses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "monstera",
+          "input": "dares",
+          "answer": "dares",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "feijoa",
+          "input": "homes",
+          "answer": "homes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "kepel",
+          "input": "ports",
+          "answer": "ports",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "jaboticaba",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "mamoncillo",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "Krillion",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "Alex",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "James",
+          "input": "manos",
+          "answer": "manos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -287,7 +464,8 @@
       "id": "p2",
       "text": "Name a live-action movie released in the 2010s (1,000+ IMDb votes)",
       "best": {
-        "answer": "Embrace of the Serpent",
+        "input": "cores",
+        "answer": "Lore",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -295,6 +473,279 @@
       },
       "tried": [
         {
+          "input": "cores",
+          "answer": "Lore",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bores",
+          "answer": "Bare",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "forms",
+          "answer": "Killa",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Café",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "modes",
+          "answer": "The Model",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "boats",
+          "answer": "The Boat",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "races",
+          "answer": "Race",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Jane",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "Mother (2015)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "songs",
+          "answer": "The Song",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "dares",
+          "answer": "The Dare",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Ares",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "The Line",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "Home",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Porto",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bonos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Banjo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "Lens",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kanos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "The Best Things in the World",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Kano",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "Zero",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "Monos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "Bent",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Embrace of the Serpent",
           "answer": "Embrace of the Serpent",
           "accepted": true,
           "tier": "deepcut",
@@ -302,6 +753,7 @@
           "correction": null
         },
         {
+          "input": "Blue Ruin",
           "answer": "Blue Ruin",
           "accepted": true,
           "tier": "deepcut",
@@ -309,6 +761,7 @@
           "correction": null
         },
         {
+          "input": "Tangerine",
           "answer": "Tangerine",
           "accepted": true,
           "tier": "deepcut",
@@ -316,6 +769,7 @@
           "correction": null
         },
         {
+          "input": "Headhunters",
           "answer": "Headhunters",
           "accepted": true,
           "tier": "deepcut",
@@ -323,6 +777,7 @@
           "correction": null
         },
         {
+          "input": "Cold in July",
           "answer": "Cold in July",
           "accepted": true,
           "tier": "deepcut",
@@ -330,6 +785,47 @@
           "correction": null
         },
         {
+          "input": "rings",
+          "answer": "Rings",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Exodus: Gods and Kings",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Pan",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "zones",
+          "answer": "The Purge: Anarchy",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "Pan",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Gravity",
           "answer": "Gravity",
           "accepted": true,
           "tier": "rare",
@@ -337,189 +833,24 @@
           "correction": null
         },
         {
-          "answer": "Drive",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Moonlight",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Locke",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Coherence",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Under the Skin",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Enemy",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Predestination",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Ex Machina",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "The Lobster",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "The Wailing",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Burning",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Victoria",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Shoplifters",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "The Handmaiden",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Mommy",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Joker",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Whiplash",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Her",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Parasite",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Arrival",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Inception",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Interstellar",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Calvaire",
+          "input": "roses",
+          "answer": "roses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Timecrimes",
+          "input": "wings",
+          "answer": "wings",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Krillion",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "Alex",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "answer": "James",
+          "input": "holes",
+          "answer": "holes",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -531,7 +862,8 @@
       "id": "p3",
       "text": "Name a way to travel in or on water",
       "best": {
-        "answer": "Umiak",
+        "input": "rings",
+        "answer": "Æring",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -539,6 +871,111 @@
       },
       "tried": [
         {
+          "input": "rings",
+          "answer": "Æring",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "Lenj",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "songs",
+          "answer": "Djong",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "dares",
+          "answer": "Darai",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "Yole",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bonos",
+          "answer": "Bongo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "Ro-ro ship",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "Dhoni",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Bago",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "Lenj",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "Panco",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "Mon",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "Topo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Umiak",
           "answer": "Umiak",
           "accepted": true,
           "tier": "deepcut",
@@ -546,90 +983,7 @@
           "correction": null
         },
         {
-          "answer": "Gondola",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Dhow",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Coracle",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Junk",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Sampan",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Hovercraft",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Catamaran",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Outrigger canoe",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Bathysphere",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Dugout canoe",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Felucca",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Hydrofoil",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
+          "input": "cores",
           "answer": "Kitesurfing",
           "accepted": true,
           "tier": "rare",
@@ -637,83 +991,127 @@
           "correction": null
         },
         {
-          "answer": "Cog",
+          "input": "forms",
+          "answer": "Wading",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Barge",
+          "input": "races",
+          "answer": "Racing sailboat",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Trimaran",
+          "input": "roses",
+          "answer": "Research vessel",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Ferry",
+          "input": "zones",
+          "answer": "Kitesurfing",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "Ocean liner",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "Sailing dinghy",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "Frigate",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "Carrack",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "Center console boat",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Gondola",
+          "answer": "Gondola",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Dhow",
+          "answer": "Dhow",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Coracle",
+          "answer": "Coracle",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Junk",
+          "answer": "Junk",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Sampan",
+          "answer": "Sampan",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "Breaststroke",
           "accepted": true,
           "tier": "schooler",
           "score": 30,
           "correction": null
         },
         {
-          "answer": "Surfboard",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Raft",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Paddleboard",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Paddle boat",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Jet ski",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Windsurfing",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Wakeboarding",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
+          "input": "bores",
           "answer": "Boat",
           "accepted": true,
           "tier": "plankton",
@@ -721,20 +1119,7 @@
           "correction": null
         },
         {
-          "answer": "Ship",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Kayak",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
+          "input": "canes",
           "answer": "Canoe",
           "accepted": true,
           "tier": "plankton",
@@ -742,28 +1127,128 @@
           "correction": null
         },
         {
-          "answer": "Swimming",
+          "input": "boats",
+          "answer": "Boat",
           "accepted": true,
           "tier": "plankton",
           "score": 10,
           "correction": null
         },
         {
-          "answer": "Krillion",
+          "input": "kanos",
+          "answer": "Canoe",
+          "accepted": true,
+          "tier": "plankton",
+          "score": 10,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "hoses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Alex",
+          "input": "modes",
+          "answer": "modes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "James",
+          "input": "panes",
+          "answer": "panes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "hares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "wings",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "homes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "kenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "wanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "zenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "benos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -775,7 +1260,8 @@
       "id": "p4",
       "text": "Name a sport where you’re allowed to kick your opponent",
       "best": {
-        "answer": "Taekkyeon",
+        "input": "cores",
+        "answer": "Turkmen goresh",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -783,6 +1269,71 @@
       },
       "tried": [
         {
+          "input": "cores",
+          "answer": "Turkmen goresh",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bores",
+          "answer": "Borreh",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Hybrid Combat System",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "roses",
+          "answer": "ROSS",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bonos",
+          "answer": "Buno",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "Kene",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Bando",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "Juego de maní",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Taekkyeon",
           "answer": "Taekkyeon",
           "accepted": true,
           "tier": "deepcut",
@@ -790,6 +1341,7 @@
           "correction": null
         },
         {
+          "input": "Bokator",
           "answer": "Bokator",
           "accepted": true,
           "tier": "deepcut",
@@ -797,6 +1349,31 @@
           "correction": null
         },
         {
+          "input": "rings",
+          "answer": "Puroresu",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "Puroresu",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Submission wrestling",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Savate",
           "answer": "Savate",
           "accepted": true,
           "tier": "rare",
@@ -804,6 +1381,7 @@
           "correction": null
         },
         {
+          "input": "Capoeira",
           "answer": "Capoeira",
           "accepted": true,
           "tier": "rare",
@@ -811,6 +1389,7 @@
           "correction": null
         },
         {
+          "input": "Sanda",
           "answer": "Sanda",
           "accepted": true,
           "tier": "rare",
@@ -818,6 +1397,7 @@
           "correction": null
         },
         {
+          "input": "Sambo",
           "answer": "Sambo",
           "accepted": true,
           "tier": "rare",
@@ -825,104 +1405,7 @@
           "correction": null
         },
         {
-          "answer": "Pankration",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Silat",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Shootfighting",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Lethwei",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Kalaripayattu",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Shin-kicking",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Sanda",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Full contact karate",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Jeet Kune Do",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Vovinam",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Hapkido",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Muay Thai",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Kung fu",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Krav Maga",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
+          "input": "modes",
           "answer": "Karate",
           "accepted": true,
           "tier": "plankton",
@@ -930,42 +1413,240 @@
           "correction": null
         },
         {
-          "answer": "Kickboxing",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Taekwondo",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Mixed martial arts",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Krillion",
+          "input": "forms",
+          "answer": "forms",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Alex",
+          "input": "canes",
+          "answer": "canes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "James",
+          "input": "panes",
+          "answer": "panes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "boats",
+          "answer": "boats",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "races",
+          "answer": "races",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "lanes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "songs",
+          "answer": "songs",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "dares",
+          "answer": "dares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "hares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zones",
+          "answer": "zones",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "lines",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "holes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "homes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "donos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "menos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "nanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "lenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "kanos",
+          "answer": "kanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "panos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "ranos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "monos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "tonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "zenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "benos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -977,7 +1658,8 @@
       "id": "p5",
       "text": "Name a job that involves drawing",
       "best": {
-        "answer": "Layout artist",
+        "input": "ronos",
+        "answer": "Rotoscope artist",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -985,13 +1667,7 @@
       },
       "tried": [
         {
-          "answer": "Layout artist",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
+          "input": "ronos",
           "answer": "Rotoscope artist",
           "accepted": true,
           "tier": "deepcut",
@@ -999,6 +1675,23 @@
           "correction": null
         },
         {
+          "input": "Layout artist",
+          "answer": "Layout artist",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Rotoscope artist",
+          "answer": "Rotoscope artist",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Etcher",
           "answer": "Etcher",
           "accepted": true,
           "tier": "deepcut",
@@ -1006,6 +1699,7 @@
           "correction": null
         },
         {
+          "input": "Lithographic artist",
           "answer": "Lithographic artist",
           "accepted": true,
           "tier": "deepcut",
@@ -1013,6 +1707,7 @@
           "correction": null
         },
         {
+          "input": "In-betweener",
           "answer": "In-betweener",
           "accepted": true,
           "tier": "deepcut",
@@ -1020,6 +1715,7 @@
           "correction": null
         },
         {
+          "input": "Ink and paint artist",
           "answer": "Ink and paint artist",
           "accepted": true,
           "tier": "deepcut",
@@ -1027,189 +1723,328 @@
           "correction": null
         },
         {
-          "answer": "Draftsman",
+          "input": "sonos",
+          "answer": "Crime scene investigator",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Storyboard artist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Courtroom sketch artist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Portrait artist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Caricaturist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Concept artist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Technical illustrator",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Pattern maker",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Engraver",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Calligrapher",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Scientific illustrator",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Police sketch artist",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Set designer",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Inker",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Architect",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Cartoonist",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Tattoo artist",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Cartographer",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Fashion designer",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Comic artist",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Cartographer",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Artist",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Animator",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Illustrator",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Krillion",
+          "input": "cores",
+          "answer": "cores",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Alex",
+          "input": "bores",
+          "answer": "bores",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "James",
+          "input": "rings",
+          "answer": "rings",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "forms",
+          "answer": "forms",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "canes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "hoses",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "modes",
+          "answer": "modes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "panes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "boats",
+          "answer": "boats",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "races",
+          "answer": "races",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lanes",
+          "answer": "lanes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "moons",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "songs",
+          "answer": "songs",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "roses",
+          "answer": "roses",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "dares",
+          "answer": "dares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "hares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "wings",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zones",
+          "answer": "zones",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "lines",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "holes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "homes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "bonos",
+          "answer": "bonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "donos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "kenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "menos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "nanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "wanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "lenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "kanos",
+          "answer": "kanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "panos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "ranos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "monos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "tonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "zenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "konos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "benos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -1221,7 +2056,8 @@
       "id": "p6",
       "text": "Name a song on a movie soundtrack from Disney Animation, Pixar, DreamWorks Animation, Illumination, Sony Pictures Animation, or Blue Sky",
       "best": {
-        "answer": "Boo!",
+        "input": "cores",
+        "answer": "Chores",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -1229,6 +2065,103 @@
       },
       "tried": [
         {
+          "input": "cores",
+          "answer": "Chores",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bores",
+          "answer": "More",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "forms",
+          "answer": "The Farm",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Cave (Dinosaur)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Holes",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "modes",
+          "answer": "More",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Planes (Main Title)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "boats",
+          "answer": "Boat/Hate You",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "races",
+          "answer": "The Race",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "Moon (Despicable Me)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "Wings",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "Holes",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "bonos",
           "answer": "Boo!",
           "accepted": true,
           "tier": "deepcut",
@@ -1236,6 +2169,87 @@
           "correction": null
         },
         {
+          "input": "ronos",
+          "answer": "Kronos Unveiled",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "Dodos",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kenos",
+          "answer": "Ken",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "Nalo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "Kronos Unveiled",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "Ben",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Boo!",
+          "answer": "Boo!",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "Home",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "kanos",
+          "answer": "All of You",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "Zero",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "Hellfire",
           "answer": "Hellfire",
           "accepted": true,
           "tier": "rare",
@@ -1243,6 +2257,7 @@
           "correction": null
         },
         {
+          "input": "Friends on the Other Side",
           "answer": "Friends on the Other Side",
           "accepted": true,
           "tier": "rare",
@@ -1250,6 +2265,7 @@
           "correction": null
         },
         {
+          "input": "Poor Unfortunate Souls",
           "answer": "Poor Unfortunate Souls",
           "accepted": true,
           "tier": "rare",
@@ -1257,6 +2273,7 @@
           "correction": null
         },
         {
+          "input": "Someday My Prince Will Come",
           "answer": "Someday My Prince Will Come",
           "accepted": true,
           "tier": "rare",
@@ -1264,6 +2281,7 @@
           "correction": null
         },
         {
+          "input": "Ev'rybody Wants to Be a Cat",
           "answer": "Ev'rybody Wants to Be a Cat",
           "accepted": true,
           "tier": "rare",
@@ -1271,189 +2289,160 @@
           "correction": null
         },
         {
-          "answer": "Zero to Hero",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Mine, Mine, Mine",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Trust in Me",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "One Jump Ahead",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Scales and Arpeggios",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Remember Me",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Circle of Life",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Under the Sea",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Try Everything",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Shiny",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Prince Ali",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "The Bare Necessities",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Love Is an Open Door",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "I Just Can't Wait to Be King",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Be Prepared",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Hawaiian Roller Coaster Ride",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Let It Go",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "You've Got a Friend in Me",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Happy",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "How Far I'll Go",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "We Don't Talk About Bruno",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "Gold",
+          "input": "rings",
+          "answer": "rings",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Real Gold",
+          "input": "lanes",
+          "answer": "lanes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "You Belong with Me",
+          "input": "songs",
+          "answer": "songs",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Krillion",
+          "input": "roses",
+          "answer": "roses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Alex",
+          "input": "dares",
+          "answer": "dares",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "James",
+          "input": "hares",
+          "answer": "hares",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "zones",
+          "answer": "zones",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "lines",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "ports",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "banos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "sonos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "menos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "wanos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lenos",
+          "answer": "lenos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "panos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "manos",
+          "answer": "manos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "ranos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "danos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "monos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "tonos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -1465,7 +2454,8 @@
       "id": "p7",
       "text": "Name a term for a division of land (like a country)",
       "best": {
-        "answer": "Kraj",
+        "input": "cores",
+        "answer": "Côte",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
@@ -1473,6 +2463,199 @@
       },
       "tried": [
         {
+          "input": "cores",
+          "answer": "Côte",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "rings",
+          "answer": "Rig",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Clean air zone",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Ho",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Pale",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "moons",
+          "answer": "Moʻo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "songs",
+          "answer": "Dong",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "dares",
+          "answer": "Dar",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Hara",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Free port",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "donos",
+          "answer": "Dong",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "banos",
+          "answer": "Ban (territory)",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "sonos",
+          "answer": "Survey number",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "menos",
+          "answer": "Pemakai menoa",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "nanos",
+          "answer": "Mandate",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Weto",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "kanos",
+          "answer": "Kafu",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "panos",
+          "answer": "Pago",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ranos",
+          "answer": "Rang",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Damno",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "monos",
+          "answer": "Moʻo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "tonos",
+          "answer": "Topo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "zenos",
+          "answer": "Zent",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "konos",
+          "answer": "Kolo",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "Kraj",
           "answer": "Kraj",
           "accepted": true,
           "tier": "deepcut",
@@ -1480,6 +2663,7 @@
           "correction": null
         },
         {
+          "input": "Okrug",
           "answer": "Okrug",
           "accepted": true,
           "tier": "deepcut",
@@ -1487,6 +2671,7 @@
           "correction": null
         },
         {
+          "input": "Fylke",
           "answer": "Fylke",
           "accepted": true,
           "tier": "deepcut",
@@ -1494,6 +2679,7 @@
           "correction": null
         },
         {
+          "input": "Rayon",
           "answer": "Rayon",
           "accepted": true,
           "tier": "deepcut",
@@ -1501,6 +2687,7 @@
           "correction": null
         },
         {
+          "input": "Amt",
           "answer": "Amt",
           "accepted": true,
           "tier": "deepcut",
@@ -1508,6 +2695,7 @@
           "correction": null
         },
         {
+          "input": "Gau",
           "answer": "Gau",
           "accepted": true,
           "tier": "deepcut",
@@ -1515,76 +2703,23 @@
           "correction": null
         },
         {
-          "answer": "Hundred",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Wapentake",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Taluk",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Tehsil",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Mukim",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Sanjak",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Vilayet",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Satrapy",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Upazila",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "answer": "Canton",
+          "input": "forms",
+          "answer": "Farm",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
+          "input": "roses",
+          "answer": "Indian reservation",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "kenos",
           "answer": "Prefecture",
           "accepted": true,
           "tier": "rare",
@@ -1592,76 +2727,23 @@
           "correction": null
         },
         {
-          "answer": "Parish",
+          "input": "lenos",
+          "answer": "Fief",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Oblast",
+          "input": "manos",
+          "answer": "Manor",
           "accepted": true,
           "tier": "rare",
           "score": 60,
           "correction": null
         },
         {
-          "answer": "Voivodeship",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Municipality",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Riding",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Shire",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Department",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "answer": "Province",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "District",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
-          "answer": "Region",
-          "accepted": true,
-          "tier": "schooler",
-          "score": 30,
-          "correction": null
-        },
-        {
+          "input": "bores",
           "answer": "Borough",
           "accepted": true,
           "tier": "schooler",
@@ -1669,49 +2751,96 @@
           "correction": null
         },
         {
-          "answer": "Country",
+          "input": "zones",
+          "answer": "Zone",
           "accepted": true,
-          "tier": "plankton",
-          "score": 10,
+          "tier": "schooler",
+          "score": 30,
           "correction": null
         },
         {
-          "answer": "State",
+          "input": "bonos",
+          "answer": "Borough",
           "accepted": true,
-          "tier": "plankton",
-          "score": 10,
+          "tier": "schooler",
+          "score": 30,
           "correction": null
         },
         {
-          "answer": "County",
-          "accepted": true,
-          "tier": "plankton",
-          "score": 10,
-          "correction": null
-        },
-        {
-          "answer": "cadastre",
+          "input": "modes",
+          "answer": "modes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Krillion",
+          "input": "boats",
+          "answer": "boats",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "Alex",
+          "input": "races",
+          "answer": "races",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "answer": "James",
+          "input": "lanes",
+          "answer": "lanes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "wings",
+          "answer": "wings",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "lines",
+          "answer": "lines",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "holes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "homes",
+          "answer": "homes",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "ronos",
+          "answer": "ronos",
+          "accepted": false,
+          "tier": null,
+          "score": 0,
+          "correction": null
+        },
+        {
+          "input": "benos",
+          "answer": "benos",
           "accepted": false,
           "tier": null,
           "score": 0,
