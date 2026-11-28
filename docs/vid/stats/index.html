@@ -39,6 +39,11 @@
   .con h3{font:800 13px Inter,system-ui;letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px}
   .con .st{font:700 13px Inter,system-ui;margin:0 0 3px;display:flex;align-items:center;gap:7px}
   .con .st i{width:9px;height:9px;border-radius:50%;background:#2ea44f;flex:0 0 auto}
+  .con.check{border-color:#c98b1a}
+  .con.check .st{color:#c98b1a}
+  .con.check .st i{background:#c98b1a}
+  .con .why.warn{color:#c98b1a}
+  .con .unver{font:400 10px Inter,system-ui;opacity:.55;display:block;text-align:right;margin-top:-4px}
   .con.down{border-color:#c0392b}
   .con.down .st{color:#c0392b}
   .con.down .st i{background:#c0392b}
@@ -121,17 +126,19 @@ function render(d){
 
   document.getElementById('cons').innerHTML=PLATS.map(([k,label])=>{
     const p=d.platforms[k]||{status:'down',statusText:'Not collected',sent:null};
-    const down=p.status!=='ok';
+    const down=p.status==='down';
+    const check=p.status==='check';
     const led=d.ledger&&d.ledger[k];
-    return '<div class="con '+(down?'down':'ok')+'">'
+    return '<div class="con '+(down?'down':check?'check':'ok')+'">'
       +'<h3>'+label+'</h3>'
       +'<p class="st"><i></i>'+esc(p.statusText||(down?'Not connected':'Working'))+'</p>'
-      +(down
-        ? '<p class="why">'+esc(p.statusWhy||'Uploads are not going through.')
-            +(led&&led.owed?' '+led.owed+' waiting.':'')+'</p>'
+      +(down||check
+        ? '<p class="why'+(check?' warn':'')+'">'+esc(p.statusWhy||'Uploads are not going through.')
+            +(down&&led&&led.owed?' '+led.owed+' waiting.':'')+'</p>'
           +(p.fix?'<code>'+esc(p.fix)+'</code>':'')
         : '<p class="last">last posted '+(day(p.lastPosted)||'—')+'</p>')
-      +'<dl><dt>videos</dt><dd>'+fmt(p.sent)+'</dd>'
+      +'<dl><dt>videos live</dt><dd>'+fmt(p.sent)
+      +(p.sentVerified===false?'<span class="unver">from the ledger, unchecked</span>':'')+'</dd>'
       +'<dt>views</dt><dd>'+fmt(p.views)+'</dd>'
       +'<dt>followers</dt><dd>'+fmt(p.followers)+'</dd></dl>'
       +'</div>';
