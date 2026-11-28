@@ -121,6 +121,50 @@ function best(tried){
 
 function rankOf(tier){ const i = TIERS.indexOf(tier); return i < 0 ? -1 : i; }
 
+// One word to type at all seven prompts. A candidate only counts if it was
+// tried on every prompt -- a word tested on six says nothing about the
+// seventh -- and the pick is the highest TOTAL, not the widest coverage: a
+// rejection scores 0, so coverage is already priced into the total. Ties go
+// to the shorter word, which is the one you can actually type in 25 seconds.
+function bestUniversal(prompts){
+  if(!Array.isArray(prompts) || !prompts.length) return null;
+  const byInput = new Map();
+  for(const p of prompts){
+    for(const t of p.tried || []){
+      const key = String(t.input ?? '').trim().toLowerCase();
+      if(!key) continue;
+      if(!byInput.has(key)) byInput.set(key, new Map());
+      const per = byInput.get(key);
+      // The same input twice on one prompt is a duplicate reading, not two
+      // prompts covered; keep the better one and never double-count the id.
+      if(!per.has(p.id) || (t.score || 0) > (per.get(p.id).score || 0)) per.set(p.id, t);
+    }
+  }
+  let top = null;
+  for(const [key, per] of byInput){
+    if(per.size !== prompts.length) continue;
+    const rows = prompts.map(p => per.get(p.id));
+    const total = rows.reduce((n, t) => n + (t.score || 0), 0);
+    if(total <= 0) continue;
+    const input = rows.find(t => t.input)?.input ?? key;
+    if(top && !(total > top.total || (total === top.total && (input.length < top.input.length ||
+       (input.length === top.input.length && input.toLowerCase() < top.input.toLowerCase()))))) continue;
+    top = {
+      input,
+      total,
+      covered: rows.filter(t => t.accepted).length,
+      prompts: prompts.map((p, i) => ({
+        id: p.id,
+        answer: rows[i].answer ?? null,
+        accepted: rows[i].accepted === true,
+        tier: rows[i].tier ?? null,
+        score: rows[i].score || 0,
+      })),
+    };
+  }
+  return top;
+}
+
 async function probe(file, dateArg){
   if(!existsSync(file)) die(`no such file: ${file}`);
   let cands;
@@ -145,7 +189,10 @@ async function probe(file, dateArg){
     for(const a of list){
       const r = await grade(date, p.id, a);
       if(r === null) die(`krillion.io stopped answering while probing ${p.id} ("${a}"); nothing written`);
-      tried.push(r);
+      // What you typed, not what the grader repaired it to. The whole
+      // one-word method lives in the input: "bonos" repairs to a different
+      // real answer on each prompt, and storing only "Mono almond" loses it.
+      tried.push({ input: a, ...r });
       process.stderr.write(`${p.id} ${String(r.score).padStart(3)} ${r.accepted ? (r.tier||'?') : 'rejected'}  ${a}\n`);
       await sleep(GAP_MS);
     }
@@ -161,6 +208,7 @@ async function probe(file, dateArg){
     dayNumber: day.dayNumber ?? null,
     probedAt: new Date().toISOString(),
     total: prompts.reduce((n, p) => n + p.best.score, 0),
+    universal: bestUniversal(prompts),
     prompts,
   };
   writeFileSync(join(DAYS, `${date}.json`), JSON.stringify(out, null, 2) + '\n');
@@ -182,6 +230,7 @@ function rebuild(){
     return {
       date:d.date, dayNumber:d.dayNumber, total:d.total,
       word: top ? top.answer : null, tier: top ? top.tier : null,
+      universal: d.universal ? { input:d.universal.input, total:d.universal.total, covered:d.universal.covered } : null,
       tiers:d.prompts.map(p => p.best.tier),
     };
   });
@@ -203,6 +252,15 @@ function check(){
       if(!q.best || !q.best.accepted) p.push(`${q.id}: best is not an accepted answer`);
       else if(rankOf(q.best.tier) < 0) p.push(`${q.id}: unknown tier ${q.best.tier}`);
       if(Array.isArray(q.tried) && q.tried.some(t => t.accepted && t.score > (q.best?.score ?? 0))) p.push(`${q.id}: best is not the top score`);
+    }
+    if(d.universal){
+      const u = d.universal;
+      if(!u.input) p.push('universal: no input word');
+      if(!Array.isArray(u.prompts) || u.prompts.length !== 7) p.push('universal: wants 7 prompt scores');
+      else {
+        const sum = u.prompts.reduce((n, t) => n + (t.score || 0), 0);
+        if(sum !== u.total) p.push(`universal: total ${u.total} but the parts sum to ${sum}`);
+      }
     }
     if(p.length){ bad++; console.error(`${f}: ${p.join('; ')}`); }
   }
@@ -243,8 +301,28 @@ function selfcheck(){
   if(e.some(w => w.length <= 2)) { bad++; console.error('FAIL edits: stubs shorter than 3 should be dropped'); }
   if(shuffled([1,2,3,4,5], 7).join() !== shuffled([1,2,3,4,5], 7).join()) { bad++; console.error('FAIL shuffled: not deterministic'); }
   if(shuffled([1,2,3,4,5], 7).slice().sort().join() !== '1,2,3,4,5') { bad++; console.error('FAIL shuffled: lost or duplicated items'); }
+  const up = (id, tried) => ({ id, tried });
+  const uni = bestUniversal([
+    up('p1',[{input:'bonos',answer:'Mono almond',accepted:true,score:85},{input:'durian',answer:'Durian',accepted:true,score:10}]),
+    up('p2',[{input:'bonos',answer:'Monos',accepted:true,score:85},{input:'durian',answer:null,accepted:false,score:0}]),
+  ]);
+  if(!uni || uni.input !== 'bonos'){ bad++; console.error(`FAIL universal: wanted bonos, got ${uni && uni.input}`); }
+  if(uni && uni.total !== 170){ bad++; console.error(`FAIL universal: wanted 170, got ${uni.total}`); }
+  if(uni && uni.covered !== 2){ bad++; console.error(`FAIL universal: wanted covered 2, got ${uni.covered}`); }
+  // A word nobody tried on p2 cannot be the one word for p1 AND p2.
+  const partial = bestUniversal([
+    up('p1',[{input:'zzz',answer:'Zzz',accepted:true,score:100}]),
+    up('p2',[{input:'qqq',answer:'Qqq',accepted:true,score:85}]),
+  ]);
+  if(partial !== null){ bad++; console.error(`FAIL universal: a word missing from a prompt should not win, got ${partial.input}`); }
+  // Ties go to the shorter word -- less to type at a 25-second prompt.
+  const tie = bestUniversal([up('p1',[{input:'longer',answer:'A',accepted:true,score:60},{input:'abc',answer:'A',accepted:true,score:60}])]);
+  if(!tie || tie.input !== 'abc'){ bad++; console.error(`FAIL universal: tie should take the shorter word, got ${tie && tie.input}`); }
+  // Repaired spellings are not inputs: an old day file has nothing to offer.
+  const legacy = bestUniversal([up('p1',[{answer:'Cupuacu',accepted:true,score:85}])]);
+  if(legacy !== null){ bad++; console.error('FAIL universal: a file with no input words should yield nothing'); }
   if(bad) die(`${bad} check(s) failed`);
-  console.log(`selfcheck: ${cases.length + 10} checks ok`);
+  console.log(`selfcheck: ${cases.length + 16} checks ok`);
 }
 
 // What a handful of raw inputs are worth, printed and not written anywhere.

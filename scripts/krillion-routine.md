@@ -27,36 +27,51 @@ If today's file already exists, stop without changing anything.
 
 Seven prompts, each with an `id` (`p1`..`p7`) and a `text`.
 
-## 3. Write the candidates
+## 3. The one word
 
-Write `krillion-today.json`: one list per prompt id, **ordered common to
-obscure**.
+**The day's answer is one input word, not seven.** The grader repairs a
+near-miss silently and scores it at the repaired answer's full value, and the
+repair runs against *each prompt's own answer set* -- so a single nonsense
+string lands on a different real answer in all seven. On 2026-11-27 `bonos`
+covered six of seven for 455 points. That is the game.
+
+So the candidate lists are built the other way round from how it looks. Write
+`krillion-today.json` as one list per prompt id, and **put every universal
+candidate into all seven lists, spelled identically**:
 
     {
-      "p1": ["apple", "kiwi", "durian", "rambutan", "soursop", "cupuacu"],
-      "p2": [...]
+      "p1": ["bonos", "ronos", "donos", "banos", ..., "durian", "rambutan"],
+      "p2": ["bonos", "ronos", "donos", "banos", ..., "Arrival", "Moonlight"],
+      ...
     }
 
-About 40 per prompt. The whole method is in how you order them:
+A universal candidate that is missing from even one list is thrown away:
+`krillion.mjs` only ranks a word that was graded on all seven prompts, because
+a word tested on six says nothing about the seventh. Spell it the same way in
+every list -- `bonos` and `Bonos` are one word to the grader but two to the
+ranker, and the split halves both their totals.
 
-- **Rarity is semantic, not spelling.** `durian` scores 10 — the answer
-  everyone blurts out. `rambutan` and `soursop` score 60, `cupuacu` 85. What
-  moves you down a tier is a less familiar *thing*, not a weirder spelling of a
-  familiar one. Do not pad the list with plurals, misspellings or inflections:
-  the grader repairs them back to the same word and you have burned a request.
-  `cupuacy` scores exactly what `cupuacu` scores, so testing both tells you
-  nothing you did not already know.
-- **Start where everyone starts, then keep walking.** The first few entries
-  should be the obvious answers, so the day file records what the floor was.
-  Then go outward: regional, historical, technical, foreign-language,
-  specialist. The last third should be answers you are not sure will be
-  accepted at all.
-- **Obscure but real.** An answer the grader rejects scores 0, and a list of
-  nothing but exotica can come back entirely rejected. Every entry has to be a
-  genuine, checkable answer to the prompt.
-- **Mind the prompt's own fence.** Several prompts carry a qualifier —
-  "live-action", "1,000+ IMDb votes", "released in the 2010s". An answer that
-  breaks it is rejected however rare it is.
+### Where universal candidates come from
+
+They are not random strings. A word only lands on a prompt if it is about one
+letter from an answer in that prompt's set, so the pool is the edit
+neighbourhood of answers you already know:
+
+- **Yesterday's file.** `docs/krillion/days/` records the `input` for every
+  attempt. Start from the inputs that covered the most prompts, and from the
+  vowel-swapped family around them (`bonos` -> `ronos`, `donos`, `banos`,
+  `benos`, `bonus`, `bonas`).
+- **Short, vowel-heavy, 4-6 letters.** Those sit one edit from the most real
+  words. A long exact answer is one edit from almost nothing.
+- **`node scripts/krillion.mjs hunt <seed answers> --budget 150`** scavenges
+  the edit neighbourhood of seeds for you and gates out dead candidates after
+  three misses. Use it to discover, then put what it finds into all seven
+  lists so the probe records it.
+
+Aim for **about 12 universal candidates**. At seven requests each that is
+~84 of the day's budget -- the smaller share on purpose. The one word is the
+headline, but it cannot be bought with the total out of 700, so the per-prompt
+floor in step 4 keeps the larger half.
 
 ### What the spelling repair does and does not do
 
@@ -79,46 +94,38 @@ It is still worth knowing for one reason: `try` reports the suggestion behind
 every rejection, and a rejected word that suggests something real has handed you
 a new answer to test. `krei` was rejected and suggested Kreis, which scores 85.
 
-## 4. Test the universal tokens
+## 4. Fill the rest with per-prompt answers
 
-Append the same handful of cross-prompt candidates to **every** list — the
-answers people claim work on anything, including the game's own name:
+The universal word can miss, and a prompt where every universal candidate was
+rejected still needs something. After the universal block, append **about 25
+real answers per prompt**, ordered common to obscure. This is what defends the
+day's score:
 
-    "Krillion", "Alex", "James"
+- **Rarity is semantic, not spelling.** `durian` scores 10 -- the answer
+  everyone blurts out. `rambutan` and `soursop` score 60, `cupuacu` 85. What
+  moves you down a tier is a less familiar *thing*, not a weirder spelling of
+  a familiar one. Do not pad with plurals or misspellings: the grader repairs
+  them back to the same word and you have burned a request.
+- **Obscure but real.** An answer the grader rejects scores 0, and a list of
+  nothing but exotica can come back entirely rejected.
+- **Mind the prompt's own fence.** Several prompts carry a qualifier --
+  "live-action", "1,000+ IMDb votes", "released in the 2010s". An answer that
+  breaks it is rejected however rare it is.
 
-They cost 7 requests a day and the day file records what they were actually
-worth, which settles the trend rather than repeating it. Drop any that come
-back rejected for a week straight.
-
-**That first reading was wrong, and the mistake is worth keeping written down.**
-The 56-out-of-56 rejection came from asking with `previewCorrection` ON, which
-reports a near-miss as a rejection and never scores it. Asked the way scoring
-actually works — flag off — the same words are among the strongest in the game.
-
-The repair runs against *each prompt's own answer set*, so one input lands on a
-different real answer per prompt. On 2026-11-27 `bonos` covered six of seven:
-
-    p1 85 Mono almond   p2 85 Monos   p3 85 Bongo
-    p4 85 Buno          p6 85 Boo!    p7 30 Borough   (p5 missed)
-
-455 points from one word. `ronos` took five including p5 (Rotoscope artist),
-`donos` and `banos` five apiece. `Alex` and `James` really do score nothing, so
-the nonsense words in that list were carrying it, not the names.
-
-Keep testing the list daily — tomorrow's prompts are different answer sets, so
-today's champion means nothing then. `hunt --words <file>` tests a named list in
-full and scavenges around known answers for better; `across WORD...` scores one
-word against all seven.
+Together that is ~84 + ~175 = ~259 requests. If you have to cut, cut the
+universal family first: a thin floor costs real points on every prompt, while a
+thin universal family only costs you the chance of beating today's champion.
 
 ## 5. Probe and publish
 
     node scripts/krillion.mjs probe krillion-today.json
 
-It grades every candidate one at a time with a gap between them, writes
-`docs/krillion/days/$TODAY.json` with the winner and the full attempt list per
-prompt, and rebuilds `docs/krillion/index.json`. It stops without writing
-anything if krillion.io starts refusing requests — that is not a failure to
-work around, so do not retry it in a loop or lower the gap.
+It grades every candidate one at a time with a gap between them, records the
+`input` alongside the repaired answer, picks the day's best universal word,
+writes `docs/krillion/days/$TODAY.json` and rebuilds `docs/krillion/index.json`.
+It stops without writing anything if krillion.io starts refusing requests --
+that is not a failure to work around, so do not retry it in a loop or lower
+the gap.
 
 Then check it:
 
@@ -128,6 +135,12 @@ Do not run git. The runner commits and pushes.
 
 ## 6. Report
 
-Finish with the seven winners, their tiers, and the day's total out of 700.
-Call out any prompt where the best answer was still Plankton or Schooler —
-that is a prompt the candidate list was too timid on, and it is worth saying so.
+Lead with **the one word**: the `universal` block in the day file -- the input
+to type, its total out of 700, how many of the seven it covered, and what it
+repaired to on each prompt. Then the per-prompt winners as the fallback.
+
+Say plainly if the best universal word covered fewer than five prompts, or if
+it lost to the per-prompt floor. That means the candidate family was built
+around the wrong seeds, and tomorrow should start from different ones --
+tomorrow's prompts are different answer sets, so today's champion means
+nothing then.
