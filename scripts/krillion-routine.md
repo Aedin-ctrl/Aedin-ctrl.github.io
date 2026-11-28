@@ -85,6 +85,20 @@ neighbourhood of answers you already know:
   requests instead of seven. Use it to discover, then put what it finds into
   all seven lists so the probe records it.
 
+**Some prompts are closed, and you must stop paying for them.** A prompt whose
+answers are a tight vocabulary cluster -- jobs, brands, a named category -- is
+reachable only from its own words, and those words repair onto nothing in the
+other six sets. Measured on 2026-11-27: p5 ("a job involving drawing") was hit
+only by literal drawing nouns -- etcher 85, tracer 85, limner 85, engraver 60 --
+each of which scored 0 to 230 across all seven. Two 700-request hunts over
+~1,200 scavenged candidates from two different neighbourhoods produced **zero**
+new words that reached it.
+
+The rule: run the gated hunt on the missing prompt, and if ~100 gated requests
+turn up no new word that reaches it, declare the prompt closed, stop, and bank
+the best word you have for the other six. 485 from six prompts is a good day;
+spending the rest of the budget on a closed prompt turns it into a bad one.
+
 **Hunt the prompt you are missing, not the word you like.** Once a candidate
 covers five or six, the only thing that matters is the blank one. Put the
 missed prompt first in `--order` with `--gate 1`, and seed from the answers
