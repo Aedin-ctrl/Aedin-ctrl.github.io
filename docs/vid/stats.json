@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-27T23:42:40.055Z",
+  "generated": "2026-11-28T00:11:49.002Z",
   "library": 52,
   "approved": 50,
   "platforms": {
@@ -27,7 +27,7 @@
           "title": "How do you count the fish in a lake?",
           "url": "https://www.youtube.com/shorts/0rGLR5HktGc",
           "when": "2026-11-27T23:00:56Z",
-          "views": 21,
+          "views": 28,
           "likes": 0,
           "comments": 0
         },
@@ -319,7 +319,12 @@
           "likes": 27,
           "comments": 2
         }
-      ]
+      ],
+      "status": "ok",
+      "statusText": "Working",
+      "statusWhy": null,
+      "sent": 34,
+      "lastPosted": "2026-11-27T23:04:24Z"
     },
     "facebook": {
       "ok": true,
@@ -637,7 +642,12 @@
           "likes": null,
           "comments": null
         }
-      ]
+      ],
+      "status": "ok",
+      "statusText": "Working",
+      "statusWhy": null,
+      "sent": 34,
+      "lastPosted": "2026-11-27T23:04:25+0000"
     },
     "instagram": {
       "ok": true,
@@ -664,7 +674,7 @@
           "url": "https://www.instagram.com/reel/DgQz-RVzs9n/",
           "when": "2026-11-27T23:02:07+0000",
           "views": null,
-          "likes": 0,
+          "likes": 2,
           "comments": 0
         },
         {
@@ -955,12 +965,22 @@
           "likes": 2,
           "comments": 0
         }
-      ]
+      ],
+      "status": "ok",
+      "statusText": "Working",
+      "statusWhy": null,
+      "sent": 34,
+      "lastPosted": "2026-11-27T23:05:49+0000"
     },
     "tiktok": {
       "ok": false,
       "label": "TikTok",
-      "error": "HTTP 401 — The access token is invalid or not found in the request."
+      "error": "HTTP 401 — The access token is invalid or not found in the request.",
+      "status": "down",
+      "statusText": "Not connected",
+      "statusWhy": "Uploads are not going through.",
+      "fix": "node auth.mjs tiktok",
+      "sent": 23
     }
   },
   "ledger": {

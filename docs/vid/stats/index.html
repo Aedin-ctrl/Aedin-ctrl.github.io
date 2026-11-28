@@ -10,30 +10,50 @@
 <body>
 <div class="wrap">
 <nav class="secnav">
+  <span aria-current="page">ANALYTICS</span>
   <a href="../">CATHODE DESK</a>
   <a href="../mini/">MINI</a>
-  <span aria-current="page">ANALYTICS</span>
 </nav>
 <header>
   <h1>ANALYTICS</h1>
-  <p class="sub">Every platform Cathode Desk posts to, and what each one has to show for it.
-  Collected on the machine that does the posting &mdash; these APIs will not talk to a browser &mdash;
-  so the numbers are as fresh as the last collection, stamped below.</p>
+  <p class="sub">Every platform Cathode Desk posts to, side by side &mdash; whether it is working,
+  when it last went out, and what it has to show for it.</p>
 </header>
 <style>
-  .asof{font:400 12px Inter,system-ui;opacity:.6;margin:0 0 18px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:0 0 26px}
-  .card{border:1px solid rgba(127,127,127,.35);border-radius:10px;padding:14px 16px;min-width:0;overflow:hidden}
-  .card h3{font:800 13px Inter,system-ui;letter-spacing:.08em;text-transform:uppercase;margin:0 0 2px}
-  .card .at{font:400 12px Inter,system-ui;opacity:.6;margin:0 0 10px;word-break:break-all}
-  .card dl{display:grid;grid-template-columns:1fr auto;gap:4px 10px;margin:0}
-  .card dt{font:400 12px Inter,system-ui;opacity:.65}
-  .card dd{font:600 15px Inter,system-ui;margin:0;text-align:right;font-variant-numeric:tabular-nums}
-  .card.bad{border-color:#c0392b}
-  .card .err{font:400 12px/1.45 Inter,system-ui;color:#c0392b;overflow-wrap:anywhere;
-    display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
-  .note{font:400 11px/1.4 Inter,system-ui;opacity:.55;margin:8px 0 0;overflow-wrap:anywhere;
-    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .statbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+  .statbar button{font:700 11px Inter,system-ui;letter-spacing:.07em;text-transform:uppercase;
+    padding:7px 13px;border-radius:7px;cursor:pointer;color:inherit;
+    border:1px solid rgba(127,127,127,.5);background:rgba(127,127,127,.12)}
+  .statbar button:hover:not(:disabled){background:rgba(127,127,127,.24)}
+  .statbar button:disabled{opacity:.5;cursor:default}
+  .statbar .age{font:400 12px Inter,system-ui;opacity:.65}
+  .poster{font:400 13px/1.55 Inter,system-ui;border:1px solid rgba(127,127,127,.3);
+    border-radius:9px;padding:11px 14px;margin:0 0 22px}
+  .poster b{font-weight:700}
+
+  .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  @media(max-width:860px){.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:460px){.grid4{grid-template-columns:minmax(0,1fr)}}
+  .con{border:1px solid rgba(127,127,127,.32);border-radius:10px;padding:14px 15px;min-width:0;
+    display:flex;flex-direction:column}
+  .con h3{font:800 13px Inter,system-ui;letter-spacing:.08em;text-transform:uppercase;margin:0 0 9px}
+  .con .st{font:700 13px Inter,system-ui;margin:0 0 3px;display:flex;align-items:center;gap:7px}
+  .con .st i{width:9px;height:9px;border-radius:50%;background:#2ea44f;flex:0 0 auto}
+  .con.down{border-color:#c0392b}
+  .con.down .st{color:#c0392b}
+  .con.down .st i{background:#c0392b}
+  .con .last{font:400 12px Inter,system-ui;opacity:.6;margin:0 0 12px}
+  .con .why{font:400 12px/1.45 Inter,system-ui;color:#c0392b;margin:0 0 9px}
+  .con code{display:block;margin:0 0 12px;padding:7px 9px;border-radius:6px;
+    background:rgba(127,127,127,.14);font:400 11px/1.4 ui-monospace,Menlo,monospace;
+    overflow-x:auto;white-space:pre}
+  .con dl{display:grid;grid-template-columns:1fr auto;gap:6px 10px;margin:auto 0 0;
+    border-top:1px solid rgba(127,127,127,.2);padding-top:11px}
+  .con dt{font:400 12px Inter,system-ui;opacity:.65}
+  .con dd{font:700 16px Inter,system-ui;margin:0;text-align:right;font-variant-numeric:tabular-nums}
+  .con .na{opacity:.3;font-weight:400}
+  .foot{font:400 11px/1.4 Inter,system-ui;opacity:.5;margin:11px 0 0}
+
   table.an{width:100%;border-collapse:collapse;font:400 13px Inter,system-ui}
   table.an th{text-align:right;font:800 11px Inter,system-ui;letter-spacing:.06em;text-transform:uppercase;opacity:.65;padding:6px 8px;border-bottom:1px solid rgba(127,127,127,.35)}
   table.an th:first-child,table.an td:first-child{text-align:left}
@@ -41,61 +61,38 @@
   table.an td.t{text-align:left;max-width:30ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   table.an td.na{opacity:.35}
   .wrapx{overflow-x:auto}
-  .run{font:400 13px/1.5 Inter,system-ui;border:1px solid rgba(127,127,127,.35);border-radius:10px;padding:12px 14px;margin:0 0 14px}
-  .run b{font-weight:700}
-  .al{border:1px solid;border-radius:10px;padding:12px 14px;margin:0 0 10px}
-  .al h4{font:800 12px Inter,system-ui;letter-spacing:.07em;text-transform:uppercase;margin:0 0 5px}
-  .al p{font:400 13px/1.5 Inter,system-ui;margin:0;opacity:.85;overflow-wrap:anywhere}
-  .al code{display:block;margin:9px 0 0;padding:8px 10px;border-radius:6px;background:rgba(127,127,127,.14);
-    font:400 12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;overflow-x:auto;white-space:pre}
-  .al.down{border-color:#c0392b}      .al.down h4{color:#c0392b}
-  .al.degraded{border-color:#c98b1a}  .al.degraded h4{color:#c98b1a}
-  .al.note{border-color:rgba(127,127,127,.4)} .al.note h4{opacity:.75}
-  .allgood{font:400 13px Inter,system-ui;opacity:.7}
-  .statbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px}
-  .statbar button{font:700 11px Inter,system-ui;letter-spacing:.07em;text-transform:uppercase;
-    padding:7px 13px;border-radius:7px;cursor:pointer;color:inherit;
-    border:1px solid rgba(127,127,127,.5);background:rgba(127,127,127,.12)}
-  .statbar button:hover:not(:disabled){background:rgba(127,127,127,.24)}
-  .statbar button:disabled{opacity:.5;cursor:default}
-  .statbar .age{font:400 12px Inter,system-ui;opacity:.65}
 </style>
 
 <section>
-  <h2>STATUS</h2>
+  <h2>CONNECTORS</h2>
   <div class="statbar">
     <button id="refresh" type="button">Check for new numbers</button>
     <span class="age" id="age"></span>
   </div>
-  <div id="run" class="run">loading&hellip;</div>
-  <div id="alerts"></div>
-</section>
-
-<section>
-  <h2>THE PLATFORMS</h2>
-  <p class="asof" id="asof">loading&hellip;</p>
-  <div class="cards" id="cards"></div>
+  <div class="poster" id="poster">loading&hellip;</div>
+  <div class="grid4" id="cons"></div>
+  <p class="foot" id="foot"></p>
 </section>
 
 <section>
   <h2>EVERY PIECE</h2>
   <div class="wrapx"><table class="an" id="tbl"></table></div>
-  <p class="note" id="tnote"></p>
+  <p class="foot" id="tnote"></p>
 </section>
 </div>
 <script>
 const PLATS=[['youtube','YouTube'],['facebook','Facebook'],['instagram','Instagram'],['tiktok','TikTok']];
-const n=v=>v==null?null:Number(v).toLocaleString();
-// "we could not ask" and "nobody watched" are different answers. Null prints as
-// a dash, zero prints as 0 -- conflating them is how a broken metric reads as a
-// real result.
-const cell=v=>v==null?'<td class="na">&mdash;</td>':'<td>'+n(v)+'</td>';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const n=v=>Number(v).toLocaleString();
+// "not reported" and "zero" are different answers, and on a page about whether
+// anyone is watching they are opposite claims. A dash is never a 0.
+const fmt=v=>v==null?'<span class="na">&mdash;</span>':n(v);
+const day=t=>t?new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short'}):null;
 const norm=s=>String(s||'').toLowerCase().replace(/[‘’“”]/g,"'").replace(/#[a-z0-9_]+/g,' ').replace(/[^a-z0-9]+/g,' ').trim();
 
 // The button cannot collect anything: these APIs need a secret and refuse a
 // browser origin, so collection happens on the Mac (hourly) and this re-reads
-// what it published. Saying "refresh" without that distinction would promise
-// fresh numbers it has no way to fetch.
+// what it published.
 let COLLECTED=null;
 function ago(t){
   const s=Math.max(0,(Date.now()-t)/1000);
@@ -112,94 +109,89 @@ function tick(){
 }
 setInterval(tick,30000);
 
-function load(){
-  const b=document.getElementById('refresh');
-  if(b){b.disabled=true;b.textContent='checking…';}
-  // A cache-busting param as well as no-store: Pages serves assets with a long
-  // max-age, and a button that returns the cached copy is worse than no button.
-  return fetch('../stats.json?t='+Date.now(),{cache:'no-store'}).then(r=>{
-    if(!r.ok) throw new Error('stats.json '+r.status);
-    return r.json();
-  }).then(d=>{
+function render(d){
   COLLECTED=new Date(d.generated).getTime(); tick();
-  const when=new Date(d.generated);
-  document.getElementById('asof').textContent=
-    'collected '+when.toLocaleString()+' · '+d.library+' pieces in the library'
-    +(d.approved!=null&&d.approved!==d.library?' · '+d.approved+' cleared to post':'');
 
   const pipe=d.pipeline||{};
-  document.getElementById('run').innerHTML=
-    (pipe.armed?'<b>The nightly poster is armed</b> for '+String(pipe.hour==null?18:pipe.hour).padStart(2,'0')+':00 every day.'
+  document.getElementById('poster').innerHTML=
+    (pipe.armed?'<b>Posting nightly at '+String(pipe.hour==null?18:pipe.hour).padStart(2,'0')+':00.</b>'
                :'<b style="color:#c0392b">Nothing is scheduled.</b> Nobody is posting.')
-    +(pipe.lastRun?'<br>Last run '+esc(pipe.lastRun)+' — '+esc(pipe.lastResult||'')
-                  :'<br>It has not run yet.');
+    +(pipe.lastRun?' Last run '+esc(pipe.lastRun)+' — '+esc(pipe.lastResult||'')
+                  :' It has not run yet.');
 
-  const als=d.alerts||[];
-  document.getElementById('alerts').innerHTML = als.length
-    ? als.map(a=>'<div class="al '+esc(a.level)+'"><h4>'+esc(a.title)+'</h4><p>'+esc(a.detail)+'</p>'
-        +(a.fix?'<code>'+esc(a.fix)+'</code>':'')+'</div>').join('')
-    : '<p class="allgood">Nothing needs attention: every platform answered and the last run finished clean.</p>';
-
-  document.getElementById('cards').innerHTML=PLATS.map(([k,label])=>{
-    const p=d.platforms[k]||{ok:false,error:'not collected'};
+  document.getElementById('cons').innerHTML=PLATS.map(([k,label])=>{
+    const p=d.platforms[k]||{status:'down',statusText:'Not collected',sent:null};
+    const down=p.status!=='ok';
     const led=d.ledger&&d.ledger[k];
-    if(!p.ok) return '<div class="card bad"><h3>'+label+'</h3>'
-      +'<p class="at">not reporting</p><p class="err" title="'+esc(p.error||'')+'">'+esc(p.error||'unknown error')+'</p>'
-      +(led?'<p class="note">ledger says '+led.posted+' posted, '+led.owed+' still owed</p>':'')+'</div>';
-    const rows=[['followers',p.followersHidden?'hidden':n(p.followers)],
-                ['views',n(p.views)],
-                ['posts',n(p.videoCount)],
-                ['still owed',led?n(led.owed):null]];
-    return '<div class="card"><h3>'+label+'</h3><p class="at">'
-      +(p.url?'<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.handle||'')+'</a>':esc(p.handle||''))
-      +'</p><dl>'+rows.map(([a,b])=>'<dt>'+a+'</dt><dd>'+(b==null?'&mdash;':b)+'</dd>').join('')+'</dl>'
-      +(p.viewsNote?'<p class="note" title="'+esc(String(p.viewsNote))+'">views unavailable: '+esc(String(p.viewsNote))+'</p>':'')+'</div>';
+    return '<div class="con '+(down?'down':'ok')+'">'
+      +'<h3>'+label+'</h3>'
+      +'<p class="st"><i></i>'+esc(p.statusText||(down?'Not connected':'Working'))+'</p>'
+      +(down
+        ? '<p class="why">'+esc(p.statusWhy||'Uploads are not going through.')
+            +(led&&led.owed?' '+led.owed+' waiting.':'')+'</p>'
+          +(p.fix?'<code>'+esc(p.fix)+'</code>':'')
+        : '<p class="last">last posted '+(day(p.lastPosted)||'—')+'</p>')
+      +'<dl><dt>videos</dt><dd>'+fmt(p.sent)+'</dd>'
+      +'<dt>views</dt><dd>'+fmt(p.views)+'</dd>'
+      +'<dt>followers</dt><dd>'+fmt(p.followers)+'</dd></dl>'
+      +'</div>';
   }).join('');
 
-  // One row per piece, matched across platforms on the normalised title. The
-  // titles all come from the same upload sheet, so this is an exact match after
-  // normalising -- never a similarity score.
-  const byTitle=new Map();
+  const missing=PLATS.filter(([k])=>{const p=d.platforms[k];return p&&p.status==='ok'&&p.views==null;})
+                     .map(([,l])=>l);
+  document.getElementById('foot').textContent=
+    d.library+' pieces in the library, '+(d.approved!=null?d.approved:d.library)+' cleared to post.'
+    +(missing.length?' '+missing.join(' and ')+' will not report view counts — a dash means not reported, which is not zero.':'');
+
+  // One row per piece, matched across platforms on the normalised title. Every
+  // title comes from the same upload sheet, so this is exact after normalising.
+  const by=new Map();
   for(const [k] of PLATS){
     const p=d.platforms[k]; if(!p||!p.ok) continue;
     for(const v of p.videos||[]){
       const key=norm(v.title); if(!key) continue;
-      if(!byTitle.has(key)) byTitle.set(key,{title:v.title,when:v.when,per:{}});
-      const row=byTitle.get(key);
-      row.per[k]=v;
+      if(!by.has(key)) by.set(key,{title:v.title,when:v.when,per:{}});
+      const row=by.get(key); row.per[k]=v;
       if(v.when&&(!row.when||v.when<row.when)) row.when=v.when;
     }
   }
   const live=PLATS.filter(([k])=>d.platforms[k]&&d.platforms[k].ok);
-  const rows=[...byTitle.values()].sort((a,b)=>String(b.when||'').localeCompare(String(a.when||'')));
+  const rows=[...by.values()].sort((a,b)=>String(b.when||'').localeCompare(String(a.when||'')));
   document.getElementById('tbl').innerHTML=
     '<thead><tr><th>piece</th><th>first posted</th>'
-    +live.map(([,l])=>'<th>'+l+' views</th>').join('')
-    +'<th>likes</th></tr></thead><tbody>'
+    +live.map(([,l])=>'<th>'+l+'</th>').join('')+'<th>likes</th></tr></thead><tbody>'
     +rows.map(r=>{
-      const likes=live.reduce((a,[k])=>{const v=r.per[k];return v&&v.likes!=null?a+v.likes:a;},null===null?0:0);
-      const anyLike=live.some(([k])=>r.per[k]&&r.per[k].likes!=null);
+      let likes=null;
+      for(const [k] of live){const v=r.per[k]; if(v&&v.likes!=null) likes=(likes||0)+v.likes;}
       const first=live.map(([k])=>r.per[k]).find(v=>v&&v.url);
       return '<tr><td class="t" title="'+esc(r.title)+'">'
         +(first?'<a href="'+esc(first.url)+'" target="_blank" rel="noopener">'+esc(r.title)+'</a>':esc(r.title))
-        +'</td><td>'+(r.when?new Date(r.when).toLocaleDateString():'&mdash;')+'</td>'
-        +live.map(([k])=>cell(r.per[k]?r.per[k].views:null)).join('')
-        +(anyLike?'<td>'+n(likes)+'</td>':'<td class="na">&mdash;</td>')+'</tr>';
+        +'</td><td>'+(r.when?new Date(r.when).toLocaleDateString():'—')+'</td>'
+        +live.map(([k])=>'<td'+(r.per[k]&&r.per[k].views!=null?'':' class="na"')+'>'
+            +(r.per[k]&&r.per[k].views!=null?n(r.per[k].views):'—')+'</td>').join('')
+        +'<td'+(likes==null?' class="na"':'')+'>'+(likes==null?'—':n(likes))+'</td></tr>';
     }).join('')+'</tbody>';
   document.getElementById('tnote').textContent=
-    rows.length+' pieces seen across '+live.length+' reporting platform'+(live.length===1?'':'s')
-    +'. A dash means the platform did not report that number, which is not the same as zero.';
-  }).catch(e=>{
-    document.getElementById('asof').textContent='could not load stats.json — '+e.message;
-    document.getElementById('tnote').textContent='Run: node stats.mjs  (in ~/Desktop/Video/publish) then redeploy.';
-  }).finally(()=>{
-    const b=document.getElementById('refresh');
-    if(b){b.disabled=false;b.textContent='Check for new numbers';}
-  });
+    rows.length+' pieces across '+live.length+' reporting platform'+(live.length===1?'':'s')+'.';
+}
+
+function load(){
+  const b=document.getElementById('refresh');
+  if(b){b.disabled=true;b.textContent='checking…';}
+  // Cache-bust as well as no-store: Pages serves assets with a long max-age and
+  // a button that returns the cached copy is worse than no button at all.
+  return fetch('../stats.json?t='+Date.now(),{cache:'no-store'})
+    .then(r=>{if(!r.ok) throw new Error('stats.json '+r.status); return r.json();})
+    .then(render)
+    .catch(e=>{
+      document.getElementById('poster').textContent='could not load stats.json — '+e.message;
+      document.getElementById('foot').textContent='Run: node stats.mjs  (in ~/Desktop/Video/publish)';
+    })
+    .finally(()=>{const b=document.getElementById('refresh');
+      if(b){b.disabled=false;b.textContent='Check for new numbers';}});
 }
 document.getElementById('refresh').addEventListener('click',load);
 load();
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 </script>
 </body>
 </html>
