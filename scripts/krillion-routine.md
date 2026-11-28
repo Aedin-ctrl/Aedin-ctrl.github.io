@@ -31,16 +31,18 @@ Seven prompts, each with an `id` (`p1`..`p7`) and a `text`.
 
 **The day's answer is one input word, not seven.** The grader repairs a
 near-miss silently and scores it at the repaired answer's full value, and the
-repair runs against *each prompt's own answer set* -- so a single nonsense
-string lands on a different real answer in all seven. On 2026-11-27 `bonos`
-covered six of seven for 455 points. That is the game.
+repair runs against *each prompt's own answer set* -- so a single string lands
+on a different real answer in all seven. It does not have to be nonsense: on
+2026-11-27 the best word of the day was the ordinary English `cores` at 485,
+ahead of the nonsense `bonos` at 455, both covering six of seven. Shape is what
+matters, not vocabulary. That is the game.
 
 **The target: 420 points from the one input.** That is what `clearsBar` in the
 day file means, and it is the number the day is judged against. Five Deep Cuts
 answer for 425 on their own, so a word that covers five prompts well clears it
-even if two come back blank. `bonos` scored 455 on 2026-11-27 (six covered,
-five deep cuts, p5 blank, p7 a Schooler) -- that is a passing day, and the
-floor to beat.
+even if two come back blank. On 2026-11-27 `cores` scored 485 and `bonos` 455, both
+covering six of seven -- two passing days from one input, and the floor to
+beat.
 
 Coverage and deep cuts are recorded beside the total because they tell you
 *why* a word missed, but they do not decide the pick: a word is worth what it

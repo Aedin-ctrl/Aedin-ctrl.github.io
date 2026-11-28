@@ -33,6 +33,17 @@
   .total span{font-size:18px; color:var(--faint); font-weight:500;}
   .summary p{color:var(--muted); font-size:13px;}
 
+  .oneword{border:1px solid var(--line-strong); border-radius:12px; padding:20px; margin-bottom:24px; background:var(--wash);}
+  .ow-label{font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);}
+  .ow-word{font-family:'Space Grotesk',sans-serif; font-size:clamp(34px,8vw,56px); font-weight:700; letter-spacing:-0.02em; line-height:1.05; margin:6px 0 4px; overflow-wrap:anywhere;}
+  .ow-meta{font-size:13px; color:var(--faint); font-variant-numeric:tabular-nums;}
+  .ow-under{color:var(--ink); font-weight:600;}
+  .ow-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(104px,1fr)); gap:8px; margin-top:16px;}
+  .ow-cell{display:flex; flex-direction:column; gap:3px; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--paper);}
+  .ow-cell.no{opacity:.45;}
+  .ow-to{font-size:12px; font-weight:600; overflow-wrap:anywhere;}
+  .ow-s{font-size:11px; color:var(--faint); font-variant-numeric:tabular-nums;}
+
   .card{border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:12px;}
   .prompt{font-size:13px; color:var(--muted); margin-bottom:10px;}
   .answer-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap;}
@@ -104,10 +115,23 @@ function render(day){
       <div class="ladder">${rungs}</div>` : ''}
     </div>`;
   }).join('');
+  // The one word is the point of the day, so it goes above the seven cards:
+  // what to type, what it repairs to on each prompt, and what that is worth.
+  const u = day.universal;
+  const one = !u ? '' : `<div class="oneword">
+      <p class="ow-label">One word for all seven</p>
+      <p class="ow-word">${esc(u.input)}</p>
+      <p class="ow-meta">${u.total} pts &middot; ${u.covered}/7 answered &middot; ${u.deepcuts} deep cut${u.deepcuts === 1 ? '' : 's'}${u.clearsBar ? '' : ' &middot; <span class="ow-under">under 420</span>'}</p>
+      <div class="ow-grid">${u.prompts.map(t => `
+        <span class="ow-cell${t.accepted ? '' : ' no'}">
+          <span class="ow-to">${t.accepted ? esc(t.answer) : '&mdash; blank'}</span>
+          <span class="ow-s">${t.accepted ? t.score + ' pts' : '0'}</span>
+        </span>`).join('')}</div>
+    </div>`;
   out.innerHTML = `<div class="summary">
       <span class="total">${day.total}<span>/700</span></span>
       <p>${pretty(day.date)}${day.dayNumber ? ' &middot; dive #' + day.dayNumber : ''}</p>
-    </div>${cards}`;
+    </div>${one}${cards}`;
   out.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => {
     const c = t.closest('.card'), open = c.classList.toggle('open');
     t.textContent = open ? 'hide' : `${c.querySelectorAll('.rung').length} answers tested`;
