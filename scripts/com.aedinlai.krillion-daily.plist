@@ -8,8 +8,9 @@
   <array><string>/bin/bash</string><string>/Users/aedinlai/Library/Application Support/krillion-daily/krillion-daily.sh</string></array>
   <!-- 12:05 AM is the real run: the dive resets at midnight ET and these times
        are local, so keep the Mac on New York time or this fires on the wrong
-       day. 9 AM and 6 PM are retries for a Mac that was asleep at midnight;
-       each exits at once if the day is already published. -->
+       day. 9 AM and 6 PM are not decoration -- this runs on a laptop that is
+       usually shut at midnight, and they are what makes the day land anyway.
+       Each exits at once if the day is already published. -->
   <key>StartCalendarInterval</key>
   <array>
     <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>5</integer></dict>

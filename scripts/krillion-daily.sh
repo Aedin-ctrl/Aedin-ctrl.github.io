@@ -2,10 +2,23 @@
 # Finds and publishes today's best Krillion answers. Runs at 12:05 AM Boston
 # time -- five minutes after the dive resets at midnight ET -- with retries
 # later in the day, and exits right away once today is done:
-#   Pi:   cron (TZ America/New_York), 5 0,9,18 * * * with KRILLION_REMOTE +
-#         GIT_SSH_COMMAND set, same deploy key the news job pushes with
 #   Mac:  launchd job ~/Library/LaunchAgents/com.aedinlai.krillion-daily.plist
-#         (backup for a Pi that was asleep or offline at midnight)
+#         This is the one that actually runs. A laptop is not awake at 00:05
+#         every night, so the 9 AM and 6 PM entries matter: launchd also fires
+#         a missed calendar job once on wake, and each run exits at once if the
+#         day is already published. The dive stays up all day, so a late run
+#         still publishes the right thing.
+#   Pi:   alai@aedin-ctrl (reach it by Tailscale IP; MagicDNS is not resolving).
+#         Installed at ~/krillion-daily.sh, cron 5 0,9,18, system clock is EST.
+#         It pushes with ~/.ssh/news_deploy, the same deploy key the news job
+#         uses, and ~/krillion-daily must exist before the first run or cron's
+#         own >> redirect fails before the script can create it.
+#         This is the better home: the Pi is awake at midnight, the Mac is not.
+#
+#         It needs `claude` logged in. As of 2026-11-27 the Pi's CLI is NOT:
+#         "OAuth session expired and could not be refreshed", which is also why
+#         news stopped publishing that day. Both jobs stay broken until someone
+#         runs `claude` on the Pi and signs in again.
 #
 # Works in its own clone (krillion-daily/site in the folder below) so it never
 # touches a working copy. Claude writes the candidate lists and runs
