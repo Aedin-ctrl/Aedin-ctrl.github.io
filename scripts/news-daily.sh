@@ -43,8 +43,18 @@ fi
 cd "$SITE" || exit 1
 # --depth 1 here too, or the repo quietly deepens back to full history over time.
 git fetch -q --depth 1 origin main || { log "fetch failed (offline?)"; exit 1; }
-git reset -q --hard origin/main
-git clean -qfd
+# A failed reset is not a hiccup to log and walk past: it means the object store
+# is damaged, and the working tree is then some arbitrary half-state. Carrying on
+# would stage and push that state -- on 2026-11-27 a reboot mid-write left this
+# clone with empty object files, and the run that followed was one step from
+# pushing a commit that deleted .gitignore and reverted two pages. The clone is
+# disposable, so throw it away and let the next run build a fresh one.
+git reset -q --hard origin/main || {
+  log "reset failed; clone is corrupt, discarding $SITE so the next run re-clones"
+  rm -rf "$SITE"
+  exit 1
+}
+git clean -qfd || { log "clean failed in $SITE"; exit 1; }
 
 TODAY=$(TZ=America/New_York date +%F)
 if [ -f "docs/news/days/$TODAY.json" ]; then log "$TODAY already published"; exit 0; fi
