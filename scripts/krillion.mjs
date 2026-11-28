@@ -3,6 +3,7 @@
 //
 //   node scripts/krillion.mjs today                      print today's 7 prompts as JSON
 //   node scripts/krillion.mjs probe FILE.json [--date D]  grade candidates, write days/DATE.json
+//   node scripts/krillion.mjs reprobe [DATE]              re-grade today's day file against the grader now
 //   node scripts/krillion.mjs try p1 cry umiak ...       what these inputs are worth, printed only
 //   node scripts/krillion.mjs sweep p7 krai [--limit N]  walk a seed's near-misses to find new answers
 //   node scripts/krillion.mjs across kray kris ...       one word against all 7, with coverage
@@ -187,7 +188,56 @@ async function probe(file, dateArg){
   let cands;
   try { cands = JSON.parse(readFileSync(file, 'utf8')); } catch(e){ die(`${file} is not JSON: ${e.message}`); }
   if(!cands || typeof cands !== 'object' || Array.isArray(cands)) die('FILE must be an object of promptId -> [answers]');
+  await gradeAll(cands, dateArg);
+}
 
+// Re-grade every input a day file already tried, and rewrite it. The grader is
+// not a fixed oracle: krillion.io tightened its spelling repair overnight on
+// 2026-11-28, and the word published at 00:14 that morning was worth 465 points
+// then and 215 by breakfast. Numbers measured hours before anyone plays have to
+// be re-measured, not trusted.
+async function reprobe(dateArg){
+  const date = dateArg || todayET();
+  const file = join(DAYS, `${date}.json`);
+  if(!existsSync(file)) die(`no day file for ${date}; run a probe first`);
+  const old = JSON.parse(readFileSync(file, 'utf8'));
+
+  // Seven requests answer the only question that matters: is the word we
+  // published still worth what we said? Re-grading the whole pool to find that
+  // out would be 270 requests to someone else's server for a day that is
+  // usually fine.
+  if(old.universal){
+    let total = 0;
+    for(const e of old.universal.prompts){
+      const r = await grade(date, e.id, old.universal.input);
+      if(r === null) die('krillion.io stopped answering; the day file is untouched');
+      total += r.score || 0;
+      await sleep(GAP_MS);
+    }
+    if(total === old.universal.total){
+      console.log(`${date}: "${old.universal.input}" is still ${total} pts; nothing to re-grade`);
+      return;
+    }
+    console.log(`${date}: "${old.universal.input}" was ${old.universal.total} pts and is now ${total}; re-grading the day`);
+  }
+
+  const cands = {};
+  for(const p of old.prompts || []){
+    cands[p.id] = (p.tried || []).map(t => t.input).filter(a => typeof a === 'string' && a.trim());
+  }
+  const thin = Object.entries(cands).filter(([, l]) => !l.length).map(([id]) => id);
+  if(thin.length) die(`${date} has no recorded inputs for ${thin.join(', ')}; it predates input tracking, so there is nothing to re-grade`);
+  const out = await gradeAll(cands, date);
+  const was = old.universal, now = out.universal;
+  console.log(`was: ${was ? `${was.input} ${was.total}pts ${was.covered}/7` : 'no word'} (${old.probedAt})`);
+  console.log(`now: ${now ? `${now.input} ${now.total}pts ${now.covered}/7` : 'no word'}`);
+  // Re-grading only re-scores words this day already tried; it cannot find the
+  // word the new grader likes. Today's pool fell to 260 while a fresh hunt
+  // found 390, so say out loud that a human should go looking.
+  if(now && !clearsBar(now)) console.log(`${now.total} is under the ${BAR.total} bar -- the best word in this day's pool no longer clears it; a fresh hunt may beat it`);
+}
+
+async function gradeAll(cands, dateArg){
   const day = await getToday();
   const date = dateArg || day.date;
   if(date !== day.date) die(`asked for ${date} but krillion.io is serving ${day.date}; the dive resets at midnight ET`);
@@ -231,6 +281,7 @@ async function probe(file, dateArg){
   writeFileSync(join(DAYS, `${date}.json`), JSON.stringify(out, null, 2) + '\n');
   rebuild();
   console.log(`${date}: ${out.total}/700  ` + prompts.map(p => `${p.best.score}`).join(' '));
+  return out;
 }
 
 function dayFiles(){
@@ -544,7 +595,7 @@ async function hunt(seeds, budget, order, gateSize, listed){
   const pool = [...named, ...scavenged];
   console.log(`${named.length} word(s) you named + ${scavenged.length} scavenged; order ${ids.join(' ')}; gate ${gateSize}; budget ${budget} requests\n`);
 
-  let spent = 0, best = 0;
+  let spent = 0, best = 0, bestPts = 0;
   for(const w of pool){
     if(spent >= budget) break;
     let cov = 0, pts = 0;
@@ -560,12 +611,15 @@ async function hunt(seeds, budget, order, gateSize, listed){
       if(r.accepted){ cov++; pts += r.score; hits.push(`${ids[i]}:${r.score}(${r.answer})`); }
       await sleep(GAP_MS);
     }
-    if(cov > best || named.includes(w)){
+    // Points, not coverage, are what the bar is in -- a 5/7 worth 400 beats a
+    // 6/7 worth 325, and reporting on coverage alone hides it.
+    if(cov > best || pts > bestPts || named.includes(w)){
       if(cov > best) best = cov;
+      if(pts > bestPts) bestPts = pts;
       console.log(`${String(cov)}/7  ${String(pts).padStart(3)}pts  ${w.padEnd(12)} ${hits.join('  ') || '-'}`);
     }
   }
-  console.log(`\nspent ${spent} requests; best coverage ${best}/7`);
+  console.log(`\nspent ${spent} requests; best coverage ${best}/7; best ${bestPts} pts`);
 }
 
 const [cmd, ...rest] = process.argv.slice(2);
@@ -579,6 +633,7 @@ const orderFlag = (() => { const i = rest.indexOf('--order'); return i < 0 ? [] 
 const wordsFlag = (() => { const i = rest.indexOf('--words'); return i < 0 ? null : rest[i + 1]; })();
 if(cmd === 'today') console.log(JSON.stringify(await getToday(), null, 2));
 else if(cmd === 'probe') await probe(rest[0] || die('probe needs a FILE.json'), dateFlag);
+else if(cmd === 'reprobe') await reprobe(dateFlag || (rest[0] && DAY_RE.test(rest[0]) ? rest[0] : null));
 else if(cmd === 'try') await tryWords(rest[0], rest.slice(1));
 else if(cmd === 'across') await across(rest);
 else if(cmd === 'hunt') await hunt(rest.filter(w => !w.startsWith('--') && w !== String(budgetFlag) && w !== orderFlag.join(',') && w !== String(gateFlag) && w !== wordsFlag), budgetFlag, orderFlag, gateFlag, wordsFlag ? wordsFromFile(wordsFlag) : []);
@@ -586,4 +641,4 @@ else if(cmd === 'sweep') await sweep(rest[0], rest.slice(1).filter(w => !w.start
 else if(cmd === 'rebuild') rebuild();
 else if(cmd === 'check') check();
 else if(cmd === 'selfcheck') selfcheck();
-else die(`usage: krillion.mjs today | probe FILE.json [--date D] | try PROMPT WORD... | sweep PROMPT SEED... [--limit N] | rebuild | check | selfcheck  (today ET is ${todayET()})`);
+else die(`usage: krillion.mjs today | probe FILE.json [--date D] | reprobe [DATE] | try PROMPT WORD... | sweep PROMPT SEED... [--limit N] | rebuild | check | selfcheck  (today ET is ${todayET()})`);

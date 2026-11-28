@@ -19,7 +19,15 @@ touch a real run.
     TODAY=$(TZ=America/New_York date +%F)
     test -f docs/krillion/days/$TODAY.json && echo "already done"
 
-If today's file already exists, stop without changing anything.
+If today's file already exists, stop without changing anything. The runner
+handles that case itself without you: a later slot re-grades the published word
+(`krillion.mjs reprobe`) and republishes only if it moved.
+
+**The grader is not a fixed oracle.** On 2026-11-28 krillion.io tightened its
+spelling repair some time between 00:14 and 05:32 ET. The word published that
+morning was worth 465 points when it was measured and 215 by breakfast; the
+player who typed it got 305. Everything below was re-measured after that change.
+A number measured hours before anyone plays has to be re-measured, not trusted.
 
 ## 2. Get today's prompts
 
@@ -32,17 +40,21 @@ Seven prompts, each with an `id` (`p1`..`p7`) and a `text`.
 **The day's answer is one input word, not seven.** The grader repairs a
 near-miss silently and scores it at the repaired answer's full value, and the
 repair runs against *each prompt's own answer set* -- so a single string lands
-on a different real answer in all seven. It does not have to be nonsense: on
-2026-11-27 the best word of the day was the ordinary English `cores` at 485,
-ahead of the nonsense `bonos` at 455, both covering six of seven. Shape is what
-matters, not vocabulary. That is the game.
+on a different real answer in all seven. That is the game.
+
+**It has to be a real or near-real word now.** Nonsense stems are finished.
+`bonos`, `ronos`, `monos`, `menos` and nine of their cousins covered six of
+seven on 2026-11-27 and scored **0/7 each** on 2026-11-28 after the repair
+tightened. What works is five letters of ordinary English ending in -es or -os,
+or one edit from one: 2026-11-28's best was `toses` (390, all seven), found by
+scavenging the edit neighbourhood of `roses`.
 
 **The target: 420 points from the one input.** That is what `clearsBar` in the
-day file means, and it is the number the day is judged against. Five Deep Cuts
-answer for 425 on their own, so a word that covers five prompts well clears it
-even if two come back blank. On 2026-11-27 `cores` scored 485 and `bonos` 455, both
-covering six of seven -- two passing days from one input, and the floor to
-beat.
+day file means. It was set under the old, looser repair and **has not been
+cleared since**: the best word found on 2026-11-28, after ~1,300 requests of
+hunting, was 390 with all seven covered -- seven Rare answers. Under this
+grader a Deep Cut repair is scarce and 60 is the common hit, so 420 is seven
+Rare answers plus one upgrade. Treat it as a target, not a floor you failed.
 
 Coverage and deep cuts are recorded beside the total because they tell you
 *why* a word missed, but they do not decide the pick: a word is worth what it
@@ -53,15 +65,15 @@ So the candidate lists are built the other way round from how it looks. Write
 candidate into all seven lists, spelled identically**:
 
     {
-      "p1": ["bonos", "ronos", "donos", "banos", ..., "durian", "rambutan"],
-      "p2": ["bonos", "ronos", "donos", "banos", ..., "Arrival", "Moonlight"],
+      "p1": ["toses", "ioses", "panes", "holes", ..., "durian", "rambutan"],
+      "p2": ["toses", "ioses", "panes", "holes", ..., "Arrival", "Moonlight"],
       ...
     }
 
 A universal candidate that is missing from even one list is thrown away:
 `krillion.mjs` only ranks a word that was graded on all seven prompts, because
 a word tested on six says nothing about the seventh. Spell it the same way in
-every list -- `bonos` and `Bonos` are one word to the grader but two to the
+every list -- `toses` and `Toses` are one word to the grader but two to the
 ranker, and the split halves both their totals.
 
 ### Where universal candidates come from
@@ -72,8 +84,8 @@ neighbourhood of answers you already know:
 
 - **Yesterday's file.** `docs/krillion/days/` records the `input` for every
   attempt. Start from the inputs that covered the most prompts, and from the
-  vowel-swapped family around them (`bonos` -> `ronos`, `donos`, `banos`,
-  `benos`, `bonus`, `bonas`).
+  one-letter family around them (`roses` -> `toses`, `ioses`, `moses`,
+  `noses`). Vowel-swapping a nonsense stem no longer works.
 - **Short, vowel-heavy, 4-6 letters.** Those sit one edit from the most real
   words. A long exact answer is one edit from almost nothing.
 - **`node scripts/krillion.mjs hunt --words scripts/krillion-seeds.txt
@@ -123,10 +135,12 @@ meaning of the call:
   shows you before you commit.
 
 The repair is fuzzy *spelling* matching against real answers, roughly a letter
-out. It is not a dictionary of synonyms and not a way to funnel an easy word
-onto a hard one: `kray`, `filke` and `okrugg` repair to Krai, Fylke and Okrug,
-while `cry`, `folk` and `oak` repair to nothing at all. Do not write candidate
-lists that lean on it.
+out, and since 2026-11-28 it is strict about that letter. It is not a dictionary
+of synonyms and not a way to funnel an easy word onto a hard one: `kray`,
+`filke` and `okrugg` repair to Krai, Fylke and Okrug, while `cry`, `folk` and
+`oak` repair to nothing at all. A word with no match comes back
+`{accepted:false, checkSpelling:true}` -- no suggestion at all -- which is the
+dead end you want to recognise early.
 
 It is still worth knowing for one reason: `try` reports the suggestion behind
 every rejection, and a rejected word that suggests something real has handed you
@@ -176,6 +190,9 @@ Do not run git. The runner commits and pushes.
 Lead with **the one word**: the `universal` block in the day file -- the input
 to type, `covered` out of seven, `deepcuts`, the total, and what it repaired to
 on each prompt. Then the per-prompt winners as the fallback.
+
+Say what the word is worth **as measured in that run**, and nothing about what
+it was worth yesterday: yesterday's grader may not be today's.
 
 **Say in the first line whether `clearsBar` is true** -- that is, whether the
 one word made 420. If it is false, say which prompt went blank and which

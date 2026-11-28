@@ -1,146 +1,82 @@
 {
   "date": "2026-11-28",
   "dayNumber": 136,
-  "probedAt": "2026-11-28T05:14:05.571Z",
-  "total": 595,
+  "probedAt": "2026-11-28T11:13:12.195Z",
+  "total": 545,
   "universal": {
-    "input": "canes",
-    "total": 465,
+    "input": "toses",
+    "total": 390,
     "covered": 7,
-    "deepcuts": 5,
+    "deepcuts": 0,
     "prompts": [
       {
         "id": "p1",
-        "answer": "Kale",
+        "answer": "Soursop",
         "accepted": true,
-        "tier": "schooler",
-        "score": 30
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p2",
-        "answer": "Cane",
+        "answer": "Port of Spain",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p3",
-        "answer": "J.J. Cale",
+        "answer": "Peter Tosh",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p4",
-        "answer": "Barry Cable",
+        "answer": "Stephen Silvagni",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p5",
-        "answer": "CAGE",
+        "answer": "Borderlands: The Pre-Sequel",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p6",
-        "answer": "Logan Cates",
+        "answer": "Moses",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85
+        "tier": "rare",
+        "score": 60
       },
       {
         "id": "p7",
-        "answer": "Cancer",
+        "answer": "Rabbit",
         "accepted": true,
-        "tier": "plankton",
-        "score": 10
+        "tier": "schooler",
+        "score": 30
       }
     ],
-    "clearsBar": true
+    "clearsBar": false
   },
   "prompts": [
     {
       "id": "p1",
       "text": "Name a green fruit or vegetable",
       "best": {
-        "input": "ronos",
-        "answer": "Noni leaves",
+        "input": "ports",
+        "answer": "Leek",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85,
+        "tier": "rare",
+        "score": 60,
         "correction": null
       },
       "tried": [
         {
-          "input": "ronos",
-          "answer": "Noni leaves",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "banos",
-          "answer": "Melinjo leaves",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "wanos",
-          "answer": "Gano avocado",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "danos",
-          "answer": "Gano avocado",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "Noni leaves",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "Hoja santa",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "Lagos spinach",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
           "input": "ports",
           "answer": "Leek",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "Key lime",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -229,6 +165,46 @@
         {
           "input": "Samphire",
           "answer": "Samphire",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "toses",
+          "answer": "Soursop",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Jackfruit",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Bitter melon",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Bitter melon",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Jackfruit",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -371,16 +347,8 @@
           "correction": null
         },
         {
-          "input": "Cupuacu",
-          "answer": "Cupuacu",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Rambutan",
-          "answer": "Rambutan",
+          "input": "holes",
+          "answer": "holes",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -417,22 +385,6 @@
           "correction": null
         },
         {
-          "input": "ports",
-          "answer": "Porto",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "lanes",
-          "answer": "Banes",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
           "input": "Chichicastenango",
           "answer": "Chichicastenango",
           "accepted": true,
@@ -446,6 +398,22 @@
           "accepted": true,
           "tier": "deepcut",
           "score": 85,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "Holetown",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ports",
+          "answer": "Port Antonio",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
           "correction": null
         },
         {
@@ -601,6 +569,46 @@
           "correction": null
         },
         {
+          "input": "toses",
+          "answer": "Port of Spain",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Port of Spain",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Bridgetown",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Salvador",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Port of Spain",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
           "input": "Lima",
           "answer": "Lima",
           "accepted": true,
@@ -657,40 +665,8 @@
           "correction": null
         },
         {
-          "input": "ronos",
-          "answer": "ronos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "konos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
+          "input": "lanes",
+          "answer": "lanes",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -702,46 +678,14 @@
       "id": "p3",
       "text": "Name a musician who has passed away and still has at least 1 million monthly listeners on Spotify",
       "best": {
-        "input": "lines",
-        "answer": "Brent Liles",
+        "input": "Roy Orbison",
+        "answer": "Roy Orbison",
         "accepted": true,
-        "tier": "deepcut",
-        "score": 85,
+        "tier": "rare",
+        "score": 60,
         "correction": null
       },
       "tried": [
-        {
-          "input": "lines",
-          "answer": "Brent Liles",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "danos",
-          "answer": "Rick Danko",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "canes",
-          "answer": "J.J. Cale",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "lanes",
-          "answer": "Denny Laine",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
         {
           "input": "Roy Orbison",
           "answer": "Roy Orbison",
@@ -793,6 +737,14 @@
         {
           "input": "Sixto Rodriguez",
           "answer": "Rodriguez",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "toses",
+          "answer": "Peter Tosh",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -911,6 +863,14 @@
           "correction": null
         },
         {
+          "input": "panes",
+          "answer": "Liam Payne",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
           "input": "Michael Jackson",
           "answer": "Michael Jackson",
           "accepted": true,
@@ -935,72 +895,40 @@
           "correction": null
         },
         {
-          "input": "ronos",
-          "answer": "ronos",
+          "input": "ioses",
+          "answer": "ioses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "banos",
-          "answer": "banos",
+          "input": "holes",
+          "answer": "holes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "wanos",
-          "answer": "wanos",
+          "input": "hares",
+          "answer": "hares",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "konos",
-          "answer": "konos",
+          "input": "hoses",
+          "answer": "hoses",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "ports",
-          "answer": "ports",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Sade Adu",
-          "answer": "Sade Adu",
+          "input": "lanes",
+          "answer": "lanes",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -1012,38 +940,14 @@
       "id": "p4",
       "text": "Name a player who won a league title in the NBA, Premier League, La Liga, AFL, or IPL (women’s equivalents count too)",
       "best": {
-        "input": "wanos",
-        "answer": "Sandra Paños",
+        "input": "lanes",
+        "answer": "Gordon Lane",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
         "correction": null
       },
       "tried": [
-        {
-          "input": "wanos",
-          "answer": "Sandra Paños",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "danos",
-          "answer": "Sandra Paños",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "canes",
-          "answer": "Barry Cable",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
         {
           "input": "lanes",
           "answer": "Gordon Lane",
@@ -1053,8 +957,8 @@
           "correction": null
         },
         {
-          "input": "lines",
-          "answer": "Jeremy Lin",
+          "input": "canes",
+          "answer": "Leroy Sané",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -1111,6 +1015,54 @@
         {
           "input": "Aitana Bonmatí",
           "answer": "Aitana Bonmatí",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "toses",
+          "answer": "Stephen Silvagni",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Stephen Silvagni",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Darren Millane",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "Ole Gunnar Solskjær",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Elvin Hayes",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Stephen Silvagni",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -1243,78 +1195,6 @@
           "tier": "plankton",
           "score": 10,
           "correction": null
-        },
-        {
-          "input": "ronos",
-          "answer": "ronos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "banos",
-          "answer": "banos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "konos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Steven Gerrard",
-          "answer": "Steven Gerrard",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Leicester Danny Drinkwater",
-          "answer": "Leicester Danny Drinkwater",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Ross Lyon",
-          "answer": "Ross Lyon",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
         }
       ]
     },
@@ -1322,46 +1202,14 @@
       "id": "p5",
       "text": "Name a first-person shooter game",
       "best": {
-        "input": "lines",
-        "answer": "The Mines",
+        "input": "Hard Reset",
+        "answer": "Hard Reset",
         "accepted": true,
         "tier": "deepcut",
         "score": 85,
         "correction": null
       },
       "tried": [
-        {
-          "input": "lines",
-          "answer": "The Mines",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "wanos",
-          "answer": "Wands",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "canes",
-          "answer": "CAGE",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "ports",
-          "answer": "Post",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
         {
           "input": "Hard Reset",
           "answer": "Hard Reset",
@@ -1384,6 +1232,22 @@
           "accepted": true,
           "tier": "deepcut",
           "score": 85,
+          "correction": null
+        },
+        {
+          "input": "holes",
+          "answer": "HOLE",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "wanos",
+          "answer": "Wolfenstein: The New Order",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
           "correction": null
         },
         {
@@ -1461,6 +1325,22 @@
         {
           "input": "Dusk",
           "answer": "Dusk",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "toses",
+          "answer": "Borderlands: The Pre-Sequel",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Insurgency: Sandstorm",
           "accepted": true,
           "tier": "rare",
           "score": 60,
@@ -1611,48 +1491,24 @@
           "correction": null
         },
         {
-          "input": "ronos",
-          "answer": "ronos",
+          "input": "panes",
+          "answer": "panes",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "banos",
-          "answer": "banos",
+          "input": "hares",
+          "answer": "hares",
           "accepted": false,
           "tier": null,
           "score": 0,
           "correction": null
         },
         {
-          "input": "danos",
-          "answer": "danos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "konos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
+          "input": "hoses",
+          "answer": "hoses",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -1661,14 +1517,6 @@
         {
           "input": "lanes",
           "answer": "lanes",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -1691,38 +1539,6 @@
         {
           "input": "lines",
           "answer": "Lin (Shantaram)",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "wanos",
-          "answer": "Wang Lung",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "danos",
-          "answer": "Davos Seaworth",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "canes",
-          "answer": "Logan Cates",
-          "accepted": true,
-          "tier": "deepcut",
-          "score": 85,
-          "correction": null
-        },
-        {
-          "input": "ports",
-          "answer": "Porta",
           "accepted": true,
           "tier": "deepcut",
           "score": 85,
@@ -1777,14 +1593,6 @@
           "correction": null
         },
         {
-          "input": "Paul Atreides",
-          "answer": "Paul Atreides",
-          "accepted": true,
-          "tier": "rare",
-          "score": 60,
-          "correction": null
-        },
-        {
           "input": "Anne Shirley",
           "answer": "Anne Shirley",
           "accepted": true,
@@ -1830,6 +1638,62 @@
           "accepted": true,
           "tier": "rare",
           "score": 60,
+          "correction": null
+        },
+        {
+          "input": "toses",
+          "answer": "Moses",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Moses",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "The Tortoise (The Tortoise and the Hare)",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Harry Dresden",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
+          "input": "danos",
+          "answer": "Hamlet",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "canes",
+          "answer": "Hamlet",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "Paul Atreides",
+          "answer": "Paul Atreides",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
           "correction": null
         },
         {
@@ -1929,6 +1793,14 @@
           "correction": null
         },
         {
+          "input": "panes",
+          "answer": "Peter Pan",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
           "input": "Harry Potter",
           "answer": "Harry Potter",
           "accepted": true,
@@ -1945,56 +1817,8 @@
           "correction": null
         },
         {
-          "input": "ronos",
-          "answer": "ronos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "banos",
-          "answer": "banos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "konos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "Sophie Zemmel",
-          "answer": "Sophie Zemmel",
+          "input": "holes",
+          "answer": "holes",
           "accepted": false,
           "tier": null,
           "score": 0,
@@ -2025,6 +1849,22 @@
         {
           "input": "Yod",
           "answer": "Yod",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "ioses",
+          "answer": "Io",
+          "accepted": true,
+          "tier": "deepcut",
+          "score": 85,
+          "correction": null
+        },
+        {
+          "input": "panes",
+          "answer": "Pan",
           "accepted": true,
           "tier": "deepcut",
           "score": 85,
@@ -2191,6 +2031,14 @@
           "correction": null
         },
         {
+          "input": "holes",
+          "answer": "Domicile",
+          "accepted": true,
+          "tier": "rare",
+          "score": 60,
+          "correction": null
+        },
+        {
           "input": "Mercury retrograde",
           "answer": "Mercury retrograde",
           "accepted": true,
@@ -2271,83 +2119,35 @@
           "correction": null
         },
         {
+          "input": "toses",
+          "answer": "Rabbit",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "hares",
+          "answer": "Rabbit",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
+          "input": "hoses",
+          "answer": "Tiger",
+          "accepted": true,
+          "tier": "schooler",
+          "score": 30,
+          "correction": null
+        },
+        {
           "input": "canes",
           "answer": "Cancer",
           "accepted": true,
           "tier": "plankton",
           "score": 10,
-          "correction": null
-        },
-        {
-          "input": "lines",
-          "answer": "lines",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "ronos",
-          "answer": "ronos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "banos",
-          "answer": "banos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "danos",
-          "answer": "danos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "konos",
-          "answer": "konos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "moons",
-          "answer": "moons",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "ports",
-          "answer": "ports",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "manos",
-          "answer": "manos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
-          "correction": null
-        },
-        {
-          "input": "sonos",
-          "answer": "sonos",
-          "accepted": false,
-          "tier": null,
-          "score": 0,
           "correction": null
         }
       ]

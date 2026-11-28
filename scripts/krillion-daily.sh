@@ -70,13 +70,26 @@ git reset -q --hard origin/main || {
 git clean -qfd || { log "clean failed in $SITE"; exit 1; }
 
 TODAY=$(TZ=America/New_York date +%F)
-if [ -f "docs/krillion/days/$TODAY.json" ]; then log "$TODAY already published"; exit 0; fi
+# Already published is not "done". krillion.io tightened its spelling repair
+# overnight on 2026-11-28 and the word published at 00:14 that morning was worth
+# 465 points then and 215 by breakfast -- the player got 305. The later slots
+# re-grade what we published and republish it if it moved; that costs seven
+# requests on a day nothing changed.
+MODE=probe
+if [ -f "docs/krillion/days/$TODAY.json" ]; then MODE=recheck; fi
 
 # The dive resets at 05:00Z. Running before that gets yesterday's prompts, and
 # probe refuses the mismatch -- so just wait for the switch rather than fail.
 SERVED=$(curl -fsS --max-time 20 https://krillion.io/api/today | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).date||"")}catch(e){console.log("")}})')
 if [ "$SERVED" != "$TODAY" ]; then log "krillion.io is still serving '$SERVED', want $TODAY; will retry at the next run"; exit 1; fi
 
+if [ "$MODE" = recheck ]; then
+  log "$TODAY is published; re-grading it against the grader now"
+  node scripts/krillion.mjs reprobe "$TODAY" || { log "reprobe failed; leaving $TODAY as it was"; exit 1; }
+  if [ -z "$(git status --porcelain -- docs/krillion)" ]; then log "$TODAY is unchanged"; exit 0; fi
+fi
+
+if [ "$MODE" = probe ]; then
 log "probing $TODAY with $MODEL"
 PROMPT="You find the day's best Krillion answers for aedinlai.com, started by the Mac runner. Today is $TODAY (America/New_York). Read scripts/krillion-routine.md and follow it through step 5 (running node scripts/krillion.mjs probe krillion-today.json until it succeeds). Do not run git; the runner commits and pushes. Finish with the seven winning answers, their tiers, and the day's total."
 perl -e 'alarm shift; exec @ARGV' "$MAX_SECONDS" \
@@ -84,6 +97,7 @@ perl -e 'alarm shift; exec @ARGV' "$MAX_SECONDS" \
     --allowedTools "Read" "Write" "Edit" "Glob" "Grep" \
       "Bash(node scripts/krillion.mjs:*)" "Bash(node -e:*)" "Bash(TZ=America/New_York date:*)" "Bash(date:*)" "Bash(ls:*)" "Bash(test:*)" "Bash(cat:*)" "Bash(head:*)" "Bash(wc:*)"
 log "claude exited with $?"
+fi
 
 if [ ! -f "docs/krillion/days/$TODAY.json" ]; then log "no day file was written; will retry at the next run"; exit 1; fi
 node scripts/krillion.mjs check || { log "day file failed the check; not publishing"; exit 1; }
@@ -92,8 +106,13 @@ if [ -n "$(git status --porcelain -- . ':!docs/krillion' ':!krillion-today.json'
 fi
 
 TOTAL=$(node -e "console.log(require('./docs/krillion/days/$TODAY.json').total)")
+WORD=$(node -e "const u=require('./docs/krillion/days/$TODAY.json').universal; console.log(u ? u.input + ' ' + u.total : '')")
 git add docs/krillion
-git commit -q -m "Krillion: $TODAY ($TOTAL/700)" || { log "nothing to commit"; exit 1; }
+if [ "$MODE" = recheck ]; then
+  git commit -q -m "Krillion: $TODAY re-graded ($WORD)" || { log "nothing to commit"; exit 0; }
+else
+  git commit -q -m "Krillion: $TODAY ($TOTAL/700)" || { log "nothing to commit"; exit 1; }
+fi
 for try in 1 2 3; do
   if git push -q origin HEAD:main; then log "published $TODAY ($TOTAL/700)"; exit 0; fi
   log "push failed (try $try); rebasing onto origin/main"
