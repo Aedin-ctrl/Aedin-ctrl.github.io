@@ -55,6 +55,9 @@ if [ ! -d "$SITE/.git" ]; then
   git clone -q --depth 1 --single-branch --branch main "$REMOTE" "$SITE" || { log "clone failed"; exit 1; }
 fi
 cd "$SITE" || exit 1
+# A run that died inside a rebase leaves the clone on a detached HEAD with
+# conflict markers, and every run after it quietly works on the wrong tree.
+git rebase --abort 2>/dev/null; git merge --abort 2>/dev/null
 git fetch -q --depth 1 origin main || { log "fetch failed (offline?)"; exit 1; }
 # A failed reset is not a hiccup to log and walk past: it means the object store
 # is damaged, and the working tree is then some arbitrary half-state. Carrying on
@@ -107,17 +110,36 @@ fi
 
 TOTAL=$(node -e "console.log(require('./docs/krillion/days/$TODAY.json').total)")
 WORD=$(node -e "const u=require('./docs/krillion/days/$TODAY.json').universal; console.log(u ? u.input + ' ' + u.total : '')")
+if [ "$MODE" = recheck ]; then MSG="Krillion: $TODAY re-graded ($WORD)"; else MSG="Krillion: $TODAY ($TOTAL/700)"; fi
 git add docs/krillion
-if [ "$MODE" = recheck ]; then
-  git commit -q -m "Krillion: $TODAY re-graded ($WORD)" || { log "nothing to commit"; exit 0; }
-else
-  git commit -q -m "Krillion: $TODAY ($TOTAL/700)" || { log "nothing to commit"; exit 1; }
-fi
+git commit -q -m "$MSG" || { log "nothing to commit"; [ "$MODE" = recheck ] && exit 0 || exit 1; }
+# `git push` exiting 0 is not proof that today is on main. On 2026-11-28 the
+# push hit a DNS failure, the rebase that followed hit a conflict and was
+# swallowed by `|| true`, and the retry pushed a detached HEAD that was already
+# origin/main -- so it succeeded, logged "published 2026-11-28 (545/700)" and
+# published nothing. The day the Pi had measured was lost for the whole day.
+# So: ask the remote, and rebuild the commit rather than rebase into a conflict.
 for try in 1 2 3; do
-  if git push -q origin HEAD:main; then log "published $TODAY ($TOTAL/700)"; exit 0; fi
-  log "push failed (try $try); rebasing onto origin/main"
-  git pull -q --rebase origin main || true
+  # Not "did push exit 0" but "is the file I measured the one main serves".
+  # merge-base cannot answer that in a --depth 1 clone; the bytes can.
+  if git push -q origin HEAD:main && git fetch -q --depth 1 origin main \
+     && git show "FETCH_HEAD:docs/krillion/days/$TODAY.json" | cmp -s - "docs/krillion/days/$TODAY.json"; then
+    log "published $TODAY ($TOTAL/700)"; exit 0
+  fi
+  log "push did not land (try $try); rebuilding the commit on top of origin/main"
+  git rebase --abort 2>/dev/null
+  # The day file is the measurement; index.json is derived from it. Keeping it
+  # aside and re-committing it beats resolving a conflict in a cron job, and
+  # the later measurement is the better one when two machines raced.
+  cp "docs/krillion/days/$TODAY.json" "$BASE/day.json" || { log "cannot keep $TODAY aside"; exit 1; }
+  # A DNS blip is what started this; give it the next try rather than the day.
+  git fetch -q --depth 1 origin main && git reset -q --hard FETCH_HEAD && git clean -qfd || { log "could not reach origin (try $try)"; sleep 20; continue; }
+  mkdir -p docs/krillion/days
+  cp "$BASE/day.json" "docs/krillion/days/$TODAY.json"
+  node scripts/krillion.mjs rebuild >/dev/null || { log "rebuild failed"; exit 1; }
+  git add docs/krillion
+  git commit -q -m "$MSG" || log "nothing new to commit"
   sleep 20
 done
-log "push failed; the commit is waiting in $SITE"
+log "push failed three times; the commit is waiting in $SITE"
 exit 1
