@@ -3,11 +3,14 @@
 # time -- five minutes after the dive resets at midnight ET -- with retries
 # later in the day, and exits right away once today is done:
 #   Mac:  launchd job ~/Library/LaunchAgents/com.aedinlai.krillion-daily.plist
-#         This is the one that actually runs. A laptop is not awake at 00:05
-#         every night, so the 9 AM and 6 PM entries matter: launchd also fires
-#         a missed calendar job once on wake, and each run exits at once if the
-#         day is already published. The dive stays up all day, so a late run
-#         still publishes the right thing.
+#         The backup, at 00:40 -- NOT 00:05. On 2026-11-28 both machines probed
+#         at 00:05, measured different words (the grader changed between them),
+#         and raced to push; the Mac won with the worse one and the Pi's run was
+#         lost. Thirty-five minutes is enough for the Pi to finish, after which
+#         this run is a seven-request recheck. A laptop is not awake at midnight
+#         every night, so the 9 AM and 6 PM entries matter: launchd fires a
+#         missed calendar job once on wake. The dive stays up all day, so a late
+#         run still publishes the right thing.
 #   Pi:   alai@aedin-ctrl (reach it by Tailscale IP; MagicDNS is not resolving).
 #         Installed at ~/krillion-daily.sh, cron 5 0,9,18, system clock is EST.
 #         It pushes with ~/.ssh/news_deploy, the same deploy key the news job
