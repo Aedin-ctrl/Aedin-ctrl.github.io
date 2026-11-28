@@ -35,15 +35,16 @@ repair runs against *each prompt's own answer set* -- so a single nonsense
 string lands on a different real answer in all seven. On 2026-11-27 `bonos`
 covered six of seven for 455 points. That is the game.
 
-**The target: one word that answers all seven, with at least five of them a
-Deep Cut.** That is the bar `krillion.mjs` ranks by -- a word that clears it is
-picked over a word that scores more and leaves a prompt blank, because a blank
-prompt is a blank prompt. Six deep cuts and a miss is a worse run than seven
-answers with five deep cuts, and the picker says so.
+**The target: 420 points from the one input.** That is what `clearsBar` in the
+day file means, and it is the number the day is judged against. Five Deep Cuts
+answer for 425 on their own, so a word that covers five prompts well clears it
+even if two come back blank. `bonos` scored 455 on 2026-11-27 (six covered,
+five deep cuts, p5 blank, p7 a Schooler) -- that is a passing day, and the
+floor to beat.
 
-`bonos` did **not** clear it on 2026-11-27: six covered, five deep cuts, p5
-blank and p7 only a Schooler. Treat a word like that as the floor to beat, not
-the answer.
+Coverage and deep cuts are recorded beside the total because they tell you
+*why* a word missed, but they do not decide the pick: a word is worth what it
+scores.
 
 So the candidate lists are built the other way round from how it looks. Write
 `krillion-today.json` as one list per prompt id, and **put every universal
@@ -73,6 +74,9 @@ neighbourhood of answers you already know:
   `benos`, `bonus`, `bonas`).
 - **Short, vowel-heavy, 4-6 letters.** Those sit one edit from the most real
   words. A long exact answer is one edit from almost nothing.
+- **`node scripts/krillion.mjs hunt --words scripts/krillion-seeds.txt
+  --budget 300`** runs the standing seed family first -- the shapes that have
+  scored before. Start every day here; it is the cheapest 420 you will find.
 - **`node scripts/krillion.mjs hunt <seeds> --budget 150 --order <hard
   prompts first> --gate 2`** scavenges the edit neighbourhood of seeds and
   abandons a candidate that clears none of the gated prompts, which costs two
@@ -157,10 +161,9 @@ Lead with **the one word**: the `universal` block in the day file -- the input
 to type, `covered` out of seven, `deepcuts`, the total, and what it repaired to
 on each prompt. Then the per-prompt winners as the fallback.
 
-**Say in the first line whether `clearsBar` is true.** If it is false, say which
-prompt went blank and which answers came back under Deep Cut -- that is the
-whole result, and burying it under a points total hides the one thing the run
-was for. Name the seeds you tried for the missing prompt so tomorrow does not
+**Say in the first line whether `clearsBar` is true** -- that is, whether the
+one word made 420. If it is false, say which prompt went blank and which
+answers came back under Deep Cut; that is what the next day has to fix. Name the seeds you tried for the missing prompt so tomorrow does not
 repeat them; tomorrow's prompts are different answer sets, so today's champion
 means nothing then, but a seed family that could not reach a drawing-jobs
 prompt probably cannot reach the next one either.

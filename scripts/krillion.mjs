@@ -121,20 +121,20 @@ function best(tried){
 
 function rankOf(tier){ const i = TIERS.indexOf(tier); return i < 0 ? -1 : i; }
 
-// The bar a universal word has to clear: every prompt answered, and at least
-// five of them a Deep Cut. It is a constraint, not a score -- a word that
-// clears it beats one that does not however the points fall, because six
-// great answers and a blank prompt is a worse run than seven you can type.
-const BAR = { covered: 7, deepcuts: 5 };
-function clearsBar(u){ return u.covered >= BAR.covered && u.deepcuts >= BAR.deepcuts; }
+// The bar a universal word has to clear: 420 points from the one input. That
+// is a usable run -- five Deep Cuts answer for 425 on their own -- and it is
+// the number the day is judged against. Coverage and deep cuts are reported
+// beside it because they say WHY a word missed, but they do not rank: a word
+// is worth what it scores.
+const BAR = { total: 420 };
+function clearsBar(u){ return u.total >= BAR.total; }
 
-// Below the bar -- and between two words that both clear it -- the higher
-// total wins, and ties go to the shorter word, the one you can type in 25
-// seconds.
+// Higher total wins. A tie goes to the word that leaves fewer prompts blank,
+// then to the shorter word -- the one you can actually type in 25 seconds.
 function betterUniversal(a, b){
   if(!b) return true;
-  if(clearsBar(a) !== clearsBar(b)) return clearsBar(a);
   if(a.total !== b.total) return a.total > b.total;
+  if(a.covered !== b.covered) return a.covered > b.covered;
   if(a.input.length !== b.input.length) return a.input.length < b.input.length;
   return a.input.toLowerCase() < b.input.toLowerCase();
 }
@@ -342,10 +342,7 @@ function selfcheck(){
   // Repaired spellings are not inputs: an old day file has nothing to offer.
   const legacy = bestUniversal([up('p1',[{answer:'Cupuacu',accepted:true,score:85}])]);
   if(legacy !== null){ bad++; console.error('FAIL universal: a file with no input words should yield nothing'); }
-  // The bar beats the scoreboard: seven answered with five deep cuts is a
-  // better run than six deep cuts and a blank prompt, even though it scores
-  // 25 fewer points. This is the whole point of the pick, so it is the test
-  // that must not quietly pass.
+  // The bar is 420 points from one input, and the pick is the highest total.
   const row = (input, score, tier) => ({ input, answer:input, accepted: score > 0, tier: score > 0 ? tier : null, score });
   const seven = [1,2,3,4,5,6,7].map(n => ({
     id:`p${n}`,
@@ -355,28 +352,28 @@ function selfcheck(){
     ],
   }));
   const picked = bestUniversal(seven);
-  if(!picked || picked.input !== 'alpha'){ bad++; console.error(`FAIL bar: wanted alpha (7 covered, 5 deep cuts), got ${picked && picked.input}`); }
-  if(picked && picked.total !== 485){ bad++; console.error(`FAIL bar: wanted total 485, got ${picked.total}`); }
-  if(picked && (picked.covered !== 7 || picked.deepcuts !== 5)){ bad++; console.error(`FAIL bar: wanted 7 covered / 5 deepcuts, got ${picked.covered}/${picked.deepcuts}`); }
-  if(picked && picked.clearsBar !== true){ bad++; console.error('FAIL bar: alpha should clear the bar'); }
-  // beta scores more and must still lose; confirm it really is the richer word.
-  const betaOnly = bestUniversal(seven.map(p => ({ id:p.id, tried:p.tried.filter(t => t.input === 'beta') })));
-  if(!betaOnly || betaOnly.total !== 510){ bad++; console.error(`FAIL bar: beta should total 510, got ${betaOnly && betaOnly.total}`); }
-  if(betaOnly && betaOnly.clearsBar !== false){ bad++; console.error('FAIL bar: beta misses a prompt and must not clear the bar'); }
-  // Krillion (100) counts toward the five, Rare (60) does not.
-  if(!clearsBar({covered:7,deepcuts:5})){ bad++; console.error('FAIL bar: 7 covered with 5 deep cuts should clear'); }
-  if(clearsBar({covered:7,deepcuts:4})){ bad++; console.error('FAIL bar: four deep cuts should not clear'); }
-  if(clearsBar({covered:6,deepcuts:6})){ bad++; console.error('FAIL bar: a missed prompt should not clear'); }
+  if(!picked || picked.input !== 'beta'){ bad++; console.error(`FAIL pick: wanted beta (510), got ${picked && picked.input}`); }
+  if(picked && picked.total !== 510){ bad++; console.error(`FAIL pick: wanted total 510, got ${picked.total}`); }
+  if(picked && (picked.covered !== 6 || picked.deepcuts !== 6)){ bad++; console.error(`FAIL pick: wanted 6 covered / 6 deepcuts, got ${picked.covered}/${picked.deepcuts}`); }
+  // A tie on points goes to the word that leaves fewer prompts blank.
+  const tied = bestUniversal([1,2,3,4,5,6,7].map(n => ({ id:`p${n}`, tried:[
+    row('wide', n <= 6 ? 60 : 60, 'rare'),
+    row('deep', n <= 4 ? 105 : 0, 'krillion'),
+  ]})));
+  if(!tied || tied.input !== 'wide'){ bad++; console.error(`FAIL tie: 420 with 7 covered should beat 420 with 4, got ${tied && tied.input}`); }
+  if(!clearsBar({total:420})){ bad++; console.error('FAIL bar: exactly 420 should clear'); }
+  if(clearsBar({total:419})){ bad++; console.error('FAIL bar: 419 should not clear'); }
+  if(!clearsBar({total:455})){ bad++; console.error('FAIL bar: bonos at 455 should clear'); }
   // Rare is not a deep cut. Seven Rare answers answer every prompt and still
   // miss the bar -- without this case, lowering the tier threshold to 'rare'
   // passes the whole suite.
   const rare = bestUniversal([1,2,3,4,5,6,7].map(n => ({ id:`p${n}`, tried:[row('gamma', n <= 5 ? 60 : 30, n <= 5 ? 'rare' : 'schooler')] })));
-  if(!rare || rare.deepcuts !== 0){ bad++; console.error(`FAIL bar: five Rare answers are 0 deep cuts, got ${rare && rare.deepcuts}`); }
-  if(rare && rare.clearsBar !== false){ bad++; console.error('FAIL bar: all-Rare should not clear the bar'); }
+  if(!rare || rare.deepcuts !== 0){ bad++; console.error(`FAIL tier: five Rare answers are 0 deep cuts, got ${rare && rare.deepcuts}`); }
+  if(rare && rare.clearsBar !== false){ bad++; console.error('FAIL bar: 360 points should not clear 420'); }
   // Krillion outranks Deep Cut and must count toward the five.
   const kril = bestUniversal([1,2,3,4,5,6,7].map(n => ({ id:`p${n}`, tried:[row('delta', n <= 5 ? 100 : 30, n <= 5 ? 'krillion' : 'schooler')] })));
-  if(!kril || kril.deepcuts !== 5){ bad++; console.error(`FAIL bar: five Krillions are 5 deep-cuts-or-better, got ${kril && kril.deepcuts}`); }
-  if(kril && kril.clearsBar !== true){ bad++; console.error('FAIL bar: five Krillions plus two answered should clear'); }
+  if(!kril || kril.deepcuts !== 5){ bad++; console.error(`FAIL tier: five Krillions are 5 deep-cuts-or-better, got ${kril && kril.deepcuts}`); }
+  if(kril && kril.clearsBar !== true){ bad++; console.error('FAIL bar: 560 points should clear 420'); }
   if(bad) die(`${bad} check(s) failed`);
   console.log(`selfcheck: ${cases.length + 29} checks ok`);
 }
