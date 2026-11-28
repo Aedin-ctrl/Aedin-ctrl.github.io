@@ -35,6 +35,16 @@ repair runs against *each prompt's own answer set* -- so a single nonsense
 string lands on a different real answer in all seven. On 2026-11-27 `bonos`
 covered six of seven for 455 points. That is the game.
 
+**The target: one word that answers all seven, with at least five of them a
+Deep Cut.** That is the bar `krillion.mjs` ranks by -- a word that clears it is
+picked over a word that scores more and leaves a prompt blank, because a blank
+prompt is a blank prompt. Six deep cuts and a miss is a worse run than seven
+answers with five deep cuts, and the picker says so.
+
+`bonos` did **not** clear it on 2026-11-27: six covered, five deep cuts, p5
+blank and p7 only a Schooler. Treat a word like that as the floor to beat, not
+the answer.
+
 So the candidate lists are built the other way round from how it looks. Write
 `krillion-today.json` as one list per prompt id, and **put every universal
 candidate into all seven lists, spelled identically**:
@@ -63,10 +73,18 @@ neighbourhood of answers you already know:
   `benos`, `bonus`, `bonas`).
 - **Short, vowel-heavy, 4-6 letters.** Those sit one edit from the most real
   words. A long exact answer is one edit from almost nothing.
-- **`node scripts/krillion.mjs hunt <seed answers> --budget 150`** scavenges
-  the edit neighbourhood of seeds for you and gates out dead candidates after
-  three misses. Use it to discover, then put what it finds into all seven
-  lists so the probe records it.
+- **`node scripts/krillion.mjs hunt <seeds> --budget 150 --order <hard
+  prompts first> --gate 2`** scavenges the edit neighbourhood of seeds and
+  abandons a candidate that clears none of the gated prompts, which costs two
+  requests instead of seven. Use it to discover, then put what it finds into
+  all seven lists so the probe records it.
+
+**Hunt the prompt you are missing, not the word you like.** Once a candidate
+covers five or six, the only thing that matters is the blank one. Put the
+missed prompt first in `--order` with `--gate 1`, and seed from the answers
+that prompt has already accepted -- its own neighbourhood is the only place a
+word that covers it can come from. A family that cannot reach it is finished;
+switch seeds rather than testing more of its cousins.
 
 Aim for **about 12 universal candidates**. At seven requests each that is
 ~84 of the day's budget -- the smaller share on purpose. The one word is the
@@ -136,11 +154,13 @@ Do not run git. The runner commits and pushes.
 ## 6. Report
 
 Lead with **the one word**: the `universal` block in the day file -- the input
-to type, its total out of 700, how many of the seven it covered, and what it
-repaired to on each prompt. Then the per-prompt winners as the fallback.
+to type, `covered` out of seven, `deepcuts`, the total, and what it repaired to
+on each prompt. Then the per-prompt winners as the fallback.
 
-Say plainly if the best universal word covered fewer than five prompts, or if
-it lost to the per-prompt floor. That means the candidate family was built
-around the wrong seeds, and tomorrow should start from different ones --
-tomorrow's prompts are different answer sets, so today's champion means
-nothing then.
+**Say in the first line whether `clearsBar` is true.** If it is false, say which
+prompt went blank and which answers came back under Deep Cut -- that is the
+whole result, and burying it under a points total hides the one thing the run
+was for. Name the seeds you tried for the missing prompt so tomorrow does not
+repeat them; tomorrow's prompts are different answer sets, so today's champion
+means nothing then, but a seed family that could not reach a drawing-jobs
+prompt probably cannot reach the next one either.
